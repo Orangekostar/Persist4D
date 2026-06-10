@@ -1,0 +1,9 @@
+# @package trainer
+deterministic: false
+max_epochs: 450
+min_epochs: 1
+check_val_every_n_epoch: 15
+num_sanity_val_steps: 2
+gradient_clip_val: 1.0
+strategy: ddp_find_unused_parameters_true
+accumulate_grad_batches: 1  # No gradient accumulation for faster updates

@@ -1,0 +1,9 @@
+# @package backbone
+_target_: models.PointceptBackbone
+name: concerto_base # name can be rewritten to a local checkpoint path 
+repo_id: Pointcept/Concerto
+model_lib: concerto
+custom_config:
+  enc_mode: False
+decoder_serializations:
+  - "standard"

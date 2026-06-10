@@ -1,0 +1,70 @@
+# @package data
+train_dataset:
+  _target_: datasets.semseg.SemanticSegmentationDataset
+  dataset_name: "multi_dataset"
+  data_dir:
+    - data/processed/scannet
+    - data/processed/rio
+  image_augmentations_path: conf/augmentation/albumentations_aug.yaml
+  volume_augmentations_path: conf/augmentation/volumentations_aug.yaml
+  # Use the primary dataset's label database (usually the largest one)
+  label_db_filepath: data/processed/rio/label_database.yaml
+  color_mean_std: data/processed/rio/color_mean_std.yaml
+  
+  mode: ${data.train_mode}
+  ignore_label: ${data.ignore_label}
+  num_labels: ${data.num_labels}
+  add_raw_coordinates: ${data.add_raw_coordinates}
+  add_colors: ${data.add_colors}
+  add_normals: ${data.add_normals}
+  add_instance: ${data.add_instance}
+  # Different augmentation experiments
+
+  filter_out_classes: [0, 1]
+  label_offset: 2
+  temporal_window: 1
+
+validation_dataset:
+  _target_: datasets.semseg.SemanticSegmentationDataset
+  dataset_name: "rio"
+  # For validation, use only the primary dataset
+  data_dir: data/processed/rio
+  image_augmentations_path: null
+  volume_augmentations_path: null
+  label_db_filepath: data/processed/rio/label_database.yaml
+  color_mean_std: data/processed/rio/color_mean_std.yaml
+  
+  mode: ${data.validation_mode}
+  ignore_label: ${data.ignore_label}
+  num_labels: ${data.num_labels}
+  add_raw_coordinates: ${data.add_raw_coordinates}
+  add_colors: ${data.add_colors}
+  add_normals: ${data.add_normals}
+  add_instance: ${data.add_instance}
+
+  filter_out_classes: [0, 1]
+  label_offset: 2
+  temporal_window: 2
+
+test_dataset:
+  _target_: datasets.semseg.SemanticSegmentationDataset
+  dataset_name: "rio"
+  # For testing, use only the primary dataset
+  data_dir: data/processed/rio
+  image_augmentations_path: null
+  volume_augmentations_path: null
+  label_db_filepath: data/processed/rio/label_database.yaml
+  color_mean_std: data/processed/rio/color_mean_std.yaml
+  
+  mode: ${data.test_mode}
+  ignore_label: ${data.ignore_label}
+  num_labels: ${data.num_labels}
+  add_raw_coordinates: ${data.add_raw_coordinates}
+  add_colors: ${data.add_colors}
+  add_normals: ${data.add_normals}
+  add_instance: ${data.add_instance}
+
+  filter_out_classes: [0, 1]
+  label_offset: 2
+  temporal_window: 2
+

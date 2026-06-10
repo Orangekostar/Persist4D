@@ -1,0 +1,14 @@
+# @package metrics
+_target_: stmetrics.InstanceMetrics
+dataset: data/processed/${data.validation_dataset.dataset_name}/${data.validation_dataset.dataset_name}.yaml
+log_prefix: val
+timestep_key: temporal_stages
+heads:
+  - _target_: stmetrics.TemporalEvaluator
+    recall: true
+    aux: changes
+  - _target_: stmetrics.LegacyAPEvaluator
+  - _target_: stmetrics.instances.SelectTimestepEvaluator
+    timesteps: [0]
+  - _target_: stmetrics.instances.SelectTimestepEvaluator
+    timesteps: [1]

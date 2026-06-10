@@ -1,0 +1,7 @@
+# @package logging
+- _target_: pytorch_lightning.loggers.WandbLogger
+  project: ${general.project_name}
+  entity: "easteine-stanford"
+  settings: 
+    start_method: thread
+    init_timeout: 180

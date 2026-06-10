@@ -1,0 +1,33 @@
+# @package data
+
+# these parameters are inherited by datasets, data_loaders and collators
+# but they might be overwritten
+
+# splits
+train_mode: train
+validation_mode: validation
+test_mode: validation # test  # validation
+
+# dataset
+ignore_label: 255
+add_raw_coordinates: true # 3dim
+add_colors: true # 3dim
+add_normals: false # 3dim # INFO: sonata overwrites this as normals are required
+in_channels: 3 # in_channels = 3 * (add_normals + add_colors + add_raw_coordinates)
+num_labels: 20
+# num_labels: 41
+num_changes: 6
+add_instance: ${general.add_instance}
+
+
+# data loader
+pin_memory: false
+num_workers: 4
+batch_size: 5
+test_batch_size: 1
+
+# collation
+voxel_size: 0.02
+
+# if this is not overwritten, inherit from the model 
+temporal_window: ${model.config.temporal_window}

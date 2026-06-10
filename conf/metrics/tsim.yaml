@@ -1,0 +1,10 @@
+# @package metrics
+# Secondary auxiliary evaluator: temporal cosine similarity (t-SIM).
+_target_: stmetrics.AuxMetrics
+log_prefix: val
+heads:
+  - _target_: stmetrics.TSim
+    timesteps: [0, 1]
+    feature_key: segment_features
+    id_key: segment_gt_instance_ids
+    timestep_key: segment_temporal_stages

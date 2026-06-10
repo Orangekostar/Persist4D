@@ -1,0 +1,7 @@
+# @package backbone
+_target_: models.PointceptBackboneEncOnly
+name: sonata # name can be rewritten to a local checkpoint path 
+repo_id: facebook/sonata
+model_lib: sonata
+custom_config: 
+  enc_mode: False 

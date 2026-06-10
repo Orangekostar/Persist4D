@@ -1,0 +1,16 @@
+# @package backbone
+_target_: models.Res16UNet34C
+config:
+  dialations: [ 1, 1, 1, 1 ]
+  conv1_kernel_size: 5
+  bn_momentum: 0.02
+  wrapper: ${model.config.backbone_wrapper}
+  num_levels: 4 # This is constant for Res16UNet architecture
+# depends on normals, color, raw_coordinates
+# varies from 3 to 9
+in_channels: ${data.in_channels}
+out_channels: ${data.num_labels}
+out_fpn: true
+D: ${model.D}
+
+  

@@ -1,0 +1,99 @@
+# @package data
+train_dataset:
+  _target_: datasets.multi_dataset.MultiDataset.from_config
+  # List of dataset configurations - only specify what differs from common configs
+
+  weights: 
+  - 0.55
+  - 0.45
+  - 0.8 # lower weight on scannet since its larger 
+
+  datasets:
+  # All other parameters inherited from common configs below
+    - target: datasets.semseg.SemanticSegmentationDataset
+      dataset_name: "rio"
+      data_dir: data/processed/rio
+      label_db_filepath: data/processed/rio/label_database.yaml
+      color_mean_std: data/processed/rio/color_mean_std.yaml
+      temporal_window: 3
+
+    - target: datasets.semseg.SemanticSegmentationDataset
+      dataset_name: "rio"
+      data_dir: data/processed/rio
+      label_db_filepath: data/processed/rio/label_database.yaml
+      color_mean_std: data/processed/rio/color_mean_std.yaml
+      temporal_window: 2
+
+    - target: datasets.semseg.SemanticSegmentationDataset
+      dataset_name: "scannet"
+      data_dir: data/processed/scannet
+      label_db_filepath: data/processed/scannet/label_database.yaml
+      color_mean_std: data/processed/scannet/color_mean_std.yaml
+      temporal_window: 1
+    
+  
+  # Common parameters applied to all datasets (can be overridden by individual dataset configs)
+  image_augmentations_path: conf/augmentation/albumentations_aug.yaml
+  volume_augmentations_path: conf/augmentation/volumentations_aug.yaml
+  
+  mode: ${data.train_mode}
+  ignore_label: ${data.ignore_label}
+  num_labels: ${data.num_labels}
+  add_raw_coordinates: ${data.add_raw_coordinates}
+  add_colors: ${data.add_colors}
+  add_normals: ${data.add_normals}
+  add_instance: ${data.add_instance}
+  # Different augmentation experiments
+  # instance_oversampling: 0.0
+  # place_around_existing: false
+  # point_per_cut: 0
+  # max_cut_region: 0
+  # flip_in_center: false
+  # noise_rate: 0
+  # resample_points: 0
+  # add_unlabeled_pc: false
+
+  filter_out_classes: [0, 1]
+  label_offset: 2
+
+validation_dataset:
+  _target_: datasets.semseg.SemanticSegmentationDataset
+  dataset_name: "rio"
+  data_dir: data/processed/rio
+  image_augmentations_path: null
+  volume_augmentations_path: null
+  label_db_filepath: data/processed/rio/label_database.yaml
+  color_mean_std: data/processed/rio/color_mean_std.yaml
+  
+  mode: ${data.validation_mode}
+  ignore_label: ${data.ignore_label}
+  num_labels: ${data.num_labels}
+  add_raw_coordinates: ${data.add_raw_coordinates}
+  add_colors: ${data.add_colors}
+  add_normals: ${data.add_normals}
+  add_instance: ${data.add_instance}
+
+  filter_out_classes: [0, 1]
+  label_offset: 2
+  temporal_window: 3
+
+test_dataset:
+  _target_: datasets.semseg.SemanticSegmentationDataset
+  dataset_name: "rio"
+  data_dir: data/processed/rio
+  image_augmentations_path: null
+  volume_augmentations_path: null
+  label_db_filepath: data/processed/rio/label_database.yaml
+  color_mean_std: data/processed/rio/color_mean_std.yaml
+  
+  mode: ${data.test_mode}
+  ignore_label: ${data.ignore_label}
+  num_labels: ${data.num_labels}
+  add_raw_coordinates: ${data.add_raw_coordinates}
+  add_colors: ${data.add_colors}
+  add_normals: ${data.add_normals}
+  add_instance: ${data.add_instance}
+
+  filter_out_classes: [0, 1]
+  label_offset: 2
+  temporal_window: 3

@@ -1,0 +1,17 @@
+# @package loss
+contrastive_loss: true
+contrastive_loss_type: "infoNCE"
+learnable_temperature: false
+learnable_bias: false
+initial_temperature: 0.5
+initial_bias: 0.0
+norm_type: "log_odds"
+weight_temporal_stages: true
+temporal_positive_weight: 1.0
+scale_contrastive_loss: false
+contrastive_loss_weight: 1.0
+max_points: 5000
+# Memory-efficient chunked loss 
+chunk_size: 2048
+use_chunked_loss: true
+num_negatives: 256

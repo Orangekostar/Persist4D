@@ -1,0 +1,903 @@
+import gc
+from pathlib import Path
+import statistics
+from torch_scatter import scatter_mean
+from collections import defaultdict
+from sklearn.cluster import DBSCAN
+import warnings
+
+import hydra
+import numpy as np
+import pytorch_lightning as pl
+import torch
+import pickle
+
+
+
+class InstanceSegmentation(pl.LightningModule):
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+        self.automatic_optimization = True
+        self._initialize_model()
+        self._setup_training()
+        self.save_hyperparameters(config)
+
+
+    def _initialize_model(self):
+        """Initialize model components and settings"""
+        torch.set_float32_matmul_precision(self.config.general.matmul_precision)
+        self.decoder_id = self.config.general.decoder_id
+        self.mask_type = "segment_mask" if self.config.model.train_on_segments else "masks"
+        self.eval_on_segments = self.config.general.eval_on_segments
+        self.model = hydra.utils.instantiate(self.config.model)
+        
+        # Enable gradient checkpointing for memory efficiency
+        if hasattr(self.model, 'gradient_checkpointing_enable'):
+            self.model.gradient_checkpointing_enable()
+        
+        # Model compilation for performance (PyTorch 2.0+)
+        if hasattr(torch, 'compile') and self.config.general.get('compile_model', False):
+            print("🔧 Compiling model with torch.compile for performance optimization")
+            self.model = torch.compile(self.model)
+        
+        # Freeze backbone parameters if specified - do this before DDP wrapping
+        if self.config.general.freeze is not None:
+            self._freeze_backbone_parameters()
+        
+        # Only watch model if logger is wandb and we're on rank 0
+        # This prevents distributed training issues with W&B
+        if (hasattr(self, 'logger') and 
+            self.logger is not None and 
+            hasattr(self.logger, '__class__') and
+            self.logger.__class__.__name__ == "WandbLogger" and
+            hasattr(self.trainer, 'global_rank') and 
+            self.trainer.global_rank == 0):
+            self.logger.watch(self.model, log="all", log_freq=100)
+
+
+    def _setup_training(self):
+        """Setup training components"""
+        self.ignore_label = self.config.data.ignore_label
+        self.criterion = self._setup_matcher_and_loss(self.config)
+        self.instance_metric = hydra.utils.instantiate(self.config.instance_metric)
+        self.aux_metric = (
+            hydra.utils.instantiate(self.config.aux_metric)
+            if hasattr(self.config, "aux_metric") and self.config.aux_metric is not None
+            else None
+        )
+
+        
+        # Suppress the Lightning sync_dist warning since we use TorchMetrics
+        warnings.filterwarnings(
+            "ignore", 
+            message=".*sync_dist=True.*when logging on epoch level in distributed setting.*",
+            category=UserWarning,
+            module="pytorch_lightning"
+        )
+        
+        if self.config.general.postprocessing_export:
+        # Initialize tracking containers
+            self.preds = {}
+
+    def _setup_matcher_and_loss(self, config):
+        """Setup matcher and loss components"""
+        matcher = hydra.utils.instantiate(config.matcher)
+        weight_dict = {
+            "loss_ce": matcher.cost_class,
+            "loss_mask": matcher.cost_mask,
+            "loss_dice": matcher.cost_dice,
+        }
+        
+        aux_weight_dict = {}
+        for i in range(self.model.num_levels * self.model.num_decoders):
+            # weight ignored masked to zero 
+            weight = 0.0 if i in config.general.ignore_mask_idx else 1.0
+            aux_weight_dict.update({k + f"_{i}": v * weight for k, v in weight_dict.items()})
+        weight_dict.update(aux_weight_dict)
+        
+        return hydra.utils.instantiate(config.loss, matcher=matcher, weight_dict=weight_dict)
+
+    def forward(self, x, point2segment=None, raw_coordinates=None, is_eval=False, targets=None):
+
+        # Set device attribute for models that expect it (minkowski)
+        x.device = self.device
+
+        # Optional: attach GT targets for models that want to export segment-level GT info
+        if targets is not None and getattr(self.config.general, "save_segment_info", False):
+            x.gt_targets = targets
+        
+        return self.model(x, point2segment, raw_coordinates=raw_coordinates, is_eval=is_eval)
+
+    
+
+    def training_step(self, batch, batch_idx):
+        """Training step implementation"""
+        data, target, file_names = batch
+
+        # validate batch 
+        if data.features.shape[0] > self.config.general.max_batch_size:
+            print("data exceeds threshold")
+            raise RuntimeError("BATCH TOO BIG")
+
+        # skip empty batches
+        if target == []:
+            return None
+
+        # Forward pass
+        try:
+            output = self.forward(
+                data,
+                point2segment=[target[i]["point2segment"] for i in range(len(target))],
+                raw_coordinates=self._process_raw_coordinates(data),
+                targets=target,
+            )
+        except RuntimeError as run_err:
+            if "only a single point gives nans in cross-attention" == run_err.args[0]:
+                return None
+            raise run_err
+
+        # Compute losses
+        try:
+            losses = self.criterion(output, target, mask_type=self.mask_type)
+        except ValueError as val_err:
+            print(f"ValueError: {val_err}")
+            raise val_err
+    
+        total_loss = sum(losses.values())
+
+        self.log_dict({
+            **{f"train_{k}": v for k, v in losses.items()},
+            "train_loss": total_loss,
+            **self._get_mean_loss(losses, "train")
+        }, on_step=True, on_epoch=True, sync_dist=True , batch_size=data.batch_size)
+
+        return total_loss
+    
+    def validation_step(self, batch, batch_idx):
+        return self._eval_step(batch, "val")
+    
+    def test_step(self, batch, batch_idx):
+        return self._eval_step(batch, "test")
+    
+    
+    def _get_mean_loss(self, losses: dict, prefix: str) -> dict:
+        """Calculate mean of final and auxiliary losses grouped by type."""
+        mean_losses = {}
+        for loss_type in ["ce", "mask", "dice"]:
+            # Filter and calculate mean for each loss type
+            relevant_losses = [v for k, v in losses.items() if loss_type in k]
+            if relevant_losses:
+                mean_losses[f"{prefix}_mean_loss_{loss_type}"] = torch.stack(relevant_losses).mean()
+        return mean_losses
+    
+
+    def export(self, pred_masks, scores, pred_classes, file_names, decoder_id):
+        if hasattr(self.trainer, 'global_rank') and self.trainer.global_rank != 0:
+            return
+
+        root_path = f"eval_output"
+        base_path = f"{root_path}/instance_evaluation_{self.config.general.experiment_name}_{self.current_epoch}/decoder_{decoder_id}"
+        pred_mask_path = f"{base_path}/pred_mask"
+
+        Path(pred_mask_path).mkdir(parents=True, exist_ok=True)
+
+        file_name = file_names
+        with open(f"{base_path}/{file_name}.txt", "w") as fout:
+            real_id = -1
+            for instance_id in range(len(pred_classes)):
+                real_id += 1
+                pred_class = pred_classes[instance_id]
+                score = scores[instance_id]
+                mask = pred_masks[:, instance_id].astype("uint8")
+
+                if score > self.config.general.export_threshold:
+                    # reduce the export size a bit. I guess no performance difference
+                    np.savetxt(
+                        f"{pred_mask_path}/{file_name}_{real_id}.txt",
+                        mask,
+                        fmt="%d",
+                    )
+                    fout.write(
+                        f"pred_mask/{file_name}_{real_id}.txt {pred_class} {score}\n"
+                    )
+
+    def postprocessing_export(self, base_path):
+        if hasattr(self.trainer, 'global_rank') and self.trainer.global_rank != 0:
+            return
+        with open(str( base_path / 'predictions.pkl'), 'wb') as f:
+            pickle.dump(self.preds, f)
+    
+    def on_validation_epoch_end(self):
+
+        ap_results = self.instance_metric.compute()
+        if self.aux_metric is not None:
+            ap_results.update(self.aux_metric.compute())
+            self.aux_metric.reset()
+        
+        # Postprocessing export only on single GPU evaluation
+        if self.config.general.postprocessing_export and self.trainer.global_rank == 0:
+            # Use save_dir instead of eval_output for unified output directory
+            base_path = Path(self.config.general.save_dir)
+            base_path.mkdir(parents=True, exist_ok=True)
+            print(f"Exported to {base_path}")
+            self.postprocessing_export(base_path)
+            
+            # Write CSV file with AP results
+            from benchmark.export_ap_csv import write_ap_csv
+            write_ap_csv(
+                ap_results,
+                header=[head.label for head in self.instance_metric.heads],
+                label_list=self.instance_metric.CLASS_LABELS,
+                log_prefix=self.instance_metric.log_prefix,
+                csv_path=base_path / "ap_results.csv",
+            )
+
+            # Clean up predictions self.preds only ever exists if exporting for postprocessing
+            if hasattr(self, 'preds'):
+                del self.preds
+                gc.collect()
+                self.preds = dict()
+
+        self.log_dict({**ap_results}, sync_dist=False) # sync handled by torchmetric compute, warning suppressed
+        
+        self.instance_metric.reset()
+      
+
+    def _eval_step(self, batch, stage):
+        """Unified evaluation step for validation and testing"""
+        data, target, file_names = batch
+        
+        # save values from data (rewritten)
+        inverse_maps = data.inverse_maps
+        target_full = data.target_full
+        original_colors = data.original_colors
+        data_idx = data.idx
+        original_normals = data.original_normals
+        original_coordinates = data.original_coordinates
+
+
+        # Skip empty batches
+        if len(data.coordinates) == 0:
+            return 0.0
+        
+        # Process raw_coordinates for model forward pass (Mask3D/ReScene need it)
+        raw_coordinates = self._process_raw_coordinates(data)
+        
+        # Disable gradient computation during evaluation
+        with torch.no_grad():
+            try:
+                output = self.forward(
+                    data,
+                    point2segment=[target[i]["point2segment"] for i in range(len(target))],
+                    raw_coordinates=raw_coordinates,
+                    is_eval=True,
+                    targets=target,
+                )
+            except RuntimeError as run_err:
+                if "only a single point gives nans in cross-attention" == run_err.args[0]:
+                    return None
+                raise run_err
+
+            # Process predictions for metrics 
+            with torch.amp.autocast('cuda',enabled=False):  # Disable autocast for evaluation
+                predictions = self._process_predictions(
+                    output=output,
+                    target_low_res=target,
+                    target_full_res=target_full,
+                    inverse_maps=inverse_maps,
+                    file_names=file_names,
+                    full_res_coords = original_coordinates,
+                    original_colors = original_colors,
+                    original_normals = original_normals,
+                    raw_coords=raw_coordinates if self.config.general.use_dbscan else None,
+                    idx=data_idx,
+                )
+                self.instance_metric.update(predictions, target_full)
+                if self.aux_metric is not None:
+                    self.aux_metric.update(predictions, target_full)
+
+            # Clear intermediate tensors to free memory
+            del predictions
+
+            # Calculate losses if not in test mode
+            if stage == "test":
+                return 0.0
+            losses = self.criterion(output, target, mask_type=self.mask_type)
+            self.log_dict({
+                **{f"{stage}_{k}": v for k, v in losses.items()},
+                **self._get_mean_loss(losses, stage)
+            }, on_step=False, on_epoch=True, sync_dist=True, batch_size=data.batch_size)
+            
+            return sum(losses.values())
+    
+    def _process_raw_coordinates(self, data):
+        """Process raw coordinates"""
+        raw_coordinates = None
+        dim = self.config.model.D
+        
+        # if sonata data structure raw coordinates are stored in the last D columns of coords
+        if hasattr(data, "coord") and data.coord is not None:
+            return data.coord[:, -dim:]  # no change to features 
+        
+        elif self.config.data.add_raw_coordinates:
+            raw_coordinates = data.features[:, -dim:]  
+            data.features = data.features[:, :-dim]     
+        return raw_coordinates
+        
+    def _calculate_eval_losses(self, output, target):
+        """Calculate evaluation losses with error handling"""
+        if self.config.trainer.deterministic:
+            torch.use_deterministic_algorithms(False)
+            
+        try:
+            losses = self.criterion(output, target, mask_type=self.mask_type)
+            # Filter losses based on weight dictionary
+            losses = {k: v * self.criterion.weight_dict[k] 
+                     for k, v in losses.items() 
+                     if k in self.criterion.weight_dict}
+        except ValueError as val_err:
+            print(f"ValueError: {val_err}")
+            return None
+        finally:
+            if self.config.trainer.deterministic:
+                torch.use_deterministic_algorithms(True)
+                
+        return losses
+    
+    def _get_full_res_mask(self, mask, inverse_map, point2segment_full, is_heatmap=False):
+        """Convert mask to full resolution"""
+        mask = mask.detach().cpu()[inverse_map.detach().cpu()]  # full res
+
+        if self.eval_on_segments and not is_heatmap:
+            mask = scatter_mean(mask, point2segment_full.detach().cpu(), dim=0)  # full res segments
+            mask = (mask > 0.5).float()
+            mask = mask.detach().cpu()[point2segment_full.detach().cpu()]  # full res points
+
+        return mask
+    
+    def _process_predictions(
+        self,
+        output,
+        target_low_res,
+        target_full_res,
+        inverse_maps,
+        file_names,
+        full_res_coords,
+        original_colors,
+        original_normals,
+        raw_coords,
+        idx,
+    ):
+        """Process instance evaluation for a batch"""
+        # Get predictions from model output
+        prediction = self._get_predictions(output)
+        needs_features = self.config.general.save_visualizations or self.config.general.save_features
+        backbone_features = output["backbone_features"].F.detach().cpu().numpy() if needs_features else None
+        pca_feat = pca_features(backbone_features) if self.config.general.save_visualizations else None
+        
+        # Optional: per-segment features produced by some models (e.g. `models/rescene.py`)
+        # Format: list[layer] -> list[batch] -> Tensor[num_segments, feat_dim]
+        segment_features_out = output.get("segment_features", None)
+
+        # Process each item in batch
+        offset_coords_idx = 0
+        batch_preds = []
+        for bid in range(len(prediction[self.decoder_id]["pred_masks"])):
+            # Get masks for current batch item
+            masks = self._get_batch_masks(prediction, bid, target_low_res)
+
+            # Process masks using DBSCAN if configured
+            if self.config.general.use_dbscan:
+                new_preds = self._process_dbscan(
+                    masks, prediction, bid, raw_coords, offset_coords_idx
+                )
+                offset_coords_idx += masks.shape[0]
+                scores, low_res_masks, classes, heatmap = self._get_mask_and_scores(
+                        torch.stack(new_preds["pred_logits"]).detach().cpu(),
+                        torch.stack(new_preds["pred_masks"]).T,
+                        len(new_preds["pred_logits"]),
+                        self.model.num_classes - 1,
+                )
+            else: # process normally if not using dbscan postprocessing 
+                scores, low_res_masks, classes, heatmap = self._get_mask_and_scores(
+                        prediction[self.decoder_id]["pred_logits"][bid].detach().cpu(),
+                        masks,
+                        prediction[self.decoder_id]["pred_logits"][bid].shape[0],
+                        self.model.num_classes - 1,
+                    )
+
+
+            # Get full resolution masks
+            masks = self._get_full_res_mask(low_res_masks, inverse_maps[bid], 
+                                            target_full_res[bid]["point2segment"]).numpy()
+            heatmap = self._get_full_res_mask(heatmap, inverse_maps[bid], 
+                                            target_full_res[bid]["point2segment"],
+                                            is_heatmap=True).numpy()
+
+
+            # Filter and sort predictions by scores and overlap if configured 
+            classes, masks, scores, heatmap = self._filter_and_sort_predictions(
+                masks, scores, classes, heatmap
+            )
+
+            # remap labels for 200 datasets
+            if "200" in self.validation_dataset.dataset_name:
+                classes[classes == 0] = -1
+                if self.config.data.test_mode != "test":
+                    target_full_res[bid]["labels"][target_full_res[bid]["labels"] == 0] = -1
+
+            label_offset = self.validation_dataset.label_offset
+            classes = self.validation_dataset._remap_model_output(classes.detach().cpu() + label_offset)
+
+            if (self.config.data.test_mode != "test" and len(target_full_res) != 0):
+                target_full_res[bid]["labels"] = self.validation_dataset._remap_model_output(
+                    target_full_res[bid]["labels"].detach().cpu() + label_offset
+                )
+                
+            
+            masks = torch.from_numpy(masks)
+            scores = torch.from_numpy(scores)
+            
+            # compute bounding boxes
+            bboxs = self._compute_bounding_boxes(masks, torch.from_numpy(full_res_coords[bid]))
+
+            # format  predictions
+            pred_data = {
+                "pred_masks": masks,
+                "pred_scores": scores,
+                "pred_classes": classes,
+                "pred_boxes": bboxs,
+            }
+            batch_preds.append(pred_data)
+            
+            #update target to include bounding boxes 
+            target_full_res[bid]["boxes"] = self._compute_bounding_boxes(target_full_res[bid]["masks"].T, torch.from_numpy(full_res_coords[bid]))
+            target_full_res[bid]["file_name"] = file_names[bid]
+            
+            # save visualization per sample in batch 
+            if self.config.general.save_visualizations:
+                # determine full resolution pca features for visualization
+                sample_features = self._get_full_res_mask(
+                    torch.from_numpy(pca_feat),
+                    inverse_maps[bid],
+                    target_full_res[bid]["point2segment"],
+                    is_heatmap=True).numpy()
+                
+                self._handle_visualizations(file_names[bid], target_full_res[bid], full_res_coords[bid], 
+                                        masks, classes, original_colors[bid], original_normals[bid],
+                                        sample_features, idx[bid])
+            
+            # handle exports
+            if self.config.general.export:
+                file_name = file_names[bid]
+                self.export(
+                    pred_data["pred_masks"],
+                    pred_data["pred_scores"],
+                    pred_data["pred_classes"],
+                    file_name,
+                    self.decoder_id,
+                    )
+
+            if self.config.general.save_features:
+                # determine avg feature per mask if required 
+                features = self._get_avg_feature_per_mask(backbone_features,
+                                                        low_res_masks)
+                pred_data["features"] = features 
+                
+                # Optionally store per-segment info (features + optional GT aggregations)
+                if getattr(self.config.general, "save_segment_info", False) and segment_features_out is not None:
+                    last_layer = segment_features_out[-1] if len(segment_features_out) > 0 else None
+                    if isinstance(last_layer, (list, tuple)) and len(last_layer) > bid:
+                        seg = last_layer[bid]
+                        pred_data["segment_features"] = (
+                            seg.detach().cpu().numpy() if torch.is_tensor(seg) else np.asarray(seg)
+                        )
+
+                    # If the model produced segment-level metadata, persist it (no recomputation here).
+                    v = output.get("segment_gt_classes", None)
+                    if isinstance(v, (list, tuple)) and len(v) > bid and v[bid] is not None:
+                        pred_data["segment_gt_classes"] = (
+                            v[bid].detach().cpu().numpy() if torch.is_tensor(v[bid]) else np.asarray(v[bid])
+                        )
+
+                    v = output.get("segment_gt_instance_ids", None)
+                    if isinstance(v, (list, tuple)) and len(v) > bid and v[bid] is not None:
+                        pred_data["segment_gt_instance_ids"] = (
+                            v[bid].detach().cpu().numpy() if torch.is_tensor(v[bid]) else np.asarray(v[bid])
+                        )
+
+                    v = output.get("segment_temporal_stages", None)
+                    if isinstance(v, (list, tuple)) and len(v) > bid and v[bid] is not None:
+                        pred_data["segment_temporal_stages"] = (
+                            v[bid].detach().cpu().numpy() if torch.is_tensor(v[bid]) else np.asarray(v[bid])
+                        )
+                
+            if self.config.general.postprocessing_export:
+                self.preds[file_names[bid]] = pred_data
+        
+        return batch_preds
+            
+
+    def _get_predictions(self, output):
+        """Extract and process predictions from model output"""
+        prediction = output["aux_outputs"].copy()
+        prediction.append({
+            "pred_logits": output["pred_logits"],
+            "pred_masks": output["pred_masks"],
+        })
+        
+        # Process logits
+        prediction[self.decoder_id]["pred_logits"] = torch.functional.F.softmax(
+            prediction[self.decoder_id]["pred_logits"], dim=-1
+        )[..., :-1]
+        
+        return prediction
+    
+    def _get_batch_masks(self, prediction, bid, target_low_res):
+        """Get masks for current batch item"""
+
+        if self.model.train_on_segments:
+            return prediction[self.decoder_id]["pred_masks"][bid].detach().cpu()[
+                target_low_res[bid]["point2segment"].detach().cpu()
+            ]
+        return prediction[self.decoder_id]["pred_masks"][bid].detach().cpu()
+    
+    def _process_dbscan(self, masks, prediction, bid, raw_coords, offset_coords_idx):
+        """Process masks using DBSCAN clustering"""
+        new_preds = {
+            "pred_masks": [],
+            "pred_logits": [],
+        }
+        
+        curr_coords_idx = masks.shape[0]
+        curr_coords = raw_coords[offset_coords_idx:curr_coords_idx + offset_coords_idx]
+        
+        for curr_query in range(masks.shape[1]):
+            curr_masks = masks[:, curr_query] > 0
+            
+            if curr_coords[curr_masks].shape[0] > 0:
+                clusters = DBSCAN(
+                    eps=self.config.general.dbscan_eps,
+                    min_samples=self.config.general.dbscan_min_points,
+                    n_jobs=-1
+                ).fit(curr_coords[curr_masks]).labels_
+                
+                new_mask = torch.zeros(curr_masks.shape, dtype=int)
+                new_mask[curr_masks] = torch.from_numpy(clusters) + 1
+                
+                for cluster_id in np.unique(clusters):
+                    if cluster_id != -1:
+                        new_preds["pred_masks"].append(
+                            masks[:, curr_query] * (new_mask == cluster_id + 1)
+                        )
+                        new_preds["pred_logits"].append(
+                            prediction[self.decoder_id]["pred_logits"][bid, curr_query]
+                        )
+                        
+        return new_preds
+    
+    def _get_mask_and_scores(
+        self, mask_cls, mask_pred, num_queries=100, num_classes=18, device=None
+    ):
+        if device is None:
+            device = self.device
+        labels = (
+            torch.arange(num_classes, device=device)
+            .unsqueeze(0)
+            .repeat(num_queries, 1)
+            .flatten(0, 1)
+        )
+
+        # Get top k predictions
+        if self.config.general.topk_per_image != -1:
+            scores_per_query, topk_indices = mask_cls.flatten(0, 1).topk(
+                self.config.general.topk_per_image, sorted=True
+            )
+        else:
+            scores_per_query, topk_indices = mask_cls.flatten(0, 1).topk(
+                num_queries, sorted=True
+            )
+
+        labels_per_query = labels[topk_indices]
+        topk_indices = topk_indices // num_classes
+        mask_pred = mask_pred[:, topk_indices]
+
+        result_pred_mask = (mask_pred > 0).float()
+        heatmap = mask_pred.float().sigmoid()
+
+        mask_scores_per_image = (heatmap * result_pred_mask).sum(0) / (
+            result_pred_mask.sum(0) + 1e-6
+        )
+        score = scores_per_query * mask_scores_per_image
+        classes = labels_per_query
+
+        return score, result_pred_mask, classes, heatmap
+    
+    
+    def _filter_and_sort_predictions(self, masks, scores, classes, heatmap):
+        """
+        Filter and sort instance predictions based on scores and overlap.
+        
+        Args:
+            masks (torch.Tensor): Instance masks [N_points, N_instances]
+            scores (torch.Tensor): Confidence scores [N_instances]
+            classes (torch.Tensor): Class predictions [N_instances]
+            heatmap (torch.Tensor): Prediction heatmaps [N_points, N_instances]
+            
+        Returns:
+            tuple: (filtered_classes, filtered_masks, filtered_scores, filtered_heatmap)
+        """
+        
+        # Sort predictions by confidence score
+        sort_scores, sort_indices = scores.sort(descending=True)
+        sort_scores_values = sort_scores.detach().cpu().numpy()
+        sort_scores_index = sort_indices.detach().cpu().numpy()
+        
+        # Sort all arrays according to scores
+        sort_classes = classes[sort_scores_index]
+        sorted_masks = masks[:, sort_scores_index]
+        sorted_heatmap = heatmap[:, sort_scores_index]
+        
+        if not self.config.general.filter_out_instances:
+            return sort_classes, sorted_masks, sort_scores_values, sorted_heatmap
+            
+        # Calculate pairwise IoU matrix
+        pairwise_overlap = sorted_masks.T @ sorted_masks  # [N_instances, N_instances]
+        normalization = pairwise_overlap.max(axis=0)
+        norm_overlaps = pairwise_overlap / normalization
+        
+        # Filter instances based on score threshold and overlap
+        #TODO: inclusive instance ID logic is not correct for 3RScan individual rescans
+        keep_instances = set()
+        for instance_id in range(norm_overlaps.shape[0]):
+            instance_score = sort_scores_values[instance_id]
+            instance_mask = sorted_masks[:, instance_id]
+            
+            # Skip if score is below threshold or mask is empty
+            if instance_score < self.config.general.scores_threshold:
+                continue
+            if instance_mask.sum() == 0.0:
+                continue
+                
+            # Find overlapping instances
+            overlap_ids = set(np.nonzero(
+                norm_overlaps[instance_id, :] > self.config.general.iou_threshold
+            )[0])
+            
+            # Keep instance if no overlaps or it's the first instance in overlapping set
+            if not overlap_ids or instance_id == min(overlap_ids):
+                keep_instances.add(instance_id)
+        
+        # Sort and apply filtering
+        keep_instances = sorted(list(keep_instances))
+        return (
+            sort_classes[keep_instances],
+            sorted_masks[:, keep_instances],
+            sort_scores_values[keep_instances],
+            sorted_heatmap[:, keep_instances]
+        )
+    
+    
+    def _compute_bounding_boxes(self, masks, coords):
+        """Process prediction boxes for each instance"""
+        #TODO: make this robust to temporal instances
+        bbox_data = torch.empty((masks.shape[1], coords.shape[1]*2), dtype=torch.float32)
+        for id in range(masks.shape[1]):
+            obj_coords = coords.to(self.device)[masks[:, id].bool(), :]
+            if obj_coords.shape[0] == 0:
+                bbox_data[id] = torch.zeros(coords.shape[1]*2, dtype=torch.float32, device=self.device)
+            else:
+                obj_center = obj_coords.mean(dim=0)
+                obj_axis_length = obj_coords.max(dim=0)[0] - obj_coords.min(dim=0)[0]
+                bbox_data[id] = torch.cat((obj_center, obj_axis_length))
+
+        return bbox_data
+
+    def _handle_visualizations(self, file_name, target_full_res, full_res_coords, 
+                         pred_masks, pred_classes, original_colors, original_normals, 
+                         backbone_features, bid_idx):
+        """Handle visualization saving"""       
+
+        if hasattr(self.trainer, 'global_rank') and self.trainer.global_rank != 0:
+            return     
+        if "cond_inner" in self.test_dataset.data[bid_idx]:
+            inner_mask = self.test_dataset.data[bid_idx]["cond_inner"]
+            target_full_res["masks"] = target_full_res["masks"][:, inner_mask]
+            
+            # Preserve temporal_stages if present
+            if "temporal_stages" in target_full_res and target_full_res["temporal_stages"] is not None:
+                if isinstance(target_full_res["temporal_stages"], torch.Tensor):
+                    target_full_res["temporal_stages"] = target_full_res["temporal_stages"][inner_mask]
+                else:
+                    target_full_res["temporal_stages"] = target_full_res["temporal_stages"][inner_mask]
+
+            full_res_coords =full_res_coords[inner_mask]
+            original_colors = original_colors[inner_mask]
+            original_normals = original_normals[inner_mask]
+            backbone_features = backbone_features[inner_mask]
+
+        # Check if model is Sonata (RGB values need to be multiplied by 255)
+        is_sonata = False
+        if hasattr(self.model, 'backbone'):
+            backbone = self.model.backbone
+            if hasattr(backbone, 'model_lib'):
+                is_sonata = backbone.model_lib == 'sonata' or (hasattr(backbone.model_lib, '__name__') and backbone.model_lib.__name__ == 'sonata')
+        
+        # Use automatic visualization routing (handles temporal detection internally)
+        save_visualizations_auto(
+            target_full_res,
+            full_res_coords,
+            pred_masks,
+            pred_classes,
+            original_colors,
+            original_normals,
+            self.validation_dataset.map2color,
+            f"{self.config['general']['save_dir']}/visualizations",
+            file_name=file_name,
+            point_size=self.config.general.visualization_point_size,
+            backbone_features=backbone_features,
+            is_sonata=is_sonata,
+        )
+    
+    def _get_avg_feature_per_mask(self, features, masks):
+        """Get average feature per mask"""
+        
+        normalized_masks = masks / (masks.sum(axis=0, keepdims=True) + 1e-10)
+        features_per_mask = np.einsum('ij,ik->jk', normalized_masks, features)
+
+        return features_per_mask
+
+    def on_test_epoch_end(self):
+        if not self.config.general.export:
+            self.on_validation_epoch_end()
+
+    def configure_optimizers(self):
+        optimizer = hydra.utils.instantiate(
+            self.config.optimizer, params=self.parameters()
+        )
+        
+        # Configure scheduler with proper Lightning handling
+        scheduler_config = self.config.scheduler.scheduler.copy()
+        if "total_steps" in scheduler_config.keys() and scheduler_config["total_steps"] == -1:
+            # Lightning will automatically set total_steps
+            scheduler_config["total_steps"] = self.trainer.estimated_stepping_batches
+        
+        lr_scheduler = hydra.utils.instantiate(scheduler_config, optimizer=optimizer)
+        
+        # Return in proper Lightning format
+        scheduler_dict = {
+            "scheduler": lr_scheduler,
+            **self.config.scheduler.pytorch_lightning_params
+        }
+        
+        return [optimizer], [scheduler_dict]
+
+    def setup(self, stage=None):
+        """Setup is called on every process and after prepare_data"""
+        if stage == 'fit' or stage is None:
+            self.train_dataset = hydra.utils.instantiate(
+                self.config.data.train_dataset
+            )
+            self.validation_dataset = hydra.utils.instantiate(
+                self.config.data.validation_dataset
+            )
+        
+        if stage == 'test' or stage is None:
+            self.test_dataset = hydra.utils.instantiate(
+                self.config.data.test_dataset
+            )
+            self.validation_dataset = hydra.utils.instantiate(
+                self.config.data.validation_dataset
+            )
+            self.labels_info = self.validation_dataset.label_info
+            
+
+    def train_dataloader(self):
+        c_fn = hydra.utils.instantiate(self.config.data.train_collation)
+        
+        # If dataset has a sampler, pass it as override (Hydra accepts kwargs that override config)
+        kwargs = {}
+        if hasattr(self.train_dataset, 'sampler') and self.train_dataset.sampler is not None:
+            kwargs['sampler'] = self.train_dataset.sampler
+            kwargs['shuffle'] = False  # Can't use shuffle with sampler
+        
+        return hydra.utils.instantiate(
+            self.config.data.train_dataloader,
+            self.train_dataset,
+            collate_fn=c_fn,
+            **kwargs
+        )
+
+    def val_dataloader(self):
+        c_fn = hydra.utils.instantiate(self.config.data.validation_collation)
+        return hydra.utils.instantiate(
+            self.config.data.validation_dataloader,
+            self.validation_dataset,
+            collate_fn=c_fn,
+        )
+
+    def test_dataloader(self):
+        c_fn = hydra.utils.instantiate(self.config.data.test_collation)
+        return hydra.utils.instantiate(
+            self.config.data.test_dataloader,
+            self.test_dataset,
+            collate_fn=c_fn,
+        )
+
+    def _freeze_backbone_parameters(self):
+        """Freeze backbone parameters based on freeze mode - DDP compatible
+        
+        Handles both Minkowski and Sonata backbones:
+        - Minkowski: backbone.conv0, backbone.bn0, backbone.block1, etc.
+        - Sonata: backbone.model.enc.*, backbone.model.embedding.*, etc.
+        """
+        freeze_mode = self.config.general.freeze
+        
+        if freeze_mode == "none":
+            return
+            
+        frozen_count = 0
+        total_backbone_params = 0
+        
+        for name, param in self.model.named_parameters():
+            if name.startswith("backbone"):
+                total_backbone_params += 1
+                
+                
+            if freeze_mode == "backbone_encoder":
+                # Minkowski encoder blocks (conv0, bn0, block1-4, etc.)
+                if (name.startswith("backbone") and 
+                    any(x in name for x in ['backbone.conv0', 'backbone.bn0', 
+                                            'backbone.conv1p1', 'backbone.bn1','backbone.block1', 
+                                            'backbone.conv2p2', 'backbone.bn2', 'backbone.block2', 
+                                            'backbone.conv3p4', 'backbone.bn3', 'backbone.block3', 
+                                            'backbone.conv4p8', 'backbone.bn4', 'backbone.block4'])):
+                    param.requires_grad_(False)
+                    frozen_count += 1
+                # Sonata encoder and embedding parameters
+                elif (name.startswith("backbone.model.enc") or 
+                      name.startswith("backbone.model.embedding")):
+                    param.requires_grad_(False)
+                    frozen_count += 1
+            elif freeze_mode == "backbone":
+                # Freeze all backbone parameters (both Minkowski and Sonata)
+                if name.startswith("backbone"):
+                    param.requires_grad_(False)
+                    frozen_count += 1
+        
+        # Set frozen modules to eval mode for optimal performance
+        self._set_frozen_modules_eval(freeze_mode)
+        
+        print(f"Frozen {frozen_count}/{total_backbone_params} backbone parameters (mode: {freeze_mode})")
+
+    def _set_frozen_modules_eval(self, freeze_mode):
+        """Set frozen backbone modules to eval mode
+        
+        Handles both Minkowski and Sonata backbones:
+        - Minkowski: backbone.conv0, backbone.bn0, backbone.block1, etc.
+        - Sonata: backbone.model.enc.*, backbone.model.embedding.*, etc.
+        """
+        for name, module in self.model.named_modules():
+            # only set to eval more if the entire backbone is frozen 
+            if freeze_mode == "backbone" and name.startswith("backbone"):
+                # For Minkowski, don't freeze final layer
+                if not name.startswith("backbone.final"):
+                    module.eval()
+                # For Sonata, freeze all model parameters
+                elif name.startswith("backbone.model"):
+                    module.eval()
+
+
+    def on_train_batch_end(self, outputs, batch, batch_idx):
+        """Quick check for unused parameters at the end of each training step"""
+        if self.config.general.get('quick_param_check', False):
+            unused = sum(1 for p in self.model.parameters() if not p.requires_grad)
+            if unused > 0:
+                print(f"⚠️  {unused} unused parameters detected")
+
+    def on_before_optimizer_step(self, optimizer):
+        norms = pl.utilities.grad_norm(self, norm_type=2)
+        self.log_dict(norms)
+
+

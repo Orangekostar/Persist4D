@@ -1,0 +1,10 @@
+# @package trainer
+deterministic: false
+max_epochs: 1000
+min_epochs: 1
+check_val_every_n_epoch: 15
+num_sanity_val_steps: 2
+strategy: ddp_find_unused_parameters_true
+precision: bf16-mixed  
+sync_batchnorm: false 
+gradient_clip_val: 1.0  

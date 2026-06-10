@@ -1,0 +1,10 @@
+# @package logging
+- _target_: pytorch_lightning.loggers.WandbLogger
+  project: ${general.project_name}
+  name: ${general.experiment_name}
+  save_dir: ${general.save_dir}
+  entity: "easteine-stanford"
+  resume: "allow"
+  id: ${general.experiment_name}
+  settings: 
+    init_timeout: 300

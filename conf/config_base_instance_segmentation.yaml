@@ -1,0 +1,77 @@
+general:
+  train_mode: true
+  seed: null
+  checkpoint: null
+  backbone_checkpoint: null
+  freeze: null # train only last layer
+  linear_probing_backbone: false
+  train_on_segments: true
+  eval_on_segments: true
+  filter_out_instances: false
+  save_visualizations: false
+  visualization_point_size: 20 
+  decoder_id: -1
+  export: false
+  postprocessing_export: false 
+  save_features: false
+  save_segment_info: false
+  use_dbscan: false
+  ignore_class_threshold: 100
+  project_name: debug
+  workspace: easteine
+  experiment_name: DEBUG
+  version: 0
+  num_targets: 19
+  num_changes: 6
+  add_instance: true
+  dbscan_eps: 0.95
+  dbscan_min_points: 1
+  matmul_precision: "high" # torch default is highest
+  compile_model: false  # Enable model compilation for performance (PyTorch 2.0+)
+
+  export_threshold: 0.0001
+
+  scores_threshold: 0.0
+  iou_threshold: 1.0
+
+  topk_per_image: 100
+
+  ignore_mask_idx: []
+
+  max_batch_size: 99999999
+
+  save_dir: saved/${general.experiment_name}
+  # time/commit/md5(config)_uuid
+  # time/experiment_id/version_uuid
+  # experiment_id: 1 # commit[:8], or unique from logger
+  # version: 1 # md5[:8] of config
+
+  gpus: 1
+
+defaults:
+  - data: indoor
+  - data/data_loaders: simple_loader
+  - data/datasets: mix
+  - data/collation_functions: auto_collate
+  - logging: full
+  - model: rescene
+  - backbone: concerto
+  - serialization: mixed    # optional: serialization=mixed | serialization=st_only
+  - loss/contrastive: null  # optional: loss/contrastive=infoNCE
+  - metrics@instance_metric: tmap  # composite (AP + t-AP + t-REC + per stage AP); heads list overridable
+  - metrics@aux_metric: tsim        # secondary evaluator: t-SIM (requires save_segment_info=true)
+  - optimizer: adamw
+  - scheduler: onecyclelr
+  - trainer: trainer
+  - callbacks: callbacks_instance_segmentation
+  - matcher: hungarian_matcher
+  - loss: set_criterion
+  - _self_
+
+hydra:
+  run:
+    dir: saved/hydra_logs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: saved/hydra_logs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    # dir: ${general.save_dir}
+    subdir: ${hydra.job.num}_${hydra.job.id}
