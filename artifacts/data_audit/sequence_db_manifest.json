@@ -1,5 +1,5 @@
 {
-  "data_dir": "/home/ww/vv/dataset/3RScan/scans",
+  "data_dir": "external:3RScan/scans",
   "databases": [
     {
       "bytes": 415937,
@@ -13,7 +13,7 @@
         "train": 0,
         "validation": 0
       },
-      "path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_2.yaml",
+      "path": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
       "sequence_count": 1482,
       "sequence_length": 2,
       "sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416",
@@ -36,7 +36,7 @@
         "train": 0,
         "validation": 0
       },
-      "path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_3.yaml",
+      "path": "repo:data/processed/rio/sequence_database_sliding_3.yaml",
       "sequence_count": 1094,
       "sequence_length": 3,
       "sha256": "20184ca27316bd668c084c39af72144d018e556b9562826b511a1413f4986893",
@@ -59,7 +59,7 @@
         "train": 0,
         "validation": 0
       },
-      "path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_4.yaml",
+      "path": "repo:data/processed/rio/sequence_database_sliding_4.yaml",
       "sequence_count": 614,
       "sequence_length": 4,
       "sha256": "18065940eccff3572dafb8408294363969e8674978b82a4d7b673837e8ff3832",
@@ -82,7 +82,7 @@
         "train": 0,
         "validation": 0
       },
-      "path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_5.yaml",
+      "path": "repo:data/processed/rio/sequence_database_sliding_5.yaml",
       "sequence_count": 342,
       "sequence_length": 5,
       "sha256": "252363f76524bb7eeff9f65b303aadda67dcd2646477daae1ac90f7f53398290",
@@ -95,13 +95,13 @@
     }
   ],
   "metadata": {
-    "path": "/home/ww/vv/dataset/3RScan/3RScan.json",
+    "path": "external:3RScan/3RScan.json",
     "sha256": "674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64"
   },
   "official_builder": "datasets.preprocessing.build_rscan_sequence_db.main",
   "official_seed": 45,
   "official_source_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
-  "processed_dir": "/home/ww/paper5/data/processed/rio",
+  "processed_dir": "repo:data/processed/rio",
   "scan_order_semantics": "metadata_order_only_no_timestamps",
   "scannet200": false,
   "schema_version": 1,

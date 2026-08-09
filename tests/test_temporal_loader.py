@@ -161,6 +161,35 @@ def test_audit_split_records_loader_shapes_and_projection(tmp_path: Path) -> Non
     assert sample["projected_change_dim"] == 1
 
 
+def test_repo_reference_serializes_repository_paths_without_absolute_prefix() -> None:
+    audit = _load_audit_module()
+    processed_dir = audit.PROJECT_ROOT / "data" / "processed" / "rio"
+
+    assert audit.repo_reference(processed_dir) == "repo:data/processed/rio"
+    assert audit.repo_reference(
+        processed_dir / "sequence_database_sliding_3.yaml"
+    ) == "repo:data/processed/rio/sequence_database_sliding_3.yaml"
+
+
+def test_committed_audit_uses_repo_references_without_personal_paths() -> None:
+    artifact_path = (
+        Path(__file__).resolve().parents[1]
+        / "artifacts"
+        / "data_audit"
+        / "temporal_loader_audit.json"
+    )
+    serialized = artifact_path.read_text(encoding="utf-8")
+    artifact = yaml.safe_load(serialized)
+
+    assert artifact["configuration"]["processed_dir"] == "repo:data/processed/rio"
+    for record in artifact["audits"]:
+        assert record["database_path"].startswith("repo:")
+        for sample in record["samples"]:
+            assert sample["change_filepath"].startswith("repo:")
+    assert "/home/" not in serialized
+    assert "/Users/" not in serialized
+
+
 def test_missing_split_writes_blocked_artifact_before_nonzero_exit(
     tmp_path: Path,
 ) -> None:

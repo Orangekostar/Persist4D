@@ -1,5 +1,6 @@
 import hashlib
 import json
+import sys
 from pathlib import Path
 
 import pytest
@@ -7,6 +8,7 @@ import pytest
 from scripts.analyze_3rscan_temporal_distribution import (
     build_audit,
     load_metadata,
+    main,
     render_markdown,
     sha256_file,
 )
@@ -144,3 +146,34 @@ def test_render_markdown_is_deterministic_and_states_scope() -> None:
     assert "test | 1" in first
     assert "not computed" in first
     assert "abc123" in first
+
+
+def test_main_writes_portable_source_reference(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    metadata_path = tmp_path / "3RScan.json"
+    json_output = tmp_path / "stats.json"
+    markdown_output = tmp_path / "stats.md"
+    metadata_path.write_text(json.dumps(_fixture_metadata()), encoding="utf-8")
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "analyze_3rscan_temporal_distribution.py",
+            "--metadata",
+            str(metadata_path),
+            "--json-output",
+            str(json_output),
+            "--markdown-output",
+            str(markdown_output),
+        ],
+    )
+
+    main()
+
+    json_text = json_output.read_text(encoding="utf-8")
+    markdown_text = markdown_output.read_text(encoding="utf-8")
+    assert json.loads(json_text)["source"]["path"] == "external:3RScan/3RScan.json"
+    for output in (json_text, markdown_text):
+        assert "/home/" not in output
+        assert "/Users/" not in output

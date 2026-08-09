@@ -14,6 +14,7 @@ from typing import Any
 AUDITED_SPLITS = ("train", "val")
 HORIZON_THRESHOLDS = range(2, 7)
 VALIDATION_ALIAS = "validation"
+SOURCE_REFERENCE = "external:3RScan/3RScan.json"
 
 
 def sha256_file(path: str | Path) -> str:
@@ -248,7 +249,7 @@ def main() -> None:
     metadata = load_metadata(metadata_path)
     audit = build_audit(
         metadata,
-        source_path=metadata_path,
+        source_path=SOURCE_REFERENCE,
         source_sha256=sha256_file(metadata_path),
     )
 

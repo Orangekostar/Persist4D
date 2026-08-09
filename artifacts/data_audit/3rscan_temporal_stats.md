@@ -1,6 +1,6 @@
 # 3RScan Temporal Distribution Audit
 
-- Source: `/home/ww/vv/dataset/3RScan/3RScan.json`
+- Source: `external:3RScan/3RScan.json`
 - SHA-256: `674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64`
 - Source scene groups: 478
 - Audited train/val scene groups: 432

@@ -48,6 +48,14 @@ def resolve_project_path(value: str) -> str:
     return str(PROJECT_ROOT / path)
 
 
+def repo_reference(path: Path) -> str:
+    resolved = Path(path).resolve()
+    try:
+        return f"repo:{resolved.relative_to(PROJECT_ROOT).as_posix()}"
+    except ValueError:
+        return f"external:{resolved.name}"
+
+
 def make_dataset(processed_dir: Path, horizon: int, split: str) -> SemanticSegmentationDataset:
     dataset = SemanticSegmentationDataset(
         dataset_name="rio",
@@ -117,7 +125,7 @@ def inspect_sample(
         "dataset_index": dataset_index,
         "sample_seed": sample_seed,
         "sequence_name": sequence_name,
-        "change_filepath": str(change_file),
+        "change_filepath": repo_reference(Path(change_file)),
         "coordinate_shape": list(coordinates.shape),
         "feature_shape": list(features.shape),
         "label_shape": list(labels.shape),
@@ -197,7 +205,7 @@ def audit_split(
     result: dict[str, Any] = {
         "horizon": horizon,
         "split": split,
-        "database_path": str(database_path),
+        "database_path": repo_reference(database_path),
         "database_sha256": sha256_file(database_path),
         "database_count": sum(
             entry.get("type") == split for entry in database.values()
@@ -340,7 +348,7 @@ def run_audit(
             "scripts/audit_temporal_loader.py": sha256_file(generator_source),
         },
         "configuration": {
-            "processed_dir": str(Path(processed_dir).resolve()),
+            "processed_dir": repo_reference(Path(processed_dir)),
             "horizons": list(horizons),
             "audited_splits": list(splits),
             "explicitly_excluded_splits": ["test"],

@@ -130,6 +130,79 @@ def test_build_all_delegates_every_horizon_and_records_inventory(
     assert all(item["count_by_split"] == {"test": 0, "train": 1, "validation": 0} for item in manifest["databases"])
 
 
+def test_build_all_keeps_runtime_paths_but_emits_portable_references(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    project_root = tmp_path / "private-home" / "paper5"
+    processed_dir = project_root / "data" / "processed" / "rio"
+    dataset_root = tmp_path / "private-datasets" / "3RScan"
+    data_dir = dataset_root / "scans"
+    metadata = dataset_root / "3RScan.json"
+    processed_dir.mkdir(parents=True)
+    data_dir.mkdir(parents=True)
+    metadata.write_text("[]\n", encoding="utf-8")
+    change_file = processed_dir / "changes.txt"
+    change_file.write_text("0\n", encoding="utf-8")
+    runtime_calls: list[dict[str, object]] = []
+
+    def fake_build_one(**kwargs: object) -> Path:
+        runtime_calls.append(kwargs)
+        horizon = int(kwargs["horizon"])
+        path = processed_dir / f"sequence_database_sliding_{horizon}.yaml"
+        sub_scenes = list(range(horizon))
+        _write_yaml(
+            path,
+            {
+                _key(1, sub_scenes): _entry(
+                    scene=1,
+                    sub_scenes=sub_scenes,
+                    split="train",
+                    filepath=str(change_file),
+                )
+            },
+        )
+        return path
+
+    monkeypatch.setattr(orchestration, "PROJECT_ROOT", project_root)
+    monkeypatch.setattr(orchestration, "build_one", fake_build_one)
+
+    manifest = orchestration.build_all(
+        data_dir=data_dir,
+        metadata=metadata,
+        processed_dir=processed_dir,
+        horizons=[2],
+    )
+
+    assert runtime_calls[0]["data_dir"] == data_dir
+    assert runtime_calls[0]["metadata"] == metadata
+    assert runtime_calls[0]["processed_dir"] == processed_dir
+    assert manifest["data_dir"] == "external:3RScan/scans"
+    assert manifest["metadata"]["path"] == "external:3RScan/3RScan.json"
+    assert manifest["processed_dir"] == "repo:data/processed/rio"
+    assert manifest["databases"][0]["path"] == (
+        "repo:data/processed/rio/sequence_database_sliding_2.yaml"
+    )
+    assert str(tmp_path) not in json.dumps(manifest)
+
+
+def test_checked_in_manifest_contains_no_personal_absolute_paths() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    manifest_path = project_root / "artifacts" / "data_audit" / "sequence_db_manifest.json"
+
+    manifest_text = manifest_path.read_text(encoding="utf-8")
+    manifest = json.loads(manifest_text)
+
+    assert manifest["data_dir"] == "external:3RScan/scans"
+    assert manifest["metadata"]["path"] == "external:3RScan/3RScan.json"
+    assert manifest["processed_dir"] == "repo:data/processed/rio"
+    assert all(
+        database["path"].startswith("repo:data/processed/rio/")
+        for database in manifest["databases"]
+    )
+    assert "/home/" not in manifest_text
+    assert "/Users/" not in manifest_text
+
+
 def test_inventory_counts_test_path_limitations(tmp_path: Path) -> None:
     existing_train = tmp_path / "train.txt"
     existing_validation = tmp_path / "validation.txt"

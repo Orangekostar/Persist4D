@@ -2,7 +2,7 @@
   "audits": [
     {
       "database_count": 1178,
-      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_2.yaml",
+      "database_path": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
       "database_sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416",
       "exceptions": [],
       "failure_count": 0,
@@ -17,7 +17,7 @@
       ],
       "samples": [
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0063_01-scene0063_00.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0063_01-scene0063_00.txt",
           "coordinate_shape": [
             53095,
             4
@@ -45,7 +45,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0108_02-scene0108_00.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0108_02-scene0108_00.txt",
           "coordinate_shape": [
             92943,
             4
@@ -73,7 +73,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0243_00-scene0243_03.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0243_00-scene0243_03.txt",
           "coordinate_shape": [
             163372,
             4
@@ -101,7 +101,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0376_00-scene0376_01.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0376_00-scene0376_01.txt",
           "coordinate_shape": [
             45415,
             4
@@ -129,7 +129,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0398_01-scene0398_03.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0398_01-scene0398_03.txt",
           "coordinate_shape": [
             118931,
             4
@@ -163,7 +163,7 @@
     },
     {
       "database_count": 157,
-      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_2.yaml",
+      "database_path": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
       "database_sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416",
       "exceptions": [],
       "failure_count": 0,
@@ -178,7 +178,7 @@
       ],
       "samples": [
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0059_00-scene0059_01.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0059_00-scene0059_01.txt",
           "coordinate_shape": [
             87523,
             4
@@ -206,7 +206,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0059_01-scene0059_00.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0059_01-scene0059_00.txt",
           "coordinate_shape": [
             87523,
             4
@@ -234,7 +234,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0259_02-scene0259_01.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0259_02-scene0259_01.txt",
           "coordinate_shape": [
             31541,
             4
@@ -262,7 +262,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0289_01-scene0289_00.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0289_01-scene0289_00.txt",
           "coordinate_shape": [
             160036,
             4
@@ -290,7 +290,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0399_01-scene0399_02.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0399_01-scene0399_02.txt",
           "coordinate_shape": [
             53784,
             4
@@ -324,7 +324,7 @@
     },
     {
       "database_count": 858,
-      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_3.yaml",
+      "database_path": "repo:data/processed/rio/sequence_database_sliding_3.yaml",
       "database_sha256": "20184ca27316bd668c084c39af72144d018e556b9562826b511a1413f4986893",
       "exceptions": [],
       "failure_count": 0,
@@ -339,7 +339,7 @@
       ],
       "samples": [
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0002_01-scene0002_00-scene0002_03.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0002_01-scene0002_00-scene0002_03.txt",
           "coordinate_shape": [
             172549,
             4
@@ -369,7 +369,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0097_01-scene0097_02-scene0097_00.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0097_01-scene0097_02-scene0097_00.txt",
           "coordinate_shape": [
             343674,
             4
@@ -399,7 +399,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0183_01-scene0183_00-scene0183_03.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0183_01-scene0183_00-scene0183_03.txt",
           "coordinate_shape": [
             200794,
             4
@@ -429,7 +429,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0246_03-scene0246_01-scene0246_00.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0246_03-scene0246_01-scene0246_00.txt",
           "coordinate_shape": [
             67040,
             4
@@ -459,7 +459,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0442_03-scene0442_04-scene0442_02.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0442_03-scene0442_04-scene0442_02.txt",
           "coordinate_shape": [
             428312,
             4
@@ -495,7 +495,7 @@
     },
     {
       "database_count": 123,
-      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_3.yaml",
+      "database_path": "repo:data/processed/rio/sequence_database_sliding_3.yaml",
       "database_sha256": "20184ca27316bd668c084c39af72144d018e556b9562826b511a1413f4986893",
       "exceptions": [],
       "failure_count": 0,
@@ -510,7 +510,7 @@
       ],
       "samples": [
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0079_03-scene0079_05-scene0079_00.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0079_03-scene0079_05-scene0079_00.txt",
           "coordinate_shape": [
             186922,
             4
@@ -540,7 +540,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0249_03-scene0249_00-scene0249_02.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0249_03-scene0249_00-scene0249_02.txt",
           "coordinate_shape": [
             241927,
             4
@@ -570,7 +570,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0269_01-scene0269_02-scene0269_03.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0269_01-scene0269_02-scene0269_03.txt",
           "coordinate_shape": [
             93873,
             4
@@ -600,7 +600,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0299_00-scene0299_02-scene0299_01.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0299_00-scene0299_02-scene0299_01.txt",
           "coordinate_shape": [
             72000,
             4
@@ -630,7 +630,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0449_03-scene0449_00-scene0449_01.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0449_03-scene0449_00-scene0449_01.txt",
           "coordinate_shape": [
             160276,
             4
@@ -666,7 +666,7 @@
     },
     {
       "database_count": 474,
-      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_4.yaml",
+      "database_path": "repo:data/processed/rio/sequence_database_sliding_4.yaml",
       "database_sha256": "18065940eccff3572dafb8408294363969e8674978b82a4d7b673837e8ff3832",
       "exceptions": [],
       "failure_count": 0,
@@ -681,7 +681,7 @@
       ],
       "samples": [
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0032_03-scene0032_01-scene0032_02-scene0032_00.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0032_03-scene0032_01-scene0032_02-scene0032_00.txt",
           "coordinate_shape": [
             216785,
             4
@@ -712,7 +712,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0174_01-scene0174_04-scene0174_05-scene0174_03.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0174_01-scene0174_04-scene0174_05-scene0174_03.txt",
           "coordinate_shape": [
             300471,
             4
@@ -743,7 +743,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0217_02-scene0217_05-scene0217_01-scene0217_03.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0217_02-scene0217_05-scene0217_01-scene0217_03.txt",
           "coordinate_shape": [
             288056,
             4
@@ -774,7 +774,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0234_00-scene0234_01-scene0234_04-scene0234_03.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0234_00-scene0234_01-scene0234_04-scene0234_03.txt",
           "coordinate_shape": [
             119551,
             4
@@ -805,7 +805,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0306_02-scene0306_00-scene0306_03-scene0306_01.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0306_02-scene0306_00-scene0306_03-scene0306_01.txt",
           "coordinate_shape": [
             145938,
             4
@@ -842,7 +842,7 @@
     },
     {
       "database_count": 75,
-      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_4.yaml",
+      "database_path": "repo:data/processed/rio/sequence_database_sliding_4.yaml",
       "database_sha256": "18065940eccff3572dafb8408294363969e8674978b82a4d7b673837e8ff3832",
       "exceptions": [],
       "failure_count": 0,
@@ -857,7 +857,7 @@
       ],
       "samples": [
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0069_09-scene0069_04-scene0069_06-scene0069_00.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0069_09-scene0069_04-scene0069_06-scene0069_00.txt",
           "coordinate_shape": [
             155158,
             4
@@ -888,7 +888,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0079_05-scene0079_03-scene0079_07-scene0079_08.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0079_05-scene0079_03-scene0079_07-scene0079_08.txt",
           "coordinate_shape": [
             162092,
             4
@@ -919,7 +919,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0079_09-scene0079_01-scene0079_02-scene0079_11.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0079_09-scene0079_01-scene0079_02-scene0079_11.txt",
           "coordinate_shape": [
             211574,
             4
@@ -950,7 +950,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0347_00-scene0347_01-scene0347_02-scene0347_03.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0347_00-scene0347_01-scene0347_02-scene0347_03.txt",
           "coordinate_shape": [
             174528,
             4
@@ -981,7 +981,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0449_00-scene0449_05-scene0449_04-scene0449_03.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0449_00-scene0449_05-scene0449_04-scene0449_03.txt",
           "coordinate_shape": [
             324162,
             4
@@ -1018,7 +1018,7 @@
     },
     {
       "database_count": 262,
-      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_5.yaml",
+      "database_path": "repo:data/processed/rio/sequence_database_sliding_5.yaml",
       "database_sha256": "252363f76524bb7eeff9f65b303aadda67dcd2646477daae1ac90f7f53398290",
       "exceptions": [],
       "failure_count": 0,
@@ -1033,7 +1033,7 @@
       ],
       "samples": [
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0066_03-scene0066_04-scene0066_01-scene0066_00-scene0066_02.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0066_03-scene0066_04-scene0066_01-scene0066_00-scene0066_02.txt",
           "coordinate_shape": [
             465271,
             4
@@ -1065,7 +1065,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0083_03-scene0083_01-scene0083_02-scene0083_04-scene0083_00.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0083_03-scene0083_01-scene0083_02-scene0083_04-scene0083_00.txt",
           "coordinate_shape": [
             76879,
             4
@@ -1097,7 +1097,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0197_04-scene0197_03-scene0197_06-scene0197_00-scene0197_05.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0197_04-scene0197_03-scene0197_06-scene0197_00-scene0197_05.txt",
           "coordinate_shape": [
             169049,
             4
@@ -1129,7 +1129,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0198_05-scene0198_01-scene0198_06-scene0198_00-scene0198_02.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0198_05-scene0198_01-scene0198_06-scene0198_00-scene0198_02.txt",
           "coordinate_shape": [
             641695,
             4
@@ -1161,7 +1161,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0454_03-scene0454_02-scene0454_00-scene0454_04-scene0454_01.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/train/scene0454_03-scene0454_02-scene0454_00-scene0454_04-scene0454_01.txt",
           "coordinate_shape": [
             253371,
             4
@@ -1199,7 +1199,7 @@
     },
     {
       "database_count": 43,
-      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_5.yaml",
+      "database_path": "repo:data/processed/rio/sequence_database_sliding_5.yaml",
       "database_sha256": "252363f76524bb7eeff9f65b303aadda67dcd2646477daae1ac90f7f53398290",
       "exceptions": [],
       "failure_count": 0,
@@ -1214,7 +1214,7 @@
       ],
       "samples": [
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01.txt",
           "coordinate_shape": [
             205984,
             4
@@ -1246,7 +1246,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0069_02-scene0069_04-scene0069_03-scene0069_01-scene0069_06.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0069_02-scene0069_04-scene0069_03-scene0069_01-scene0069_06.txt",
           "coordinate_shape": [
             189258,
             4
@@ -1278,7 +1278,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0079_07-scene0079_01-scene0079_06-scene0079_11-scene0079_10.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0079_07-scene0079_01-scene0079_06-scene0079_11-scene0079_10.txt",
           "coordinate_shape": [
             225099,
             4
@@ -1310,7 +1310,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0119_01-scene0119_04-scene0119_00-scene0119_02-scene0119_03.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0119_01-scene0119_04-scene0119_00-scene0119_02-scene0119_03.txt",
           "coordinate_shape": [
             454986,
             4
@@ -1342,7 +1342,7 @@
           ]
         },
         {
-          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0119_03-scene0119_01-scene0119_04-scene0119_00-scene0119_02.txt",
+          "change_filepath": "repo:data/processed/rio/change_gt/validation/scene0119_03-scene0119_01-scene0119_04-scene0119_00-scene0119_02.txt",
           "coordinate_shape": [
             454986,
             4
@@ -1405,13 +1405,13 @@
       4,
       5
     ],
-    "processed_dir": "/home/ww/paper5/data/processed/rio",
+    "processed_dir": "repo:data/processed/rio",
     "samples_per_split": 5,
     "seed": 45,
     "sequence_type": "sliding"
   },
   "generator_dirty": true,
-  "generator_git_commit": "ca32b9da2d3151df3519396098712b4a1ca1238d",
+  "generator_git_commit": "2d397393fc941bd8c402e2ec74312baf271e335b",
   "official_source_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
   "schema_version": 2,
   "semantic_limitations": [
@@ -1432,7 +1432,7 @@
   "source_hashes": {
     "conf/profiling/p0_p1_a40.yaml": "87ea55ac6cf2aa00a0d25fe3c82a2e7a122b60395ade4b96f2f58c9803a087c0",
     "datasets/semseg.py": "ca3316b12acfb22766b145885b0b4d84423fc9d754d267333b7d2052cf1f9322",
-    "scripts/audit_temporal_loader.py": "4c8039a786e115725a3ba79fa79c89fd638f720da614cc308e1abdc3250a8dc3"
+    "scripts/audit_temporal_loader.py": "abe4544392346d1907d0a86957f85acba6708f6b20282f7ed6468fca341e9fae"
   },
   "status": "pass",
   "top_level_exceptions": [],

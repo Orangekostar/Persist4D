@@ -41,6 +41,21 @@ REQUIRED_FIELDS = frozenset(
 SCAN_ID_PATTERN = re.compile(r"scene\d{4}_\d{2}")
 
 
+def repo_reference(path: str | Path) -> str:
+    """Return a portable reference without changing the runtime path."""
+    resolved_path = Path(path).resolve()
+    try:
+        relative_path = resolved_path.relative_to(PROJECT_ROOT.resolve())
+    except ValueError:
+        return f"external:{resolved_path.name}"
+    return f"repo:{relative_path.as_posix()}"
+
+
+def rscan_reference(path: str | Path) -> str:
+    """Return a stable external reference for a 3RScan dataset path."""
+    return f"external:3RScan/{Path(path).name}"
+
+
 def sha256_file(path: str | Path) -> str:
     """Return the SHA-256 digest of a file."""
     digest = hashlib.sha256()
@@ -182,7 +197,7 @@ def inventory_database(path: str | Path, *, horizon: int) -> dict[str, Any]:
                 raise ValueError(f"{split} sequence filepath does not exist: {filepath}")
 
     return {
-        "path": str(database_path.resolve()),
+        "path": repo_reference(database_path),
         "sha256": sha256_file(database_path),
         "bytes": database_path.stat().st_size,
         "sequence_length": horizon,
@@ -244,10 +259,10 @@ def build_all(
         "sequence_type": sequence_type,
         "scannet200": scannet200,
         "scan_order_semantics": "metadata_order_only_no_timestamps",
-        "data_dir": str(data_dir.resolve()),
-        "processed_dir": str(processed_dir.resolve()),
+        "data_dir": rscan_reference(data_dir),
+        "processed_dir": repo_reference(processed_dir),
         "metadata": {
-            "path": str(metadata.resolve()),
+            "path": rscan_reference(metadata),
             "sha256": sha256_file(metadata),
         },
         "supervised_splits": sorted(SUPERVISED_SPLITS),
