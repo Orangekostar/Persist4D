@@ -1,0 +1,48 @@
+{
+  "generated_at_utc": "2026-08-09T11:23:14Z",
+  "official_source": {
+    "repository_url": "https://github.com/GradientSpaces/rescene4d.git",
+    "commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+    "branch": "main"
+  },
+  "third_party_sources": {
+    "concerto": {
+      "repository_url": "https://github.com/Pointcept/Concerto.git",
+      "commit": "10a7d17cff4dddff028f1522c2e72de4c4515df7",
+      "license": "Apache-2.0"
+    },
+    "stmetrics": {
+      "repository_url": "https://github.com/GradientSpaces/stmetrics.git",
+      "commit": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f",
+      "license": "MIT"
+    }
+  },
+  "model_weights": {
+    "concerto": {
+      "repository_url": "https://huggingface.co/Pointcept/Concerto",
+      "revision": "c31f993a56129f2ba9c5d06a35957e3f05bff710",
+      "license": "CC-BY-NC-4.0"
+    },
+    "rescene": {
+      "complete_checkpoint_included": false,
+      "upstream_status": "Coming soon"
+    }
+  },
+  "dataset_metadata": {
+    "path": "/home/ww/vv/dataset/3RScan/3RScan.json",
+    "path_role": "runtime_evidence_only",
+    "sha256": "674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64"
+  },
+  "runtime_environment": {
+    "python": "3.10.20",
+    "torch": "2.6.0+cu126",
+    "cuda": "12.6",
+    "cuda_source": "torch.version.cuda",
+    "gpu": {
+      "count": 3,
+      "model": "NVIDIA A40",
+      "memory_mib": 46068,
+      "driver": "595.71.05"
+    }
+  }
+}
