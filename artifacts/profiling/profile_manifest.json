@@ -1,0 +1,867 @@
+{
+  "artifacts": {
+    "latency_vs_t.png": {
+      "byte_size": 110792,
+      "sha256": "67a2591fade5d06d143e4057bcbfcf1d0ff60fe6114e866d636f1268309da985"
+    },
+    "peak_vram_vs_t.png": {
+      "byte_size": 102896,
+      "sha256": "76ab05d278456a9eb4f8368b909a5db39fadfd98ee5816df11d9ae9af5803924"
+    },
+    "re_scene4d_scaling.csv": {
+      "byte_size": 25189,
+      "sha256": "ed9a44f18615dd8f63a91e48eb7e5f3eb1622f0a29b2aca652da6ef4eaf9681b"
+    },
+    "re_scene4d_scaling.md": {
+      "byte_size": 3476,
+      "sha256": "78d98095db2755f97fc3e5d7bf6720ccdb444cc747407edb8002147a4e8ff644"
+    },
+    "throughput_vs_t.png": {
+      "byte_size": 105909,
+      "sha256": "1e021dcbec77f53072a839521e039a1168fe9777e3277c459ca61910697c2a79"
+    }
+  },
+  "batch_search": {
+    "2:inference": {
+      "attempts": [
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 4,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 4,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 8,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 8,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 16,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 16,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 32,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 32,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        }
+      ],
+      "configured_cap": 32,
+      "max_batch_size_without_oom": 32,
+      "oom_observed": false,
+      "oom_safety_margin_mb": 512,
+      "safety_reserve_allocated_bytes": 536870912,
+      "selected_raw_point_count": 107183,
+      "selected_sequence_name": "scene0219_00-scene0219_02",
+      "stop_reason": "configured_cap_right_censored"
+    },
+    "2:training": {
+      "attempts": [
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 4,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 4,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 8,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 8,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 16,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        },
+        {
+          "batch_size": 12,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        },
+        {
+          "batch_size": 10,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        },
+        {
+          "batch_size": 9,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        }
+      ],
+      "configured_cap": 32,
+      "max_batch_size_without_oom": 8,
+      "oom_observed": true,
+      "oom_safety_margin_mb": 512,
+      "safety_reserve_allocated_bytes": 536870912,
+      "selected_raw_point_count": 107183,
+      "selected_sequence_name": "scene0219_00-scene0219_02",
+      "stop_reason": "cuda_oom"
+    },
+    "4:inference": {
+      "attempts": [
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 4,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 4,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 8,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 8,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 16,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 16,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 32,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        },
+        {
+          "batch_size": 24,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        },
+        {
+          "batch_size": 20,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        },
+        {
+          "batch_size": 18,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        },
+        {
+          "batch_size": 17,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        }
+      ],
+      "configured_cap": 32,
+      "max_batch_size_without_oom": 16,
+      "oom_observed": true,
+      "oom_safety_margin_mb": 512,
+      "safety_reserve_allocated_bytes": 536870912,
+      "selected_raw_point_count": 209237,
+      "selected_sequence_name": "scene0219_01-scene0219_04-scene0219_03-scene0219_00",
+      "stop_reason": "cuda_oom"
+    },
+    "4:training": {
+      "attempts": [
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 4,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 4,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 8,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        },
+        {
+          "batch_size": 6,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        },
+        {
+          "batch_size": 5,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        }
+      ],
+      "configured_cap": 32,
+      "max_batch_size_without_oom": 4,
+      "oom_observed": true,
+      "oom_safety_margin_mb": 512,
+      "safety_reserve_allocated_bytes": 536870912,
+      "selected_raw_point_count": 209237,
+      "selected_sequence_name": "scene0219_01-scene0219_04-scene0219_03-scene0219_00",
+      "stop_reason": "cuda_oom"
+    },
+    "5:inference": {
+      "attempts": [
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 4,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 4,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 8,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 8,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 16,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        },
+        {
+          "batch_size": 12,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 12,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 14,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 14,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 15,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        }
+      ],
+      "configured_cap": 32,
+      "max_batch_size_without_oom": 14,
+      "oom_observed": true,
+      "oom_safety_margin_mb": 512,
+      "safety_reserve_allocated_bytes": 536870912,
+      "selected_raw_point_count": 263273,
+      "selected_sequence_name": "scene0219_02-scene0219_01-scene0219_04-scene0219_00-scene0219_03",
+      "stop_reason": "cuda_oom"
+    },
+    "5:training": {
+      "attempts": [
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 1,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 2,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        },
+        {
+          "batch_size": 4,
+          "exception": "OutOfMemoryError",
+          "outcome": "oom",
+          "repetition": 1
+        },
+        {
+          "batch_size": 3,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 1
+        },
+        {
+          "batch_size": 3,
+          "exception": null,
+          "outcome": "success",
+          "repetition": 2
+        }
+      ],
+      "configured_cap": 32,
+      "max_batch_size_without_oom": 3,
+      "oom_observed": true,
+      "oom_safety_margin_mb": 512,
+      "safety_reserve_allocated_bytes": 536870912,
+      "selected_raw_point_count": 263273,
+      "selected_sequence_name": "scene0219_02-scene0219_01-scene0219_04-scene0219_00-scene0219_03",
+      "stop_reason": "cuda_oom"
+    }
+  },
+  "checkpoint": {
+    "byte_size": 433987358,
+    "filename": "concerto_base.pth",
+    "huggingface_revision": "c31f993a56129f2ba9c5d06a35957e3f05bff710",
+    "license": "CC-BY-NC-4.0",
+    "reference": "local_cache:persist4d/concerto/concerto_base.pth",
+    "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+  },
+  "configuration": {
+    "batch_search_skipped": false,
+    "config_reference": "repo:conf/profiling/p0_p1_a40.yaml",
+    "explicitly_excluded_splits": [
+      "train",
+      "test"
+    ],
+    "freeze_mode": "backbone_encoder",
+    "gpu_index": 0,
+    "horizons": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "max_batch_search": 32,
+    "measurement_iterations": 10,
+    "oom_safety_margin_mb": 512,
+    "precision": "fp32",
+    "precision_contract": {
+      "cuda_matmul_allow_tf32": true,
+      "float32_matmul_precision": "high",
+      "outer_execution": "fp32_without_autocast",
+      "upstream_concerto_flash_attention_qkv": "explicit_fp16_cast"
+    },
+    "processed_dir_reference": "repo:data/processed/rio",
+    "profile_scenes": 5,
+    "profile_split": "validation",
+    "reference_scene": 219,
+    "seed": 45,
+    "sequence_type": "sliding",
+    "voxel_size": 0.02,
+    "warmup_iterations": 3
+  },
+  "dependency_sources": {
+    "concerto": "10a7d17cff4dddff028f1522c2e72de4c4515df7",
+    "detectron2": "b4a4a3bd136852dae5fb1de37978dee412653e31",
+    "sonata": "18c09ff8d713494f78a8213792262b910977a65d",
+    "stmetrics": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f"
+  },
+  "errors": [],
+  "hardware": {
+    "compute_capability": "8.6",
+    "device_alias": "device-0",
+    "device_index": 0,
+    "driver_version": "595.71.05",
+    "name": "NVIDIA A40",
+    "total_memory_mib": 46068,
+    "uuid": "redacted",
+    "uuid_redacted": true
+  },
+  "horizons": {
+    "2": {
+      "model": {
+        "complete_rescene_checkpoint_available": false,
+        "encoder_module_training_at_capture": true,
+        "frozen_parameter_tensors": 453,
+        "frozen_parameters": 108461376,
+        "initialized_components": {
+          "concerto_decoder": "seeded_random_initialization",
+          "concerto_encoder": "pretrained",
+          "rescene_heads": "seeded_random_initialization"
+        },
+        "total_parameter_tensors": 795,
+        "total_parameters": 135149395,
+        "trainable_parameters": 26688019
+      },
+      "selected_windows": [
+        {
+          "dataset_index": 80,
+          "sequence_name": "scene0219_00-scene0219_02",
+          "sub_scenes": [
+            0,
+            2
+          ]
+        },
+        {
+          "dataset_index": 81,
+          "sequence_name": "scene0219_01-scene0219_03",
+          "sub_scenes": [
+            1,
+            3
+          ]
+        },
+        {
+          "dataset_index": 82,
+          "sequence_name": "scene0219_02-scene0219_01",
+          "sub_scenes": [
+            2,
+            1
+          ]
+        },
+        {
+          "dataset_index": 83,
+          "sequence_name": "scene0219_03-scene0219_04",
+          "sub_scenes": [
+            3,
+            4
+          ]
+        },
+        {
+          "dataset_index": 84,
+          "sequence_name": "scene0219_04-scene0219_00",
+          "sub_scenes": [
+            4,
+            0
+          ]
+        }
+      ],
+      "sequence_database": {
+        "byte_size": 415937,
+        "reference": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
+        "sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416"
+      }
+    },
+    "3": {
+      "model": {
+        "complete_rescene_checkpoint_available": false,
+        "encoder_module_training_at_capture": true,
+        "frozen_parameter_tensors": 453,
+        "frozen_parameters": 108461376,
+        "initialized_components": {
+          "concerto_decoder": "seeded_random_initialization",
+          "concerto_encoder": "pretrained",
+          "rescene_heads": "seeded_random_initialization"
+        },
+        "total_parameter_tensors": 795,
+        "total_parameters": 135149395,
+        "trainable_parameters": 26688019
+      },
+      "selected_windows": [
+        {
+          "dataset_index": 58,
+          "sequence_name": "scene0219_00-scene0219_04-scene0219_02",
+          "sub_scenes": [
+            0,
+            4,
+            2
+          ]
+        },
+        {
+          "dataset_index": 59,
+          "sequence_name": "scene0219_01-scene0219_03-scene0219_00",
+          "sub_scenes": [
+            1,
+            3,
+            0
+          ]
+        },
+        {
+          "dataset_index": 60,
+          "sequence_name": "scene0219_02-scene0219_01-scene0219_03",
+          "sub_scenes": [
+            2,
+            1,
+            3
+          ]
+        },
+        {
+          "dataset_index": 61,
+          "sequence_name": "scene0219_03-scene0219_00-scene0219_04",
+          "sub_scenes": [
+            3,
+            0,
+            4
+          ]
+        },
+        {
+          "dataset_index": 62,
+          "sequence_name": "scene0219_04-scene0219_02-scene0219_01",
+          "sub_scenes": [
+            4,
+            2,
+            1
+          ]
+        }
+      ],
+      "sequence_database": {
+        "byte_size": 410458,
+        "reference": "repo:data/processed/rio/sequence_database_sliding_3.yaml",
+        "sha256": "20184ca27316bd668c084c39af72144d018e556b9562826b511a1413f4986893"
+      }
+    },
+    "4": {
+      "model": {
+        "complete_rescene_checkpoint_available": false,
+        "encoder_module_training_at_capture": true,
+        "frozen_parameter_tensors": 453,
+        "frozen_parameters": 108461376,
+        "initialized_components": {
+          "concerto_decoder": "seeded_random_initialization",
+          "concerto_encoder": "pretrained",
+          "rescene_heads": "seeded_random_initialization"
+        },
+        "total_parameter_tensors": 795,
+        "total_parameters": 135149395,
+        "trainable_parameters": 26688019
+      },
+      "selected_windows": [
+        {
+          "dataset_index": 43,
+          "sequence_name": "scene0219_00-scene0219_02-scene0219_01-scene0219_04",
+          "sub_scenes": [
+            0,
+            2,
+            1,
+            4
+          ]
+        },
+        {
+          "dataset_index": 44,
+          "sequence_name": "scene0219_01-scene0219_04-scene0219_03-scene0219_00",
+          "sub_scenes": [
+            1,
+            4,
+            3,
+            0
+          ]
+        },
+        {
+          "dataset_index": 45,
+          "sequence_name": "scene0219_02-scene0219_01-scene0219_04-scene0219_03",
+          "sub_scenes": [
+            2,
+            1,
+            4,
+            3
+          ]
+        },
+        {
+          "dataset_index": 46,
+          "sequence_name": "scene0219_03-scene0219_00-scene0219_02-scene0219_01",
+          "sub_scenes": [
+            3,
+            0,
+            2,
+            1
+          ]
+        },
+        {
+          "dataset_index": 47,
+          "sequence_name": "scene0219_04-scene0219_03-scene0219_00-scene0219_02",
+          "sub_scenes": [
+            4,
+            3,
+            0,
+            2
+          ]
+        }
+      ],
+      "sequence_database": {
+        "byte_size": 292451,
+        "reference": "repo:data/processed/rio/sequence_database_sliding_4.yaml",
+        "sha256": "18065940eccff3572dafb8408294363969e8674978b82a4d7b673837e8ff3832"
+      }
+    },
+    "5": {
+      "model": {
+        "complete_rescene_checkpoint_available": false,
+        "encoder_module_training_at_capture": true,
+        "frozen_parameter_tensors": 453,
+        "frozen_parameters": 108461376,
+        "initialized_components": {
+          "concerto_decoder": "seeded_random_initialization",
+          "concerto_encoder": "pretrained",
+          "rescene_heads": "seeded_random_initialization"
+        },
+        "total_parameter_tensors": 795,
+        "total_parameters": 135149395,
+        "trainable_parameters": 26688019
+      },
+      "selected_windows": [
+        {
+          "dataset_index": 27,
+          "sequence_name": "scene0219_00-scene0219_03-scene0219_02-scene0219_01-scene0219_04",
+          "sub_scenes": [
+            0,
+            3,
+            2,
+            1,
+            4
+          ]
+        },
+        {
+          "dataset_index": 28,
+          "sequence_name": "scene0219_01-scene0219_04-scene0219_00-scene0219_03-scene0219_02",
+          "sub_scenes": [
+            1,
+            4,
+            0,
+            3,
+            2
+          ]
+        },
+        {
+          "dataset_index": 29,
+          "sequence_name": "scene0219_02-scene0219_01-scene0219_04-scene0219_00-scene0219_03",
+          "sub_scenes": [
+            2,
+            1,
+            4,
+            0,
+            3
+          ]
+        },
+        {
+          "dataset_index": 30,
+          "sequence_name": "scene0219_03-scene0219_02-scene0219_01-scene0219_04-scene0219_00",
+          "sub_scenes": [
+            3,
+            2,
+            1,
+            4,
+            0
+          ]
+        },
+        {
+          "dataset_index": 31,
+          "sequence_name": "scene0219_04-scene0219_00-scene0219_03-scene0219_02-scene0219_01",
+          "sub_scenes": [
+            4,
+            0,
+            3,
+            2,
+            1
+          ]
+        }
+      ],
+      "sequence_database": {
+        "byte_size": 196305,
+        "reference": "repo:data/processed/rio/sequence_database_sliding_5.yaml",
+        "sha256": "252363f76524bb7eeff9f65b303aadda67dcd2646477daae1ac90f7f53398290"
+      }
+    }
+  },
+  "measurement_rows": 80,
+  "official_source_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+  "run_id": "p0-p1-a40-20260809",
+  "schema_version": 1,
+  "source_verification": {
+    "official_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+    "official_commit_is_ancestor": true,
+    "official_execution_paths_unchanged": true,
+    "profiler_sha256": "41056175309ecd299ff3b7c89d4613b26f5ea9b713c0b9fdb9319d391f9f1490",
+    "runtime_head": "2ccaabab7281d63f2c7acf93fa165b542a0113cd"
+  },
+  "status": "pass"
+}

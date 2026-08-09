@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-09T11:23:14Z",
+  "generated_at_utc": "2026-08-09T13:09:50Z",
   "official_source": {
     "repository_url": "https://github.com/GradientSpaces/rescene4d.git",
     "commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
@@ -15,12 +15,26 @@
       "repository_url": "https://github.com/GradientSpaces/stmetrics.git",
       "commit": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f",
       "license": "MIT"
+    },
+    "sonata": {
+      "repository_url": "https://github.com/facebookresearch/sonata.git",
+      "commit": "18c09ff8d713494f78a8213792262b910977a65d",
+      "license": "Apache-2.0"
+    },
+    "detectron2": {
+      "repository_url": "https://github.com/facebookresearch/detectron2.git",
+      "commit": "b4a4a3bd136852dae5fb1de37978dee412653e31",
+      "license": "Apache-2.0"
     }
   },
   "model_weights": {
     "concerto": {
       "repository_url": "https://huggingface.co/Pointcept/Concerto",
       "revision": "c31f993a56129f2ba9c5d06a35957e3f05bff710",
+      "filename": "concerto_base.pth",
+      "byte_size": 433987358,
+      "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+      "local_reference": "local_cache:persist4d/concerto/concerto_base.pth",
       "license": "CC-BY-NC-4.0"
     },
     "rescene": {
@@ -29,7 +43,7 @@
     }
   },
   "dataset_metadata": {
-    "path": "/home/ww/vv/dataset/3RScan/3RScan.json",
+    "path": "external:3RScan/3RScan.json",
     "path_role": "runtime_evidence_only",
     "sha256": "674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64"
   },
@@ -38,6 +52,14 @@
     "torch": "2.6.0+cu126",
     "cuda": "12.6",
     "cuda_source": "torch.version.cuda",
+    "runtime_packages": {
+      "flash_attn": "2.8.3",
+      "spconv-cu126": "2.3.8",
+      "torch_scatter": "2.1.2+pt26cu126",
+      "sonata": "1.0",
+      "detectron2": "0.6",
+      "stmetrics": "0.1.0"
+    },
     "gpu": {
       "count": 3,
       "model": "NVIDIA A40",
