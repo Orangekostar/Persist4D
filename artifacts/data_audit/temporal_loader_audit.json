@@ -1,0 +1,1434 @@
+{
+  "audits": [
+    {
+      "database_count": 1178,
+      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_2.yaml",
+      "database_sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416",
+      "exceptions": [],
+      "failure_count": 0,
+      "horizon": 2,
+      "loader_sequence_count": 1178,
+      "sample_indices": [
+        143,
+        257,
+        588,
+        924,
+        964
+      ],
+      "samples": [
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0063_01-scene0063_00.txt",
+          "coordinate_shape": [
+            53095,
+            4
+          ],
+          "dataset_index": 143,
+          "feature_shape": [
+            53095,
+            3
+          ],
+          "label_shape": [
+            53095,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 1,
+          "raw_change_shape": [
+            53095
+          ],
+          "sample_seed": 188,
+          "sequence_name": "scene0063_01-scene0063_00",
+          "temporal_stages": [
+            0,
+            1
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0108_02-scene0108_00.txt",
+          "coordinate_shape": [
+            92943,
+            4
+          ],
+          "dataset_index": 257,
+          "feature_shape": [
+            92943,
+            3
+          ],
+          "label_shape": [
+            92943,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 1,
+          "raw_change_shape": [
+            92943
+          ],
+          "sample_seed": 302,
+          "sequence_name": "scene0108_02-scene0108_00",
+          "temporal_stages": [
+            0,
+            1
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0243_00-scene0243_03.txt",
+          "coordinate_shape": [
+            163372,
+            4
+          ],
+          "dataset_index": 588,
+          "feature_shape": [
+            163372,
+            3
+          ],
+          "label_shape": [
+            163372,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 1,
+          "raw_change_shape": [
+            163372
+          ],
+          "sample_seed": 633,
+          "sequence_name": "scene0243_00-scene0243_03",
+          "temporal_stages": [
+            0,
+            1
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0376_00-scene0376_01.txt",
+          "coordinate_shape": [
+            45415,
+            4
+          ],
+          "dataset_index": 924,
+          "feature_shape": [
+            45415,
+            3
+          ],
+          "label_shape": [
+            45415,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 1,
+          "raw_change_shape": [
+            45415
+          ],
+          "sample_seed": 969,
+          "sequence_name": "scene0376_00-scene0376_01",
+          "temporal_stages": [
+            0,
+            1
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0398_01-scene0398_03.txt",
+          "coordinate_shape": [
+            118931,
+            4
+          ],
+          "dataset_index": 964,
+          "feature_shape": [
+            118931,
+            3
+          ],
+          "label_shape": [
+            118931,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 1,
+          "raw_change_shape": [
+            118931
+          ],
+          "sample_seed": 1009,
+          "sequence_name": "scene0398_01-scene0398_03",
+          "temporal_stages": [
+            0,
+            1
+          ]
+        }
+      ],
+      "split": "train",
+      "success_count": 5
+    },
+    {
+      "database_count": 157,
+      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_2.yaml",
+      "database_sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416",
+      "exceptions": [],
+      "failure_count": 0,
+      "horizon": 2,
+      "loader_sequence_count": 157,
+      "sample_indices": [
+        15,
+        16,
+        91,
+        99,
+        132
+      ],
+      "samples": [
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0059_00-scene0059_01.txt",
+          "coordinate_shape": [
+            87523,
+            4
+          ],
+          "dataset_index": 15,
+          "feature_shape": [
+            87523,
+            3
+          ],
+          "label_shape": [
+            87523,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 1,
+          "raw_change_shape": [
+            87523
+          ],
+          "sample_seed": 60,
+          "sequence_name": "scene0059_00-scene0059_01",
+          "temporal_stages": [
+            0,
+            1
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0059_01-scene0059_00.txt",
+          "coordinate_shape": [
+            87523,
+            4
+          ],
+          "dataset_index": 16,
+          "feature_shape": [
+            87523,
+            3
+          ],
+          "label_shape": [
+            87523,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 1,
+          "raw_change_shape": [
+            87523
+          ],
+          "sample_seed": 61,
+          "sequence_name": "scene0059_01-scene0059_00",
+          "temporal_stages": [
+            0,
+            1
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0259_02-scene0259_01.txt",
+          "coordinate_shape": [
+            31541,
+            4
+          ],
+          "dataset_index": 91,
+          "feature_shape": [
+            31541,
+            3
+          ],
+          "label_shape": [
+            31541,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 1,
+          "raw_change_shape": [
+            31541
+          ],
+          "sample_seed": 136,
+          "sequence_name": "scene0259_02-scene0259_01",
+          "temporal_stages": [
+            0,
+            1
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0289_01-scene0289_00.txt",
+          "coordinate_shape": [
+            160036,
+            4
+          ],
+          "dataset_index": 99,
+          "feature_shape": [
+            160036,
+            3
+          ],
+          "label_shape": [
+            160036,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 1,
+          "raw_change_shape": [
+            160036
+          ],
+          "sample_seed": 144,
+          "sequence_name": "scene0289_01-scene0289_00",
+          "temporal_stages": [
+            0,
+            1
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0399_01-scene0399_02.txt",
+          "coordinate_shape": [
+            53784,
+            4
+          ],
+          "dataset_index": 132,
+          "feature_shape": [
+            53784,
+            3
+          ],
+          "label_shape": [
+            53784,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 1,
+          "raw_change_shape": [
+            53784
+          ],
+          "sample_seed": 177,
+          "sequence_name": "scene0399_01-scene0399_02",
+          "temporal_stages": [
+            0,
+            1
+          ]
+        }
+      ],
+      "split": "validation",
+      "success_count": 5
+    },
+    {
+      "database_count": 858,
+      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_3.yaml",
+      "database_sha256": "20184ca27316bd668c084c39af72144d018e556b9562826b511a1413f4986893",
+      "exceptions": [],
+      "failure_count": 0,
+      "horizon": 3,
+      "loader_sequence_count": 858,
+      "sample_indices": [
+        5,
+        168,
+        291,
+        419,
+        789
+      ],
+      "samples": [
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0002_01-scene0002_00-scene0002_03.txt",
+          "coordinate_shape": [
+            172549,
+            4
+          ],
+          "dataset_index": 5,
+          "feature_shape": [
+            172549,
+            3
+          ],
+          "label_shape": [
+            172549,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            172549,
+            2
+          ],
+          "sample_seed": 50,
+          "sequence_name": "scene0002_01-scene0002_00-scene0002_03",
+          "temporal_stages": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0097_01-scene0097_02-scene0097_00.txt",
+          "coordinate_shape": [
+            343674,
+            4
+          ],
+          "dataset_index": 168,
+          "feature_shape": [
+            343674,
+            3
+          ],
+          "label_shape": [
+            343674,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            343674,
+            2
+          ],
+          "sample_seed": 213,
+          "sequence_name": "scene0097_01-scene0097_02-scene0097_00",
+          "temporal_stages": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0183_01-scene0183_00-scene0183_03.txt",
+          "coordinate_shape": [
+            200794,
+            4
+          ],
+          "dataset_index": 291,
+          "feature_shape": [
+            200794,
+            3
+          ],
+          "label_shape": [
+            200794,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            200794,
+            2
+          ],
+          "sample_seed": 336,
+          "sequence_name": "scene0183_01-scene0183_00-scene0183_03",
+          "temporal_stages": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0246_03-scene0246_01-scene0246_00.txt",
+          "coordinate_shape": [
+            67040,
+            4
+          ],
+          "dataset_index": 419,
+          "feature_shape": [
+            67040,
+            3
+          ],
+          "label_shape": [
+            67040,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            67040,
+            2
+          ],
+          "sample_seed": 464,
+          "sequence_name": "scene0246_03-scene0246_01-scene0246_00",
+          "temporal_stages": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0442_03-scene0442_04-scene0442_02.txt",
+          "coordinate_shape": [
+            428312,
+            4
+          ],
+          "dataset_index": 789,
+          "feature_shape": [
+            428312,
+            3
+          ],
+          "label_shape": [
+            428312,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            428312,
+            2
+          ],
+          "sample_seed": 834,
+          "sequence_name": "scene0442_03-scene0442_04-scene0442_02",
+          "temporal_stages": [
+            0,
+            1,
+            2
+          ]
+        }
+      ],
+      "split": "train",
+      "success_count": 5
+    },
+    {
+      "database_count": 123,
+      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_3.yaml",
+      "database_sha256": "20184ca27316bd668c084c39af72144d018e556b9562826b511a1413f4986893",
+      "exceptions": [],
+      "failure_count": 0,
+      "horizon": 3,
+      "loader_sequence_count": 123,
+      "sample_indices": [
+        24,
+        66,
+        71,
+        77,
+        120
+      ],
+      "samples": [
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0079_03-scene0079_05-scene0079_00.txt",
+          "coordinate_shape": [
+            186922,
+            4
+          ],
+          "dataset_index": 24,
+          "feature_shape": [
+            186922,
+            3
+          ],
+          "label_shape": [
+            186922,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            186922,
+            2
+          ],
+          "sample_seed": 69,
+          "sequence_name": "scene0079_03-scene0079_05-scene0079_00",
+          "temporal_stages": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0249_03-scene0249_00-scene0249_02.txt",
+          "coordinate_shape": [
+            241927,
+            4
+          ],
+          "dataset_index": 66,
+          "feature_shape": [
+            241927,
+            3
+          ],
+          "label_shape": [
+            241927,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            241927,
+            2
+          ],
+          "sample_seed": 111,
+          "sequence_name": "scene0249_03-scene0249_00-scene0249_02",
+          "temporal_stages": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0269_01-scene0269_02-scene0269_03.txt",
+          "coordinate_shape": [
+            93873,
+            4
+          ],
+          "dataset_index": 71,
+          "feature_shape": [
+            93873,
+            3
+          ],
+          "label_shape": [
+            93873,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            93873,
+            2
+          ],
+          "sample_seed": 116,
+          "sequence_name": "scene0269_01-scene0269_02-scene0269_03",
+          "temporal_stages": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0299_00-scene0299_02-scene0299_01.txt",
+          "coordinate_shape": [
+            72000,
+            4
+          ],
+          "dataset_index": 77,
+          "feature_shape": [
+            72000,
+            3
+          ],
+          "label_shape": [
+            72000,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            72000,
+            2
+          ],
+          "sample_seed": 122,
+          "sequence_name": "scene0299_00-scene0299_02-scene0299_01",
+          "temporal_stages": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0449_03-scene0449_00-scene0449_01.txt",
+          "coordinate_shape": [
+            160276,
+            4
+          ],
+          "dataset_index": 120,
+          "feature_shape": [
+            160276,
+            3
+          ],
+          "label_shape": [
+            160276,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            160276,
+            2
+          ],
+          "sample_seed": 165,
+          "sequence_name": "scene0449_03-scene0449_00-scene0449_01",
+          "temporal_stages": [
+            0,
+            1,
+            2
+          ]
+        }
+      ],
+      "split": "validation",
+      "success_count": 5
+    },
+    {
+      "database_count": 474,
+      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_4.yaml",
+      "database_sha256": "18065940eccff3572dafb8408294363969e8674978b82a4d7b673837e8ff3832",
+      "exceptions": [],
+      "failure_count": 0,
+      "horizon": 4,
+      "loader_sequence_count": 474,
+      "sample_indices": [
+        40,
+        127,
+        201,
+        216,
+        282
+      ],
+      "samples": [
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0032_03-scene0032_01-scene0032_02-scene0032_00.txt",
+          "coordinate_shape": [
+            216785,
+            4
+          ],
+          "dataset_index": 40,
+          "feature_shape": [
+            216785,
+            3
+          ],
+          "label_shape": [
+            216785,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            216785,
+            3
+          ],
+          "sample_seed": 85,
+          "sequence_name": "scene0032_03-scene0032_01-scene0032_02-scene0032_00",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0174_01-scene0174_04-scene0174_05-scene0174_03.txt",
+          "coordinate_shape": [
+            300471,
+            4
+          ],
+          "dataset_index": 127,
+          "feature_shape": [
+            300471,
+            3
+          ],
+          "label_shape": [
+            300471,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            300471,
+            3
+          ],
+          "sample_seed": 172,
+          "sequence_name": "scene0174_01-scene0174_04-scene0174_05-scene0174_03",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0217_02-scene0217_05-scene0217_01-scene0217_03.txt",
+          "coordinate_shape": [
+            288056,
+            4
+          ],
+          "dataset_index": 201,
+          "feature_shape": [
+            288056,
+            3
+          ],
+          "label_shape": [
+            288056,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            288056,
+            3
+          ],
+          "sample_seed": 246,
+          "sequence_name": "scene0217_02-scene0217_05-scene0217_01-scene0217_03",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0234_00-scene0234_01-scene0234_04-scene0234_03.txt",
+          "coordinate_shape": [
+            119551,
+            4
+          ],
+          "dataset_index": 216,
+          "feature_shape": [
+            119551,
+            3
+          ],
+          "label_shape": [
+            119551,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            119551,
+            3
+          ],
+          "sample_seed": 261,
+          "sequence_name": "scene0234_00-scene0234_01-scene0234_04-scene0234_03",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0306_02-scene0306_00-scene0306_03-scene0306_01.txt",
+          "coordinate_shape": [
+            145938,
+            4
+          ],
+          "dataset_index": 282,
+          "feature_shape": [
+            145938,
+            3
+          ],
+          "label_shape": [
+            145938,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            145938,
+            3
+          ],
+          "sample_seed": 327,
+          "sequence_name": "scene0306_02-scene0306_00-scene0306_03-scene0306_01",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3
+          ]
+        }
+      ],
+      "split": "train",
+      "success_count": 5
+    },
+    {
+      "database_count": 75,
+      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_4.yaml",
+      "database_sha256": "18065940eccff3572dafb8408294363969e8674978b82a4d7b673837e8ff3832",
+      "exceptions": [],
+      "failure_count": 0,
+      "horizon": 4,
+      "loader_sequence_count": 75,
+      "sample_indices": [
+        17,
+        23,
+        27,
+        61,
+        69
+      ],
+      "samples": [
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0069_09-scene0069_04-scene0069_06-scene0069_00.txt",
+          "coordinate_shape": [
+            155158,
+            4
+          ],
+          "dataset_index": 17,
+          "feature_shape": [
+            155158,
+            3
+          ],
+          "label_shape": [
+            155158,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            155158,
+            3
+          ],
+          "sample_seed": 62,
+          "sequence_name": "scene0069_09-scene0069_04-scene0069_06-scene0069_00",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0079_05-scene0079_03-scene0079_07-scene0079_08.txt",
+          "coordinate_shape": [
+            162092,
+            4
+          ],
+          "dataset_index": 23,
+          "feature_shape": [
+            162092,
+            3
+          ],
+          "label_shape": [
+            162092,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            162092,
+            3
+          ],
+          "sample_seed": 68,
+          "sequence_name": "scene0079_05-scene0079_03-scene0079_07-scene0079_08",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0079_09-scene0079_01-scene0079_02-scene0079_11.txt",
+          "coordinate_shape": [
+            211574,
+            4
+          ],
+          "dataset_index": 27,
+          "feature_shape": [
+            211574,
+            3
+          ],
+          "label_shape": [
+            211574,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            211574,
+            3
+          ],
+          "sample_seed": 72,
+          "sequence_name": "scene0079_09-scene0079_01-scene0079_02-scene0079_11",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0347_00-scene0347_01-scene0347_02-scene0347_03.txt",
+          "coordinate_shape": [
+            174528,
+            4
+          ],
+          "dataset_index": 61,
+          "feature_shape": [
+            174528,
+            3
+          ],
+          "label_shape": [
+            174528,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            174528,
+            3
+          ],
+          "sample_seed": 106,
+          "sequence_name": "scene0347_00-scene0347_01-scene0347_02-scene0347_03",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0449_00-scene0449_05-scene0449_04-scene0449_03.txt",
+          "coordinate_shape": [
+            324162,
+            4
+          ],
+          "dataset_index": 69,
+          "feature_shape": [
+            324162,
+            3
+          ],
+          "label_shape": [
+            324162,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            324162,
+            3
+          ],
+          "sample_seed": 114,
+          "sequence_name": "scene0449_00-scene0449_05-scene0449_04-scene0449_03",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3
+          ]
+        }
+      ],
+      "split": "validation",
+      "success_count": 5
+    },
+    {
+      "database_count": 262,
+      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_5.yaml",
+      "database_sha256": "252363f76524bb7eeff9f65b303aadda67dcd2646477daae1ac90f7f53398290",
+      "exceptions": [],
+      "failure_count": 0,
+      "horizon": 5,
+      "loader_sequence_count": 262,
+      "sample_indices": [
+        28,
+        39,
+        110,
+        118,
+        255
+      ],
+      "samples": [
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0066_03-scene0066_04-scene0066_01-scene0066_00-scene0066_02.txt",
+          "coordinate_shape": [
+            465271,
+            4
+          ],
+          "dataset_index": 28,
+          "feature_shape": [
+            465271,
+            3
+          ],
+          "label_shape": [
+            465271,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            465271,
+            4
+          ],
+          "sample_seed": 73,
+          "sequence_name": "scene0066_03-scene0066_04-scene0066_01-scene0066_00-scene0066_02",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0083_03-scene0083_01-scene0083_02-scene0083_04-scene0083_00.txt",
+          "coordinate_shape": [
+            76879,
+            4
+          ],
+          "dataset_index": 39,
+          "feature_shape": [
+            76879,
+            3
+          ],
+          "label_shape": [
+            76879,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            76879,
+            4
+          ],
+          "sample_seed": 84,
+          "sequence_name": "scene0083_03-scene0083_01-scene0083_02-scene0083_04-scene0083_00",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0197_04-scene0197_03-scene0197_06-scene0197_00-scene0197_05.txt",
+          "coordinate_shape": [
+            169049,
+            4
+          ],
+          "dataset_index": 110,
+          "feature_shape": [
+            169049,
+            3
+          ],
+          "label_shape": [
+            169049,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            169049,
+            4
+          ],
+          "sample_seed": 155,
+          "sequence_name": "scene0197_04-scene0197_03-scene0197_06-scene0197_00-scene0197_05",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0198_05-scene0198_01-scene0198_06-scene0198_00-scene0198_02.txt",
+          "coordinate_shape": [
+            641695,
+            4
+          ],
+          "dataset_index": 118,
+          "feature_shape": [
+            641695,
+            3
+          ],
+          "label_shape": [
+            641695,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            641695,
+            4
+          ],
+          "sample_seed": 163,
+          "sequence_name": "scene0198_05-scene0198_01-scene0198_06-scene0198_00-scene0198_02",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/train/scene0454_03-scene0454_02-scene0454_00-scene0454_04-scene0454_01.txt",
+          "coordinate_shape": [
+            253371,
+            4
+          ],
+          "dataset_index": 255,
+          "feature_shape": [
+            253371,
+            3
+          ],
+          "label_shape": [
+            253371,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            253371,
+            4
+          ],
+          "sample_seed": 300,
+          "sequence_name": "scene0454_03-scene0454_02-scene0454_00-scene0454_04-scene0454_01",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      ],
+      "split": "train",
+      "success_count": 5
+    },
+    {
+      "database_count": 43,
+      "database_path": "/home/ww/paper5/data/processed/rio/sequence_database_sliding_5.yaml",
+      "database_sha256": "252363f76524bb7eeff9f65b303aadda67dcd2646477daae1ac90f7f53398290",
+      "exceptions": [],
+      "failure_count": 0,
+      "horizon": 5,
+      "loader_sequence_count": 43,
+      "sample_indices": [
+        0,
+        2,
+        17,
+        23,
+        25
+      ],
+      "samples": [
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01.txt",
+          "coordinate_shape": [
+            205984,
+            4
+          ],
+          "dataset_index": 0,
+          "feature_shape": [
+            205984,
+            3
+          ],
+          "label_shape": [
+            205984,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            205984,
+            4
+          ],
+          "sample_seed": 45,
+          "sequence_name": "scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0069_02-scene0069_04-scene0069_03-scene0069_01-scene0069_06.txt",
+          "coordinate_shape": [
+            189258,
+            4
+          ],
+          "dataset_index": 2,
+          "feature_shape": [
+            189258,
+            3
+          ],
+          "label_shape": [
+            189258,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            189258,
+            4
+          ],
+          "sample_seed": 47,
+          "sequence_name": "scene0069_02-scene0069_04-scene0069_03-scene0069_01-scene0069_06",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0079_07-scene0079_01-scene0079_06-scene0079_11-scene0079_10.txt",
+          "coordinate_shape": [
+            225099,
+            4
+          ],
+          "dataset_index": 17,
+          "feature_shape": [
+            225099,
+            3
+          ],
+          "label_shape": [
+            225099,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            225099,
+            4
+          ],
+          "sample_seed": 62,
+          "sequence_name": "scene0079_07-scene0079_01-scene0079_06-scene0079_11-scene0079_10",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0119_01-scene0119_04-scene0119_00-scene0119_02-scene0119_03.txt",
+          "coordinate_shape": [
+            454986,
+            4
+          ],
+          "dataset_index": 23,
+          "feature_shape": [
+            454986,
+            3
+          ],
+          "label_shape": [
+            454986,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            454986,
+            4
+          ],
+          "sample_seed": 68,
+          "sequence_name": "scene0119_01-scene0119_04-scene0119_00-scene0119_02-scene0119_03",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "change_filepath": "/home/ww/paper5/data/processed/rio/change_gt/validation/scene0119_03-scene0119_01-scene0119_04-scene0119_00-scene0119_02.txt",
+          "coordinate_shape": [
+            454986,
+            4
+          ],
+          "dataset_index": 25,
+          "feature_shape": [
+            454986,
+            3
+          ],
+          "label_shape": [
+            454986,
+            4
+          ],
+          "projected_change_dim": 1,
+          "projection_matches_official_rule": true,
+          "raw_change_dim": 2,
+          "raw_change_shape": [
+            454986,
+            4
+          ],
+          "sample_seed": 70,
+          "sequence_name": "scene0119_03-scene0119_01-scene0119_04-scene0119_00-scene0119_02",
+          "temporal_stages": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      ],
+      "split": "validation",
+      "success_count": 5
+    }
+  ],
+  "configuration": {
+    "audited_splits": [
+      "train",
+      "validation"
+    ],
+    "dataset": {
+      "add_colors": true,
+      "add_instance": true,
+      "add_normals": false,
+      "filter_out_classes": [
+        0,
+        1
+      ],
+      "label_offset": 2,
+      "num_changes": -1,
+      "num_labels": 20
+    },
+    "explicitly_excluded_splits": [
+      "test"
+    ],
+    "horizons": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "processed_dir": "/home/ww/paper5/data/processed/rio",
+    "samples_per_split": 5,
+    "seed": 45,
+    "sequence_type": "sliding"
+  },
+  "git_commit": "606e2f7097d2934f8b96b05c5f4f47714ca17ccb",
+  "schema_version": 1,
+  "semantic_limitations": [
+    {
+      "code": "metadata_order_is_not_chronology",
+      "detail": "3RScan metadata contains no timestamps; sequence position records metadata order only and is not asserted to be real chronology."
+    },
+    {
+      "code": "first_transition_change_projection",
+      "detail": "For T>2, raw change GT has shape (N, T-1), but the official loader projects it to raw_changes[:, 0]; downstream labels retain only the first transition."
+    },
+    {
+      "code": "test_split_excluded",
+      "detail": "The test split is excluded because local test point clouds and GT are unavailable."
+    }
+  ],
+  "sequence_order_semantics": "metadata_order_only_no_timestamps",
+  "source_hashes": {
+    "conf/profiling/p0_p1_a40.yaml": "87ea55ac6cf2aa00a0d25fe3c82a2e7a122b60395ade4b96f2f58c9803a087c0",
+    "datasets/semseg.py": "ca3316b12acfb22766b145885b0b4d84423fc9d754d267333b7d2052cf1f9322"
+  },
+  "status": "pass",
+  "top_level_exceptions": [],
+  "totals": {
+    "completed_audits": 8,
+    "failures": 0,
+    "loaded_samples": 40,
+    "requested_audits": 8
+  }
+}
