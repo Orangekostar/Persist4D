@@ -3,6 +3,7 @@ from pathlib import Path
 import statistics
 from torch_scatter import scatter_mean
 from collections import defaultdict
+from collections.abc import Mapping
 from sklearn.cluster import DBSCAN
 import warnings
 
@@ -16,6 +17,11 @@ import pickle
 _SINGLE_POINT_CROSS_ATTENTION_ERROR = (
     "only a single point gives nans in cross-attention"
 )
+
+
+def _p2_general_flag(config, name):
+    general = getattr(config, "general", None)
+    return bool(getattr(general, name, False))
 
 
 def _safe_length(value):
@@ -34,17 +40,281 @@ def _point_cloud_is_empty(data):
     )
 
 
-def _batch_preflight_failure(data, target, max_batch_size=None):
+def _batch_preflight_failure(
+    data,
+    target,
+    max_batch_size=None,
+    require_labels=True,
+):
     if not isinstance(target, (list, tuple)):
         return "invalid target list"
     if _safe_length(target) == 0:
         return "empty target list"
+    for target_idx, target_item in enumerate(target):
+        if not isinstance(target_item, Mapping):
+            return f"target[{target_idx}] must be a mapping"
+        required_fields = ["point2segment"]
+        if require_labels:
+            required_fields.insert(0, "labels")
+        for field in required_fields:
+            if field not in target_item:
+                return f"target[{target_idx}] missing required field '{field}'"
+            value = target_item[field]
+            if not isinstance(value, torch.Tensor) or value.ndim == 0:
+                return (
+                    f"target[{target_idx}] field '{field}' must be a "
+                    "non-scalar tensor"
+                )
     if _point_cloud_is_empty(data):
         return "empty point cloud"
 
     feature_count = _safe_length(getattr(data, "features", None))
     if max_batch_size is not None and feature_count > max_batch_size:
         return f"batch exceeds max_batch_size ({feature_count} > {max_batch_size})"
+    return None
+
+
+def _output_tensor_failure(field, tensor, expected_device):
+    if expected_device is not None and tensor.device != torch.device(
+        expected_device
+    ):
+        return (
+            f"forward output field '{field}' must be on device "
+            f"{torch.device(expected_device)} (got {tensor.device})"
+        )
+    try:
+        finite = bool(torch.isfinite(tensor).all().item())
+    except Exception as error:
+        return (
+            f"forward output field '{field}' finite check failed: "
+            f"{type(error).__name__}: {error}"
+        )
+    if not finite:
+        return f"forward output field '{field}' contains non-finite values"
+    return None
+
+
+def _prediction_layer_failure(
+    output,
+    expected_batch_size,
+    expected_device,
+    field_prefix="",
+    expect_pred_changes=None,
+):
+    if not isinstance(output, Mapping):
+        field = field_prefix.removesuffix(".")
+        return f"forward output field '{field}' must be a mapping"
+
+    for field in ("pred_logits", "pred_masks"):
+        if field not in output:
+            return (
+                "forward output missing required field "
+                f"'{field_prefix}{field}'"
+            )
+
+    pred_logits_field = f"{field_prefix}pred_logits"
+    pred_logits = output["pred_logits"]
+    if not isinstance(pred_logits, torch.Tensor) or pred_logits.numel() == 0:
+        return (
+            f"forward output field '{pred_logits_field}' must be a "
+            "non-empty tensor"
+        )
+    if pred_logits.ndim < 3 or pred_logits.shape[0] != expected_batch_size:
+        return (
+            f"forward output field '{pred_logits_field}' must have one "
+            "batched entry per target"
+        )
+    tensor_failure = _output_tensor_failure(
+        pred_logits_field,
+        pred_logits,
+        expected_device,
+    )
+    if tensor_failure is not None:
+        return tensor_failure
+
+    pred_masks_field = f"{field_prefix}pred_masks"
+    pred_masks = output["pred_masks"]
+    if isinstance(pred_masks, torch.Tensor):
+        valid_masks = (
+            pred_masks.numel() > 0
+            and pred_masks.ndim >= 3
+            and pred_masks.shape[0] == expected_batch_size
+        )
+    elif isinstance(pred_masks, (list, tuple)):
+        valid_masks = len(pred_masks) == expected_batch_size and all(
+            isinstance(mask, torch.Tensor)
+            and mask.numel() > 0
+            and mask.ndim >= 2
+            for mask in pred_masks
+        )
+    else:
+        valid_masks = False
+    if not valid_masks:
+        return (
+            f"forward output field '{pred_masks_field}' must contain "
+            "non-empty tensors"
+        )
+    mask_tensors = (
+        [(pred_masks_field, pred_masks)]
+        if isinstance(pred_masks, torch.Tensor)
+        else [
+            (f"{pred_masks_field}[{mask_idx}]", mask)
+            for mask_idx, mask in enumerate(pred_masks)
+        ]
+    )
+    for field, mask in mask_tensors:
+        tensor_failure = _output_tensor_failure(
+            field,
+            mask,
+            expected_device,
+        )
+        if tensor_failure is not None:
+            return tensor_failure
+
+    if expect_pred_changes is None:
+        return None
+
+    pred_changes_field = f"{field_prefix}pred_changes"
+    if "pred_changes" not in output:
+        return (
+            "forward output missing required field "
+            f"'{pred_changes_field}'"
+        )
+    pred_changes = output["pred_changes"]
+    if not expect_pred_changes:
+        if pred_changes is not None:
+            return (
+                f"forward output field '{pred_changes_field}' must be None "
+                "when change objective is disabled"
+            )
+        return None
+    if not isinstance(pred_changes, torch.Tensor) or pred_changes.numel() == 0:
+        return (
+            f"forward output field '{pred_changes_field}' must be a "
+            "non-empty tensor"
+        )
+    if pred_changes.ndim < 3 or pred_changes.shape[0] != expected_batch_size:
+        return (
+            f"forward output field '{pred_changes_field}' must have one "
+            "batched entry per target"
+        )
+    return _output_tensor_failure(
+        pred_changes_field,
+        pred_changes,
+        expected_device,
+    )
+
+
+def _expected_aux_output_count(module):
+    model = getattr(module, "model", None)
+    try:
+        count = int(model.num_levels) * int(model.num_decoders)
+    except (AttributeError, TypeError, ValueError):
+        return None
+    return count if count > 0 else None
+
+
+def _criterion_output_requirements(module):
+    criterion = getattr(module, "criterion", None)
+    losses = getattr(criterion, "losses", None)
+    expect_pred_changes = (
+        "changes" in losses if losses is not None else None
+    )
+    require_segment_features = bool(
+        getattr(criterion, "use_contrastive_loss", False)
+    )
+    return expect_pred_changes, require_segment_features
+
+
+def _forward_output_failure(
+    output,
+    expected_batch_size,
+    expected_device=None,
+    expected_aux_outputs=None,
+    expect_pred_changes=None,
+    require_segment_features=False,
+):
+    if not isinstance(output, Mapping):
+        return "forward output must be a mapping"
+    prediction_failure = _prediction_layer_failure(
+        output,
+        expected_batch_size,
+        expected_device,
+        expect_pred_changes=expect_pred_changes,
+    )
+    if prediction_failure is not None:
+        return prediction_failure
+
+    aux_outputs = output.get("aux_outputs")
+    if aux_outputs is None:
+        if expected_aux_outputs is not None:
+            return "forward output missing required field 'aux_outputs'"
+    else:
+        if not isinstance(aux_outputs, (list, tuple)):
+            return "forward output field 'aux_outputs' must be a sequence"
+        if not aux_outputs and expected_aux_outputs is not None:
+            return (
+                "forward output field 'aux_outputs' must be a non-empty "
+                "sequence"
+            )
+        if (
+            expected_aux_outputs is not None
+            and len(aux_outputs) != expected_aux_outputs
+        ):
+            return (
+                "forward output field 'aux_outputs' must contain "
+                f"{expected_aux_outputs} entries (got {len(aux_outputs)})"
+            )
+        for aux_idx, aux_output in enumerate(aux_outputs):
+            prediction_failure = _prediction_layer_failure(
+                aux_output,
+                expected_batch_size,
+                expected_device,
+                field_prefix=f"aux_outputs[{aux_idx}].",
+                expect_pred_changes=expect_pred_changes,
+            )
+            if prediction_failure is not None:
+                return prediction_failure
+
+    if not require_segment_features:
+        return None
+    if "segment_features" not in output:
+        return "forward output missing required field 'segment_features'"
+    segment_features = output["segment_features"]
+    if not isinstance(segment_features, (list, tuple)) or not segment_features:
+        return (
+            "forward output field 'segment_features' must be a non-empty "
+            "sequence"
+        )
+    if len(segment_features) != 1:
+        return (
+            "forward output field 'segment_features' must contain 1 layer "
+            f"(got {len(segment_features)})"
+        )
+    for layer_idx, layer_features in enumerate(segment_features):
+        field = f"segment_features[{layer_idx}]"
+        if (
+            not isinstance(layer_features, (list, tuple))
+            or len(layer_features) != expected_batch_size
+        ):
+            return (
+                f"forward output field '{field}' must contain one tensor "
+                "per target"
+            )
+        for batch_item_idx, features in enumerate(layer_features):
+            tensor_field = f"{field}[{batch_item_idx}]"
+            if not isinstance(features, torch.Tensor) or features.numel() == 0:
+                return (
+                    f"forward output field '{tensor_field}' must be a "
+                    "non-empty tensor"
+                )
+            tensor_failure = _output_tensor_failure(
+                tensor_field,
+                features,
+                expected_device,
+            )
+            if tensor_failure is not None:
+                return tensor_failure
     return None
 
 
@@ -57,6 +327,73 @@ def _batch_collective_device(module, data):
         if isinstance(value, torch.Tensor):
             return value.device
     return torch.device("cpu")
+
+
+def _fallback_collective_device(module):
+    try:
+        module_device = getattr(module, "device", None)
+        if module_device is not None:
+            return module_device
+    except Exception:
+        pass
+
+    try:
+        parameter = next(module.parameters())
+        return parameter.device
+    except Exception:
+        pass
+
+    distributed = (
+        torch.distributed.is_available() and torch.distributed.is_initialized()
+    )
+    if distributed:
+        try:
+            if str(torch.distributed.get_backend()).lower() == "nccl":
+                return torch.device("cuda", torch.cuda.current_device())
+        except Exception:
+            pass
+    return torch.device("cpu")
+
+
+def _p2_batch_input(module, batch, stage):
+    data = None
+    target = None
+    file_names = "<unavailable>"
+    collective_device = _fallback_collective_device(module)
+    failure = None
+    cause = None
+    try:
+        data, target, file_names = batch
+        collective_device = _batch_collective_device(module, data)
+        max_batch_size = (
+            module.config.general.max_batch_size
+            if stage == "train"
+            else None
+        )
+        failure = _batch_preflight_failure(
+            data,
+            target,
+            max_batch_size=max_batch_size,
+            require_labels=stage != "test",
+        )
+    except Exception as error:
+        failure = _phase_exception_reason("input", error)
+        cause = error
+    return (
+        data,
+        target,
+        file_names,
+        collective_device,
+        failure,
+        cause,
+    )
+
+
+def _safe_repr(value):
+    try:
+        return repr(value)
+    except Exception as error:
+        return f"<unrepresentable {type(error).__name__}>"
 
 
 def _format_batch_contract_failures(failures):
@@ -86,7 +423,7 @@ def _batch_contract_consensus(
             "rank": rank,
             "stage": stage,
             "batch_idx": batch_idx,
-            "file_names": repr(file_names),
+            "file_names": _safe_repr(file_names),
             "reason": reason,
         }
         if reason is not None
@@ -120,23 +457,110 @@ def _batch_contract_consensus(
     raise error from cause
 
 
-def aggregate_objective_loss(losses, weight_dict):
+def _phase_exception_reason(phase, error):
+    if (
+        phase == "forward"
+        and isinstance(error, RuntimeError)
+        and str(error) == _SINGLE_POINT_CROSS_ATTENTION_ERROR
+    ):
+        return _SINGLE_POINT_CROSS_ATTENTION_ERROR
+    return f"{phase} {type(error).__name__}: {error}"
+
+
+def _validate_objective_value(value, description):
+    tensor = (
+        value.detach()
+        if isinstance(value, torch.Tensor)
+        else torch.as_tensor(value)
+    )
+    if tensor.numel() == 0:
+        raise ValueError(f"empty {description}")
+    if tensor.ndim != 0:
+        raise ValueError(f"non-scalar {description}")
+    if not bool(torch.isfinite(tensor).item()):
+        raise ValueError(f"non-finite {description}")
+
+
+def _validate_objective_finite(losses, total_loss, loss_names):
+    if not loss_names:
+        raise ValueError("no objective loss terms")
+    for loss_name in loss_names:
+        _validate_objective_value(
+            losses[loss_name],
+            f"raw objective term '{loss_name}'",
+        )
+    _validate_objective_value(total_loss, "aggregate objective")
+
+
+def _optimizer_gradient_failure(optimizer):
+    for group_idx, param_group in enumerate(optimizer.param_groups):
+        for parameter_idx, parameter in enumerate(param_group["params"]):
+            gradient = parameter.grad
+            if gradient is None:
+                continue
+            gradient_values = (
+                gradient.coalesce().values()
+                if gradient.is_sparse
+                else gradient
+            )
+            if not torch.isfinite(gradient_values).all():
+                return (
+                    "non-finite gradient at optimizer "
+                    f"param_group={group_idx}, parameter={parameter_idx}"
+                )
+    return None
+
+
+def aggregate_objective_loss(losses, weight_dict, validate_finite=True):
     """Build the optimized objective while omitting per-layer diagnostics."""
-    objective_terms = [
-        loss * weight_dict.get(loss_name, 1.0)
+    objective_items = [
+        (loss_name, loss)
         for loss_name, loss in losses.items()
         if not (loss_name.startswith("loss_") and "_contrastive_layer" in loss_name)
     ]
-    if not objective_terms:
+    if not objective_items:
         raise ValueError("no objective loss terms")
-    return sum(objective_terms)
+    total_loss = sum(
+        loss * weight_dict.get(loss_name, 1.0)
+        for loss_name, loss in objective_items
+    )
+    if validate_finite:
+        _validate_objective_finite(
+            losses,
+            total_loss,
+            [loss_name for loss_name, _ in objective_items],
+        )
+    return total_loss
+
+
+def _configured_objective_loss(module, losses):
+    p2_fail_closed_runtime = _p2_general_flag(
+        module.config,
+        "p2_fail_closed_runtime",
+    )
+    if _p2_general_flag(module.config, "p2_weighted_objective"):
+        return aggregate_objective_loss(
+            losses,
+            module.criterion.weight_dict,
+            validate_finite=p2_fail_closed_runtime,
+        )
+
+    total_loss = sum(losses.values())
+    if p2_fail_closed_runtime:
+        _validate_objective_finite(losses, total_loss, list(losses))
+    return total_loss
 
 
 
 class InstanceSegmentation(pl.LightningModule):
+    _TRAIN_SAMPLER_CHECKPOINT_KEY = "p2_train_sampler_generator"
+    _TRAIN_SAMPLER_CHECKPOINT_SCHEMA_VERSION = 1
+    _TRAIN_SAMPLER_RESUME_SCOPE = "completed_epoch_boundary_only"
+
     def __init__(self, config):
         super().__init__()
         self.config = config
+        self._pending_train_sampler_generator_state = None
         self.automatic_optimization = True
         self._initialize_model()
         self._setup_training()
@@ -215,7 +639,21 @@ class InstanceSegmentation(pl.LightningModule):
             aux_weight_dict.update({k + f"_{i}": v * weight for k, v in weight_dict.items()})
         weight_dict.update(aux_weight_dict)
         
-        return hydra.utils.instantiate(config.loss, matcher=matcher, weight_dict=weight_dict)
+        criterion = hydra.utils.instantiate(
+            config.loss,
+            matcher=matcher,
+            weight_dict=weight_dict,
+        )
+        p2_fail_closed_runtime = _p2_general_flag(
+            config,
+            "p2_fail_closed_runtime",
+        )
+        criterion.p2_fail_closed_runtime = p2_fail_closed_runtime
+        if hasattr(criterion, "contrastive_loss"):
+            criterion.contrastive_loss.p2_fail_closed_runtime = (
+                p2_fail_closed_runtime
+            )
+        return criterion
 
     def forward(self, x, point2segment=None, raw_coordinates=None, is_eval=False, targets=None):
 
@@ -232,62 +670,148 @@ class InstanceSegmentation(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         """Training step implementation"""
-        data, target, file_names = batch
-        collective_device = _batch_collective_device(self, data)
-        preflight_failure = _batch_preflight_failure(
-            data,
-            target,
-            max_batch_size=self.config.general.max_batch_size,
+        p2_fail_closed_runtime = _p2_general_flag(
+            self.config,
+            "p2_fail_closed_runtime",
         )
-
-        _batch_contract_consensus(
-            stage="train",
-            batch_idx=batch_idx,
-            file_names=file_names,
-            reason=preflight_failure,
-            device=collective_device,
-        )
+        if p2_fail_closed_runtime:
+            (
+                data,
+                target,
+                file_names,
+                collective_device,
+                preflight_failure,
+                preflight_cause,
+            ) = _p2_batch_input(
+                self,
+                batch,
+                stage="train",
+            )
+            _batch_contract_consensus(
+                stage="train",
+                batch_idx=batch_idx,
+                file_names=file_names,
+                reason=preflight_failure,
+                cause=preflight_cause,
+                device=collective_device,
+            )
+            self._p2_optimizer_context = {
+                "batch_idx": batch_idx,
+                "file_names": file_names,
+                "device": collective_device,
+            }
+        else:
+            data, target, file_names = batch
+            if data.features.shape[0] > self.config.general.max_batch_size:
+                print("data exceeds threshold")
+                raise RuntimeError("BATCH TOO BIG")
+            if target == []:
+                return None
 
         # Forward pass
-        forward_failure = None
-        forward_cause = None
-        try:
-            output = self.forward(
-                data,
-                point2segment=[target[i]["point2segment"] for i in range(len(target))],
-                raw_coordinates=self._process_raw_coordinates(data),
-                targets=target,
-            )
-        except RuntimeError as run_err:
-            if str(run_err) == _SINGLE_POINT_CROSS_ATTENTION_ERROR:
-                forward_failure = _SINGLE_POINT_CROSS_ATTENTION_ERROR
-                forward_cause = run_err
-            else:
-                raise
+        if p2_fail_closed_runtime:
+            forward_failure = None
+            forward_cause = None
+            try:
+                output = self.forward(
+                    data,
+                    point2segment=[
+                        target[i]["point2segment"] for i in range(len(target))
+                    ],
+                    raw_coordinates=self._process_raw_coordinates(data),
+                    targets=target,
+                )
+                (
+                    expect_pred_changes,
+                    require_segment_features,
+                ) = _criterion_output_requirements(self)
+                forward_failure = _forward_output_failure(
+                    output,
+                    expected_batch_size=len(target),
+                    expected_device=collective_device,
+                    expected_aux_outputs=_expected_aux_output_count(self),
+                    expect_pred_changes=expect_pred_changes,
+                    require_segment_features=require_segment_features,
+                )
+            except Exception as error:
+                forward_failure = _phase_exception_reason("forward", error)
+                forward_cause = error
 
-        _batch_contract_consensus(
-            stage="train",
-            batch_idx=batch_idx,
-            file_names=file_names,
-            reason=forward_failure,
-            cause=forward_cause,
-            device=collective_device,
-        )
+            _batch_contract_consensus(
+                stage="train",
+                batch_idx=batch_idx,
+                file_names=file_names,
+                reason=forward_failure,
+                cause=forward_cause,
+                device=collective_device,
+            )
+        else:
+            try:
+                output = self.forward(
+                    data,
+                    point2segment=[
+                        target[i]["point2segment"] for i in range(len(target))
+                    ],
+                    raw_coordinates=self._process_raw_coordinates(data),
+                    targets=target,
+                )
+            except RuntimeError as run_err:
+                if run_err.args[0] == _SINGLE_POINT_CROSS_ATTENTION_ERROR:
+                    return None
+                raise run_err
 
         # Compute losses
-        try:
-            losses = self.criterion(output, target, mask_type=self.mask_type)
-        except ValueError as val_err:
-            print(f"ValueError: {val_err}")
-            raise val_err
-    
-        total_loss = aggregate_objective_loss(losses, self.criterion.weight_dict)
+        if p2_fail_closed_runtime:
+            objective_failure = None
+            objective_cause = None
+            try:
+                losses = self.criterion(output, target, mask_type=self.mask_type)
+            except Exception as error:
+                objective_failure = _phase_exception_reason("criterion", error)
+                objective_cause = error
 
-        self.log_dict({
-            **{f"train_{k}": v for k, v in losses.items()},
-            "train_loss": total_loss,
-            **self._get_mean_loss(losses, "train")
-        }, on_step=True, on_epoch=True, sync_dist=True , batch_size=data.batch_size)
+            if objective_failure is None:
+                try:
+                    total_loss = _configured_objective_loss(self, losses)
+                    log_values = {
+                        **{f"train_{k}": v for k, v in losses.items()},
+                        "train_loss": total_loss,
+                        **self._get_mean_loss(losses, "train"),
+                    }
+                    log_batch_size = data.batch_size
+                except Exception as error:
+                    objective_failure = _phase_exception_reason("objective", error)
+                    objective_cause = error
+
+            _batch_contract_consensus(
+                stage="train",
+                batch_idx=batch_idx,
+                file_names=file_names,
+                reason=objective_failure,
+                cause=objective_cause,
+                device=collective_device,
+            )
+        else:
+            try:
+                losses = self.criterion(output, target, mask_type=self.mask_type)
+            except ValueError as val_err:
+                print(f"ValueError: {val_err}")
+                raise val_err
+            total_loss = _configured_objective_loss(self, losses)
+            log_values = {
+                **{f"train_{k}": v for k, v in losses.items()},
+                "train_loss": total_loss,
+                **self._get_mean_loss(losses, "train"),
+            }
+            log_batch_size = data.batch_size
+
+        self.log_dict(
+            log_values,
+            on_step=True,
+            on_epoch=True,
+            sync_dist=True,
+            batch_size=log_batch_size,
+        )
 
         return total_loss
     
@@ -383,74 +907,191 @@ class InstanceSegmentation(pl.LightningModule):
 
     def _eval_step(self, batch, stage, batch_idx=None):
         """Unified evaluation step for validation and testing"""
-        data, target, file_names = batch
-        collective_device = _batch_collective_device(self, data)
-        preflight_failure = _batch_preflight_failure(data, target)
-        _batch_contract_consensus(
-            stage=stage,
-            batch_idx=batch_idx,
-            file_names=file_names,
-            reason=preflight_failure,
-            device=collective_device,
+        p2_fail_closed_runtime = _p2_general_flag(
+            self.config,
+            "p2_fail_closed_runtime",
         )
-
-        # save values from data (rewritten)
-        inverse_maps = data.inverse_maps
-        target_full = data.target_full
-        original_colors = data.original_colors
-        data_idx = data.idx
-        original_normals = data.original_normals
-        original_coordinates = data.original_coordinates
-
-
-        # Process raw_coordinates for model forward pass (Mask3D/ReScene need it)
-        raw_coordinates = self._process_raw_coordinates(data)
-        
-        # Disable gradient computation during evaluation
-        with torch.no_grad():
-            forward_failure = None
-            forward_cause = None
-            try:
-                output = self.forward(
-                    data,
-                    point2segment=[target[i]["point2segment"] for i in range(len(target))],
-                    raw_coordinates=raw_coordinates,
-                    is_eval=True,
-                    targets=target,
-                )
-            except RuntimeError as run_err:
-                if str(run_err) == _SINGLE_POINT_CROSS_ATTENTION_ERROR:
-                    forward_failure = _SINGLE_POINT_CROSS_ATTENTION_ERROR
-                    forward_cause = run_err
-                else:
-                    raise
-
+        if p2_fail_closed_runtime:
+            (
+                data,
+                target,
+                file_names,
+                collective_device,
+                preflight_failure,
+                preflight_cause,
+            ) = _p2_batch_input(self, batch, stage=stage)
+            eval_data = {}
+            if preflight_failure is None:
+                for attribute in (
+                    "inverse_maps",
+                    "target_full",
+                    "original_colors",
+                    "idx",
+                    "original_normals",
+                    "original_coordinates",
+                ):
+                    try:
+                        eval_data[attribute] = getattr(data, attribute)
+                    except AttributeError as error:
+                        preflight_failure = (
+                            f"missing eval data attribute '{attribute}'"
+                        )
+                        preflight_cause = error
+                        break
+                    except Exception as error:
+                        preflight_failure = _phase_exception_reason(
+                            "evaluation metadata",
+                            error,
+                        )
+                        preflight_cause = error
+                        break
             _batch_contract_consensus(
                 stage=stage,
                 batch_idx=batch_idx,
                 file_names=file_names,
-                reason=forward_failure,
-                cause=forward_cause,
+                reason=preflight_failure,
+                cause=preflight_cause,
                 device=collective_device,
             )
+            inverse_maps = eval_data["inverse_maps"]
+            target_full = eval_data["target_full"]
+            original_colors = eval_data["original_colors"]
+            data_idx = eval_data["idx"]
+            original_normals = eval_data["original_normals"]
+            original_coordinates = eval_data["original_coordinates"]
+        else:
+            data, target, file_names = batch
+            # save values from data (rewritten)
+            inverse_maps = data.inverse_maps
+            target_full = data.target_full
+            original_colors = data.original_colors
+            data_idx = data.idx
+            original_normals = data.original_normals
+            original_coordinates = data.original_coordinates
 
-            # Process predictions for metrics 
-            with torch.amp.autocast('cuda',enabled=False):  # Disable autocast for evaluation
-                predictions = self._process_predictions(
-                    output=output,
-                    target_low_res=target,
-                    target_full_res=target_full,
-                    inverse_maps=inverse_maps,
+            if len(data.coordinates) == 0:
+                return 0.0
+
+        # Disable gradient computation during evaluation
+        with torch.no_grad():
+            if p2_fail_closed_runtime:
+                forward_failure = None
+                forward_cause = None
+                try:
+                    raw_coordinates = self._process_raw_coordinates(data)
+                    output = self.forward(
+                        data,
+                        point2segment=[
+                            target[i]["point2segment"]
+                            for i in range(len(target))
+                        ],
+                        raw_coordinates=raw_coordinates,
+                        is_eval=True,
+                        targets=target,
+                    )
+                    (
+                        expect_pred_changes,
+                        require_segment_features,
+                    ) = _criterion_output_requirements(self)
+                    forward_failure = _forward_output_failure(
+                        output,
+                        expected_batch_size=len(target),
+                        expected_device=collective_device,
+                        expected_aux_outputs=_expected_aux_output_count(self),
+                        expect_pred_changes=expect_pred_changes,
+                        require_segment_features=require_segment_features,
+                    )
+                except Exception as error:
+                    forward_failure = _phase_exception_reason("forward", error)
+                    forward_cause = error
+
+                _batch_contract_consensus(
+                    stage=stage,
+                    batch_idx=batch_idx,
                     file_names=file_names,
-                    full_res_coords = original_coordinates,
-                    original_colors = original_colors,
-                    original_normals = original_normals,
-                    raw_coords=raw_coordinates if self.config.general.use_dbscan else None,
-                    idx=data_idx,
+                    reason=forward_failure,
+                    cause=forward_cause,
+                    device=collective_device,
                 )
-                self.instance_metric.update(predictions, target_full)
-                if self.aux_metric is not None:
-                    self.aux_metric.update(predictions, target_full)
+            else:
+                raw_coordinates = self._process_raw_coordinates(data)
+                try:
+                    output = self.forward(
+                        data,
+                        point2segment=[
+                            target[i]["point2segment"]
+                            for i in range(len(target))
+                        ],
+                        raw_coordinates=raw_coordinates,
+                        is_eval=True,
+                        targets=target,
+                    )
+                except RuntimeError as run_err:
+                    if run_err.args[0] == _SINGLE_POINT_CROSS_ATTENTION_ERROR:
+                        return None
+                    raise run_err
+
+            # Process predictions for metrics
+            if p2_fail_closed_runtime:
+                evaluation_failure = None
+                evaluation_cause = None
+                try:
+                    with torch.amp.autocast("cuda", enabled=False):
+                        predictions = self._process_predictions(
+                            output=output,
+                            target_low_res=target,
+                            target_full_res=target_full,
+                            inverse_maps=inverse_maps,
+                            file_names=file_names,
+                            full_res_coords=original_coordinates,
+                            original_colors=original_colors,
+                            original_normals=original_normals,
+                            raw_coords=(
+                                raw_coordinates
+                                if self.config.general.use_dbscan
+                                else None
+                            ),
+                            idx=data_idx,
+                        )
+                        self.instance_metric.update(predictions, target_full)
+                        if self.aux_metric is not None:
+                            self.aux_metric.update(predictions, target_full)
+                except Exception as error:
+                    evaluation_failure = _phase_exception_reason(
+                        "evaluation",
+                        error,
+                    )
+                    evaluation_cause = error
+
+                _batch_contract_consensus(
+                    stage=stage,
+                    batch_idx=batch_idx,
+                    file_names=file_names,
+                    reason=evaluation_failure,
+                    cause=evaluation_cause,
+                    device=collective_device,
+                )
+            else:
+                with torch.amp.autocast("cuda", enabled=False):
+                    predictions = self._process_predictions(
+                        output=output,
+                        target_low_res=target,
+                        target_full_res=target_full,
+                        inverse_maps=inverse_maps,
+                        file_names=file_names,
+                        full_res_coords=original_coordinates,
+                        original_colors=original_colors,
+                        original_normals=original_normals,
+                        raw_coords=(
+                            raw_coordinates
+                            if self.config.general.use_dbscan
+                            else None
+                        ),
+                        idx=data_idx,
+                    )
+                    self.instance_metric.update(predictions, target_full)
+                    if self.aux_metric is not None:
+                        self.aux_metric.update(predictions, target_full)
 
             # Clear intermediate tensors to free memory
             del predictions
@@ -458,13 +1099,74 @@ class InstanceSegmentation(pl.LightningModule):
             # Calculate losses if not in test mode
             if stage == "test":
                 return 0.0
-            losses = self.criterion(output, target, mask_type=self.mask_type)
-            total_loss = aggregate_objective_loss(losses, self.criterion.weight_dict)
-            self.log_dict({
-                **{f"{stage}_{k}": v for k, v in losses.items()},
-                f"{stage}_loss": total_loss,
-                **self._get_mean_loss(losses, stage)
-            }, on_step=False, on_epoch=True, sync_dist=True, batch_size=data.batch_size)
+            if p2_fail_closed_runtime:
+                objective_failure = None
+                objective_cause = None
+                try:
+                    losses = self.criterion(
+                        output,
+                        target,
+                        mask_type=self.mask_type,
+                    )
+                except Exception as error:
+                    objective_failure = _phase_exception_reason(
+                        "criterion",
+                        error,
+                    )
+                    objective_cause = error
+
+                if objective_failure is None:
+                    try:
+                        total_loss = _configured_objective_loss(self, losses)
+                        log_values = {
+                            **{f"{stage}_{k}": v for k, v in losses.items()},
+                            **self._get_mean_loss(losses, stage),
+                        }
+                        if _p2_general_flag(
+                            self.config,
+                            "p2_weighted_objective",
+                        ):
+                            log_values[f"{stage}_loss"] = total_loss
+                        log_batch_size = data.batch_size
+                    except Exception as error:
+                        objective_failure = _phase_exception_reason(
+                            "objective",
+                            error,
+                        )
+                        objective_cause = error
+
+                _batch_contract_consensus(
+                    stage=stage,
+                    batch_idx=batch_idx,
+                    file_names=file_names,
+                    reason=objective_failure,
+                    cause=objective_cause,
+                    device=collective_device,
+                )
+            else:
+                losses = self.criterion(
+                    output,
+                    target,
+                    mask_type=self.mask_type,
+                )
+                total_loss = _configured_objective_loss(self, losses)
+                log_values = {
+                    **{f"{stage}_{k}": v for k, v in losses.items()},
+                    **self._get_mean_loss(losses, stage),
+                }
+                if _p2_general_flag(
+                    self.config,
+                    "p2_weighted_objective",
+                ):
+                    log_values[f"{stage}_loss"] = total_loss
+                log_batch_size = data.batch_size
+            self.log_dict(
+                log_values,
+                on_step=False,
+                on_epoch=True,
+                sync_dist=True,
+                batch_size=log_batch_size,
+            )
             
             return total_loss
     
@@ -930,12 +1632,88 @@ class InstanceSegmentation(pl.LightningModule):
         
         return [optimizer], [scheduler_dict]
 
+    def _train_sampler_generator(self):
+        train_dataset = getattr(self, "train_dataset", None)
+        sampler = getattr(train_dataset, "sampler", None)
+        return getattr(sampler, "generator", None)
+
+    def _restore_train_sampler_generator_state(self):
+        state = getattr(self, "_pending_train_sampler_generator_state", None)
+        if state is None or not hasattr(self, "train_dataset"):
+            return
+
+        generator = self._train_sampler_generator()
+        enabled = (
+            _p2_general_flag(self.config, "p2_fail_closed_runtime")
+            or generator is not None
+        )
+        if not enabled:
+            self._pending_train_sampler_generator_state = None
+            return
+        if generator is None:
+            raise RuntimeError(
+                "cannot restore train sampler generator state: sampler has no "
+                "explicit generator"
+            )
+
+        generator.set_state(state)
+        self._pending_train_sampler_generator_state = None
+
+    def on_save_checkpoint(self, checkpoint):
+        generator = self._train_sampler_generator()
+        p2_fail_closed_runtime = _p2_general_flag(
+            self.config,
+            "p2_fail_closed_runtime",
+        )
+        if generator is None:
+            if p2_fail_closed_runtime:
+                raise RuntimeError(
+                    "cannot checkpoint train sampler: sampler has no explicit "
+                    "generator"
+                )
+            return
+
+        checkpoint[self._TRAIN_SAMPLER_CHECKPOINT_KEY] = {
+            "schema_version": self._TRAIN_SAMPLER_CHECKPOINT_SCHEMA_VERSION,
+            "resume_scope": self._TRAIN_SAMPLER_RESUME_SCOPE,
+            "mid_epoch_resume_supported": False,
+            "dataloader_prefetch_state_checkpointed": False,
+            "generator_state": generator.get_state().detach().cpu().clone(),
+        }
+
+    def on_load_checkpoint(self, checkpoint):
+        self._pending_train_sampler_generator_state = None
+        payload = checkpoint.get(self._TRAIN_SAMPLER_CHECKPOINT_KEY)
+        if payload is None:
+            return
+        if not isinstance(payload, dict):
+            raise ValueError("invalid train sampler generator checkpoint payload")
+        if payload.get("schema_version") != self._TRAIN_SAMPLER_CHECKPOINT_SCHEMA_VERSION:
+            raise ValueError("unsupported train sampler generator checkpoint schema")
+        if payload.get("resume_scope") != self._TRAIN_SAMPLER_RESUME_SCOPE:
+            raise ValueError("unsupported train sampler generator resume scope")
+
+        state = payload.get("generator_state")
+        if not isinstance(state, torch.Tensor):
+            raise ValueError("train sampler generator checkpoint state must be a tensor")
+        self._pending_train_sampler_generator_state = state.detach().cpu().clone()
+        self._restore_train_sampler_generator_state()
+
     def setup(self, stage=None):
         """Setup is called on every process and after prepare_data"""
         if stage == 'fit' or stage is None:
             self.train_dataset = hydra.utils.instantiate(
                 self.config.data.train_dataset
             )
+            if (
+                _p2_general_flag(self.config, "p2_fail_closed_runtime")
+                and self._train_sampler_generator() is None
+            ):
+                raise RuntimeError(
+                    "cannot set up P2 train sampler: sampler has no explicit "
+                    "generator"
+                )
+            self._restore_train_sampler_generator_state()
             self.validation_dataset = hydra.utils.instantiate(
                 self.config.data.validation_dataset
             )
@@ -1054,5 +1832,34 @@ class InstanceSegmentation(pl.LightningModule):
                 print(f"⚠️  {unused} unused parameters detected")
 
     def on_before_optimizer_step(self, optimizer):
+        if _p2_general_flag(self.config, "p2_fail_closed_runtime"):
+            collective_device = _fallback_collective_device(self)
+            batch_idx = None
+            file_names = "<unavailable>"
+            gradient_failure = None
+            gradient_cause = None
+            try:
+                context = getattr(self, "_p2_optimizer_context", {})
+                if isinstance(context, Mapping):
+                    batch_idx = context.get("batch_idx")
+                    file_names = context.get("file_names", file_names)
+                    collective_device = context.get(
+                        "device",
+                        collective_device,
+                    )
+                gradient_failure = _optimizer_gradient_failure(optimizer)
+            except Exception as error:
+                gradient_failure = _phase_exception_reason("gradient", error)
+                gradient_cause = error
+
+            _batch_contract_consensus(
+                stage="train",
+                batch_idx=batch_idx,
+                file_names=file_names,
+                reason=gradient_failure,
+                cause=gradient_cause,
+                device=collective_device,
+            )
+
         norms = pl.utilities.grad_norm(self, norm_type=2)
         self.log_dict(norms)

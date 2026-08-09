@@ -146,6 +146,9 @@ class ScannetPreprocessing(BasePreprocessing):
                 .replace(" ", "_", regex=True)
             )
             df = pd.concat([pd.DataFrame([{"name": "empty"}]), df], ignore_index=True)
+            df["name"] = df["name"].replace(
+                {"refridgerator": "refrigerator"}
+            )
             df["validation"] = False
 
             with open(
@@ -334,16 +337,47 @@ class ScannetPreprocessing(BasePreprocessing):
                 tuple([270, 2]): 50,
                 tuple([384, 0]): 149,
             }
+            database_path = self.save_dir / "train_database.yaml"
+            database = self._load_yaml(database_path)
+            records = {
+                (int(record["scene"]), int(record["sub_scene"])): record
+                for record in database
+            }
             for scene, wrong_label in found_wrong_labels.items():
                 scene, sub_scene = scene
                 bug_file = (
                     self.save_dir / "train" / f"{scene:04}_{sub_scene:02}.npy"
                 )
+                record = records.get((scene, sub_scene))
+                if record is None:
+                    raise ValueError(
+                        "Known ScanNet label fix has no database record for "
+                        f"scene{scene:04}_{sub_scene:02}"
+                    )
                 points = np.load(bug_file)
                 bug_mask = points[:, -1] != wrong_label
+                gt_path = Path(record["instance_gt_filepath"])
+                instance_gt = np.loadtxt(gt_path, dtype=np.int64, ndmin=1)
+                if len(instance_gt) != len(points):
+                    raise ValueError(
+                        f"NPY/GT length mismatch before fixing {bug_file}"
+                    )
                 points = points[bug_mask]
+                instance_gt = instance_gt[bug_mask]
+                if len(points) == 0:
+                    raise ValueError(f"Known label fix emptied {bug_file}")
                 np.save(bug_file, points)
+                np.savetxt(gt_path, instance_gt, fmt="%d")
+                record["file_len"] = int(len(points))
+                colors = points[:, 3:6] / 255.0
+                record["color_mean"] = [
+                    float(value) for value in colors.mean(axis=0)
+                ]
+                record["color_std"] = [
+                    float(value) for value in np.square(colors).mean(axis=0)
+                ]
                 logger.info(f"Fixed {bug_file}")
+            self._save_yaml(database_path, database)
 
     def _parse_scene_subscene(self, name):
         scene_match = re.match(r"scene(\d{4})_(\d{2})", name)

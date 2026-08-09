@@ -68,11 +68,14 @@ def test_base_contrastive_override_composes_after_set_criterion() -> None:
 
 def test_p2_config_locks_the_reproduction_contract(monkeypatch) -> None:
     monkeypatch.delenv("CONCERTO_CHECKPOINT", raising=False)
+    monkeypatch.setenv("HOME", "/tmp/p2-test-home")
     cfg = _compose("config_p2_rescene4d_concerto_t2")
 
     assert cfg.general.seed == 45
     assert cfg.general.freeze == "backbone_encoder"
     assert cfg.general.gpus == 2
+    assert cfg.general.p2_weighted_objective is True
+    assert cfg.general.p2_fail_closed_runtime is True
 
     assert cfg.data.train_dataset._target_ == (
         "datasets.multi_dataset.MultiDataset.from_config"
@@ -86,12 +89,37 @@ def test_p2_config_locks_the_reproduction_contract(monkeypatch) -> None:
         1,
     ]
     assert list(cfg.data.train_dataset.weights) == [1.0, 0.8]
+    assert cfg.data.train_dataset.fail_closed is True
+    assert cfg.data.train_dataset.epoch_sample_multiple == 32
+    assert cfg.data.train_dataset.sampler_seed == 45
+    assert (
+        cfg.data.train_dataset.known_empty_scan_policy
+        == "official_substitute"
+    )
+    assert list(cfg.data.train_dataset.filter_out_classes) == [0, 1, 255]
+    assert cfg.data.validation_dataset.fail_closed is True
+    assert (
+        cfg.data.validation_dataset.known_empty_scan_policy
+        == "official_substitute"
+    )
+    assert list(cfg.data.validation_dataset.filter_out_classes) == [0, 1, 255]
+    assert cfg.data.test_dataset.fail_closed is True
+    assert (
+        cfg.data.test_dataset.known_empty_scan_policy
+        == "official_substitute"
+    )
+    assert list(cfg.data.test_dataset.filter_out_classes) == [0, 1, 255]
+    assert list(cfg.data.train_collation.filter_out_classes) == [0, 1, 255]
+    assert list(cfg.data.validation_collation.filter_out_classes) == [0, 1, 255]
+    assert list(cfg.data.test_collation.filter_out_classes) == [0, 1, 255]
     assert cfg.data.validation_dataset.temporal_window == 2
     assert cfg.data.test_dataset.temporal_window == 2
 
     assert cfg.backbone._target_ == "models.PointceptBackbone"
     assert cfg.backbone.model_lib == "concerto"
-    assert cfg.backbone.name == "concerto_base"
+    assert cfg.backbone.name == (
+        "/tmp/p2-test-home/.cache/persist4d/concerto/concerto_base.pth"
+    )
     assert list(cfg.backbone.decoder_serializations) == [
         "standard",
         "temporal_overlay",
@@ -131,6 +159,60 @@ def test_p2_config_locks_the_reproduction_contract(monkeypatch) -> None:
         cfg.general.gpus * cfg.data.batch_size * cfg.trainer.accumulate_grad_batches
         == 32
     )
+    assert cfg.general.experiment_name == "rescene4d_concerto_t2_repro"
+    assert cfg.general.save_dir == "checkpoints/rescene4d_concerto_t2_repro"
+    assert cfg.general.project_name == "rescene4d_concerto_t2_repro"
+    assert cfg.general.workspace is None
+    assert len(cfg.logging) == 1
+    assert cfg.logging[0]._target_ == "pytorch_lightning.loggers.CSVLogger"
+    assert "entity" not in cfg.logging[0]
+    assert OmegaConf.to_container(cfg.callbacks, resolve=True) == [
+        {
+            "_target_": "pytorch_lightning.callbacks.ModelCheckpoint",
+            "monitor": "val_mean_t-AP",
+            "mode": "max",
+            "save_top_k": 1,
+            "save_last": True,
+            "dirpath": "checkpoints/rescene4d_concerto_t2_repro",
+            "filename": (
+                "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}"
+            ),
+            "every_n_epochs": 1,
+            "save_on_train_epoch_end": False,
+            "save_weights_only": False,
+            "auto_insert_metric_name": False,
+        },
+        {
+            "_target_": "pytorch_lightning.callbacks.ModelCheckpoint",
+            "monitor": None,
+            "save_top_k": -1,
+            "save_last": False,
+            "dirpath": "checkpoints/rescene4d_concerto_t2_repro",
+            "filename": "periodic-epoch={epoch:03d}",
+            "every_n_epochs": 25,
+            "save_on_train_epoch_end": True,
+            "save_weights_only": False,
+            "auto_insert_metric_name": False,
+        },
+        {
+            "_target_": "pytorch_lightning.callbacks.ModelCheckpoint",
+            "monitor": None,
+            "save_top_k": -1,
+            "save_last": False,
+            "dirpath": "checkpoints",
+            "filename": "rescene4d_concerto_t2_repro",
+            "every_n_epochs": 450,
+            "save_on_train_epoch_end": True,
+            "save_weights_only": False,
+            "auto_insert_metric_name": False,
+            "enable_version_counter": False,
+        },
+        {
+            "_target_": "pytorch_lightning.callbacks.LearningRateMonitor",
+        },
+    ]
+    assert cfg.p2_preflight.target == "rescene4d_concerto_t2"
+    assert cfg.p2_preflight.artifact_path == "artifacts/P2/scannet_preflight.json"
 
     config_source = yaml.safe_load(
         (CONFIG_DIR / "config_p2_rescene4d_concerto_t2.yaml").read_text(
@@ -138,8 +220,16 @@ def test_p2_config_locks_the_reproduction_contract(monkeypatch) -> None:
         )
     )
     assert config_source["backbone"]["name"] == (
-        "${oc.env:CONCERTO_CHECKPOINT,concerto_base}"
+        "${oc.env:CONCERTO_CHECKPOINT,${oc.env:HOME}/.cache/persist4d/concerto/concerto_base.pth}"
     )
+
+
+def test_p2_ignore_instance_filter_does_not_change_the_base_profile() -> None:
+    cfg = _compose("config_base_instance_segmentation")
+
+    assert list(cfg.data.train_dataset.filter_out_classes) == [0, 1]
+    assert list(cfg.data.validation_dataset.filter_out_classes) == [0, 1]
+    assert list(cfg.data.test_dataset.filter_out_classes) == [0, 1]
 
 
 def test_p2_config_accepts_checkpoint_from_environment(monkeypatch) -> None:
@@ -148,6 +238,18 @@ def test_p2_config_accepts_checkpoint_from_environment(monkeypatch) -> None:
     cfg = _compose("config_p2_rescene4d_concerto_t2")
 
     assert cfg.backbone.name == "/checkpoints/concerto.pth"
+
+
+def test_p2_preflight_artifact_path_cannot_be_redirected_by_environment(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("P2_SCANNET_PREFLIGHT", "/tmp/forged.json")
+
+    cfg = _compose("config_p2_rescene4d_concerto_t2")
+
+    assert cfg.p2_preflight.artifact_path == (
+        "artifacts/P2/scannet_preflight.json"
+    )
 
 
 def test_p2_config_disables_the_non_g2_auxiliary_metric() -> None:
@@ -284,11 +386,19 @@ def test_training_and_validation_use_the_weighted_objective_and_log_raw_losses(
         criterion.weight_dict = {"loss_ce": 2.0}
         logged = []
         instance.config = types.SimpleNamespace(
-            general=types.SimpleNamespace(max_batch_size=10, use_dbscan=False)
+            general=types.SimpleNamespace(
+                max_batch_size=10,
+                use_dbscan=False,
+                p2_weighted_objective=True,
+                p2_fail_closed_runtime=True,
+            )
         )
         instance.mask_type = "segment_mask"
         instance.criterion = criterion
-        instance.forward = lambda *args, **kwargs: {}
+        instance.forward = lambda *args, **kwargs: {
+            "pred_logits": torch.zeros((1, 1, 2)),
+            "pred_masks": [torch.zeros((1, 1))],
+        }
         instance._process_raw_coordinates = lambda data: None
         instance.log_dict = lambda values, **kwargs: logged.append(values)
 
@@ -303,7 +413,12 @@ def test_training_and_validation_use_the_weighted_objective_and_log_raw_losses(
             original_normals=[],
             original_coordinates=[],
         )
-        target = [{"point2segment": torch.tensor([0])}]
+        target = [
+            {
+                "labels": torch.tensor([0]),
+                "point2segment": torch.tensor([0]),
+            }
+        ]
         batch = (data, target, ["scene"])
 
         train_objective = instance.training_step(batch, 0)

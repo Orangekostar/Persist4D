@@ -51,7 +51,15 @@ class SemanticSegmentationDataset(Dataset):
             str
         ] = "data/rio/change_label_database.yaml",
         max_points_per_sample: Optional[int] = None,
+        fail_closed: bool = False,
+        known_empty_scan_policy: str = "official_substitute",
     ):
+
+        if known_empty_scan_policy not in {"official_substitute", "error"}:
+            raise ValueError(
+                "known_empty_scan_policy must be 'official_substitute' or 'error', "
+                f"got {known_empty_scan_policy!r}"
+            )
 
         self.dataset_name = dataset_name
 
@@ -70,6 +78,9 @@ class SemanticSegmentationDataset(Dataset):
         self.add_raw_coordinates = add_raw_coordinates
         self.temporal_window = temporal_window
         self.max_points_per_sample = max_points_per_sample
+        self.fail_closed = fail_closed
+        self.known_empty_scan_policy = known_empty_scan_policy
+        self.known_empty_scan_substitution_count = 0
 
         # loading database files
         self._data = []
@@ -77,14 +88,19 @@ class SemanticSegmentationDataset(Dataset):
             database_path = Path(database_path)
             database_filepath = database_path / f"{mode}_database.yaml"
             if not database_filepath.exists():
-                raise FileNotFoundError(
-                    "Required dataset database does not exist: "
-                    f"{database_filepath}. Generate it before loading the dataset."
-                )
+                if self.fail_closed:
+                    raise FileNotFoundError(
+                        "Required dataset database does not exist: "
+                        f"{database_filepath}. Generate it before loading the dataset."
+                    )
+                print(f"generate {database_filepath} first")
+                raise SystemExit()
             
             # Load data from this directory
             data_from_dir = self._load_yaml(database_filepath)
-            if not isinstance(data_from_dir, list) or not data_from_dir:
+            if self.fail_closed and (
+                not isinstance(data_from_dir, list) or not data_from_dir
+            ):
                 raise ValueError(
                     f"Dataset split database {database_filepath} must be a "
                     "non-empty list"
@@ -158,6 +174,43 @@ class SemanticSegmentationDataset(Dataset):
 
             # Process each data directory
             for dir_path in self.data_dir:
+                if not self.fail_closed:
+                    file_path = (
+                        f"{dir_path}/sequence_database_{sequence_type}_"
+                        f"{self.temporal_window}.yaml"
+                    )
+                    try:
+                        sequence_db = self._load_yaml(file_path)
+                        dir_mode = [
+                            (
+                                key,
+                                value.get("filepath", None),
+                                value.get("ambiguities", None),
+                            )
+                            for key, value in sequence_db.items()
+                            if value.get("type") == mode
+                        ]
+                        dir_sequence_names = [entry[0] for entry in dir_mode]
+                        dir_change_files = [entry[1] for entry in dir_mode]
+                        dir_ambiguities = [entry[2] for entry in dir_mode]
+                        dir_sequence_indices = np.zeros(
+                            (len(dir_sequence_names), self.temporal_window),
+                            dtype=int,
+                        )
+                        for i, sequence in enumerate(dir_sequence_names):
+                            names = sequence.split("-")
+                            dir_sequence_indices[i] = np.array(
+                                [name_idx_mapping[name] for name in names]
+                            )
+                    except Exception as error:
+                        print(f"Error loading sequence database: {error}")
+
+                    self.sequence_names.extend(dir_sequence_names)
+                    all_sequence_indices.append(dir_sequence_indices)
+                    self.change_files.extend(dir_change_files)
+                    self.ambiguities.extend(dir_ambiguities)
+                    continue
+
                 database_path = (
                     Path(dir_path)
                     / f"sequence_database_{sequence_type}_{self.temporal_window}.yaml"
@@ -233,6 +286,14 @@ class SemanticSegmentationDataset(Dataset):
             # Combine sequence indices from all directories
             self.sequence_indices = np.vstack(all_sequence_indices)
 
+        self.known_empty_scan_contexts = self._find_known_empty_scan_contexts()
+        if (
+            self.known_empty_scan_policy == "error"
+            and self.known_empty_scan_contexts
+        ):
+            context = self.known_empty_scan_contexts[0]
+            raise ValueError(self._known_empty_scan_error(context))
+
 
     def map2color(self, labels):
         output_colors = list()
@@ -241,6 +302,63 @@ class SemanticSegmentationDataset(Dataset):
             output_colors.append(self.color_map[label])
 
         return torch.tensor(output_colors)
+
+    @staticmethod
+    def _known_empty_scan(filepath):
+        path = Path(filepath)
+        known_sources = {"scannet", "scannet200", "rio", "rio200"}
+        scene_source = next(
+            (
+                path_part
+                for path_part in reversed(path.parts[:-1])
+                if path_part in known_sources
+            ),
+            None,
+        )
+        scene_id = path.stem
+        if scene_source in {"scannet", "scannet200"} and scene_id in {
+            "scene0636_00",
+            "scene0154_00",
+        }:
+            return scene_source, scene_id
+        if scene_source in {"rio", "rio200"} and scene_id == "0171_01":
+            return scene_source, scene_id
+        return None
+
+    def _known_empty_scan_context(self, sequence_index, scan_index):
+        known_scan = self._known_empty_scan(self.data[scan_index]["filepath"])
+        if known_scan is None:
+            return None
+        scene_source, scene_id = known_scan
+        return {
+            "scene_source": scene_source,
+            "scene_id": scene_id,
+            "sequence_name": self.sequence_names[sequence_index],
+            "sequence_index": int(sequence_index),
+            "scan_index": int(scan_index),
+        }
+
+    def _find_known_empty_scan_contexts(self):
+        contexts = []
+        for sequence_index, scan_indices in enumerate(self.sequence_indices):
+            for scan_index in scan_indices:
+                context = self._known_empty_scan_context(
+                    sequence_index,
+                    int(scan_index),
+                )
+                if context is not None:
+                    contexts.append(context)
+        return contexts
+
+    def _known_empty_scan_error(self, context):
+        return (
+            f"Known empty-instance scan '{context['scene_id']}' from source "
+            f"'{context['scene_source']}' is forbidden by "
+            "known_empty_scan_policy='error'; "
+            f"sequence '{context['sequence_name']}' "
+            f"(sequence index {context['sequence_index']}, scan index "
+            f"{context['scan_index']}) would otherwise be replaced by sample 0"
+        )
     
     
     def _name_scene(self, idx):
@@ -295,17 +413,29 @@ class SemanticSegmentationDataset(Dataset):
             # update the new max 
             max_segment = np.max(segments[start_slice:end_slice]) + 1
 
-            # skip problematic scans robust to dataset name changes
-            scene_source = self.data[scan_idx]['filepath'].split("/")[-3]
-            scene_id = self.data[scan_idx]['filepath'].split("/")[-1].replace('.npy', '')
-            if scene_id in [
-                "scene0636_00",
-                "scene0154_00",
-            ] and (scene_source == "scannet" or scene_source == "scannet200"):
-                return self.__getitem__(0)
-            if scene_id in [
-                "0171_01"
-            ] and (scene_source == "rio" or scene_source == "rio200"):
+            known_empty_context = self._known_empty_scan_context(idx, int(scan_idx))
+            if known_empty_context is not None:
+                if self.known_empty_scan_policy == "error":
+                    raise ValueError(
+                        self._known_empty_scan_error(known_empty_context)
+                    )
+                self.known_empty_scan_substitution_count += 1
+                logger.warning(
+                    "Applying official sample-zero substitution for known empty scan",
+                    extra={
+                        "event": "known_empty_scan_substitution",
+                        "policy": self.known_empty_scan_policy,
+                        **known_empty_context,
+                        "requested_index": int(idx),
+                        "substitute_index": 0,
+                        "substitution_count": (
+                            self.known_empty_scan_substitution_count
+                        ),
+                        "affected_sequence_count": len(
+                            self.known_empty_scan_contexts
+                        ),
+                    },
+                )
                 return self.__getitem__(0)
             
             start_slice = end_slice

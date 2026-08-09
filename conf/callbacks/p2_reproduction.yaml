@@ -1,0 +1,37 @@
+# @package callbacks
+- _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  monitor: val_mean_t-AP
+  mode: max
+  save_top_k: 1
+  save_last: true
+  dirpath: ${general.save_dir}
+  filename: "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}"
+  every_n_epochs: 1
+  save_on_train_epoch_end: false
+  save_weights_only: false
+  auto_insert_metric_name: false
+
+- _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  monitor: null
+  save_top_k: -1
+  save_last: false
+  dirpath: ${general.save_dir}
+  filename: "periodic-epoch={epoch:03d}"
+  every_n_epochs: 25
+  save_on_train_epoch_end: true
+  save_weights_only: false
+  auto_insert_metric_name: false
+
+- _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  monitor: null
+  save_top_k: -1
+  save_last: false
+  dirpath: checkpoints
+  filename: rescene4d_concerto_t2_repro
+  every_n_epochs: 450
+  save_on_train_epoch_end: true
+  save_weights_only: false
+  auto_insert_metric_name: false
+  enable_version_counter: false
+
+- _target_: pytorch_lightning.callbacks.LearningRateMonitor

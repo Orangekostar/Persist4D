@@ -7,6 +7,8 @@ defaults:
   - override optimizer: adamw
   - override scheduler: onecyclelr
   - override trainer: trainer
+  - override logging: local_csv
+  - override callbacks: p2_reproduction
   - override matcher: hungarian_matcher
   - override loss: set_criterion
   - override loss/contrastive: infoNCE
@@ -15,18 +17,42 @@ defaults:
 # Reproduction choice: t-SIM is outside G2 and its required inputs are disabled.
 aux_metric: null
 
+p2_preflight:
+  target: rescene4d_concerto_t2
+  artifact_path: artifacts/P2/scannet_preflight.json
+
 general:
   train_mode: true
   seed: 45
   freeze: backbone_encoder
   gpus: 2
+  project_name: rescene4d_concerto_t2_repro
+  workspace: null
+  experiment_name: rescene4d_concerto_t2_repro
+  save_dir: checkpoints/rescene4d_concerto_t2_repro
+  p2_weighted_objective: true
+  p2_fail_closed_runtime: true
 
 data:
   batch_size: 4
   voxel_size: 0.02
+  train_dataset:
+    filter_out_classes: [0, 1, 255]
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
+    epoch_sample_multiple: 32
+    sampler_seed: 45
+  validation_dataset:
+    filter_out_classes: [0, 1, 255]
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
+  test_dataset:
+    filter_out_classes: [0, 1, 255]
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
 
 backbone:
-  name: ${oc.env:CONCERTO_CHECKPOINT,concerto_base}
+  name: ${oc.env:CONCERTO_CHECKPOINT,${oc.env:HOME}/.cache/persist4d/concerto/concerto_base.pth}
 
 model:
   num_queries: 100

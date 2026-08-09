@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 import torch
 import torch.nn.functional as F
+from omegaconf import OmegaConf
 from pytorch_lightning import LightningModule, Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 from torch.utils.data import DataLoader, TensorDataset
@@ -26,6 +27,19 @@ class TinyResumeModule(LightningModule):
             "optimizer": optimizer,
             "lr_scheduler": {"scheduler": scheduler, "interval": "step"},
         }
+
+
+class TinyDictConfigResumeModule(TinyResumeModule):
+    def __init__(self) -> None:
+        super().__init__()
+        self.save_hyperparameters(
+            {"runtime_cfg": OmegaConf.create({"seed": 45})}
+        )
+
+    def train_dataloader(self):
+        inputs = torch.tensor([[1.0], [2.0]])
+        targets = torch.tensor([[2.0], [4.0]])
+        return DataLoader(TensorDataset(inputs, targets), batch_size=1)
 
 
 def _full_checkpoint(*, epoch: int, global_step: int) -> dict:
@@ -54,6 +68,19 @@ def _full_checkpoint(*, epoch: int, global_step: int) -> dict:
 def _save_checkpoint(path: Path, *, epoch: int, global_step: int) -> None:
     payload = _full_checkpoint(epoch=epoch, global_step=global_step)
     torch.save(payload, path)
+
+
+def _add_sampler_generator_state(payload: dict) -> dict:
+    generator = torch.Generator()
+    generator.manual_seed(45)
+    payload["p2_train_sampler_generator"] = {
+        "schema_version": 1,
+        "resume_scope": "completed_epoch_boundary_only",
+        "mid_epoch_resume_supported": False,
+        "dataloader_prefetch_state_checkpointed": False,
+        "generator_state": generator.get_state(),
+    }
+    return payload
 
 
 def test_find_best_tap_checkpoint_parses_standard_lightning_filename(
@@ -112,6 +139,36 @@ def test_resume_skips_corruption_and_selects_latest_valid_epoch(
     selected = training_entrypoint.find_resume_checkpoint(tmp_path)
 
     assert selected == str(latest_valid)
+
+
+def test_formal_resume_skips_newer_checkpoint_without_sampler_generator_state(
+    tmp_path: Path,
+) -> None:
+    older_complete = tmp_path / "epoch=7-val_mean_t-AP=0.200.ckpt"
+    newer_without_sampler = tmp_path / "epoch=8-val_mean_t-AP=0.900.ckpt"
+    torch.save(
+        _add_sampler_generator_state(_full_checkpoint(epoch=7, global_step=70)),
+        older_complete,
+    )
+    _save_checkpoint(newer_without_sampler, epoch=8, global_step=80)
+
+    selected = training_entrypoint.find_resume_checkpoint(
+        tmp_path,
+        formal_p2=True,
+    )
+
+    assert selected == str(older_complete)
+
+
+def test_non_p2_resume_accepts_checkpoint_without_sampler_generator_state(
+    tmp_path: Path,
+) -> None:
+    checkpoint = tmp_path / "epoch=8-val_mean_t-AP=0.900.ckpt"
+    _save_checkpoint(checkpoint, epoch=8, global_step=80)
+
+    selected = training_entrypoint.find_resume_checkpoint(tmp_path)
+
+    assert selected == str(checkpoint)
 
 
 def test_resume_skips_weights_only_and_partial_training_checkpoints(
@@ -233,6 +290,76 @@ def test_actual_lightning_checkpoint_is_selected_and_restores_after_bad_newer_fi
         ckpt_path=selected,
     )
     assert restored_trainer.global_step > valid_payload["global_step"]
+
+
+def test_training_entrypoint_restores_real_dictconfig_lightning_checkpoint(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    checkpoint = tmp_path / "last.ckpt"
+    source_callback = ModelCheckpoint(
+        dirpath=tmp_path / "source",
+        save_last=True,
+        save_top_k=0,
+    )
+    source_trainer = Trainer(
+        max_epochs=1,
+        accelerator="cpu",
+        devices=1,
+        logger=False,
+        enable_progress_bar=False,
+        enable_model_summary=False,
+        callbacks=[source_callback],
+    )
+    source_trainer.fit(TinyDictConfigResumeModule())
+    source_trainer.save_checkpoint(checkpoint)
+    payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
+    assert type(payload["hyper_parameters"]["runtime_cfg"]).__name__ == "DictConfig"
+
+    cfg = OmegaConf.create(
+        {
+            "general": {
+                "save_dir": str(tmp_path),
+                "experiment_name": "dictconfig-resume-test",
+                "project_name": "tests",
+                "gpus": 1,
+            },
+            "logging": [],
+            "callbacks": [],
+            "trainer": {},
+        }
+    )
+    restored_trainers = []
+
+    def cpu_trainer(**_kwargs):
+        trainer = Trainer(
+            max_epochs=2,
+            accelerator="cpu",
+            devices=1,
+            logger=False,
+            enable_progress_bar=False,
+            enable_model_summary=False,
+            callbacks=[
+                ModelCheckpoint(
+                    dirpath=tmp_path / "source",
+                    save_last=True,
+                    save_top_k=0,
+                )
+            ],
+        )
+        restored_trainers.append(trainer)
+        return trainer
+
+    monkeypatch.setattr(training_entrypoint, "Trainer", cpu_trainer)
+    monkeypatch.setattr(
+        training_entrypoint,
+        "get_parameters",
+        lambda candidate_cfg: (candidate_cfg, TinyDictConfigResumeModule()),
+    )
+
+    training_entrypoint.train.__wrapped__(cfg)
+
+    assert restored_trainers[0].global_step > payload["global_step"]
 
 
 def test_resume_returns_none_when_checkpoint_directory_is_empty(

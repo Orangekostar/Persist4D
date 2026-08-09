@@ -1,4 +1,5 @@
 import importlib
+import logging
 import re
 import subprocess
 import sys
@@ -103,24 +104,78 @@ def _make_three_scan_fixture(tmp_path: Path) -> tuple[Path, np.ndarray]:
     return processed_dir, raw_changes
 
 
-def _make_dataset(processed_dir: Path) -> SemanticSegmentationDataset:
-    return SemanticSegmentationDataset(
-        dataset_name="rio",
-        data_dir=str(processed_dir),
-        label_db_filepath=str(processed_dir / "label_database.yaml"),
-        change_label_db_filepath=str(processed_dir / "change_label_database.yaml"),
-        color_mean_std=str(processed_dir / "color_mean_std.yaml"),
-        mode="validation",
-        add_colors=True,
-        add_normals=False,
-        add_raw_coordinates=False,
-        add_instance=True,
-        num_labels=20,
-        num_changes=-1,
-        filter_out_classes=[0, 1],
-        label_offset=2,
-        temporal_window=3,
+def _make_known_empty_rio_fixture(tmp_path: Path) -> Path:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    database_path = processed_dir / "validation_database.yaml"
+    database = yaml.safe_load(database_path.read_text(encoding="utf-8"))
+
+    empty_scan_id = "0171_01"
+    empty_scan_name = "scene0171_01"
+    empty_point_path = processed_dir / "rio" / "validation" / f"{empty_scan_id}.npy"
+    empty_instance_path = (
+        processed_dir
+        / "rio"
+        / "instance_gt"
+        / "validation"
+        / f"{empty_scan_name}.txt"
     )
+    empty_point_path.parent.mkdir(parents=True)
+    empty_instance_path.parent.mkdir(parents=True)
+    Path(database[2]["filepath"]).rename(empty_point_path)
+    Path(database[2]["instance_gt_filepath"]).rename(empty_instance_path)
+    database[2]["filepath"] = str(empty_point_path)
+    database[2]["instance_gt_filepath"] = str(empty_instance_path)
+    _write_yaml(database_path, database)
+
+    changes = np.zeros(4, dtype=np.int64)
+    change_path = processed_dir / "known_empty_changes.txt"
+    np.savetxt(change_path, changes, fmt="%d")
+    _write_yaml(
+        processed_dir / "sequence_database_sliding_2.yaml",
+        {
+            "scene0000_00-scene0000_01": {
+                "type": "validation",
+                "ambiguities": [],
+                "filepath": str(change_path),
+            },
+            f"scene0000_01-{empty_scan_name}": {
+                "type": "validation",
+                "ambiguities": [],
+                "filepath": str(change_path),
+            },
+        },
+    )
+    return processed_dir
+
+
+def _make_dataset(
+    processed_dir: Path,
+    *,
+    fail_closed: bool = True,
+    temporal_window: int = 3,
+    known_empty_scan_policy: str | None = None,
+) -> SemanticSegmentationDataset:
+    kwargs = {
+        "dataset_name": "rio",
+        "data_dir": str(processed_dir),
+        "label_db_filepath": str(processed_dir / "label_database.yaml"),
+        "change_label_db_filepath": str(processed_dir / "change_label_database.yaml"),
+        "color_mean_std": str(processed_dir / "color_mean_std.yaml"),
+        "mode": "validation",
+        "add_colors": True,
+        "add_normals": False,
+        "add_raw_coordinates": False,
+        "add_instance": True,
+        "num_labels": 20,
+        "num_changes": -1,
+        "filter_out_classes": [0, 1],
+        "label_offset": 2,
+        "temporal_window": temporal_window,
+        "fail_closed": fail_closed,
+    }
+    if known_empty_scan_policy is not None:
+        kwargs["known_empty_scan_policy"] = known_empty_scan_policy
+    return SemanticSegmentationDataset(**kwargs)
 
 
 def test_official_loader_projects_three_scan_changes_to_first_transition(
@@ -135,6 +190,55 @@ def test_official_loader_projects_three_scan_changes_to_first_transition(
     assert features.shape == (6, 3)
     assert labels.shape == (6, 4)
     np.testing.assert_array_equal(labels[:, 2], raw_changes[:, 0])
+
+
+def test_known_empty_scan_error_policy_fails_before_returning_sample_zero(
+    tmp_path: Path,
+) -> None:
+    processed_dir = _make_known_empty_rio_fixture(tmp_path)
+    problem_sequence = "scene0000_01-scene0171_01"
+
+    with pytest.raises(
+        ValueError,
+        match=rf"0171_01.*{problem_sequence}",
+    ):
+        _make_dataset(
+            processed_dir,
+            fail_closed=True,
+            temporal_window=2,
+            known_empty_scan_policy="error",
+        )
+
+
+def test_official_known_empty_scan_substitution_is_observable(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    processed_dir = _make_known_empty_rio_fixture(tmp_path)
+    dataset = _make_dataset(
+        processed_dir,
+        fail_closed=False,
+        temporal_window=2,
+    )
+
+    with caplog.at_level(logging.WARNING, logger="datasets.semseg"):
+        result = dataset[1]
+
+    assert result[3] == "scene0000_00-scene0000_01"
+    assert result[7] == 0
+    assert dataset.known_empty_scan_substitution_count == 1
+    record = next(
+        record
+        for record in caplog.records
+        if getattr(record, "event", None) == "known_empty_scan_substitution"
+    )
+    assert record.policy == "official_substitute"
+    assert record.scene_source == "rio"
+    assert record.scene_id == "0171_01"
+    assert record.sequence_name == "scene0000_01-scene0171_01"
+    assert record.requested_index == 1
+    assert record.substitute_index == 0
+    assert record.substitution_count == 1
 
 
 @pytest.mark.parametrize("invalid_database", [{}, [], None, [{"type": "validation"}]])
@@ -312,7 +416,7 @@ def test_missing_split_writes_blocked_artifact_before_nonzero_exit(
     artifact = yaml.safe_load(output.read_text(encoding="utf-8"))
     assert artifact["status"] == "blocked"
     assert artifact["totals"]["failures"] == 1
-    assert artifact["audits"][0]["exceptions"][0]["type"] == "FileNotFoundError"
+    assert artifact["audits"][0]["exceptions"][0]["type"] == "SystemExit"
 
 
 def test_database_loader_count_mismatch_blocks_audit(

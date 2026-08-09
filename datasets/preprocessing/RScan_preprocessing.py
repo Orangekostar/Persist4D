@@ -459,6 +459,9 @@ class RScanPreprocessing(BasePreprocessing):
                 .replace(" ", "_", regex=True)
             )
             df = pd.concat([pd.DataFrame([{"name": "empty"}]), df], ignore_index=True)
+            df["name"] = df["name"].replace(
+                {"refridgerator": "refrigerator"}
+            )
             df["validation"] = False
 
             with open(

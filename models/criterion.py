@@ -726,6 +726,17 @@ class ContrastiveLoss(nn.Module):
         instance_masks: (M, N) binary masks indicating instance membership per point
         temporal_stages: Optional (N,) int tensor indicating stage per point (for per-point weighting)
         """
+        if getattr(self, "p2_fail_closed_runtime", False):
+            if not torch.isfinite(features).all():
+                raise ValueError("non-finite contrastive features")
+            if not torch.isfinite(instance_masks).all():
+                raise ValueError("non-finite contrastive instance masks")
+            if (
+                temporal_stages is not None
+                and not torch.isfinite(temporal_stages).all()
+            ):
+                raise ValueError("non-finite contrastive temporal stages")
+
         # Use memory-efficient chunked implementation by default
         if self.use_chunked_loss:
             # Compute logit scale and bias from learnable parameters
@@ -805,9 +816,14 @@ class ContrastiveLoss(nn.Module):
             else:
                 raise NotImplementedError(f"Unsupported contrastive loss type: {self.loss_type}")
 
-        # Check for NaN in output
+        if (
+            getattr(self, "p2_fail_closed_runtime", False)
+            and not torch.isfinite(loss).all()
+        ):
+            raise ValueError("non-finite contrastive loss")
+
+        # Preserve the upstream fallback outside the P2 fail-closed path.
         if torch.isnan(loss):
-            # Fallback: return 0.0 if loss is NaN
             return torch.tensor(0.0, device=features.device, dtype=features.dtype)
         
         return loss
@@ -1156,6 +1172,28 @@ class SetCriterion(nn.Module):
              targets: list of dicts, such that len(targets) == batch_size.
                       The expected keys in each dict depends on the losses applied, see each loss' doc
         """
+        def normalized_num_masks(device):
+            num_masks = sum(len(t["labels"]) for t in targets)
+            num_masks = torch.as_tensor(
+                [num_masks],
+                dtype=torch.float,
+                device=device,
+            )
+            if is_dist_avail_and_initialized():
+                torch.distributed.all_reduce(num_masks)
+            return torch.clamp(
+                num_masks / get_world_size(),
+                min=1,
+            ).detach()
+
+        p2_fail_closed_runtime = getattr(
+            self,
+            "p2_fail_closed_runtime",
+            False,
+        )
+        if p2_fail_closed_runtime:
+            num_masks = normalized_num_masks(outputs["pred_logits"].device)
+
         outputs_without_aux = {
             k: v for k, v in outputs.items() if k != "aux_outputs"
         }
@@ -1163,16 +1201,10 @@ class SetCriterion(nn.Module):
         # Retrieve the matching between the outputs of the last layer and the targets
         indices = self.matcher(outputs_without_aux, targets, mask_type)
 
-        # Compute the average number of target boxes accross all nodes, for normalization purposes
-        num_masks = sum(len(t["labels"]) for t in targets)
-        num_masks = torch.as_tensor(
-            [num_masks],
-            dtype=torch.float,
-            device=next(iter(outputs.values())).device,
-        )
-        if is_dist_avail_and_initialized():
-            torch.distributed.all_reduce(num_masks)
-        num_masks = torch.clamp(num_masks / get_world_size(), min=1).detach()
+        if not p2_fail_closed_runtime:
+            num_masks = normalized_num_masks(
+                next(iter(outputs.values())).device
+            )
 
         # Compute all the requested losses
         losses = {}
