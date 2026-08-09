@@ -1,0 +1,68 @@
+defaults:
+  - config_base_instance_segmentation
+  - override data/datasets: mix
+  - override model: rescene
+  - override backbone: concerto
+  - override serialization: mixed
+  - override optimizer: adamw
+  - override scheduler: onecyclelr
+  - override trainer: trainer
+  - override matcher: hungarian_matcher
+  - override loss: set_criterion
+  - override loss/contrastive: infoNCE
+  - _self_
+
+# Reproduction choice: t-SIM is outside G2 and its required inputs are disabled.
+aux_metric: null
+
+general:
+  train_mode: true
+  seed: 45
+  freeze: backbone_encoder
+  gpus: 2
+
+data:
+  batch_size: 4
+  voxel_size: 0.02
+
+backbone:
+  name: ${oc.env:CONCERTO_CHECKPOINT,concerto_base}
+
+model:
+  num_queries: 100
+  non_parametric_queries: true
+  random_query_both: false
+  random_normal: false
+  random_queries: false
+  temporal_masking: false
+  config:
+    temporal_window: 2
+
+loss:
+  eos_coef: 0.2
+
+optimizer:
+  lr: 0.0005
+  # Reproduction choices: explicit PyTorch defaults, not paper-reported values.
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.01
+  amsgrad: false
+
+scheduler:
+  scheduler:
+    # Reproduction choices: explicit PyTorch defaults, not paper-reported values.
+    pct_start: 0.3
+    anneal_strategy: cos
+    cycle_momentum: true
+    base_momentum: 0.85
+    max_momentum: 0.95
+    div_factor: 25.0
+    final_div_factor: 10000.0
+    three_phase: false
+    last_epoch: -1
+
+trainer:
+  max_epochs: 450
+  accumulate_grad_batches: 4
+  precision: 32-true

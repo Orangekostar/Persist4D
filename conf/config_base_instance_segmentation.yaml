@@ -57,6 +57,7 @@ defaults:
   - model: rescene
   - backbone: concerto
   - serialization: mixed    # optional: serialization=mixed | serialization=st_only
+  - loss: set_criterion
   - loss/contrastive: null  # optional: loss/contrastive=infoNCE
   - metrics@instance_metric: tmap  # composite (AP + t-AP + t-REC + per stage AP); heads list overridable
   - metrics@aux_metric: tsim        # secondary evaluator: t-SIM (requires save_segment_info=true)
@@ -65,7 +66,6 @@ defaults:
   - trainer: trainer
   - callbacks: callbacks_instance_segmentation
   - matcher: hungarian_matcher
-  - loss: set_criterion
   - _self_
 
 hydra:

@@ -13,6 +13,18 @@ import torch
 import pickle
 
 
+def aggregate_objective_loss(losses, weight_dict):
+    """Build the optimized objective while omitting per-layer diagnostics."""
+    objective_terms = [
+        loss * weight_dict.get(loss_name, 1.0)
+        for loss_name, loss in losses.items()
+        if not (loss_name.startswith("loss_") and "_contrastive_layer" in loss_name)
+    ]
+    if not objective_terms:
+        raise ValueError("no objective loss terms")
+    return sum(objective_terms)
+
+
 
 class InstanceSegmentation(pl.LightningModule):
     def __init__(self, config):
@@ -144,7 +156,7 @@ class InstanceSegmentation(pl.LightningModule):
             print(f"ValueError: {val_err}")
             raise val_err
     
-        total_loss = sum(losses.values())
+        total_loss = aggregate_objective_loss(losses, self.criterion.weight_dict)
 
         self.log_dict({
             **{f"train_{k}": v for k, v in losses.items()},
@@ -304,12 +316,14 @@ class InstanceSegmentation(pl.LightningModule):
             if stage == "test":
                 return 0.0
             losses = self.criterion(output, target, mask_type=self.mask_type)
+            total_loss = aggregate_objective_loss(losses, self.criterion.weight_dict)
             self.log_dict({
                 **{f"{stage}_{k}": v for k, v in losses.items()},
+                f"{stage}_loss": total_loss,
                 **self._get_mean_loss(losses, stage)
             }, on_step=False, on_epoch=True, sync_dist=True, batch_size=data.batch_size)
             
-            return sum(losses.values())
+            return total_loss
     
     def _process_raw_coordinates(self, data):
         """Process raw coordinates"""
@@ -899,5 +913,3 @@ class InstanceSegmentation(pl.LightningModule):
     def on_before_optimizer_step(self, optimizer):
         norms = pl.utilities.grad_norm(self, norm_type=2)
         self.log_dict(norms)
-
-
