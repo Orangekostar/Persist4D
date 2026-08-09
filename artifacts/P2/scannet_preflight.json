@@ -1,0 +1,719 @@
+{
+  "class_taxonomy": {
+    "class_count": 0,
+    "name": null,
+    "status": "fail",
+    "valid_class_ids": []
+  },
+  "errors": [
+    {
+      "code": "scannet_raw_root_missing"
+    },
+    {
+      "code": "scannet_label_map_missing"
+    },
+    {
+      "code": "raw_scene_assets_incomplete",
+      "missing_asset_count": 6005,
+      "missing_scene_count": 1201,
+      "split": "train"
+    },
+    {
+      "code": "raw_scene_assets_incomplete",
+      "missing_asset_count": 1560,
+      "missing_scene_count": 312,
+      "split": "validation"
+    },
+    {
+      "code": "raw_scene_assets_incomplete",
+      "missing_asset_count": 200,
+      "missing_scene_count": 100,
+      "split": "test"
+    },
+    {
+      "code": "scannet_processed_root_missing"
+    },
+    {
+      "code": "processed_global_file_missing",
+      "name": "label_database.yaml"
+    },
+    {
+      "code": "processed_global_file_missing",
+      "name": "color_mean_std.yaml"
+    },
+    {
+      "code": "processed_global_file_missing",
+      "name": "scannet.yaml"
+    },
+    {
+      "code": "processed_database_missing",
+      "split": "train"
+    },
+    {
+      "code": "processed_database_count_mismatch",
+      "expected": 1201,
+      "observed": 0,
+      "split": "train"
+    },
+    {
+      "code": "processed_database_scene_missing",
+      "missing_scene_count": 1201,
+      "scenes": [
+        "scene0191_00",
+        "scene0191_01",
+        "scene0191_02",
+        "scene0119_00",
+        "scene0230_00",
+        "scene0528_00",
+        "scene0528_01",
+        "scene0705_00",
+        "scene0705_01",
+        "scene0705_02"
+      ],
+      "split": "train"
+    },
+    {
+      "code": "processed_database_missing",
+      "split": "validation"
+    },
+    {
+      "code": "processed_database_count_mismatch",
+      "expected": 312,
+      "observed": 0,
+      "split": "validation"
+    },
+    {
+      "code": "processed_database_scene_missing",
+      "missing_scene_count": 312,
+      "scenes": [
+        "scene0568_00",
+        "scene0568_01",
+        "scene0568_02",
+        "scene0304_00",
+        "scene0488_00",
+        "scene0488_01",
+        "scene0412_00",
+        "scene0412_01",
+        "scene0217_00",
+        "scene0019_00"
+      ],
+      "split": "validation"
+    },
+    {
+      "code": "processed_database_missing",
+      "split": "test"
+    },
+    {
+      "code": "processed_database_count_mismatch",
+      "expected": 100,
+      "observed": 0,
+      "split": "test"
+    },
+    {
+      "code": "processed_database_scene_missing",
+      "missing_scene_count": 100,
+      "scenes": [
+        "scene0707_00",
+        "scene0708_00",
+        "scene0709_00",
+        "scene0710_00",
+        "scene0711_00",
+        "scene0712_00",
+        "scene0713_00",
+        "scene0714_00",
+        "scene0715_00",
+        "scene0716_00"
+      ],
+      "split": "test"
+    },
+    {
+      "code": "label_database_invalid_or_missing"
+    },
+    {
+      "code": "metric_taxonomy_invalid_or_missing"
+    }
+  ],
+  "expected_split_counts": {
+    "test": 100,
+    "train": 1201,
+    "validation": 312
+  },
+  "formal_p2_training_authorized": false,
+  "mix_instantiation": {
+    "attempted": false,
+    "status": "blocked_prerequisites"
+  },
+  "official_source_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+  "processed_assets": {
+    "by_split": {
+      "test": {
+        "database_record_count": 0,
+        "database_ref": "repo:data/processed/scannet/test_database.yaml",
+        "database_scene_count": 0,
+        "expected_scene_count": 100,
+        "instance_gt_scene_count": 0,
+        "missing_examples": [
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0707_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0708_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0709_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0710_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0711_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0712_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0713_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0714_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0715_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0716_00"
+          }
+        ],
+        "npy_scene_count": 0,
+        "status": "fail"
+      },
+      "train": {
+        "database_record_count": 0,
+        "database_ref": "repo:data/processed/scannet/train_database.yaml",
+        "database_scene_count": 0,
+        "expected_scene_count": 1201,
+        "instance_gt_scene_count": 0,
+        "missing_examples": [
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0191_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0191_01"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0191_02"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0119_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0230_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0528_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0528_01"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0705_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0705_01"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0705_02"
+          }
+        ],
+        "npy_scene_count": 0,
+        "status": "fail"
+      },
+      "validation": {
+        "database_record_count": 0,
+        "database_ref": "repo:data/processed/scannet/validation_database.yaml",
+        "database_scene_count": 0,
+        "expected_scene_count": 312,
+        "instance_gt_scene_count": 0,
+        "missing_examples": [
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0568_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0568_01"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0568_02"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0304_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0488_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0488_01"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0412_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0412_01"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0217_00"
+          },
+          {
+            "missing": [
+              "database_record"
+            ],
+            "scene": "scene0019_00"
+          }
+        ],
+        "npy_scene_count": 0,
+        "status": "fail"
+      }
+    },
+    "database_scene_count": 0,
+    "expected_scene_count": 1613,
+    "global_files": {
+      "color_mean_std.yaml": {
+        "present": false,
+        "reference": "repo:data/processed/scannet/color_mean_std.yaml"
+      },
+      "label_database.yaml": {
+        "present": false,
+        "reference": "repo:data/processed/scannet/label_database.yaml"
+      },
+      "scannet.yaml": {
+        "present": false,
+        "reference": "repo:data/processed/scannet/scannet.yaml"
+      }
+    },
+    "instance_gt_scene_count": 0,
+    "npy_scene_count": 0,
+    "root_ref": "repo:data/processed/scannet",
+    "status": "fail"
+  },
+  "raw_assets": {
+    "by_split": {
+      "test": {
+        "complete_scene_count": 0,
+        "expected_scene_count": 100,
+        "missing_asset_count": 200,
+        "missing_examples": [
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans_test/scene0707_00/scene0707_00_vh_clean_2.ply",
+              "repo:data/raw/scannet_test_segments/scene0707_00_vh_clean_2.0.010000.segs.json"
+            ],
+            "scene": "scene0707_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans_test/scene0708_00/scene0708_00_vh_clean_2.ply",
+              "repo:data/raw/scannet_test_segments/scene0708_00_vh_clean_2.0.010000.segs.json"
+            ],
+            "scene": "scene0708_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans_test/scene0709_00/scene0709_00_vh_clean_2.ply",
+              "repo:data/raw/scannet_test_segments/scene0709_00_vh_clean_2.0.010000.segs.json"
+            ],
+            "scene": "scene0709_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans_test/scene0710_00/scene0710_00_vh_clean_2.ply",
+              "repo:data/raw/scannet_test_segments/scene0710_00_vh_clean_2.0.010000.segs.json"
+            ],
+            "scene": "scene0710_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans_test/scene0711_00/scene0711_00_vh_clean_2.ply",
+              "repo:data/raw/scannet_test_segments/scene0711_00_vh_clean_2.0.010000.segs.json"
+            ],
+            "scene": "scene0711_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans_test/scene0712_00/scene0712_00_vh_clean_2.ply",
+              "repo:data/raw/scannet_test_segments/scene0712_00_vh_clean_2.0.010000.segs.json"
+            ],
+            "scene": "scene0712_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans_test/scene0713_00/scene0713_00_vh_clean_2.ply",
+              "repo:data/raw/scannet_test_segments/scene0713_00_vh_clean_2.0.010000.segs.json"
+            ],
+            "scene": "scene0713_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans_test/scene0714_00/scene0714_00_vh_clean_2.ply",
+              "repo:data/raw/scannet_test_segments/scene0714_00_vh_clean_2.0.010000.segs.json"
+            ],
+            "scene": "scene0714_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans_test/scene0715_00/scene0715_00_vh_clean_2.ply",
+              "repo:data/raw/scannet_test_segments/scene0715_00_vh_clean_2.0.010000.segs.json"
+            ],
+            "scene": "scene0715_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans_test/scene0716_00/scene0716_00_vh_clean_2.ply",
+              "repo:data/raw/scannet_test_segments/scene0716_00_vh_clean_2.0.010000.segs.json"
+            ],
+            "scene": "scene0716_00"
+          }
+        ],
+        "missing_scene_count": 100,
+        "status": "fail"
+      },
+      "train": {
+        "complete_scene_count": 0,
+        "expected_scene_count": 1201,
+        "missing_asset_count": 6005,
+        "missing_examples": [
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0191_00/scene0191_00_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0191_00/scene0191_00_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0191_00/scene0191_00_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0191_00/scene0191_00.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0191_00/scene0191_00.txt"
+            ],
+            "scene": "scene0191_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0191_01/scene0191_01_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0191_01/scene0191_01_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0191_01/scene0191_01_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0191_01/scene0191_01.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0191_01/scene0191_01.txt"
+            ],
+            "scene": "scene0191_01"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0191_02/scene0191_02_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0191_02/scene0191_02_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0191_02/scene0191_02_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0191_02/scene0191_02.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0191_02/scene0191_02.txt"
+            ],
+            "scene": "scene0191_02"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0119_00/scene0119_00_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0119_00/scene0119_00_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0119_00/scene0119_00_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0119_00/scene0119_00.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0119_00/scene0119_00.txt"
+            ],
+            "scene": "scene0119_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0230_00/scene0230_00_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0230_00/scene0230_00_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0230_00/scene0230_00_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0230_00/scene0230_00.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0230_00/scene0230_00.txt"
+            ],
+            "scene": "scene0230_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0528_00/scene0528_00_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0528_00/scene0528_00_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0528_00/scene0528_00_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0528_00/scene0528_00.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0528_00/scene0528_00.txt"
+            ],
+            "scene": "scene0528_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0528_01/scene0528_01_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0528_01/scene0528_01_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0528_01/scene0528_01_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0528_01/scene0528_01.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0528_01/scene0528_01.txt"
+            ],
+            "scene": "scene0528_01"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0705_00/scene0705_00_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0705_00/scene0705_00_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0705_00/scene0705_00_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0705_00/scene0705_00.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0705_00/scene0705_00.txt"
+            ],
+            "scene": "scene0705_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0705_01/scene0705_01_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0705_01/scene0705_01_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0705_01/scene0705_01_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0705_01/scene0705_01.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0705_01/scene0705_01.txt"
+            ],
+            "scene": "scene0705_01"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0705_02/scene0705_02_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0705_02/scene0705_02_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0705_02/scene0705_02_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0705_02/scene0705_02.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0705_02/scene0705_02.txt"
+            ],
+            "scene": "scene0705_02"
+          }
+        ],
+        "missing_scene_count": 1201,
+        "status": "fail"
+      },
+      "validation": {
+        "complete_scene_count": 0,
+        "expected_scene_count": 312,
+        "missing_asset_count": 1560,
+        "missing_examples": [
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0568_00/scene0568_00_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0568_00/scene0568_00_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0568_00/scene0568_00_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0568_00/scene0568_00.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0568_00/scene0568_00.txt"
+            ],
+            "scene": "scene0568_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0568_01/scene0568_01_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0568_01/scene0568_01_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0568_01/scene0568_01_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0568_01/scene0568_01.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0568_01/scene0568_01.txt"
+            ],
+            "scene": "scene0568_01"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0568_02/scene0568_02_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0568_02/scene0568_02_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0568_02/scene0568_02_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0568_02/scene0568_02.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0568_02/scene0568_02.txt"
+            ],
+            "scene": "scene0568_02"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0304_00/scene0304_00_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0304_00/scene0304_00_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0304_00/scene0304_00_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0304_00/scene0304_00.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0304_00/scene0304_00.txt"
+            ],
+            "scene": "scene0304_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0488_00/scene0488_00_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0488_00/scene0488_00_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0488_00/scene0488_00_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0488_00/scene0488_00.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0488_00/scene0488_00.txt"
+            ],
+            "scene": "scene0488_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0488_01/scene0488_01_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0488_01/scene0488_01_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0488_01/scene0488_01_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0488_01/scene0488_01.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0488_01/scene0488_01.txt"
+            ],
+            "scene": "scene0488_01"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0412_00/scene0412_00_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0412_00/scene0412_00_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0412_00/scene0412_00_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0412_00/scene0412_00.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0412_00/scene0412_00.txt"
+            ],
+            "scene": "scene0412_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0412_01/scene0412_01_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0412_01/scene0412_01_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0412_01/scene0412_01_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0412_01/scene0412_01.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0412_01/scene0412_01.txt"
+            ],
+            "scene": "scene0412_01"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0217_00/scene0217_00_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0217_00/scene0217_00_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0217_00/scene0217_00_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0217_00/scene0217_00.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0217_00/scene0217_00.txt"
+            ],
+            "scene": "scene0217_00"
+          },
+          {
+            "missing_asset_refs": [
+              "repo:data/raw/scannet/scannet/scans/scene0019_00/scene0019_00_vh_clean_2.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0019_00/scene0019_00_vh_clean_2.labels.ply",
+              "repo:data/raw/scannet/scannet/scans/scene0019_00/scene0019_00_vh_clean_2.0.010000.segs.json",
+              "repo:data/raw/scannet/scannet/scans/scene0019_00/scene0019_00.aggregation.json",
+              "repo:data/raw/scannet/scannet/scans/scene0019_00/scene0019_00.txt"
+            ],
+            "scene": "scene0019_00"
+          }
+        ],
+        "missing_scene_count": 312,
+        "status": "fail"
+      }
+    },
+    "complete_scene_count": 0,
+    "expected_scene_count": 1613,
+    "label_map_present": false,
+    "label_map_ref": "repo:data/raw/scannet/scannet/scannetv2-labels.combined.tsv",
+    "missing_asset_count": 7765,
+    "root_ref": "repo:data/raw/scannet/scannet",
+    "status": "fail",
+    "test_segments_ref": "repo:data/raw/scannet_test_segments"
+  },
+  "schema_version": 1,
+  "split_metadata": {
+    "test": {
+      "expected": 100,
+      "observed": 100,
+      "source_ref": "repo:third_party/ScanNet/Tasks/Benchmark/scannetv2_test.txt",
+      "status": "pass",
+      "unique": 100
+    },
+    "train": {
+      "expected": 1201,
+      "observed": 1201,
+      "source_ref": "repo:third_party/ScanNet/Tasks/Benchmark/scannetv2_train.txt",
+      "status": "pass",
+      "unique": 1201
+    },
+    "validation": {
+      "expected": 312,
+      "observed": 312,
+      "source_ref": "repo:third_party/ScanNet/Tasks/Benchmark/scannetv2_val.txt",
+      "status": "pass",
+      "unique": 312
+    }
+  },
+  "split_metadata_status": "pass",
+  "status": "blocked_missing_scannet"
+}

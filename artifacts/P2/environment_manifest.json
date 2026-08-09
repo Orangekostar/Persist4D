@@ -1,0 +1,78 @@
+{
+  "manifest_source_ref": "repo:artifacts/environment/source_manifest.json",
+  "model_weights": {
+    "concerto": {
+      "byte_size": 433987358,
+      "license": "CC-BY-NC-4.0",
+      "reference": "local_cache:persist4d/concerto/concerto_base.pth",
+      "revision": "c31f993a56129f2ba9c5d06a35957e3f05bff710",
+      "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+    },
+    "rescene": {
+      "complete_checkpoint_included": false,
+      "upstream_status": "Coming soon"
+    }
+  },
+  "official_source": {
+    "commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+    "paper_ref": "external:arxiv/2601.11508v2",
+    "source_ref": "external:github/GradientSpaces/rescene4d"
+  },
+  "runtime_environment": {
+    "cuda": "12.6",
+    "cudnn": "9.5.1",
+    "gpu": {
+      "count": 3,
+      "driver": "595.71.05",
+      "memory_mib": 46068,
+      "model": "NVIDIA A40"
+    },
+    "nccl": "2.21.5",
+    "python": "3.10.20",
+    "runtime_packages": {
+      "concerto": "1.0",
+      "detectron2": "0.6",
+      "flash_attn": "2.8.3",
+      "hydra_core": "1.3.4",
+      "pytorch_lightning": "2.6.5",
+      "sonata": "1.0",
+      "spconv": "2.3.8",
+      "stmetrics": "0.1.0",
+      "torch_scatter": "2.1.2+pt26cu126",
+      "wandb": "0.28.0"
+    },
+    "torch": "2.6.0+cu126"
+  },
+  "schema_version": 1,
+  "third_party_sources": {
+    "concerto": {
+      "commit": "10a7d17cff4dddff028f1522c2e72de4c4515df7",
+      "license": "Apache-2.0",
+      "source_ref": "external:github/Pointcept/Concerto"
+    },
+    "detectron2": {
+      "commit": "b4a4a3bd136852dae5fb1de37978dee412653e31",
+      "license": "Apache-2.0",
+      "source_ref": "external:github/facebookresearch/detectron2"
+    },
+    "scannet_tools": {
+      "commit": "3830fce7f8b2e48ef047ef7fd76ea5f62903f51c",
+      "source_ref": "external:github/ScanNet/ScanNet"
+    },
+    "sonata": {
+      "commit": "18c09ff8d713494f78a8213792262b910977a65d",
+      "license": "Apache-2.0",
+      "source_ref": "external:github/facebookresearch/sonata"
+    },
+    "stmetrics": {
+      "commit": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f",
+      "license": "MIT",
+      "source_ref": "external:github/GradientSpaces/stmetrics"
+    }
+  },
+  "workspace": {
+    "branch": "research/p2-rescene4d-t2-repro",
+    "commit": "06d3b1bc3551bac1ed85b822384d532407ec41c5",
+    "source_ref": "repo:."
+  }
+}

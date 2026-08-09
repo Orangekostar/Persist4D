@@ -1,0 +1,76 @@
+schema_version: 1
+stage: P2
+baseline: ReScene4D-C T=2
+official_source_ref: external:arxiv/2601.11508v2
+official_code_ref: external:github/GradientSpaces/rescene4d
+official_source_commit: fb2fe42eb8f1e926567c48eea9acb874e608ee10
+model:
+  backbone: Concerto
+  encoder: PTv3 frozen
+  decoder: train from scratch
+  queries: 100
+  query_initialization: FPS non-parametric
+  temporal_window: 2
+  contrastive: true
+  st_serialization: true
+  st_masking: false
+data:
+  mix:
+  - dataset: 3RScan
+    temporal_window: 2
+    weight: 1.0
+  - dataset: ScanNet
+    temporal_window: 1
+    weight: 0.8
+  voxel_size_m: 0.02
+  taxonomy: NYU40 18-class instance subset
+  sequence_database: sliding T=2
+training:
+  epochs: 450
+  effective_batch_size: 32
+  optimizer: AdamW
+  scheduler: OneCycleLR
+  max_lr: 0.0005
+  loss_weights:
+    class: 2.0
+    mask_bce: 5.0
+    dice: 2.0
+  no_object_weight: 0.2
+  seed: 45
+  precision: 32-true
+local_recommended_topology:
+  gpus: 2
+  batch_per_gpu: 4
+  gradient_accumulation: 4
+  physical_global_batch: 8
+  effective_batch: 32
+checkpoint:
+  reference: local_cache:persist4d/concerto/concerto_base.pth
+  revision: c31f993a56129f2ba9c5d06a35957e3f05bff710
+  sha256: 845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07
+reproduction_choices:
+  sequence_database:
+    reference: repo:data/processed/rio/sequence_database_sliding_2.yaml
+    sha256: 974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416
+  frozen_encoder_runtime:
+    parameters_require_grad: false
+    module_mode: train
+    concerto_drop_path_rate: 0.3
+    decoder_and_head_trainable: true
+  adamw_implicit_defaults:
+    betas:
+    - 0.9
+    - 0.999
+    eps: 1.0e-08
+    weight_decay: 0.01
+    amsgrad: false
+  onecycle_implicit_defaults:
+    pct_start: 0.3
+    anneal_strategy: cos
+    cycle_momentum: true
+    base_momentum: 0.85
+    max_momentum: 0.95
+    div_factor: 25.0
+    final_div_factor: 10000.0
+    three_phase: false
+  augmentation_exactness: repository recipe; paper exact transform list unreported

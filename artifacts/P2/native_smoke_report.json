@@ -1,0 +1,184 @@
+{
+  "checkpoint": {
+    "reference": "local_cache:persist4d/concerto/concerto_base.pth",
+    "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+  },
+  "checkpoint_roundtrip": {
+    "advanced_global_step": 2,
+    "advanced_model_bitwise_changed": true,
+    "advanced_optimizer_state_changed": true,
+    "checkpoint_bytes": 754740466,
+    "kind": "native_model_optimizer_scheduler_state_roundtrip",
+    "lightning_full_resume_validation": false,
+    "passed": true,
+    "restored_global_step": 1,
+    "temporary_checkpoint_removed": true
+  },
+  "dependencies": {
+    "Concerto": "source-install",
+    "Detectron2": "0.6",
+    "Sonata": "source-install",
+    "flash-attn": "2.8.3",
+    "stmetrics": "0.1.0"
+  },
+  "g2_evidence": false,
+  "hardware": {
+    "device_alias": "device-0",
+    "gpu_count_used": 1,
+    "name": "NVIDIA A40",
+    "total_memory_mib": 45490
+  },
+  "objective_contract": {
+    "aggregate_contrastive_counted_once": true,
+    "per_layer_contrastive_diagnostics_excluded": true,
+    "segmentation_weights": {
+      "class": 2.0,
+      "dice": 2.0,
+      "mask": 5.0
+    }
+  },
+  "official_mixed_data_reproduction": false,
+  "sample": {
+    "name": "scene0112_00-scene0112_01",
+    "raw_points": 8977,
+    "supervised_instances": 2,
+    "temporal_stages": [
+      0,
+      1
+    ],
+    "voxels": 5285
+  },
+  "scope": "preflight-only",
+  "seed": 45,
+  "smoke": {
+    "decoder_head_changed": true,
+    "elapsed_seconds": 24.598573049996048,
+    "encoder_bitwise_unchanged": true,
+    "first_step_aggregate_contrastive": 0.693093478679657,
+    "first_step_final_head_segmentation": 16.996435165405273,
+    "first_step_matching": {
+      "classification_accuracy": 0.0,
+      "matched_instances": 2,
+      "mean_dice": 0.17595580220222473
+    },
+    "first_step_model_bitwise_changed": true,
+    "first_step_weighted_objective": 185.53610229492188,
+    "gradients": {
+      "frozen_encoder": {
+        "finite": true,
+        "max_grad_norm": 0.0,
+        "missing_grad_tensors": 453,
+        "nonzero_grad_tensors": 0,
+        "parameter_tensors": 453
+      },
+      "trainable_concerto_decoder": {
+        "finite": true,
+        "max_grad_norm": 948.8002319335938,
+        "missing_grad_tensors": 0,
+        "nonzero_grad_tensors": 248,
+        "parameter_tensors": 248
+      },
+      "trainable_objective": {
+        "finite": true,
+        "max_grad_norm": 0.0,
+        "missing_grad_tensors": 0,
+        "nonzero_grad_tensors": 0,
+        "parameter_tensors": 0
+      },
+      "trainable_rescene_decoder": {
+        "finite": true,
+        "max_grad_norm": 639.562744140625,
+        "missing_grad_tensors": 0,
+        "nonzero_grad_tensors": 82,
+        "parameter_tensors": 82
+      },
+      "trainable_rescene_heads": {
+        "finite": true,
+        "max_grad_norm": 314.1291198730469,
+        "missing_grad_tensors": 0,
+        "nonzero_grad_tensors": 12,
+        "parameter_tensors": 12
+      }
+    },
+    "initial_lr": 1.9999999999999998e-05,
+    "lr_after_first_step": 0.00040587282697488147,
+    "optimizer_global_step": 2,
+    "parameter_tensors": {
+      "frozen_encoder": 453,
+      "trainable_concerto_decoder": 248,
+      "trainable_objective": 0,
+      "trainable_rescene_decoder": 82,
+      "trainable_rescene_heads": 12
+    },
+    "passed": true,
+    "peak_allocated_vram_mib": 1860.7958984375,
+    "raw_objective_losses": {
+      "loss_aux_contrastive": 0.0,
+      "loss_ce": 3.900630235671997,
+      "loss_ce_0": 2.988114595413208,
+      "loss_ce_1": 3.395217180252075,
+      "loss_ce_10": 4.045473098754883,
+      "loss_ce_11": 3.255629062652588,
+      "loss_ce_2": 3.2764596939086914,
+      "loss_ce_3": 3.393906831741333,
+      "loss_ce_4": 3.5494980812072754,
+      "loss_ce_5": 3.4792792797088623,
+      "loss_ce_6": 3.7828378677368164,
+      "loss_ce_7": 3.236475944519043,
+      "loss_ce_8": 3.9476442337036133,
+      "loss_ce_9": 3.7667582035064697,
+      "loss_dice": 0.8199738264083862,
+      "loss_dice_0": 0.5413748025894165,
+      "loss_dice_1": 0.5456342101097107,
+      "loss_dice_10": 0.5968352556228638,
+      "loss_dice_11": 0.6713588833808899,
+      "loss_dice_2": 0.5691887140274048,
+      "loss_dice_3": 0.8246169090270996,
+      "loss_dice_4": 0.8918834924697876,
+      "loss_dice_5": 0.7672423124313354,
+      "loss_dice_6": 0.591132402420044,
+      "loss_dice_7": 0.7148544788360596,
+      "loss_dice_8": 0.8130475282669067,
+      "loss_dice_9": 0.6179826259613037,
+      "loss_mask": 1.511045217514038,
+      "loss_mask_0": 0.7468482255935669,
+      "loss_mask_1": 0.9788318872451782,
+      "loss_mask_10": 0.9754506349563599,
+      "loss_mask_11": 1.0307815074920654,
+      "loss_mask_2": 0.9689388275146484,
+      "loss_mask_3": 1.462425708770752,
+      "loss_mask_4": 1.7262301445007324,
+      "loss_mask_5": 1.2290239334106445,
+      "loss_mask_6": 0.9367227554321289,
+      "loss_mask_7": 1.1387070417404175,
+      "loss_mask_8": 1.343090534210205,
+      "loss_mask_9": 0.9272840619087219,
+      "loss_segment_contrastive": 0.693093478679657
+    },
+    "scheduler_last_epoch": 2,
+    "segment_contrastive_positive": true
+  },
+  "source_commit": "06d3b1bc3551bac1ed85b822384d532407ec41c5",
+  "validation_evaluator": {
+    "finite_required_value_count": 6,
+    "g2_metric_evidence": false,
+    "input": "real_3rscan_validation_window_with_current_model_predictions",
+    "model_metric_values_published": false,
+    "model_state": "pretrained_concerto_encoder_with_seeded_randomly_initialized_decoder_and_heads_after_two_native_smoke_steps",
+    "pipeline_executed": true,
+    "required_value_count": 6,
+    "sample": {
+      "name": "scene0149_00-scene0149_01",
+      "raw_points": 20733,
+      "voxels": 14867
+    },
+    "schema_keys": [
+      "val_mean_AP",
+      "val_mean_stage1-AP",
+      "val_mean_stage2-AP",
+      "val_mean_t-AP",
+      "val_mean_t-AP_25",
+      "val_mean_t-AP_50"
+    ]
+  }
+}

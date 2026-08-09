@@ -1,0 +1,562 @@
+{
+  "base_config_ref": "repo:conf/config_base_instance_segmentation.yaml",
+  "compose_error_type": null,
+  "config_composed": true,
+  "config_ref": "repo:conf/config_p2_rescene4d_concerto_t2.yaml",
+  "declared_deviations": [
+    {
+      "reason": "The paper does not report the exact Concerto revision or weight hash; the reproduction pins and verifies one licensed artifact.",
+      "setting": "backbone_checkpoint"
+    },
+    {
+      "reason": "Encoder parameters have requires_grad=false, but the encoder module remains in train mode and Concerto drop_path=0.3 remains active.",
+      "setting": "frozen_encoder_runtime"
+    },
+    {
+      "reason": "The paper reports AdamW but not betas, epsilon, weight decay, or AMSGrad; PyTorch 2.6 defaults are locked as a reproduction choice.",
+      "setting": "adamw_implicit_defaults"
+    },
+    {
+      "reason": "The paper reports OneCycle and max LR only; PyTorch 2.6 curve and momentum defaults are locked as a reproduction choice.",
+      "setting": "onecycle_implicit_defaults"
+    },
+    {
+      "reason": "The paper reports shared sequence rotation/scaling but not the exact transform list; repository color, scale, and three-axis rotation transforms are retained with serialized config versions recorded.",
+      "setting": "augmentations"
+    },
+    {
+      "reason": "Official precision is not reported; reproduction locks FP32.",
+      "setting": "precision"
+    },
+    {
+      "reason": "Local recommendation is 2 A40 GPUs with accumulation; official training used 8 H100 GPUs.",
+      "setting": "hardware_topology"
+    }
+  ],
+  "implementation_fixes": [
+    {
+      "classification": "local_paper_alignment_fix",
+      "evidence_refs": [
+        "external:github/GradientSpaces/rescene4d@fb2fe42/trainer/trainer.py",
+        "repo:trainer/trainer.py",
+        "repo:tests/test_p2_training_contract.py"
+      ],
+      "id": "weighted_segmentation_objective",
+      "local_behavior": "training and validation use criterion.weight_dict, applying 2/5/2 to final and auxiliary segmentation losses",
+      "local_fix_commit": "3c6b11a3af600aa98c93128361c2ecb4900ea186",
+      "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+      "paper_alignment": "restores the reported class/mask BCE/Dice objective ratio 2/5/2",
+      "upstream_behavior": "training and validation returned sum(losses.values()) even though criterion.weight_dict was constructed",
+      "upstream_semantic_effect": "configured class/mask_bce/dice weights 2/5/2 were not applied to the optimized objective; effective weights were 1/1/1"
+    },
+    {
+      "classification": "local_paper_alignment_fix",
+      "evidence_refs": [
+        "external:github/GradientSpaces/rescene4d@fb2fe42/models/criterion.py",
+        "external:github/GradientSpaces/rescene4d@fb2fe42/trainer/trainer.py",
+        "repo:trainer/trainer.py",
+        "repo:tests/test_p2_training_contract.py"
+      ],
+      "id": "contrastive_diagnostic_deduplication",
+      "local_behavior": "aggregate contrastive objectives are optimized exactly once; per-layer values remain logging-only diagnostics",
+      "local_fix_commit": "3c6b11a3af600aa98c93128361c2ecb4900ea186",
+      "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+      "paper_alignment": "counts each aggregate temporal contrastive loss exactly once while preserving per-layer observability",
+      "upstream_behavior": "criterion emitted aggregate and per-layer contrastive values, and raw loss summation optimized every emitted value",
+      "upstream_semantic_effect": "aggregate contrastive losses and their per-layer diagnostic losses were both summed, double-counting the contrastive objective"
+    },
+    {
+      "classification": "local_paper_alignment_fix",
+      "evidence_refs": [
+        "external:github/GradientSpaces/rescene4d@fb2fe42/conf/config_base_instance_segmentation.yaml",
+        "repo:conf/config_base_instance_segmentation.yaml",
+        "repo:tests/test_p2_training_contract.py"
+      ],
+      "id": "hydra_contrastive_override_order",
+      "local_behavior": "set_criterion composes first and loss/contrastive=infoNCE composes afterward, resolving loss.contrastive_loss=true",
+      "local_fix_commit": "3c6b11a3af600aa98c93128361c2ecb4900ea186",
+      "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+      "paper_alignment": "ensures the paper-required temporal contrastive loss is active",
+      "upstream_behavior": "the optional contrastive config was composed before set_criterion in the Hydra defaults list",
+      "upstream_semantic_effect": "loss/contrastive=infoNCE was overwritten by the later set_criterion default, leaving loss.contrastive_loss=false"
+    },
+    {
+      "classification": "local_reproduction_safety_fix",
+      "evidence_refs": [
+        "external:github/GradientSpaces/rescene4d@fb2fe42/datasets/semseg.py",
+        "external:github/GradientSpaces/rescene4d@fb2fe42/datasets/multi_dataset.py",
+        "repo:datasets/semseg.py",
+        "repo:datasets/multi_dataset.py",
+        "repo:tests/test_p2_data_failure.py",
+        "repo:tests/test_temporal_loader.py"
+      ],
+      "id": "fail_closed_dataset_sequence_mix_validation",
+      "local_behavior": "every configured split database and temporal sequence mapping must be non-empty; every sequence scan must resolve; every mixed child must be non-empty; dataset and weight lengths must match and weights must be finite and positive",
+      "local_fix_commit": "973629172cc01ae0998bc785ac0ea2979756b72c",
+      "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+      "safety_effect": "prevents missing ScanNet from degrading the required mix to RIO-only and prevents unknown temporal scans from becoming zero indices",
+      "upstream_behavior": "missing split databases called bare exit(), temporal database exceptions were printed and swallowed, and zero-length child datasets were skipped",
+      "upstream_semantic_effect": "a missing or empty ScanNet child could terminate with status 0 or be omitted from sampling, while an unknown temporal scan could leave zero-filled indices"
+    },
+    {
+      "classification": "local_reproduction_safety_fix",
+      "collective_contract": {
+        "covered_forward_failure": {
+          "all_gather_object_count": 1,
+          "int32_max_all_reduce_count": 2
+        },
+        "covered_preflight_failure": {
+          "all_gather_object_count": 1,
+          "int32_max_all_reduce_count": 1
+        },
+        "normal_ddp_microbatch": {
+          "all_gather_object_count": 0,
+          "int32_max_all_reduce_count": 2
+        }
+      },
+      "coverage_boundary": "consensus covers declared preflight violations and the recognized single-point cross-attention RuntimeError; unrelated rank-local exceptions are not converted",
+      "evidence_refs": [
+        "external:github/GradientSpaces/rescene4d@fb2fe42/trainer/trainer.py",
+        "repo:trainer/trainer.py",
+        "repo:tests/test_p2_ddp_batch_contract.py"
+      ],
+      "id": "ddp_batch_contract_consensus",
+      "local_behavior": "preflight and post-forward consensus cover train, validation, and test microbatches and raise a contextual RuntimeError across ranks instead of returning None",
+      "local_fix_commit": "973629172cc01ae0998bc785ac0ea2979756b72c",
+      "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+      "performance_cost": "two blocking scalar int32 MAX all_reduce operations per normal DDP microbatch, or eight per optimizer step at accumulation=4; all_gather_object is failure-only",
+      "upstream_behavior": "training returned None for empty targets or the recognized single-point cross-attention error; evaluation returned 0.0 or None for empty coordinates or that error, without cross-rank consensus",
+      "upstream_semantic_effect": "asymmetric rank-local skipping could desynchronize optimizer and scheduler progress or hang later DDP collectives"
+    },
+    {
+      "classification": "local_reproduction_safety_fix",
+      "evidence_refs": [
+        "external:github/GradientSpaces/rescene4d@fb2fe42/main_instance_segmentation.py",
+        "repo:main_instance_segmentation.py",
+        "repo:tests/test_p2_checkpoint_selection.py"
+      ],
+      "id": "full_state_checkpoint_resume_selection",
+      "local_behavior": "statically validates required Lightning full-state fields, selects the latest valid candidate by checkpoint epoch/global_step and numeric filename version, and refuses to start from scratch when checkpoint files exist but all are invalid",
+      "local_fix_commit": "973629172cc01ae0998bc785ac0ea2979756b72c",
+      "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+      "restore_boundary": "static validation is not a real Lightning restore; trainer.fit is attempted once with the selected checkpoint and does not automatically retry another candidate after a Lightning restore failure",
+      "startup_cost": "each checkpoint candidate is deserialized on CPU once during static selection",
+      "upstream_behavior": "resume selection checked deserialization of last or last-epoch and a filename-metric fallback, then allowed starting from scratch when candidates were corrupt",
+      "upstream_semantic_effect": "weights-only or partial checkpoints could pass the load check, stale last metadata could win, and an all-corrupt checkpoint directory could silently reset training"
+    }
+  ],
+  "official_source_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+  "reproduction_code_relation": {
+    "local_fix_commit": "3c6b11a3af600aa98c93128361c2ecb4900ea186",
+    "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+    "official_code_used_unchanged": false,
+    "runtime_safety_fix_commit": "973629172cc01ae0998bc785ac0ea2979756b72c",
+    "status": "local_alignment_and_safety_patch_set"
+  },
+  "schema_version": 1,
+  "settings": {
+    "adamw_implicit_defaults": {
+      "official": "not reported",
+      "repository_default": {
+        "amsgrad": false,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "weight_decay": 0.01
+      },
+      "reproduction": {
+        "amsgrad": false,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "weight_decay": 0.01
+      },
+      "status": "verified_reproduction_choice"
+    },
+    "augmentations": {
+      "official": {
+        "exact_transform_list": "not reported",
+        "sequence_scope": "same rotation/scaling across the registered sequence",
+        "serialized_config_versions": "not reported"
+      },
+      "repository_default": {
+        "image": {
+          "reference": "repo:conf/augmentation/albumentations_aug.yaml",
+          "schema_version": "0.4.5",
+          "transforms": [
+            "RandomBrightnessContrast",
+            "RGBShift"
+          ]
+        },
+        "volume": {
+          "reference": "repo:conf/augmentation/volumentations_aug.yaml",
+          "schema_version": "0.1.6",
+          "transforms": [
+            "Scale3d",
+            "RotateAroundAxis3d",
+            "RotateAroundAxis3d",
+            "RotateAroundAxis3d"
+          ]
+        }
+      },
+      "reproduction": {
+        "image": {
+          "reference": "repo:conf/augmentation/albumentations_aug.yaml",
+          "schema_version": "0.4.5",
+          "transforms": [
+            "RandomBrightnessContrast",
+            "RGBShift"
+          ]
+        },
+        "volume": {
+          "reference": "repo:conf/augmentation/volumentations_aug.yaml",
+          "schema_version": "0.1.6",
+          "transforms": [
+            "Scale3d",
+            "RotateAroundAxis3d",
+            "RotateAroundAxis3d",
+            "RotateAroundAxis3d"
+          ]
+        }
+      },
+      "status": "paper_exactness_unverified"
+    },
+    "backbone": {
+      "official": "Concerto",
+      "repository_default": "Concerto",
+      "reproduction": "Concerto",
+      "status": "match"
+    },
+    "backbone_checkpoint": {
+      "official": {
+        "encoder": "Concerto pretrained",
+        "exact_revision": "not reported",
+        "exact_weight_hash": "not reported"
+      },
+      "repository_default": {
+        "name": "concerto_base",
+        "repo_id": "Pointcept/Concerto"
+      },
+      "reproduction": {
+        "license": "CC-BY-NC-4.0",
+        "reference": "local_cache:persist4d/concerto/concerto_base.pth",
+        "revision": "c31f993a56129f2ba9c5d06a35957e3f05bff710",
+        "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+      },
+      "status": "verified_reproduction_choice"
+    },
+    "contrastive": {
+      "official": true,
+      "repository_default": false,
+      "reproduction": true,
+      "status": "match"
+    },
+    "dataset_mix": {
+      "official": [
+        {
+          "dataset": "3RScan",
+          "temporal_window": 2,
+          "weight": 1.0
+        },
+        {
+          "dataset": "ScanNet",
+          "temporal_window": 1,
+          "weight": 0.8
+        }
+      ],
+      "repository_default": [
+        {
+          "dataset": "3RScan",
+          "temporal_window": 2,
+          "weight": 1.0
+        },
+        {
+          "dataset": "ScanNet",
+          "temporal_window": 1,
+          "weight": 0.8
+        }
+      ],
+      "reproduction": [
+        {
+          "dataset": "3RScan",
+          "temporal_window": 2,
+          "weight": 1.0
+        },
+        {
+          "dataset": "ScanNet",
+          "temporal_window": 1,
+          "weight": 0.8
+        }
+      ],
+      "status": "match"
+    },
+    "decoder_trainability": {
+      "official": "trainable",
+      "repository_default": "trainable",
+      "reproduction": "trainable",
+      "status": "match"
+    },
+    "effective_batch_size": {
+      "official": 32,
+      "repository_default": 5,
+      "reproduction": 32,
+      "status": "match"
+    },
+    "encoder_freeze": {
+      "official": "backbone_encoder",
+      "repository_default": "None",
+      "reproduction": "backbone_encoder",
+      "status": "match"
+    },
+    "epochs": {
+      "official": 450,
+      "repository_default": 450,
+      "reproduction": 450,
+      "status": "match"
+    },
+    "evaluation_taxonomy": {
+      "official": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        14,
+        16,
+        24,
+        28,
+        33,
+        34,
+        36,
+        39
+      ],
+      "repository_default": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        14,
+        16,
+        24,
+        28,
+        33,
+        34,
+        36,
+        39
+      ],
+      "reproduction": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        14,
+        16,
+        24,
+        28,
+        33,
+        34,
+        36,
+        39
+      ],
+      "status": "match"
+    },
+    "frozen_encoder_runtime": {
+      "official": {
+        "drop_path_rate": "not reported",
+        "module_mode": "not reported",
+        "parameters_require_grad": false
+      },
+      "repository_default": {
+        "drop_path_rate": 0.3,
+        "module_mode": "train",
+        "parameters_require_grad": true
+      },
+      "reproduction": {
+        "decoder_and_head_trainable": true,
+        "drop_path_rate": 0.3,
+        "module_mode": "train",
+        "parameters_require_grad": false
+      },
+      "status": "repository_behavior_risk"
+    },
+    "loss_weights": {
+      "official": {
+        "class": 2.0,
+        "dice": 2.0,
+        "mask_bce": 5.0
+      },
+      "repository_default": {
+        "class": 2.0,
+        "dice": 2.0,
+        "mask_bce": 5.0
+      },
+      "reproduction": {
+        "class": 2.0,
+        "dice": 2.0,
+        "mask_bce": 5.0
+      },
+      "status": "match"
+    },
+    "max_lr": {
+      "official": 0.0005,
+      "repository_default": 0.0005,
+      "reproduction": 0.0005,
+      "status": "match"
+    },
+    "metric_config": {
+      "official": "t-mAP + overall AP + stage AP",
+      "repository_default": "repo:conf/metrics/tmap.yaml",
+      "reproduction": "repo:conf/metrics/tmap.yaml",
+      "status": "match"
+    },
+    "no_object_weight": {
+      "official": 0.2,
+      "repository_default": 0.1,
+      "reproduction": 0.2,
+      "status": "match"
+    },
+    "num_queries": {
+      "official": 100,
+      "repository_default": 100,
+      "reproduction": 100,
+      "status": "match"
+    },
+    "onecycle_implicit_defaults": {
+      "official": "not reported",
+      "repository_default": {
+        "anneal_strategy": "cos",
+        "base_momentum": 0.85,
+        "cycle_momentum": true,
+        "div_factor": 25.0,
+        "final_div_factor": 10000.0,
+        "max_momentum": 0.95,
+        "pct_start": 0.3,
+        "three_phase": false
+      },
+      "reproduction": {
+        "anneal_strategy": "cos",
+        "base_momentum": 0.85,
+        "cycle_momentum": true,
+        "div_factor": 25.0,
+        "final_div_factor": 10000.0,
+        "max_momentum": 0.95,
+        "pct_start": 0.3,
+        "three_phase": false
+      },
+      "status": "verified_reproduction_choice"
+    },
+    "optimizer": {
+      "official": "AdamW",
+      "repository_default": "AdamW",
+      "reproduction": "AdamW",
+      "status": "match"
+    },
+    "precision": {
+      "official": "not reported",
+      "repository_default": "not explicit",
+      "reproduction": "32-true",
+      "status": "explicit_reproduction_choice"
+    },
+    "query_initialization": {
+      "official": "FPS non-parametric",
+      "repository_default": "FPS non-parametric",
+      "reproduction": "FPS non-parametric",
+      "status": "match"
+    },
+    "scheduler": {
+      "official": "OneCycleLR",
+      "repository_default": "OneCycleLR",
+      "reproduction": "OneCycleLR",
+      "status": "match"
+    },
+    "seed": {
+      "official": 45,
+      "repository_default": null,
+      "reproduction": 45,
+      "status": "match"
+    },
+    "sequence_database": {
+      "official": {
+        "construction": "randomly ordered sliding windows",
+        "exact_yaml_hash": "not reported",
+        "temporal_window": 2
+      },
+      "repository_default": {
+        "mode": "sliding",
+        "reference": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
+        "sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416",
+        "temporal_window": 2
+      },
+      "reproduction": {
+        "mode": "sliding",
+        "reference": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
+        "sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416",
+        "temporal_window": 2
+      },
+      "status": "match"
+    },
+    "st_masking": {
+      "official": false,
+      "repository_default": false,
+      "reproduction": false,
+      "status": "match"
+    },
+    "st_serialization": {
+      "official": [
+        "standard",
+        "temporal_overlay"
+      ],
+      "repository_default": [
+        "standard",
+        "temporal_overlay"
+      ],
+      "reproduction": [
+        "standard",
+        "temporal_overlay"
+      ],
+      "status": "match"
+    },
+    "temporal_window": {
+      "official": {
+        "rio": 2,
+        "scannet": 1
+      },
+      "repository_default": {
+        "rio": 2,
+        "scannet": 1
+      },
+      "reproduction": {
+        "rio": 2,
+        "scannet": 1
+      },
+      "status": "match"
+    },
+    "voxel_size_m": {
+      "official": 0.02,
+      "repository_default": 0.02,
+      "reproduction": 0.02,
+      "status": "match"
+    }
+  }
+}
