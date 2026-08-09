@@ -197,8 +197,8 @@ def _assert_no_training_measurements(rows: list[dict[str, str]]) -> None:
 
 def _assert_private(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
-    assert "/home/" not in text
-    assert "/Users/" not in text
+    assert "/" + "home/" not in text
+    assert "/" + "Users/" not in text
     assert "GPU-" not in text
     assert not re.search(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", text)
     assert not re.search(r"\b[0-9A-Fa-f]{4,8}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}\.\d\b", text)
