@@ -1,9 +1,8 @@
-import logging
+import math
+from numbers import Real
 from typing import List, Dict, Any
 from torch.utils.data import Dataset, ConcatDataset, WeightedRandomSampler
 from datasets.semseg import SemanticSegmentationDataset
-
-logger = logging.getLogger(__name__)
 
 
 class MultiDataset(ConcatDataset):
@@ -22,8 +21,35 @@ class MultiDataset(ConcatDataset):
             datasets: List of dataset instances to combine.
             weights: Optional weights for each dataset. If None, equal weights are used.
         """
+        if datasets is None:
+            raise ValueError("MultiDataset requires at least one dataset")
+        datasets = list(datasets)
+        if not datasets:
+            raise ValueError("MultiDataset requires at least one dataset")
+
+        if weights is None:
+            weights = [1.0] * len(datasets)
+        else:
+            weights = list(weights)
+        if len(weights) != len(datasets):
+            raise ValueError("datasets and weights must have the same length")
+
+        for index, dataset in enumerate(datasets):
+            if len(dataset) == 0:
+                raise ValueError(f"dataset at index {index} has zero length")
+        for index, weight in enumerate(weights):
+            if (
+                isinstance(weight, bool)
+                or not isinstance(weight, Real)
+                or not math.isfinite(weight)
+                or weight <= 0
+            ):
+                raise ValueError(
+                    f"weight at index {index} must be a finite positive number"
+                )
+
         super().__init__(datasets)
-        self.weights = weights or [1.0] * len(datasets)
+        self.weights = weights
         self._setup_sampler()
     
     @classmethod
@@ -80,30 +106,23 @@ class MultiDataset(ConcatDataset):
         epoch length is consistent regardless of secondary dataset sizes.
         """
         sample_weights = []
-        primary_dataset_size = len(self.datasets[0]) if len(self.datasets) > 0 else 0
-        
+        primary_dataset_size = len(self.datasets[0])
+
         for dataset, weight in zip(self.datasets, self.weights):
             dataset_size = len(dataset)
-            if dataset_size > 0:
-                # Normalize weight by dataset size so weights represent desired ratio per epoch
-                # This ensures a dataset with weight 0.05 contributes 5% as much as one with weight 1.0
-                normalized_weight = weight / dataset_size
-                sample_weights.extend([normalized_weight] * dataset_size)
-            else:
-                logger.warning(f"Dataset has zero size, skipping")
+            # Normalize weight by dataset size so weights represent desired ratio per epoch
+            # This ensures a dataset with weight 0.05 contributes 5% as much as one with weight 1.0
+            normalized_weight = weight / dataset_size
+            sample_weights.extend([normalized_weight] * dataset_size)
         
         # Calculate num_samples based on weighted contributions
         # This ensures the epoch length reflects the weighted combination
         # For each dataset, its contribution = weight (since weights are normalized to represent epoch ratio)
-        if len(self.datasets) > 0 and len(self.weights) > 0:
-            primary_dataset_size = len(self.datasets[0])
-            primary_weight = self.weights[0]
-            # Total samples = primary_size + (sum of other weights / primary_weight) * primary_size
-            # This way, if scannet has weight 0.05, it contributes 5% as many samples as rio
-            other_weight_sum = sum(self.weights[1:]) if len(self.weights) > 1 else 0
-            num_samples = int(primary_dataset_size * (1 + other_weight_sum / primary_weight))
-        else:
-            num_samples = len(sample_weights)
+        primary_weight = self.weights[0]
+        # Total samples = primary_size + (sum of other weights / primary_weight) * primary_size
+        # This way, if scannet has weight 0.05, it contributes 5% as many samples as rio
+        other_weight_sum = sum(self.weights[1:]) if len(self.weights) > 1 else 0
+        num_samples = int(primary_dataset_size * (1 + other_weight_sum / primary_weight))
         
         self.sampler = WeightedRandomSampler(sample_weights, num_samples)
     

@@ -75,14 +75,20 @@ class SemanticSegmentationDataset(Dataset):
         self._data = []
         for database_path in self.data_dir:
             database_path = Path(database_path)
-            if not (database_path / f"{mode}_database.yaml").exists():
-                print(
-                    f"generate {database_path}/{mode}_database.yaml first"
+            database_filepath = database_path / f"{mode}_database.yaml"
+            if not database_filepath.exists():
+                raise FileNotFoundError(
+                    "Required dataset database does not exist: "
+                    f"{database_filepath}. Generate it before loading the dataset."
                 )
-                exit()
             
             # Load data from this directory
-            data_from_dir = self._load_yaml(database_path / f"{mode}_database.yaml")
+            data_from_dir = self._load_yaml(database_filepath)
+            if not isinstance(data_from_dir, list) or not data_from_dir:
+                raise ValueError(
+                    f"Dataset split database {database_filepath} must be a "
+                    "non-empty list"
+                )
             
             # For multi-dataset configurations, add dataset source information
             if len(self.data_dir) > 1:
@@ -143,38 +149,87 @@ class SemanticSegmentationDataset(Dataset):
             self.ambiguities = [None] * len(self.data)
 
         else:
-            sequence_type= 'sliding' #TODO
-            
+            sequence_type = "sliding"
+
             self.sequence_names = []
             all_sequence_indices = []
             self.change_files = []
             self.ambiguities = []
-            
+
             # Process each data directory
             for dir_path in self.data_dir:
-                file_path = f"{dir_path}/sequence_database_{sequence_type}_{self.temporal_window}.yaml"
-                try:
-                    sequence_db = self._load_yaml(file_path)
-                    
-                    # Get sequences of the specified mode from this directory
-                    dir_mode = [(k, v.get('filepath', None), v.get('ambiguities', None)) for k, v in sequence_db.items() if v.get('type') == mode]
-                    dir_sequence_names = [entry[0] for entry in dir_mode]
-                    dir_change_files = [entry[1] for entry in dir_mode]
-                    dir_ambiguities = [entry[2] for entry in dir_mode]
-                    dir_sequence_indices = np.zeros((len(dir_sequence_names), self.temporal_window), dtype=int)
-                    for i, sequence in enumerate(dir_sequence_names):
-                        names = sequence.split('-')
-                        dir_sequence_indices[i] = np.array([name_idx_mapping[name] for name in names])
-                    
-                except Exception as e:
-                    print(f"Error loading sequence database: {e}")
-                
-                # Add to our collections
+                database_path = (
+                    Path(dir_path)
+                    / f"sequence_database_{sequence_type}_{self.temporal_window}.yaml"
+                )
+                sequence_db = self._load_yaml(database_path)
+                if not isinstance(sequence_db, dict) or not sequence_db:
+                    raise ValueError(
+                        f"Temporal sequence database {database_path} must be a "
+                        "non-empty mapping"
+                    )
+
+                dir_mode = []
+                for sequence, entry in sequence_db.items():
+                    if not isinstance(entry, dict):
+                        raise ValueError(
+                            f"Temporal sequence database {database_path}: "
+                            f"sequence '{sequence}' must map to a record"
+                        )
+                    if entry.get("type") == mode:
+                        dir_mode.append((sequence, entry))
+                if not dir_mode:
+                    raise ValueError(
+                        f"Temporal sequence database {database_path} has no "
+                        f"sequences for mode '{mode}'"
+                    )
+
+                dir_sequence_names = []
+                dir_change_files = []
+                dir_ambiguities = []
+                dir_sequence_indices = []
+                for sequence, entry in dir_mode:
+                    if not isinstance(sequence, str):
+                        raise ValueError(
+                            f"Temporal sequence database {database_path}: "
+                            f"sequence key {sequence!r} must be a string"
+                        )
+                    names = sequence.split("-")
+                    if len(names) != self.temporal_window:
+                        raise ValueError(
+                            f"Temporal sequence database {database_path}: "
+                            f"sequence '{sequence}' expected {self.temporal_window} "
+                            f"scan names, got {len(names)}"
+                        )
+
+                    resolved_indices = []
+                    for name in names:
+                        lookup_name = name
+                        if lookup_name not in name_idx_mapping and len(self.data_dir) > 1:
+                            prefixed_name = f"{Path(dir_path).name}_{name}"
+                            if prefixed_name in name_idx_mapping:
+                                lookup_name = prefixed_name
+                        if lookup_name not in name_idx_mapping:
+                            raise KeyError(
+                                f"Temporal sequence database {database_path}: "
+                                f"sequence '{sequence}' references unknown scan "
+                                f"'{name}'"
+                            )
+                        resolved_indices.append(name_idx_mapping[lookup_name])
+
+                    dir_sequence_names.append(sequence)
+                    dir_change_files.append(entry.get("filepath"))
+                    dir_ambiguities.append(entry.get("ambiguities"))
+                    dir_sequence_indices.append(resolved_indices)
+
+                # Add only fully validated sequences to our collections.
                 self.sequence_names.extend(dir_sequence_names)
-                all_sequence_indices.append(dir_sequence_indices)
+                all_sequence_indices.append(
+                    np.asarray(dir_sequence_indices, dtype=int)
+                )
                 self.change_files.extend(dir_change_files)
                 self.ambiguities.extend(dir_ambiguities)
-            
+
             # Combine sequence indices from all directories
             self.sequence_indices = np.vstack(all_sequence_indices)
 
@@ -482,4 +537,3 @@ def elastic_distortion(pointcloud, granularity, magnitude):
     )
     pointcloud[:, :3] = coords + interp(coords) * magnitude
     return pointcloud
-

@@ -13,6 +13,113 @@ import torch
 import pickle
 
 
+_SINGLE_POINT_CROSS_ATTENTION_ERROR = (
+    "only a single point gives nans in cross-attention"
+)
+
+
+def _safe_length(value):
+    if value is None:
+        return 0
+    try:
+        return len(value)
+    except (AttributeError, TypeError):
+        return 0
+
+
+def _point_cloud_is_empty(data):
+    return any(
+        _safe_length(getattr(data, component, None)) == 0
+        for component in ("features", "coordinates")
+    )
+
+
+def _batch_preflight_failure(data, target, max_batch_size=None):
+    if not isinstance(target, (list, tuple)):
+        return "invalid target list"
+    if _safe_length(target) == 0:
+        return "empty target list"
+    if _point_cloud_is_empty(data):
+        return "empty point cloud"
+
+    feature_count = _safe_length(getattr(data, "features", None))
+    if max_batch_size is not None and feature_count > max_batch_size:
+        return f"batch exceeds max_batch_size ({feature_count} > {max_batch_size})"
+    return None
+
+
+def _batch_collective_device(module, data):
+    module_device = getattr(module, "device", None)
+    if module_device is not None:
+        return module_device
+    for component in ("features", "coordinates"):
+        value = getattr(data, component, None)
+        if isinstance(value, torch.Tensor):
+            return value.device
+    return torch.device("cpu")
+
+
+def _format_batch_contract_failures(failures):
+    details = "; ".join(
+        f"rank={failure['rank']}, stage={failure['stage']}, "
+        f"batch_idx={failure['batch_idx']}, "
+        f"file_names={failure['file_names']}, reason={failure['reason']}"
+        for failure in failures
+    )
+    return f"Batch contract violation: {details}"
+
+
+def _batch_contract_consensus(
+    stage,
+    batch_idx,
+    file_names,
+    reason=None,
+    cause=None,
+    device=None,
+):
+    distributed = (
+        torch.distributed.is_available() and torch.distributed.is_initialized()
+    )
+    rank = torch.distributed.get_rank() if distributed else 0
+    local_failure = (
+        {
+            "rank": rank,
+            "stage": stage,
+            "batch_idx": batch_idx,
+            "file_names": repr(file_names),
+            "reason": reason,
+        }
+        if reason is not None
+        else None
+    )
+
+    if distributed:
+        failure_flag = torch.tensor(
+            int(local_failure is not None),
+            dtype=torch.int32,
+            device=device,
+        )
+        torch.distributed.all_reduce(
+            failure_flag,
+            op=torch.distributed.ReduceOp.MAX,
+        )
+        if failure_flag.item() == 0:
+            return
+
+        gathered_failures = [None] * torch.distributed.get_world_size()
+        torch.distributed.all_gather_object(gathered_failures, local_failure)
+        failures = [failure for failure in gathered_failures if failure is not None]
+    else:
+        if local_failure is None:
+            return
+        failures = [local_failure]
+
+    error = RuntimeError(_format_batch_contract_failures(failures))
+    if cause is None:
+        raise error
+    raise error from cause
+
+
 def aggregate_objective_loss(losses, weight_dict):
     """Build the optimized objective while omitting per-layer diagnostics."""
     objective_terms = [
@@ -126,17 +233,24 @@ class InstanceSegmentation(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         """Training step implementation"""
         data, target, file_names = batch
+        collective_device = _batch_collective_device(self, data)
+        preflight_failure = _batch_preflight_failure(
+            data,
+            target,
+            max_batch_size=self.config.general.max_batch_size,
+        )
 
-        # validate batch 
-        if data.features.shape[0] > self.config.general.max_batch_size:
-            print("data exceeds threshold")
-            raise RuntimeError("BATCH TOO BIG")
-
-        # skip empty batches
-        if target == []:
-            return None
+        _batch_contract_consensus(
+            stage="train",
+            batch_idx=batch_idx,
+            file_names=file_names,
+            reason=preflight_failure,
+            device=collective_device,
+        )
 
         # Forward pass
+        forward_failure = None
+        forward_cause = None
         try:
             output = self.forward(
                 data,
@@ -145,9 +259,20 @@ class InstanceSegmentation(pl.LightningModule):
                 targets=target,
             )
         except RuntimeError as run_err:
-            if "only a single point gives nans in cross-attention" == run_err.args[0]:
-                return None
-            raise run_err
+            if str(run_err) == _SINGLE_POINT_CROSS_ATTENTION_ERROR:
+                forward_failure = _SINGLE_POINT_CROSS_ATTENTION_ERROR
+                forward_cause = run_err
+            else:
+                raise
+
+        _batch_contract_consensus(
+            stage="train",
+            batch_idx=batch_idx,
+            file_names=file_names,
+            reason=forward_failure,
+            cause=forward_cause,
+            device=collective_device,
+        )
 
         # Compute losses
         try:
@@ -167,10 +292,10 @@ class InstanceSegmentation(pl.LightningModule):
         return total_loss
     
     def validation_step(self, batch, batch_idx):
-        return self._eval_step(batch, "val")
+        return self._eval_step(batch, "val", batch_idx=batch_idx)
     
     def test_step(self, batch, batch_idx):
-        return self._eval_step(batch, "test")
+        return self._eval_step(batch, "test", batch_idx=batch_idx)
     
     
     def _get_mean_loss(self, losses: dict, prefix: str) -> dict:
@@ -256,10 +381,19 @@ class InstanceSegmentation(pl.LightningModule):
         self.instance_metric.reset()
       
 
-    def _eval_step(self, batch, stage):
+    def _eval_step(self, batch, stage, batch_idx=None):
         """Unified evaluation step for validation and testing"""
         data, target, file_names = batch
-        
+        collective_device = _batch_collective_device(self, data)
+        preflight_failure = _batch_preflight_failure(data, target)
+        _batch_contract_consensus(
+            stage=stage,
+            batch_idx=batch_idx,
+            file_names=file_names,
+            reason=preflight_failure,
+            device=collective_device,
+        )
+
         # save values from data (rewritten)
         inverse_maps = data.inverse_maps
         target_full = data.target_full
@@ -269,15 +403,13 @@ class InstanceSegmentation(pl.LightningModule):
         original_coordinates = data.original_coordinates
 
 
-        # Skip empty batches
-        if len(data.coordinates) == 0:
-            return 0.0
-        
         # Process raw_coordinates for model forward pass (Mask3D/ReScene need it)
         raw_coordinates = self._process_raw_coordinates(data)
         
         # Disable gradient computation during evaluation
         with torch.no_grad():
+            forward_failure = None
+            forward_cause = None
             try:
                 output = self.forward(
                     data,
@@ -287,9 +419,20 @@ class InstanceSegmentation(pl.LightningModule):
                     targets=target,
                 )
             except RuntimeError as run_err:
-                if "only a single point gives nans in cross-attention" == run_err.args[0]:
-                    return None
-                raise run_err
+                if str(run_err) == _SINGLE_POINT_CROSS_ATTENTION_ERROR:
+                    forward_failure = _SINGLE_POINT_CROSS_ATTENTION_ERROR
+                    forward_cause = run_err
+                else:
+                    raise
+
+            _batch_contract_consensus(
+                stage=stage,
+                batch_idx=batch_idx,
+                file_names=file_names,
+                reason=forward_failure,
+                cause=forward_cause,
+                device=collective_device,
+            )
 
             # Process predictions for metrics 
             with torch.amp.autocast('cuda',enabled=False):  # Disable autocast for evaluation

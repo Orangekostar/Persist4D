@@ -1,9 +1,11 @@
 import importlib
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 import numpy as np
+import pytest
 import yaml
 
 from datasets.semseg import SemanticSegmentationDataset
@@ -135,6 +137,95 @@ def test_official_loader_projects_three_scan_changes_to_first_transition(
     np.testing.assert_array_equal(labels[:, 2], raw_changes[:, 0])
 
 
+@pytest.mark.parametrize("invalid_database", [{}, [], None, [{"type": "validation"}]])
+def test_temporal_sequence_database_requires_a_non_empty_mapping(
+    tmp_path: Path,
+    invalid_database,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    database_path = processed_dir / "sequence_database_sliding_3.yaml"
+    _write_yaml(database_path, invalid_database)
+
+    with pytest.raises(
+        ValueError,
+        match=rf"{re.escape(str(database_path))}.*non-empty mapping",
+    ):
+        _make_dataset(processed_dir)
+
+
+def test_temporal_sequence_database_requires_requested_mode(
+    tmp_path: Path,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    database_path = processed_dir / "sequence_database_sliding_3.yaml"
+    database = yaml.safe_load(database_path.read_text(encoding="utf-8"))
+    for entry in database.values():
+        entry["type"] = "train"
+    _write_yaml(database_path, database)
+
+    with pytest.raises(
+        ValueError,
+        match=rf"{re.escape(str(database_path))}.*mode 'validation'",
+    ):
+        _make_dataset(processed_dir)
+
+
+@pytest.mark.parametrize(
+    "invalid_sequence",
+    [
+        "scene0000_00",
+        "scene0000_00-scene0000_01",
+        "scene0000_00-scene0000_01-scene0000_02-scene0000_03",
+    ],
+)
+def test_temporal_sequence_length_mismatch_has_database_and_sequence_context(
+    tmp_path: Path,
+    invalid_sequence: str,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    database_path = processed_dir / "sequence_database_sliding_3.yaml"
+    database = yaml.safe_load(database_path.read_text(encoding="utf-8"))
+    entry = next(iter(database.values()))
+    _write_yaml(database_path, {invalid_sequence: entry})
+
+    with pytest.raises(
+        ValueError,
+        match=rf"{re.escape(str(database_path))}.*{invalid_sequence}.*expected 3",
+    ):
+        _make_dataset(processed_dir)
+
+
+def test_missing_temporal_sequence_database_raises_with_path(
+    tmp_path: Path,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    database_path = processed_dir / "sequence_database_sliding_3.yaml"
+    database_path.unlink()
+
+    with pytest.raises(FileNotFoundError, match=re.escape(str(database_path))):
+        _make_dataset(processed_dir)
+
+
+def test_unknown_temporal_scan_has_database_sequence_and_name_context(
+    tmp_path: Path,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    database_path = processed_dir / "sequence_database_sliding_3.yaml"
+    database = yaml.safe_load(database_path.read_text(encoding="utf-8"))
+    entry = next(iter(database.values()))
+    missing_name = "scene9999_99"
+    bad_sequence = f"scene0000_00-{missing_name}-scene0000_02"
+    _write_yaml(database_path, {bad_sequence: entry})
+
+    with pytest.raises(
+        KeyError,
+        match=(
+            rf"{re.escape(str(database_path))}.*{bad_sequence}.*{missing_name}"
+        ),
+    ):
+        _make_dataset(processed_dir)
+
+
 def test_audit_split_records_loader_shapes_and_projection(tmp_path: Path) -> None:
     processed_dir, _ = _make_three_scan_fixture(tmp_path)
     audit = _load_audit_module()
@@ -221,7 +312,7 @@ def test_missing_split_writes_blocked_artifact_before_nonzero_exit(
     artifact = yaml.safe_load(output.read_text(encoding="utf-8"))
     assert artifact["status"] == "blocked"
     assert artifact["totals"]["failures"] == 1
-    assert artifact["audits"][0]["exceptions"][0]["type"] == "SystemExit"
+    assert artifact["audits"][0]["exceptions"][0]["type"] == "FileNotFoundError"
 
 
 def test_database_loader_count_mismatch_blocks_audit(
