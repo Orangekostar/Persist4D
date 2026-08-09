@@ -9,6 +9,12 @@ import yaml
 from datasets.semseg import SemanticSegmentationDataset
 
 
+def _load_audit_module():
+    script = Path(__file__).resolve().parents[1] / "scripts" / "audit_temporal_loader.py"
+    assert script.exists(), "temporal loader audit script has not been implemented"
+    return importlib.import_module("scripts.audit_temporal_loader")
+
+
 def _write_yaml(path: Path, payload: object) -> None:
     path.write_text(yaml.safe_dump(payload, sort_keys=True), encoding="utf-8")
 
@@ -131,9 +137,7 @@ def test_official_loader_projects_three_scan_changes_to_first_transition(
 
 def test_audit_split_records_loader_shapes_and_projection(tmp_path: Path) -> None:
     processed_dir, _ = _make_three_scan_fixture(tmp_path)
-    script = Path(__file__).resolve().parents[1] / "scripts" / "audit_temporal_loader.py"
-    assert script.exists(), "temporal loader audit script has not been implemented"
-    audit = importlib.import_module("scripts.audit_temporal_loader")
+    audit = _load_audit_module()
 
     result = audit.audit_split(
         processed_dir=processed_dir,
@@ -155,6 +159,130 @@ def test_audit_split_records_loader_shapes_and_projection(tmp_path: Path) -> Non
     assert sample["raw_change_shape"] == [6, 2]
     assert sample["raw_change_dim"] == 2
     assert sample["projected_change_dim"] == 1
+
+
+def test_missing_split_writes_blocked_artifact_before_nonzero_exit(
+    tmp_path: Path,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    script = Path(__file__).resolve().parents[1] / "scripts" / "audit_temporal_loader.py"
+    output = tmp_path / "blocked.json"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--processed-dir",
+            str(processed_dir),
+            "--output",
+            str(output),
+            "--horizons",
+            "3",
+            "--splits",
+            "train",
+            "--samples-per-split",
+            "1",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    artifact = yaml.safe_load(output.read_text(encoding="utf-8"))
+    assert artifact["status"] == "blocked"
+    assert artifact["totals"]["failures"] == 1
+    assert artifact["audits"][0]["exceptions"][0]["type"] == "SystemExit"
+
+
+def test_database_loader_count_mismatch_blocks_audit(
+    monkeypatch, tmp_path: Path
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    audit = _load_audit_module()
+
+    class CountMismatchDataset:
+        def __len__(self) -> int:
+            return 2
+
+    monkeypatch.setattr(audit, "make_dataset", lambda *_args, **_kwargs: CountMismatchDataset())
+
+    artifact = audit.run_audit(
+        processed_dir=processed_dir,
+        horizons=[3],
+        splits=["validation"],
+        sample_limit=5,
+        seed=45,
+    )
+
+    assert artifact["status"] == "blocked"
+    assert artifact["totals"]["failures"] == 1
+    audit_record = artifact["audits"][0]
+    assert audit_record["success_count"] == 0
+    assert audit_record["validation_errors"][0]["code"] == "database_loader_count_mismatch"
+
+
+def test_false_projection_blocks_audit(monkeypatch, tmp_path: Path) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    audit = _load_audit_module()
+    original_inspect_sample = audit.inspect_sample
+
+    def inspect_with_false_projection(*args, **kwargs):
+        sample = original_inspect_sample(*args, **kwargs)
+        sample["projection_matches_official_rule"] = False
+        return sample
+
+    monkeypatch.setattr(audit, "inspect_sample", inspect_with_false_projection)
+
+    artifact = audit.run_audit(
+        processed_dir=processed_dir,
+        horizons=[3],
+        splits=["validation"],
+        sample_limit=1,
+        seed=45,
+    )
+
+    assert artifact["status"] == "blocked"
+    assert artifact["totals"]["failures"] == 1
+    audit_record = artifact["audits"][0]
+    assert audit_record["success_count"] == 0
+    assert audit_record["validation_errors"][0]["errors"] == [
+        {
+            "code": "projection_mismatch",
+            "expected": True,
+            "actual": False,
+        }
+    ]
+
+
+def test_audit_records_unambiguous_generator_provenance(tmp_path: Path) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    audit = _load_audit_module()
+
+    artifact = audit.run_audit(
+        processed_dir=processed_dir,
+        horizons=[3],
+        splits=["validation"],
+        sample_limit=1,
+        seed=45,
+    )
+
+    script_path = Path(audit.__file__).resolve()
+    assert artifact["official_source_commit"] == (
+        "fb2fe42eb8f1e926567c48eea9acb874e608ee10"
+    )
+    assert artifact["generator_git_commit"] == subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=script_path.parents[1],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    assert isinstance(artifact["generator_dirty"], bool)
+    assert artifact["source_hashes"]["scripts/audit_temporal_loader.py"] == (
+        audit.sha256_file(script_path)
+    )
+    assert "git_commit" not in artifact
 
 
 def test_script_entrypoint_works_outside_project_directory(tmp_path: Path) -> None:

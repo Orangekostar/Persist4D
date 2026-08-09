@@ -158,7 +158,8 @@
         }
       ],
       "split": "train",
-      "success_count": 5
+      "success_count": 5,
+      "validation_errors": []
     },
     {
       "database_count": 157,
@@ -318,7 +319,8 @@
         }
       ],
       "split": "validation",
-      "success_count": 5
+      "success_count": 5,
+      "validation_errors": []
     },
     {
       "database_count": 858,
@@ -488,7 +490,8 @@
         }
       ],
       "split": "train",
-      "success_count": 5
+      "success_count": 5,
+      "validation_errors": []
     },
     {
       "database_count": 123,
@@ -658,7 +661,8 @@
         }
       ],
       "split": "validation",
-      "success_count": 5
+      "success_count": 5,
+      "validation_errors": []
     },
     {
       "database_count": 474,
@@ -833,7 +837,8 @@
         }
       ],
       "split": "train",
-      "success_count": 5
+      "success_count": 5,
+      "validation_errors": []
     },
     {
       "database_count": 75,
@@ -1008,7 +1013,8 @@
         }
       ],
       "split": "validation",
-      "success_count": 5
+      "success_count": 5,
+      "validation_errors": []
     },
     {
       "database_count": 262,
@@ -1188,7 +1194,8 @@
         }
       ],
       "split": "train",
-      "success_count": 5
+      "success_count": 5,
+      "validation_errors": []
     },
     {
       "database_count": 43,
@@ -1368,7 +1375,8 @@
         }
       ],
       "split": "validation",
-      "success_count": 5
+      "success_count": 5,
+      "validation_errors": []
     }
   ],
   "configuration": {
@@ -1402,8 +1410,10 @@
     "seed": 45,
     "sequence_type": "sliding"
   },
-  "git_commit": "606e2f7097d2934f8b96b05c5f4f47714ca17ccb",
-  "schema_version": 1,
+  "generator_dirty": true,
+  "generator_git_commit": "ca32b9da2d3151df3519396098712b4a1ca1238d",
+  "official_source_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+  "schema_version": 2,
   "semantic_limitations": [
     {
       "code": "metadata_order_is_not_chronology",
@@ -1421,7 +1431,8 @@
   "sequence_order_semantics": "metadata_order_only_no_timestamps",
   "source_hashes": {
     "conf/profiling/p0_p1_a40.yaml": "87ea55ac6cf2aa00a0d25fe3c82a2e7a122b60395ade4b96f2f58c9803a087c0",
-    "datasets/semseg.py": "ca3316b12acfb22766b145885b0b4d84423fc9d754d267333b7d2052cf1f9322"
+    "datasets/semseg.py": "ca3316b12acfb22766b145885b0b4d84423fc9d754d267333b7d2052cf1f9322",
+    "scripts/audit_temporal_loader.py": "4c8039a786e115725a3ba79fa79c89fd638f720da614cc308e1abdc3250a8dc3"
   },
   "status": "pass",
   "top_level_exceptions": [],

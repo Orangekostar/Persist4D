@@ -25,6 +25,7 @@ from datasets.semseg import SemanticSegmentationDataset
 
 DEFAULT_HORIZONS = (2, 3, 4, 5)
 DEFAULT_SPLITS = ("train", "validation")
+OFFICIAL_SOURCE_COMMIT = "fb2fe42eb8f1e926567c48eea9acb874e608ee10"
 
 
 def sha256_file(path: Path) -> str:
@@ -100,8 +101,17 @@ def inspect_sample(
     raw_changes = np.genfromtxt(change_file, dtype=int)
     loaded = dataset[dataset_index]
     coordinates, features, labels, sequence_name = loaded[:4]
-    projected_changes = labels[:, 2]
+    projected_changes = (
+        labels[:, 2]
+        if labels.ndim == 2 and labels.shape[1] > 2
+        else np.asarray(None)
+    )
     expected_projection = raw_changes[:, 0] if raw_changes.ndim == 2 else raw_changes
+    temporal_stages = (
+        sorted(int(stage) for stage in np.unique(coordinates[:, 3]).tolist())
+        if coordinates.ndim == 2 and coordinates.shape[1] > 3
+        else []
+    )
 
     return {
         "dataset_index": dataset_index,
@@ -111,9 +121,7 @@ def inspect_sample(
         "coordinate_shape": list(coordinates.shape),
         "feature_shape": list(features.shape),
         "label_shape": list(labels.shape),
-        "temporal_stages": sorted(
-            int(stage) for stage in np.unique(coordinates[:, 3]).tolist()
-        ),
+        "temporal_stages": temporal_stages,
         "raw_change_shape": list(raw_changes.shape),
         "raw_change_dim": int(raw_changes.ndim),
         "projected_change_dim": int(projected_changes.ndim),
@@ -121,6 +129,55 @@ def inspect_sample(
             np.array_equal(projected_changes, expected_projection)
         ),
     }
+
+
+def validate_sample_record(sample: dict[str, Any], horizon: int) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+
+    def require(code: str, expected: Any, actual: Any) -> None:
+        if actual != expected:
+            errors.append({"code": code, "expected": expected, "actual": actual})
+
+    coordinate_shape = sample["coordinate_shape"]
+    feature_shape = sample["feature_shape"]
+    label_shape = sample["label_shape"]
+    point_count = coordinate_shape[0] if len(coordinate_shape) == 2 else None
+
+    require("coordinate_rank", 2, len(coordinate_shape))
+    require(
+        "coordinate_columns",
+        4,
+        coordinate_shape[1] if len(coordinate_shape) == 2 else None,
+    )
+    require(
+        "feature_point_count",
+        point_count,
+        feature_shape[0] if len(feature_shape) >= 1 else None,
+    )
+    require(
+        "label_point_count",
+        point_count,
+        label_shape[0] if len(label_shape) >= 1 else None,
+    )
+    require(
+        "label_columns",
+        4,
+        label_shape[1] if len(label_shape) == 2 else None,
+    )
+    require("temporal_stages", list(range(horizon)), sample["temporal_stages"])
+
+    expected_raw_shape = (
+        [point_count] if horizon == 2 else [point_count, horizon - 1]
+    )
+    require("raw_change_shape", expected_raw_shape, sample["raw_change_shape"])
+    require("raw_change_dim", 1 if horizon == 2 else 2, sample["raw_change_dim"])
+    require("projected_change_dim", 1, sample["projected_change_dim"])
+    require(
+        "projection_mismatch",
+        True,
+        sample["projection_matches_official_rule"],
+    )
+    return errors
 
 
 def audit_split(
@@ -151,12 +208,13 @@ def audit_split(
         "failure_count": 0,
         "samples": [],
         "exceptions": [],
+        "validation_errors": [],
     }
 
     try:
         dataset = make_dataset(processed_dir, horizon, split)
         result["loader_sequence_count"] = len(dataset)
-    except Exception as error:
+    except (Exception, SystemExit) as error:
         result["failure_count"] = 1
         result["exceptions"].append(
             {
@@ -167,13 +225,38 @@ def audit_split(
         )
         return result
 
+    if result["loader_sequence_count"] != result["database_count"]:
+        result["failure_count"] = 1
+        result["validation_errors"].append(
+            {
+                "phase": "dataset_validation",
+                "code": "database_loader_count_mismatch",
+                "expected": result["database_count"],
+                "actual": result["loader_sequence_count"],
+            }
+        )
+        return result
+
     indices = select_indices(len(dataset), sample_limit, seed, horizon, split)
     result["sample_indices"] = indices
     for dataset_index in indices:
         try:
-            result["samples"].append(inspect_sample(dataset, dataset_index, seed))
-            result["success_count"] += 1
-        except Exception as error:
+            sample = inspect_sample(dataset, dataset_index, seed)
+            result["samples"].append(sample)
+            validation_errors = validate_sample_record(sample, horizon)
+            if validation_errors:
+                result["failure_count"] += 1
+                result["validation_errors"].append(
+                    {
+                        "phase": "sample_validation",
+                        "dataset_index": dataset_index,
+                        "sequence_name": sample["sequence_name"],
+                        "errors": validation_errors,
+                    }
+                )
+            else:
+                result["success_count"] += 1
+        except (Exception, SystemExit) as error:
             result["failure_count"] += 1
             result["exceptions"].append(
                 {
@@ -195,6 +278,17 @@ def git_commit() -> str | None:
         text=True,
     )
     return result.stdout.strip() if result.returncode == 0 else None
+
+
+def git_dirty() -> bool:
+    result = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=PROJECT_ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    return True if result.returncode != 0 else bool(result.stdout.strip())
 
 
 def run_audit(
@@ -219,7 +313,7 @@ def run_audit(
                         seed=seed,
                     )
                 )
-            except Exception as error:
+            except (Exception, SystemExit) as error:
                 top_level_exceptions.append(
                     {
                         "horizon": horizon,
@@ -233,13 +327,17 @@ def run_audit(
     failure_count += len(top_level_exceptions)
     loader_source = PROJECT_ROOT / "datasets" / "semseg.py"
     profile_config = PROJECT_ROOT / "conf" / "profiling" / "p0_p1_a40.yaml"
+    generator_source = PROJECT_ROOT / "scripts" / "audit_temporal_loader.py"
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": "pass" if failure_count == 0 else "blocked",
-        "git_commit": git_commit(),
+        "official_source_commit": OFFICIAL_SOURCE_COMMIT,
+        "generator_git_commit": git_commit(),
+        "generator_dirty": git_dirty(),
         "source_hashes": {
             "datasets/semseg.py": sha256_file(loader_source),
             "conf/profiling/p0_p1_a40.yaml": sha256_file(profile_config),
+            "scripts/audit_temporal_loader.py": sha256_file(generator_source),
         },
         "configuration": {
             "processed_dir": str(Path(processed_dir).resolve()),
