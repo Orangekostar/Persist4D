@@ -10,7 +10,6 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-
 AUDITED_SPLITS = ("train", "val")
 HORIZON_THRESHOLDS = range(2, 7)
 VALIDATION_ALIAS = "validation"
@@ -36,7 +35,7 @@ def load_metadata(path: str | Path) -> list[dict[str, Any]]:
         raise ValueError(f"invalid JSON in metadata file {metadata_path}: {error}") from error
 
     if not isinstance(metadata, list):
-        raise ValueError("metadata must be a JSON array")
+        raise ValueError("metadata must be a JSON array")  # noqa: TRY004
     return metadata
 
 
@@ -73,7 +72,7 @@ def build_audit(
 ) -> dict[str, Any]:
     """Build deterministic source-wide and train/validation temporal statistics."""
     if not isinstance(metadata, list):
-        raise ValueError("metadata must be a JSON array")
+        raise ValueError("metadata must be a JSON array")  # noqa: TRY004
 
     source_lengths: list[int] = []
     split_lengths: dict[str, list[int]] = {split: [] for split in AUDITED_SPLITS}
@@ -83,7 +82,7 @@ def build_audit(
     for group_index, group in enumerate(metadata):
         context = f"metadata group at index {group_index}"
         if not isinstance(group, dict):
-            raise ValueError(f"{context} must be an object")
+            raise ValueError(f"{context} must be an object")  # noqa: TRY004
 
         reference_id = _require_nonempty_string(group, "reference", context)
         raw_split = _require_nonempty_string(group, "type", context)
@@ -91,13 +90,13 @@ def build_audit(
             raise ValueError(f"{context} is missing required field 'scans'")
         scans = group["scans"]
         if not isinstance(scans, list):
-            raise ValueError(f"{context} field 'scans' must be an array")
+            raise ValueError(f"{context} field 'scans' must be an array")  # noqa: TRY004
 
         scan_ids = [reference_id]
         for scan_index, scan in enumerate(scans):
             scan_context = f"{context} scan at index {scan_index}"
             if not isinstance(scan, dict):
-                raise ValueError(f"{scan_context} must be an object")
+                raise ValueError(f"{scan_context} must be an object")  # noqa: TRY004
             scan_ids.append(_require_nonempty_string(scan, "reference", scan_context))
 
         temporal_length = len(scan_ids)

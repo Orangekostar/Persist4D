@@ -9,8 +9,9 @@ import json
 import re
 import sys
 from collections import Counter
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import yaml
 
@@ -19,7 +20,6 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from datasets.preprocessing import build_rscan_sequence_db as official_sequence_builder
-
 
 OFFICIAL_SEED = 45
 OFFICIAL_SOURCE_COMMIT = "fb2fe42eb8f1e926567c48eea9acb874e608ee10"
@@ -92,7 +92,7 @@ def _empty_split_counts() -> dict[str, int]:
 
 def _scan_ids_from_key(key: object, *, horizon: int) -> list[str]:
     if not isinstance(key, str):
-        raise ValueError("sequence database keys must be strings")
+        raise ValueError("sequence database keys must be strings")  # noqa: TRY004
     scan_ids = key.split("-")
     if len(scan_ids) != horizon:
         raise ValueError(
@@ -113,7 +113,7 @@ def _validate_entry(
     horizon: int,
 ) -> tuple[str, int, str | None]:
     if not isinstance(entry, dict):
-        raise ValueError(f"sequence {key!r} entry must be a mapping")
+        raise ValueError(f"sequence {key!r} entry must be a mapping")  # noqa: TRY004
 
     missing = sorted(REQUIRED_FIELDS - entry.keys())
     if missing:
@@ -125,7 +125,9 @@ def _validate_entry(
     sub_scenes = entry["sub_scenes"]
     split = entry["type"]
     if not isinstance(scene, int):
-        raise ValueError(f"sequence {key!r} field 'scene' must be an integer")
+        raise ValueError(  # noqa: TRY004
+            f"sequence {key!r} field 'scene' must be an integer"
+        )
     if not isinstance(sub_scenes, list) or len(sub_scenes) != horizon:
         raise ValueError(
             f"sequence {key!r} field 'sub_scenes' must contain {horizon} values"
@@ -168,7 +170,9 @@ def inventory_database(path: str | Path, *, horizon: int) -> dict[str, Any]:
         database = yaml.safe_load(database_file)
 
     if not isinstance(database, dict):
-        raise ValueError(f"{database_path}: top level must be a mapping")
+        raise ValueError(  # noqa: TRY004
+            f"{database_path}: top level must be a mapping"
+        )
     if not database:
         raise ValueError(f"{database_path}: database is empty")
 

@@ -6,22 +6,21 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from pathlib import Path
 import random
 import subprocess
 import sys
-from typing import Any, Sequence
+from collections.abc import Sequence
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 import yaml
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from datasets.semseg import SemanticSegmentationDataset
-
 
 DEFAULT_HORIZONS = (2, 3, 4, 5)
 DEFAULT_SPLITS = ("train", "validation")
@@ -200,7 +199,9 @@ def audit_split(
     database_path = processed_dir / f"sequence_database_sliding_{horizon}.yaml"
     database = load_yaml(database_path)
     if not isinstance(database, dict):
-        raise ValueError(f"sequence database must be a mapping: {database_path}")
+        raise ValueError(  # noqa: TRY004
+            f"sequence database must be a mapping: {database_path}"
+        )
 
     result: dict[str, Any] = {
         "horizon": horizon,
@@ -222,7 +223,7 @@ def audit_split(
     try:
         dataset = make_dataset(processed_dir, horizon, split)
         result["loader_sequence_count"] = len(dataset)
-    except (Exception, SystemExit) as error:
+    except (Exception, SystemExit) as error:  # noqa: BLE001
         result["failure_count"] = 1
         result["exceptions"].append(
             {
@@ -264,7 +265,7 @@ def audit_split(
                 )
             else:
                 result["success_count"] += 1
-        except (Exception, SystemExit) as error:
+        except (Exception, SystemExit) as error:  # noqa: BLE001
             result["failure_count"] += 1
             result["exceptions"].append(
                 {
@@ -321,7 +322,7 @@ def run_audit(
                         seed=seed,
                     )
                 )
-            except (Exception, SystemExit) as error:
+            except (Exception, SystemExit) as error:  # noqa: BLE001
                 top_level_exceptions.append(
                     {
                         "horizon": horizon,
