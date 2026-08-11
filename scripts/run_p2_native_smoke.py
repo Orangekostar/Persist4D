@@ -864,6 +864,16 @@ def _instantiate_formal_checkpoint_callbacks(config: Any) -> list[Any]:
         raise AssertionError(
             "formal ModelCheckpoint callbacks require exactly one save-last owner"
         )
+    monitored_callbacks = [
+        callback for callback in callbacks if callback.monitor == "val_mean_t-AP"
+    ]
+    if (
+        len(monitored_callbacks) != 1
+        or monitored_callbacks[0]._save_on_train_epoch_end is not True
+    ):
+        raise AssertionError(
+            "formal monitored ModelCheckpoint must save at train epoch end"
+        )
     state_keys = [callback.state_key for callback in callbacks]
     if len(set(state_keys)) != len(state_keys):
         raise AssertionError("formal checkpoint callback state keys are not unique")
@@ -1552,13 +1562,13 @@ def _run_lightning_checkpoint_resume(
         fit_loop_validation_batches_completed = int(
             fit_loop["epoch_loop.val_loop.batch_progress"]["total"]["completed"]
         )
-        source_checkpoint_generated_at_real_validation_epoch_end = (
+        source_checkpoint_generated_at_real_train_epoch_end = (
             fit_loop_epoch_total
             == {
                 "ready": 1,
-                "completed": 0,
+                "completed": 1,
                 "started": 1,
-                "processed": 0,
+                "processed": 1,
             }
             and fit_loop_optimizer_steps_completed
             == _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH
@@ -1566,18 +1576,18 @@ def _run_lightning_checkpoint_resume(
             == _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH
             and fit_loop_train_batches_completed == _P2_FORMAL_TRAIN_BATCHES_PER_EPOCH
             and fit_loop_batches_that_stepped
-            == _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH - 1
-            and fit_loop_validation_batches_completed == 1
+            == _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH
+            and fit_loop_validation_batches_completed == 0
             and monitored_callback_history_populated
         )
         if (
             saved_epoch != 0
             or saved_global_step != _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH
             or saved_scheduler_last_epoch != _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH
-            or not source_checkpoint_generated_at_real_validation_epoch_end
+            or not source_checkpoint_generated_at_real_train_epoch_end
         ):
             raise AssertionError(
-                "formal Lightning checkpoint is not a real epoch0 validation-end "
+                "formal Lightning checkpoint is not a real epoch0 train-epoch-end "
                 "checkpoint"
             )
         del saved, saved_state_dict
@@ -1624,6 +1634,9 @@ def _run_lightning_checkpoint_resume(
         resumed_checkpoint_callbacks = _instantiate_formal_checkpoint_callbacks(
             resume_config
         )
+        # The probe intentionally stops after one optimizer step, not at a
+        # resumable epoch boundary, so it must not emit a second checkpoint.
+        resumed_checkpoint_callbacks[0].save_last = False
         resumed_trainer = make_trainer(
             max_epochs=2,
             max_steps=_P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH + 1,
@@ -1773,8 +1786,8 @@ def _run_lightning_checkpoint_resume(
             ),
             "monitored_topk_checkpoint_bytes": (monitored_topk_checkpoint_bytes),
             "monitored_topk_checkpoint_removed": (monitored_topk_checkpoint_removed),
-            "source_checkpoint_generated_at_real_validation_epoch_end": (
-                source_checkpoint_generated_at_real_validation_epoch_end
+            "source_checkpoint_generated_at_real_train_epoch_end": (
+                source_checkpoint_generated_at_real_train_epoch_end
             ),
             "source_fit_loop_progress": {
                 "epoch_total": fit_loop_epoch_total,
@@ -1855,6 +1868,8 @@ def _run_lightning_checkpoint_resume(
             "advanced_scheduler_last_epoch": advanced_scheduler_last_epoch,
         }
 
+        sampler_stream_actual_indices = list(resumed_dataset.sampled_indices)
+        sampler_stream_expected_indices = list(expected_next_indices)
         del saved_sampler_state
         del final_optimizer, final_scheduler, final_sampler_state, probe
         del resumed_binding, resumed_checkpoint_callbacks
@@ -1909,8 +1924,8 @@ def _run_lightning_checkpoint_resume(
         "monitored_topk_checkpoint_removed": details[
             "monitored_topk_checkpoint_removed"
         ],
-        "source_checkpoint_generated_at_real_validation_epoch_end": details[
-            "source_checkpoint_generated_at_real_validation_epoch_end"
+        "source_checkpoint_generated_at_real_train_epoch_end": details[
+            "source_checkpoint_generated_at_real_train_epoch_end"
         ],
         "lightning_ckpt_path_restore": details["lightning_ckpt_path_restore"],
         "formal_completed_epoch_boundary": details["formal_completed_epoch_boundary"],
@@ -1947,6 +1962,16 @@ def _run_lightning_checkpoint_resume(
     details["passed"] = all(checks.values())
     if not details["passed"]:
         failed = [key for key, passed in checks.items() if not passed]
+        if not sampler_stream_continuous:
+            raise AssertionError(
+                "Lightning sampler stream mismatch: "
+                f"actual_len={len(sampler_stream_actual_indices)}, "
+                f"expected_len={len(sampler_stream_expected_indices)}, "
+                f"actual_head={sampler_stream_actual_indices[:8]!r}, "
+                f"expected_head={sampler_stream_expected_indices[:8]!r}, "
+                f"actual_tail={sampler_stream_actual_indices[-8:]!r}, "
+                f"expected_tail={sampler_stream_expected_indices[-8:]!r}"
+            )
         raise AssertionError(
             "Lightning full checkpoint resume validation failed: " + ", ".join(failed)
         )

@@ -117,7 +117,7 @@ P2_KNOWN_EMPTY_RIO_SEQUENCES = [
 ]
 P2_KNOWN_EMPTY_SCANNET_SCAN_IDS = ["scene0154_00", "scene0636_00"]
 P2_TRAINING_SEMANTIC_SHA256 = (
-    "4e6532a02bb67e1c1a9f990010d1ba89f4d40d596b9790f91b79ff70566565bc"
+    "898cc3588218d63fe0295aa274dbf63c51b29ad8aa1f32f918427d99e7e6060d"
 )
 NYU40_INSTANCE_IDS = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 24, 28, 33, 34, 36, 39]
 NYU40_INSTANCE_LABELS = [
@@ -1384,7 +1384,7 @@ def validate_p2_training_config_contract(cfg: Any) -> list[str]:
             "dirpath": P2_SAVE_DIR,
             "filename": "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}",
             "every_n_epochs": 1,
-            "save_on_train_epoch_end": False,
+            "save_on_train_epoch_end": True,
             "save_weights_only": False,
             "auto_insert_metric_name": False,
         },

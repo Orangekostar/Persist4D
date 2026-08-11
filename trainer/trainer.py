@@ -19,8 +19,6 @@ import pickle
 _SINGLE_POINT_CROSS_ATTENTION_ERROR = (
     "only a single point gives nans in cross-attention"
 )
-
-
 def _p2_general_flag(config, name):
     general = getattr(config, "general", None)
     return bool(getattr(general, name, False))
@@ -551,6 +549,172 @@ def _configured_objective_loss(module, losses):
     if p2_fail_closed_runtime:
         _validate_objective_finite(losses, total_loss, list(losses))
     return total_loss
+
+
+def normalize_formal_p2_epoch_boundary_checkpoint(checkpoint, config):
+    """Normalize a formal P2 train-epoch-end checkpoint for next-epoch resume."""
+    if not _p2_general_flag(config, "p2_fail_closed_runtime"):
+        return
+
+    def fail(message):
+        raise RuntimeError(f"cannot normalize formal P2 checkpoint: {message}")
+
+    def progress_matches(progress, expected):
+        return (
+            isinstance(progress, dict)
+            and set(progress) == set(expected)
+            and all(
+                isinstance(progress[field], int)
+                and not isinstance(progress[field], bool)
+                and progress[field] == value
+                for field, value in expected.items()
+            )
+        )
+
+    if not isinstance(checkpoint, dict):
+        fail("checkpoint payload is not mutable")
+    loops = checkpoint.get("loops")
+    fit_loop = loops.get("fit_loop") if isinstance(loops, Mapping) else None
+    if not isinstance(fit_loop, dict):
+        fail("missing fit_loop state")
+    epoch = checkpoint.get("epoch")
+    global_step = checkpoint.get("global_step")
+    if (
+        not isinstance(epoch, int)
+        or isinstance(epoch, bool)
+        or epoch < 0
+        or not isinstance(global_step, int)
+        or isinstance(global_step, bool)
+    ):
+        fail("invalid epoch or global_step")
+    completed_epochs = epoch + 1
+    if global_step != completed_epochs * 66:
+        fail("invalid epoch or global_step")
+
+    epoch_progress = fit_loop.get("epoch_progress")
+    if not isinstance(epoch_progress, dict):
+        fail("missing epoch_progress")
+    expected_epoch_progress = {
+        "ready": completed_epochs,
+        "completed": epoch,
+        "started": completed_epochs,
+        "processed": completed_epochs,
+    }
+    for scope in ("total", "current"):
+        progress = epoch_progress.get(scope)
+        if not progress_matches(progress, expected_epoch_progress):
+            fail(f"invalid epoch_progress.{scope} for train epoch end")
+
+    batch_progress = fit_loop.get("epoch_loop.batch_progress")
+    if not isinstance(batch_progress, dict):
+        fail("missing epoch_loop.batch_progress")
+    current_batches = batch_progress.get("current")
+    total_batches = batch_progress.get("total")
+    if (
+        not isinstance(current_batches, dict)
+        or not isinstance(total_batches, dict)
+        or batch_progress.get("is_last_batch") is not True
+    ):
+        fail("invalid train batch progress for train epoch end")
+    batch_fields = ("ready", "completed", "started", "processed")
+    if not progress_matches(
+        current_batches,
+        {field: 264 for field in batch_fields},
+    ) or not progress_matches(
+        total_batches,
+        {field: completed_epochs * 264 for field in batch_fields},
+    ):
+        fail("invalid cumulative train batch progress")
+
+    scheduler_progress = fit_loop.get("epoch_loop.scheduler_progress")
+    if not isinstance(scheduler_progress, dict):
+        fail("missing epoch_loop.scheduler_progress")
+    current_scheduler = scheduler_progress.get("current")
+    total_scheduler = scheduler_progress.get("total")
+    if (
+        not progress_matches(current_scheduler, {"ready": 66, "completed": 66})
+        or not progress_matches(
+            total_scheduler,
+            {"ready": global_step, "completed": global_step},
+        )
+    ):
+        fail("invalid scheduler progress for train epoch end")
+
+    optimizer_progress = fit_loop.get(
+        "epoch_loop.automatic_optimization.optim_progress"
+    )
+    optimizer = (
+        optimizer_progress.get("optimizer")
+        if isinstance(optimizer_progress, dict)
+        else None
+    )
+    if not isinstance(optimizer, dict):
+        fail("missing optimizer progress")
+    optimizer_fields = {
+        "step": ("ready", "completed"),
+        "zero_grad": ("ready", "completed", "started"),
+    }
+    if set(optimizer) != set(optimizer_fields):
+        fail("invalid optimizer progress")
+    for name, fields in optimizer_fields.items():
+        progress = optimizer.get(name)
+        current = progress.get("current") if isinstance(progress, dict) else None
+        total = progress.get("total") if isinstance(progress, dict) else None
+        if (
+            not isinstance(progress, dict)
+            or set(progress) != {"total", "current"}
+            or not progress_matches(current, {field: 66 for field in fields})
+            or not progress_matches(
+                total,
+                {field: global_step for field in fields},
+            )
+        ):
+            fail(f"invalid optimizer {name} progress for train epoch end")
+
+    fit_loop_state = fit_loop.get("epoch_loop.state_dict")
+    if (
+        not isinstance(fit_loop_state, dict)
+        or fit_loop_state.get("_batches_that_stepped") != global_step
+    ):
+        fail("invalid _batches_that_stepped for train epoch end")
+
+    val_batch_progress = fit_loop.get("epoch_loop.val_loop.batch_progress")
+    if (
+        not isinstance(val_batch_progress, dict)
+        or not isinstance(val_batch_progress.get("total"), dict)
+        or not isinstance(val_batch_progress.get("current"), dict)
+        or not isinstance(val_batch_progress.get("is_last_batch"), bool)
+    ):
+        fail("invalid fit validation loop progress")
+    for progress in (
+        val_batch_progress["total"],
+        val_batch_progress["current"],
+    ):
+        if (
+            set(progress) != set(batch_fields)
+            or any(
+                not isinstance(progress[field], int)
+                or isinstance(progress[field], bool)
+                or progress[field] < 0
+                for field in batch_fields
+            )
+        ):
+            fail("invalid fit validation batch counters")
+
+    for progress in epoch_progress.values():
+        progress["completed"] = completed_epochs
+    batch_progress["current"] = {field: 0 for field in current_batches}
+    batch_progress["is_last_batch"] = False
+    scheduler_progress["current"] = {field: 0 for field in current_scheduler}
+    for name in ("step", "zero_grad"):
+        progress = optimizer[name]
+        progress["current"] = {field: 0 for field in progress["current"]}
+    fit_loop["epoch_loop.state_dict"]["_batches_that_stepped"] = global_step
+    for field in ("total", "current"):
+        val_batch_progress[field] = {
+            key: 0 for key in val_batch_progress[field]
+        }
+    val_batch_progress["is_last_batch"] = False
 
 
 
@@ -1816,6 +1980,11 @@ class InstanceSegmentation(pl.LightningModule):
                     "generator"
                 )
             return
+        if p2_fail_closed_runtime:
+            normalize_formal_p2_epoch_boundary_checkpoint(
+                checkpoint,
+                self.config,
+            )
 
         checkpoint[self._TRAIN_SAMPLER_CHECKPOINT_KEY] = {
             "schema_version": self._TRAIN_SAMPLER_CHECKPOINT_SCHEMA_VERSION,

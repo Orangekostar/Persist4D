@@ -104,8 +104,8 @@ EXPECTED_INPUT_PROVENANCE = {
     "resolved_composed_config": {
         "format": "canonical-json-sort-keys-v1",
         "portable_references": True,
-        "serialized_bytes": 9307,
-        "sha256": "0f9e61ada901ba416ea66022bed3be90f6a5f43316f2c6983d1f4c38e0086a3a",
+        "serialized_bytes": 9306,
+        "sha256": "42670aa8d514ca5e8ff4f9e0dc80f8d30984b438e804e38da7fbce97c58697f8",
     },
 }
 
@@ -756,6 +756,7 @@ def test_lightning_resume_uses_all_formal_checkpoint_callbacks(
         None,
         None,
     ]
+    assert callbacks[0]._save_on_train_epoch_end is True
     assert all(callback.save_weights_only is False for callback in callbacks)
     assert sum(bool(callback.save_last) for callback in callbacks) == 1
     assert all(
@@ -773,6 +774,11 @@ def test_lightning_resume_uses_all_formal_checkpoint_callbacks(
         }
         for callback in callbacks
     )
+
+    with open_dict(config.callbacks[0]):
+        config.callbacks[0].save_on_train_epoch_end = False
+    with pytest.raises(AssertionError, match="train epoch end"):
+        smoke._instantiate_formal_checkpoint_callbacks(config)
 
 
 def test_lightning_resume_wiring_requests_full_state_ckpt_path() -> None:
@@ -992,6 +998,7 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
         find_resume_checkpoint,
         require_p2_resume_checkpoint,
     )
+    from trainer.trainer import normalize_formal_p2_epoch_boundary_checkpoint
 
     events: list[str] = []
 
@@ -1018,6 +1025,7 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
                 self.observed_events.append("on_load_checkpoint")
 
         def on_save_checkpoint(self, checkpoint: dict[str, object]) -> None:
+            normalize_formal_p2_epoch_boundary_checkpoint(checkpoint, config)
             checkpoint["p2_train_sampler_generator"] = {
                 "schema_version": 1,
                 "resume_scope": "completed_epoch_boundary_only",
@@ -1258,9 +1266,9 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
     fit_loop = saved["loops"]["fit_loop"]
     assert fit_loop["epoch_progress"]["total"] == {
         "ready": 1,
-        "completed": 0,
+        "completed": 1,
         "started": 1,
-        "processed": 0,
+        "processed": 1,
     }
     assert (
         fit_loop["epoch_loop.automatic_optimization.optim_progress"]["optimizer"][
@@ -1270,8 +1278,8 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
     )
     assert fit_loop["epoch_loop.scheduler_progress"]["total"]["completed"] == 66
     assert fit_loop["epoch_loop.batch_progress"]["total"]["completed"] == 264
-    assert fit_loop["epoch_loop.state_dict"]["_batches_that_stepped"] == 65
-    assert fit_loop["epoch_loop.val_loop.batch_progress"]["total"]["completed"] == 1
+    assert fit_loop["epoch_loop.state_dict"]["_batches_that_stepped"] == 66
+    assert fit_loop["epoch_loop.val_loop.batch_progress"]["total"]["completed"] == 0
     saved_optimizer = saved["optimizer_states"][0]
     optimizer_parameter_ids = {
         parameter_id
@@ -1313,6 +1321,7 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
     resumed_checkpoint_callbacks = smoke._instantiate_formal_checkpoint_callbacks(
         config
     )
+    resumed_checkpoint_callbacks[0].save_last = False
     resumed_dataset, resumed_generator, resumed_loader = loader()
     resumed_trainer = trainer(
         max_epochs=2,
@@ -1327,7 +1336,16 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
         weights_only=False,
     )
 
-    assert events == ["setup", "on_load_checkpoint", "on_train_batch_start"]
+    assert events == [
+        "setup",
+        "on_load_checkpoint",
+        "on_train_batch_start",
+    ], (
+        events,
+        resumed_trainer.current_epoch,
+        resumed_trainer.global_step,
+        resumed_dataset.sampled_indices,
+    )
     assert probe.snapshot is not None
     assert probe.snapshot["global_step"] == saved["global_step"] == 66
     assert smoke._recursive_equal(
@@ -1353,6 +1371,7 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
     ]
     assert resumed_monitored_state["current_score"] is None
     assert monitored_state["current_score"] is not None
+    assert len(resumed_dataset.sampled_indices) == 4
     assert resumed_dataset.sampled_indices == expected_next_indices
     assert resumed_trainer.global_step == 67
     assert resumed_trainer.lr_scheduler_configs[0].scheduler.last_epoch == 67
@@ -1574,21 +1593,21 @@ def test_real_native_smoke_artifact_passes_all_gates() -> None:
     assert lightning_resume["monitored_topk_checkpoint_bytes"] > 0
     assert lightning_resume["monitored_topk_checkpoint_removed"] is True
     assert (
-        lightning_resume["source_checkpoint_generated_at_real_validation_epoch_end"]
+        lightning_resume["source_checkpoint_generated_at_real_train_epoch_end"]
         is True
     )
     assert lightning_resume["source_fit_loop_progress"] == {
         "epoch_total": {
             "ready": 1,
-            "completed": 0,
+            "completed": 1,
             "started": 1,
-            "processed": 0,
+            "processed": 1,
         },
-        "batches_that_stepped": 65,
+        "batches_that_stepped": 66,
         "optimizer_steps_completed": 66,
         "scheduler_steps_completed": 66,
         "train_batches_completed": 264,
-        "validation_batches_completed": 1,
+        "validation_batches_completed": 0,
     }
     assert lightning_resume["lightning_ckpt_path_restore"] is True
     assert lightning_resume["lightning_fit_weights_only"] is False

@@ -473,10 +473,10 @@ def _formal_artifact(cfg, *, issued_at: datetime | None = None) -> dict:
             "status": "pass",
             "errors": [],
             "expected_semantic_sha256": (
-                "4e6532a02bb67e1c1a9f990010d1ba89f4d40d596b9790f91b79ff70566565bc"
+                "898cc3588218d63fe0295aa274dbf63c51b29ad8aa1f32f918427d99e7e6060d"
             ),
             "observed_semantic_sha256": (
-                "4e6532a02bb67e1c1a9f990010d1ba89f4d40d596b9790f91b79ff70566565bc"
+                "898cc3588218d63fe0295aa274dbf63c51b29ad8aa1f32f918427d99e7e6060d"
             ),
         },
         "authorization": {
@@ -630,14 +630,14 @@ def _optimizer_parameter_contract(optimizer_state: dict, state_dict: dict) -> di
 def _formal_loop_states(*, epoch: int, global_step: int) -> dict:
     epoch_total = {
         "ready": epoch + 1,
-        "completed": epoch,
+        "completed": epoch + 1,
         "started": epoch + 1,
         "processed": epoch + 1,
     }
     optimizer_steps = {"ready": global_step, "completed": global_step}
     current_optimizer_steps = {
-        "ready": 66,
-        "completed": 66,
+        "ready": 0,
+        "completed": 0,
     }
     optimizer_zero_grads = {
         "ready": global_step,
@@ -645,9 +645,9 @@ def _formal_loop_states(*, epoch: int, global_step: int) -> dict:
         "started": global_step,
     }
     current_optimizer_zero_grads = {
-        "ready": 66,
-        "completed": 66,
-        "started": 66,
+        "ready": 0,
+        "completed": 0,
+        "started": 0,
     }
     batches = (epoch + 1) * 264
     batch_total = {
@@ -667,8 +667,8 @@ def _formal_loop_states(*, epoch: int, global_step: int) -> dict:
             "epoch_loop.state_dict": {"_batches_that_stepped": global_step},
             "epoch_loop.batch_progress": {
                 "total": batch_total,
-                "current": {field: 264 for field in batch_total},
-                "is_last_batch": True,
+                "current": {field: 0 for field in batch_total},
+                "is_last_batch": False,
             },
             "epoch_loop.scheduler_progress": {
                 "total": optimizer_steps.copy(),
@@ -686,6 +686,11 @@ def _formal_loop_states(*, epoch: int, global_step: int) -> dict:
                         "current": current_optimizer_zero_grads,
                     },
                 }
+            },
+            "epoch_loop.val_loop.state_dict": {},
+            "epoch_loop.val_loop.batch_progress": {
+                **copy.deepcopy(idle_batch_progress),
+                "is_last_batch": False,
             },
         },
         "validate_loop": {
@@ -1278,6 +1283,20 @@ def test_formal_p2_resume_rejects_fresh_state_for_triggered_monitor_callback(
         training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
 
 
+def test_formal_p2_resume_rejects_validation_end_monitored_checkpoint_contract(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    with open_dict(cfg.callbacks[0]):
+        cfg.callbacks[0].save_on_train_epoch_end = False
+    checkpoint = tmp_path / "validation-end-monitored-callback.ckpt"
+    torch.save(_formal_resume_payload(cfg), checkpoint)
+
+    with pytest.raises(RuntimeError, match="train_epoch_end"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
 @pytest.mark.parametrize(
     ("epoch", "callback_index"),
     [(25, 1)],
@@ -1315,36 +1334,9 @@ def test_formal_p2_resume_accepts_fresh_periodic_state_at_first_trigger_boundary
     payload = _formal_resume_payload(cfg, epoch=epoch)
     callback = _model_checkpoint_callbacks(cfg)[callback_index]
     payload["callbacks"][callback.state_key] = callback.state_dict()
-    epoch_progress = payload["loops"]["fit_loop"]["epoch_progress"]
-    epoch_progress["total"]["processed"] = epoch
-    epoch_progress["current"]["processed"] = epoch
-    payload["loops"]["fit_loop"]["epoch_loop.state_dict"][
-        "_batches_that_stepped"
-    ] = payload["global_step"] - 1
     torch.save(payload, checkpoint)
 
     training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
-
-
-@pytest.mark.parametrize(
-    ("epoch", "callback_index"),
-    [(24, 1), (449, 2)],
-)
-def test_formal_p2_resume_rejects_fresh_due_callback_after_train_epoch_end(
-    tmp_path: Path,
-    epoch: int,
-    callback_index: int,
-) -> None:
-    cfg = _compose(P2_CONFIG_NAME)
-    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
-    checkpoint = tmp_path / f"missing-due-callback-{epoch}.ckpt"
-    payload = _formal_resume_payload(cfg, epoch=epoch)
-    callback = _model_checkpoint_callbacks(cfg)[callback_index]
-    payload["callbacks"][callback.state_key] = callback.state_dict()
-    torch.save(payload, checkpoint)
-
-    with pytest.raises(RuntimeError, match="ModelCheckpoint callback history"):
-        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
 
 
 def test_formal_p2_resume_accepts_first_top_checkpoint_before_save_last(
@@ -1422,12 +1414,6 @@ def test_formal_p2_resume_accepts_real_lightning_callback_save_order(
     epoch = 14
     payload = _formal_resume_payload(cfg, epoch=epoch)
     payload["callbacks"] = top_checkpoint["callbacks"]
-    epoch_progress = payload["loops"]["fit_loop"]["epoch_progress"]
-    epoch_progress["total"]["processed"] = epoch
-    epoch_progress["current"]["processed"] = epoch
-    payload["loops"]["fit_loop"]["epoch_loop.state_dict"][
-        "_batches_that_stepped"
-    ] = payload["global_step"] - 1
     checkpoint = tmp_path / f"formal-callback-timing-{epoch}.ckpt"
     torch.save(payload, checkpoint)
     training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
@@ -1631,7 +1617,7 @@ def test_formal_p2_resume_rejects_shallow_fit_loop_state(tmp_path: Path) -> None
         (("epoch_progress", "total", "ready"), 0),
         (("epoch_progress", "total", "processed"), 2),
         (("epoch_progress", "total", "started"), 0),
-        (("epoch_progress", "total", "completed"), 1),
+        (("epoch_progress", "total", "completed"), 0),
         (("epoch_progress", "current", "processed"), 2),
         (("epoch_loop.state_dict", "_batches_that_stepped"), 64),
         (
@@ -1681,7 +1667,7 @@ def test_formal_p2_resume_rejects_shallow_fit_loop_state(tmp_path: Path) -> None
         (("epoch_loop.batch_progress", "total", "started"), 263),
         (("epoch_loop.batch_progress", "total", "processed"), 263),
         (("epoch_loop.batch_progress", "current", "processed"), 263),
-        (("epoch_loop.batch_progress", "is_last_batch"), False),
+        (("epoch_loop.batch_progress", "is_last_batch"), True),
     ],
 )
 def test_formal_p2_resume_rejects_inconsistent_fit_loop_progress(
@@ -1722,7 +1708,7 @@ def test_formal_p2_resume_requires_all_lightning_loop_states(
         training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
 
 
-def test_formal_p2_resume_accepts_validation_end_epoch_progress(
+def test_formal_p2_resume_rejects_validation_end_epoch_progress(
     tmp_path: Path,
 ) -> None:
     cfg = _compose(P2_CONFIG_NAME)
@@ -1737,7 +1723,8 @@ def test_formal_p2_resume_accepts_validation_end_epoch_progress(
     ] = 65
     torch.save(payload, checkpoint)
 
-    training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+    with pytest.raises(RuntimeError, match="fit_loop"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
 
 
 def test_formal_p2_resume_rejects_empty_adamw_optimizer_state(

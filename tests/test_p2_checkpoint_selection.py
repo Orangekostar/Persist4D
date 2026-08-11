@@ -212,7 +212,7 @@ def _formal_checkpoint(cfg, *, epoch: int, global_step: int) -> dict:
     }
     epoch_progress = {
         "ready": epoch + 1,
-        "completed": epoch,
+        "completed": epoch + 1,
         "started": epoch + 1,
         "processed": epoch + 1,
     }
@@ -240,23 +240,23 @@ def _formal_checkpoint(cfg, *, epoch: int, global_step: int) -> dict:
             "epoch_loop.batch_progress": {
                 "total": batch_progress,
                 "current": {
-                    "ready": 264,
-                    "completed": 264,
-                    "started": 264,
-                    "processed": 264,
+                    "ready": 0,
+                    "completed": 0,
+                    "started": 0,
+                    "processed": 0,
                 },
-                "is_last_batch": True,
+                "is_last_batch": False,
             },
             "epoch_loop.state_dict": {"_batches_that_stepped": global_step},
             "epoch_loop.scheduler_progress": {
                 "total": optimizer_progress,
-                "current": {"ready": 66, "completed": 66},
+                "current": {"ready": 0, "completed": 0},
             },
             "epoch_loop.automatic_optimization.optim_progress": {
                 "optimizer": {
                     "step": {
                         "total": optimizer_progress,
-                        "current": {"ready": 66, "completed": 66},
+                        "current": {"ready": 0, "completed": 0},
                     },
                     "zero_grad": {
                         "total": {
@@ -265,12 +265,18 @@ def _formal_checkpoint(cfg, *, epoch: int, global_step: int) -> dict:
                             "started": global_step,
                         },
                         "current": {
-                            "ready": 66,
-                            "completed": 66,
-                            "started": 66,
+                            "ready": 0,
+                            "completed": 0,
+                            "started": 0,
                         },
                     },
                 }
+            },
+            "epoch_loop.val_loop.state_dict": {},
+            "epoch_loop.val_loop.batch_progress": {
+                "total": idle_progress.copy(),
+                "current": idle_progress.copy(),
+                "is_last_batch": False,
             },
         },
         "validate_loop": {

@@ -178,7 +178,7 @@ def test_p2_config_locks_the_reproduction_contract(monkeypatch) -> None:
                 "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}"
             ),
             "every_n_epochs": 1,
-            "save_on_train_epoch_end": False,
+            "save_on_train_epoch_end": True,
             "save_weights_only": False,
             "auto_insert_metric_name": False,
         },

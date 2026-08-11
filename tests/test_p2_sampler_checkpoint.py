@@ -103,15 +103,92 @@ def _patch_dataset_instantiation(
     monkeypatch.setattr(trainer_module.hydra.utils, "instantiate", instantiate)
 
 
+def _raw_epoch_end_loops(epochs: int) -> dict:
+    global_step = epochs * 66
+    total_batches = epochs * 264
+    epoch_progress = {
+        "ready": epochs,
+        "completed": epochs - 1,
+        "started": epochs,
+        "processed": epochs,
+    }
+    batch_progress = {
+        "ready": total_batches,
+        "completed": total_batches,
+        "started": total_batches,
+        "processed": total_batches,
+    }
+    current_batch_progress = {
+        "ready": 264,
+        "completed": 264,
+        "started": 264,
+        "processed": 264,
+    }
+    optimizer_progress = {"ready": global_step, "completed": global_step}
+    current_optimizer_progress = {"ready": 66, "completed": 66}
+    zero_grad_progress = {
+        "ready": global_step,
+        "completed": global_step,
+        "started": global_step,
+    }
+    current_zero_grad_progress = {
+        "ready": 66,
+        "completed": 66,
+        "started": 66,
+    }
+    idle_validation_progress = {
+        "ready": 0,
+        "completed": 0,
+        "started": 0,
+        "processed": 0,
+    }
+    return {
+        "fit_loop": {
+            "state_dict": {},
+            "epoch_progress": {
+                "total": epoch_progress,
+                "current": epoch_progress.copy(),
+            },
+            "epoch_loop.state_dict": {"_batches_that_stepped": global_step},
+            "epoch_loop.batch_progress": {
+                "total": batch_progress,
+                "current": current_batch_progress,
+                "is_last_batch": True,
+            },
+            "epoch_loop.scheduler_progress": {
+                "total": optimizer_progress.copy(),
+                "current": current_optimizer_progress.copy(),
+            },
+            "epoch_loop.automatic_optimization.optim_progress": {
+                "optimizer": {
+                    "step": {
+                        "total": optimizer_progress,
+                        "current": current_optimizer_progress,
+                    },
+                    "zero_grad": {
+                        "total": zero_grad_progress,
+                        "current": current_zero_grad_progress,
+                    },
+                }
+            },
+            "epoch_loop.val_loop.batch_progress": {
+                "total": idle_validation_progress,
+                "current": idle_validation_progress.copy(),
+                "is_last_batch": False,
+            },
+        }
+    }
+
+
 def _checkpoint_after_complete_epochs(trainer_module, module, epochs: int):
     for _ in range(epochs):
         list(module.train_dataset.sampler)
-    checkpoint = _checkpoint_payload_for_module(module)
+    checkpoint = _checkpoint_payload_for_module(module, epochs=epochs)
     trainer_module.InstanceSegmentation.on_save_checkpoint(module, checkpoint)
     return checkpoint
 
 
-def _checkpoint_payload_for_module(module) -> dict:
+def _checkpoint_payload_for_module(module, *, epochs: int = 1) -> dict:
     if not module.config.general.p2_fail_closed_runtime:
         return {}
     parameter = torch.nn.Parameter(torch.ones(1))
@@ -122,6 +199,9 @@ def _checkpoint_payload_for_module(module) -> dict:
     module._trainer = types.SimpleNamespace(optimizers=[optimizer])
     module.named_parameters = lambda: iter([("model.weight", parameter)])
     return {
+        "epoch": epochs - 1,
+        "global_step": epochs * 66,
+        "loops": _raw_epoch_end_loops(epochs),
         "state_dict": {"model.weight": parameter.detach().clone()},
         "optimizer_states": [optimizer.state_dict()],
     }
@@ -183,6 +263,9 @@ def test_formal_checkpoint_writes_optimizer_parameter_contract(
         module._trainer = types.SimpleNamespace(optimizers=[optimizer])
         module.named_parameters = lambda: iter([("model.weight", parameter)])
         checkpoint = {
+            "epoch": 0,
+            "global_step": 66,
+            "loops": _raw_epoch_end_loops(1),
             "state_dict": {"model.weight": parameter.detach().clone()},
             "optimizer_states": [optimizer.state_dict()],
         }
@@ -226,6 +309,36 @@ def test_formal_checkpoint_writes_optimizer_parameter_contract(
                 ).encode("ascii")
             ).hexdigest(),
         }
+        fit_loop = checkpoint["loops"]["fit_loop"]
+        assert fit_loop["epoch_progress"]["total"]["completed"] == 1
+        assert fit_loop["epoch_loop.batch_progress"]["current"] == {
+            "ready": 0,
+            "completed": 0,
+            "started": 0,
+            "processed": 0,
+        }
+        assert fit_loop["epoch_loop.batch_progress"]["is_last_batch"] is False
+
+
+def test_formal_checkpoint_rejects_mid_epoch_progress(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    with _load_trainer_module(monkeypatch) as trainer_module:
+        module, _, _ = _make_module(
+            trainer_module,
+            p2_fail_closed_runtime=True,
+        )
+        module.train_dataset = _make_dataset()
+        checkpoint = _checkpoint_payload_for_module(module)
+        checkpoint["loops"]["fit_loop"]["epoch_loop.batch_progress"][
+            "current"
+        ]["processed"] = 263
+
+        with pytest.raises(RuntimeError, match="cannot normalize formal P2"):
+            trainer_module.InstanceSegmentation.on_save_checkpoint(
+                module,
+                checkpoint,
+            )
 
 
 def test_sampler_checkpoint_restores_when_lightning_setup_precedes_load(
@@ -432,7 +545,7 @@ def test_lightning_checkpoint_resume_restores_next_epoch_sampler_stream(
         def __init__(self) -> None:
             pl.LightningModule.__init__(self)
             self.config = types.SimpleNamespace(
-                general=types.SimpleNamespace(p2_fail_closed_runtime=True),
+                general=types.SimpleNamespace(p2_fail_closed_runtime=False),
                 data=types.SimpleNamespace(
                     train_dataset=train_config,
                     validation_dataset=validation_config,

@@ -1029,7 +1029,7 @@ def _formal_p2_callback_history_validation_error(
                 checkpoint["loops"]["fit_loop"],
                 ("epoch_progress", "total", "processed"),
             )
-            if epoch_processed == epoch:
+            if epoch_processed == completed_epochs:
                 return None
     if callback.monitor is not None and completed_epochs < interval:
         return None
@@ -1095,6 +1095,14 @@ def _formal_p2_callback_validation_error(checkpoint, cfg):
 
     callback_states = checkpoint["callbacks"]
     for callback in expected_callbacks:
+        if (
+            callback.monitor == "val_mean_t-AP"
+            and callback._save_on_train_epoch_end is not True
+        ):
+            return (
+                "formal P2 monitored ModelCheckpoint must save on "
+                "train_epoch_end"
+            )
         state = callback_states.get(callback.state_key)
         if not isinstance(state, Mapping):
             return f"missing formal P2 ModelCheckpoint callback state: {callback.state_key}"
@@ -1177,27 +1185,16 @@ def _formal_p2_loop_validation_error(checkpoint, _cfg):
     completed_epochs = checkpoint["epoch"] + 1
     global_step = checkpoint["global_step"]
     total_batches = completed_epochs * _P2_FORMAL_TRAIN_BATCHES_PER_EPOCH
-    current_steps = _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH
-    current_batches = _P2_FORMAL_TRAIN_BATCHES_PER_EPOCH
     expected_progress = {
         ("epoch_progress", "total", "ready"): {completed_epochs},
-        ("epoch_progress", "total", "completed"): {checkpoint["epoch"]},
+        ("epoch_progress", "total", "completed"): {completed_epochs},
         ("epoch_progress", "total", "started"): {completed_epochs},
-        ("epoch_progress", "total", "processed"): {
-            checkpoint["epoch"],
-            completed_epochs,
-        },
+        ("epoch_progress", "total", "processed"): {completed_epochs},
         ("epoch_progress", "current", "ready"): {completed_epochs},
-        ("epoch_progress", "current", "completed"): {checkpoint["epoch"]},
+        ("epoch_progress", "current", "completed"): {completed_epochs},
         ("epoch_progress", "current", "started"): {completed_epochs},
-        ("epoch_progress", "current", "processed"): {
-            checkpoint["epoch"],
-            completed_epochs,
-        },
-        ("epoch_loop.state_dict", "_batches_that_stepped"): {
-            global_step - 1,
-            global_step,
-        },
+        ("epoch_progress", "current", "processed"): {completed_epochs},
+        ("epoch_loop.state_dict", "_batches_that_stepped"): {global_step},
         (
             "epoch_loop.automatic_optimization.optim_progress",
             "optimizer",
@@ -1218,14 +1215,14 @@ def _formal_p2_loop_validation_error(checkpoint, _cfg):
             "step",
             "current",
             "ready",
-        ): {current_steps},
+        ): {0},
         (
             "epoch_loop.automatic_optimization.optim_progress",
             "optimizer",
             "step",
             "current",
             "completed",
-        ): {current_steps},
+        ): {0},
         (
             "epoch_loop.automatic_optimization.optim_progress",
             "optimizer",
@@ -1253,37 +1250,37 @@ def _formal_p2_loop_validation_error(checkpoint, _cfg):
             "zero_grad",
             "current",
             "ready",
-        ): {current_steps},
+        ): {0},
         (
             "epoch_loop.automatic_optimization.optim_progress",
             "optimizer",
             "zero_grad",
             "current",
             "completed",
-        ): {current_steps},
+        ): {0},
         (
             "epoch_loop.automatic_optimization.optim_progress",
             "optimizer",
             "zero_grad",
             "current",
             "started",
-        ): {current_steps},
+        ): {0},
         ("epoch_loop.scheduler_progress", "total", "ready"): {global_step},
         (
             "epoch_loop.scheduler_progress",
             "total",
             "completed",
         ): {global_step},
-        ("epoch_loop.scheduler_progress", "current", "ready"): {current_steps},
+        ("epoch_loop.scheduler_progress", "current", "ready"): {0},
         (
             "epoch_loop.scheduler_progress",
             "current",
             "completed",
-        ): {current_steps},
+        ): {0},
     }
     for progress_scope, expected_value in (
         ("total", total_batches),
-        ("current", current_batches),
+        ("current", 0),
     ):
         for field in ("ready", "completed", "started", "processed"):
             expected_progress[
@@ -1302,8 +1299,23 @@ def _formal_p2_loop_validation_error(checkpoint, _cfg):
     if _nested_checkpoint_value(
         fit_loop,
         ("epoch_loop.batch_progress", "is_last_batch"),
-    ) is not True:
+    ) is not False:
         return "missing or inconsistent formal P2 fit_loop progress"
+    val_batch_progress = fit_loop.get("epoch_loop.val_loop.batch_progress")
+    if (
+        not isinstance(val_batch_progress, Mapping)
+        or val_batch_progress.get("is_last_batch") is not False
+    ):
+        return "missing or inconsistent formal P2 fit_loop validation progress"
+    for field in ("total", "current"):
+        progress = val_batch_progress.get(field)
+        if (
+            not isinstance(progress, Mapping)
+            or any(progress.get(counter) != 0 for counter in (
+                "ready", "completed", "started", "processed"
+            ))
+        ):
+            return "missing or inconsistent formal P2 fit_loop validation progress"
     return None
 
 
