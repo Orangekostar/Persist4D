@@ -479,7 +479,7 @@ def test_non_utf8_preflight_is_invalid_and_blocked(tmp_path: Path) -> None:
     }
 
 
-def test_repository_artifact_is_current_private_blocked_machine_profile(
+def test_repository_artifact_is_current_private_authorized_pending_benchmark(
     tmp_path: Path,
 ) -> None:
     regenerated = tmp_path / "hardware_topology_profile.csv"
@@ -491,7 +491,7 @@ def test_repository_artifact_is_current_private_blocked_machine_profile(
         check=False,
     )
 
-    assert result.returncode == 2, result.stderr
+    assert result.returncode == 0, result.stderr
     assert regenerated.read_bytes() == ARTIFACT.read_bytes()
     rows = _read_rows(ARTIFACT)
     assert len(rows) == 6
@@ -500,11 +500,10 @@ def test_repository_artifact_is_current_private_blocked_machine_profile(
     assert {row["scannet_preflight_ref"] for row in rows} == {
         "repo:artifacts/P2/scannet_preflight.json"
     }
-    assert {row["scannet_preflight_status"] for row in rows} == {
-        "blocked_missing_scannet"
-    }
+    assert {row["scannet_preflight_status"] for row in rows} == {"pass"}
+    assert {row["formal_training_authorized"] for row in rows} == {"true"}
     assert {row["topology_selection_status"] for row in rows} == {
-        "blocked_by_scannet_preflight"
+        "pending_formal_benchmark"
     }
     _assert_no_training_measurements(rows)
     _assert_private(ARTIFACT)
