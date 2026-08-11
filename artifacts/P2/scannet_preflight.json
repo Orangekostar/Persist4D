@@ -1,6 +1,6 @@
 {
   "authorization": {
-    "artifact_payload_sha256": "29e58b9129522692acd15395fca595307bd5ec532dd9bf7fb847c9a2bd5553a0",
+    "artifact_payload_sha256": "bb95a6d6b7707292518158258800c70acff55bc4ede6154f8aa7574304d5cbf2",
     "config_ref": "repo:conf/config_p2_rescene4d_concerto_t2.yaml",
     "config_sha256": "653a3aa1a64fc187eed4d42677dfae461fee67bb66ac599e57b1ea6db0b19496",
     "expected_split_counts": {
@@ -8,7 +8,7 @@
       "train": 1201,
       "validation": 312
     },
-    "issued_at_utc": "2026-08-11T22:11:28.394081Z",
+    "issued_at_utc": "2026-08-11T23:00:11.329273Z",
     "max_age_seconds": 86400,
     "schema_version": 1,
     "status": "issued"
@@ -144,7 +144,7 @@
     "status": "pass",
     "temporal_window": 2
   },
-  "local_source_commit": "773886fbd31eb54304966d11519b8feedbf657b3",
+  "local_source_commit": "97744692df0028e37ecabcb593e8eb664470a31e",
   "mix_instantiation": {
     "attempted": true,
     "dataset_names": [
@@ -153,7 +153,7 @@
     ],
     "dataset_sizes": [
       1174,
-      1201
+      1199
     ],
     "epoch_sample_multiple": 32,
     "implementation": "datasets.multi_dataset.MultiDataset",
@@ -681,22 +681,17 @@
     ],
     "committed_paths_since_source": [],
     "dirty_paths": [
-      "artifacts/P2/BLOCKED_MISSING_SCANNET.md",
-      "artifacts/P2/config_audit.md",
-      "artifacts/P2/environment_manifest.json",
-      "artifacts/P2/hardware_topology_profile.csv",
-      "artifacts/P2/lr_schedule_audit.md",
       "artifacts/P2/scannet_preflight.json"
     ],
     "disallowed_committed_paths": [],
     "disallowed_dirty_paths": [],
     "errors": [],
-    "expected_tracked_tree_sha256": "04cf45e1dcba3cc49c0aa39aafcf0110774263845b7c73d7cc28a4b877643f58",
+    "expected_tracked_tree_sha256": "f123b17bb7a8adbfd5d5cb35bd0c0c685a387a3bcd7dcb72e8422affdd8fd32a",
     "index_flag_paths": [],
-    "observed_head": "773886fbd31eb54304966d11519b8feedbf657b3",
-    "observed_tracked_tree_sha256": "04cf45e1dcba3cc49c0aa39aafcf0110774263845b7c73d7cc28a4b877643f58",
+    "observed_head": "97744692df0028e37ecabcb593e8eb664470a31e",
+    "observed_tracked_tree_sha256": "f123b17bb7a8adbfd5d5cb35bd0c0c685a387a3bcd7dcb72e8422affdd8fd32a",
     "schema_version": 1,
-    "source_commit": "773886fbd31eb54304966d11519b8feedbf657b3",
+    "source_commit": "97744692df0028e37ecabcb593e8eb664470a31e",
     "status": "pass"
   },
   "split_metadata": {
