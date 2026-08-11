@@ -2,11 +2,14 @@
   "manifest_source_ref": "repo:artifacts/environment/source_manifest.json",
   "model_weights": {
     "concerto": {
-      "byte_size": 433987358,
+      "expected_byte_size": 433987358,
+      "expected_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
       "license": "CC-BY-NC-4.0",
+      "observed_byte_size": 433987358,
+      "observed_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
       "reference": "local_cache:persist4d/concerto/concerto_base.pth",
       "revision": "c31f993a56129f2ba9c5d06a35957e3f05bff710",
-      "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+      "status": "pass"
     },
     "rescene": {
       "complete_checkpoint_included": false,
@@ -72,7 +75,7 @@
   },
   "workspace": {
     "branch": "research/p2-rescene4d-t2-repro",
-    "commit": "06d3b1bc3551bac1ed85b822384d532407ec41c5",
+    "commit": "50e7870286209867a85a55fea5d3a50c12e61548",
     "source_ref": "repo:."
   }
 }

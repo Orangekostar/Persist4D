@@ -5,12 +5,12 @@ This is not an official mixed-data reproduction and is not G2 evidence.
 - Status: **PASS**
 - Sample: `scene0112_00-scene0112_01`
 - Optimizer steps: 128
-- Elapsed: 66.918 s
-- Peak allocated VRAM: 1230.4 MiB
-- Final-head segmentation median ratio: 0.023331
-- Aggregate contrastive final/initial ratio: 0.028671
+- Elapsed: 54.657 s
+- Peak allocated VRAM: 1235.2 MiB
+- Final-head segmentation median ratio: 0.013334
+- Aggregate contrastive final/initial ratio: 0.025407
 - Final matcher classification accuracy: 1.000000
-- Final mean soft Dice: 0.999948
+- Final mean soft Dice: 0.999937
 
 | Gate | Result |
 |---|---|

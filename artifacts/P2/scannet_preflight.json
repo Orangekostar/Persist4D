@@ -1,11 +1,54 @@
 {
+  "authorization": {
+    "reason": "formal_prerequisites_failed",
+    "schema_version": 1,
+    "status": "not_issued"
+  },
   "class_taxonomy": {
     "class_count": 0,
+    "class_labels": [],
     "name": null,
     "status": "fail",
     "valid_class_ids": []
   },
+  "config_contract": {
+    "errors": [],
+    "expected_semantic_sha256": "898cc3588218d63fe0295aa274dbf63c51b29ad8aa1f32f918427d99e7e6060d",
+    "observed_semantic_sha256": "898cc3588218d63fe0295aa274dbf63c51b29ad8aa1f32f918427d99e7e6060d",
+    "schema_version": 1,
+    "status": "pass"
+  },
+  "data_root_bindings": {
+    "expected": {
+      "raw_scannet": "repo:data/raw/scannet/scannet",
+      "rio": "repo:data/processed/rio",
+      "scannet": "repo:data/processed/scannet",
+      "split_metadata": "repo:third_party/ScanNet/Tasks/Benchmark",
+      "test_segments": "repo:data/raw/scannet_test_segments"
+    },
+    "observed": {
+      "raw_scannet": "repo:data/raw/scannet/scannet",
+      "rio": "repo:data/processed/rio",
+      "scannet": "repo:data/processed/scannet",
+      "split_metadata": "repo:third_party/ScanNet/Tasks/Benchmark",
+      "test_segments": "repo:data/raw/scannet_test_segments"
+    },
+    "status": "pass"
+  },
   "errors": [
+    {
+      "code": "rio_active_sequence_supervision_empty",
+      "sequence_count": 7,
+      "sequences": [
+        "scene0242_00-scene0242_01",
+        "scene0242_01-scene0242_02",
+        "scene0242_02-scene0242_00",
+        "scene0245_01-scene0245_02",
+        "scene0439_00-scene0439_02",
+        "scene0439_01-scene0439_00",
+        "scene0439_02-scene0439_01"
+      ]
+    },
     {
       "code": "scannet_raw_root_missing"
     },
@@ -131,6 +174,20 @@
     },
     {
       "code": "metric_taxonomy_invalid_or_missing"
+    },
+    {
+      "code": "label_database_validation_mapping_mismatch",
+      "expected_count": 20,
+      "observed_count": 0
+    },
+    {
+      "code": "metric_class_ids_mismatch"
+    },
+    {
+      "code": "metric_class_labels_mismatch"
+    },
+    {
+      "code": "metric_dataset_name_mismatch"
     }
   ],
   "expected_split_counts": {
@@ -139,11 +196,79 @@
     "validation": 312
   },
   "formal_p2_training_authorized": false,
+  "input_manifest": {
+    "schema_version": 1,
+    "status": "blocked_prerequisites"
+  },
+  "known_empty_scan_substitutions": {
+    "affected_sequences": [
+      "scene0171_00-scene0171_01",
+      "scene0171_01-scene0171_02"
+    ],
+    "dataset": "rio",
+    "expected_sequence_database_sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416",
+    "fail_closed": {
+      "test": true,
+      "train": true,
+      "validation": true
+    },
+    "known_empty_scan_id": "0171_01",
+    "observed_sequence_database_sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416",
+    "policy": "official_substitute",
+    "scannet_known_empty_scan_ids": [
+      "scene0154_00",
+      "scene0636_00"
+    ],
+    "sequence_database_ref": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
+    "status": "pass",
+    "temporal_window": 2
+  },
+  "local_source_commit": "50e7870286209867a85a55fea5d3a50c12e61548",
   "mix_instantiation": {
     "attempted": false,
     "status": "blocked_prerequisites"
   },
+  "model_checkpoint": {
+    "expected_byte_size": 433987358,
+    "expected_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+    "observed_byte_size": 433987358,
+    "observed_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+    "reference": "local_cache:persist4d/concerto/concerto_base.pth",
+    "status": "pass"
+  },
   "official_source_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+  "official_split_identity": {
+    "expected_commit": "3830fce7f8b2e48ef047ef7fd76ea5f62903f51c",
+    "files": {
+      "test": {
+        "expected_scene_count": 100,
+        "expected_sha256": "0214c6a3b1ee516ad653393b0321e7c0394c7662a4b3702eac1ddd7fbc00f7e0",
+        "observed_scene_count": 100,
+        "observed_sha256": "0214c6a3b1ee516ad653393b0321e7c0394c7662a4b3702eac1ddd7fbc00f7e0",
+        "reference": "repo:third_party/ScanNet/Tasks/Benchmark/scannetv2_test.txt",
+        "status": "pass"
+      },
+      "train": {
+        "expected_scene_count": 1201,
+        "expected_sha256": "96acca299b7855f02824c496b19077904d80996e7ced1bb9f0dac98f7dd4d0c8",
+        "observed_scene_count": 1201,
+        "observed_sha256": "96acca299b7855f02824c496b19077904d80996e7ced1bb9f0dac98f7dd4d0c8",
+        "reference": "repo:third_party/ScanNet/Tasks/Benchmark/scannetv2_train.txt",
+        "status": "pass"
+      },
+      "validation": {
+        "expected_scene_count": 312,
+        "expected_sha256": "d75d4971c3fa7128c643695840e279042c212ef904fe933bd00cf9918c61b083",
+        "observed_scene_count": 312,
+        "observed_sha256": "d75d4971c3fa7128c643695840e279042c212ef904fe933bd00cf9918c61b083",
+        "reference": "repo:third_party/ScanNet/Tasks/Benchmark/scannetv2_val.txt",
+        "status": "pass"
+      }
+    },
+    "observed_commit": "3830fce7f8b2e48ef047ef7fd76ea5f62903f51c",
+    "repository_ref": "external:github/ScanNet/ScanNet",
+    "status": "pass"
+  },
   "processed_assets": {
     "by_split": {
       "test": {
@@ -690,11 +815,339 @@
     "status": "fail",
     "test_segments_ref": "repo:data/raw/scannet_test_segments"
   },
-  "schema_version": 1,
+  "rio_class_taxonomy": {
+    "class_count": 18,
+    "class_labels": [
+      "cabinet",
+      "bed",
+      "chair",
+      "sofa",
+      "table",
+      "door",
+      "window",
+      "bookshelf",
+      "picture",
+      "counter",
+      "desk",
+      "curtain",
+      "refrigerator",
+      "shower curtain",
+      "toilet",
+      "sink",
+      "bathtub",
+      "otherfurniture"
+    ],
+    "name": "rio",
+    "status": "pass",
+    "valid_class_ids": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      14,
+      16,
+      24,
+      28,
+      33,
+      34,
+      36,
+      39
+    ]
+  },
+  "rio_path_integrity": {
+    "content_validation": "fail",
+    "database_record_counts": {
+      "train": 1178,
+      "validation": 157
+    },
+    "sequence_record_count": 1482,
+    "status": "fail",
+    "supervised_record_count": 1326,
+    "unsupervised_sequences": [
+      "scene0242_00-scene0242_01",
+      "scene0242_01-scene0242_02",
+      "scene0242_02-scene0242_00",
+      "scene0245_01-scene0245_02",
+      "scene0439_00-scene0439_02",
+      "scene0439_01-scene0439_00",
+      "scene0439_02-scene0439_01"
+    ]
+  },
+  "runtime_environment_contract": {
+    "components": {
+      "cumm": {
+        "errors": [],
+        "native_manifest": {
+          "content_sha256": "9d9da91b2342c73f3e57df5222f39162d803a1d2588fc1989b0650f129c686ca",
+          "file_count": 4,
+          "total_bytes": 66860900
+        },
+        "origin_refs": [
+          "env:lib/python3.10/site-packages/cumm/__init__.py"
+        ],
+        "status": "pass"
+      },
+      "flash_attn": {
+        "errors": [],
+        "native_manifest": {
+          "content_sha256": "46f471d5e931ab2c8e2d92d00965f454cebc0cb64426cfe951bf5a56a1acd26d",
+          "file_count": 1,
+          "total_bytes": 1000864504
+        },
+        "origin_refs": [
+          "env:lib/python3.10/site-packages/flash_attn/__init__.py",
+          "env:lib/python3.10/site-packages/flash_attn_2_cuda.cpython-310-x86_64-linux-gnu.so"
+        ],
+        "status": "pass"
+      },
+      "hydra": {
+        "errors": [],
+        "origin_refs": [
+          "env:lib/python3.10/site-packages/hydra/__init__.py"
+        ],
+        "python_source_manifest": {
+          "content_sha256": "fb3f2fef49c10d5ed70f7b53074d8e8cedffeea68e78a0f088892bb5261dcb08",
+          "file_count": 77,
+          "total_bytes": 451677
+        },
+        "status": "pass"
+      },
+      "nvidia_cuda_libraries": {
+        "errors": [],
+        "native_manifest": {
+          "content_sha256": "ff36dac1d4c4f8ae377623531337b6936dbacc3a1133d95a66ff0223ec2155eb",
+          "file_count": 29,
+          "total_bytes": 2813974016
+        },
+        "origin_refs": [
+          "env:lib/python3.10/site-packages/nvidia"
+        ],
+        "status": "pass"
+      },
+      "omegaconf": {
+        "errors": [],
+        "origin_refs": [
+          "env:lib/python3.10/site-packages/omegaconf/__init__.py"
+        ],
+        "python_source_manifest": {
+          "content_sha256": "78144107843f3000ba56e2337692eacdc2a3204154c2b4b99081ad6ec7578cb1",
+          "file_count": 22,
+          "total_bytes": 337473
+        },
+        "status": "pass"
+      },
+      "pointnet2": {
+        "errors": [],
+        "native_manifest": {
+          "content_sha256": "a6f97b83988b6cd56822856c9b607ccd3db0b5554e22dcf75da00b2dddfcd99f",
+          "file_count": 1,
+          "total_bytes": 402336
+        },
+        "origin_refs": [
+          "env:lib/python3.10/site-packages/pointnet2/_ext.cpython-310-x86_64-linux-gnu.so"
+        ],
+        "status": "pass"
+      },
+      "python": {
+        "errors": [],
+        "native_manifest": {
+          "content_sha256": "1d2a6dfcadec1a70fa1767e91c85aac21760fda52239d4671bf465ab57e73777",
+          "file_count": 1,
+          "total_bytes": 17467520
+        },
+        "origin_refs": [
+          "env:bin/python3.10"
+        ],
+        "status": "pass"
+      },
+      "pytorch_lightning": {
+        "errors": [],
+        "origin_refs": [
+          "env:lib/python3.10/site-packages/pytorch_lightning/__init__.py"
+        ],
+        "python_source_manifest": {
+          "content_sha256": "689a1d52b56590120ea71abf47f4c3d66db1d3462d172170405eb0bdbe9dc3f4",
+          "file_count": 175,
+          "total_bytes": 1609938
+        },
+        "status": "pass"
+      },
+      "spconv": {
+        "errors": [],
+        "native_manifest": {
+          "content_sha256": "838a0865537981a1f47e37872133af4b8c153895487c27636e81318885a4b7f5",
+          "file_count": 2,
+          "total_bytes": 284849074
+        },
+        "origin_refs": [
+          "env:lib/python3.10/site-packages/spconv/__init__.py"
+        ],
+        "status": "pass"
+      },
+      "torch": {
+        "errors": [],
+        "native_manifest": {
+          "content_sha256": "baefa610e8cc0b7c77290d0962beb4b1e36f953cfd8e481d86fed9b52ff6c915",
+          "file_count": 12,
+          "total_bytes": 1450232964
+        },
+        "origin_refs": [
+          "env:lib/python3.10/site-packages/torch/__init__.py"
+        ],
+        "status": "pass"
+      },
+      "torch_scatter": {
+        "errors": [],
+        "native_manifest": {
+          "content_sha256": "9b6b64da3ceec83a576ef43b01f4f2d49106d66dea68648674fb842884d85461",
+          "file_count": 8,
+          "total_bytes": 72109952
+        },
+        "origin_refs": [
+          "env:lib/python3.10/site-packages/torch_scatter/__init__.py"
+        ],
+        "status": "pass"
+      }
+    },
+    "errors": [],
+    "optional_modules": {
+      "pointops": {
+        "required": false,
+        "status": "absent"
+      }
+    },
+    "schema_version": 2,
+    "status": "pass",
+    "versions": {
+      "cuda": "12.6",
+      "cuda_runtime_package": "12.6.77",
+      "cudnn": "9.5.1",
+      "cudnn_package": "v9.5.1.17",
+      "cumm": "0.7.11",
+      "flash_attn": "2.8.3",
+      "hydra_core": "1.3.4",
+      "nccl": "2.21.5",
+      "nccl_package": "2.21.5",
+      "omegaconf": "2.3.1",
+      "pointnet2": "0.0.0",
+      "python": "3.10.20",
+      "pytorch_lightning": "2.6.5",
+      "spconv": "2.3.8",
+      "torch": "2.6.0+cu126",
+      "torch_scatter": "2.1.2+pt26cu126"
+    }
+  },
+  "runtime_source_contract": {
+    "errors": [],
+    "repositories": {
+      "concerto": {
+        "dirty_paths": [],
+        "errors": [],
+        "expected_commit": "10a7d17cff4dddff028f1522c2e72de4c4515df7",
+        "expected_tracked_tree_sha256": "bd7a08251a6a3bcb6359d9f3c18959e9e3c6d50dfe7c074d05ad60828d0e18c8",
+        "index_flag_paths": [],
+        "module": "concerto",
+        "module_origin_ref": "repo:third_party/concerto/concerto/__init__.py",
+        "native_extensions": {},
+        "observed_commit": "10a7d17cff4dddff028f1522c2e72de4c4515df7",
+        "observed_tracked_tree_sha256": "bd7a08251a6a3bcb6359d9f3c18959e9e3c6d50dfe7c074d05ad60828d0e18c8",
+        "reference": "repo:third_party/concerto",
+        "status": "pass"
+      },
+      "detectron2": {
+        "dirty_paths": [],
+        "errors": [],
+        "expected_commit": "b4a4a3bd136852dae5fb1de37978dee412653e31",
+        "expected_tracked_tree_sha256": "290a175efa383cb2e35889ff536e0254624e098c5ccc58ae41d60e3ea789c408",
+        "index_flag_paths": [],
+        "module": "detectron2",
+        "module_origin_ref": "repo:third_party/detectron2/detectron2/__init__.py",
+        "native_extensions": {
+          "detectron2._C": {
+            "expected_byte_size": 1291352,
+            "expected_sha256": "4f66dbe809bfcba0015f71d26ded0c1922e60bad0d92d5f63ecb9e300ae5cba8",
+            "observed_byte_size": 1291352,
+            "observed_sha256": "4f66dbe809bfcba0015f71d26ded0c1922e60bad0d92d5f63ecb9e300ae5cba8",
+            "origin_ref": "repo:third_party/detectron2/detectron2/_C.cpython-310-x86_64-linux-gnu.so",
+            "status": "pass"
+          }
+        },
+        "observed_commit": "b4a4a3bd136852dae5fb1de37978dee412653e31",
+        "observed_tracked_tree_sha256": "290a175efa383cb2e35889ff536e0254624e098c5ccc58ae41d60e3ea789c408",
+        "reference": "repo:third_party/detectron2",
+        "status": "pass"
+      },
+      "sonata": {
+        "dirty_paths": [],
+        "errors": [],
+        "expected_commit": "18c09ff8d713494f78a8213792262b910977a65d",
+        "expected_tracked_tree_sha256": "aaf0f32e466e64a0484d7e1baefcfb49a41c4e4c1a10a2c5fae38883459c7778",
+        "index_flag_paths": [],
+        "module": "sonata",
+        "module_origin_ref": "repo:third_party/sonata/sonata/__init__.py",
+        "native_extensions": {},
+        "observed_commit": "18c09ff8d713494f78a8213792262b910977a65d",
+        "observed_tracked_tree_sha256": "aaf0f32e466e64a0484d7e1baefcfb49a41c4e4c1a10a2c5fae38883459c7778",
+        "reference": "repo:third_party/sonata",
+        "status": "pass"
+      },
+      "stmetrics": {
+        "dirty_paths": [],
+        "errors": [],
+        "expected_commit": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f",
+        "expected_tracked_tree_sha256": "7f898a48bd1a5aacb40a39021185d9e007ea6a36aa24669ede889ccb32ea8b19",
+        "index_flag_paths": [],
+        "module": "stmetrics",
+        "module_origin_ref": "repo:third_party/stmetrics/stmetrics/__init__.py",
+        "native_extensions": {},
+        "observed_commit": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f",
+        "observed_tracked_tree_sha256": "7f898a48bd1a5aacb40a39021185d9e007ea6a36aa24669ede889ccb32ea8b19",
+        "reference": "repo:third_party/stmetrics",
+        "status": "pass"
+      }
+    },
+    "schema_version": 1,
+    "status": "pass"
+  },
+  "schema_version": 4,
+  "source_tree_contract": {
+    "allowed_dirty_prefixes": [
+      "artifacts/P2/"
+    ],
+    "committed_paths_since_source": [],
+    "dirty_paths": [
+      "artifacts/P2/BLOCKED_MISSING_SCANNET.md",
+      "artifacts/P2/config_audit.md",
+      "artifacts/P2/environment_manifest.json",
+      "artifacts/P2/lr_schedule_audit.md",
+      "artifacts/P2/native_smoke_report.json",
+      "artifacts/P2/official_vs_repro_config_diff.json",
+      "artifacts/P2/scannet_preflight.json",
+      "artifacts/P2/tiny_overfit_report.json",
+      "artifacts/P2/tiny_overfit_report.md"
+    ],
+    "disallowed_committed_paths": [],
+    "disallowed_dirty_paths": [],
+    "errors": [],
+    "expected_tracked_tree_sha256": "7cdc7199a327fdb5507601df8b71a103469d7b4778ebeedda64e5d65c99285c9",
+    "index_flag_paths": [],
+    "observed_head": "50e7870286209867a85a55fea5d3a50c12e61548",
+    "observed_tracked_tree_sha256": "7cdc7199a327fdb5507601df8b71a103469d7b4778ebeedda64e5d65c99285c9",
+    "schema_version": 1,
+    "source_commit": "50e7870286209867a85a55fea5d3a50c12e61548",
+    "status": "pass"
+  },
   "split_metadata": {
     "test": {
       "expected": 100,
       "observed": 100,
+      "observed_sha256": "0214c6a3b1ee516ad653393b0321e7c0394c7662a4b3702eac1ddd7fbc00f7e0",
       "source_ref": "repo:third_party/ScanNet/Tasks/Benchmark/scannetv2_test.txt",
       "status": "pass",
       "unique": 100
@@ -702,6 +1155,7 @@
     "train": {
       "expected": 1201,
       "observed": 1201,
+      "observed_sha256": "96acca299b7855f02824c496b19077904d80996e7ced1bb9f0dac98f7dd4d0c8",
       "source_ref": "repo:third_party/ScanNet/Tasks/Benchmark/scannetv2_train.txt",
       "status": "pass",
       "unique": 1201
@@ -709,6 +1163,7 @@
     "validation": {
       "expected": 312,
       "observed": 312,
+      "observed_sha256": "d75d4971c3fa7128c643695840e279042c212ef904fe933bd00cf9918c61b083",
       "source_ref": "repo:third_party/ScanNet/Tasks/Benchmark/scannetv2_val.txt",
       "status": "pass",
       "unique": 312

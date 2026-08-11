@@ -14,15 +14,30 @@
 - the short simulation need not reach max_lr exactly; it verifies the configured ceiling and step semantics
 - LR semantics: lr_before is applied to the current optimizer update; lr_after is scheduled for the next optimizer update
 - formal status: blocked_missing_scannet
+- formal contract kind: planned_not_observed
+- formal run observed: false
 - formal epochs: 450
-- formal total_steps: null
-- formal epoch microbatch divisibility: pending_missing_scannet
-- formal epoch microbatches: null
-- formal accumulation remainder: null
+- planned raw sampler num_samples: 2120
+- planned epoch sample multiple: 32
+- planned sampler num_samples: 2112
+- planned sampler seed: 45
+- planned sampler seed scope: fresh_start_and_completed_epoch_boundary_resume
+- sampler generator state checkpointed: true
+- sampler checkpoint scope: completed_epoch_boundary_only
+- sampler checkpoint save timing: p2_normalized_train_epoch_end_callbacks
+- sampler non-boundary resume verified: false
+- sampler mid-epoch resume supported: false
+- sampler DataLoader prefetch state checkpointed: false
+- planned samples per rank: 1056
+- planned optimizer steps per epoch: 66
+- planned total_steps: 29700
+- planned epoch microbatch divisibility: planned_aligned
+- planned epoch microbatches per rank: 264
+- planned accumulation remainder: 0
 - formal readiness condition: epoch_microbatches % 4 == 0, or an explicit drop_last/tail-normalization policy; otherwise formal training is prohibited
 - formal dataset ref: repo:data/processed/scannet
 - formal gate ref: repo:artifacts/P2/scannet_preflight.json
-- formal status reason: ScanNet prerequisites are missing; the formal mixed-data loader length and total_steps cannot be computed.
+- formal status reason: ScanNet prerequisites are missing, so no formal mixed-data run was observed; the planned sampler and optimizer-step contract remains computable from the locked P2 configuration.
 
 | micro | window | window size | target samples | norm denom | rel grad | optimizer before | optimizer after | global before | global after | scheduler before | scheduler after | LR before | LR after | optimizer step |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |

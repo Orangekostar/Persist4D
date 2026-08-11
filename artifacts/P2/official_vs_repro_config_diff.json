@@ -92,7 +92,7 @@
       ],
       "id": "fail_closed_dataset_sequence_mix_validation",
       "local_behavior": "every configured split database and temporal sequence mapping must be non-empty; every sequence scan must resolve; every mixed child must be non-empty; dataset and weight lengths must match and weights must be finite and positive",
-      "local_fix_commit": "973629172cc01ae0998bc785ac0ea2979756b72c",
+      "local_fix_commit": "611ba161454cdfde7fe047fcae1e0d7b81387bf2",
       "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
       "safety_effect": "prevents missing ScanNet from degrading the required mix to RIO-only and prevents unknown temporal scans from becoming zero indices",
       "upstream_behavior": "missing split databases called bare exit(), temporal database exceptions were printed and swallowed, and zero-length child datasets were skipped",
@@ -101,30 +101,45 @@
     {
       "classification": "local_reproduction_safety_fix",
       "collective_contract": {
-        "covered_forward_failure": {
-          "all_gather_object_count": 1,
-          "int32_max_all_reduce_count": 2
+        "covered_stage_failure": {
+          "additional_all_gather_object_count": 1
         },
-        "covered_preflight_failure": {
-          "all_gather_object_count": 1,
-          "int32_max_all_reduce_count": 1
-        },
-        "normal_ddp_microbatch": {
+        "normal_test_microbatch": {
           "all_gather_object_count": 0,
-          "int32_max_all_reduce_count": 2
+          "criterion_float_num_masks_all_reduce_count": 0,
+          "safety_int32_max_all_reduce_count": 3,
+          "total_all_reduce_count": 3
+        },
+        "normal_train_microbatch": {
+          "all_gather_object_count": 0,
+          "criterion_float_num_masks_all_reduce_count": 1,
+          "safety_int32_max_all_reduce_count": 3,
+          "total_all_reduce_count": 4
+        },
+        "normal_validation_microbatch": {
+          "all_gather_object_count": 0,
+          "criterion_float_num_masks_all_reduce_count": 1,
+          "safety_int32_max_all_reduce_count": 4,
+          "total_all_reduce_count": 5
+        },
+        "train_optimizer_step_accumulation_4": {
+          "criterion_float_num_masks_all_reduce_count": 4,
+          "optimizer_gradient_int32_max_all_reduce_count": 1,
+          "safety_int32_max_all_reduce_count": 13,
+          "total_all_reduce_count": 17
         }
       },
-      "coverage_boundary": "consensus covers declared preflight violations and the recognized single-point cross-attention RuntimeError; unrelated rank-local exceptions are not converted",
+      "coverage_boundary": "consensus covers input, recursive model output, criterion, objective, evaluation metadata and metrics, plus pre-optimizer gradient finiteness; exceptions outside those covered stages retain native behavior",
       "evidence_refs": [
         "external:github/GradientSpaces/rescene4d@fb2fe42/trainer/trainer.py",
         "repo:trainer/trainer.py",
         "repo:tests/test_p2_ddp_batch_contract.py"
       ],
       "id": "ddp_batch_contract_consensus",
-      "local_behavior": "preflight and post-forward consensus cover train, validation, and test microbatches and raise a contextual RuntimeError across ranks instead of returning None",
-      "local_fix_commit": "973629172cc01ae0998bc785ac0ea2979756b72c",
+      "local_behavior": "staged input, recursive output, criterion, objective, and evaluation consensus cover train, validation, and test microbatches; a pre-optimizer gradient-finiteness consensus prevents parameter updates after non-finite gradients",
+      "local_fix_commit": "611ba161454cdfde7fe047fcae1e0d7b81387bf2",
       "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
-      "performance_cost": "two blocking scalar int32 MAX all_reduce operations per normal DDP microbatch, or eight per optimizer step at accumulation=4; all_gather_object is failure-only",
+      "performance_cost": "three blocking scalar int32 MAX all_reduce operations per normal train DDP microbatch, four per validation microbatch, and three per test microbatch; train accumulation=4 costs twelve microbatch safety all-reduces, one optimizer-gradient safety all-reduce, and four criterion float num_masks all-reduces per optimizer step (17 total); all_gather_object adds one call only on a covered stage failure",
       "upstream_behavior": "training returned None for empty targets or the recognized single-point cross-attention error; evaluation returned 0.0 or None for empty coordinates or that error, without cross-rank consensus",
       "upstream_semantic_effect": "asymmetric rank-local skipping could desynchronize optimizer and scheduler progress or hang later DDP collectives"
     },
@@ -137,7 +152,7 @@
       ],
       "id": "full_state_checkpoint_resume_selection",
       "local_behavior": "statically validates required Lightning full-state fields, selects the latest valid candidate by checkpoint epoch/global_step and numeric filename version, and refuses to start from scratch when checkpoint files exist but all are invalid",
-      "local_fix_commit": "973629172cc01ae0998bc785ac0ea2979756b72c",
+      "local_fix_commit": "611ba161454cdfde7fe047fcae1e0d7b81387bf2",
       "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
       "restore_boundary": "static validation is not a real Lightning restore; trainer.fit is attempted once with the selected checkpoint and does not automatically retry another candidate after a Lightning restore failure",
       "startup_cost": "each checkpoint candidate is deserialized on CPU once during static selection",
@@ -150,7 +165,7 @@
     "local_fix_commit": "3c6b11a3af600aa98c93128361c2ecb4900ea186",
     "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
     "official_code_used_unchanged": false,
-    "runtime_safety_fix_commit": "973629172cc01ae0998bc785ac0ea2979756b72c",
+    "runtime_safety_fix_commit": "611ba161454cdfde7fe047fcae1e0d7b81387bf2",
     "status": "local_alignment_and_safety_patch_set"
   },
   "schema_version": 1,
