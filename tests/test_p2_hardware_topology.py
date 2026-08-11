@@ -6,9 +6,23 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import pytest
+
+from scripts import audit_p2_hardware_topology as audit
+from utils.p2_preflight import P2_PREFLIGHT_SCHEMA_VERSION
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts" / "audit_p2_hardware_topology.py"
 ARTIFACT = REPO_ROOT / "artifacts" / "P2" / "hardware_topology_profile.csv"
+SHARED_GATE_FIELDS = (
+    "config_contract",
+    "source_tree_contract",
+    "runtime_source_contract",
+    "runtime_environment_contract",
+    "official_split_identity",
+    "input_manifest",
+    "authorization",
+)
 
 INVENTORY = """\
 0, NVIDIA A40, 46068
@@ -80,7 +94,7 @@ def _valid_preflight() -> dict[str, Any]:
         for split, count in split_counts.items()
     }
     return {
-        "schema_version": 1,
+        "schema_version": P2_PREFLIGHT_SCHEMA_VERSION,
         "status": "pass",
         "formal_p2_training_authorized": True,
         "official_source_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
@@ -267,16 +281,147 @@ def test_blocked_scannet_emits_all_one_and_two_gpu_candidates(tmp_path: Path) ->
 
 def test_passed_preflight_only_marks_candidates_pending_formal_benchmark(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    result, output = _run_audit(tmp_path, preflight=_valid_preflight())
+    payload = _valid_preflight()
+    payload.update({field: {} for field in SHARED_GATE_FIELDS})
+    preflight_path = tmp_path / "scannet_preflight.json"
+    preflight_path.write_text(json.dumps(payload), encoding="utf-8")
+    monkeypatch.setattr(audit, "_shared_p2_authorization_gate", lambda _path: True)
 
-    assert result.returncode == 0, result.stderr
-    rows = _read_rows(output)
+    status, authorized, selection_status, return_code = audit._read_preflight(
+        preflight_path
+    )
+    assert (status, authorized, selection_status, return_code) == (
+        "pass",
+        True,
+        "pending_formal_benchmark",
+        0,
+    )
+    rows = audit.build_rows(
+        inventory=audit.parse_inventory(INVENTORY),
+        topology=audit.parse_topology(TOPOLOGY, [0, 1, 2]),
+        preflight_ref=audit._portable_preflight_ref(preflight_path),
+        preflight_status=status,
+        formal_training_authorized=authorized,
+        topology_selection_status=selection_status,
+    )
     assert {row["formal_training_authorized"] for row in rows} == {"true"}
     assert {row["topology_selection_status"] for row in rows} == {
         "pending_formal_benchmark"
     }
     _assert_no_training_measurements(rows)
+
+
+@pytest.mark.parametrize("missing_field", SHARED_GATE_FIELDS)
+def test_pass_preflight_requires_every_shared_authorization_field(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    missing_field: str,
+) -> None:
+    payload = _valid_preflight()
+    payload.update({field: {} for field in SHARED_GATE_FIELDS})
+    payload.pop(missing_field)
+    preflight_path = tmp_path / "scannet_preflight.json"
+    preflight_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    monkeypatch.setattr(
+        audit,
+        "_shared_p2_authorization_gate",
+        lambda _path: True,
+        raising=False,
+    )
+
+    status, authorized, selection_status, return_code = audit._read_preflight(
+        preflight_path
+    )
+
+    assert (status, authorized, selection_status, return_code) == (
+        "invalid_pass_contract",
+        False,
+        "blocked_invalid_preflight",
+        2,
+    )
+
+
+def test_pass_preflight_is_blocked_when_shared_authorization_rejects(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload = _valid_preflight()
+    payload.update({field: {} for field in SHARED_GATE_FIELDS})
+    preflight_path = tmp_path / "scannet_preflight.json"
+    preflight_path.write_text(json.dumps(payload), encoding="utf-8")
+    monkeypatch.setattr(audit, "_compose_p2_config", lambda: object())
+
+    def reject_authorization(*_args: Any, **_kwargs: Any) -> None:
+        raise RuntimeError("shared authorization rejected")
+
+    monkeypatch.setattr(
+        audit,
+        "require_p2_preflight_authorization",
+        reject_authorization,
+    )
+
+    status, authorized, selection_status, return_code = audit._read_preflight(
+        preflight_path
+    )
+
+    assert (status, authorized, selection_status, return_code) == (
+        "invalid_pass_contract",
+        False,
+        "blocked_invalid_preflight",
+        2,
+    )
+
+
+def test_pass_preflight_is_ready_only_when_shared_authorization_passes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload = _valid_preflight()
+    payload.update({field: {} for field in SHARED_GATE_FIELDS})
+    preflight_path = tmp_path / "scannet_preflight.json"
+    preflight_path.write_text(json.dumps(payload), encoding="utf-8")
+    config = object()
+    calls: list[tuple[object, Path]] = []
+    monkeypatch.setattr(audit, "_compose_p2_config", lambda: config)
+
+    def allow_authorization(received_config: object, *, artifact_path: Path) -> Path:
+        calls.append((received_config, artifact_path))
+        return artifact_path
+
+    monkeypatch.setattr(
+        audit,
+        "require_p2_preflight_authorization",
+        allow_authorization,
+    )
+
+    status, authorized, selection_status, return_code = audit._read_preflight(
+        preflight_path
+    )
+
+    assert (status, authorized, selection_status, return_code) == (
+        "pass",
+        True,
+        "pending_formal_benchmark",
+        0,
+    )
+    assert calls == [(config, preflight_path)]
+
+
+def test_legacy_complete_preflight_is_rejected(tmp_path: Path) -> None:
+    preflight = _valid_preflight()
+    preflight["schema_version"] = P2_PREFLIGHT_SCHEMA_VERSION - 1
+
+    result, output = _run_audit(tmp_path, preflight=preflight)
+
+    assert result.returncode == 2, result.stderr
+    rows = _read_rows(output)
+    assert {row["scannet_preflight_status"] for row in rows} == {
+        "invalid_pass_contract"
+    }
+    assert {row["formal_training_authorized"] for row in rows} == {"false"}
 
 
 def test_incomplete_pass_preflight_is_rejected(tmp_path: Path) -> None:

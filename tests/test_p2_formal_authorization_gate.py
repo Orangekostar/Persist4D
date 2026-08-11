@@ -4,10 +4,14 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import hydra
 import pytest
 import torch
 from hydra import compose, initialize_config_dir
 from omegaconf import OmegaConf, open_dict
+from pytorch_lightning import LightningModule, Trainer
+from pytorch_lightning.callbacks import ModelCheckpoint
+from torch.utils.data import DataLoader, TensorDataset
 
 import main_instance_segmentation as training_entrypoint
 from utils import p2_preflight
@@ -61,10 +65,157 @@ FORMAL_INPUT_MANIFEST = {
         "content_sha256": "2" * 64,
     },
 }
+LOCAL_SOURCE_COMMIT = "a" * 40
+FORMAL_TEST_MODEL_STATE_SCHEMA = {
+    "model.bias": {"shape": [2], "dtype": "torch.float32"},
+    "model.running_mean": {"shape": [3], "dtype": "torch.float32"},
+    "model.weight": {"shape": [1], "dtype": "torch.float32"},
+}
+
+
+def _model_state_schema_sha256(schema: dict) -> str:
+    entries = [
+        [name, metadata["shape"], metadata["dtype"]]
+        for name, metadata in sorted(schema.items())
+    ]
+    payload = json.dumps(entries, ensure_ascii=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("ascii")).hexdigest()
+
+
+def _parameter_schema_sha256(entries: list[list[object]]) -> str:
+    payload = json.dumps(entries, ensure_ascii=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("ascii")).hexdigest()
+
+
+FORMAL_TEST_MODEL_STATE_SCHEMA_SHA256 = _model_state_schema_sha256(
+    FORMAL_TEST_MODEL_STATE_SCHEMA
+)
+FORMAL_TEST_TRAINABLE_PARAMETER_SCHEMA = [
+    ["model.weight", [1], "torch.float32"],
+    ["model.bias", [2], "torch.float32"],
+]
+FORMAL_TEST_TRAINABLE_PARAMETER_SCHEMA_SHA256 = _parameter_schema_sha256(
+    FORMAL_TEST_TRAINABLE_PARAMETER_SCHEMA
+)
+
+
+def _passing_source_tree_contract(source_commit: str | None = None) -> dict:
+    pinned_commit = source_commit or LOCAL_SOURCE_COMMIT
+    return {
+        "schema_version": 1,
+        "status": "pass",
+        "source_commit": pinned_commit,
+        "observed_head": pinned_commit,
+        "allowed_dirty_prefixes": ["artifacts/P2/"],
+        "committed_paths_since_source": [],
+        "dirty_paths": ["artifacts/P2/scannet_preflight.json"],
+        "index_flag_paths": [],
+        "expected_tracked_tree_sha256": "3" * 64,
+        "observed_tracked_tree_sha256": "3" * 64,
+        "disallowed_committed_paths": [],
+        "disallowed_dirty_paths": [],
+        "errors": [],
+    }
+
+
+def _passing_runtime_source_contract() -> dict:
+    repositories = {}
+    for name, definition in p2_preflight.P2_RUNTIME_SOURCE_REPOSITORIES.items():
+        relative_root = definition["relative_root"]
+        native_extensions = {}
+        for module, extension in definition.get("native_extensions", {}).items():
+            native_extensions[module] = {
+                "origin_ref": (
+                    "repo:third_party/detectron2/detectron2/"
+                    "_C.cpython-310-x86_64-linux-gnu.so"
+                ),
+                "expected_byte_size": extension["expected_byte_size"],
+                "observed_byte_size": extension["expected_byte_size"],
+                "expected_sha256": extension["expected_sha256"],
+                "observed_sha256": extension["expected_sha256"],
+                "status": "pass",
+            }
+        repositories[name] = {
+            "reference": f"repo:{relative_root}",
+            "module": definition["module"],
+            "expected_commit": definition["expected_commit"],
+            "observed_commit": definition["expected_commit"],
+            "module_origin_ref": (
+                f"repo:{relative_root}/{definition['module']}/__init__.py"
+            ),
+            "dirty_paths": [],
+            "index_flag_paths": [],
+            "expected_tracked_tree_sha256": "4" * 64,
+            "observed_tracked_tree_sha256": "4" * 64,
+            "native_extensions": native_extensions,
+            "status": "pass",
+            "errors": [],
+        }
+    return {
+        "schema_version": 1,
+        "status": "pass",
+        "repositories": repositories,
+        "errors": [],
+    }
+
+
+def _passing_runtime_environment_contract() -> dict:
+    python_source_components = {"pytorch_lightning", "hydra", "omegaconf"}
+    components = {
+        name: {
+            "status": "pass",
+            "origin_refs": [f"env:{name}"],
+            (
+                "python_source_manifest"
+                if name in python_source_components
+                else "native_manifest"
+            ): {
+                "file_count": 1,
+                "total_bytes": 1,
+                "content_sha256": "5" * 64,
+            },
+            "errors": [],
+        }
+        for name in (
+            "python",
+            "torch",
+            "spconv",
+            "cumm",
+            "flash_attn",
+            "torch_scatter",
+            "pointnet2",
+            "nvidia_cuda_libraries",
+            "pytorch_lightning",
+            "hydra",
+            "omegaconf",
+        )
+    }
+    return {
+        "schema_version": (
+            p2_preflight.P2_RUNTIME_ENVIRONMENT_CONTRACT_SCHEMA_VERSION
+        ),
+        "status": "pass",
+        "versions": copy.deepcopy(p2_preflight.P2_RUNTIME_ENVIRONMENT_VERSIONS),
+        "components": components,
+        "optional_modules": {
+            "pointops": {"required": False, "status": "absent"}
+        },
+        "errors": [],
+    }
 
 
 @pytest.fixture(autouse=True)
 def _current_input_manifest_matches_the_formal_fixture(monkeypatch) -> None:
+    monkeypatch.setattr(
+        training_entrypoint,
+        "_P2_FORMAL_MODEL_STATE_SCHEMA_SHA256",
+        FORMAL_TEST_MODEL_STATE_SCHEMA_SHA256,
+    )
+    monkeypatch.setattr(
+        training_entrypoint,
+        "_P2_FORMAL_TRAINABLE_PARAMETER_SCHEMA_SHA256",
+        FORMAL_TEST_TRAINABLE_PARAMETER_SCHEMA_SHA256,
+    )
     monkeypatch.setattr(
         p2_preflight,
         "build_p2_input_manifest",
@@ -97,6 +248,26 @@ def _current_input_manifest_matches_the_formal_fixture(monkeypatch) -> None:
                 for split, expected in OFFICIAL_SPLIT_COUNTS.items()
             },
         },
+    )
+    monkeypatch.setattr(
+        p2_preflight,
+        "build_p2_source_tree_contract",
+        lambda *args, source_commit=None, **kwargs: _passing_source_tree_contract(
+            source_commit
+        ),
+        raising=False,
+    )
+    monkeypatch.setattr(
+        p2_preflight,
+        "build_p2_runtime_source_contract",
+        lambda *args, **kwargs: _passing_runtime_source_contract(),
+        raising=False,
+    )
+    monkeypatch.setattr(
+        p2_preflight,
+        "build_p2_runtime_environment_contract",
+        lambda *args, **kwargs: _passing_runtime_environment_contract(),
+        raising=False,
     )
 
 
@@ -133,10 +304,16 @@ def _formal_artifact(cfg, *, issued_at: datetime | None = None) -> dict:
         OFFICIAL_SPLIT_COUNTS["train"] + OFFICIAL_SPLIT_COUNTS["validation"]
     )
     artifact = {
-        "schema_version": 2,
+        "schema_version": p2_preflight.P2_PREFLIGHT_SCHEMA_VERSION,
         "status": "pass",
         "formal_p2_training_authorized": True,
         "official_source_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+        "local_source_commit": LOCAL_SOURCE_COMMIT,
+        "source_tree_contract": _passing_source_tree_contract(),
+        "runtime_source_contract": _passing_runtime_source_contract(),
+        "runtime_environment_contract": (
+            _passing_runtime_environment_contract()
+        ),
         "expected_split_counts": OFFICIAL_SPLIT_COUNTS,
         "split_metadata_status": "pass",
         "split_metadata": {
@@ -334,21 +511,226 @@ def _sampler_generator_checkpoint_payload() -> dict:
     }
 
 
-def _formal_resume_payload(cfg) -> dict:
+def _optimizer_scheduler_checkpoint_states(
+    cfg,
+    *,
+    global_step: int,
+) -> tuple[dict, dict]:
+    parameters = [
+        torch.nn.Parameter(torch.ones(1)),
+        torch.nn.Parameter(torch.ones(2)),
+    ]
+    optimizer = hydra.utils.instantiate(cfg.optimizer, params=parameters)
+    scheduler_cfg = cfg.scheduler.scheduler.copy()
+    scheduler_cfg.total_steps = 29_700
+    scheduler = hydra.utils.instantiate(scheduler_cfg, optimizer=optimizer)
+    for _ in range(global_step):
+        for parameter in parameters:
+            parameter.grad = torch.ones_like(parameter)
+        optimizer.step()
+        scheduler.step()
+        optimizer.zero_grad(set_to_none=True)
+    return optimizer.state_dict(), scheduler.state_dict()
+
+
+def _model_checkpoint_callbacks(cfg) -> list[ModelCheckpoint]:
+    callbacks = [
+        hydra.utils.instantiate(callback_cfg)
+        for callback_cfg in cfg.callbacks
+        if callback_cfg.get("_target_")
+        == "pytorch_lightning.callbacks.ModelCheckpoint"
+    ]
+    assert len(callbacks) == 3
+    assert all(isinstance(callback, ModelCheckpoint) for callback in callbacks)
+    return callbacks
+
+
+def _isolate_formal_callback_paths(cfg) -> None:
+    save_dir = Path(str(cfg.general.save_dir)).expanduser()
+    if not save_dir.is_absolute():
+        return
+    for callback_index, callback_cfg in enumerate(cfg.callbacks):
+        if callback_cfg.get("_target_") != (
+            "pytorch_lightning.callbacks.ModelCheckpoint"
+        ):
+            continue
+        dirpath = callback_cfg.get("dirpath")
+        if not isinstance(dirpath, str) or Path(dirpath).is_absolute():
+            continue
+        with open_dict(callback_cfg):
+            callback_cfg.dirpath = str(save_dir / f"callback-{callback_index}")
+
+
+def _fresh_model_checkpoint_callback_states(cfg) -> dict:
+    callbacks = _model_checkpoint_callbacks(cfg)
+    return {callback.state_key: callback.state_dict() for callback in callbacks}
+
+
+def _model_checkpoint_callback_states(cfg, *, epoch: int) -> dict:
+    _isolate_formal_callback_paths(cfg)
+    callbacks = _model_checkpoint_callbacks(cfg)
+    completed_epochs = epoch + 1
+    for callback in callbacks:
+        interval = callback._every_n_epochs
+        if interval is None or completed_epochs < interval:
+            continue
+        checkpoint_path = str(
+            Path(callback.dirpath) / f"fixture-epoch={epoch:03d}.ckpt"
+        )
+        Path(checkpoint_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(checkpoint_path).touch()
+        callback.best_model_path = checkpoint_path
+        if callback.monitor is not None:
+            score = torch.tensor(0.5)
+            callback.best_model_score = score
+            callback.current_score = score.clone()
+            callback.best_k_models = {checkpoint_path: score.clone()}
+            callback.kth_best_model_path = checkpoint_path
+            callback.kth_value = score.clone()
+            last_path = Path(callback.dirpath) / "last.ckpt"
+            last_path.parent.mkdir(parents=True, exist_ok=True)
+            last_path.touch()
+            callback.last_model_path = str(last_path)
+    return {callback.state_key: callback.state_dict() for callback in callbacks}
+
+
+def _optimizer_parameter_contract(optimizer_state: dict, state_dict: dict) -> dict:
+    parameter_ids = optimizer_state["param_groups"][0]["params"]
+    parameter_names = ["model.weight", "model.bias"]
+    assert len(parameter_ids) == len(parameter_names)
+    model_state = {
+        name: {
+            "shape": list(tensor.shape),
+            "dtype": str(tensor.dtype),
+        }
+        for name, tensor in state_dict.items()
+    }
     return {
-        "pytorch-lightning_version": "2.6.5",
-        "state_dict": {"model.weight": torch.ones(1)},
-        "optimizer_states": [
-            {"state": {}, "param_groups": [{"params": []}]}
+        "schema_version": 1,
+        "state_dict": model_state,
+        "state_dict_schema_sha256": _model_state_schema_sha256(model_state),
+        "param_groups": [
+            list(group["params"]) for group in optimizer_state["param_groups"]
         ],
-        "lr_schedulers": [{"last_epoch": 0}],
-        "loops": {"fit_loop": {"state": 1}},
-        "callbacks": {"ModelCheckpoint": {"best_model_path": ""}},
-        "epoch": 0,
-        "global_step": 0,
+        "parameters": {
+            parameter_id: {
+                "name": name,
+                "shape": list(state_dict[name].shape),
+                "dtype": str(state_dict[name].dtype),
+            }
+            for parameter_id, name in zip(parameter_ids, parameter_names)
+        },
+        "trainable_parameters": FORMAL_TEST_TRAINABLE_PARAMETER_SCHEMA.copy(),
+        "trainable_parameter_schema_sha256": (
+            FORMAL_TEST_TRAINABLE_PARAMETER_SCHEMA_SHA256
+        ),
+    }
+
+
+def _formal_loop_states(*, epoch: int, global_step: int) -> dict:
+    epoch_total = {
+        "ready": epoch + 1,
+        "completed": epoch,
+        "started": epoch + 1,
+        "processed": epoch + 1,
+    }
+    optimizer_steps = {"ready": global_step, "completed": global_step}
+    current_optimizer_steps = {
+        "ready": 66,
+        "completed": 66,
+    }
+    optimizer_zero_grads = {
+        "ready": global_step,
+        "completed": global_step,
+        "started": global_step,
+    }
+    current_optimizer_zero_grads = {
+        "ready": 66,
+        "completed": 66,
+        "started": 66,
+    }
+    batches = (epoch + 1) * 264
+    batch_total = {
+        "ready": batches,
+        "completed": batches,
+        "started": batches,
+        "processed": batches,
+    }
+    idle_batch_progress = {
+        "total": {key: 0 for key in batch_total},
+        "current": {key: 0 for key in batch_total},
+    }
+    return {
+        "fit_loop": {
+            "state_dict": {},
+            "epoch_progress": {"total": epoch_total, "current": epoch_total.copy()},
+            "epoch_loop.state_dict": {"_batches_that_stepped": global_step},
+            "epoch_loop.batch_progress": {
+                "total": batch_total,
+                "current": {field: 264 for field in batch_total},
+                "is_last_batch": True,
+            },
+            "epoch_loop.scheduler_progress": {
+                "total": optimizer_steps.copy(),
+                "current": current_optimizer_steps.copy(),
+            },
+            "epoch_loop.automatic_optimization.state_dict": {},
+            "epoch_loop.automatic_optimization.optim_progress": {
+                "optimizer": {
+                    "step": {
+                        "total": optimizer_steps.copy(),
+                        "current": current_optimizer_steps.copy(),
+                    },
+                    "zero_grad": {
+                        "total": optimizer_zero_grads,
+                        "current": current_optimizer_zero_grads,
+                    },
+                }
+            },
+        },
+        "validate_loop": {
+            "state_dict": {},
+            "batch_progress": {**copy.deepcopy(idle_batch_progress), "is_last_batch": False},
+        },
+        "test_loop": {
+            "state_dict": {},
+            "batch_progress": {**copy.deepcopy(idle_batch_progress), "is_last_batch": False},
+        },
+        "predict_loop": {
+            "state_dict": {},
+            "batch_progress": copy.deepcopy(idle_batch_progress),
+        },
+    }
+
+
+def _formal_resume_payload(cfg, *, epoch: int = 0) -> dict:
+    global_step = (epoch + 1) * 66
+    optimizer_state, scheduler_state = _optimizer_scheduler_checkpoint_states(
+        cfg,
+        global_step=global_step,
+    )
+    state_dict = {
+        "model.weight": torch.ones(1),
+        "model.bias": torch.ones(2),
+        "model.running_mean": torch.zeros(3),
+    }
+    payload = {
+        "pytorch-lightning_version": "2.6.5",
+        "state_dict": state_dict,
+        "optimizer_states": [optimizer_state],
+        "lr_schedulers": [scheduler_state],
+        "loops": _formal_loop_states(epoch=epoch, global_step=global_step),
+        "callbacks": _model_checkpoint_callback_states(cfg, epoch=epoch),
+        "epoch": epoch,
+        "global_step": global_step,
         "hyper_parameters": cfg,
         "p2_train_sampler_generator": _sampler_generator_checkpoint_payload(),
     }
+    payload["p2_optimizer_parameter_contract"] = _optimizer_parameter_contract(
+        optimizer_state,
+        state_dict,
+    )
+    return payload
 
 
 def test_fresh_bound_preflight_authorizes_the_exact_p2_config(tmp_path: Path) -> None:
@@ -457,6 +839,100 @@ def test_current_training_input_manifest_is_recomputed(
         )
 
 
+def test_preflight_without_local_source_binding_fails_closed(tmp_path: Path) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    artifact_path = tmp_path / "scannet_preflight.json"
+    artifact = _formal_artifact(cfg)
+    artifact.pop("local_source_commit")
+    artifact.pop("source_tree_contract")
+    artifact["authorization"]["artifact_payload_sha256"] = _artifact_sha256(
+        artifact
+    )
+    _write_artifact(artifact_path, artifact)
+
+    with pytest.raises(RuntimeError, match="source_tree_contract"):
+        training_entrypoint.require_p2_preflight_authorization(
+            cfg,
+            artifact_path=artifact_path,
+        )
+
+
+def test_current_non_artifact_dirty_source_tree_fails_closed(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    artifact_path = tmp_path / "scannet_preflight.json"
+    _write_artifact(artifact_path, _formal_artifact(cfg))
+    failed_contract = _passing_source_tree_contract()
+    failed_contract.update(
+        {
+            "status": "fail",
+            "dirty_paths": ["trainer/trainer.py"],
+            "disallowed_dirty_paths": ["trainer/trainer.py"],
+            "errors": ["non_artifact_worktree_changes"],
+        }
+    )
+    monkeypatch.setattr(
+        p2_preflight,
+        "build_p2_source_tree_contract",
+        lambda *args, **kwargs: copy.deepcopy(failed_contract),
+        raising=False,
+    )
+
+    with pytest.raises(RuntimeError, match="current source_tree_contract"):
+        training_entrypoint.require_p2_preflight_authorization(
+            cfg,
+            artifact_path=artifact_path,
+        )
+
+
+def test_preflight_without_runtime_source_binding_fails_closed(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    artifact_path = tmp_path / "scannet_preflight.json"
+    artifact = _formal_artifact(cfg)
+    artifact.pop("runtime_source_contract")
+    artifact["authorization"]["artifact_payload_sha256"] = _artifact_sha256(
+        artifact
+    )
+    _write_artifact(artifact_path, artifact)
+
+    with pytest.raises(RuntimeError, match="runtime_source_contract"):
+        training_entrypoint.require_p2_preflight_authorization(
+            cfg,
+            artifact_path=artifact_path,
+        )
+
+
+def test_current_nested_runtime_source_drift_fails_closed(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    artifact_path = tmp_path / "scannet_preflight.json"
+    _write_artifact(artifact_path, _formal_artifact(cfg))
+    failed_contract = _passing_runtime_source_contract()
+    failed_contract["status"] = "fail"
+    failed_contract["errors"] = ["detectron2:native_extension_mismatch"]
+    failed_contract["repositories"]["detectron2"]["status"] = "fail"
+    failed_contract["repositories"]["detectron2"]["errors"] = [
+        "native_extension_mismatch"
+    ]
+    monkeypatch.setattr(
+        p2_preflight,
+        "build_p2_runtime_source_contract",
+        lambda *args, **kwargs: copy.deepcopy(failed_contract),
+    )
+
+    with pytest.raises(RuntimeError, match="current runtime_source_contract"):
+        training_entrypoint.require_p2_preflight_authorization(
+            cfg,
+            artifact_path=artifact_path,
+        )
+
+
 def test_freshness_is_rechecked_after_expensive_input_validation(
     tmp_path: Path,
     monkeypatch,
@@ -484,6 +960,54 @@ def test_freshness_is_rechecked_after_expensive_input_validation(
     monkeypatch.setattr(p2_preflight, "datetime", AdvancingDateTime)
 
     with pytest.raises(RuntimeError, match="stale"):
+        training_entrypoint.require_p2_preflight_authorization(
+            cfg,
+            artifact_path=artifact_path,
+        )
+
+
+def test_training_inputs_are_rechecked_after_the_authorization_scan(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    artifact_path = tmp_path / "scannet_preflight.json"
+    _write_artifact(artifact_path, _formal_artifact(cfg))
+    changed = copy.deepcopy(FORMAL_INPUT_MANIFEST)
+    changed["rio"]["content_sha256"] = "9" * 64
+    manifests = iter([copy.deepcopy(FORMAL_INPUT_MANIFEST), changed])
+    monkeypatch.setattr(
+        p2_preflight,
+        "build_p2_input_manifest",
+        lambda *args, **kwargs: next(manifests),
+    )
+
+    with pytest.raises(RuntimeError, match="training inputs changed"):
+        training_entrypoint.require_p2_preflight_authorization(
+            cfg,
+            artifact_path=artifact_path,
+        )
+
+
+def test_official_splits_are_rechecked_after_the_authorization_scan(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    artifact_path = tmp_path / "scannet_preflight.json"
+    artifact = _formal_artifact(cfg)
+    _write_artifact(artifact_path, artifact)
+    matching = copy.deepcopy(artifact["official_split_identity"])
+    changed = copy.deepcopy(matching)
+    changed["files"]["validation"]["observed_sha256"] = "9" * 64
+    identities = iter([matching, changed])
+    monkeypatch.setattr(
+        p2_preflight,
+        "build_scannet_official_split_identity",
+        lambda *args, **kwargs: next(identities),
+    )
+
+    with pytest.raises(RuntimeError, match="official split changed"):
         training_entrypoint.require_p2_preflight_authorization(
             cfg,
             artifact_path=artifact_path,
@@ -681,6 +1205,822 @@ def test_formal_p2_resume_accepts_matching_p2_hyperparameters(
     training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
 
 
+def test_formal_checkpoint_validation_requires_the_current_config(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    payload = _formal_resume_payload(cfg)
+
+    assert training_entrypoint._resume_checkpoint_validation_error(
+        payload,
+        formal_p2=True,
+    ) == "formal P2 checkpoint validation requires current config"
+
+
+def test_formal_p2_resume_rejects_learning_rate_monitor_only_callback_state(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "learning-rate-monitor-only.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["callbacks"] = {"LearningRateMonitor": {}}
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="ModelCheckpoint callback state"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+@pytest.mark.parametrize("callback_index", range(3))
+def test_formal_p2_resume_requires_every_configured_model_checkpoint_state(
+    tmp_path: Path,
+    callback_index: int,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / f"missing-callback-{callback_index}.ckpt"
+    payload = _formal_resume_payload(cfg)
+    state_key = tuple(payload["callbacks"])[callback_index]
+    payload["callbacks"].pop(state_key)
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="ModelCheckpoint callback state"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_malformed_model_checkpoint_state(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "malformed-callback-state.ckpt"
+    payload = _formal_resume_payload(cfg)
+    state_key = next(iter(payload["callbacks"]))
+    payload["callbacks"][state_key] = {"best_model_path": ""}
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="ModelCheckpoint callback state"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_fresh_state_for_triggered_monitor_callback(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "fresh-monitor-callback-state.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["callbacks"] = _fresh_model_checkpoint_callback_states(cfg)
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="ModelCheckpoint callback history"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+@pytest.mark.parametrize(
+    ("epoch", "callback_index"),
+    [(25, 1)],
+)
+def test_formal_p2_resume_rejects_fresh_state_after_prior_periodic_trigger(
+    tmp_path: Path,
+    epoch: int,
+    callback_index: int,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / f"fresh-periodic-callback-{epoch}.ckpt"
+    payload = _formal_resume_payload(cfg, epoch=epoch)
+    callbacks = _model_checkpoint_callbacks(cfg)
+    callback = callbacks[callback_index]
+    payload["callbacks"][callback.state_key] = callback.state_dict()
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="ModelCheckpoint callback history"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+@pytest.mark.parametrize(
+    ("epoch", "callback_index"),
+    [(24, 1), (449, 2)],
+)
+def test_formal_p2_resume_accepts_fresh_periodic_state_at_first_trigger_boundary(
+    tmp_path: Path,
+    epoch: int,
+    callback_index: int,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / f"pre-periodic-callback-{epoch}.ckpt"
+    payload = _formal_resume_payload(cfg, epoch=epoch)
+    callback = _model_checkpoint_callbacks(cfg)[callback_index]
+    payload["callbacks"][callback.state_key] = callback.state_dict()
+    epoch_progress = payload["loops"]["fit_loop"]["epoch_progress"]
+    epoch_progress["total"]["processed"] = epoch
+    epoch_progress["current"]["processed"] = epoch
+    payload["loops"]["fit_loop"]["epoch_loop.state_dict"][
+        "_batches_that_stepped"
+    ] = payload["global_step"] - 1
+    torch.save(payload, checkpoint)
+
+    training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+@pytest.mark.parametrize(
+    ("epoch", "callback_index"),
+    [(24, 1), (449, 2)],
+)
+def test_formal_p2_resume_rejects_fresh_due_callback_after_train_epoch_end(
+    tmp_path: Path,
+    epoch: int,
+    callback_index: int,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / f"missing-due-callback-{epoch}.ckpt"
+    payload = _formal_resume_payload(cfg, epoch=epoch)
+    callback = _model_checkpoint_callbacks(cfg)[callback_index]
+    payload["callbacks"][callback.state_key] = callback.state_dict()
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="ModelCheckpoint callback history"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_accepts_first_top_checkpoint_before_save_last(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "first-top-before-last.ckpt"
+    payload = _formal_resume_payload(cfg, epoch=14)
+    monitor_state = next(iter(payload["callbacks"].values()))
+    monitor_state["last_model_path"] = ""
+    torch.save(payload, checkpoint)
+
+    training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_empty_last_before_first_validation(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "empty-last-before-first-validation.ckpt"
+    payload = _formal_resume_payload(cfg)
+    monitor_state = next(iter(payload["callbacks"].values()))
+    monitor_state["last_model_path"] = ""
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="ModelCheckpoint callback history"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_accepts_real_lightning_callback_save_order(
+    tmp_path: Path,
+) -> None:
+    class CallbackTimingModule(LightningModule):
+        def __init__(self) -> None:
+            super().__init__()
+            self.weight = torch.nn.Parameter(torch.ones(()))
+
+        def training_step(self, _batch, _batch_idx):
+            return self.weight.square()
+
+        def validation_step(self, _batch, _batch_idx):
+            self.log("val_mean_t-AP", torch.tensor(0.5), on_epoch=True)
+
+        def configure_optimizers(self):
+            return torch.optim.AdamW(self.parameters(), lr=1e-3)
+
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "callbacks")
+    with open_dict(cfg.callbacks[2]):
+        cfg.callbacks[2].dirpath = str(tmp_path / "final")
+    callbacks = _model_checkpoint_callbacks(cfg)
+    loader = DataLoader(TensorDataset(torch.ones(1)), batch_size=1)
+    Trainer(
+        max_epochs=15,
+        check_val_every_n_epoch=15,
+        accelerator="cpu",
+        devices=1,
+        logger=False,
+        enable_progress_bar=False,
+        enable_model_summary=False,
+        num_sanity_val_steps=0,
+        callbacks=callbacks,
+    ).fit(CallbackTimingModule(), loader, loader)
+
+    top_checkpoint = torch.load(
+        callbacks[0].best_model_path,
+        map_location="cpu",
+        weights_only=False,
+    )
+    monitor_key = callbacks[0].state_key
+    assert top_checkpoint["callbacks"][monitor_key]["last_model_path"] == ""
+
+    epoch = 14
+    payload = _formal_resume_payload(cfg, epoch=epoch)
+    payload["callbacks"] = top_checkpoint["callbacks"]
+    epoch_progress = payload["loops"]["fit_loop"]["epoch_progress"]
+    epoch_progress["total"]["processed"] = epoch
+    epoch_progress["current"]["processed"] = epoch
+    payload["loops"]["fit_loop"]["epoch_loop.state_dict"][
+        "_batches_that_stepped"
+    ] = payload["global_step"] - 1
+    checkpoint = tmp_path / f"formal-callback-timing-{epoch}.ckpt"
+    torch.save(payload, checkpoint)
+    training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+@pytest.mark.parametrize(
+    ("field", "invalid_value"),
+    [
+        ("best_model_path", ""),
+        ("best_model_score", torch.tensor(float("nan"))),
+        ("current_score", None),
+        ("best_k_models", {}),
+    ],
+)
+def test_formal_p2_resume_rejects_incomplete_monitor_callback_history(
+    tmp_path: Path,
+    field: str,
+    invalid_value,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / f"invalid-monitor-callback-{field}.ckpt"
+    payload = _formal_resume_payload(cfg)
+    monitor_state = next(iter(payload["callbacks"].values()))
+    monitor_state[field] = invalid_value
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="ModelCheckpoint callback history"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_missing_last_history_after_first_epoch(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "missing-last-after-first-epoch.ckpt"
+    payload = _formal_resume_payload(cfg, epoch=1)
+    monitor_state = next(iter(payload["callbacks"].values()))
+    monitor_state["last_model_path"] = ""
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="ModelCheckpoint callback history"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_dangling_last_callback_reference(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "dangling-last-callback-reference.ckpt"
+    payload = _formal_resume_payload(cfg, epoch=1)
+    monitor_state = next(
+        state
+        for state in payload["callbacks"].values()
+        if state["monitor"] is not None
+    )
+    Path(monitor_state["last_model_path"]).unlink()
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="callback history references"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_inconsistent_monitor_callback_score(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "inconsistent-monitor-callback-score.ckpt"
+    payload = _formal_resume_payload(cfg)
+    monitor_state = next(iter(payload["callbacks"].values()))
+    best_path = monitor_state["best_model_path"]
+    monitor_state["best_k_models"][best_path] = torch.tensor(-1.0)
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="ModelCheckpoint callback history"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_requires_optimizer_parameter_contract(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "missing-optimizer-parameter-contract.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload.pop("p2_optimizer_parameter_contract")
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="optimizer parameter contract"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_missing_nonoptimizer_model_state(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "missing-model-buffer.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["state_dict"].pop("model.running_mean")
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="model state contract"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_model_state_deleted_with_self_contract(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "self-consistent-incomplete-model.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["state_dict"].pop("model.running_mean")
+    model_contract = payload["p2_optimizer_parameter_contract"]["state_dict"]
+    model_contract.pop("model.running_mean")
+    payload["p2_optimizer_parameter_contract"]["state_dict_schema_sha256"] = (
+        _model_state_schema_sha256(model_contract)
+    )
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="model state schema"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "value"),
+    [
+        ("shape", torch.zeros(4)),
+        ("dtype", torch.zeros(3, dtype=torch.float64)),
+        ("extra", torch.ones(1)),
+    ],
+)
+def test_formal_p2_resume_rejects_tampered_model_state_tensor_contract(
+    tmp_path: Path,
+    mutation: str,
+    value: torch.Tensor,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / f"tampered-model-state-{mutation}.ckpt"
+    payload = _formal_resume_payload(cfg)
+    if mutation == "extra":
+        payload["state_dict"]["model.unexpected"] = value
+    else:
+        payload["state_dict"]["model.running_mean"] = value
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="model state contract"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_adamw_moment_shape_mismatch(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "adamw-moment-shape-mismatch.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["optimizer_states"][0]["state"][0]["exp_avg"] = torch.zeros(3)
+    payload["optimizer_states"][0]["state"][0]["exp_avg_sq"] = torch.zeros(3)
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="AdamW parameter slot moments"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_stale_adamw_parameter_step(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "stale-adamw-parameter-step.ckpt"
+    payload = _formal_resume_payload(cfg)
+    step = payload["optimizer_states"][0]["state"][0]["step"]
+    payload["optimizer_states"][0]["state"][0]["step"] = step.new_tensor(1)
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="AdamW parameter slot step"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_shallow_fit_loop_state(tmp_path: Path) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "shallow-loop-state.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["loops"]["fit_loop"] = {"state": 1}
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="fit_loop"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+@pytest.mark.parametrize(
+    ("path", "invalid_value"),
+    [
+        (("epoch_progress", "total", "ready"), 0),
+        (("epoch_progress", "total", "processed"), 2),
+        (("epoch_progress", "total", "started"), 0),
+        (("epoch_progress", "total", "completed"), 1),
+        (("epoch_progress", "current", "processed"), 2),
+        (("epoch_loop.state_dict", "_batches_that_stepped"), 64),
+        (
+            (
+                "epoch_loop.automatic_optimization.optim_progress",
+                "optimizer",
+                "step",
+                "total",
+                "completed",
+            ),
+            65,
+        ),
+        (
+            (
+                "epoch_loop.automatic_optimization.optim_progress",
+                "optimizer",
+                "step",
+                "current",
+                "completed",
+            ),
+            65,
+        ),
+        (
+            (
+                "epoch_loop.automatic_optimization.optim_progress",
+                "optimizer",
+                "zero_grad",
+                "total",
+                "started",
+            ),
+            65,
+        ),
+        (
+            (
+                "epoch_loop.automatic_optimization.optim_progress",
+                "optimizer",
+                "zero_grad",
+                "current",
+                "ready",
+            ),
+            65,
+        ),
+        (("epoch_loop.scheduler_progress", "total", "completed"), 65),
+        (("epoch_loop.scheduler_progress", "current", "completed"), 65),
+        (("epoch_loop.batch_progress", "total", "ready"), 263),
+        (("epoch_loop.batch_progress", "total", "completed"), 263),
+        (("epoch_loop.batch_progress", "total", "started"), 263),
+        (("epoch_loop.batch_progress", "total", "processed"), 263),
+        (("epoch_loop.batch_progress", "current", "processed"), 263),
+        (("epoch_loop.batch_progress", "is_last_batch"), False),
+    ],
+)
+def test_formal_p2_resume_rejects_inconsistent_fit_loop_progress(
+    tmp_path: Path,
+    path: tuple[str, ...],
+    invalid_value: int,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / f"bad-fit-progress-{path[-1]}-{invalid_value}.ckpt"
+    payload = _formal_resume_payload(cfg)
+    target = payload["loops"]["fit_loop"]
+    for key in path[:-1]:
+        target = target[key]
+    target[path[-1]] = invalid_value
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="fit_loop"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+@pytest.mark.parametrize(
+    "loop_name",
+    ["fit_loop", "validate_loop", "test_loop", "predict_loop"],
+)
+def test_formal_p2_resume_requires_all_lightning_loop_states(
+    tmp_path: Path,
+    loop_name: str,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / f"missing-{loop_name}.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["loops"].pop(loop_name)
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="loop state"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_accepts_validation_end_epoch_progress(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "validation-end-loop-state.ckpt"
+    payload = _formal_resume_payload(cfg)
+    epoch_progress = payload["loops"]["fit_loop"]["epoch_progress"]
+    epoch_progress["total"]["processed"] = 0
+    epoch_progress["current"]["processed"] = 0
+    payload["loops"]["fit_loop"]["epoch_loop.state_dict"][
+        "_batches_that_stepped"
+    ] = 65
+    torch.save(payload, checkpoint)
+
+    training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_empty_adamw_optimizer_state(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "empty-adamw-state.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["optimizer_states"][0]["state"] = {}
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="AdamW optimizer state"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+@pytest.mark.parametrize("missing_field", ["step", "exp_avg", "exp_avg_sq"])
+def test_formal_p2_resume_rejects_incomplete_adamw_parameter_slot(
+    tmp_path: Path,
+    missing_field: str,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / f"adamw-slot-without-{missing_field}.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["optimizer_states"][0]["state"][0].pop(missing_field)
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="AdamW parameter slot"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_adamw_state_for_unknown_parameter(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "unknown-adamw-parameter.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["optimizer_states"][0]["state"] = {
+        1: payload["optimizer_states"][0]["state"].pop(0)
+    }
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="AdamW parameter slot"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_requires_every_adamw_parameter_slot(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "missing-adamw-parameter-slot.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["optimizer_states"][0]["state"].pop(1)
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="AdamW parameter slot coverage"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_reordered_optimizer_parameter_ids(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "reordered-optimizer-parameters.ckpt"
+    payload = _formal_resume_payload(cfg)
+    params = payload["optimizer_states"][0]["param_groups"][0]["params"]
+    params.reverse()
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="optimizer parameter group order"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_same_shape_parameter_name_swap(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "same-shape-parameter-name-swap.ckpt"
+    payload = _formal_resume_payload(cfg)
+    optimizer_state = payload["optimizer_states"][0]
+    for parameter_id in (0, 1):
+        optimizer_state["state"][parameter_id]["exp_avg"] = torch.ones(1)
+        optimizer_state["state"][parameter_id]["exp_avg_sq"] = torch.ones(1)
+    payload["state_dict"]["model.bias"] = torch.ones(1)
+    contract = payload["p2_optimizer_parameter_contract"]
+    contract["state_dict"]["model.bias"] = {
+        "shape": [1],
+        "dtype": "torch.float32",
+    }
+    contract["parameters"][1]["shape"] = [1]
+    contract["state_dict_schema_sha256"] = _model_state_schema_sha256(
+        contract["state_dict"]
+    )
+    monkeypatch.setattr(
+        training_entrypoint,
+        "_P2_FORMAL_MODEL_STATE_SCHEMA_SHA256",
+        contract["state_dict_schema_sha256"],
+    )
+    parameter_zero = contract["parameters"][0]
+    parameter_one = contract["parameters"][1]
+    contract["parameters"][0] = parameter_one
+    contract["parameters"][1] = parameter_zero
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="trainable parameter schema"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+@pytest.mark.parametrize(
+    ("field", "invalid_value"),
+    [
+        ("eps", 1.0),
+        ("weight_decay", 999.0),
+        ("amsgrad", True),
+        ("maximize", True),
+    ],
+)
+def test_formal_p2_resume_rejects_tampered_adamw_parameter_group(
+    tmp_path: Path,
+    field: str,
+    invalid_value,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / f"tampered-adamw-{field}.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["optimizer_states"][0]["param_groups"][0][field] = invalid_value
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="AdamW parameter group"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_missing_adamw_default_group_field(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "adamw-group-without-foreach.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["optimizer_states"][0]["param_groups"][0].pop("foreach")
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="AdamW parameter group"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_wrong_current_onecycle_learning_rate(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "tampered-current-lr.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["optimizer_states"][0]["param_groups"][0]["lr"] = 123.0
+    payload["lr_schedulers"][0]["_last_lr"] = [123.0]
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="OneCycleLR current learning rate"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_rejects_wrong_current_onecycle_momentum(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "tampered-current-momentum.ckpt"
+    payload = _formal_resume_payload(cfg)
+    group = payload["optimizer_states"][0]["param_groups"][0]
+    group["betas"] = (0.1, group["betas"][1])
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="OneCycleLR current momentum"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_optimizer_excludes_frozen_parameters() -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.scheduler.scheduler.total_steps = 2
+    trainable = torch.nn.Parameter(torch.ones(1), requires_grad=True)
+    frozen = torch.nn.Parameter(torch.ones(1), requires_grad=False)
+
+    class OptimizerOwner:
+        config = cfg
+
+        @staticmethod
+        def parameters():
+            return iter((trainable, frozen))
+
+    optimizers, _ = training_entrypoint.InstanceSegmentation.configure_optimizers(
+        OptimizerOwner()
+    )
+
+    assert optimizers[0].param_groups[0]["params"] == [trainable]
+
+
+def test_nonformal_optimizer_keeps_frozen_parameter_compatibility() -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.p2_fail_closed_runtime = False
+    cfg.scheduler.scheduler.total_steps = 2
+    trainable = torch.nn.Parameter(torch.ones(1), requires_grad=True)
+    frozen = torch.nn.Parameter(torch.ones(1), requires_grad=False)
+
+    class OptimizerOwner:
+        config = cfg
+
+        @staticmethod
+        def parameters():
+            return iter((trainable, frozen))
+
+    optimizers, _ = training_entrypoint.InstanceSegmentation.configure_optimizers(
+        OptimizerOwner()
+    )
+
+    params = optimizers[0].param_groups[0]["params"]
+    assert len(params) == 2
+    assert params[0] is trainable
+    assert params[1] is frozen
+
+
+def test_formal_p2_resume_rejects_arbitrary_nonempty_scheduler_state(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "fake-scheduler-state.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["lr_schedulers"] = [{"last_epoch": payload["global_step"]}]
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="OneCycleLR scheduler state"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_requires_scheduler_step_to_match_global_step(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "scheduler-step-mismatch.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["lr_schedulers"][0]["last_epoch"] = payload["global_step"] - 1
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="last_epoch.*global_step"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_requires_the_planned_onecycle_total_steps(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "scheduler-total-steps-mismatch.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["lr_schedulers"][0]["total_steps"] = 10
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="OneCycleLR total_steps"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
+def test_formal_p2_resume_requires_a_completed_epoch_boundary(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "mid-epoch-sampler-state.ckpt"
+    payload = _formal_resume_payload(cfg)
+    payload["epoch"] = 400
+    torch.save(payload, checkpoint)
+
+    with pytest.raises(RuntimeError, match="completed epoch boundary"):
+        training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+
 def test_formal_p2_resume_rejects_missing_sampler_generator_payload(
     tmp_path: Path,
 ) -> None:
@@ -828,6 +2168,7 @@ def test_formal_resume_explicitly_disables_weights_only_for_trainer_fit(
         cfg.callbacks = []
     selected = tmp_path / "last.ckpt"
     verified_snapshot = tmp_path / "verified-resume.ckpt"
+    expected_cfg = cfg
     selected.touch()
     verified_snapshot.touch()
     monkeypatch.setattr(
@@ -838,8 +2179,10 @@ def test_formal_resume_explicitly_disables_weights_only_for_trainer_fit(
     monkeypatch.setattr(
         training_entrypoint,
         "find_resume_checkpoint",
-        lambda _save_dir, *, formal_p2=False: (
-            str(selected) if formal_p2 else pytest.fail("formal selector not used")
+        lambda _save_dir, *, formal_p2=False, cfg=None: (
+            str(selected)
+            if formal_p2 and cfg is expected_cfg
+            else pytest.fail("formal selector did not receive current config")
         ),
     )
     monkeypatch.setattr(
@@ -914,6 +2257,22 @@ def test_formal_p2_general_identity_cannot_bypass_gate_without_marker(
     cfg = _compose("config_base_instance_segmentation")
     assert "p2_preflight" not in cfg
     setattr(cfg.general, field_name, field_value)
+
+    _assert_formal_identity_consumes_preflight(cfg, monkeypatch)
+
+
+@pytest.mark.parametrize(
+    "flag_name",
+    ["p2_weighted_objective", "p2_fail_closed_runtime"],
+)
+def test_formal_p2_runtime_flag_cannot_bypass_gate_without_marker(
+    flag_name: str,
+    monkeypatch,
+) -> None:
+    cfg = _compose("config_base_instance_segmentation")
+    assert "p2_preflight" not in cfg
+    with open_dict(cfg.general):
+        setattr(cfg.general, flag_name, True)
 
     _assert_formal_identity_consumes_preflight(cfg, monkeypatch)
 

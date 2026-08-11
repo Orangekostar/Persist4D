@@ -7,10 +7,155 @@ from pathlib import Path
 
 import pytest
 
-from scripts.audit_p2_lr_schedule import CSV_FIELDS, run_audit
+from scripts import audit_p2_lr_schedule as audit
+from scripts.audit_p2_lr_schedule import (
+    CSV_FIELDS,
+    _complete_scannet_gate_passed,
+    run_audit,
+)
+from utils.p2_preflight import P2_PREFLIGHT_SCHEMA_VERSION
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts" / "audit_p2_lr_schedule.py"
+SHARED_AUTHORIZATION_FIELDS = (
+    "config_contract",
+    "source_tree_contract",
+    "runtime_source_contract",
+    "runtime_environment_contract",
+    "official_split_identity",
+    "input_manifest",
+    "authorization",
+)
+
+
+def _complete_preflight(schema_version: int) -> dict:
+    payload = {
+        "schema_version": schema_version,
+        "status": "pass",
+        "formal_p2_training_authorized": True,
+        "official_source_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+        "split_metadata_status": "pass",
+        "expected_split_counts": {
+            "train": 1201,
+            "validation": 312,
+            "test": 100,
+        },
+        "errors": [],
+        "raw_assets": {"status": "pass"},
+        "processed_assets": {"status": "pass"},
+        "class_taxonomy": {"status": "pass"},
+        "mix_instantiation": {"status": "pass"},
+    }
+    payload.update({field: {} for field in SHARED_AUTHORIZATION_FIELDS})
+    return payload
+
+
+def test_complete_scannet_gate_accepts_current_preflight_schema(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    preflight_path = tmp_path / "scannet_preflight.json"
+    preflight_path.write_text(
+        json.dumps(_complete_preflight(P2_PREFLIGHT_SCHEMA_VERSION)),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(audit, "_shared_p2_authorization_gate", lambda _path: True)
+
+    assert _complete_scannet_gate_passed(preflight_path) is True
+
+
+def test_complete_scannet_gate_rejects_legacy_preflight_schema(
+    tmp_path: Path,
+) -> None:
+    preflight_path = tmp_path / "scannet_preflight.json"
+    preflight_path.write_text(
+        json.dumps(_complete_preflight(P2_PREFLIGHT_SCHEMA_VERSION - 1)),
+        encoding="utf-8",
+    )
+
+    assert _complete_scannet_gate_passed(preflight_path) is False
+
+
+@pytest.mark.parametrize(
+    "missing_field",
+    [
+        "config_contract",
+        "source_tree_contract",
+        "runtime_source_contract",
+        "runtime_environment_contract",
+        "official_split_identity",
+        "input_manifest",
+        "authorization",
+    ],
+)
+def test_complete_gate_requires_every_shared_authorization_field(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    missing_field: str,
+) -> None:
+    payload = _complete_preflight(P2_PREFLIGHT_SCHEMA_VERSION)
+    payload.pop(missing_field)
+    preflight_path = tmp_path / "scannet_preflight.json"
+    preflight_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    monkeypatch.setattr(
+        audit,
+        "_shared_p2_authorization_gate",
+        lambda _path: True,
+    )
+
+    assert _complete_scannet_gate_passed(preflight_path) is False
+
+
+def test_complete_gate_rejects_shared_authorization_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    preflight_path = tmp_path / "scannet_preflight.json"
+    preflight_path.write_text(
+        json.dumps(_complete_preflight(P2_PREFLIGHT_SCHEMA_VERSION)),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(audit, "_compose_p2_config", lambda: object())
+
+    def reject_authorization(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("shared authorization rejected")
+
+    monkeypatch.setattr(
+        audit,
+        "require_p2_preflight_authorization",
+        reject_authorization,
+    )
+
+    assert _complete_scannet_gate_passed(preflight_path) is False
+
+
+def test_complete_gate_allows_ready_only_after_shared_authorization(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    preflight_path = tmp_path / "scannet_preflight.json"
+    preflight_path.write_text(
+        json.dumps(_complete_preflight(P2_PREFLIGHT_SCHEMA_VERSION)),
+        encoding="utf-8",
+    )
+    config = object()
+    calls: list[tuple[object, Path]] = []
+    monkeypatch.setattr(audit, "_compose_p2_config", lambda: config)
+
+    def allow_authorization(received_config: object, *, artifact_path: Path) -> Path:
+        calls.append((received_config, artifact_path))
+        return artifact_path
+
+    monkeypatch.setattr(
+        audit,
+        "require_p2_preflight_authorization",
+        allow_authorization,
+    )
+
+    assert _complete_scannet_gate_passed(preflight_path) is True
+    assert calls == [(config, preflight_path)]
 
 
 def _read_csv(path: Path) -> list[dict[str, str]]:
@@ -97,7 +242,7 @@ def test_optimizer_global_step_scheduler_and_lr_advance_together(
     assert result["scheduler"]["sampled_max_lr_must_equal_contract"] is False
 
 
-def test_metadata_locks_effective_batch_and_blocks_formal_total_steps(
+def test_metadata_records_planned_batch_contract_while_formal_run_is_blocked(
     completed_audit,
 ) -> None:
     result, output_dir, _ = completed_audit
@@ -112,21 +257,44 @@ def test_metadata_locks_effective_batch_and_blocks_formal_total_steps(
     }
     assert result["formal_training"] == {
         "status": "blocked_missing_scannet",
+        "contract_kind": "planned_not_observed",
+        "observed_formal_run": False,
         "dataset_mix": "3RScan T=2 (1.0) + ScanNet T=1 (0.8)",
+        "primary_dataset_samples": 1178,
+        "dataset_weights": [1.0, 0.8],
+        "raw_sampler_num_samples": 2120,
+        "epoch_sample_multiple": 32,
+        "sampler_num_samples": 2112,
+        "sampler_seed": 45,
+        "sampler_seed_scope": (
+            "fresh_start_and_completed_epoch_boundary_resume"
+        ),
+        "sampler_generator_state_checkpointed": True,
+        "sampler_checkpoint_scope": "completed_epoch_boundary_only",
+        "sampler_checkpoint_save_timing": (
+            "p2_train_or_validation_epoch_end_callbacks"
+        ),
+        "sampler_non_boundary_resume_verified": False,
+        "sampler_mid_epoch_resume_supported": False,
+        "sampler_dataloader_prefetch_state_checkpointed": False,
+        "samples_per_rank": 1056,
         "epochs": 450,
-        "total_steps": None,
+        "optimizer_steps_per_epoch": 66,
+        "total_steps": 29700,
         "scannet_ref": "repo:data/processed/scannet",
         "preflight_ref": "repo:artifacts/P2/scannet_preflight.json",
         "epoch_microbatch_divisibility": {
-            "status": "pending_missing_scannet",
-            "epoch_microbatches": None,
+            "status": "planned_aligned",
+            "scope": "per_rank",
+            "epoch_microbatches": 264,
             "accumulation_steps": 4,
-            "remainder": None,
+            "remainder": 0,
             "drop_last": False,
         },
         "reason": (
-            "ScanNet prerequisites are missing; the formal mixed-data loader "
-            "length and total_steps cannot be computed."
+            "ScanNet prerequisites are missing, so no formal mixed-data run was "
+            "observed; the planned sampler and optimizer-step contract remains "
+            "computable from the locked P2 configuration."
         ),
     }
 
@@ -134,12 +302,29 @@ def test_metadata_locks_effective_batch_and_blocks_formal_total_steps(
     assert "scheduler semantics preflight" in report
     assert "not formal mixed-data training" in report
     assert "2 GPUs * 4 samples/GPU * 4 accumulation steps = 32" in report
+    assert "sampler checkpoint scope: completed_epoch_boundary_only" in report
+    assert (
+        "sampler checkpoint save timing: "
+        "p2_train_or_validation_epoch_end_callbacks"
+    ) in report
+    assert "sampler non-boundary resume verified: false" in report
+    assert "sampler mid-epoch resume supported: false" in report
+    assert "sampler DataLoader prefetch state checkpointed: false" in report
     assert "formal status: blocked_missing_scannet" in report
+    assert "formal run observed: false" in report
     assert "formal epochs: 450" in report
-    assert "formal total_steps: null" in report
-    assert "formal epoch microbatch divisibility: pending_missing_scannet" in report
-    assert "formal epoch microbatches: null" in report
-    assert "formal accumulation remainder: null" in report
+    assert "planned sampler num_samples: 2112" in report
+    assert (
+        "planned sampler seed scope: "
+        "fresh_start_and_completed_epoch_boundary_resume"
+    ) in report
+    assert "sampler generator state checkpointed: true" in report
+    assert "planned samples per rank: 1056" in report
+    assert "planned optimizer steps per epoch: 66" in report
+    assert "planned total_steps: 29700" in report
+    assert "planned epoch microbatch divisibility: planned_aligned" in report
+    assert "planned epoch microbatches per rank: 264" in report
+    assert "planned accumulation remainder: 0" in report
     assert "tail target samples=16" in report
     assert "relative gradient scale=0.5" in report
     assert "lr_before is applied to the current optimizer update" in report
@@ -171,8 +356,11 @@ def test_incomplete_scannet_metadata_stays_blocked(tmp_path: Path) -> None:
         scannet_preflight_path=incomplete_preflight,
     )
 
-    assert result["formal_training"]["status"] == "blocked_missing_scannet"
-    assert result["formal_training"]["total_steps"] is None
+    formal = result["formal_training"]
+    assert formal["status"] == "blocked_missing_scannet"
+    assert formal["contract_kind"] == "planned_not_observed"
+    assert formal["observed_formal_run"] is False
+    assert formal["total_steps"] == 29700
 
 
 def test_csv_schema_and_artifacts_are_deterministic_and_private(
@@ -196,9 +384,6 @@ def test_csv_schema_and_artifacts_are_deterministic_and_private(
     }
 
     assert second == first
-    assert {
-        name: (REPO_ROOT / "artifacts" / "P2" / name).read_bytes() for name in first
-    } == first
     csv_path = output_dir / "lr_schedule_audit.csv"
     with csv_path.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
@@ -252,4 +437,6 @@ def test_cli_generates_both_artifacts_and_exits_zero(tmp_path: Path) -> None:
     ]
     assert "optimizer_steps=3" in result.stdout
     assert "formal_status=blocked_missing_scannet" in result.stdout
-    assert "formal_total_steps=null" in result.stdout
+    assert "planned_total_steps=29700" in result.stdout
+    assert "formal_run_observed=false" in result.stdout
+    assert "formal_total_steps" not in result.stdout

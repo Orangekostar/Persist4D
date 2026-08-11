@@ -31,6 +31,7 @@ CONCERTO_CHECKPOINT_SHA256 = (
     "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
 )
 CONCERTO_CHECKPOINT_REFERENCE = "local_cache:persist4d/concerto/concerto_base.pth"
+SOURCE_TREE_ARTIFACT_PREFIX = "artifacts/P2/"
 SEED = 45
 TINY_SAMPLE_NAME = "scene0112_00-scene0112_01"
 TINY_OVERFIT_STEPS = 128
@@ -62,6 +63,117 @@ def checkpoint_provenance(path: Path, *, sha256: str | None = None) -> dict[str,
     return {
         "reference": CONCERTO_CHECKPOINT_REFERENCE,
         "sha256": checksum,
+    }
+
+
+def _project_file_provenance(path: str | Path) -> dict[str, str]:
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        candidate = PROJECT_ROOT / candidate
+    resolved = candidate.resolve()
+    try:
+        relative = resolved.relative_to(PROJECT_ROOT)
+    except ValueError as error:
+        raise ValueError(f"input file is outside the repository: {path}") from error
+    if not resolved.is_file():
+        raise FileNotFoundError(f"required input file does not exist: {relative}")
+    return {
+        "reference": f"repo:{relative.as_posix()}",
+        "sha256": sha256_file(resolved),
+    }
+
+
+def _portable_config_value(value: Any, checkpoint: Path) -> Any:
+    if isinstance(value, Mapping):
+        return {
+            str(key): _portable_config_value(item, checkpoint)
+            for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        return [_portable_config_value(item, checkpoint) for item in value]
+    if not isinstance(value, str) or not Path(value).is_absolute():
+        return value
+
+    resolved = Path(value).resolve()
+    if resolved == checkpoint.resolve():
+        return CONCERTO_CHECKPOINT_REFERENCE
+    try:
+        relative = resolved.relative_to(PROJECT_ROOT)
+    except ValueError as error:
+        raise ValueError(
+            f"resolved config contains a non-portable absolute path: {value}"
+        ) from error
+    return f"repo:{relative.as_posix()}"
+
+
+def _resolved_config_provenance(config: Any, checkpoint: Path) -> dict[str, Any]:
+    from omegaconf import OmegaConf
+
+    resolved = OmegaConf.to_container(config, resolve=True)
+    portable = _portable_config_value(resolved, checkpoint)
+    serialized = json.dumps(
+        portable,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("ascii")
+    return {
+        "format": "canonical-json-sort-keys-v1",
+        "portable_references": True,
+        "serialized_bytes": len(serialized),
+        "sha256": hashlib.sha256(serialized).hexdigest(),
+    }
+
+
+def _input_provenance(
+    config: Any,
+    dataset: Any,
+    dataset_index: int,
+    checkpoint: Path,
+) -> dict[str, Any]:
+    if dataset.dataset_name != "rio" or len(dataset.data_dir) != 1:
+        raise AssertionError("P2 preflight input provenance requires RIO-only data")
+    if dataset.sequence_names[dataset_index] != TINY_SAMPLE_NAME:
+        raise AssertionError("input provenance resolved an unexpected temporal sample")
+
+    scan_indices = [int(index) for index in dataset.sequence_indices[dataset_index]]
+    records = [dataset.data[index] for index in scan_indices]
+    data_dir = Path(dataset.data_dir[0])
+    train_config = config.data.train_dataset
+    change_ground_truth = dataset.change_files[dataset_index]
+    if change_ground_truth is None:
+        raise AssertionError("T=2 training sample has no change ground truth")
+
+    return {
+        "dataset": "3RScan",
+        "sample_name": dataset.sequence_names[dataset_index],
+        "temporal_window": int(dataset.temporal_window),
+        "processed_point_clouds": [
+            _project_file_provenance(record["filepath"]) for record in records
+        ],
+        "instance_ground_truth": [
+            _project_file_provenance(record["instance_gt_filepath"])
+            for record in records
+        ],
+        "change_ground_truth": _project_file_provenance(change_ground_truth),
+        "sequence_database": _project_file_provenance(
+            data_dir / f"sequence_database_sliding_{dataset.temporal_window}.yaml"
+        ),
+        "split_database": _project_file_provenance(
+            data_dir / f"{dataset.mode}_database.yaml"
+        ),
+        "semantic_label_database": _project_file_provenance(
+            train_config.label_db_filepath
+        ),
+        "change_label_database": _project_file_provenance(
+            train_config.change_label_db_filepath
+        ),
+        "color_statistics": _project_file_provenance(train_config.color_mean_std),
+        "train_augmentations": {
+            "image": _project_file_provenance(train_config.image_augmentations_path),
+            "volume": _project_file_provenance(train_config.volume_augmentations_path),
+        },
+        "resolved_composed_config": _resolved_config_provenance(config, checkpoint),
     }
 
 
@@ -351,22 +463,27 @@ def _dependency_provenance() -> dict[str, str]:
     return result
 
 
-def _compose_runtime(checkpoint: Path, device: Any):
+def _compose_config(checkpoint: Path):
     from hydra import compose, initialize_config_dir
     from omegaconf import open_dict
 
-    seed_everything(SEED)
     with initialize_config_dir(
         version_base="1.2", config_dir=str(PROJECT_ROOT / "conf")
     ):
         config = compose(
             config_name="config_p2_rescene4d_concerto_t2",
-            overrides=["data/datasets=rio"],
+            overrides=[
+                "data/datasets=rio",
+                "~data.train_dataset.epoch_sample_multiple",
+                "~data.train_dataset.sampler_seed",
+                "++data.train_dataset.known_empty_scan_policy=official_substitute",
+            ],
         )
     processed_dir = PROJECT_ROOT / "data" / "processed" / "rio"
     with open_dict(config):
         config.general.gpus = 1
         config.general.compile_model = False
+        config.general.p2_fail_closed_runtime = False
         config.data.batch_size = 1
         config.data.num_workers = 0
         config.backbone.name = str(checkpoint.resolve())
@@ -381,8 +498,54 @@ def _compose_runtime(checkpoint: Path, device: Any):
             )
             dataset_config.color_mean_std = str(processed_dir / "color_mean_std.yaml")
             dataset_config.temporal_window = 2
+            dataset_config.known_empty_scan_policy = "official_substitute"
     if not config.loss.contrastive_loss:
         raise RuntimeError("P2 runtime composed with contrastive loss disabled")
+    return config
+
+
+def _configure_lightning_weighted_sampler(config: Any) -> Any:
+    from omegaconf import OmegaConf, open_dict
+
+    rio_dataset = OmegaConf.to_container(
+        config.data.train_dataset,
+        resolve=False,
+    )
+    rio_dataset["target"] = rio_dataset.pop("_target_")
+    with open_dict(config):
+        config.data.train_dataset = OmegaConf.create(
+            {
+                "_target_": "datasets.multi_dataset.MultiDataset.from_config",
+                "datasets": [rio_dataset],
+                "weights": [1.0],
+                "epoch_sample_multiple": 1,
+                "sampler_seed": SEED,
+                "fail_closed": True,
+            }
+        )
+        config.general.p2_fail_closed_runtime = True
+    return config
+
+
+def _compose_runtime(
+    checkpoint: Path,
+    device: Any,
+    *,
+    save_dir: Path | None = None,
+    scheduler_total_steps: int | None = None,
+    lightning_weighted_sampler: bool = False,
+):
+    from omegaconf import open_dict
+
+    seed_everything(SEED)
+    config = _compose_config(checkpoint)
+    with open_dict(config):
+        if save_dir is not None:
+            config.general.save_dir = str(save_dir.resolve())
+        if scheduler_total_steps is not None:
+            config.scheduler.scheduler.total_steps = scheduler_total_steps
+    if lightning_weighted_sampler:
+        _configure_lightning_weighted_sampler(config)
 
     from trainer.trainer import InstanceSegmentation
 
@@ -410,6 +573,12 @@ def _materialize_named_train_batch(config: Any, sample_name: str, device: Any):
         raise ValueError(
             f"required T=2 train sample is absent: {sample_name}"
         ) from error
+    provenance = _input_provenance(
+        config,
+        dataset,
+        dataset_index,
+        Path(config.backbone.name),
+    )
     collate = hydra.utils.instantiate(config.data.train_collation)
     seed_everything(SEED)
     sample = dataset[dataset_index]
@@ -437,6 +606,7 @@ def _materialize_named_train_batch(config: Any, sample_name: str, device: Any):
             "supervised_instances": instances,
             "temporal_stages": stages,
         },
+        provenance,
     )
 
 
@@ -642,6 +812,1147 @@ def _run_validation_evaluator(system: Any, config: Any, device: Any) -> dict[str
     }
 
 
+def _cpu_snapshot(value: Any) -> Any:
+    import torch
+
+    if isinstance(value, torch.Tensor):
+        return value.detach().cpu().clone()
+    if isinstance(value, Mapping):
+        return {key: _cpu_snapshot(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_cpu_snapshot(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_cpu_snapshot(item) for item in value)
+    return copy.deepcopy(value)
+
+
+def _persistent_checkpoint_callback_states(
+    states: Mapping[str, Any],
+) -> dict[str, Any]:
+    return {
+        state_key: {
+            field: _cpu_snapshot(value)
+            for field, value in state.items()
+            if field != "current_score"
+        }
+        for state_key, state in states.items()
+    }
+
+
+def _instantiate_formal_checkpoint_callbacks(config: Any) -> list[Any]:
+    import hydra
+    from pytorch_lightning.callbacks import ModelCheckpoint
+
+    target = "pytorch_lightning.callbacks.ModelCheckpoint"
+    callback_configs = [
+        item for item in config.callbacks if getattr(item, "_target_", None) == target
+    ]
+    if len(callback_configs) != 3:
+        raise AssertionError(
+            "P2 Lightning resume smoke requires exactly three formal "
+            "ModelCheckpoint callbacks"
+        )
+
+    callbacks = [hydra.utils.instantiate(item) for item in callback_configs]
+    if not all(type(callback) is ModelCheckpoint for callback in callbacks):
+        raise AssertionError("formal checkpoint callback instantiated wrong type")
+    if any(callback.save_weights_only for callback in callbacks):
+        raise AssertionError("formal ModelCheckpoint callback is weights-only")
+    if sum(bool(callback.save_last) for callback in callbacks) != 1:
+        raise AssertionError(
+            "formal ModelCheckpoint callbacks require exactly one save-last owner"
+        )
+    state_keys = [callback.state_key for callback in callbacks]
+    if len(set(state_keys)) != len(state_keys):
+        raise AssertionError("formal checkpoint callback state keys are not unique")
+
+    expected_state_fields = {
+        "monitor",
+        "best_model_score",
+        "best_model_path",
+        "current_score",
+        "dirpath",
+        "best_k_models",
+        "kth_best_model_path",
+        "kth_value",
+        "last_model_path",
+    }
+    for callback in callbacks:
+        if set(callback.state_dict()) != expected_state_fields:
+            raise AssertionError(
+                "formal ModelCheckpoint state schema changed from the validated "
+                "Lightning contract"
+            )
+    return callbacks
+
+
+def _run_lightning_checkpoint_resume(
+    checkpoint: Path,
+    device: Any,
+    data: Any,
+    targets: Any,
+    sample_name: str,
+) -> dict[str, Any]:
+    import gc
+    from types import MethodType
+
+    import torch
+    from pytorch_lightning import Callback, Trainer
+    from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
+
+    from main_instance_segmentation import (
+        _P2_FORMAL_MODEL_STATE_SCHEMA_SHA256,
+        _P2_FORMAL_ONECYCLE_TOTAL_STEPS,
+        _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH,
+        _P2_FORMAL_TRAIN_BATCHES_PER_EPOCH,
+        _P2_FORMAL_TRAINABLE_PARAMETER_SCHEMA_SHA256,
+        find_resume_checkpoint,
+        require_p2_resume_checkpoint,
+    )
+    from utils.p2_preflight import p2_training_semantic_sha256
+
+    if sample_name != TINY_SAMPLE_NAME:
+        raise AssertionError("Lightning resume smoke requires the pinned 3RScan sample")
+    torch.cuda.reset_peak_memory_stats(device)
+    started = time.perf_counter()
+
+    class ResumeStateProbe(Callback):
+        def __init__(self, events: list[str], dataset: Any) -> None:
+            self.snapshot = None
+            self.events = events
+            self.dataset = dataset
+
+        def on_train_batch_start(
+            self,
+            trainer: Any,
+            pl_module: Any,
+            batch: Any,
+            batch_idx: int,
+        ) -> None:
+            if self.snapshot is not None:
+                return
+            if len(trainer.optimizers) != 1 or len(trainer.lr_scheduler_configs) != 1:
+                raise AssertionError(
+                    "Lightning resume smoke requires one optimizer and one scheduler"
+                )
+            scheduler = trainer.lr_scheduler_configs[0].scheduler
+            sampler_generator = pl_module._train_sampler_generator()
+            if sampler_generator is None:
+                raise AssertionError(
+                    "Lightning resume probe found no train sampler generator"
+                )
+            if (
+                getattr(pl_module, "train_dataset", None) is not self.dataset
+                or sampler_generator is not self.dataset.sampler.generator
+            ):
+                raise AssertionError(
+                    "Lightning resume probe observed the wrong sampler generator"
+                )
+            self.events.append("on_train_batch_start_state_observed")
+            self.snapshot = {
+                "global_step": int(trainer.global_step),
+                "model_digest": _tensor_digest(pl_module.state_dict().items()),
+                "optimizer": _cpu_snapshot(trainer.optimizers[0].state_dict()),
+                "scheduler": _cpu_snapshot(scheduler.state_dict()),
+                "checkpoint_callbacks": {
+                    callback.state_key: _cpu_snapshot(callback.state_dict())
+                    for callback in trainer.checkpoint_callbacks
+                },
+            }
+
+    class PinnedBatchDataset(Dataset):
+        def __init__(self, num_samples: int) -> None:
+            self.batch = (data, targets, [sample_name])
+            self.sampled_indices = []
+            generator = torch.Generator()
+            generator.manual_seed(SEED)
+            self.initial_generator_state = generator.get_state().detach().cpu().clone()
+            self.sampler = WeightedRandomSampler(
+                weights=torch.ones(4, dtype=torch.double),
+                num_samples=num_samples,
+                replacement=True,
+                generator=generator,
+            )
+
+        def __len__(self) -> int:
+            return 4
+
+        def __getitem__(self, index: int) -> Any:
+            if index < 0 or index >= len(self):
+                raise IndexError(index)
+            self.sampled_indices.append(index)
+            return self.batch
+
+    def bind_pinned_dataset_on_setup(
+        system: Any,
+        dataset: PinnedBatchDataset,
+        events: list[str],
+        validation_dataset: Any | None = None,
+    ) -> dict[str, Any]:
+        original_setup = system.setup
+        original_on_load_checkpoint = system.on_load_checkpoint
+        binding = {
+            "configured_sampler_present": False,
+            "restored_to_actual_loader_generator": False,
+        }
+
+        def setup_with_pinned_dataset(module: Any, stage: Any = None) -> None:
+            original_setup(stage)
+            if stage not in ("fit", None):
+                return
+            configured_generator = module._train_sampler_generator()
+            binding["configured_sampler_present"] = configured_generator is not None
+            if not binding["configured_sampler_present"]:
+                raise AssertionError(
+                    "formal-like single-RIO config has no sampler generator"
+                )
+            events.append("setup_configured_sampler_verified")
+            module.train_dataset = dataset
+            if module._train_sampler_generator() is not dataset.sampler.generator:
+                raise AssertionError("setup bound the wrong actual loader generator")
+            events.append("setup_actual_loader_sampler_bound")
+            if validation_dataset is not None:
+                module.validation_dataset = validation_dataset
+
+        def on_load_checkpoint_with_identity_check(
+            module: Any,
+            checkpoint_payload: Mapping[str, Any],
+        ) -> None:
+            if (
+                getattr(module, "train_dataset", None) is not dataset
+                or module._train_sampler_generator() is not dataset.sampler.generator
+            ):
+                raise AssertionError(
+                    "checkpoint restore target is not the actual loader generator"
+                )
+            events.append("on_load_checkpoint_actual_loader_sampler_verified")
+            original_on_load_checkpoint(checkpoint_payload)
+            sampler_payload = checkpoint_payload.get(
+                module._TRAIN_SAMPLER_CHECKPOINT_KEY
+            )
+            expected_state = (
+                sampler_payload.get("generator_state")
+                if isinstance(sampler_payload, Mapping)
+                else None
+            )
+            actual_state = module._train_sampler_generator().get_state()
+            if not isinstance(expected_state, torch.Tensor) or not torch.equal(
+                actual_state.detach().cpu(),
+                expected_state.detach().cpu(),
+            ):
+                raise AssertionError(
+                    "checkpoint state was not restored to the actual loader generator"
+                )
+            binding["restored_to_actual_loader_generator"] = True
+            events.append("on_load_checkpoint_actual_loader_sampler_restored")
+
+        system.setup = MethodType(setup_with_pinned_dataset, system)
+        system.on_load_checkpoint = MethodType(
+            on_load_checkpoint_with_identity_check,
+            system,
+        )
+        return binding
+
+    def pinned_batch_loader(
+        num_samples: int,
+    ) -> tuple[PinnedBatchDataset, Any]:
+        dataset = PinnedBatchDataset(num_samples)
+        return dataset, DataLoader(
+            dataset,
+            batch_size=None,
+            sampler=dataset.sampler,
+            num_workers=0,
+            collate_fn=lambda item: item,
+        )
+
+    def pinned_validation_loader(batch: Any) -> Any:
+        return DataLoader(
+            [None],
+            batch_size=None,
+            num_workers=0,
+            collate_fn=lambda _: batch,
+        )
+
+    def make_trainer(
+        *,
+        max_epochs: int,
+        max_steps: int,
+        root_dir: Path,
+        callbacks: Sequence[Any],
+        limit_val_batches: int,
+    ) -> Any:
+        return Trainer(
+            accelerator="gpu",
+            devices=[device.index],
+            max_epochs=max_epochs,
+            max_steps=max_steps,
+            accumulate_grad_batches=4,
+            limit_train_batches=_P2_FORMAL_TRAIN_BATCHES_PER_EPOCH,
+            limit_val_batches=limit_val_batches,
+            num_sanity_val_steps=0,
+            logger=False,
+            callbacks=list(callbacks),
+            default_root_dir=root_dir,
+            enable_progress_bar=False,
+            enable_model_summary=False,
+            deterministic=False,
+            use_distributed_sampler=False,
+        )
+
+    temporary_checkpoint = None
+    verified_resume_checkpoint = None
+    details = None
+    with tempfile.TemporaryDirectory(prefix="p2-lightning-checkpoint-") as directory:
+        checkpoint_dir = Path(directory)
+        temporary_checkpoint = checkpoint_dir / "last.ckpt"
+
+        source_config, source_system = _compose_runtime(
+            checkpoint,
+            device,
+            save_dir=checkpoint_dir,
+            scheduler_total_steps=_P2_FORMAL_ONECYCLE_TOTAL_STEPS,
+            lightning_weighted_sampler=True,
+        )
+        source_checkpoint_callbacks = _instantiate_formal_checkpoint_callbacks(
+            source_config
+        )
+        source_checkpoint_state_keys = {
+            callback.state_key for callback in source_checkpoint_callbacks
+        }
+        monitored_checkpoint_callbacks = [
+            callback
+            for callback in source_checkpoint_callbacks
+            if callback.monitor == "val_mean_t-AP" and callback.save_last
+        ]
+        if len(monitored_checkpoint_callbacks) != 1:
+            raise AssertionError(
+                "formal checkpoint config has no unique monitored save-last callback"
+            )
+        monitored_checkpoint_callback = monitored_checkpoint_callbacks[0]
+        model_class = f"{type(source_system).__module__}.{type(source_system).__name__}"
+        model_name = type(source_system.model).__name__
+        backbone_type = type(source_system.model.backbone.model)
+        backbone_class = f"{backbone_type.__module__}.{backbone_type.__name__}"
+        configured_datasets = source_config.data.train_dataset.datasets
+        if len(configured_datasets) != 1:
+            raise AssertionError("Lightning resume smoke requires one RIO dataset")
+        configured_rio = configured_datasets[0]
+        configured_data_dirs = configured_rio.data_dir
+        if isinstance(configured_data_dirs, str):
+            configured_data_dirs = [configured_data_dirs]
+        data_dir_names = {Path(path).name for path in configured_data_dirs}
+        if (
+            model_class != "trainer.trainer.InstanceSegmentation"
+            or model_name != "ReScene"
+            or not backbone_class.startswith("concerto.")
+            or configured_rio.dataset_name != "rio"
+            or data_dir_names != {"rio"}
+            or not source_config.general.p2_fail_closed_runtime
+        ):
+            raise AssertionError(
+                "Lightning resume smoke did not construct ReScene+Concerto on RIO"
+            )
+        parameter_names = tuple(name for name, _ in source_system.named_parameters())
+        source_trainable_parameter_names = {
+            name
+            for name, parameter in source_system.named_parameters()
+            if parameter.requires_grad
+        }
+        source_dataset, source_loader = pinned_batch_loader(
+            _P2_FORMAL_TRAIN_BATCHES_PER_EPOCH
+        )
+        (
+            source_validation_dataset,
+            source_validation_data,
+            source_validation_targets,
+            source_validation_names,
+            source_validation_sample,
+        ) = _materialize_smallest_validation_batch(source_config, device)
+        source_validation_loader = pinned_validation_loader(
+            (
+                source_validation_data,
+                source_validation_targets,
+                source_validation_names,
+            )
+        )
+        source_events: list[str] = []
+        source_binding = bind_pinned_dataset_on_setup(
+            source_system,
+            source_dataset,
+            source_events,
+            validation_dataset=source_validation_dataset,
+        )
+        source_trainer = make_trainer(
+            max_epochs=1,
+            max_steps=-1,
+            root_dir=checkpoint_dir,
+            callbacks=source_checkpoint_callbacks,
+            limit_val_batches=1,
+        )
+        source_trainer.fit(
+            source_system,
+            train_dataloaders=source_loader,
+            val_dataloaders=source_validation_loader,
+        )
+        if source_trainer.global_step != _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH:
+            raise AssertionError(
+                f"first Lightning fit stopped at global_step={source_trainer.global_step}"
+            )
+        source_train_dataset = getattr(source_system, "train_dataset", None)
+        if (
+            source_train_dataset is not source_dataset
+            or getattr(source_train_dataset, "sampler", None)
+            is not source_loader.sampler
+            or source_loader.sampler.generator is None
+            or not source_binding["configured_sampler_present"]
+            or source_events
+            != [
+                "setup_configured_sampler_verified",
+                "setup_actual_loader_sampler_bound",
+            ]
+            or len(source_dataset.sampled_indices) != _P2_FORMAL_TRAIN_BATCHES_PER_EPOCH
+        ):
+            raise AssertionError(
+                "single-RIO preflight did not train through its weighted sampler"
+            )
+        source_sampler_state_after_step = (
+            source_loader.sampler.generator.get_state().detach().cpu().clone()
+        )
+        sampler_source_state_advanced = not torch.equal(
+            source_sampler_state_after_step,
+            source_dataset.initial_generator_state,
+        )
+        if not sampler_source_state_advanced:
+            raise AssertionError("source weighted sampler generator did not advance")
+        monitored_callback_state = _cpu_snapshot(
+            monitored_checkpoint_callback.state_dict()
+        )
+        observed_val_batches = source_trainer.num_val_batches
+        source_validation_batch_count = (
+            sum(int(value) for value in observed_val_batches)
+            if isinstance(observed_val_batches, (list, tuple))
+            else int(observed_val_batches)
+        )
+        source_validation_dataset_name = source_validation_dataset.dataset_name
+        source_real_validation_path_executed = (
+            source_validation_batch_count == 1
+            and source_validation_dataset_name == "rio"
+            and bool(source_validation_sample["name"])
+        )
+        if not source_real_validation_path_executed:
+            raise AssertionError(
+                "Lightning source did not execute one real RIO validation batch"
+            )
+        monitored_topk_checkpoint = Path(monitored_callback_state["best_model_path"])
+        monitored_callback_history_populated = (
+            monitored_callback_state["monitor"] == "val_mean_t-AP"
+            and monitored_callback_state["best_model_score"] is not None
+            and monitored_callback_state["current_score"] is not None
+            and bool(monitored_callback_state["best_k_models"])
+            and monitored_topk_checkpoint.is_file()
+            and monitored_topk_checkpoint != temporary_checkpoint
+            and monitored_callback_state["last_model_path"] == str(temporary_checkpoint)
+        )
+        if not monitored_callback_history_populated:
+            raise AssertionError(
+                "real validation did not populate monitored checkpoint history"
+            )
+        monitored_topk_checkpoint_bytes = monitored_topk_checkpoint.stat().st_size
+        checkpoint_bytes = temporary_checkpoint.stat().st_size
+
+        selected_checkpoint = find_resume_checkpoint(
+            checkpoint_dir,
+            formal_p2=True,
+            cfg=source_config,
+        )
+        selected_by_main = selected_checkpoint == str(temporary_checkpoint)
+        if not selected_by_main:
+            raise AssertionError(
+                "main formal P2 resume selection missed Lightning checkpoint"
+            )
+        verified_resume_checkpoint = require_p2_resume_checkpoint(
+            source_config,
+            selected_checkpoint,
+        )
+        verified_resume_checkpoint = Path(verified_resume_checkpoint)
+        verified_snapshot_created = (
+            verified_resume_checkpoint.is_file()
+            and verified_resume_checkpoint != temporary_checkpoint
+            and verified_resume_checkpoint.parent == checkpoint_dir / ".verified_inputs"
+            and verified_resume_checkpoint.stat().st_size == checkpoint_bytes
+        )
+        if not verified_snapshot_created:
+            raise AssertionError(
+                "main formal P2 resume validation did not create a verified snapshot"
+            )
+        monitored_topk_checkpoint.unlink()
+        monitored_topk_checkpoint_removed = not monitored_topk_checkpoint.exists()
+        if not monitored_topk_checkpoint_removed:
+            raise AssertionError("temporary monitored top-k checkpoint was not removed")
+        source_config_semantic_sha256 = p2_training_semantic_sha256(source_config)
+
+        # This full-state pickle is trusted because it was created above in this temp dir.
+        saved = torch.load(
+            verified_resume_checkpoint,
+            map_location="cpu",
+            weights_only=False,
+        )
+        saved_checkpoint_callbacks = saved.pop("callbacks", None)
+        checkpoint_callbacks_nonempty = bool(saved_checkpoint_callbacks)
+        if not checkpoint_callbacks_nonempty:
+            raise AssertionError("Lightning full checkpoint has no callback state")
+        if (
+            not isinstance(saved_checkpoint_callbacks, Mapping)
+            or set(saved_checkpoint_callbacks) != source_checkpoint_state_keys
+        ):
+            raise AssertionError(
+                "Lightning full checkpoint does not contain all three formal "
+                "ModelCheckpoint states"
+            )
+        source_callback_states = {
+            callback.state_key: _cpu_snapshot(callback.state_dict())
+            for callback in source_checkpoint_callbacks
+        }
+        if not _recursive_equal(
+            saved_checkpoint_callbacks,
+            source_callback_states,
+        ):
+            raise AssertionError(
+                "saved formal ModelCheckpoint states differ from source Trainer"
+            )
+        sampler_checkpoint_key = source_system._TRAIN_SAMPLER_CHECKPOINT_KEY
+        sampler_payload = saved.pop(sampler_checkpoint_key, None)
+        if not isinstance(sampler_payload, Mapping):
+            raise TypeError(
+                "Lightning full checkpoint has no sampler generator payload"
+            )
+        sampler_generator_checkpointed = isinstance(
+            sampler_payload.get("generator_state"),
+            torch.Tensor,
+        )
+        sampler_resume_scope = sampler_payload.get("resume_scope")
+        if (
+            not sampler_generator_checkpointed
+            or sampler_resume_scope != source_system._TRAIN_SAMPLER_RESUME_SCOPE
+        ):
+            raise AssertionError("Lightning sampler checkpoint payload is invalid")
+        saved_sampler_state = sampler_payload["generator_state"].detach().cpu().clone()
+        if not torch.equal(saved_sampler_state, source_sampler_state_after_step):
+            raise AssertionError(
+                "checkpoint sampler state differs from the actual source loader"
+            )
+        expected_stream_generator = torch.Generator()
+        expected_stream_generator.set_state(saved_sampler_state)
+        expected_stream = iter(
+            WeightedRandomSampler(
+                weights=torch.ones(4, dtype=torch.double),
+                num_samples=_P2_FORMAL_TRAIN_BATCHES_PER_EPOCH,
+                replacement=True,
+                generator=expected_stream_generator,
+            )
+        )
+        expected_next_indices = [next(expected_stream) for _ in range(4)]
+        sampler_class = (
+            f"{type(source_loader.sampler).__module__}."
+            f"{type(source_loader.sampler).__name__}"
+        )
+        saved_state_dict = saved.pop("state_dict")
+        saved_model_digest = _tensor_digest(saved_state_dict.items())
+        optimizer_parameter_contract = saved.pop(
+            source_system._OPTIMIZER_PARAMETER_CONTRACT_KEY,
+            None,
+        )
+        optimizer_states = saved.pop("optimizer_states")
+        scheduler_states = saved.pop("lr_schedulers")
+        if len(optimizer_states) != 1 or len(scheduler_states) != 1:
+            raise AssertionError(
+                "Lightning full checkpoint requires one optimizer and one scheduler"
+            )
+        saved_optimizer = optimizer_states[0]
+        saved_scheduler = scheduler_states[0]
+        optimizer_parameter_ids = {
+            parameter_id
+            for group in saved_optimizer["param_groups"]
+            for parameter_id in group["params"]
+        }
+        optimizer_state_slot_ids = set(saved_optimizer["state"])
+        optimizer_state_slot_step_values = sorted(
+            {
+                float(
+                    slot["step"].item()
+                    if isinstance(slot["step"], torch.Tensor)
+                    else slot["step"]
+                )
+                for slot in saved_optimizer["state"].values()
+            }
+        )
+        optimizer_contract_parameters = (
+            optimizer_parameter_contract.get("parameters")
+            if isinstance(optimizer_parameter_contract, Mapping)
+            else None
+        )
+        optimizer_contract_parameter_ids = (
+            set(optimizer_contract_parameters)
+            if isinstance(optimizer_contract_parameters, Mapping)
+            else set()
+        )
+        optimizer_contract_parameter_names = (
+            {
+                metadata.get("name")
+                for metadata in optimizer_contract_parameters.values()
+                if isinstance(metadata, Mapping)
+            }
+            if isinstance(optimizer_contract_parameters, Mapping)
+            else set()
+        )
+        optimizer_contract_parameter_groups = (
+            optimizer_parameter_contract.get("param_groups")
+            if isinstance(optimizer_parameter_contract, Mapping)
+            else None
+        )
+        optimizer_parameter_group_order_matches_contract = (
+            optimizer_contract_parameter_groups
+            == [list(group["params"]) for group in saved_optimizer["param_groups"]]
+        )
+        trainable_parameter_schema = (
+            optimizer_parameter_contract.get("trainable_parameters")
+            if isinstance(optimizer_parameter_contract, Mapping)
+            else None
+        )
+        trainable_parameter_schema_sha256 = (
+            optimizer_parameter_contract.get("trainable_parameter_schema_sha256")
+            if isinstance(optimizer_parameter_contract, Mapping)
+            else None
+        )
+        expected_trainable_parameter_schema = [
+            [
+                metadata.get("name"),
+                metadata.get("shape"),
+                metadata.get("dtype"),
+            ]
+            for group in saved_optimizer["param_groups"]
+            for parameter_id in group["params"]
+            for metadata in [
+                optimizer_contract_parameters.get(parameter_id, {})
+                if isinstance(optimizer_contract_parameters, Mapping)
+                else {}
+            ]
+        ]
+        trainable_parameter_schema_payload = json.dumps(
+            trainable_parameter_schema
+            if isinstance(trainable_parameter_schema, list)
+            else [],
+            ensure_ascii=True,
+            separators=(",", ":"),
+        ).encode("ascii")
+        observed_trainable_parameter_schema_sha256 = hashlib.sha256(
+            trainable_parameter_schema_payload
+        ).hexdigest()
+        trainable_parameter_schema_order_matches_contract = (
+            isinstance(trainable_parameter_schema, list)
+            and trainable_parameter_schema == expected_trainable_parameter_schema
+        )
+        trainable_parameter_schema_matches_formal_contract = (
+            trainable_parameter_schema_order_matches_contract
+            and trainable_parameter_schema_sha256
+            == observed_trainable_parameter_schema_sha256
+            and trainable_parameter_schema_sha256
+            == _P2_FORMAL_TRAINABLE_PARAMETER_SCHEMA_SHA256
+        )
+        if not trainable_parameter_schema_matches_formal_contract:
+            raise AssertionError(
+                "formal Lightning checkpoint trainable parameter schema does not "
+                "match the main checkpoint contract"
+            )
+        trainable_parameter_schema_entry_count = len(trainable_parameter_schema)
+        trainable_parameter_schema_serialized_bytes = len(
+            trainable_parameter_schema_payload
+        )
+        optimizer_contract_state_dict = (
+            optimizer_parameter_contract.get("state_dict")
+            if isinstance(optimizer_parameter_contract, Mapping)
+            else None
+        )
+        model_state_schema_sha256 = (
+            optimizer_parameter_contract.get("state_dict_schema_sha256")
+            if isinstance(optimizer_parameter_contract, Mapping)
+            else None
+        )
+        model_state_schema_entry_count = (
+            len(optimizer_contract_state_dict)
+            if isinstance(optimizer_contract_state_dict, Mapping)
+            else 0
+        )
+        model_state_schema_serialized_bytes = (
+            len(
+                json.dumps(
+                    [
+                        [name, metadata["shape"], metadata["dtype"]]
+                        for name, metadata in sorted(
+                            optimizer_contract_state_dict.items()
+                        )
+                    ],
+                    ensure_ascii=True,
+                    separators=(",", ":"),
+                ).encode("ascii")
+            )
+            if isinstance(optimizer_contract_state_dict, Mapping)
+            else 0
+        )
+        model_state_schema_matches_formal_contract = (
+            model_state_schema_entry_count == len(saved_state_dict)
+            and set(optimizer_contract_state_dict) == set(saved_state_dict)
+            and model_state_schema_sha256 == _P2_FORMAL_MODEL_STATE_SCHEMA_SHA256
+        )
+        optimizer_state_slots_cover_all_trainable_parameters = (
+            bool(optimizer_parameter_ids)
+            and optimizer_parameter_ids == optimizer_state_slot_ids
+            and optimizer_parameter_ids == optimizer_contract_parameter_ids
+            and optimizer_parameter_group_order_matches_contract
+            and optimizer_contract_parameter_names == source_trainable_parameter_names
+            and trainable_parameter_schema_matches_formal_contract
+            and model_state_schema_matches_formal_contract
+        )
+        if not optimizer_state_slots_cover_all_trainable_parameters:
+            raise AssertionError(
+                "formal Lightning checkpoint optimizer state does not cover "
+                "every trainable parameter"
+            )
+        trainable_parameter_tensor_count = len(source_trainable_parameter_names)
+        optimizer_param_group_parameter_count = len(optimizer_parameter_ids)
+        optimizer_parameter_contract_count = len(optimizer_contract_parameter_ids)
+        optimizer_state_slot_count = len(optimizer_state_slot_ids)
+        optimizer_state_slot_step_min = min(optimizer_state_slot_step_values)
+        optimizer_state_slot_step_max = max(optimizer_state_slot_step_values)
+        optimizer_state_slots_all_at_global_step = optimizer_state_slot_step_values == [
+            float(_P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH)
+        ]
+        del optimizer_states, scheduler_states
+        saved_global_step = int(saved["global_step"])
+        saved_epoch = int(saved["epoch"])
+        saved_scheduler_last_epoch = int(saved_scheduler["last_epoch"])
+        fit_loop = saved["loops"]["fit_loop"]
+        fit_loop_epoch_total = dict(fit_loop["epoch_progress"]["total"])
+        fit_loop_batches_that_stepped = int(
+            fit_loop["epoch_loop.state_dict"]["_batches_that_stepped"]
+        )
+        fit_loop_optimizer_steps_completed = int(
+            fit_loop["epoch_loop.automatic_optimization.optim_progress"]["optimizer"][
+                "step"
+            ]["total"]["completed"]
+        )
+        fit_loop_scheduler_steps_completed = int(
+            fit_loop["epoch_loop.scheduler_progress"]["total"]["completed"]
+        )
+        fit_loop_train_batches_completed = int(
+            fit_loop["epoch_loop.batch_progress"]["total"]["completed"]
+        )
+        fit_loop_validation_batches_completed = int(
+            fit_loop["epoch_loop.val_loop.batch_progress"]["total"]["completed"]
+        )
+        source_checkpoint_generated_at_real_validation_epoch_end = (
+            fit_loop_epoch_total
+            == {
+                "ready": 1,
+                "completed": 0,
+                "started": 1,
+                "processed": 0,
+            }
+            and fit_loop_optimizer_steps_completed
+            == _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH
+            and fit_loop_scheduler_steps_completed
+            == _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH
+            and fit_loop_train_batches_completed == _P2_FORMAL_TRAIN_BATCHES_PER_EPOCH
+            and fit_loop_batches_that_stepped
+            == _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH - 1
+            and fit_loop_validation_batches_completed == 1
+            and monitored_callback_history_populated
+        )
+        if (
+            saved_epoch != 0
+            or saved_global_step != _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH
+            or saved_scheduler_last_epoch != _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH
+            or not source_checkpoint_generated_at_real_validation_epoch_end
+        ):
+            raise AssertionError(
+                "formal Lightning checkpoint is not a real epoch0 validation-end "
+                "checkpoint"
+            )
+        del saved, saved_state_dict
+        del source_sampler_state_after_step, expected_stream_generator
+        del sampler_payload, source_binding, monitored_callback_state
+        del monitored_checkpoint_callback, monitored_checkpoint_callbacks
+        del source_dataset, source_loader
+        del source_validation_data, source_validation_dataset
+        del source_validation_loader, source_validation_names
+        del source_validation_targets
+        del source_events, source_train_dataset
+        del source_callback_states, source_checkpoint_callbacks
+        del source_config, source_trainer, source_system
+        gc.collect()
+        torch.cuda.empty_cache()
+
+        resume_config, resumed_system = _compose_runtime(
+            checkpoint,
+            device,
+            save_dir=checkpoint_dir,
+            scheduler_total_steps=_P2_FORMAL_ONECYCLE_TOTAL_STEPS,
+            lightning_weighted_sampler=True,
+        )
+        resume_config_matches_checkpoint = (
+            p2_training_semantic_sha256(resume_config) == source_config_semantic_sha256
+        )
+        if not resume_config_matches_checkpoint:
+            raise AssertionError("resumed runtime config changed from saved config")
+        if (
+            tuple(name for name, _ in resumed_system.named_parameters())
+            != parameter_names
+        ):
+            raise AssertionError("resumed model parameter structure changed")
+        resumed_dataset, resumed_loader = pinned_batch_loader(
+            _P2_FORMAL_TRAIN_BATCHES_PER_EPOCH
+        )
+        resume_events: list[str] = []
+        resumed_binding = bind_pinned_dataset_on_setup(
+            resumed_system,
+            resumed_dataset,
+            resume_events,
+        )
+        probe = ResumeStateProbe(resume_events, resumed_dataset)
+        resumed_checkpoint_callbacks = _instantiate_formal_checkpoint_callbacks(
+            resume_config
+        )
+        resumed_trainer = make_trainer(
+            max_epochs=2,
+            max_steps=_P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH + 1,
+            root_dir=checkpoint_dir,
+            callbacks=[*resumed_checkpoint_callbacks, probe],
+            limit_val_batches=0,
+        )
+        restore_fit_completed = False
+        resumed_trainer.fit(
+            resumed_system,
+            train_dataloaders=resumed_loader,
+            ckpt_path=verified_resume_checkpoint,
+            weights_only=False,
+        )
+        restore_fit_completed = True
+        if probe.snapshot is None:
+            raise AssertionError(
+                "Lightning resume probe did not observe restored state"
+            )
+
+        model_restored = probe.snapshot["model_digest"] == saved_model_digest
+        optimizer_restored = _recursive_equal(
+            probe.snapshot["optimizer"], saved_optimizer
+        )
+        scheduler_restored = _recursive_equal(
+            probe.snapshot["scheduler"], saved_scheduler
+        )
+        checkpoint_callback_persistent_states_restored = _recursive_equal(
+            _persistent_checkpoint_callback_states(
+                probe.snapshot["checkpoint_callbacks"]
+            ),
+            _persistent_checkpoint_callback_states(saved_checkpoint_callbacks),
+        )
+        saved_monitored_current_score = saved_checkpoint_callbacks[
+            next(
+                state_key
+                for state_key, state in saved_checkpoint_callbacks.items()
+                if state.get("monitor") == "val_mean_t-AP"
+            )
+        ]["current_score"]
+        resumed_monitored_current_score = probe.snapshot["checkpoint_callbacks"][
+            next(
+                state_key
+                for state_key, state in probe.snapshot["checkpoint_callbacks"].items()
+                if state.get("monitor") == "val_mean_t-AP"
+            )
+        ]["current_score"]
+        checkpoint_callback_transient_score_not_restored = (
+            saved_monitored_current_score is not None
+            and resumed_monitored_current_score is None
+        )
+        sampler_state_restored = resumed_binding["restored_to_actual_loader_generator"]
+        del saved_checkpoint_callbacks, saved_optimizer, saved_scheduler
+
+        resumed_scheduler = resumed_trainer.lr_scheduler_configs[0].scheduler
+        final_model_digest = _tensor_digest(resumed_system.state_dict().items())
+        final_optimizer = _cpu_snapshot(resumed_trainer.optimizers[0].state_dict())
+        final_scheduler = _cpu_snapshot(resumed_scheduler.state_dict())
+        model_advanced = final_model_digest != probe.snapshot["model_digest"]
+        optimizer_advanced = not _recursive_equal(
+            final_optimizer, probe.snapshot["optimizer"]
+        )
+        scheduler_advanced = not _recursive_equal(
+            final_scheduler, probe.snapshot["scheduler"]
+        )
+        final_sampler_state = (
+            resumed_dataset.sampler.generator.get_state().detach().cpu().clone()
+        )
+        sampler_state_advanced = not torch.equal(
+            final_sampler_state,
+            saved_sampler_state,
+        )
+        sampler_stream_continuous = (
+            resumed_dataset.sampled_indices == expected_next_indices
+        )
+        sampler_state_restored_to_actual_loader_generator = resumed_binding[
+            "restored_to_actual_loader_generator"
+        ]
+        expected_restore_event_order = [
+            "setup_configured_sampler_verified",
+            "setup_actual_loader_sampler_bound",
+            "on_load_checkpoint_actual_loader_sampler_verified",
+            "on_load_checkpoint_actual_loader_sampler_restored",
+            "on_train_batch_start_state_observed",
+        ]
+        if resume_events != expected_restore_event_order:
+            raise AssertionError(
+                "unexpected Lightning sampler restore order: " + repr(resume_events)
+            )
+        restored_scheduler_last_epoch = int(probe.snapshot["scheduler"]["last_epoch"])
+        advanced_scheduler_last_epoch = int(final_scheduler["last_epoch"])
+        torch.cuda.synchronize(device)
+        elapsed = time.perf_counter() - started
+        peak_vram_mib = torch.cuda.max_memory_allocated(device) / 1024**2
+        details = {
+            "kind": "pytorch_lightning_full_checkpoint_resume",
+            "lightning_full_resume_validation": True,
+            "model_class": model_class,
+            "sample_name": sample_name,
+            "architecture": {
+                "model": model_name,
+                "backbone": "Concerto",
+                "backbone_class": backbone_class,
+            },
+            "data_scope": "single_real_3rscan_t2_window",
+            "scannet_used": False,
+            "mixed_sampler_resume_validation": False,
+            "sampler_scope": "single_real_3rscan_preflight_weighted_sampler",
+            "sampler_class": sampler_class,
+            "sampler_generator_checkpointed": sampler_generator_checkpointed,
+            "sampler_resume_scope": sampler_resume_scope,
+            "sampler_source_state_advanced": sampler_source_state_advanced,
+            "sampler_state_restored": sampler_state_restored,
+            "sampler_state_advanced": sampler_state_advanced,
+            "sampler_state_restored_to_actual_loader_generator": (
+                sampler_state_restored_to_actual_loader_generator
+            ),
+            "sampler_stream_continuous": sampler_stream_continuous,
+            "sampler_restore_event_order": list(resume_events),
+            "main_formal_resume_checkpoint_selected": selected_by_main,
+            "main_verified_resume_snapshot_used": (
+                verified_snapshot_created and restore_fit_completed
+            ),
+            "resume_config_matches_checkpoint": resume_config_matches_checkpoint,
+            "checkpoint_callbacks_nonempty": checkpoint_callbacks_nonempty,
+            "formal_model_checkpoint_callback_count": len(resumed_checkpoint_callbacks),
+            "formal_model_checkpoint_state_keys_unique": (
+                len(source_checkpoint_state_keys) == 3
+            ),
+            "formal_model_checkpoint_persistent_states_restored": (
+                checkpoint_callback_persistent_states_restored
+            ),
+            "formal_model_checkpoint_transient_current_score_policy": (
+                "not_restored_by_pytorch_lightning_2_6_5"
+            ),
+            "formal_model_checkpoint_transient_current_score_not_restored": (
+                checkpoint_callback_transient_score_not_restored
+            ),
+            "source_real_validation_path_executed": (
+                source_real_validation_path_executed
+            ),
+            "source_validation_batch_count": source_validation_batch_count,
+            "source_validation_dataset": source_validation_dataset_name,
+            "source_validation_sample": source_validation_sample,
+            "monitored_callback_history_populated": (
+                monitored_callback_history_populated
+            ),
+            "monitored_topk_checkpoint_bytes": (monitored_topk_checkpoint_bytes),
+            "monitored_topk_checkpoint_removed": (monitored_topk_checkpoint_removed),
+            "source_checkpoint_generated_at_real_validation_epoch_end": (
+                source_checkpoint_generated_at_real_validation_epoch_end
+            ),
+            "source_fit_loop_progress": {
+                "epoch_total": fit_loop_epoch_total,
+                "batches_that_stepped": fit_loop_batches_that_stepped,
+                "optimizer_steps_completed": (fit_loop_optimizer_steps_completed),
+                "scheduler_steps_completed": (fit_loop_scheduler_steps_completed),
+                "train_batches_completed": fit_loop_train_batches_completed,
+                "validation_batches_completed": (fit_loop_validation_batches_completed),
+            },
+            "lightning_ckpt_path_restore": restore_fit_completed,
+            "lightning_fit_weights_only": False,
+            "checkpoint_bytes": checkpoint_bytes,
+            "elapsed_seconds": elapsed,
+            "peak_allocated_vram_mib": peak_vram_mib,
+            "formal_optimizer_steps_per_epoch": (_P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH),
+            "formal_train_batches_per_epoch": (_P2_FORMAL_TRAIN_BATCHES_PER_EPOCH),
+            "gradient_accumulation_steps": 4,
+            "formal_completed_epoch_boundary": (
+                saved_epoch == 0
+                and saved_global_step == _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH
+            ),
+            "trainable_parameter_tensor_count": (trainable_parameter_tensor_count),
+            "optimizer_param_group_parameter_count": (
+                optimizer_param_group_parameter_count
+            ),
+            "optimizer_parameter_contract_count": (optimizer_parameter_contract_count),
+            "optimizer_parameter_group_order_matches_contract": (
+                optimizer_parameter_group_order_matches_contract
+            ),
+            "trainable_parameter_schema_entry_count": (
+                trainable_parameter_schema_entry_count
+            ),
+            "trainable_parameter_schema_serialized_bytes": (
+                trainable_parameter_schema_serialized_bytes
+            ),
+            "trainable_parameter_schema_sha256": (
+                trainable_parameter_schema_sha256
+            ),
+            "trainable_parameter_schema_order_matches_contract": (
+                trainable_parameter_schema_order_matches_contract
+            ),
+            "trainable_parameter_schema_matches_formal_contract": (
+                trainable_parameter_schema_matches_formal_contract
+            ),
+            "optimizer_state_slot_count": optimizer_state_slot_count,
+            "optimizer_state_slot_step_unique_values": (
+                optimizer_state_slot_step_values
+            ),
+            "optimizer_state_slot_step_min": optimizer_state_slot_step_min,
+            "optimizer_state_slot_step_max": optimizer_state_slot_step_max,
+            "optimizer_state_slots_all_at_global_step": (
+                optimizer_state_slots_all_at_global_step
+            ),
+            "optimizer_state_slots_cover_all_trainable_parameters": (
+                optimizer_state_slots_cover_all_trainable_parameters
+            ),
+            "model_state_schema_entry_count": model_state_schema_entry_count,
+            "model_state_schema_serialized_bytes": (
+                model_state_schema_serialized_bytes
+            ),
+            "model_state_schema_sha256": model_state_schema_sha256,
+            "model_state_schema_matches_formal_contract": (
+                model_state_schema_matches_formal_contract
+            ),
+            "saved_epoch": saved_epoch,
+            "saved_global_step": saved_global_step,
+            "restored_global_step": probe.snapshot["global_step"],
+            "advanced_global_step": int(resumed_trainer.global_step),
+            "model_state_scope": "lightning_module_state_dict",
+            "model_state_restored": model_restored,
+            "optimizer_state_restored": optimizer_restored,
+            "scheduler_state_restored": scheduler_restored,
+            "model_state_advanced": model_advanced,
+            "optimizer_state_advanced": optimizer_advanced,
+            "scheduler_state_advanced": scheduler_advanced,
+            "saved_scheduler_last_epoch": saved_scheduler_last_epoch,
+            "restored_scheduler_last_epoch": restored_scheduler_last_epoch,
+            "advanced_scheduler_last_epoch": advanced_scheduler_last_epoch,
+        }
+
+        del saved_sampler_state
+        del final_optimizer, final_scheduler, final_sampler_state, probe
+        del resumed_binding, resumed_checkpoint_callbacks
+        del resumed_dataset, resumed_loader, resume_events
+        del resumed_trainer, resumed_system
+
+    if (
+        details is None
+        or temporary_checkpoint is None
+        or verified_resume_checkpoint is None
+    ):
+        raise AssertionError("Lightning checkpoint resume smoke produced no result")
+    details["temporary_checkpoint_removed"] = not temporary_checkpoint.exists()
+    details["verified_resume_snapshot_removed"] = (
+        not verified_resume_checkpoint.exists()
+    )
+    checks = {
+        "main_formal_resume_checkpoint_selected": details[
+            "main_formal_resume_checkpoint_selected"
+        ],
+        "main_verified_resume_snapshot_used": details[
+            "main_verified_resume_snapshot_used"
+        ],
+        "resume_config_matches_checkpoint": details["resume_config_matches_checkpoint"],
+        "sampler_generator_checkpointed": details["sampler_generator_checkpointed"],
+        "sampler_source_state_advanced": details["sampler_source_state_advanced"],
+        "sampler_state_restored": details["sampler_state_restored"],
+        "sampler_state_advanced": details["sampler_state_advanced"],
+        "sampler_state_restored_to_actual_loader_generator": details[
+            "sampler_state_restored_to_actual_loader_generator"
+        ],
+        "sampler_stream_continuous": details["sampler_stream_continuous"],
+        "checkpoint_callbacks_nonempty": details["checkpoint_callbacks_nonempty"],
+        "formal_model_checkpoint_callback_count_is_3": (
+            details["formal_model_checkpoint_callback_count"] == 3
+        ),
+        "formal_model_checkpoint_state_keys_unique": details[
+            "formal_model_checkpoint_state_keys_unique"
+        ],
+        "formal_model_checkpoint_persistent_states_restored": details[
+            "formal_model_checkpoint_persistent_states_restored"
+        ],
+        "formal_model_checkpoint_transient_current_score_not_restored": details[
+            "formal_model_checkpoint_transient_current_score_not_restored"
+        ],
+        "source_real_validation_path_executed": details[
+            "source_real_validation_path_executed"
+        ],
+        "monitored_callback_history_populated": details[
+            "monitored_callback_history_populated"
+        ],
+        "monitored_topk_checkpoint_removed": details[
+            "monitored_topk_checkpoint_removed"
+        ],
+        "source_checkpoint_generated_at_real_validation_epoch_end": details[
+            "source_checkpoint_generated_at_real_validation_epoch_end"
+        ],
+        "lightning_ckpt_path_restore": details["lightning_ckpt_path_restore"],
+        "formal_completed_epoch_boundary": details["formal_completed_epoch_boundary"],
+        "optimizer_state_slots_cover_all_trainable_parameters": details[
+            "optimizer_state_slots_cover_all_trainable_parameters"
+        ],
+        "optimizer_parameter_group_order_matches_contract": details[
+            "optimizer_parameter_group_order_matches_contract"
+        ],
+        "model_state_schema_matches_formal_contract": details[
+            "model_state_schema_matches_formal_contract"
+        ],
+        "saved_global_step_is_66": details["saved_global_step"] == 66,
+        "restored_global_step_is_66": details["restored_global_step"] == 66,
+        "advanced_global_step_is_67": details["advanced_global_step"] == 67,
+        "model_state_restored": details["model_state_restored"],
+        "optimizer_state_restored": details["optimizer_state_restored"],
+        "scheduler_state_restored": details["scheduler_state_restored"],
+        "model_state_advanced": details["model_state_advanced"],
+        "optimizer_state_advanced": details["optimizer_state_advanced"],
+        "scheduler_state_advanced": details["scheduler_state_advanced"],
+        "saved_scheduler_last_epoch_is_66": (
+            details["saved_scheduler_last_epoch"] == 66
+        ),
+        "restored_scheduler_last_epoch_is_66": (
+            details["restored_scheduler_last_epoch"] == 66
+        ),
+        "advanced_scheduler_last_epoch_is_67": (
+            details["advanced_scheduler_last_epoch"] == 67
+        ),
+        "temporary_checkpoint_removed": details["temporary_checkpoint_removed"],
+        "verified_resume_snapshot_removed": details["verified_resume_snapshot_removed"],
+    }
+    details["passed"] = all(checks.values())
+    if not details["passed"]:
+        failed = [key for key, passed in checks.items() if not passed]
+        raise AssertionError(
+            "Lightning full checkpoint resume validation failed: " + ", ".join(failed)
+        )
+    gc.collect()
+    torch.cuda.empty_cache()
+    return details
+
+
 def _hardware(device: Any) -> dict[str, Any]:
     import torch
 
@@ -668,14 +1979,189 @@ def _git_commit() -> str:
     ).stdout.strip()
 
 
-def run_native_smoke(checkpoint: Path, device: Any) -> dict[str, Any]:
+def _build_source_tree_contract(
+    source_commit: str | None = None,
+) -> dict[str, Any]:
+    from utils.p2_preflight import build_p2_source_tree_contract
+
+    return build_p2_source_tree_contract(
+        source_commit=source_commit,
+        repo_root=PROJECT_ROOT,
+    )
+
+
+def _build_runtime_source_contract() -> dict[str, Any]:
+    from utils.p2_preflight import build_p2_runtime_source_contract
+
+    return build_p2_runtime_source_contract(repo_root=PROJECT_ROOT)
+
+
+def _build_runtime_environment_contract() -> dict[str, Any]:
+    from utils.p2_preflight import build_p2_runtime_environment_contract
+
+    return build_p2_runtime_environment_contract()
+
+
+def _tracked_tree_record_is_clean(record: Mapping[str, Any]) -> bool:
+    expected = record.get("expected_tracked_tree_sha256")
+    observed = record.get("observed_tracked_tree_sha256")
+    return (
+        record.get("index_flag_paths") == []
+        and isinstance(expected, str)
+        and len(expected) == 64
+        and all(character in "0123456789abcdef" for character in expected)
+        and observed == expected
+    )
+
+
+def _require_passing_source_tree_contract(contract: Mapping[str, Any]) -> None:
+    committed_paths = contract.get("committed_paths_since_source")
+    dirty_paths = contract.get("dirty_paths")
+    if (
+        contract.get("schema_version") == 1
+        and contract.get("status") == "pass"
+        and contract.get("allowed_dirty_prefixes") == [SOURCE_TREE_ARTIFACT_PREFIX]
+        and isinstance(committed_paths, list)
+        and all(
+            path.startswith(SOURCE_TREE_ARTIFACT_PREFIX) for path in committed_paths
+        )
+        and isinstance(dirty_paths, list)
+        and all(path.startswith(SOURCE_TREE_ARTIFACT_PREFIX) for path in dirty_paths)
+        and _tracked_tree_record_is_clean(contract)
+        and not contract.get("disallowed_committed_paths")
+        and not contract.get("disallowed_dirty_paths")
+        and not contract.get("errors")
+    ):
+        return
+    problems = [
+        *list(contract.get("disallowed_committed_paths") or []),
+        *list(contract.get("disallowed_dirty_paths") or []),
+        *list(contract.get("errors") or []),
+    ]
+    if not problems:
+        problems.append("invalid_source_tree_contract")
+    raise RuntimeError(
+        "P2 GPU artifact source tree contract is not pass: "
+        + ", ".join(str(problem) for problem in problems)
+    )
+
+
+def _require_passing_runtime_source_contract(
+    contract: Mapping[str, Any],
+) -> None:
+    repositories = contract.get("repositories")
+    if (
+        contract.get("schema_version") == 1
+        and contract.get("status") == "pass"
+        and isinstance(repositories, Mapping)
+        and bool(repositories)
+        and all(
+            isinstance(record, Mapping)
+            and record.get("status") == "pass"
+            and record.get("errors") == []
+            and _tracked_tree_record_is_clean(record)
+            for record in repositories.values()
+        )
+        and contract.get("errors") == []
+    ):
+        return
+    problems = list(contract.get("errors") or [])
+    if not problems:
+        problems.append("invalid_runtime_source_contract")
+    raise RuntimeError(
+        "P2 GPU artifact runtime source contract is not pass: "
+        + ", ".join(str(problem) for problem in problems)
+    )
+
+
+def _require_passing_runtime_environment_contract(
+    contract: Mapping[str, Any],
+) -> None:
+    from utils.p2_preflight import _validate_runtime_environment_contract
+
+    problems: list[str] = []
+    _validate_runtime_environment_contract(
+        {"runtime_environment_contract": contract},
+        problems,
+    )
+    if not problems:
+        return
+    raise RuntimeError(
+        "P2 GPU artifact runtime environment contract is not pass: "
+        + ", ".join(str(problem) for problem in problems)
+    )
+
+
+def _begin_source_tree_contract() -> dict[str, Any]:
+    contract = _build_source_tree_contract()
+    _require_passing_source_tree_contract(contract)
+    runtime_contract = _build_runtime_source_contract()
+    _require_passing_runtime_source_contract(runtime_contract)
+    runtime_environment_contract = _build_runtime_environment_contract()
+    _require_passing_runtime_environment_contract(runtime_environment_contract)
+    source_commit = contract.get("observed_head")
+    if (
+        not isinstance(source_commit, str)
+        or len(source_commit) != 40
+        or any(character not in "0123456789abcdef" for character in source_commit)
+    ):
+        raise RuntimeError("P2 GPU artifact generation requires a full Git HEAD")
+    if contract.get("source_commit") != source_commit:
+        raise RuntimeError("P2 GPU artifact source commit differs from Git HEAD")
+    if _git_commit() != source_commit:
+        raise RuntimeError("Git HEAD changed during generation preflight")
+    return {
+        "source_commit": source_commit,
+        "source_tree_contract_before": contract,
+        "runtime_source_contract_before": copy.deepcopy(runtime_contract),
+        "runtime_environment_contract_before": copy.deepcopy(
+            runtime_environment_contract
+        ),
+    }
+
+
+def _finalize_source_tree_contract(
+    guard: Mapping[str, Any],
+) -> dict[str, Any]:
+    source_commit = str(guard["source_commit"])
+    if _git_commit() != source_commit:
+        raise RuntimeError("Git HEAD changed during generation")
+    contract = _build_source_tree_contract(source_commit)
+    if contract.get("observed_head") != source_commit:
+        raise RuntimeError("Git HEAD changed during generation")
+    _require_passing_source_tree_contract(contract)
+    runtime_contract = _build_runtime_source_contract()
+    _require_passing_runtime_source_contract(runtime_contract)
+    if runtime_contract != guard.get("runtime_source_contract_before"):
+        raise RuntimeError("P2 runtime source changed during generation")
+    runtime_environment_contract = _build_runtime_environment_contract()
+    _require_passing_runtime_environment_contract(runtime_environment_contract)
+    if runtime_environment_contract != guard.get("runtime_environment_contract_before"):
+        raise RuntimeError("P2 runtime environment changed during generation")
+    result = dict(contract)
+    result["generation_head_unchanged"] = True
+    result["dirty_paths_before_generation"] = list(
+        guard["source_tree_contract_before"]["dirty_paths"]
+    )
+    return result
+
+
+def run_native_smoke(
+    checkpoint: Path,
+    device: Any,
+    *,
+    source_tree_guard: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    import gc
+
     import torch
 
+    source_tree_guard = source_tree_guard or _begin_source_tree_contract()
     seed_everything(SEED)
     torch.cuda.reset_peak_memory_stats(device)
     started = time.perf_counter()
     config, system = _compose_runtime(checkpoint, device)
-    data, targets, sample = _materialize_named_train_batch(
+    data, targets, sample, input_provenance = _materialize_named_train_batch(
         config, TINY_SAMPLE_NAME, device
     )
     groups = classify_parameters(system.named_parameters())
@@ -740,6 +2226,19 @@ def run_native_smoke(checkpoint: Path, device: Any) -> dict[str, Any]:
     all_after_first_step = _tensor_digest(system.named_parameters())
     if trainable_after_first == trainable_before:
         raise AssertionError("native decoder/head parameters did not update")
+    raw_losses = {
+        key: float(value.detach().cpu())
+        for key, value in losses.items()
+        if not _is_contrastive_diagnostic(key)
+    }
+    first_step_weighted_objective = float(breakdown["objective"].detach().cpu())
+    first_step_final_head_segmentation = float(
+        breakdown["final_head_segmentation"].detach().cpu()
+    )
+    first_step_aggregate_contrastive = float(
+        breakdown["aggregate_contrastive"].detach().cpu()
+    )
+    del _output, losses, breakdown
 
     with tempfile.TemporaryDirectory(prefix="p2-native-checkpoint-") as directory:
         checkpoint_path = Path(directory) / "roundtrip.ckpt"
@@ -793,28 +2292,43 @@ def run_native_smoke(checkpoint: Path, device: Any) -> dict[str, Any]:
             raise AssertionError(
                 "restored checkpoint did not advance one optimizer step"
             )
+        del loaded, saved_optimizer, saved_scheduler, restored_optimizer
+    native_checkpoint_removed = not checkpoint_path.exists()
+    if not native_checkpoint_removed:
+        raise AssertionError("native roundtrip checkpoint was not removed")
 
-    torch.cuda.synchronize(device)
     frozen_after = _tensor_digest(_named_subset(system, groups["frozen_encoder"]))
     trainable_after = _tensor_digest(_named_subset(system, trainable_names))
     evaluator = _run_validation_evaluator(system, config, device)
     torch.cuda.synchronize(device)
-    elapsed = time.perf_counter() - started
-    raw_losses = {
-        key: float(value.detach().cpu())
-        for key, value in losses.items()
-        if not _is_contrastive_diagnostic(key)
-    }
+    native_elapsed = time.perf_counter() - started
+    native_peak_vram_mib = torch.cuda.max_memory_allocated(device) / 1024**2
+
+    scheduler_last_epoch = int(scheduler.last_epoch)
+    del optimizer, scheduler, system
+    gc.collect()
+    torch.cuda.empty_cache()
+
+    lightning_resume = _run_lightning_checkpoint_resume(
+        checkpoint,
+        device,
+        data,
+        targets,
+        sample["name"],
+    )
+
     report = {
         "scope": "preflight-only",
+        "verification_mode": "artifact_contract_not_reexecution",
         "official_mixed_data_reproduction": False,
         "g2_evidence": False,
         "seed": SEED,
-        "source_commit": _git_commit(),
+        "source_commit": source_tree_guard["source_commit"],
         "checkpoint": checkpoint_provenance(checkpoint),
         "hardware": _hardware(device),
         "dependencies": _dependency_provenance(),
         "sample": sample,
+        "input_provenance": input_provenance,
         "objective_contract": {
             "segmentation_weights": {"class": 2.0, "mask": 5.0, "dice": 2.0},
             "aggregate_contrastive_counted_once": True,
@@ -822,11 +2336,10 @@ def run_native_smoke(checkpoint: Path, device: Any) -> dict[str, Any]:
         },
         "smoke": {
             "passed": True,
-            "elapsed_seconds": elapsed,
-            "peak_allocated_vram_mib": torch.cuda.max_memory_allocated(device)
-            / 1024**2,
+            "elapsed_seconds": native_elapsed,
+            "peak_allocated_vram_mib": native_peak_vram_mib,
             "optimizer_global_step": global_step,
-            "scheduler_last_epoch": scheduler.last_epoch,
+            "scheduler_last_epoch": scheduler_last_epoch,
             "initial_lr": initial_lr,
             "lr_after_first_step": lr_after_first_step,
             "first_step_model_bitwise_changed": (
@@ -837,15 +2350,9 @@ def run_native_smoke(checkpoint: Path, device: Any) -> dict[str, Any]:
             "segment_contrastive_positive": raw_losses["loss_segment_contrastive"]
             > 1e-8,
             "raw_objective_losses": raw_losses,
-            "first_step_weighted_objective": float(
-                breakdown["objective"].detach().cpu()
-            ),
-            "first_step_final_head_segmentation": float(
-                breakdown["final_head_segmentation"].detach().cpu()
-            ),
-            "first_step_aggregate_contrastive": float(
-                breakdown["aggregate_contrastive"].detach().cpu()
-            ),
+            "first_step_weighted_objective": first_step_weighted_objective,
+            "first_step_final_head_segmentation": (first_step_final_head_segmentation),
+            "first_step_aggregate_contrastive": first_step_aggregate_contrastive,
             "first_step_matching": quality,
             "gradients": {
                 "frozen_encoder": frozen_grad,
@@ -860,29 +2367,51 @@ def run_native_smoke(checkpoint: Path, device: Any) -> dict[str, Any]:
             "passed": restored and advanced_after_restore,
             "kind": "native_model_optimizer_scheduler_state_roundtrip",
             "lightning_full_resume_validation": False,
-            "temporary_checkpoint_removed": True,
+            "temporary_checkpoint_removed": native_checkpoint_removed,
             "checkpoint_bytes": saved_bytes,
             "restored_global_step": 1,
             "advanced_global_step": global_step,
             "advanced_model_bitwise_changed": advanced_model_changed,
             "advanced_optimizer_state_changed": advanced_optimizer_changed,
         },
+        "lightning_checkpoint_resume": lightning_resume,
         "validation_evaluator": evaluator,
     }
     if not report["smoke"]["encoder_bitwise_unchanged"]:
         raise AssertionError("frozen Concerto encoder changed during native smoke")
-    _write_json(report, ARTIFACT_DIR / "native_smoke_report.json")
+    report_path = ARTIFACT_DIR / "native_smoke_report.json"
+    report["runtime_source_contract"] = copy.deepcopy(
+        source_tree_guard["runtime_source_contract_before"]
+    )
+    report["runtime_environment_contract"] = copy.deepcopy(
+        source_tree_guard["runtime_environment_contract_before"]
+    )
+    report["source_tree_contract"] = _finalize_source_tree_contract(source_tree_guard)
+    _write_json(report, report_path)
+    report["source_tree_contract"] = _finalize_source_tree_contract(source_tree_guard)
+    _write_json(report, report_path)
+    if (
+        _finalize_source_tree_contract(source_tree_guard)
+        != report["source_tree_contract"]
+    ):
+        raise RuntimeError("source tree changed while finalizing native artifact")
     return report
 
 
-def run_tiny_overfit(checkpoint: Path, device: Any) -> dict[str, Any]:
+def run_tiny_overfit(
+    checkpoint: Path,
+    device: Any,
+    *,
+    source_tree_guard: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     import torch
 
+    source_tree_guard = source_tree_guard or _begin_source_tree_contract()
     seed_everything(SEED)
     torch.cuda.reset_peak_memory_stats(device)
     started = time.perf_counter()
     config, system = _compose_runtime(checkpoint, device)
-    data, targets, sample = _materialize_named_train_batch(
+    data, targets, sample, input_provenance = _materialize_named_train_batch(
         config, TINY_SAMPLE_NAME, device
     )
     groups = classify_parameters(system.named_parameters())
@@ -940,14 +2469,16 @@ def run_tiny_overfit(checkpoint: Path, device: Any) -> dict[str, Any]:
     passed = gate_result["passed"] and encoder_unchanged and decoder_head_changed
     report = {
         "scope": "preflight-only",
+        "verification_mode": "artifact_contract_not_reexecution",
         "official_mixed_data_reproduction": False,
         "g2_evidence": False,
         "seed": SEED,
-        "source_commit": _git_commit(),
+        "source_commit": source_tree_guard["source_commit"],
         "checkpoint": checkpoint_provenance(checkpoint),
         "hardware": _hardware(device),
         "sample_name": TINY_SAMPLE_NAME,
         "sample": sample,
+        "input_provenance": input_provenance,
         "optimizer": "AdamW",
         "scheduler": "OneCycleLR",
         "max_lr": 5e-4,
@@ -960,14 +2491,30 @@ def run_tiny_overfit(checkpoint: Path, device: Any) -> dict[str, Any]:
         "passed": passed,
         "history": history,
     }
-    _write_json(report, ARTIFACT_DIR / "tiny_overfit_report.json")
+    report["runtime_source_contract"] = copy.deepcopy(
+        source_tree_guard["runtime_source_contract_before"]
+    )
+    report["runtime_environment_contract"] = copy.deepcopy(
+        source_tree_guard["runtime_environment_contract_before"]
+    )
+    report["source_tree_contract"] = _finalize_source_tree_contract(source_tree_guard)
     markdown = render_tiny_overfit_markdown(
         report,
         sample_name=TINY_SAMPLE_NAME,
         elapsed_seconds=elapsed,
         peak_vram_mib=report["peak_allocated_vram_mib"],
     )
-    _write_text(markdown, ARTIFACT_DIR / "tiny_overfit_report.md")
+    report_path = ARTIFACT_DIR / "tiny_overfit_report.json"
+    markdown_path = ARTIFACT_DIR / "tiny_overfit_report.md"
+    _write_json(report, report_path)
+    _write_text(markdown, markdown_path)
+    report["source_tree_contract"] = _finalize_source_tree_contract(source_tree_guard)
+    _write_json(report, report_path)
+    if (
+        _finalize_source_tree_contract(source_tree_guard)
+        != report["source_tree_contract"]
+    ):
+        raise RuntimeError("source tree changed while finalizing tiny artifact")
     if not passed:
         failed = [name for name, value in report["gates"].items() if not value]
         if not encoder_unchanged:
@@ -990,19 +2537,31 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     os.chdir(PROJECT_ROOT)
-    import torch
+    source_tree_guard = _begin_source_tree_contract()
+    try:
+        import torch
 
-    if not torch.cuda.is_available():
-        raise RuntimeError("CUDA is required for the P2 native training checks")
-    checkpoint_provenance(args.checkpoint)
-    device = torch.device("cuda", args.device)
-    torch.cuda.set_device(device)
-    torch.set_float32_matmul_precision("high")
-    _hardware(device)
-    if args.mode in {"all", "smoke"}:
-        run_native_smoke(args.checkpoint, device)
-    if args.mode in {"all", "tiny"}:
-        run_tiny_overfit(args.checkpoint, device)
+        if not torch.cuda.is_available():
+            raise RuntimeError("CUDA is required for the P2 native training checks")
+        checkpoint_provenance(args.checkpoint)
+        device = torch.device("cuda", args.device)
+        torch.cuda.set_device(device)
+        torch.set_float32_matmul_precision("high")
+        _hardware(device)
+        if args.mode in {"all", "smoke"}:
+            run_native_smoke(
+                args.checkpoint,
+                device,
+                source_tree_guard=source_tree_guard,
+            )
+        if args.mode in {"all", "tiny"}:
+            run_tiny_overfit(
+                args.checkpoint,
+                device,
+                source_tree_guard=source_tree_guard,
+            )
+    finally:
+        _finalize_source_tree_contract(source_tree_guard)
     return 0
 
 

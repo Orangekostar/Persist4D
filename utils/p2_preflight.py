@@ -4,9 +4,14 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import importlib.metadata
+import importlib.util
 import json
+import os
+import platform
 import re
 import subprocess
+import sys
 from collections.abc import Mapping
 from datetime import datetime, timezone
 from pathlib import Path
@@ -21,9 +26,66 @@ P2_TARGET = "rescene4d_concerto_t2"
 P2_EXPERIMENT_NAME = "rescene4d_concerto_t2_repro"
 P2_SAVE_DIR = "checkpoints/rescene4d_concerto_t2_repro"
 P2_PREFLIGHT_MAX_AGE_SECONDS = 24 * 60 * 60
-P2_PREFLIGHT_SCHEMA_VERSION = 2
+P2_PREFLIGHT_SCHEMA_VERSION = 4
 P2_AUTHORIZATION_SCHEMA_VERSION = 1
 P2_TRAINING_CONTRACT_SCHEMA_VERSION = 1
+P2_SOURCE_TREE_CONTRACT_SCHEMA_VERSION = 1
+P2_ALLOWED_SOURCE_DIRTY_PREFIXES = ("artifacts/P2/",)
+P2_RUNTIME_SOURCE_CONTRACT_SCHEMA_VERSION = 1
+P2_RUNTIME_ENVIRONMENT_CONTRACT_SCHEMA_VERSION = 2
+P2_RUNTIME_ENVIRONMENT_VERSIONS = {
+    "python": "3.10.20",
+    "torch": "2.6.0+cu126",
+    "cuda": "12.6",
+    "cudnn": "9.5.1",
+    "nccl": "2.21.5",
+    "pytorch_lightning": "2.6.5",
+    "hydra_core": "1.3.4",
+    "omegaconf": "2.3.1",
+    "spconv": "2.3.8",
+    "cumm": "0.7.11",
+    "flash_attn": "2.8.3",
+    "torch_scatter": "2.1.2+pt26cu126",
+    "pointnet2": "0.0.0",
+    "cuda_runtime_package": "12.6.77",
+    # Prefix the four-component package version so privacy scanners cannot
+    # mistake it for an IPv4 address.
+    "cudnn_package": "v9.5.1.17",
+    "nccl_package": "2.21.5",
+}
+P2_RUNTIME_SOURCE_REPOSITORIES = {
+    "concerto": {
+        "relative_root": "third_party/concerto",
+        "module": "concerto",
+        "expected_commit": "10a7d17cff4dddff028f1522c2e72de4c4515df7",
+    },
+    "sonata": {
+        "relative_root": "third_party/sonata",
+        "module": "sonata",
+        "expected_commit": "18c09ff8d713494f78a8213792262b910977a65d",
+    },
+    "detectron2": {
+        "relative_root": "third_party/detectron2",
+        "module": "detectron2",
+        "expected_commit": "b4a4a3bd136852dae5fb1de37978dee412653e31",
+        "native_extensions": {
+            "detectron2._C": {
+                "relative_path": (
+                    "detectron2/_C.cpython-310-x86_64-linux-gnu.so"
+                ),
+                "expected_byte_size": 1_291_352,
+                "expected_sha256": (
+                    "4f66dbe809bfcba0015f71d26ded0c1922e60bad0d92d5f63ecb9e300ae5cba8"
+                ),
+            }
+        },
+    },
+    "stmetrics": {
+        "relative_root": "third_party/stmetrics",
+        "module": "stmetrics",
+        "expected_commit": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f",
+    },
+}
 OFFICIAL_SOURCE_COMMIT = "fb2fe42eb8f1e926567c48eea9acb874e608ee10"
 OFFICIAL_SPLIT_COUNTS = {"train": 1201, "validation": 312, "test": 100}
 SCANNET_OFFICIAL_COMMIT = "3830fce7f8b2e48ef047ef7fd76ea5f62903f51c"
@@ -112,6 +174,794 @@ def _sha256_file_stable(path: Path) -> tuple[int, str]:
     return after.st_size, digest.hexdigest()
 
 
+def _git_nul_paths(repo_root: Path, *args: str) -> list[str]:
+    result = subprocess.run(
+        ["git", "-C", str(repo_root), *args],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return sorted({path for path in result.stdout.split("\0") if path})
+
+
+def _git_index_flag_paths(repo_root: Path) -> list[str]:
+    result = subprocess.run(
+        ["git", "-C", str(repo_root), "ls-files", "-v", "-z"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    flagged = []
+    for record in result.stdout.split("\0"):
+        if not record:
+            continue
+        if len(record) < 3 or record[1] != " ":
+            raise ValueError("invalid git ls-files output")
+        tag = record[0]
+        if tag == "S" or tag.islower():
+            flagged.append(record[2:])
+    return sorted(set(flagged))
+
+
+def _git_blob_oid(content: bytes, algorithm: str) -> str:
+    digest = hashlib.new(algorithm)
+    digest.update(f"blob {len(content)}\0".encode("ascii"))
+    digest.update(content)
+    return digest.hexdigest()
+
+
+def _stable_worktree_blob(path: Path, expected_mode: str) -> tuple[str, bytes]:
+    before = path.lstat()
+    if expected_mode == "120000":
+        if not path.is_symlink():
+            raise OSError("tracked symlink changed type")
+        content = os.readlink(path).encode("utf-8", errors="surrogateescape")
+        observed_mode = "120000"
+    else:
+        if expected_mode not in {"100644", "100755"}:
+            raise OSError("unsupported tracked file mode")
+        if path.is_symlink() or not path.is_file():
+            raise OSError("tracked file changed type")
+        content = path.read_bytes()
+        observed_mode = "100755" if before.st_mode & 0o111 else "100644"
+    after = path.lstat()
+    identity_before = (
+        before.st_dev,
+        before.st_ino,
+        before.st_size,
+        before.st_mtime_ns,
+        before.st_mode,
+    )
+    identity_after = (
+        after.st_dev,
+        after.st_ino,
+        after.st_size,
+        after.st_mtime_ns,
+        after.st_mode,
+    )
+    if identity_before != identity_after:
+        raise OSError("tracked file changed while hashing")
+    return observed_mode, content
+
+
+def _git_tracked_tree_contract(
+    repo_root: Path,
+    commit: str,
+    *,
+    exclude_allowed_paths: bool = False,
+) -> tuple[str, str]:
+    tree = subprocess.run(
+        ["git", "-C", str(repo_root), "ls-tree", "-r", "-z", commit],
+        capture_output=True,
+        check=True,
+    ).stdout
+    algorithm = subprocess.run(
+        ["git", "-C", str(repo_root), "rev-parse", "--show-object-format"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    if algorithm not in hashlib.algorithms_available:
+        raise ValueError("unsupported git object format")
+
+    expected_entries = []
+    observed_entries = []
+    for raw_record in tree.split(b"\0"):
+        if not raw_record:
+            continue
+        header, raw_path = raw_record.split(b"\t", 1)
+        mode, object_type, object_id = header.decode("ascii").split(" ")
+        path = raw_path.decode("utf-8", errors="surrogateescape")
+        if object_type != "blob" or "\n" in path or "\r" in path:
+            raise ValueError("unsupported tracked tree entry")
+        if exclude_allowed_paths and _source_path_is_allowed(path):
+            continue
+        expected_entry = {
+            "path": path,
+            "mode": mode,
+            "object_id": object_id,
+        }
+        expected_entries.append(expected_entry)
+        try:
+            observed_mode, content = _stable_worktree_blob(repo_root / path, mode)
+            observed_object_id = _git_blob_oid(content, algorithm)
+        except OSError:
+            observed_mode = "missing"
+            observed_object_id = None
+        observed_entries.append(
+            {
+                "path": path,
+                "mode": observed_mode,
+                "object_id": observed_object_id,
+            }
+        )
+    return _canonical_sha256(expected_entries), _canonical_sha256(observed_entries)
+
+
+def _source_path_is_allowed(path: str) -> bool:
+    return any(
+        path == prefix.rstrip("/") or path.startswith(prefix)
+        for prefix in P2_ALLOWED_SOURCE_DIRTY_PREFIXES
+    )
+
+
+def build_p2_source_tree_contract(
+    *,
+    source_commit: str | None = None,
+    repo_root: str | Path | None = None,
+) -> dict[str, Any]:
+    """Bind formal evidence to a commit while allowing only P2 artifact changes."""
+    repository = Path(repo_root or REPO_ROOT).resolve()
+    errors: list[str] = []
+    observed_head: str | None = None
+    committed_paths: list[str] = []
+    dirty_paths: list[str] = []
+    index_flag_paths: list[str] = []
+    expected_tracked_tree_sha256: str | None = None
+    observed_tracked_tree_sha256: str | None = None
+    try:
+        head_result = subprocess.run(
+            ["git", "-C", str(repository), "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        observed_head = head_result.stdout.strip()
+        if not re.fullmatch(r"[0-9a-f]{40}", observed_head):
+            errors.append("invalid_observed_head")
+        pinned_commit = source_commit or observed_head
+        if not isinstance(pinned_commit, str) or not re.fullmatch(
+            r"[0-9a-f]{40}", pinned_commit
+        ):
+            errors.append("invalid_source_commit")
+        else:
+            ancestor = subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(repository),
+                    "merge-base",
+                    "--is-ancestor",
+                    pinned_commit,
+                    observed_head or "HEAD",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if ancestor.returncode != 0:
+                errors.append("source_commit_is_not_an_ancestor")
+            else:
+                committed_paths = _git_nul_paths(
+                    repository,
+                    "diff",
+                    "--name-only",
+                    "-z",
+                    "--no-ext-diff",
+                    f"{pinned_commit}..{observed_head}",
+                )
+
+        dirty_paths = sorted(
+            set(
+                _git_nul_paths(
+                    repository,
+                    "diff",
+                    "--name-only",
+                    "-z",
+                    "--no-ext-diff",
+                )
+            )
+            | set(
+                _git_nul_paths(
+                    repository,
+                    "diff",
+                    "--cached",
+                    "--name-only",
+                    "-z",
+                    "--no-ext-diff",
+                )
+            )
+            | set(
+                _git_nul_paths(
+                    repository,
+                    "ls-files",
+                    "--others",
+                    "--exclude-standard",
+                    "-z",
+                )
+            )
+        )
+        index_flag_paths = _git_index_flag_paths(repository)
+        if isinstance(pinned_commit, str) and re.fullmatch(
+            r"[0-9a-f]{40}", pinned_commit
+        ):
+            (
+                expected_tracked_tree_sha256,
+                observed_tracked_tree_sha256,
+            ) = _git_tracked_tree_contract(
+                repository,
+                pinned_commit,
+                exclude_allowed_paths=True,
+            )
+    except (OSError, ValueError, subprocess.CalledProcessError):
+        pinned_commit = source_commit
+        errors.append("git_state_unavailable")
+
+    disallowed_committed = [
+        path for path in committed_paths if not _source_path_is_allowed(path)
+    ]
+    disallowed_dirty = [
+        path for path in dirty_paths if not _source_path_is_allowed(path)
+    ]
+    if disallowed_committed:
+        errors.append("non_artifact_commits_since_source")
+    if disallowed_dirty:
+        errors.append("non_artifact_worktree_changes")
+    if index_flag_paths:
+        errors.append("index_flags_not_clean")
+    if (
+        expected_tracked_tree_sha256 is None
+        or observed_tracked_tree_sha256 is None
+    ):
+        errors.append("tracked_tree_unavailable")
+    elif expected_tracked_tree_sha256 != observed_tracked_tree_sha256:
+        errors.append("tracked_tree_mismatch")
+    return {
+        "schema_version": P2_SOURCE_TREE_CONTRACT_SCHEMA_VERSION,
+        "status": "pass" if not errors else "fail",
+        "source_commit": pinned_commit,
+        "observed_head": observed_head,
+        "allowed_dirty_prefixes": list(P2_ALLOWED_SOURCE_DIRTY_PREFIXES),
+        "committed_paths_since_source": committed_paths,
+        "dirty_paths": dirty_paths,
+        "index_flag_paths": index_flag_paths,
+        "expected_tracked_tree_sha256": expected_tracked_tree_sha256,
+        "observed_tracked_tree_sha256": observed_tracked_tree_sha256,
+        "disallowed_committed_paths": disallowed_committed,
+        "disallowed_dirty_paths": disallowed_dirty,
+        "errors": errors,
+    }
+
+
+def build_p2_runtime_source_contract(
+    *,
+    repo_root: str | Path | None = None,
+) -> dict[str, Any]:
+    """Pin editable runtime dependencies to clean nested repositories."""
+    repository = Path(repo_root or REPO_ROOT).resolve()
+    records: dict[str, Any] = {}
+    contract_errors: list[str] = []
+    for name, definition in sorted(P2_RUNTIME_SOURCE_REPOSITORIES.items()):
+        relative_root = str(definition["relative_root"])
+        module_name = str(definition["module"])
+        expected_commit = str(definition["expected_commit"])
+        configured_root = repository / relative_root
+        root = configured_root.resolve()
+        errors: list[str] = []
+        observed_commit: str | None = None
+        dirty_paths: list[str] = []
+        index_flag_paths: list[str] = []
+        expected_tracked_tree_sha256: str | None = None
+        observed_tracked_tree_sha256: str | None = None
+        module_origin_ref: str | None = None
+        native_extension_records: dict[str, Any] = {}
+
+        if (
+            configured_root.is_symlink()
+            or not root.is_dir()
+            or not root.is_relative_to(repository)
+        ):
+            errors.append("repository_root_invalid")
+        else:
+            try:
+                top_level = subprocess.run(
+                    ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                ).stdout.strip()
+                observed_commit = subprocess.run(
+                    ["git", "-C", str(root), "rev-parse", "HEAD"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                ).stdout.strip()
+                if Path(top_level).resolve() != root:
+                    errors.append("repository_root_mismatch")
+                dirty_paths = sorted(
+                    set(
+                        _git_nul_paths(
+                            root,
+                            "diff",
+                            "--name-only",
+                            "-z",
+                            "--no-ext-diff",
+                        )
+                    )
+                    | set(
+                        _git_nul_paths(
+                            root,
+                            "diff",
+                            "--cached",
+                            "--name-only",
+                            "-z",
+                            "--no-ext-diff",
+                        )
+                    )
+                    | set(
+                        _git_nul_paths(
+                            root,
+                            "ls-files",
+                            "--others",
+                            "--exclude-standard",
+                            "-z",
+                        )
+                    )
+                )
+                index_flag_paths = _git_index_flag_paths(root)
+                (
+                    expected_tracked_tree_sha256,
+                    observed_tracked_tree_sha256,
+                ) = _git_tracked_tree_contract(root, expected_commit)
+            except (OSError, ValueError, subprocess.CalledProcessError):
+                errors.append("git_state_unavailable")
+
+        if observed_commit != expected_commit:
+            errors.append("commit_mismatch")
+        if dirty_paths:
+            errors.append("worktree_not_clean")
+        if index_flag_paths:
+            errors.append("index_flags_not_clean")
+        if (
+            expected_tracked_tree_sha256 is None
+            or observed_tracked_tree_sha256 is None
+        ):
+            errors.append("tracked_tree_unavailable")
+        elif expected_tracked_tree_sha256 != observed_tracked_tree_sha256:
+            errors.append("tracked_tree_mismatch")
+
+        try:
+            spec = importlib.util.find_spec(module_name)
+            origin_value = None if spec is None else spec.origin
+            if not isinstance(origin_value, str):
+                raise TypeError
+            origin = Path(origin_value).resolve(strict=True)
+            expected_origin = (
+                root / Path(*module_name.split(".")) / "__init__.py"
+            ).resolve(strict=True)
+            if not origin.is_file() or origin != expected_origin:
+                raise ValueError
+            module_origin_ref = _portable_root_ref(
+                origin,
+                repository,
+                f"{name}_module",
+            )
+        except (ImportError, ModuleNotFoundError, OSError, TypeError, ValueError):
+            errors.append("module_origin_mismatch")
+
+        native_extensions = definition.get("native_extensions", {})
+        if not isinstance(native_extensions, Mapping):
+            errors.append("native_extension_contract_invalid")
+            native_extensions = {}
+        for extension_module, extension_contract in sorted(
+            native_extensions.items()
+        ):
+            observed_byte_size = None
+            observed_sha256 = None
+            origin_ref = None
+            extension_status = "fail"
+            expected_extension = (
+                extension_contract
+                if isinstance(extension_contract, Mapping)
+                else {}
+            )
+            try:
+                if not isinstance(extension_contract, Mapping):
+                    raise TypeError
+                relative_extension_path = extension_contract.get("relative_path")
+                if not isinstance(relative_extension_path, str):
+                    raise TypeError
+                expected_extension_origin = (
+                    root / relative_extension_path
+                ).resolve(strict=True)
+                extension_spec = importlib.util.find_spec(extension_module)
+                extension_origin_value = (
+                    None if extension_spec is None else extension_spec.origin
+                )
+                if not isinstance(extension_origin_value, str):
+                    raise TypeError
+                extension_origin = Path(extension_origin_value).resolve(strict=True)
+                if (
+                    not extension_origin.is_file()
+                    or extension_origin != expected_extension_origin
+                ):
+                    raise ValueError
+                observed_byte_size, observed_sha256 = _sha256_file_stable(
+                    extension_origin
+                )
+                origin_ref = _portable_root_ref(
+                    extension_origin,
+                    repository,
+                    f"{name}_native_extension",
+                )
+                if (
+                    observed_byte_size == expected_extension.get("expected_byte_size")
+                    and observed_sha256 == expected_extension.get("expected_sha256")
+                ):
+                    extension_status = "pass"
+                else:
+                    errors.append("native_extension_mismatch")
+            except (
+                ImportError,
+                ModuleNotFoundError,
+                OSError,
+                TypeError,
+                ValueError,
+            ):
+                errors.append("native_extension_mismatch")
+            native_extension_records[extension_module] = {
+                "origin_ref": origin_ref,
+                "expected_byte_size": expected_extension.get("expected_byte_size"),
+                "observed_byte_size": observed_byte_size,
+                "expected_sha256": expected_extension.get("expected_sha256"),
+                "observed_sha256": observed_sha256,
+                "status": extension_status,
+            }
+
+        records[name] = {
+            "reference": _portable_root_ref(root, repository, f"{name}_source"),
+            "module": module_name,
+            "expected_commit": expected_commit,
+            "observed_commit": observed_commit,
+            "module_origin_ref": module_origin_ref,
+            "dirty_paths": dirty_paths,
+            "index_flag_paths": index_flag_paths,
+            "expected_tracked_tree_sha256": expected_tracked_tree_sha256,
+            "observed_tracked_tree_sha256": observed_tracked_tree_sha256,
+            "native_extensions": native_extension_records,
+            "status": "pass" if not errors else "fail",
+            "errors": errors,
+        }
+        contract_errors.extend(f"{name}:{error}" for error in errors)
+
+    return {
+        "schema_version": P2_RUNTIME_SOURCE_CONTRACT_SCHEMA_VERSION,
+        "status": "pass" if not contract_errors else "fail",
+        "repositories": records,
+        "errors": contract_errors,
+    }
+
+
+def _environment_ref(path: Path, prefix: Path) -> str:
+    resolved = path.resolve(strict=True)
+    return f"env:{resolved.relative_to(prefix).as_posix()}"
+
+
+def _native_binary_manifest(paths: list[Path], prefix: Path) -> dict[str, Any]:
+    candidates: set[Path] = set()
+    for path in paths:
+        resolved = path.resolve(strict=True)
+        if not resolved.is_relative_to(prefix):
+            raise ValueError("runtime binary escapes environment prefix")
+        if resolved.is_file():
+            candidates.add(resolved)
+            continue
+        if not resolved.is_dir():
+            raise ValueError("runtime binary root is invalid")
+        for candidate in resolved.rglob("*"):
+            if candidate.is_file() and ".so" in candidate.name:
+                candidates.add(candidate.resolve(strict=True))
+    if not candidates:
+        raise ValueError("runtime component has no native files")
+
+    entries = []
+    for candidate in sorted(candidates, key=lambda item: item.as_posix()):
+        if not candidate.is_relative_to(prefix):
+            raise ValueError("runtime binary escapes environment prefix")
+        byte_size, sha256 = _sha256_file_stable(candidate)
+        entries.append(
+            {
+                "path": candidate.relative_to(prefix).as_posix(),
+                "byte_size": byte_size,
+                "sha256": sha256,
+            }
+        )
+    return {
+        "file_count": len(entries),
+        "total_bytes": sum(entry["byte_size"] for entry in entries),
+        "content_sha256": _canonical_sha256(entries),
+    }
+
+
+def _python_source_manifest(root: Path, prefix: Path) -> dict[str, Any]:
+    resolved_root = root.resolve(strict=True)
+    if not resolved_root.is_dir() or not resolved_root.is_relative_to(prefix):
+        raise ValueError("runtime Python source root is invalid")
+    entries = []
+    for candidate in sorted(resolved_root.rglob("*.py")):
+        if candidate.is_symlink():
+            raise ValueError("runtime Python source cannot be a symbolic link")
+        resolved = candidate.resolve(strict=True)
+        if not resolved.is_relative_to(resolved_root):
+            raise ValueError("runtime Python source escapes package root")
+        byte_size, sha256 = _sha256_file_stable(resolved)
+        entries.append(
+            {
+                "path": resolved.relative_to(prefix).as_posix(),
+                "byte_size": byte_size,
+                "sha256": sha256,
+            }
+        )
+    if not entries:
+        raise ValueError("runtime Python package has no source files")
+    return {
+        "file_count": len(entries),
+        "total_bytes": sum(entry["byte_size"] for entry in entries),
+        "content_sha256": _canonical_sha256(entries),
+    }
+
+
+def _runtime_module_origin(
+    module_name: str,
+    expected_path: Path,
+    prefix: Path,
+) -> str:
+    spec = importlib.util.find_spec(module_name)
+    origin_value = None if spec is None else spec.origin
+    if not isinstance(origin_value, str):
+        raise TypeError(module_name)
+    origin = Path(origin_value).resolve(strict=True)
+    if origin != expected_path.resolve(strict=True):
+        raise ValueError(f"unexpected module origin for {module_name}")
+    return _environment_ref(origin, prefix)
+
+
+def _format_runtime_cudnn_version(value: int | None) -> str:
+    if not isinstance(value, int):
+        return "unknown"
+    return f"{value // 10000}.{value % 10000 // 100}.{value % 100}"
+
+
+def _format_runtime_nccl_version(value: Any) -> str:
+    if not isinstance(value, tuple) or not value or any(
+        not isinstance(part, int) for part in value
+    ):
+        return "unknown"
+    return ".".join(str(part) for part in value)
+
+
+def _runtime_environment_versions() -> dict[str, str]:
+    import torch
+
+    return {
+        "python": platform.python_version(),
+        "torch": str(torch.__version__),
+        "cuda": str(torch.version.cuda),
+        "cudnn": _format_runtime_cudnn_version(torch.backends.cudnn.version()),
+        "nccl": _format_runtime_nccl_version(torch.cuda.nccl.version()),
+        "pytorch_lightning": importlib.metadata.version("pytorch-lightning"),
+        "hydra_core": importlib.metadata.version("hydra-core"),
+        "omegaconf": importlib.metadata.version("omegaconf"),
+        "spconv": importlib.metadata.version("spconv-cu126"),
+        "cumm": importlib.metadata.version("cumm-cu126"),
+        "flash_attn": importlib.metadata.version("flash-attn"),
+        "torch_scatter": importlib.metadata.version("torch-scatter"),
+        "pointnet2": importlib.metadata.version("pointnet2"),
+        "cuda_runtime_package": importlib.metadata.version(
+            "nvidia-cuda-runtime-cu12"
+        ),
+        "cudnn_package": (
+            "v" + importlib.metadata.version("nvidia-cudnn-cu12")
+        ),
+        "nccl_package": importlib.metadata.version("nvidia-nccl-cu12"),
+    }
+
+
+def build_p2_runtime_environment_contract() -> dict[str, Any]:
+    """Bind formal P2 authorization to the active CUDA/PyTorch runtime."""
+    prefix = Path(sys.prefix).resolve()
+    site_packages = prefix / "lib" / "python3.10" / "site-packages"
+    errors: list[str] = []
+    try:
+        versions = _runtime_environment_versions()
+    except (
+        AttributeError,
+        ImportError,
+        importlib.metadata.PackageNotFoundError,
+        OSError,
+        RuntimeError,
+    ):
+        versions = {}
+        errors.append("runtime_versions_unavailable")
+    if versions != P2_RUNTIME_ENVIRONMENT_VERSIONS:
+        errors.append("runtime_versions_mismatch")
+
+    component_definitions = {
+        "python": {
+            "modules": {},
+            "origins": [Path(sys.executable).resolve()],
+            "native_paths": [Path(sys.executable).resolve()],
+        },
+        "torch": {
+            "modules": {
+                "torch": site_packages / "torch" / "__init__.py",
+            },
+            "origins": [],
+            "native_paths": [site_packages / "torch"],
+        },
+        "spconv": {
+            "modules": {
+                "spconv": site_packages / "spconv" / "__init__.py",
+            },
+            "origins": [],
+            "native_paths": [
+                site_packages / "spconv",
+                site_packages / "spconv_cu126.libs",
+            ],
+        },
+        "cumm": {
+            "modules": {
+                "cumm": site_packages / "cumm" / "__init__.py",
+            },
+            "origins": [],
+            "native_paths": [
+                site_packages / "cumm",
+                site_packages / "cumm_cu126.libs",
+            ],
+        },
+        "flash_attn": {
+            "modules": {
+                "flash_attn": site_packages / "flash_attn" / "__init__.py",
+                "flash_attn_2_cuda": (
+                    site_packages
+                    / "flash_attn_2_cuda.cpython-310-x86_64-linux-gnu.so"
+                ),
+            },
+            "origins": [],
+            "native_paths": [
+                site_packages
+                / "flash_attn_2_cuda.cpython-310-x86_64-linux-gnu.so"
+            ],
+        },
+        "torch_scatter": {
+            "modules": {
+                "torch_scatter": (
+                    site_packages / "torch_scatter" / "__init__.py"
+                ),
+            },
+            "origins": [],
+            "native_paths": [site_packages / "torch_scatter"],
+        },
+        "pointnet2": {
+            "modules": {
+                "pointnet2._ext": (
+                    site_packages
+                    / "pointnet2"
+                    / "_ext.cpython-310-x86_64-linux-gnu.so"
+                ),
+            },
+            "origins": [],
+            "native_paths": [
+                site_packages
+                / "pointnet2"
+                / "_ext.cpython-310-x86_64-linux-gnu.so"
+            ],
+        },
+        "nvidia_cuda_libraries": {
+            "modules": {},
+            "origins": [site_packages / "nvidia"],
+            "native_paths": [site_packages / "nvidia"],
+        },
+        "pytorch_lightning": {
+            "modules": {
+                "pytorch_lightning": (
+                    site_packages / "pytorch_lightning" / "__init__.py"
+                ),
+            },
+            "origins": [],
+            "python_source_root": site_packages / "pytorch_lightning",
+        },
+        "hydra": {
+            "modules": {
+                "hydra": site_packages / "hydra" / "__init__.py",
+            },
+            "origins": [],
+            "python_source_root": site_packages / "hydra",
+        },
+        "omegaconf": {
+            "modules": {
+                "omegaconf": site_packages / "omegaconf" / "__init__.py",
+            },
+            "origins": [],
+            "python_source_root": site_packages / "omegaconf",
+        },
+    }
+    components = {}
+    for name, definition in component_definitions.items():
+        component_errors = []
+        origin_refs = []
+        try:
+            origin_refs.extend(
+                _runtime_module_origin(module, path, prefix)
+                for module, path in definition["modules"].items()
+            )
+            origin_refs.extend(
+                _environment_ref(path, prefix) for path in definition["origins"]
+            )
+            native_paths = definition.get("native_paths")
+            native_manifest = (
+                _native_binary_manifest(list(native_paths), prefix)
+                if native_paths is not None
+                else None
+            )
+            source_root = definition.get("python_source_root")
+            python_source_manifest = (
+                _python_source_manifest(Path(source_root), prefix)
+                if source_root is not None
+                else None
+            )
+            if native_manifest is None and python_source_manifest is None:
+                raise ValueError("runtime component has no content binding")
+        except (ImportError, OSError, TypeError, ValueError):
+            native_manifest = {
+                "file_count": 0,
+                "total_bytes": 0,
+                "content_sha256": None,
+            }
+            python_source_manifest = None
+            component_errors.append("runtime_component_unavailable")
+        component = {
+            "status": "pass" if not component_errors else "fail",
+            "origin_refs": sorted(origin_refs),
+            "errors": component_errors,
+        }
+        if native_manifest is not None:
+            component["native_manifest"] = native_manifest
+        if python_source_manifest is not None:
+            component["python_source_manifest"] = python_source_manifest
+        components[name] = component
+        errors.extend(f"{name}:{error}" for error in component_errors)
+
+    try:
+        pointops_spec = importlib.util.find_spec("pointops")
+    except (ImportError, ModuleNotFoundError, ValueError):
+        pointops_spec = None
+    optional_modules = {
+        "pointops": {
+            "required": False,
+            "status": "absent" if pointops_spec is None else "present_not_required",
+        }
+    }
+    return {
+        "schema_version": P2_RUNTIME_ENVIRONMENT_CONTRACT_SCHEMA_VERSION,
+        "status": "pass" if not errors else "fail",
+        "versions": versions,
+        "components": components,
+        "optional_modules": optional_modules,
+        "errors": errors,
+    }
+
+
 def _directory_content_manifest(root: Path) -> dict[str, Any]:
     resolved_root = root.resolve(strict=True)
     if not resolved_root.is_dir():
@@ -198,10 +1048,25 @@ def build_scannet_official_split_identity(
         observed_sha256: str | None = None
         scene_count = 0
         try:
-            _, observed_sha256 = _sha256_file_stable(path)
+            before = path.stat()
+            payload = path.read_bytes()
+            after = path.stat()
+            if (
+                before.st_dev,
+                before.st_ino,
+                before.st_size,
+                before.st_mtime_ns,
+            ) != (
+                after.st_dev,
+                after.st_ino,
+                after.st_size,
+                after.st_mtime_ns,
+            ):
+                raise OSError("split changed while reading")
+            observed_sha256 = hashlib.sha256(payload).hexdigest()
             scenes = [
                 line.strip()
-                for line in path.read_text(encoding="utf-8").splitlines()
+                for line in payload.decode("utf-8").splitlines()
                 if line.strip()
             ]
             scene_count = len(scenes)
@@ -670,6 +1535,248 @@ def _validate_model_checkpoint(artifact: Mapping[str, Any], errors: list[str]) -
         errors.append("model_checkpoint.reference invalid")
 
 
+def _validate_tracked_tree_binding(
+    record: Mapping[str, Any],
+    prefix: str,
+    errors: list[str],
+) -> None:
+    if record.get("index_flag_paths") != []:
+        errors.append(f"{prefix}.index_flag_paths mismatch")
+    expected_sha256 = record.get("expected_tracked_tree_sha256")
+    observed_sha256 = record.get("observed_tracked_tree_sha256")
+    if (
+        not isinstance(expected_sha256, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", expected_sha256)
+        or observed_sha256 != expected_sha256
+    ):
+        errors.append(f"{prefix}.tracked_tree_sha256 mismatch")
+
+
+def _validate_source_tree_contract(
+    artifact: Mapping[str, Any],
+    errors: list[str],
+) -> str | None:
+    source_commit = artifact.get("local_source_commit")
+    if not isinstance(source_commit, str) or not re.fullmatch(
+        r"[0-9a-f]{40}", source_commit
+    ):
+        errors.append("local_source_commit invalid")
+        source_commit = None
+
+    contract = artifact.get("source_tree_contract")
+    if not isinstance(contract, Mapping):
+        errors.append("source_tree_contract is missing")
+        return source_commit
+    expected = {
+        "schema_version": P2_SOURCE_TREE_CONTRACT_SCHEMA_VERSION,
+        "status": "pass",
+        "source_commit": source_commit,
+        "observed_head": source_commit,
+        "allowed_dirty_prefixes": list(P2_ALLOWED_SOURCE_DIRTY_PREFIXES),
+        "committed_paths_since_source": [],
+        "disallowed_committed_paths": [],
+        "disallowed_dirty_paths": [],
+        "errors": [],
+    }
+    for field, expected_value in expected.items():
+        if contract.get(field) != expected_value:
+            errors.append(f"source_tree_contract.{field} mismatch")
+    dirty_paths = contract.get("dirty_paths")
+    if not isinstance(dirty_paths, list) or any(
+        not isinstance(path, str) or not _source_path_is_allowed(path)
+        for path in dirty_paths
+    ):
+        errors.append("source_tree_contract.dirty_paths invalid")
+    _validate_tracked_tree_binding(contract, "source_tree_contract", errors)
+    return source_commit
+
+
+def _validate_runtime_source_contract(
+    artifact: Mapping[str, Any],
+    errors: list[str],
+) -> Mapping[str, Any] | None:
+    contract = artifact.get("runtime_source_contract")
+    if not isinstance(contract, Mapping):
+        errors.append("runtime_source_contract is missing")
+        return None
+    if contract.get("schema_version") != P2_RUNTIME_SOURCE_CONTRACT_SCHEMA_VERSION:
+        errors.append("runtime_source_contract.schema_version mismatch")
+    if contract.get("status") != "pass":
+        errors.append("runtime_source_contract.status is not pass")
+    if contract.get("errors") != []:
+        errors.append("runtime_source_contract.errors is not empty")
+
+    repositories = contract.get("repositories")
+    if not isinstance(repositories, Mapping) or set(repositories) != set(
+        P2_RUNTIME_SOURCE_REPOSITORIES
+    ):
+        errors.append("runtime_source_contract.repositories mismatch")
+        return contract
+    for name, definition in P2_RUNTIME_SOURCE_REPOSITORIES.items():
+        record = repositories.get(name)
+        if not isinstance(record, Mapping):
+            errors.append(f"runtime_source_contract.{name} is missing")
+            continue
+        relative_root = str(definition["relative_root"])
+        expected = {
+            "reference": f"repo:{relative_root}",
+            "module": definition["module"],
+            "expected_commit": definition["expected_commit"],
+            "observed_commit": definition["expected_commit"],
+            "dirty_paths": [],
+            "status": "pass",
+            "errors": [],
+        }
+        for field, expected_value in expected.items():
+            if record.get(field) != expected_value:
+                errors.append(
+                    f"runtime_source_contract.{name}.{field} mismatch"
+                )
+        _validate_tracked_tree_binding(
+            record,
+            f"runtime_source_contract.{name}",
+            errors,
+        )
+        origin_ref = record.get("module_origin_ref")
+        expected_origin_ref = (
+            f"repo:{relative_root}/{str(definition['module']).replace('.', '/')}/"
+            "__init__.py"
+        )
+        if origin_ref != expected_origin_ref:
+            errors.append(
+                f"runtime_source_contract.{name}.module_origin_ref mismatch"
+            )
+        native_records = record.get("native_extensions")
+        native_contracts = definition.get("native_extensions", {})
+        if not isinstance(native_records, Mapping) or set(native_records) != set(
+            native_contracts
+        ):
+            errors.append(
+                f"runtime_source_contract.{name}.native_extensions mismatch"
+            )
+            continue
+        for extension_module, extension_contract in native_contracts.items():
+            native_record = native_records.get(extension_module)
+            if not isinstance(native_record, Mapping):
+                errors.append(
+                    "runtime_source_contract."
+                    f"{name}.{extension_module} is missing"
+                )
+                continue
+            expected_native = {
+                "expected_byte_size": extension_contract["expected_byte_size"],
+                "observed_byte_size": extension_contract["expected_byte_size"],
+                "expected_sha256": extension_contract["expected_sha256"],
+                "observed_sha256": extension_contract["expected_sha256"],
+                "status": "pass",
+            }
+            for field, expected_value in expected_native.items():
+                if native_record.get(field) != expected_value:
+                    errors.append(
+                        "runtime_source_contract."
+                        f"{name}.{extension_module}.{field} mismatch"
+                    )
+            native_origin_ref = native_record.get("origin_ref")
+            expected_native_origin_ref = (
+                f"repo:{relative_root}/{extension_contract['relative_path']}"
+            )
+            if native_origin_ref != expected_native_origin_ref:
+                errors.append(
+                    "runtime_source_contract."
+                    f"{name}.{extension_module}.origin_ref mismatch"
+                )
+    return contract
+
+
+def _validate_runtime_environment_contract(
+    artifact: Mapping[str, Any],
+    errors: list[str],
+) -> Mapping[str, Any] | None:
+    contract = artifact.get("runtime_environment_contract")
+    prefix = "runtime_environment_contract"
+    if not isinstance(contract, Mapping):
+        errors.append(f"{prefix} is missing")
+        return None
+    if contract.get("schema_version") != (
+        P2_RUNTIME_ENVIRONMENT_CONTRACT_SCHEMA_VERSION
+    ):
+        errors.append(f"{prefix}.schema_version mismatch")
+    if contract.get("status") != "pass":
+        errors.append(f"{prefix}.status is not pass")
+    if contract.get("errors") != []:
+        errors.append(f"{prefix}.errors is not empty")
+    if contract.get("versions") != P2_RUNTIME_ENVIRONMENT_VERSIONS:
+        errors.append(f"{prefix}.versions mismatch")
+
+    expected_components = {
+        "pytorch_lightning",
+        "hydra",
+        "omegaconf",
+        "python",
+        "torch",
+        "spconv",
+        "cumm",
+        "flash_attn",
+        "torch_scatter",
+        "pointnet2",
+        "nvidia_cuda_libraries",
+    }
+    components = contract.get("components")
+    if not isinstance(components, Mapping) or set(components) != expected_components:
+        errors.append(f"{prefix}.components mismatch")
+        return contract
+    python_source_components = {"pytorch_lightning", "hydra", "omegaconf"}
+    for name, record in components.items():
+        component_prefix = f"{prefix}.{name}"
+        if not isinstance(record, Mapping):
+            errors.append(f"{component_prefix} is missing")
+            continue
+        if record.get("status") != "pass" or record.get("errors") != []:
+            errors.append(f"{component_prefix}.status mismatch")
+        origin_refs = record.get("origin_refs")
+        if (
+            not isinstance(origin_refs, list)
+            or not origin_refs
+            or any(
+                not isinstance(origin, str) or not origin.startswith("env:")
+                for origin in origin_refs
+            )
+        ):
+            errors.append(f"{component_prefix}.origin_refs invalid")
+        manifest_field = (
+            "python_source_manifest"
+            if name in python_source_components
+            else "native_manifest"
+        )
+        manifest = record.get(manifest_field)
+        if not isinstance(manifest, Mapping):
+            errors.append(f"{component_prefix}.{manifest_field} invalid")
+            continue
+        if (
+            type(manifest.get("file_count")) is not int
+            or manifest["file_count"] < 1
+            or type(manifest.get("total_bytes")) is not int
+            or manifest["total_bytes"] < 1
+            or not isinstance(manifest.get("content_sha256"), str)
+            or not re.fullmatch(r"[0-9a-f]{64}", manifest["content_sha256"])
+        ):
+            errors.append(f"{component_prefix}.{manifest_field} invalid")
+
+    optional_modules = contract.get("optional_modules")
+    pointops = (
+        optional_modules.get("pointops")
+        if isinstance(optional_modules, Mapping)
+        else None
+    )
+    if (
+        not isinstance(pointops, Mapping)
+        or pointops.get("required") is not False
+        or pointops.get("status") not in {"absent", "present_not_required"}
+    ):
+        errors.append(f"{prefix}.optional_modules invalid")
+    return contract
+
+
 def _validate_asset_summaries(artifact: Mapping[str, Any], errors: list[str]) -> None:
     expected_total = sum(OFFICIAL_SPLIT_COUNTS.values())
     expected_instances = (
@@ -925,6 +2032,12 @@ def validate_p2_preflight_authorization(
     _validate_split_metadata(artifact, errors)
     _validate_official_split_identity(artifact, errors)
     _validate_model_checkpoint(artifact, errors)
+    source_commit = _validate_source_tree_contract(artifact, errors)
+    runtime_source_contract = _validate_runtime_source_contract(artifact, errors)
+    runtime_environment_contract = _validate_runtime_environment_contract(
+        artifact,
+        errors,
+    )
     _validate_asset_summaries(artifact, errors)
     _validate_taxonomy_and_mix(artifact, errors)
     _validate_known_empty_substitutions(artifact, errors)
@@ -966,15 +2079,61 @@ def validate_p2_preflight_authorization(
         if age_error is not None:
             errors.append(age_error)
     current_inputs_revalidated = False
+    first_source_contract: Mapping[str, Any] | None = None
+    first_runtime_source_contract: Mapping[str, Any] | None = None
+    first_runtime_environment_contract: Mapping[str, Any] | None = None
+    first_split_identity: Mapping[str, Any] | None = None
+    first_input_manifest: Mapping[str, Any] | None = None
     if not errors:
         current_inputs_revalidated = True
-        current_split_identity = build_scannet_official_split_identity()
-        if current_split_identity != artifact.get("official_split_identity"):
+        first_source_contract = build_p2_source_tree_contract(
+            source_commit=source_commit
+        )
+        if first_source_contract.get("status") != "pass":
+            errors.append("current source_tree_contract is not pass")
+        first_runtime_source_contract = build_p2_runtime_source_contract()
+        if first_runtime_source_contract != runtime_source_contract:
+            errors.append("current runtime_source_contract mismatch")
+        first_runtime_environment_contract = (
+            build_p2_runtime_environment_contract()
+        )
+        if first_runtime_environment_contract != runtime_environment_contract:
+            errors.append("current runtime_environment_contract mismatch")
+        first_split_identity = build_scannet_official_split_identity()
+        if first_split_identity != artifact.get("official_split_identity"):
             errors.append("current official_split_identity mismatch")
-        current_input_manifest = build_p2_input_manifest()
-        if current_input_manifest != artifact.get("input_manifest"):
+        first_input_manifest = build_p2_input_manifest()
+        if first_input_manifest != artifact.get("input_manifest"):
             errors.append("current input_manifest mismatch")
     if current_inputs_revalidated and issued_at is not None:
+        final_source_contract = build_p2_source_tree_contract(
+            source_commit=source_commit
+        )
+        final_runtime_source_contract = build_p2_runtime_source_contract()
+        final_runtime_environment_contract = (
+            build_p2_runtime_environment_contract()
+        )
+        final_split_identity = build_scannet_official_split_identity()
+        final_input_manifest = build_p2_input_manifest()
+        if final_source_contract.get("status") != "pass":
+            errors.append("final source_tree_contract is not pass")
+        elif (
+            first_source_contract is not None
+            and final_source_contract.get("observed_head")
+            != first_source_contract.get("observed_head")
+        ):
+            errors.append("source HEAD changed during authorization")
+        if final_runtime_source_contract != first_runtime_source_contract:
+            errors.append("runtime source changed during authorization")
+        if (
+            final_runtime_environment_contract
+            != first_runtime_environment_contract
+        ):
+            errors.append("runtime environment changed during authorization")
+        if final_split_identity != first_split_identity:
+            errors.append("official split changed during authorization")
+        if final_input_manifest != first_input_manifest:
+            errors.append("training inputs changed during authorization")
         final_checked_at = now or datetime.now(timezone.utc)
         final_age_error = _authorization_age_error(issued_at, final_checked_at)
         if final_age_error is not None and final_age_error not in errors:

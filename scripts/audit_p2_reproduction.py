@@ -12,23 +12,48 @@ import platform
 import re
 import subprocess
 import sys
+import tempfile
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from utils.p2_preflight import (
+    P2_KNOWN_EMPTY_RIO_SCAN_ID,
+    P2_KNOWN_EMPTY_RIO_SEQUENCES,
+    P2_KNOWN_EMPTY_SCANNET_SCAN_IDS,
+    P2_PREFLIGHT_SCHEMA_VERSION,
+    P2_RIO_SEQUENCE_DATABASE_REF,
+    P2_RIO_SEQUENCE_DATABASE_SHA256,
+    P2_TRAINING_CONTRACT_SCHEMA_VERSION,
+    P2_TRAINING_SEMANTIC_SHA256,
+    SCANNET_OFFICIAL_COMMIT,
+    SCANNET_OFFICIAL_REPOSITORY_REF,
+    SCANNET_SPLIT_SHA256,
+    build_p2_input_manifest,
+    build_p2_runtime_environment_contract,
+    build_p2_runtime_source_contract,
+    build_p2_source_tree_contract,
+    build_scannet_official_split_identity,
+    issue_formal_authorization,
+    not_issued_authorization,
+    p2_training_semantic_sha256,
+    validate_p2_training_config_contract,
+)
+
 OFFICIAL_SOURCE_COMMIT = "fb2fe42eb8f1e926567c48eea9acb874e608ee10"
 P2_TRAINING_CONTRACT_FIX_COMMIT = "3c6b11a3af600aa98c93128361c2ecb4900ea186"
-P2_RUNTIME_SAFETY_FIX_COMMIT = "973629172cc01ae0998bc785ac0ea2979756b72c"
+P2_RUNTIME_SAFETY_FIX_COMMIT = "52781187a236b7114cf067b59540120a9aebe8fe"
 CONCERTO_REVISION = "c31f993a56129f2ba9c5d06a35957e3f05bff710"
 CONCERTO_SHA256 = "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
 CONCERTO_BYTES = 433_987_358
-SEQUENCE_DB_SHA256 = "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416"
+SEQUENCE_DB_SHA256 = P2_RIO_SEQUENCE_DATABASE_SHA256
 
 ADAMW_IMPLICIT_DEFAULTS = {
     "betas": [0.9, 0.999],
@@ -180,6 +205,52 @@ def _portable_ref(path: Path, external_role: str) -> str:
     return f"repo:{relative.as_posix()}"
 
 
+def _audit_model_checkpoint(
+    checkpoint_path: Path,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    checkpoint_path = Path(checkpoint_path).expanduser()
+    default_path = (
+        Path.home() / ".cache" / "persist4d" / "concerto" / "concerto_base.pth"
+    )
+    reference = (
+        "local_cache:persist4d/concerto/concerto_base.pth"
+        if checkpoint_path == default_path
+        else _portable_ref(checkpoint_path, "concerto_checkpoint")
+    )
+    errors: list[dict[str, Any]] = []
+    observed_bytes: int | None = None
+    observed_sha256: str | None = None
+    if not checkpoint_path.is_file():
+        errors.append(_error("model_checkpoint_missing"))
+    else:
+        try:
+            observed_bytes = checkpoint_path.stat().st_size
+            observed_sha256 = _sha256_file(checkpoint_path)
+        except OSError:
+            errors.append(_error("model_checkpoint_unreadable"))
+        if observed_bytes is not None and observed_bytes != CONCERTO_BYTES:
+            errors.append(
+                _error(
+                    "model_checkpoint_size_mismatch",
+                    expected=CONCERTO_BYTES,
+                    observed=observed_bytes,
+                )
+            )
+        if observed_sha256 != CONCERTO_SHA256:
+            errors.append(_error("model_checkpoint_sha256_mismatch"))
+    return (
+        {
+            "reference": reference,
+            "expected_sha256": CONCERTO_SHA256,
+            "observed_sha256": observed_sha256,
+            "expected_byte_size": CONCERTO_BYTES,
+            "observed_byte_size": observed_bytes,
+            "status": "pass" if not errors else "fail",
+        },
+        errors,
+    )
+
+
 def _join_ref(root_ref: str, relative: str) -> str:
     return f"{root_ref.rstrip('/')}/{relative.lstrip('/')}"
 
@@ -200,6 +271,250 @@ def _git_revision(path: Path, fallback: str) -> str:
 
 def _error(code: str, **details: Any) -> dict[str, Any]:
     return {"code": code, **details}
+
+
+def _audit_known_empty_scan_substitutions(
+    p2_config: Any | None,
+    sequence_database_path: Path | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    path = sequence_database_path or (
+        REPO_ROOT / "data" / "processed" / "rio" / "sequence_database_sliding_2.yaml"
+    )
+    observed_sha256 = _sha256_file(path)
+    errors: list[dict[str, Any]] = []
+    fail_closed: dict[str, Any] = {
+        "train": None,
+        "validation": None,
+        "test": None,
+    }
+    policies: dict[str, Any] = {
+        "train": None,
+        "validation": None,
+        "test": None,
+    }
+    temporal_windows: dict[str, Any] = {
+        "train": None,
+        "validation": None,
+        "test": None,
+    }
+
+    if p2_config is None:
+        errors.append(_error("known_empty_scan_p2_config_unavailable"))
+    else:
+        try:
+            train = p2_config.data.train_dataset
+            validation = p2_config.data.validation_dataset
+            test = p2_config.data.test_dataset
+            split_configs = {
+                "train": train,
+                "validation": validation,
+                "test": test,
+            }
+            for split, dataset_config in split_configs.items():
+                fail_closed[split] = dataset_config.get("fail_closed")
+                policies[split] = dataset_config.get("known_empty_scan_policy")
+                if fail_closed[split] is not True:
+                    errors.append(
+                        _error(
+                            "known_empty_scan_fail_closed_config_mismatch",
+                            split=split,
+                        )
+                    )
+                if policies[split] != "official_substitute":
+                    errors.append(
+                        _error(
+                            "known_empty_scan_policy_config_mismatch",
+                            split=split,
+                        )
+                    )
+
+            rio_children = [
+                child
+                for child in train.datasets
+                if child.get("dataset_name") == "rio"
+            ]
+            if len(rio_children) != 1:
+                errors.append(_error("known_empty_scan_train_rio_config_mismatch"))
+            else:
+                temporal_windows["train"] = rio_children[0].get(
+                    "temporal_window"
+                )
+            temporal_windows["validation"] = validation.get("temporal_window")
+            temporal_windows["test"] = test.get("temporal_window")
+            if any(value != 2 for value in temporal_windows.values()):
+                errors.append(
+                    _error("known_empty_scan_temporal_window_config_mismatch")
+                )
+            if validation.get("dataset_name") != "rio":
+                errors.append(
+                    _error(
+                        "known_empty_scan_dataset_config_mismatch",
+                        split="validation",
+                    )
+                )
+            if test.get("dataset_name") != "rio":
+                errors.append(
+                    _error(
+                        "known_empty_scan_dataset_config_mismatch",
+                        split="test",
+                    )
+                )
+        except (AttributeError, KeyError, TypeError):
+            errors.append(_error("known_empty_scan_p2_config_invalid"))
+
+    if observed_sha256 is None:
+        errors.append(_error("rio_sequence_database_missing"))
+    elif observed_sha256 != P2_RIO_SEQUENCE_DATABASE_SHA256:
+        errors.append(_error("rio_sequence_database_sha256_mismatch"))
+
+    affected_sequences: list[str] = []
+    try:
+        sequence_database = _read_yaml(path)
+    except (OSError, yaml.YAMLError):
+        errors.append(_error("rio_sequence_database_unreadable"))
+    else:
+        if not isinstance(sequence_database, Mapping):
+            errors.append(_error("rio_sequence_database_invalid"))
+        else:
+            known_scan = f"scene{P2_KNOWN_EMPTY_RIO_SCAN_ID}"
+            affected_sequences = sorted(
+                str(name)
+                for name in sequence_database
+                if known_scan in str(name).split("-")
+            )
+            if affected_sequences != P2_KNOWN_EMPTY_RIO_SEQUENCES:
+                errors.append(_error("known_empty_scan_sequences_mismatch"))
+
+    common_policy = (
+        "official_substitute"
+        if set(policies.values()) == {"official_substitute"}
+        else "config_mismatch"
+    )
+    return (
+        {
+            "status": "pass" if not errors else "fail",
+            "dataset": "rio",
+            "temporal_window": 2,
+            "known_empty_scan_id": P2_KNOWN_EMPTY_RIO_SCAN_ID,
+            "policy": common_policy,
+            "sequence_database_ref": (
+                P2_RIO_SEQUENCE_DATABASE_REF
+                if path.resolve()
+                == (
+                    REPO_ROOT
+                    / "data"
+                    / "processed"
+                    / "rio"
+                    / "sequence_database_sliding_2.yaml"
+                ).resolve()
+                else _portable_ref(path, "rio_sequence_database")
+            ),
+            "expected_sequence_database_sha256": (
+                P2_RIO_SEQUENCE_DATABASE_SHA256
+            ),
+            "observed_sequence_database_sha256": observed_sha256,
+            "fail_closed": fail_closed,
+            "affected_sequences": affected_sequences,
+            "scannet_known_empty_scan_ids": P2_KNOWN_EMPTY_SCANNET_SCAN_IDS,
+        },
+        errors,
+    )
+
+
+def _audit_formal_data_roots(
+    p2_config: Any | None,
+    processed_scannet_dir: Path,
+    rio_processed_dir: Path,
+    *,
+    raw_scannet_dir: Path | None = None,
+    split_dir: Path | None = None,
+    test_segments_dir: Path | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    errors: list[dict[str, Any]] = []
+    expected_paths: dict[str, Path] = {}
+    try:
+        if p2_config is None:
+            raise TypeError
+        children = p2_config.data.train_dataset.datasets
+        by_name = {str(child.dataset_name): child for child in children}
+        if set(by_name) != {"rio", "scannet"}:
+            raise ValueError
+        for name in ("scannet", "rio"):
+            path = Path(str(by_name[name].data_dir)).expanduser()
+            expected_paths[name] = (
+                path if path.is_absolute() else REPO_ROOT / path
+            ).resolve()
+        expected_paths.update(
+            {
+                "raw_scannet": (
+                    REPO_ROOT / "data" / "raw" / "scannet" / "scannet"
+                ).resolve(),
+                "split_metadata": (
+                    REPO_ROOT
+                    / "third_party"
+                    / "ScanNet"
+                    / "Tasks"
+                    / "Benchmark"
+                ).resolve(),
+                "test_segments": (
+                    REPO_ROOT / "data" / "raw" / "scannet_test_segments"
+                ).resolve(),
+            }
+        )
+    except (AttributeError, KeyError, TypeError, ValueError):
+        errors.append(_error("formal_data_root_config_invalid"))
+
+    observed_paths = {
+        "scannet": Path(processed_scannet_dir).expanduser().resolve(),
+        "rio": Path(rio_processed_dir).expanduser().resolve(),
+        "raw_scannet": Path(
+            raw_scannet_dir
+            or REPO_ROOT / "data" / "raw" / "scannet" / "scannet"
+        ).expanduser().resolve(),
+        "split_metadata": Path(
+            split_dir
+            or REPO_ROOT
+            / "third_party"
+            / "ScanNet"
+            / "Tasks"
+            / "Benchmark"
+        ).expanduser().resolve(),
+        "test_segments": Path(
+            test_segments_dir
+            or REPO_ROOT / "data" / "raw" / "scannet_test_segments"
+        ).expanduser().resolve(),
+    }
+    for name in (
+        "raw_scannet",
+        "scannet",
+        "rio",
+        "split_metadata",
+        "test_segments",
+    ):
+        expected = expected_paths.get(name)
+        if expected is not None and observed_paths[name] != expected:
+            errors.append(_error(f"formal_{name}_data_root_mismatch"))
+
+    expected_refs = {
+        name: _portable_ref(path, f"configured_{name}_processed")
+        for name, path in expected_paths.items()
+    }
+    observed_refs = {
+        name: (
+            expected_refs[name]
+            if name in expected_paths and path == expected_paths[name]
+            else _portable_ref(path, f"audited_{name}_processed")
+        )
+        for name, path in observed_paths.items()
+    }
+    return (
+        {
+            "status": "pass" if not errors else "fail",
+            "expected": expected_refs,
+            "observed": observed_refs,
+        },
+        errors,
+    )
 
 
 def _scene_error(code: str, split: str, scenes: Sequence[str]) -> dict[str, Any]:
@@ -235,14 +550,7 @@ def _resolve_record_path(value: Any, processed_dir: Path, split: str) -> Path | 
     if not isinstance(value, (str, os.PathLike)):
         return None
     path = Path(value)
-    candidates = [path] if path.is_absolute() else [REPO_ROOT / path]
-    candidates.extend(
-        [
-            processed_dir / split / path.name,
-            processed_dir / path,
-        ]
-    )
-    return next((candidate for candidate in candidates if candidate.is_file()), candidates[0])
+    return path if path.is_absolute() else REPO_ROOT / path
 
 
 def _read_split_metadata(
@@ -258,14 +566,42 @@ def _read_split_metadata(
         filename = SPLIT_FILES[split]
         path = split_dir / filename
         expected = int(expected_counts[split])
+        observed_sha256 = None
+        read_failed = False
         if path.is_file():
-            scenes = [line.strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            try:
+                before = path.stat()
+                payload = path.read_bytes()
+                after = path.stat()
+                if (
+                    before.st_dev,
+                    before.st_ino,
+                    before.st_size,
+                    before.st_mtime_ns,
+                ) != (
+                    after.st_dev,
+                    after.st_ino,
+                    after.st_size,
+                    after.st_mtime_ns,
+                ):
+                    raise OSError("split changed while reading")
+                observed_sha256 = hashlib.sha256(payload).hexdigest()
+                scenes = [
+                    line.strip()
+                    for line in payload.decode("utf-8").splitlines()
+                    if line.strip()
+                ]
+            except (OSError, UnicodeError):
+                scenes = []
+                read_failed = True
+                errors.append(_error("split_file_unreadable", split=split))
         else:
             scenes = []
+            read_failed = True
             errors.append(_error("split_file_missing", split=split))
         unique_scenes = list(dict.fromkeys(scenes))
         valid_names = all(re.fullmatch(r"scene\d{4}_\d{2}", scene) for scene in scenes)
-        status = "pass"
+        status = "fail" if read_failed else "pass"
         if len(scenes) != expected:
             errors.append(
                 _error(
@@ -288,9 +624,164 @@ def _read_split_metadata(
             "expected": expected,
             "observed": len(scenes),
             "unique": len(unique_scenes),
+            "observed_sha256": observed_sha256,
             "status": status,
         }
+    scene_owners: dict[str, list[str]] = {}
+    for split, scenes in scenes_by_split.items():
+        for scene in scenes:
+            scene_owners.setdefault(scene, []).append(split)
+    overlap = {
+        scene: splits
+        for scene, splits in scene_owners.items()
+        if len(splits) > 1
+    }
+    if overlap:
+        errors.append(
+            _error(
+                "split_cross_partition_overlap",
+                overlap_count=len(overlap),
+                scenes=sorted(overlap)[:10],
+            )
+        )
+        for split, record in records.items():
+            if any(split in splits for splits in overlap.values()):
+                record["status"] = "fail"
     return scenes_by_split, records, errors
+
+
+def _audit_official_split_identity(
+    split_dir: Path,
+    *,
+    split_records: Mapping[str, Mapping[str, Any]] | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    if split_records is None:
+        identity = build_scannet_official_split_identity(split_dir=split_dir)
+    else:
+        try:
+            observed_commit = subprocess.run(
+                ["git", "-C", str(split_dir), "rev-parse", "HEAD"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+        except (OSError, subprocess.CalledProcessError):
+            observed_commit = None
+        files = {}
+        for split, filename in SPLIT_FILES.items():
+            record = split_records.get(split, {})
+            observed_sha256 = record.get("observed_sha256")
+            observed_count = record.get("observed")
+            files[split] = {
+                "reference": record.get(
+                    "source_ref",
+                    _join_ref(
+                        _portable_ref(split_dir, "scannet_splits"),
+                        filename,
+                    ),
+                ),
+                "expected_sha256": SCANNET_SPLIT_SHA256[split],
+                "observed_sha256": observed_sha256,
+                "expected_scene_count": OFFICIAL_SPLIT_COUNTS[split],
+                "observed_scene_count": observed_count,
+                "status": (
+                    "pass"
+                    if observed_sha256 == SCANNET_SPLIT_SHA256[split]
+                    and observed_count == OFFICIAL_SPLIT_COUNTS[split]
+                    else "fail"
+                ),
+            }
+        identity = {
+            "status": (
+                "pass"
+                if observed_commit == SCANNET_OFFICIAL_COMMIT
+                and all(record["status"] == "pass" for record in files.values())
+                else "fail"
+            ),
+            "repository_ref": SCANNET_OFFICIAL_REPOSITORY_REF,
+            "expected_commit": SCANNET_OFFICIAL_COMMIT,
+            "observed_commit": observed_commit,
+            "files": files,
+        }
+    errors: list[dict[str, Any]] = []
+    if identity.get("observed_commit") != SCANNET_OFFICIAL_COMMIT:
+        errors.append(_error("scannet_official_commit_mismatch"))
+    for split, record in identity.get("files", {}).items():
+        if record.get("observed_sha256") != record.get("expected_sha256"):
+            errors.append(
+                _error("official_split_sha256_mismatch", split=split)
+            )
+        if record.get("observed_scene_count") != record.get(
+            "expected_scene_count"
+        ):
+            errors.append(
+                _error("official_split_scene_count_mismatch", split=split)
+            )
+    return identity, errors
+
+
+def _audit_semantic_snapshot_stability(
+    *,
+    initial_input_manifest: Mapping[str, Any],
+    initial_split_identity: Mapping[str, Any],
+    processed_scannet_dir: Path,
+    rio_processed_dir: Path,
+    split_dir: Path,
+) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
+    final_input_manifest = build_p2_input_manifest(
+        scannet_root=processed_scannet_dir,
+        rio_root=rio_processed_dir,
+    )
+    final_split_identity = build_scannet_official_split_identity(
+        split_dir=split_dir
+    )
+    errors: list[dict[str, Any]] = []
+    if final_input_manifest != initial_input_manifest:
+        errors.append(_error("processed_input_changed_during_semantic_audit"))
+    if final_split_identity != initial_split_identity:
+        errors.append(_error("official_split_changed_during_semantic_audit"))
+    return final_input_manifest, final_split_identity, errors
+
+
+def _audit_source_contract_stability(
+    *,
+    initial_source_tree_contract: Mapping[str, Any],
+    initial_runtime_source_contract: Mapping[str, Any],
+    initial_runtime_environment_contract: Mapping[str, Any],
+) -> tuple[
+    dict[str, Any],
+    dict[str, Any],
+    dict[str, Any],
+    list[dict[str, Any]],
+]:
+    final_source_tree_contract = build_p2_source_tree_contract()
+    final_runtime_source_contract = build_p2_runtime_source_contract()
+    final_runtime_environment_contract = build_p2_runtime_environment_contract()
+    errors: list[dict[str, Any]] = []
+    if final_source_tree_contract != initial_source_tree_contract:
+        errors.append(_error("source_tree_changed_during_audit"))
+    if final_runtime_source_contract != initial_runtime_source_contract:
+        errors.append(_error("runtime_source_changed_during_audit"))
+    if final_runtime_environment_contract != initial_runtime_environment_contract:
+        errors.append(_error("runtime_environment_changed_during_audit"))
+    return (
+        final_source_tree_contract,
+        final_runtime_source_contract,
+        final_runtime_environment_contract,
+        errors,
+    )
+
+
+def _initial_input_manifest_allowed(
+    *,
+    source_tree: Mapping[str, Any],
+    runtime_source: Mapping[str, Any],
+    runtime_environment: Mapping[str, Any],
+) -> bool:
+    return all(
+        contract.get("status") == "pass"
+        for contract in (source_tree, runtime_source, runtime_environment)
+    )
 
 
 def _raw_scene_candidates(raw_dir: Path, split: str, scene: str) -> list[Path]:
@@ -406,13 +897,20 @@ def _audit_raw_assets(
     )
 
 
-def _audit_taxonomy(processed_dir: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+def _audit_taxonomy(
+    processed_dir: Path,
+    dataset_name: str = "scannet",
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     errors: list[dict[str, Any]] = []
     label_db_path = processed_dir / "label_database.yaml"
-    metric_path = processed_dir / "scannet.yaml"
-    expected_validation_ids = {1, 2, *NYU40_INSTANCE_IDS}
-    validation_ids: set[int] = set()
-    metric_ids: list[int] = []
+    metric_path = processed_dir / f"{dataset_name}.yaml"
+    expected_validation_items = [
+        (1, "wall"),
+        (2, "floor"),
+        *list(zip(NYU40_INSTANCE_IDS, NYU40_INSTANCE_LABELS)),
+    ]
+    validation_items: list[tuple[int, str | None]] = []
+    metric_ids: list[Any] = []
     metric_labels: list[str] = []
     metric_name: str | None = None
 
@@ -420,37 +918,69 @@ def _audit_taxonomy(processed_dir: Path) -> tuple[dict[str, Any], list[dict[str,
         labels = _read_yaml(label_db_path)
         if not isinstance(labels, Mapping):
             raise TypeError
-        validation_ids = {
-            int(class_id)
-            for class_id, entry in labels.items()
-            if isinstance(entry, Mapping) and bool(entry.get("validation"))
-        }
-    except (OSError, TypeError, ValueError, yaml.YAMLError):
+        for class_id, entry in labels.items():
+            if type(class_id) is not int:
+                errors.append(
+                    _error("label_database_validation_id_type_invalid")
+                )
+                continue
+            if not isinstance(entry, Mapping):
+                errors.append(_error("label_database_entry_invalid"))
+                continue
+            validation = entry.get("validation")
+            if type(validation) is not bool:
+                errors.append(
+                    _error("label_database_validation_flag_type_invalid")
+                )
+                continue
+            if validation:
+                name = entry.get("name")
+                if isinstance(name, str):
+                    normalized_name = name.replace("_", " ")
+                else:
+                    normalized_name = None
+                validation_items.append((class_id, normalized_name))
+    except (OSError, TypeError, yaml.YAMLError):
         errors.append(_error("label_database_invalid_or_missing"))
 
     try:
         metric = _read_yaml(metric_path)
         if not isinstance(metric, Mapping):
             raise TypeError
-        metric_name = str(metric.get("name"))
-        metric_ids = [int(value) for value in metric.get("valid_class_ids", [])]
-        metric_labels = [str(value) for value in metric.get("class_labels", [])]
-    except (OSError, TypeError, ValueError, yaml.YAMLError):
+        metric_name_value = metric.get("name")
+        metric_id_values = metric.get("valid_class_ids")
+        metric_label_values = metric.get("class_labels")
+        if not isinstance(metric_name_value, str):
+            raise TypeError
+        if not isinstance(metric_id_values, list):
+            raise TypeError
+        if any(type(value) is not int for value in metric_id_values):
+            errors.append(_error("metric_class_id_type_invalid"))
+        if not isinstance(metric_label_values, list) or any(
+            not isinstance(value, str) for value in metric_label_values
+        ):
+            errors.append(_error("metric_class_label_type_invalid"))
+        metric_name = metric_name_value
+        metric_ids = list(metric_id_values)
+        metric_labels = list(metric_label_values)
+    except (OSError, TypeError, yaml.YAMLError):
         errors.append(_error("metric_taxonomy_invalid_or_missing"))
 
-    if validation_ids and validation_ids != expected_validation_ids:
+    if dict(validation_items) != dict(expected_validation_items):
         errors.append(
             _error(
-                "label_database_validation_ids_mismatch",
-                expected_count=len(expected_validation_ids),
-                observed_count=len(validation_ids),
+                "label_database_validation_mapping_mismatch",
+                expected_count=len(expected_validation_items),
+                observed_count=len(validation_items),
             )
         )
-    if metric_ids and metric_ids != NYU40_INSTANCE_IDS:
+    elif validation_items != expected_validation_items:
+        errors.append(_error("label_database_validation_order_mismatch"))
+    if metric_ids != NYU40_INSTANCE_IDS:
         errors.append(_error("metric_class_ids_mismatch"))
-    if metric_labels and metric_labels != NYU40_INSTANCE_LABELS:
+    if metric_labels != NYU40_INSTANCE_LABELS:
         errors.append(_error("metric_class_labels_mismatch"))
-    if metric_name is not None and metric_name != "scannet":
+    if metric_name != dataset_name:
         errors.append(_error("metric_dataset_name_mismatch"))
 
     status = "pass" if not errors else "fail"
@@ -459,10 +989,456 @@ def _audit_taxonomy(processed_dir: Path) -> tuple[dict[str, Any], list[dict[str,
             "status": status,
             "name": metric_name,
             "valid_class_ids": metric_ids,
+            "class_labels": metric_labels,
             "class_count": len(metric_ids),
         },
         errors,
     )
+
+
+def _load_unique_yaml_mapping(path: Path) -> Mapping[str, Any]:
+    class UniqueKeyLoader(yaml.SafeLoader):
+        pass
+
+    def construct_mapping(loader, node, deep=False):
+        mapping: dict[Any, Any] = {}
+        for key_node, value_node in node.value:
+            key = loader.construct_object(key_node, deep=deep)
+            if key in mapping:
+                raise yaml.YAMLError(f"duplicate YAML key: {key!r}")
+            mapping[key] = loader.construct_object(value_node, deep=deep)
+        return mapping
+
+    UniqueKeyLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+        construct_mapping,
+    )
+    loaded = yaml.load(path.read_text(encoding="utf-8"), Loader=UniqueKeyLoader)
+    if not isinstance(loaded, Mapping):
+        raise TypeError("expected a YAML mapping")
+    return loaded
+
+
+def _audit_rio_record_paths(
+    rio_processed_dir: Path,
+    *,
+    validate_content: bool = False,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Bind every P2-active RIO record to its canonical processed asset."""
+    errors: list[dict[str, Any]] = []
+    database_record_counts: dict[str, int] = {}
+    records_by_split: dict[str, list[Mapping[str, Any]]] = {}
+    scenes_by_split: dict[str, set[str]] = {}
+    seen_npy: set[Path] = set()
+    seen_gt: set[Path] = set()
+    supervision_observed: list[bool] = []
+    scene_supervision: dict[str, bool] = {}
+    expected_repo_prefix: Path | None
+    try:
+        expected_repo_prefix = rio_processed_dir.resolve().relative_to(
+            REPO_ROOT.resolve()
+        )
+    except ValueError:
+        expected_repo_prefix = None
+
+    for split, expected_count in (("train", 1178), ("validation", 157)):
+        database_path = rio_processed_dir / f"{split}_database.yaml"
+        try:
+            loaded = _read_yaml(database_path)
+            if not isinstance(loaded, list) or not all(
+                isinstance(record, Mapping) for record in loaded
+            ):
+                raise TypeError
+            records = list(loaded)
+        except (OSError, TypeError, yaml.YAMLError):
+            records = []
+            errors.append(_error("rio_database_invalid", split=split))
+        records_by_split[split] = records
+        database_record_counts[split] = len(records)
+        if len(records) != expected_count:
+            errors.append(
+                _error(
+                    "rio_database_count_mismatch",
+                    split=split,
+                    expected=expected_count,
+                    observed=len(records),
+                )
+            )
+
+        split_scenes: set[str] = set()
+        for record in records:
+            scene = _scene_from_record(record)
+            if scene is None or scene in split_scenes:
+                errors.append(_error("rio_database_scene_invalid", split=split))
+                continue
+            split_scenes.add(scene)
+            numeric_stem = scene.removeprefix("scene")
+            npy_path: Path | None = None
+            instance_path: Path | None = None
+            path_specs = (
+                (
+                    "filepath",
+                    rio_processed_dir / split,
+                    numeric_stem,
+                    ".npy",
+                    "rio_processed_npy",
+                    seen_npy,
+                ),
+                (
+                    "instance_gt_filepath",
+                    rio_processed_dir / "instance_gt" / split,
+                    scene,
+                    ".txt",
+                    "rio_instance_gt",
+                    seen_gt,
+                ),
+            )
+            for field, root, stem, suffix, code_prefix, seen in path_specs:
+                value = record.get(field)
+                lexical_path = Path(value) if isinstance(value, str) else None
+                if lexical_path is None:
+                    errors.append(_error(f"{code_prefix}_path_invalid", split=split))
+                    continue
+                if lexical_path.is_absolute() or ".." in lexical_path.parts:
+                    resolved = lexical_path.resolve()
+                    errors.append(
+                        _error(f"{code_prefix}_path_noncanonical", split=split)
+                    )
+                else:
+                    resolved = (REPO_ROOT / lexical_path).resolve()
+                if field == "filepath":
+                    npy_path = resolved
+                else:
+                    instance_path = resolved
+                expected_root = root.resolve()
+                if not resolved.is_relative_to(expected_root):
+                    errors.append(
+                        _error(f"{code_prefix}_path_outside_split", split=split)
+                    )
+                expected_lexical = (
+                    expected_repo_prefix / root.relative_to(rio_processed_dir) / f"{stem}{suffix}"
+                    if expected_repo_prefix is not None
+                    else None
+                )
+                if expected_lexical is not None and lexical_path != expected_lexical:
+                    errors.append(
+                        _error(f"{code_prefix}_path_noncanonical", split=split)
+                    )
+                if resolved.stem != stem or resolved.suffix != suffix:
+                    errors.append(
+                        _error(f"{code_prefix}_scene_stem_mismatch", split=split)
+                    )
+                if resolved in seen:
+                    errors.append(_error(f"{code_prefix}_path_reused", split=split))
+                seen.add(resolved)
+                if not resolved.is_file() or resolved.is_symlink():
+                    errors.append(_error(f"{code_prefix}_missing", split=split))
+            if (
+                validate_content
+                and npy_path is not None
+                and instance_path is not None
+                and npy_path.is_file()
+                and instance_path.is_file()
+                and not any(
+                    error.get("split") == split
+                    and error["code"].endswith(
+                        ("path_outside_split", "path_noncanonical")
+                    )
+                    for error in errors
+                )
+            ):
+                supervision_count_before = len(supervision_observed)
+                content_codes = _validate_processed_record_assets(
+                    record,
+                    npy_path,
+                    instance_path,
+                    split,
+                    allow_known_empty_supervision=True,
+                    instance_gt_offset=0,
+                    allow_unlabeled_instance_gt=True,
+                    supervision_observed=supervision_observed,
+                )
+                errors.extend(
+                    _error(f"rio_{code}", split=split, scene=scene)
+                    for code in sorted(content_codes)
+                )
+                if len(supervision_observed) > supervision_count_before:
+                    scene_supervision[scene] = supervision_observed[-1]
+        scenes_by_split[split] = split_scenes
+
+    combined_path = rio_processed_dir / "train_validation_database.yaml"
+    try:
+        combined = _read_yaml(combined_path)
+    except (OSError, yaml.YAMLError):
+        combined = None
+    if combined != records_by_split["train"] + records_by_split["validation"]:
+        errors.append(_error("rio_train_validation_database_mismatch"))
+
+    sequence_path = rio_processed_dir / "sequence_database_sliding_2.yaml"
+    try:
+        sequences = _load_unique_yaml_mapping(sequence_path)
+    except (OSError, TypeError, yaml.YAMLError):
+        sequences = {}
+        errors.append(_error("rio_sequence_database_invalid"))
+    if len(sequences) != 1482:
+        errors.append(
+            _error(
+                "rio_sequence_database_count_mismatch",
+                expected=1482,
+                observed=len(sequences),
+            )
+        )
+
+    seen_change_paths: set[Path] = set()
+    sequence_counts = {"train": 0, "validation": 0}
+    endpoint_counts = {
+        split: {scene: [0, 0] for scene in scenes}
+        for split, scenes in scenes_by_split.items()
+    }
+    observed_unsupervised_sequences: list[str] = []
+    for sequence, entry in sequences.items():
+        if not isinstance(entry, Mapping) or entry.get("type") not in sequence_counts:
+            continue
+        split = str(entry["type"])
+        sequence_counts[split] += 1
+        names = str(sequence).split("-")
+        if (
+            len(names) != 2
+            or any(not re.fullmatch(r"scene\d{4}_\d{2}", name) for name in names)
+            or any(name not in scenes_by_split[split] for name in names)
+        ):
+            errors.append(_error("rio_sequence_endpoints_invalid", split=split))
+        else:
+            for index, name in enumerate(names):
+                endpoint_counts[split][name][index] += 1
+            try:
+                expected_scene = int(names[0][5:9])
+                expected_sub_scenes = [int(name[10:12]) for name in names]
+            except (ValueError, IndexError):
+                expected_scene = None
+                expected_sub_scenes = None
+            if (
+                type(entry.get("scene")) is not int
+                or entry.get("scene") != expected_scene
+                or entry.get("sub_scenes") != expected_sub_scenes
+            ):
+                errors.append(_error("rio_sequence_metadata_mismatch", split=split))
+            if validate_content and not any(
+                scene_supervision.get(name, False) for name in names
+            ):
+                observed_unsupervised_sequences.append(str(sequence))
+
+        filepath = entry.get("filepath")
+        lexical_path = Path(filepath) if isinstance(filepath, str) else None
+        if lexical_path is None:
+            errors.append(_error("rio_change_gt_path_invalid", split=split))
+            continue
+        if lexical_path.is_absolute() or ".." in lexical_path.parts:
+            resolved_change = lexical_path.resolve()
+            errors.append(_error("rio_change_gt_path_noncanonical", split=split))
+        else:
+            resolved_change = (REPO_ROOT / lexical_path).resolve()
+        change_root = (rio_processed_dir / "change_gt" / split).resolve()
+        if not resolved_change.is_relative_to(change_root):
+            errors.append(_error("rio_change_gt_path_outside_root", split=split))
+        if expected_repo_prefix is not None:
+            expected_change = (
+                expected_repo_prefix / "change_gt" / split / f"{sequence}.txt"
+            )
+            if lexical_path != expected_change:
+                errors.append(_error("rio_change_gt_path_noncanonical", split=split))
+        if resolved_change.stem != str(sequence) or resolved_change.suffix != ".txt":
+            errors.append(_error("rio_change_gt_scene_stem_mismatch", split=split))
+        if resolved_change in seen_change_paths:
+            errors.append(_error("rio_change_gt_path_reused", split=split))
+        seen_change_paths.add(resolved_change)
+        if not resolved_change.is_file() or resolved_change.is_symlink():
+            errors.append(_error("rio_change_gt_missing", split=split))
+
+    for split, expected_count in (("train", 1178), ("validation", 157)):
+        if sequence_counts[split] != expected_count:
+            errors.append(_error("rio_sequence_split_count_mismatch", split=split))
+        if any(counts != [1, 1] for counts in endpoint_counts[split].values()):
+            errors.append(_error("rio_sequence_endpoint_coverage_mismatch", split=split))
+
+    if validate_content and not any(supervision_observed):
+        errors.append(_error("rio_dataset_instance_supervision_empty"))
+    if validate_content and observed_unsupervised_sequences:
+        errors.append(
+            _error(
+                "rio_active_sequence_supervision_empty",
+                sequence_count=len(observed_unsupervised_sequences),
+                sequences=observed_unsupervised_sequences,
+            )
+        )
+    rio_content_errors = any(
+        error["code"].startswith("rio_processed_")
+        or error["code"]
+        in {
+            "rio_dataset_instance_supervision_empty",
+            "rio_active_sequence_supervision_empty",
+        }
+        for error in errors
+    )
+
+    return (
+        {
+            "status": "pass" if not errors else "fail",
+            "database_record_counts": database_record_counts,
+            "sequence_record_count": len(sequences),
+            "content_validation": (
+                "pass"
+                if validate_content and not rio_content_errors
+                else "not_run_diagnostic"
+                if not validate_content
+                else "fail"
+            ),
+            "supervised_record_count": (
+                sum(supervision_observed) if validate_content else None
+            ),
+            "unsupervised_sequences": (
+                observed_unsupervised_sequences if validate_content else None
+            ),
+        },
+        errors,
+    )
+
+
+def _is_integer_column(values: np.ndarray, *, minimum: int, maximum: int) -> bool:
+    return bool(
+        values.size
+        and np.isfinite(values).all()
+        and np.equal(values, np.rint(values)).all()
+        and values.min() >= minimum
+        and values.max() <= maximum
+    )
+
+
+def _read_instance_gt(path: Path) -> np.ndarray:
+    values = [
+        int(line.strip())
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    return np.asarray(values, dtype=np.int64)
+
+
+def _validate_processed_record_assets(
+    record: Mapping[str, Any],
+    npy_path: Path,
+    instance_path: Path | None,
+    split: str,
+    *,
+    allow_known_empty_supervision: bool = False,
+    instance_gt_offset: int = 1,
+    allow_unlabeled_instance_gt: bool = False,
+    supervision_observed: list[bool] | None = None,
+) -> set[str]:
+    error_codes: set[str] = set()
+    file_len = record.get("file_len")
+    if type(file_len) is not int or file_len < 1:
+        error_codes.add("processed_npy_file_len_invalid")
+        file_len = None
+    try:
+        points = np.load(npy_path, mmap_mode="r", allow_pickle=False)
+    except (OSError, ValueError, TypeError):
+        return {"processed_npy_load_failed"}
+
+    expected_columns = 10 if split == "test" else 12
+    if (
+        points.ndim != 2
+        or points.shape[0] < 1
+        or points.shape[1] != expected_columns
+    ):
+        error_codes.add("processed_npy_shape_invalid")
+        return error_codes
+    if points.dtype != np.dtype(np.float32):
+        error_codes.add("processed_npy_dtype_invalid")
+        return error_codes
+    if file_len is not None and points.shape[0] != file_len:
+        error_codes.add("processed_npy_file_len_mismatch")
+    try:
+        finite = bool(np.isfinite(points).all())
+    except TypeError:
+        error_codes.add("processed_npy_dtype_invalid")
+        return error_codes
+    if not finite:
+        error_codes.add("processed_npy_nonfinite")
+        return error_codes
+
+    segments = np.asarray(points[:, 9])
+    if not _is_integer_column(
+        segments,
+        minimum=0,
+        maximum=max(points.shape[0] - 1, 0),
+    ):
+        error_codes.add("processed_npy_integer_columns_invalid")
+        error_codes.add("processed_npy_value_range_invalid")
+
+    if split == "test":
+        return error_codes
+
+    semantic_labels = np.asarray(points[:, 10])
+    instance_labels = np.asarray(points[:, 11])
+    semantic_values = np.rint(semantic_labels).astype(np.int64)
+    semantic_ids_valid = np.isin(semantic_values, range(41)).all()
+    if (
+        not _is_integer_column(semantic_labels, minimum=-1, maximum=255)
+        or not semantic_ids_valid
+        or not _is_integer_column(instance_labels, minimum=-1, maximum=999)
+    ):
+        error_codes.add("processed_npy_integer_columns_invalid")
+        error_codes.add("processed_npy_value_range_invalid")
+        return error_codes
+    if not np.any((semantic_labels > 0) & (semantic_labels != 255)):
+        error_codes.add("processed_npy_supervision_empty")
+    effective_instance_supervision = np.isin(
+        semantic_values,
+        NYU40_INSTANCE_IDS,
+    ) & (instance_labels >= 0)
+    if supervision_observed is not None:
+        supervision_observed.append(bool(np.any(effective_instance_supervision)))
+    if (
+        not allow_known_empty_supervision
+        and not np.any(effective_instance_supervision)
+    ):
+        error_codes.add("processed_npy_instance_supervision_empty")
+
+    if instance_path is None or not instance_path.is_file():
+        return error_codes
+    try:
+        instance_gt = _read_instance_gt(instance_path)
+    except (OSError, UnicodeError, ValueError, OverflowError):
+        error_codes.add("processed_instance_gt_invalid")
+        return error_codes
+    if file_len is not None and len(instance_gt) != file_len:
+        error_codes.add("processed_instance_gt_length_mismatch")
+    if len(instance_gt) != points.shape[0]:
+        error_codes.add("processed_instance_gt_length_mismatch")
+        return error_codes
+    minimum_instance_gt = -1 if allow_unlabeled_instance_gt else 0
+    if len(instance_gt) == 0 or np.any(instance_gt < minimum_instance_gt):
+        error_codes.add("processed_instance_gt_invalid")
+        return error_codes
+    if allow_unlabeled_instance_gt:
+        valid_negative = (
+            (instance_gt == -1)
+            & (semantic_values == 0)
+            & (instance_labels == -1)
+        )
+        if np.any((instance_gt < 0) & ~valid_negative):
+            error_codes.add("processed_instance_gt_invalid")
+            return error_codes
+    if not np.any(instance_gt > 0):
+        error_codes.add("processed_instance_gt_supervision_empty")
+    expected_gt = (
+        np.rint(semantic_labels).astype(np.int64) * 1000
+        + np.rint(instance_labels).astype(np.int64)
+        + instance_gt_offset
+    )
+    if not np.array_equal(instance_gt, expected_gt):
+        error_codes.add("processed_instance_gt_npy_mismatch")
+    return error_codes
 
 
 def _audit_processed_assets(
@@ -490,6 +1466,8 @@ def _audit_processed_assets(
     npy_scene_count = 0
     instance_gt_scene_count = 0
     by_split: dict[str, Any] = {}
+    seen_npy_paths: dict[Path, str] = {}
+    seen_instance_paths: dict[Path, str] = {}
     for split in ("train", "validation", "test"):
         database_path = processed_dir / DATABASE_FILES[split]
         expected_scenes = list(scenes_by_split[split])
@@ -538,6 +1516,7 @@ def _audit_processed_assets(
         missing_database_scenes: list[str] = []
         missing_npy_scenes: list[str] = []
         missing_instance_scenes: list[str] = []
+        invalid_scenes_by_code: dict[str, list[str]] = {}
         missing_examples: list[dict[str, Any]] = []
         for scene in expected_scenes:
             record = scene_records.get(scene)
@@ -548,22 +1527,102 @@ def _audit_processed_assets(
                 continue
             split_db_count += 1
             npy_path = _resolve_record_path(record.get("filepath"), processed_dir, split)
-            if npy_path is not None and npy_path.is_file() and npy_path.suffix == ".npy":
-                split_npy_count += 1
-            else:
+            instance_path = None
+            if split != "test":
+                instance_path = _resolve_record_path(
+                    record.get("instance_gt_filepath"),
+                    processed_dir / "instance_gt",
+                    split,
+                )
+            validation_codes: set[str] = set()
+            processed_ref = None
+            if npy_path is not None:
+                resolved_npy = npy_path.resolve()
+                expected_npy_root = (processed_dir / split).resolve()
+                expected_npy_stem = scene.removeprefix("scene")
+                if not resolved_npy.is_relative_to(expected_npy_root):
+                    validation_codes.add("processed_npy_path_outside_split")
+                if resolved_npy.stem != expected_npy_stem:
+                    validation_codes.add("processed_npy_scene_stem_mismatch")
+                if resolved_npy in seen_npy_paths:
+                    validation_codes.add("processed_npy_path_reused")
+                else:
+                    seen_npy_paths[resolved_npy] = scene
+                try:
+                    processed_ref = processed_dir.resolve().relative_to(
+                        REPO_ROOT.resolve()
+                    )
+                except ValueError:
+                    processed_ref = None
+                if processed_ref is not None and Path(
+                    str(record.get("filepath"))
+                ) != processed_ref / split / f"{expected_npy_stem}.npy":
+                    validation_codes.add("processed_npy_path_noncanonical")
+
+            if split != "test" and instance_path is not None:
+                resolved_instance = instance_path.resolve()
+                expected_instance_root = (
+                    processed_dir / "instance_gt" / split
+                ).resolve()
+                if not resolved_instance.is_relative_to(expected_instance_root):
+                    validation_codes.add(
+                        "processed_instance_gt_path_outside_split"
+                    )
+                if resolved_instance.stem != scene:
+                    validation_codes.add(
+                        "processed_instance_gt_scene_stem_mismatch"
+                    )
+                if resolved_instance in seen_instance_paths:
+                    validation_codes.add("processed_instance_gt_path_reused")
+                else:
+                    seen_instance_paths[resolved_instance] = scene
+                if processed_ref is not None and Path(
+                    str(record.get("instance_gt_filepath"))
+                ) != processed_ref / "instance_gt" / split / f"{scene}.txt":
+                    validation_codes.add(
+                        "processed_instance_gt_path_noncanonical"
+                    )
+
+            if npy_path is None or not npy_path.is_file() or npy_path.suffix != ".npy":
                 missing_npy_scenes.append(scene)
                 if len(missing_examples) < 10:
                     missing_examples.append({"scene": scene, "missing": ["npy"]})
+            else:
+                if not any(
+                    code.endswith("path_outside_split")
+                    for code in validation_codes
+                ):
+                    validation_codes.update(
+                        _validate_processed_record_assets(
+                            record,
+                            npy_path,
+                            instance_path,
+                            split,
+                            allow_known_empty_supervision=(
+                                scene in {"scene0154_00", "scene0636_00"}
+                            ),
+                        )
+                    )
+                if not any(code.startswith("processed_npy_") for code in validation_codes):
+                    split_npy_count += 1
+                if validation_codes and len(missing_examples) < 10:
+                    missing_examples.append(
+                        {"scene": scene, "invalid": sorted(validation_codes)}
+                    )
+            for code in validation_codes:
+                invalid_scenes_by_code.setdefault(code, []).append(scene)
             if split != "test":
-                instance_path = _resolve_record_path(
-                    record.get("instance_gt_filepath"), processed_dir / "instance_gt", split
-                )
-                if instance_path is not None and instance_path.is_file():
-                    split_instance_count += 1
-                else:
+                if instance_path is None or not instance_path.is_file():
                     missing_instance_scenes.append(scene)
                     if len(missing_examples) < 10:
                         missing_examples.append({"scene": scene, "missing": ["instance_gt"]})
+                elif (
+                    npy_path is not None
+                    and npy_path.is_file()
+                    and npy_path.suffix == ".npy"
+                    and not validation_codes
+                ):
+                    split_instance_count += 1
 
         if missing_database_scenes:
             errors.append(
@@ -575,6 +1634,8 @@ def _audit_processed_assets(
             errors.append(
                 _scene_error("processed_instance_gt_missing", split, missing_instance_scenes)
             )
+        for code, scenes in sorted(invalid_scenes_by_code.items()):
+            errors.append(_scene_error(code, split, scenes))
 
         database_scene_count += split_db_count
         npy_scene_count += split_npy_count
@@ -641,7 +1702,13 @@ def _augmentation_snapshot() -> dict[str, Any]:
     return output
 
 
-def _compose_config_snapshot() -> tuple[dict[str, Any], dict[str, Any], bool, str | None]:
+def _compose_config_snapshot() -> tuple[
+    dict[str, Any],
+    dict[str, Any],
+    bool,
+    str | None,
+    Any | None,
+]:
     try:
         from hydra import compose, initialize_config_dir
 
@@ -724,9 +1791,9 @@ def _compose_config_snapshot() -> tuple[dict[str, Any], dict[str, Any], bool, st
                 "seed": None if cfg.general.seed is None else int(cfg.general.seed),
             }
 
-        return snapshot(p2), snapshot(base), True, None
-    except (Exception, SystemExit) as exc:  # noqa: BLE001 - preserve partial audit evidence.
-        return {}, {}, False, type(exc).__name__
+        return snapshot(p2), snapshot(base), True, None, p2
+    except (Exception, SystemExit) as exc:  # noqa: BLE001 - preserve partial evidence.
+        return {}, {}, False, type(exc).__name__, None
 
 
 def _setting(official: Any, reproduction: Any, repository_default: Any = None, status: str | None = None) -> dict[str, Any]:
@@ -745,17 +1812,31 @@ def _build_config_diff(
     repository_default: Mapping[str, Any],
     composed: bool,
     error_type: str | None,
+    model_checkpoint: Mapping[str, Any],
 ) -> dict[str, Any]:
     get = reproduction.get
     base = repository_default.get
     official_mix = REPRODUCTION_TARGET["data"]["mix"]
     official_temporal = {"rio": 2, "scannet": 1}
-    checkpoint_choice = {
-        "reference": "local_cache:persist4d/concerto/concerto_base.pth",
-        "revision": CONCERTO_REVISION,
-        "sha256": CONCERTO_SHA256,
-        "license": "CC-BY-NC-4.0",
-    }
+    checkpoint_verified = model_checkpoint.get("status") == "pass"
+    if checkpoint_verified:
+        checkpoint_choice = {
+            "reference": model_checkpoint.get("reference"),
+            "revision": CONCERTO_REVISION,
+            "sha256": model_checkpoint.get("observed_sha256"),
+            "license": "CC-BY-NC-4.0",
+        }
+    else:
+        checkpoint_choice = {
+            "reference": model_checkpoint.get("reference"),
+            "revision": CONCERTO_REVISION,
+            "expected_sha256": model_checkpoint.get("expected_sha256"),
+            "observed_sha256": model_checkpoint.get("observed_sha256"),
+            "expected_byte_size": model_checkpoint.get("expected_byte_size"),
+            "observed_byte_size": model_checkpoint.get("observed_byte_size"),
+            "verification_status": model_checkpoint.get("status", "fail"),
+            "license": "CC-BY-NC-4.0",
+        }
     frozen_runtime = get("frozen_encoder_runtime")
     if isinstance(frozen_runtime, Mapping):
         frozen_runtime = {
@@ -774,7 +1855,9 @@ def _build_config_diff(
             },
             checkpoint_choice if composed else None,
             base("backbone_checkpoint_config"),
-            "verified_reproduction_choice" if composed else "unverified",
+            "verified_reproduction_choice"
+            if composed and checkpoint_verified
+            else "unverified",
         ),
         "encoder_freeze": _setting("backbone_encoder", get("encoder_freeze"), base("encoder_freeze")),
         "decoder_trainability": _setting("trainable", get("decoder_trainability"), base("decoder_trainability")),
@@ -942,23 +2025,38 @@ def _build_config_diff(
             "local_fix_commit": P2_RUNTIME_SAFETY_FIX_COMMIT,
             "upstream_behavior": "training returned None for empty targets or the recognized single-point cross-attention error; evaluation returned 0.0 or None for empty coordinates or that error, without cross-rank consensus",
             "upstream_semantic_effect": "asymmetric rank-local skipping could desynchronize optimizer and scheduler progress or hang later DDP collectives",
-            "local_behavior": "preflight and post-forward consensus cover train, validation, and test microbatches and raise a contextual RuntimeError across ranks instead of returning None",
+            "local_behavior": "staged input, recursive output, criterion, objective, and evaluation consensus cover train, validation, and test microbatches; a pre-optimizer gradient-finiteness consensus prevents parameter updates after non-finite gradients",
             "collective_contract": {
-                "normal_ddp_microbatch": {
-                    "int32_max_all_reduce_count": 2,
+                "normal_train_microbatch": {
+                    "safety_int32_max_all_reduce_count": 3,
+                    "criterion_float_num_masks_all_reduce_count": 1,
+                    "total_all_reduce_count": 4,
                     "all_gather_object_count": 0,
                 },
-                "covered_preflight_failure": {
-                    "int32_max_all_reduce_count": 1,
-                    "all_gather_object_count": 1,
+                "normal_validation_microbatch": {
+                    "safety_int32_max_all_reduce_count": 4,
+                    "criterion_float_num_masks_all_reduce_count": 1,
+                    "total_all_reduce_count": 5,
+                    "all_gather_object_count": 0,
                 },
-                "covered_forward_failure": {
-                    "int32_max_all_reduce_count": 2,
-                    "all_gather_object_count": 1,
+                "normal_test_microbatch": {
+                    "safety_int32_max_all_reduce_count": 3,
+                    "criterion_float_num_masks_all_reduce_count": 0,
+                    "total_all_reduce_count": 3,
+                    "all_gather_object_count": 0,
+                },
+                "covered_stage_failure": {
+                    "additional_all_gather_object_count": 1,
+                },
+                "train_optimizer_step_accumulation_4": {
+                    "safety_int32_max_all_reduce_count": 13,
+                    "optimizer_gradient_int32_max_all_reduce_count": 1,
+                    "criterion_float_num_masks_all_reduce_count": 4,
+                    "total_all_reduce_count": 17,
                 },
             },
-            "performance_cost": "two blocking scalar int32 MAX all_reduce operations per normal DDP microbatch, or eight per optimizer step at accumulation=4; all_gather_object is failure-only",
-            "coverage_boundary": "consensus covers declared preflight violations and the recognized single-point cross-attention RuntimeError; unrelated rank-local exceptions are not converted",
+            "performance_cost": "three blocking scalar int32 MAX all_reduce operations per normal train DDP microbatch, four per validation microbatch, and three per test microbatch; train accumulation=4 costs twelve microbatch safety all-reduces, one optimizer-gradient safety all-reduce, and four criterion float num_masks all-reduces per optimizer step (17 total); all_gather_object adds one call only on a covered stage failure",
+            "coverage_boundary": "consensus covers input, recursive model output, criterion, objective, evaluation metadata and metrics, plus pre-optimizer gradient finiteness; exceptions outside those covered stages retain native behavior",
             "evidence_refs": [
                 "external:github/GradientSpaces/rescene4d@fb2fe42/trainer/trainer.py",
                 "repo:trainer/trainer.py",
@@ -1141,7 +2239,7 @@ def _measure_runtime_environment(source_runtime: Mapping[str, Any]) -> dict[str,
         cuda_version = str(torch.version.cuda)
         cudnn_version = _format_cudnn_version(torch.backends.cudnn.version())
         nccl_version = _format_nccl_version(torch.cuda.nccl.version())
-    except (ImportError, RuntimeError, AttributeError):
+    except (ImportError, OSError, RuntimeError, AttributeError):
         pass
     fallback_gpu = source_runtime.get("gpu", {})
     if not isinstance(fallback_gpu, Mapping):
@@ -1157,7 +2255,9 @@ def _measure_runtime_environment(source_runtime: Mapping[str, Any]) -> dict[str,
     }
 
 
-def _build_environment_manifest() -> dict[str, Any]:
+def _build_environment_manifest(
+    model_checkpoint: Mapping[str, Any],
+) -> dict[str, Any]:
     source_path = REPO_ROOT / "artifacts" / "environment" / "source_manifest.json"
     try:
         source = json.loads(source_path.read_text(encoding="utf-8"))
@@ -1216,10 +2316,13 @@ def _build_environment_manifest() -> dict[str, Any]:
         "third_party_sources": third_party,
         "model_weights": {
             "concerto": {
-                "reference": "local_cache:persist4d/concerto/concerto_base.pth",
+                "reference": model_checkpoint.get("reference"),
                 "revision": CONCERTO_REVISION,
-                "sha256": CONCERTO_SHA256,
-                "byte_size": CONCERTO_BYTES,
+                "expected_sha256": model_checkpoint.get("expected_sha256"),
+                "observed_sha256": model_checkpoint.get("observed_sha256"),
+                "expected_byte_size": model_checkpoint.get("expected_byte_size"),
+                "observed_byte_size": model_checkpoint.get("observed_byte_size"),
+                "status": model_checkpoint.get("status", "fail"),
                 "license": source.get("model_weights", {})
                 .get("concerto", {})
                 .get("license", "CC-BY-NC-4.0"),
@@ -1326,7 +2429,7 @@ def _config_audit_markdown(diff: Mapping[str, Any], preflight: Mapping[str, Any]
             f"These are local reproduction safety fixes, not paper-alignment loss fixes, and are not unchanged behavior from official code commit `{diff['reproduction_code_relation']['official_code_commit']}`. They are bound to local runtime safety commit `{diff['reproduction_code_relation']['runtime_safety_fix_commit']}`.",
             "",
             "- Fail-closed data validation: split and temporal databases, sequence scan references, every configured mixed child, and sampling weights are validated before sampling. This prevents missing ScanNet from degrading the required mix to RIO-only and prevents an unknown temporal scan from retaining zero indices.",
-            "- DDP batch-contract consensus: covered preflight and forward failures raise across ranks instead of returning `None`. The normal path adds two scalar int32 MAX all-reduces per normal DDP microbatch, or eight per optimizer step at accumulation=4, and all_gather_object only on a covered failure. This is a deliberate performance cost.",
+            "- DDP batch-contract consensus: covered input, recursive output, criterion, objective, evaluation, and gradient failures raise across ranks instead of returning `None` or updating non-finite parameters. The normal path adds three scalar int32 MAX all-reduces per train microbatch, four per validation and three per test microbatch. At train accumulation=4, this is twelve microbatch safety plus one optimizer-gradient safety and four criterion float num_masks all-reduces per optimizer step (17 total); all_gather_object only on a covered failure. This is a deliberate performance cost.",
             "- Full-state checkpoint selection: candidates receive static Lightning state validation, latest selection uses checkpoint epoch/global_step plus numeric filename version metadata, and an all-corrupt directory refuses a silent fresh start. Static validation is not a real Lightning restore; `trainer.fit` does not automatically retry another candidate after a restore failure.",
             "",
             "## Data Gate Evidence",
@@ -1352,10 +2455,30 @@ def _config_audit_markdown(diff: Mapping[str, Any], preflight: Mapping[str, Any]
 
 
 def _blocked_markdown(preflight: Mapping[str, Any]) -> str:
+    if preflight["status"] == "diagnostic_pass":
+        counts = preflight["expected_split_counts"]
+        return "\n".join(
+            [
+                "# P2 Formal Training Blocked",
+                "",
+                "Status: `BLOCKED_DIAGNOSTIC_ONLY`",
+                "",
+                "The injected dataset passed the selected diagnostic checks, but this is a diagnostic-only run and cannot authorize formal P2 training.",
+                "",
+                f"Selected diagnostic counts: {counts['train']}/{counts['validation']}/{counts['test']}.",
+                "Formal authorization requires the official 1201/312/100 ScanNet split counts.",
+                "",
+                "The formal training blocker remains in place.",
+                "",
+            ]
+        )
     raw = preflight["raw_assets"]
     processed = preflight["processed_assets"]
     counts = preflight["expected_split_counts"]
     error_codes = sorted({entry["code"] for entry in preflight["errors"]})
+    rio_unsupervised_sequences = preflight.get("rio_path_integrity", {}).get(
+        "unsupervised_sequences"
+    ) or []
     return "\n".join(
         [
             "# P2 ScanNet Prerequisite Blocked",
@@ -1372,6 +2495,13 @@ def _blocked_markdown(preflight: Mapping[str, Any]) -> str:
             f"- Processed NPY coverage is {processed['npy_scene_count']}/{processed['expected_scene_count']} scenes.",
             f"- NYU40 instance taxonomy status is `{preflight['class_taxonomy']['status']}`.",
             f"- Real mixed-dataset instantiation status is `{preflight['mix_instantiation']['status']}`.",
+            "- RIO active T=2 sequences without an NYU40-18 instance: "
+            f"{len(rio_unsupervised_sequences)}"
+            + (
+                f" (`{', '.join(rio_unsupervised_sequences)}`)"
+                if rio_unsupervised_sequences
+                else "."
+            ),
             f"- Blocking error codes: `{', '.join(error_codes)}`.",
             "",
             "Required inputs must be obtained under the official ScanNet terms, preprocessed into the repository schema, and then re-audited. Unauthorized mirrors are not an acceptable substitute.",
@@ -1406,6 +2536,42 @@ def _validate_artifact_privacy(rendered: Mapping[str, str]) -> None:
             raise ValueError(f"artifact privacy validation failed: {pattern}")
 
 
+def _atomic_write_text(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+            temporary_path = Path(handle.name)
+        os.replace(temporary_path, path)
+    finally:
+        if temporary_path is not None and temporary_path.exists():
+            temporary_path.unlink()
+
+
+def _invalidate_formal_preflight(output_dir: Path) -> None:
+    invalid = {
+        "schema_version": P2_PREFLIGHT_SCHEMA_VERSION,
+        "status": "audit_in_progress",
+        "formal_p2_training_authorized": False,
+        "errors": [{"code": "audit_in_progress"}],
+        "authorization": not_issued_authorization("audit_in_progress"),
+    }
+    _atomic_write_text(
+        output_dir / "scannet_preflight.json",
+        _json_text(invalid),
+    )
+
+
 def run_audit(
     *,
     raw_scannet_dir: Path,
@@ -1416,16 +2582,169 @@ def run_audit(
     output_dir: Path,
     expected_split_counts: Mapping[str, int],
 ) -> int:
+    _invalidate_formal_preflight(output_dir)
+    source_tree_contract = build_p2_source_tree_contract()
+    runtime_source_contract = build_p2_runtime_source_contract()
+    runtime_environment_contract = build_p2_runtime_environment_contract()
+    (
+        reproduction,
+        repository_default,
+        composed,
+        compose_error,
+        p2_config,
+    ) = _compose_config_snapshot()
+    selected_counts = {
+        split: int(expected_split_counts[split])
+        for split in ("train", "validation", "test")
+    }
+    official_counts = selected_counts == OFFICIAL_SPLIT_COUNTS
+    config_contract_errors = validate_p2_training_config_contract(p2_config)
+    try:
+        observed_semantic_sha256 = p2_training_semantic_sha256(p2_config)
+    except Exception:  # noqa: BLE001 - malformed config is represented below.
+        observed_semantic_sha256 = None
+    config_contract = {
+        "schema_version": P2_TRAINING_CONTRACT_SCHEMA_VERSION,
+        "status": "pass" if not config_contract_errors else "fail",
+        "errors": config_contract_errors,
+        "expected_semantic_sha256": P2_TRAINING_SEMANTIC_SHA256,
+        "observed_semantic_sha256": observed_semantic_sha256,
+    }
+    config_audit_errors = [
+        _error("p2_config_contract_mismatch", field=error)
+        for error in config_contract_errors
+    ]
+    known_empty_substitutions, known_empty_errors = (
+        _audit_known_empty_scan_substitutions(p2_config)
+    )
+    data_root_bindings, data_root_errors = _audit_formal_data_roots(
+        p2_config,
+        processed_scannet_dir,
+        rio_processed_dir,
+        raw_scannet_dir=raw_scannet_dir,
+        split_dir=split_dir,
+        test_segments_dir=test_segments_dir,
+    )
+    if data_root_errors and not official_counts:
+        data_root_bindings["status"] = "diagnostic_override"
+    if p2_config is None:
+        model_checkpoint = {
+            "reference": "external:concerto_checkpoint",
+            "expected_sha256": CONCERTO_SHA256,
+            "observed_sha256": None,
+            "expected_byte_size": CONCERTO_BYTES,
+            "observed_byte_size": None,
+            "status": "fail",
+        }
+        checkpoint_errors = [_error("model_checkpoint_config_unavailable")]
+    else:
+        checkpoint_path = Path(str(p2_config.backbone.name)).expanduser()
+        if not checkpoint_path.is_absolute():
+            checkpoint_path = REPO_ROOT / checkpoint_path
+        model_checkpoint, checkpoint_errors = _audit_model_checkpoint(
+            checkpoint_path
+        )
+
     scenes_by_split, split_records, split_errors = _read_split_metadata(
         split_dir, expected_split_counts
     )
+    official_split_identity, official_split_errors = (
+        _audit_official_split_identity(
+            split_dir,
+            split_records=split_records,
+        )
+    )
+    if official_split_errors and not official_counts:
+        official_split_identity["status"] = "diagnostic_override"
     raw_assets, raw_errors = _audit_raw_assets(
         raw_scannet_dir, test_segments_dir, scenes_by_split
     )
+    initial_input_manifest = None
+    snapshot_start_errors: list[dict[str, Any]] = []
+    if official_counts and not any(
+        (
+            checkpoint_errors,
+            config_audit_errors,
+            known_empty_errors,
+            data_root_errors,
+            official_split_errors,
+            split_errors,
+            raw_errors,
+        )
+    ) and _initial_input_manifest_allowed(
+        source_tree=source_tree_contract,
+        runtime_source=runtime_source_contract,
+        runtime_environment=runtime_environment_contract,
+    ):
+        initial_input_manifest = build_p2_input_manifest(
+            scannet_root=processed_scannet_dir,
+            rio_root=rio_processed_dir,
+        )
+        if initial_input_manifest.get("status") != "pass":
+            snapshot_start_errors.append(
+                _error("p2_input_manifest_precheck_failed")
+            )
     processed_assets, taxonomy, processed_errors = _audit_processed_assets(
         processed_scannet_dir, scenes_by_split
     )
-    errors = [*split_errors, *raw_errors, *processed_errors]
+    rio_taxonomy, rio_taxonomy_errors = _audit_taxonomy(
+        rio_processed_dir,
+        "rio",
+    )
+    rio_path_integrity, rio_path_errors = _audit_rio_record_paths(
+        rio_processed_dir,
+        validate_content=official_counts,
+    )
+    errors = [
+        *checkpoint_errors,
+        *config_audit_errors,
+        *known_empty_errors,
+        *(
+            [
+                _error(
+                    "local_source_tree_contract_failed",
+                    errors=source_tree_contract.get("errors", []),
+                    disallowed_committed_paths=source_tree_contract.get(
+                        "disallowed_committed_paths", []
+                    ),
+                    disallowed_dirty_paths=source_tree_contract.get(
+                        "disallowed_dirty_paths", []
+                    ),
+                )
+            ]
+            if official_counts and source_tree_contract.get("status") != "pass"
+            else []
+        ),
+        *(
+            [
+                _error(
+                    "runtime_source_contract_failed",
+                    errors=runtime_source_contract.get("errors", []),
+                )
+            ]
+            if official_counts and runtime_source_contract.get("status") != "pass"
+            else []
+        ),
+        *(
+            [
+                _error(
+                    "runtime_environment_contract_failed",
+                    errors=runtime_environment_contract.get("errors", []),
+                )
+            ]
+            if official_counts
+            and runtime_environment_contract.get("status") != "pass"
+            else []
+        ),
+        *(data_root_errors if official_counts else []),
+        *(official_split_errors if official_counts else []),
+        *(rio_taxonomy_errors if official_counts else []),
+        *(rio_path_errors if official_counts else []),
+        *snapshot_start_errors,
+        *split_errors,
+        *raw_errors,
+        *processed_errors,
+    ]
 
     if errors:
         mix = {"attempted": False, "status": "blocked_prerequisites"}
@@ -1433,31 +2752,111 @@ def run_audit(
         mix, mix_errors = _instantiate_real_mix(processed_scannet_dir, rio_processed_dir)
         errors.extend(mix_errors)
 
-    formal_authorized = not errors and mix.get("status") == "pass"
+    if official_counts and not errors and mix.get("status") == "pass":
+        if initial_input_manifest is None:
+            errors.append(_error("p2_input_manifest_precheck_missing"))
+            input_manifest = {
+                "schema_version": 1,
+                "status": "fail",
+            }
+        else:
+            (
+                input_manifest,
+                official_split_identity,
+                snapshot_errors,
+            ) = _audit_semantic_snapshot_stability(
+                initial_input_manifest=initial_input_manifest,
+                initial_split_identity=official_split_identity,
+                processed_scannet_dir=processed_scannet_dir,
+                rio_processed_dir=rio_processed_dir,
+                split_dir=split_dir,
+            )
+            errors.extend(snapshot_errors)
+        if input_manifest.get("status") != "pass":
+            errors.append(_error("p2_input_manifest_failed"))
+    elif official_counts:
+        input_manifest = {
+            "schema_version": 1,
+            "status": "blocked_prerequisites",
+        }
+    else:
+        input_manifest = {
+            "schema_version": 1,
+            "status": "diagnostic_not_issued",
+        }
+
+    if official_counts:
+        (
+            source_tree_contract,
+            runtime_source_contract,
+            runtime_environment_contract,
+            source_stability_errors,
+        ) = _audit_source_contract_stability(
+            initial_source_tree_contract=source_tree_contract,
+            initial_runtime_source_contract=runtime_source_contract,
+            initial_runtime_environment_contract=runtime_environment_contract,
+        )
+        errors.extend(source_stability_errors)
+
+    audit_passed = not errors and mix.get("status") == "pass"
+    formal_authorized = audit_passed and official_counts and composed
+    diagnostic_pass = audit_passed and not official_counts
     split_status = "pass" if not split_errors else "fail"
+    if formal_authorized:
+        status = "pass"
+    elif diagnostic_pass:
+        status = "diagnostic_pass"
+    elif not composed:
+        status = "blocked_p2_config"
+    else:
+        status = "blocked_missing_scannet"
     preflight = {
-        "schema_version": 1,
-        "status": "pass" if formal_authorized else "blocked_missing_scannet",
+        "schema_version": P2_PREFLIGHT_SCHEMA_VERSION,
+        "status": status,
         "formal_p2_training_authorized": formal_authorized,
         "official_source_commit": OFFICIAL_SOURCE_COMMIT,
-        "expected_split_counts": {
-            split: int(expected_split_counts[split])
-            for split in ("train", "validation", "test")
-        },
+        "local_source_commit": source_tree_contract.get("source_commit"),
+        "source_tree_contract": source_tree_contract,
+        "runtime_source_contract": runtime_source_contract,
+        "runtime_environment_contract": runtime_environment_contract,
+        "expected_split_counts": selected_counts,
         "split_metadata_status": split_status,
         "split_metadata": split_records,
+        "official_split_identity": official_split_identity,
+        "model_checkpoint": model_checkpoint,
         "raw_assets": raw_assets,
         "processed_assets": processed_assets,
         "class_taxonomy": taxonomy,
+        "rio_class_taxonomy": rio_taxonomy,
+        "known_empty_scan_substitutions": known_empty_substitutions,
+        "data_root_bindings": data_root_bindings,
+        "rio_path_integrity": rio_path_integrity,
+        "input_manifest": input_manifest,
+        "config_contract": config_contract,
         "mix_instantiation": mix,
         "errors": errors,
     }
+    if formal_authorized:
+        issue_formal_authorization(preflight, p2_config)
+    else:
+        if diagnostic_pass:
+            authorization_reason = "non_official_expected_split_counts"
+        elif not composed:
+            authorization_reason = "p2_config_not_composed"
+        else:
+            authorization_reason = "formal_prerequisites_failed"
+        preflight["authorization"] = not_issued_authorization(
+            authorization_reason
+        )
 
-    reproduction, repository_default, composed, compose_error = _compose_config_snapshot()
     config_diff = _build_config_diff(
-        reproduction, repository_default, composed, compose_error
+        reproduction,
+        repository_default,
+        composed,
+        compose_error,
+        model_checkpoint,
     )
-    environment = _build_environment_manifest()
+    environment = _build_environment_manifest(model_checkpoint)
     rendered = {
         "config_audit.md": _config_audit_markdown(config_diff, preflight),
         "environment_manifest.json": _json_text(environment),
@@ -1469,13 +2868,17 @@ def run_audit(
         rendered["BLOCKED_MISSING_SCANNET.md"] = _blocked_markdown(preflight)
     _validate_artifact_privacy(rendered)
 
-    output_dir.mkdir(parents=True, exist_ok=True)
     blocked_path = output_dir / "BLOCKED_MISSING_SCANNET.md"
+    for filename, content in rendered.items():
+        if filename != "scannet_preflight.json":
+            _atomic_write_text(output_dir / filename, content)
     if formal_authorized and blocked_path.exists():
         blocked_path.unlink()
-    for filename, content in rendered.items():
-        (output_dir / filename).write_text(content, encoding="utf-8")
-    return 0 if formal_authorized else 2
+    _atomic_write_text(
+        output_dir / "scannet_preflight.json",
+        rendered["scannet_preflight.json"],
+    )
+    return 0 if formal_authorized or diagnostic_pass else 2
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:

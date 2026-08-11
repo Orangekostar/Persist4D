@@ -1,14 +1,146 @@
 import json
 import os
+import subprocess
 from pathlib import Path
 
 import pytest
 
 from scripts import run_p2_native_smoke as smoke
+from utils import p2_preflight
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-JSON_REPORT = REPO_ROOT / "artifacts" / "P2" / "tiny_overfit_report.json"
-MARKDOWN_REPORT = REPO_ROOT / "artifacts" / "P2" / "tiny_overfit_report.md"
+JSON_REPORT = Path(
+    os.environ.get(
+        "P2_TINY_OVERFIT_JSON_REPORT",
+        REPO_ROOT / "artifacts" / "P2" / "tiny_overfit_report.json",
+    )
+)
+MARKDOWN_REPORT = Path(
+    os.environ.get(
+        "P2_TINY_OVERFIT_MARKDOWN_REPORT",
+        REPO_ROOT / "artifacts" / "P2" / "tiny_overfit_report.md",
+    )
+)
+
+
+def _git_nul_paths(*args: str) -> list[str]:
+    output = subprocess.run(
+        ["git", *args],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+    ).stdout
+    return sorted(os.fsdecode(path) for path in output.split(b"\0") if path)
+
+
+def _assert_artifact_source_tree_contract(payload: dict[str, object]) -> None:
+    contract = payload["source_tree_contract"]
+    source_commit = payload["source_commit"]
+    assert contract["schema_version"] == 1
+    assert contract["status"] == "pass"
+    assert contract["source_commit"] == source_commit
+    assert contract["observed_head"] == source_commit
+    assert contract["generation_head_unchanged"] is True
+    assert contract["allowed_dirty_prefixes"] == ["artifacts/P2/"]
+    assert contract["committed_paths_since_source"] == []
+    assert contract["disallowed_committed_paths"] == []
+    assert contract["disallowed_dirty_paths"] == []
+    assert contract["index_flag_paths"] == []
+    assert len(contract["expected_tracked_tree_sha256"]) == 64
+    assert set(contract["expected_tracked_tree_sha256"]) <= set("0123456789abcdef")
+    assert (
+        contract["observed_tracked_tree_sha256"]
+        == contract["expected_tracked_tree_sha256"]
+    )
+    assert contract["errors"] == []
+    assert all(
+        path.startswith("artifacts/P2/")
+        for path in contract["dirty_paths_before_generation"]
+    )
+    assert all(path.startswith("artifacts/P2/") for path in contract["dirty_paths"])
+
+    current_head = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=REPO_ROOT,
+        check=True,
+        text=True,
+        capture_output=True,
+    ).stdout.strip()
+    current_contract = smoke._build_source_tree_contract(source_commit)
+    smoke._require_passing_source_tree_contract(current_contract)
+    assert current_contract["observed_head"] == current_head
+    assert current_contract["index_flag_paths"] == []
+    assert (
+        current_contract["expected_tracked_tree_sha256"]
+        == contract["expected_tracked_tree_sha256"]
+    )
+    assert (
+        current_contract["observed_tracked_tree_sha256"]
+        == contract["observed_tracked_tree_sha256"]
+    )
+    assert (
+        subprocess.run(
+            ["git", "merge-base", "--is-ancestor", source_commit, current_head],
+            cwd=REPO_ROOT,
+            check=False,
+        ).returncode
+        == 0
+    )
+    assert all(
+        path.startswith("artifacts/P2/")
+        for path in _git_nul_paths(
+            "diff",
+            "--name-only",
+            "--no-renames",
+            "-z",
+            f"{source_commit}..{current_head}",
+            "--",
+        )
+    )
+    current_dirty_paths = sorted(
+        set(_git_nul_paths("diff", "--name-only", "--no-renames", "-z", "--"))
+        | set(
+            _git_nul_paths(
+                "diff",
+                "--cached",
+                "--name-only",
+                "--no-renames",
+                "-z",
+                "--",
+            )
+        )
+        | set(_git_nul_paths("ls-files", "--others", "--exclude-standard", "-z", "--"))
+    )
+    assert all(path.startswith("artifacts/P2/") for path in current_dirty_paths)
+
+
+def _assert_artifact_runtime_source_contract(payload: dict[str, object]) -> None:
+    current = smoke._build_runtime_source_contract()
+    assert current["status"] == "pass"
+    assert current["errors"] == []
+    for record in current["repositories"].values():
+        assert record["index_flag_paths"] == []
+        assert len(record["expected_tracked_tree_sha256"]) == 64
+        assert set(record["expected_tracked_tree_sha256"]) <= set("0123456789abcdef")
+        assert (
+            record["observed_tracked_tree_sha256"]
+            == record["expected_tracked_tree_sha256"]
+        )
+    assert payload["runtime_source_contract"] == current
+
+
+def _assert_artifact_runtime_environment_contract(
+    payload: dict[str, object],
+) -> None:
+    current = smoke._build_runtime_environment_contract()
+    validation_errors = []
+    observed = p2_preflight._validate_runtime_environment_contract(
+        {"runtime_environment_contract": current},
+        validation_errors,
+    )
+    assert observed is current
+    assert validation_errors == []
+    assert payload["runtime_environment_contract"] == current
 
 
 def _passing_history() -> list[dict[str, float]]:
@@ -94,7 +226,11 @@ def test_real_tiny_overfit_artifacts_pass_all_gates() -> None:
     payload = json.loads(JSON_REPORT.read_text(encoding="utf-8"))
     markdown = MARKDOWN_REPORT.read_text(encoding="utf-8")
 
+    _assert_artifact_source_tree_contract(payload)
+    _assert_artifact_runtime_source_contract(payload)
+    _assert_artifact_runtime_environment_contract(payload)
     assert payload["scope"] == "preflight-only"
+    assert payload["verification_mode"] == "artifact_contract_not_reexecution"
     assert payload["official_mixed_data_reproduction"] is False
     assert payload["g2_evidence"] is False
     assert payload["sample_name"] == smoke.TINY_SAMPLE_NAME
@@ -102,6 +238,23 @@ def test_real_tiny_overfit_artifacts_pass_all_gates() -> None:
     assert payload["passed"] is True
     assert payload["encoder_bitwise_unchanged"] is True
     assert payload["decoder_head_changed"] is True
+    provenance = payload["input_provenance"]
+    assert provenance["dataset"] == "3RScan"
+    assert provenance["sample_name"] == smoke.TINY_SAMPLE_NAME
+    assert provenance["resolved_composed_config"] == {
+        "format": "canonical-json-sort-keys-v1",
+        "portable_references": True,
+        "serialized_bytes": 9307,
+        "sha256": "0f9e61ada901ba416ea66022bed3be90f6a5f43316f2c6983d1f4c38e0086a3a",
+    }
+    assert len(provenance["processed_point_clouds"]) == 2
+    assert len(provenance["instance_ground_truth"]) == 2
+    assert provenance["change_ground_truth"]["sha256"] == (
+        "75baf0a2d41956bd7d8c27b2a4257f5b8e606ab7a43a3436cc1bce07cbe0003c"
+    )
+    assert provenance["sequence_database"]["sha256"] == (
+        "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416"
+    )
     assert "not an official mixed-data reproduction" in markdown
     assert "not G2 evidence" in markdown
     serialized = json.dumps(payload, sort_keys=True)

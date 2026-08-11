@@ -1,4 +1,6 @@
 import importlib
+import hashlib
+import json
 import sys
 import types
 from contextlib import contextmanager
@@ -11,6 +13,7 @@ from torch.utils.data import DataLoader, Dataset
 from datasets.multi_dataset import MultiDataset
 
 CHECKPOINT_KEY = "p2_train_sampler_generator"
+OPTIMIZER_CONTRACT_KEY = "p2_optimizer_parameter_contract"
 
 
 class SizedDataset(Dataset):
@@ -103,9 +106,25 @@ def _patch_dataset_instantiation(
 def _checkpoint_after_complete_epochs(trainer_module, module, epochs: int):
     for _ in range(epochs):
         list(module.train_dataset.sampler)
-    checkpoint = {}
+    checkpoint = _checkpoint_payload_for_module(module)
     trainer_module.InstanceSegmentation.on_save_checkpoint(module, checkpoint)
     return checkpoint
+
+
+def _checkpoint_payload_for_module(module) -> dict:
+    if not module.config.general.p2_fail_closed_runtime:
+        return {}
+    parameter = torch.nn.Parameter(torch.ones(1))
+    optimizer = torch.optim.AdamW([parameter], lr=1e-3)
+    parameter.grad = torch.ones_like(parameter)
+    optimizer.step()
+    optimizer.zero_grad(set_to_none=True)
+    module._trainer = types.SimpleNamespace(optimizers=[optimizer])
+    module.named_parameters = lambda: iter([("model.weight", parameter)])
+    return {
+        "state_dict": {"model.weight": parameter.detach().clone()},
+        "optimizer_states": [optimizer.state_dict()],
+    }
 
 
 def test_sampler_checkpoint_restores_next_epoch_after_load_then_setup(
@@ -145,6 +164,68 @@ def test_sampler_checkpoint_restores_next_epoch_after_load_then_setup(
         trainer_module.InstanceSegmentation.setup(resumed, "fit")
 
         assert list(resumed.train_dataset.sampler) == uninterrupted_next_epoch
+
+
+def test_formal_checkpoint_writes_optimizer_parameter_contract(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    with _load_trainer_module(monkeypatch) as trainer_module:
+        module, _, _ = _make_module(
+            trainer_module,
+            p2_fail_closed_runtime=True,
+        )
+        module.train_dataset = _make_dataset()
+        parameter = torch.nn.Parameter(torch.ones(2))
+        optimizer = torch.optim.AdamW([parameter], lr=1e-3)
+        parameter.grad = torch.ones_like(parameter)
+        optimizer.step()
+        optimizer.zero_grad(set_to_none=True)
+        module._trainer = types.SimpleNamespace(optimizers=[optimizer])
+        module.named_parameters = lambda: iter([("model.weight", parameter)])
+        checkpoint = {
+            "state_dict": {"model.weight": parameter.detach().clone()},
+            "optimizer_states": [optimizer.state_dict()],
+        }
+
+        trainer_module.InstanceSegmentation.on_save_checkpoint(module, checkpoint)
+
+        parameter_id = checkpoint["optimizer_states"][0]["param_groups"][0][
+            "params"
+        ][0]
+        assert checkpoint[OPTIMIZER_CONTRACT_KEY] == {
+            "schema_version": 1,
+            "state_dict": {
+                "model.weight": {
+                    "shape": [2],
+                    "dtype": "torch.float32",
+                }
+            },
+            "state_dict_schema_sha256": hashlib.sha256(
+                json.dumps(
+                    [["model.weight", [2], "torch.float32"]],
+                    ensure_ascii=True,
+                    separators=(",", ":"),
+                ).encode("ascii")
+                ).hexdigest(),
+            "param_groups": [[parameter_id]],
+            "parameters": {
+                parameter_id: {
+                    "name": "model.weight",
+                    "shape": [2],
+                    "dtype": "torch.float32",
+                }
+            },
+            "trainable_parameters": [
+                ["model.weight", [2], "torch.float32"],
+            ],
+            "trainable_parameter_schema_sha256": hashlib.sha256(
+                json.dumps(
+                    [["model.weight", [2], "torch.float32"]],
+                    ensure_ascii=True,
+                    separators=(",", ":"),
+                ).encode("ascii")
+            ).hexdigest(),
+        }
 
 
 def test_sampler_checkpoint_restores_when_lightning_setup_precedes_load(
@@ -290,7 +371,7 @@ def test_distributed_sampler_rank_streams_resume_from_checkpoint_state(
             for module in running_modules
         ]
         assert torch.equal(rank_states[0], rank_states[1])
-        checkpoint = {}
+        checkpoint = _checkpoint_payload_for_module(running_modules[0])
         trainer_module.InstanceSegmentation.on_save_checkpoint(
             running_modules[0],
             checkpoint,

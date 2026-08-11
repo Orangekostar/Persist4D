@@ -1,4 +1,6 @@
 import gc
+import hashlib
+import json
 from pathlib import Path
 import statistics
 from torch_scatter import scatter_mean
@@ -556,6 +558,8 @@ class InstanceSegmentation(pl.LightningModule):
     _TRAIN_SAMPLER_CHECKPOINT_KEY = "p2_train_sampler_generator"
     _TRAIN_SAMPLER_CHECKPOINT_SCHEMA_VERSION = 1
     _TRAIN_SAMPLER_RESUME_SCOPE = "completed_epoch_boundary_only"
+    _OPTIMIZER_PARAMETER_CONTRACT_KEY = "p2_optimizer_parameter_contract"
+    _OPTIMIZER_PARAMETER_CONTRACT_SCHEMA_VERSION = 1
 
     def __init__(self, config):
         super().__init__()
@@ -1612,8 +1616,13 @@ class InstanceSegmentation(pl.LightningModule):
             self.on_validation_epoch_end()
 
     def configure_optimizers(self):
+        parameters = self.parameters()
+        if _p2_general_flag(self.config, "p2_fail_closed_runtime"):
+            parameters = (
+                parameter for parameter in parameters if parameter.requires_grad
+            )
         optimizer = hydra.utils.instantiate(
-            self.config.optimizer, params=self.parameters()
+            self.config.optimizer, params=parameters
         )
         
         # Configure scheduler with proper Lightning handling
@@ -1659,6 +1668,141 @@ class InstanceSegmentation(pl.LightningModule):
         generator.set_state(state)
         self._pending_train_sampler_generator_state = None
 
+    def _optimizer_parameter_contract(self, checkpoint):
+        trainer = getattr(self, "_trainer", None)
+        optimizers = getattr(trainer, "optimizers", None)
+        optimizer_states = checkpoint.get("optimizer_states")
+        state_dict = checkpoint.get("state_dict")
+        if (
+            not isinstance(optimizers, list)
+            or len(optimizers) != 1
+            or not isinstance(optimizer_states, list)
+            or len(optimizer_states) != 1
+            or not isinstance(state_dict, Mapping)
+        ):
+            raise RuntimeError(
+                "cannot checkpoint formal P2 optimizer parameter contract"
+            )
+
+        optimizer = optimizers[0]
+        optimizer_state = optimizer_states[0]
+        saved_groups = optimizer_state.get("param_groups")
+        live_groups = getattr(optimizer, "param_groups", None)
+        if (
+            not isinstance(saved_groups, list)
+            or not isinstance(live_groups, list)
+            or len(saved_groups) != len(live_groups)
+        ):
+            raise RuntimeError(
+                "cannot checkpoint formal P2 optimizer parameter contract"
+            )
+
+        model_state = {}
+        for name, value in state_dict.items():
+            if (
+                not isinstance(name, str)
+                or not isinstance(value, torch.Tensor)
+                or value.layout != torch.strided
+            ):
+                raise RuntimeError(
+                    "cannot checkpoint formal P2 optimizer parameter contract"
+                )
+            model_state[name] = {
+                "shape": list(value.shape),
+                "dtype": str(value.dtype),
+            }
+        model_state_entries = [
+            [name, metadata["shape"], metadata["dtype"]]
+            for name, metadata in sorted(model_state.items())
+        ]
+        model_state_payload = json.dumps(
+            model_state_entries,
+            ensure_ascii=True,
+            separators=(",", ":"),
+        )
+
+        names_by_identity = {
+            id(parameter): name for name, parameter in self.named_parameters()
+        }
+        trainable_named_parameters = [
+            (name, parameter)
+            for name, parameter in self.named_parameters()
+            if parameter.requires_grad
+        ]
+        parameters = {}
+        contract_parameter_groups = []
+        ordered_trainable_parameters = []
+        for saved_group, live_group in zip(saved_groups, live_groups):
+            saved_parameter_ids = saved_group.get("params")
+            live_parameters = live_group.get("params")
+            if (
+                not isinstance(saved_parameter_ids, list)
+                or not isinstance(live_parameters, list)
+                or len(saved_parameter_ids) != len(live_parameters)
+            ):
+                raise RuntimeError(
+                    "cannot checkpoint formal P2 optimizer parameter contract"
+                )
+            contract_parameter_groups.append(list(saved_parameter_ids))
+            for parameter_id, parameter in zip(
+                saved_parameter_ids,
+                live_parameters,
+            ):
+                name = names_by_identity.get(id(parameter))
+                saved_parameter = state_dict.get(name) if name is not None else None
+                if (
+                    not isinstance(parameter_id, int)
+                    or isinstance(parameter_id, bool)
+                    or parameter_id in parameters
+                    or not parameter.requires_grad
+                    or not isinstance(name, str)
+                    or not isinstance(saved_parameter, torch.Tensor)
+                    or saved_parameter.shape != parameter.shape
+                    or saved_parameter.dtype != parameter.dtype
+                ):
+                    raise RuntimeError(
+                        "cannot checkpoint formal P2 optimizer parameter contract"
+                    )
+                parameters[parameter_id] = {
+                    "name": name,
+                    "shape": list(parameter.shape),
+                    "dtype": str(parameter.dtype),
+                }
+                ordered_trainable_parameters.append(
+                    [name, list(parameter.shape), str(parameter.dtype)]
+                )
+        if not parameters:
+            raise RuntimeError(
+                "cannot checkpoint formal P2 optimizer parameter contract"
+            )
+        expected_trainable_parameters = [
+            [name, list(parameter.shape), str(parameter.dtype)]
+            for name, parameter in trainable_named_parameters
+        ]
+        if ordered_trainable_parameters != expected_trainable_parameters:
+            raise RuntimeError(
+                "cannot checkpoint formal P2 optimizer parameter contract: "
+                "optimizer order does not match trainable parameter order"
+            )
+        trainable_parameter_payload = json.dumps(
+            ordered_trainable_parameters,
+            ensure_ascii=True,
+            separators=(",", ":"),
+        )
+        return {
+            "schema_version": self._OPTIMIZER_PARAMETER_CONTRACT_SCHEMA_VERSION,
+            "state_dict": model_state,
+            "state_dict_schema_sha256": hashlib.sha256(
+                model_state_payload.encode("ascii")
+            ).hexdigest(),
+            "param_groups": contract_parameter_groups,
+            "parameters": parameters,
+            "trainable_parameters": ordered_trainable_parameters,
+            "trainable_parameter_schema_sha256": hashlib.sha256(
+                trainable_parameter_payload.encode("ascii")
+            ).hexdigest(),
+        }
+
     def on_save_checkpoint(self, checkpoint):
         generator = self._train_sampler_generator()
         p2_fail_closed_runtime = _p2_general_flag(
@@ -1680,6 +1824,10 @@ class InstanceSegmentation(pl.LightningModule):
             "dataloader_prefetch_state_checkpointed": False,
             "generator_state": generator.get_state().detach().cpu().clone(),
         }
+        if p2_fail_closed_runtime:
+            checkpoint[self._OPTIMIZER_PARAMETER_CONTRACT_KEY] = (
+                self._optimizer_parameter_contract(checkpoint)
+            )
 
     def on_load_checkpoint(self, checkpoint):
         self._pending_train_sampler_generator_state = None

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 import warnings
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -18,6 +19,15 @@ from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from utils.p2_preflight import (
+    P2_CONFIG_NAME,
+    P2_PREFLIGHT_SCHEMA_VERSION,
+    require_p2_preflight_authorization,
+)
+
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "artifacts" / "P2"
 DEFAULT_SCANNET_DIR = PROJECT_ROOT / "data" / "processed" / "scannet"
 DEFAULT_SCANNET_PREFLIGHT = PROJECT_ROOT / "artifacts" / "P2" / "scannet_preflight.json"
@@ -28,11 +38,25 @@ TARGET_BATCH_PER_GPU = 4
 TARGET_ACCUMULATION = 4
 TARGET_PHYSICAL_GLOBAL_BATCH = TARGET_GPUS * TARGET_BATCH_PER_GPU
 TARGET_EFFECTIVE_BATCH = TARGET_PHYSICAL_GLOBAL_BATCH * TARGET_ACCUMULATION
+TARGET_EPOCHS = 450
+TARGET_PRIMARY_DATASET_SAMPLES = 1178
+TARGET_DATASET_WEIGHTS = (1.0, 0.8)
+TARGET_EPOCH_SAMPLE_MULTIPLE = TARGET_EFFECTIVE_BATCH
+TARGET_SAMPLER_SEED = SEED
 MAX_LR = 5e-4
 SIMULATION_MICROBATCHES = 10
 LIGHTNING_VERSION_CONTRACT = "2.6.5"
 SCANNET_SPLIT_COUNTS = {"train": 1201, "validation": 312}
 OFFICIAL_SOURCE_COMMIT = "fb2fe42eb8f1e926567c48eea9acb874e608ee10"
+SHARED_AUTHORIZATION_FIELDS = (
+    "config_contract",
+    "source_tree_contract",
+    "runtime_source_contract",
+    "runtime_environment_contract",
+    "official_split_identity",
+    "input_manifest",
+    "authorization",
+)
 
 CSV_FIELDS = (
     "micro_step",
@@ -279,6 +303,24 @@ def _portable_preflight_ref(scannet_preflight_path: Path) -> str:
     return f"repo:{relative.as_posix()}"
 
 
+def _compose_p2_config() -> Any:
+    from hydra import compose, initialize_config_dir
+
+    with initialize_config_dir(
+        config_dir=str(PROJECT_ROOT / "conf"), version_base="1.2"
+    ):
+        return compose(config_name=P2_CONFIG_NAME)
+
+
+def _shared_p2_authorization_gate(path: Path) -> bool:
+    try:
+        cfg = _compose_p2_config()
+        require_p2_preflight_authorization(cfg, artifact_path=path)
+    except Exception:  # noqa: BLE001 - the ready gate must fail closed.
+        return False
+    return True
+
+
 def _complete_scannet_gate_passed(scannet_preflight_path: Path) -> bool:
     try:
         payload = json.loads(scannet_preflight_path.read_text(encoding="utf-8"))
@@ -287,7 +329,7 @@ def _complete_scannet_gate_passed(scannet_preflight_path: Path) -> bool:
     if not isinstance(payload, Mapping):
         return False
     expected_scalars = {
-        "schema_version": 1,
+        "schema_version": P2_PREFLIGHT_SCHEMA_VERSION,
         "status": "pass",
         "formal_p2_training_authorized": True,
         "official_source_commit": OFFICIAL_SOURCE_COMMIT,
@@ -297,7 +339,12 @@ def _complete_scannet_gate_passed(scannet_preflight_path: Path) -> bool:
     }
     if any(payload.get(key) != value for key, value in expected_scalars.items()):
         return False
-    return all(
+    if not all(
+        isinstance(payload.get(field), Mapping)
+        for field in SHARED_AUTHORIZATION_FIELDS
+    ):
+        return False
+    local_gate_passed = all(
         isinstance(payload.get(section), Mapping)
         and payload[section].get("status") == "pass"
         for section in (
@@ -307,6 +354,7 @@ def _complete_scannet_gate_passed(scannet_preflight_path: Path) -> bool:
             "mix_instantiation",
         )
     )
+    return local_gate_passed and _shared_p2_authorization_gate(scannet_preflight_path)
 
 
 def _formal_training_status(
@@ -316,43 +364,80 @@ def _formal_training_status(
     preflight_ref = _portable_preflight_ref(scannet_preflight_path)
     gate_passed = _complete_scannet_gate_passed(scannet_preflight_path)
     assets_complete = _scannet_processed_assets_complete(processed_scannet_dir)
+    primary_weight = TARGET_DATASET_WEIGHTS[0]
+    secondary_weight_sum = sum(TARGET_DATASET_WEIGHTS[1:])
+    raw_sampler_num_samples = int(
+        TARGET_PRIMARY_DATASET_SAMPLES
+        * (1 + secondary_weight_sum / primary_weight)
+    )
+    sampler_num_samples = (
+        raw_sampler_num_samples
+        - raw_sampler_num_samples % TARGET_EPOCH_SAMPLE_MULTIPLE
+    )
+    samples_per_rank = (sampler_num_samples + TARGET_GPUS - 1) // TARGET_GPUS
+    epoch_microbatches = (
+        samples_per_rank + TARGET_BATCH_PER_GPU - 1
+    ) // TARGET_BATCH_PER_GPU
+    accumulation_remainder = epoch_microbatches % TARGET_ACCUMULATION
+    optimizer_steps_per_epoch = (
+        epoch_microbatches + TARGET_ACCUMULATION - 1
+    ) // TARGET_ACCUMULATION
+    planned_contract = {
+        "contract_kind": "planned_not_observed",
+        "observed_formal_run": False,
+        "dataset_mix": "3RScan T=2 (1.0) + ScanNet T=1 (0.8)",
+        "primary_dataset_samples": TARGET_PRIMARY_DATASET_SAMPLES,
+        "dataset_weights": list(TARGET_DATASET_WEIGHTS),
+        "raw_sampler_num_samples": raw_sampler_num_samples,
+        "epoch_sample_multiple": TARGET_EPOCH_SAMPLE_MULTIPLE,
+        "sampler_num_samples": sampler_num_samples,
+        "sampler_seed": TARGET_SAMPLER_SEED,
+        "sampler_seed_scope": (
+            "fresh_start_and_completed_epoch_boundary_resume"
+        ),
+        "sampler_generator_state_checkpointed": True,
+        "sampler_checkpoint_scope": "completed_epoch_boundary_only",
+        "sampler_checkpoint_save_timing": (
+            "p2_train_or_validation_epoch_end_callbacks"
+        ),
+        "sampler_non_boundary_resume_verified": False,
+        "sampler_mid_epoch_resume_supported": False,
+        "sampler_dataloader_prefetch_state_checkpointed": False,
+        "samples_per_rank": samples_per_rank,
+        "epochs": TARGET_EPOCHS,
+        "optimizer_steps_per_epoch": optimizer_steps_per_epoch,
+        "total_steps": optimizer_steps_per_epoch * TARGET_EPOCHS,
+        "scannet_ref": "repo:data/processed/scannet",
+        "preflight_ref": preflight_ref,
+        "epoch_microbatch_divisibility": {
+            "status": (
+                "planned_aligned"
+                if accumulation_remainder == 0
+                else "planned_tail_window"
+            ),
+            "scope": "per_rank",
+            "epoch_microbatches": epoch_microbatches,
+            "accumulation_steps": TARGET_ACCUMULATION,
+            "remainder": accumulation_remainder,
+            "drop_last": False,
+        },
+    }
     if not gate_passed or not assets_complete:
         return {
             "status": "blocked_missing_scannet",
-            "dataset_mix": "3RScan T=2 (1.0) + ScanNet T=1 (0.8)",
-            "epochs": 450,
-            "total_steps": None,
-            "scannet_ref": "repo:data/processed/scannet",
-            "preflight_ref": preflight_ref,
-            "epoch_microbatch_divisibility": {
-                "status": "pending_missing_scannet",
-                "epoch_microbatches": None,
-                "accumulation_steps": TARGET_ACCUMULATION,
-                "remainder": None,
-                "drop_last": False,
-            },
+            **planned_contract,
             "reason": (
-                "ScanNet prerequisites are missing; the formal mixed-data loader "
-                "length and total_steps cannot be computed."
+                "ScanNet prerequisites are missing, so no formal mixed-data run was "
+                "observed; the planned sampler and optimizer-step contract remains "
+                "computable from the locked P2 configuration."
             ),
         }
     return {
         "status": "deferred_to_formal_mixed_data_preflight",
-        "dataset_mix": "3RScan T=2 (1.0) + ScanNet T=1 (0.8)",
-        "epochs": 450,
-        "total_steps": None,
-        "scannet_ref": "repo:data/processed/scannet",
-        "preflight_ref": preflight_ref,
-        "epoch_microbatch_divisibility": {
-            "status": "pending_formal_loader_instantiation",
-            "epoch_microbatches": None,
-            "accumulation_steps": TARGET_ACCUMULATION,
-            "remainder": None,
-            "drop_last": False,
-        },
+        **planned_contract,
         "reason": (
-            "This scheduler-only preflight does not instantiate the formal mixed-data "
-            "loader; total_steps remains intentionally unset."
+            "This scheduler-only preflight records the locked planned contract but "
+            "does not instantiate or observe a formal mixed-data training run."
         ),
     }
 
@@ -430,17 +515,6 @@ def _write_markdown(result: Mapping[str, Any], path: Path) -> None:
     topology = result["target_topology"]
     formal = result["formal_training"]
     divisibility = formal["epoch_microbatch_divisibility"]
-    formal_total_steps = (
-        "null" if formal["total_steps"] is None else str(formal["total_steps"])
-    )
-    formal_epoch_microbatches = (
-        "null"
-        if divisibility["epoch_microbatches"] is None
-        else str(divisibility["epoch_microbatches"])
-    )
-    formal_remainder = (
-        "null" if divisibility["remainder"] is None else str(divisibility["remainder"])
-    )
     lines = [
         "# P2 LR schedule audit",
         "",
@@ -467,11 +541,41 @@ def _write_markdown(result: Mapping[str, Any], path: Path) -> None:
             "lr_after is scheduled for the next optimizer update"
         ),
         f"- formal status: {formal['status']}",
+        f"- formal contract kind: {formal['contract_kind']}",
+        f"- formal run observed: {str(formal['observed_formal_run']).lower()}",
         f"- formal epochs: {formal['epochs']}",
-        f"- formal total_steps: {formal_total_steps}",
-        f"- formal epoch microbatch divisibility: {divisibility['status']}",
-        f"- formal epoch microbatches: {formal_epoch_microbatches}",
-        f"- formal accumulation remainder: {formal_remainder}",
+        f"- planned raw sampler num_samples: {formal['raw_sampler_num_samples']}",
+        f"- planned epoch sample multiple: {formal['epoch_sample_multiple']}",
+        f"- planned sampler num_samples: {formal['sampler_num_samples']}",
+        f"- planned sampler seed: {formal['sampler_seed']}",
+        f"- planned sampler seed scope: {formal['sampler_seed_scope']}",
+        (
+            "- sampler generator state checkpointed: "
+            f"{str(formal['sampler_generator_state_checkpointed']).lower()}"
+        ),
+        f"- sampler checkpoint scope: {formal['sampler_checkpoint_scope']}",
+        (
+            "- sampler checkpoint save timing: "
+            f"{formal['sampler_checkpoint_save_timing']}"
+        ),
+        (
+            "- sampler non-boundary resume verified: "
+            f"{str(formal['sampler_non_boundary_resume_verified']).lower()}"
+        ),
+        (
+            "- sampler mid-epoch resume supported: "
+            f"{str(formal['sampler_mid_epoch_resume_supported']).lower()}"
+        ),
+        (
+            "- sampler DataLoader prefetch state checkpointed: "
+            f"{str(formal['sampler_dataloader_prefetch_state_checkpointed']).lower()}"
+        ),
+        f"- planned samples per rank: {formal['samples_per_rank']}",
+        f"- planned optimizer steps per epoch: {formal['optimizer_steps_per_epoch']}",
+        f"- planned total_steps: {formal['total_steps']}",
+        f"- planned epoch microbatch divisibility: {divisibility['status']}",
+        f"- planned epoch microbatches per rank: {divisibility['epoch_microbatches']}",
+        f"- planned accumulation remainder: {divisibility['remainder']}",
         (
             "- formal readiness condition: epoch_microbatches % 4 == 0, or an "
             "explicit drop_last/tail-normalization policy; otherwise formal training "
@@ -615,15 +719,14 @@ def main() -> int:
         scannet_preflight_path=args.scannet_preflight,
     )
     formal_status = result["formal_training"]["status"]
-    formal_total_steps = result["formal_training"]["total_steps"]
-    formal_total_steps_text = (
-        "null" if formal_total_steps is None else str(formal_total_steps)
-    )
+    planned_total_steps = result["formal_training"]["total_steps"]
+    formal_run_observed = result["formal_training"]["observed_formal_run"]
     print(
         "P2 LR scheduler audit complete: "
         f"optimizer_steps={result['runtime']['simulation_total_steps']}; "
         f"formal_status={formal_status}; "
-        f"formal_total_steps={formal_total_steps_text}"
+        f"planned_total_steps={planned_total_steps}; "
+        f"formal_run_observed={str(formal_run_observed).lower()}"
     )
     return 0
 

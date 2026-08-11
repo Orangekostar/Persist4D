@@ -15,12 +15,30 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from utils.p2_preflight import (
+    P2_CONFIG_NAME,
+    P2_PREFLIGHT_SCHEMA_VERSION,
+    require_p2_preflight_authorization,
+)
+
 DEFAULT_PREFLIGHT = REPO_ROOT / "artifacts" / "P2" / "scannet_preflight.json"
 DEFAULT_OUTPUT = REPO_ROOT / "artifacts" / "P2" / "hardware_topology_profile.csv"
 OFFICIAL_SOURCE_COMMIT = "fb2fe42eb8f1e926567c48eea9acb874e608ee10"
 OFFICIAL_SPLIT_COUNTS = {"train": 1201, "validation": 312, "test": 100}
 NYU40_INSTANCE_IDS = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 24, 28, 33, 34, 36, 39]
 UNKNOWN_NUMA_AFFINITIES = {"", "-", "N/A", "NA", "UNKNOWN"}
+SHARED_AUTHORIZATION_FIELDS = (
+    "config_contract",
+    "source_tree_contract",
+    "runtime_source_contract",
+    "runtime_environment_contract",
+    "official_split_identity",
+    "input_manifest",
+    "authorization",
+)
 
 CSV_COLUMNS = [
     "schema_version",
@@ -159,15 +177,40 @@ def _portable_preflight_ref(path: Path) -> str:
     return f"repo:{relative.as_posix()}"
 
 
-def _full_pass_contract(payload: Mapping[str, Any]) -> bool:
+def _compose_p2_config() -> Any:
+    from hydra import compose, initialize_config_dir
+
+    with initialize_config_dir(
+        config_dir=str(REPO_ROOT / "conf"), version_base="1.2"
+    ):
+        return compose(config_name=P2_CONFIG_NAME)
+
+
+def _shared_p2_authorization_gate(path: Path) -> bool:
+    try:
+        cfg = _compose_p2_config()
+        require_p2_preflight_authorization(cfg, artifact_path=path)
+    except Exception:  # noqa: BLE001 - the ready gate must fail closed.
+        return False
+    return True
+
+
+def _full_pass_contract(
+    payload: Mapping[str, Any], *, artifact_path: Path | None = None
+) -> bool:
     if not (
-        payload.get("schema_version") == 1
+        payload.get("schema_version") == P2_PREFLIGHT_SCHEMA_VERSION
         and payload.get("status") == "pass"
         and payload.get("formal_p2_training_authorized") is True
         and payload.get("official_source_commit") == OFFICIAL_SOURCE_COMMIT
         and payload.get("expected_split_counts") == OFFICIAL_SPLIT_COUNTS
         and payload.get("split_metadata_status") == "pass"
         and payload.get("errors") == []
+    ):
+        return False
+    if not all(
+        isinstance(payload.get(field), Mapping)
+        for field in SHARED_AUTHORIZATION_FIELDS
     ):
         return False
 
@@ -236,7 +279,7 @@ def _full_pass_contract(payload: Mapping[str, Any]) -> bool:
         return False
 
     mix = payload.get("mix_instantiation")
-    return isinstance(mix, Mapping) and (
+    if not isinstance(mix, Mapping) or not (
         mix.get("attempted") is True
         and mix.get("status") == "pass"
         and mix.get("implementation") == "datasets.multi_dataset.MultiDataset"
@@ -245,7 +288,9 @@ def _full_pass_contract(payload: Mapping[str, Any]) -> bool:
         and mix.get("weights") == [1.0, 0.8]
         and mix.get("temporal_windows") == [2, 1]
         and mix.get("sampler") == "WeightedRandomSampler"
-    )
+    ):
+        return False
+    return artifact_path is not None and _shared_p2_authorization_gate(artifact_path)
 
 
 def _read_preflight(path: Path) -> tuple[str, bool, str, int]:
@@ -259,7 +304,7 @@ def _read_preflight(path: Path) -> tuple[str, bool, str, int]:
         return "invalid", False, "blocked_invalid_preflight", 2
 
     status = str(payload.get("status", "invalid"))
-    if status == "pass" and _full_pass_contract(payload):
+    if status == "pass" and _full_pass_contract(payload, artifact_path=path):
         return status, True, "pending_formal_benchmark", 0
     if status == "pass":
         return "invalid_pass_contract", False, "blocked_invalid_preflight", 2
