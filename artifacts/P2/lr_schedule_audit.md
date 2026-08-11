@@ -13,11 +13,11 @@
 - max_lr contract: 0.00050000000000000001
 - the short simulation need not reach max_lr exactly; it verifies the configured ceiling and step semantics
 - LR semantics: lr_before is applied to the current optimizer update; lr_after is scheduled for the next optimizer update
-- formal status: blocked_missing_scannet
+- formal status: deferred_to_formal_mixed_data_preflight
 - formal contract kind: planned_not_observed
 - formal run observed: false
 - formal epochs: 450
-- planned raw sampler num_samples: 2120
+- planned raw sampler num_samples: 2113
 - planned epoch sample multiple: 32
 - planned sampler num_samples: 2112
 - planned sampler seed: 45
@@ -37,7 +37,7 @@
 - formal readiness condition: epoch_microbatches % 4 == 0, or an explicit drop_last/tail-normalization policy; otherwise formal training is prohibited
 - formal dataset ref: repo:data/processed/scannet
 - formal gate ref: repo:artifacts/P2/scannet_preflight.json
-- formal status reason: ScanNet prerequisites are missing, so no formal mixed-data run was observed; the planned sampler and optimizer-step contract remains computable from the locked P2 configuration.
+- formal status reason: This scheduler-only preflight records the locked planned contract but does not instantiate or observe a formal mixed-data training run.
 
 | micro | window | window size | target samples | norm denom | rel grad | optimizer before | optimizer after | global before | global after | scheduler before | scheduler after | LR before | LR after | optimizer step |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |

@@ -1,7 +1,7 @@
 # P2 ReScene4D-C T=2 Configuration Audit
 
-Data gate: `blocked_missing_scannet`
-Formal P2 training authorized: `false`
+Data gate: `pass`
+Formal P2 training authorized: `true`
 
 | Setting | Official target | P2 reproduction | Repository default | Status |
 |---|---|---|---|---|
@@ -53,10 +53,10 @@ These are local reproduction safety fixes, not paper-alignment loss fixes, and a
 ## Data Gate Evidence
 
 - Split metadata: `pass`; expected train/validation/test = 1201/312/100 by default.
-- Raw ScanNet assets: `fail`.
-- Processed DB/NPY assets: `fail`.
-- NYU40 18-class taxonomy: `fail`.
-- Real 3RScan + ScanNet mix instantiation: `blocked_prerequisites`.
+- Raw ScanNet assets: `pass`.
+- Processed DB/NPY assets: `pass`.
+- NYU40 18-class taxonomy: `pass`.
+- Real 3RScan + ScanNet mix instantiation: `pass`.
 
 The precision choice (`32-true`) is explicit because the official paper does not report training precision.
 
