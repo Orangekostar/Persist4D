@@ -65,8 +65,8 @@
     "resolved_composed_config": {
       "format": "canonical-json-sort-keys-v1",
       "portable_references": true,
-      "serialized_bytes": 9306,
-      "sha256": "42670aa8d514ca5e8ff4f9e0dc80f8d30984b438e804e38da7fbce97c58697f8"
+      "serialized_bytes": 9420,
+      "sha256": "1e3b2f333ae8dbc676dc8df969105c832cb9f0f06bc65651640bbbf1a5eacf6b"
     },
     "sample_name": "scene0112_00-scene0112_01",
     "semantic_label_database": {
@@ -101,10 +101,10 @@
       "backbone_class": "concerto.model.PointTransformerV3",
       "model": "ReScene"
     },
-    "checkpoint_bytes": 754917414,
+    "checkpoint_bytes": 754917990,
     "checkpoint_callbacks_nonempty": true,
     "data_scope": "single_real_3rscan_t2_window",
-    "elapsed_seconds": 182.77864961116575,
+    "elapsed_seconds": 157.25528256595135,
     "formal_completed_epoch_boundary": true,
     "formal_model_checkpoint_callback_count": 3,
     "formal_model_checkpoint_persistent_states_restored": true,
@@ -130,7 +130,7 @@
     "model_state_schema_sha256": "4dc8e5e8d455cec6a9f1ecd25653cd8a2736debb2e94c138a5fae6744562e069",
     "model_state_scope": "lightning_module_state_dict",
     "monitored_callback_history_populated": true,
-    "monitored_topk_checkpoint_bytes": 754917414,
+    "monitored_topk_checkpoint_bytes": 754917926,
     "monitored_topk_checkpoint_removed": true,
     "optimizer_param_group_parameter_count": 342,
     "optimizer_parameter_contract_count": 342,
@@ -464,14 +464,14 @@
   "seed": 45,
   "smoke": {
     "decoder_head_changed": true,
-    "elapsed_seconds": 24.297261622035876,
+    "elapsed_seconds": 26.810446196002886,
     "encoder_bitwise_unchanged": true,
     "first_step_aggregate_contrastive": 0.6930935978889465,
     "first_step_final_head_segmentation": 16.996435165405273,
     "first_step_matching": {
       "classification_accuracy": 0.0,
       "matched_instances": 2,
-      "mean_dice": 0.17595580965280533
+      "mean_dice": 0.17595580220222473
     },
     "first_step_model_bitwise_changed": true,
     "first_step_weighted_objective": 185.53610229492188,
@@ -485,7 +485,7 @@
       },
       "trainable_concerto_decoder": {
         "finite": true,
-        "max_grad_norm": 948.8001098632812,
+        "max_grad_norm": 948.8002319335938,
         "missing_grad_tensors": 0,
         "nonzero_grad_tensors": 248,
         "parameter_tensors": 248
@@ -499,7 +499,7 @@
       },
       "trainable_rescene_decoder": {
         "finite": true,
-        "max_grad_norm": 639.5816650390625,
+        "max_grad_norm": 639.5787963867188,
         "missing_grad_tensors": 0,
         "nonzero_grad_tensors": 82,
         "parameter_tensors": 82
@@ -540,74 +540,56 @@
       "loss_ce_8": 3.9476442337036133,
       "loss_ce_9": 3.7667582035064697,
       "loss_dice": 0.8199738264083862,
-      "loss_dice_0": 0.5413748025894165,
+      "loss_dice_0": 0.5413748621940613,
       "loss_dice_1": 0.5456342697143555,
       "loss_dice_10": 0.5968352556228638,
-      "loss_dice_11": 0.6713588833808899,
+      "loss_dice_11": 0.6713589429855347,
       "loss_dice_2": 0.5691887140274048,
       "loss_dice_3": 0.8246169090270996,
       "loss_dice_4": 0.8918834924697876,
       "loss_dice_5": 0.7672423124313354,
       "loss_dice_6": 0.591132402420044,
-      "loss_dice_7": 0.7148544788360596,
+      "loss_dice_7": 0.7148545384407043,
       "loss_dice_8": 0.8130475282669067,
       "loss_dice_9": 0.6179826259613037,
       "loss_mask": 1.511045217514038,
-      "loss_mask_0": 0.7468482851982117,
-      "loss_mask_1": 0.9788320064544678,
-      "loss_mask_10": 0.9754505157470703,
+      "loss_mask_0": 0.7468482255935669,
+      "loss_mask_1": 0.9788318872451782,
+      "loss_mask_10": 0.9754505753517151,
       "loss_mask_11": 1.030781626701355,
-      "loss_mask_2": 0.968938946723938,
-      "loss_mask_3": 1.462425708770752,
+      "loss_mask_2": 0.9689387083053589,
+      "loss_mask_3": 1.4624258279800415,
       "loss_mask_4": 1.7262301445007324,
-      "loss_mask_5": 1.2290239334106445,
+      "loss_mask_5": 1.2290241718292236,
       "loss_mask_6": 0.9367227554321289,
       "loss_mask_7": 1.1387070417404175,
-      "loss_mask_8": 1.343090534210205,
-      "loss_mask_9": 0.9272840023040771,
+      "loss_mask_8": 1.343090295791626,
+      "loss_mask_9": 0.9272840619087219,
       "loss_segment_contrastive": 0.6930935978889465
     },
     "scheduler_last_epoch": 2,
     "segment_contrastive_positive": true
   },
-  "source_commit": "50e7870286209867a85a55fea5d3a50c12e61548",
+  "source_commit": "26d2bd72b780c8a2d794fbe039893cb5f0869c7e",
   "source_tree_contract": {
     "allowed_dirty_prefixes": [
       "artifacts/P2/"
     ],
     "committed_paths_since_source": [],
     "dirty_paths": [
-      "artifacts/P2/BLOCKED_MISSING_SCANNET.md",
-      "artifacts/P2/config_audit.md",
-      "artifacts/P2/environment_manifest.json",
-      "artifacts/P2/lr_schedule_audit.md",
-      "artifacts/P2/native_smoke_report.json",
-      "artifacts/P2/official_vs_repro_config_diff.json",
-      "artifacts/P2/scannet_preflight.json",
-      "artifacts/P2/tiny_overfit_report.json",
-      "artifacts/P2/tiny_overfit_report.md"
+      "artifacts/P2/native_smoke_report.json"
     ],
-    "dirty_paths_before_generation": [
-      "artifacts/P2/BLOCKED_MISSING_SCANNET.md",
-      "artifacts/P2/config_audit.md",
-      "artifacts/P2/environment_manifest.json",
-      "artifacts/P2/lr_schedule_audit.md",
-      "artifacts/P2/native_smoke_report.json",
-      "artifacts/P2/official_vs_repro_config_diff.json",
-      "artifacts/P2/scannet_preflight.json",
-      "artifacts/P2/tiny_overfit_report.json",
-      "artifacts/P2/tiny_overfit_report.md"
-    ],
+    "dirty_paths_before_generation": [],
     "disallowed_committed_paths": [],
     "disallowed_dirty_paths": [],
     "errors": [],
-    "expected_tracked_tree_sha256": "7cdc7199a327fdb5507601df8b71a103469d7b4778ebeedda64e5d65c99285c9",
+    "expected_tracked_tree_sha256": "04cf45e1dcba3cc49c0aa39aafcf0110774263845b7c73d7cc28a4b877643f58",
     "generation_head_unchanged": true,
     "index_flag_paths": [],
-    "observed_head": "50e7870286209867a85a55fea5d3a50c12e61548",
-    "observed_tracked_tree_sha256": "7cdc7199a327fdb5507601df8b71a103469d7b4778ebeedda64e5d65c99285c9",
+    "observed_head": "26d2bd72b780c8a2d794fbe039893cb5f0869c7e",
+    "observed_tracked_tree_sha256": "04cf45e1dcba3cc49c0aa39aafcf0110774263845b7c73d7cc28a4b877643f58",
     "schema_version": 1,
-    "source_commit": "50e7870286209867a85a55fea5d3a50c12e61548",
+    "source_commit": "26d2bd72b780c8a2d794fbe039893cb5f0869c7e",
     "status": "pass"
   },
   "validation_evaluator": {
