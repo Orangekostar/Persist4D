@@ -507,6 +507,8 @@ def _compose_config(checkpoint: Path):
 def _configure_lightning_weighted_sampler(config: Any) -> Any:
     from omegaconf import OmegaConf, open_dict
 
+    # Resolve collations while they still point at the original train dataset.
+    OmegaConf.resolve(config)
     rio_dataset = OmegaConf.to_container(
         config.data.train_dataset,
         resolve=False,

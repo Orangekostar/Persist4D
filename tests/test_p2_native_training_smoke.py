@@ -712,6 +712,7 @@ def test_real_3rscan_input_provenance_is_portable_and_pinned() -> None:
 
 def test_lightning_resume_runtime_uses_single_rio_weighted_sampler() -> None:
     import hydra
+    from omegaconf import OmegaConf
     from torch.utils.data import WeightedRandomSampler
 
     config = smoke._compose_config(smoke.DEFAULT_CHECKPOINT)
@@ -726,6 +727,9 @@ def test_lightning_resume_runtime_uses_single_rio_weighted_sampler() -> None:
     assert isinstance(dataset.sampler, WeightedRandomSampler)
     assert dataset.sampler.generator is not None
     assert dataset.sampler_seed == smoke.SEED
+    semantic_sha256 = p2_preflight.p2_training_semantic_sha256(config)
+    roundtrip = OmegaConf.create(OmegaConf.to_container(config, resolve=True))
+    assert semantic_sha256 == p2_preflight.p2_training_semantic_sha256(roundtrip)
 
 
 def test_lightning_resume_uses_all_formal_checkpoint_callbacks(
@@ -1206,6 +1210,7 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
     with open_dict(config):
         config.general.save_dir = str(tmp_path)
         config.scheduler.scheduler.total_steps = _P2_FORMAL_ONECYCLE_TOTAL_STEPS
+    smoke._configure_lightning_weighted_sampler(config)
     source_checkpoint_callbacks = smoke._instantiate_formal_checkpoint_callbacks(config)
     source_dataset, source_generator, source_loader = loader()
     validation_loader = DataLoader(
@@ -1226,6 +1231,10 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
     assert checkpoint.is_file()
     assert len(source_dataset.sampled_indices) == 264
     raw_saved = torch.load(checkpoint, map_location="cpu", weights_only=False)
+    assert type(raw_saved["hyper_parameters"]).__name__ == "DictConfig"
+    assert p2_preflight.p2_training_semantic_sha256(
+        raw_saved["hyper_parameters"]
+    ) == p2_preflight.p2_training_semantic_sha256(config)
     monkeypatch.setattr(
         training_entrypoint,
         "_P2_FORMAL_MODEL_STATE_SCHEMA_SHA256",
