@@ -398,7 +398,7 @@ def _formal_training_status(
         "sampler_generator_state_checkpointed": True,
         "sampler_checkpoint_scope": "completed_epoch_boundary_only",
         "sampler_checkpoint_save_timing": (
-            "p2_train_or_validation_epoch_end_callbacks"
+            "p2_normalized_train_epoch_end_callbacks"
         ),
         "sampler_non_boundary_resume_verified": False,
         "sampler_mid_epoch_resume_supported": False,

@@ -272,7 +272,7 @@ def test_metadata_records_planned_batch_contract_while_formal_run_is_blocked(
         "sampler_generator_state_checkpointed": True,
         "sampler_checkpoint_scope": "completed_epoch_boundary_only",
         "sampler_checkpoint_save_timing": (
-            "p2_train_or_validation_epoch_end_callbacks"
+            "p2_normalized_train_epoch_end_callbacks"
         ),
         "sampler_non_boundary_resume_verified": False,
         "sampler_mid_epoch_resume_supported": False,
@@ -305,7 +305,7 @@ def test_metadata_records_planned_batch_contract_while_formal_run_is_blocked(
     assert "sampler checkpoint scope: completed_epoch_boundary_only" in report
     assert (
         "sampler checkpoint save timing: "
-        "p2_train_or_validation_epoch_end_callbacks"
+        "p2_normalized_train_epoch_end_callbacks"
     ) in report
     assert "sampler non-boundary resume verified: false" in report
     assert "sampler mid-epoch resume supported: false" in report
