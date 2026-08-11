@@ -114,6 +114,41 @@ def sequence_fixture(tmp_path: Path) -> dict[str, Path]:
     return {"root": root, "labels": root / "label_database.yaml"}
 
 
+@pytest.fixture()
+def scannet_t1_fixture(tmp_path: Path) -> Path:
+    root = tmp_path / "scannet"
+    labels = {
+        1: {"color": [1, 1, 1], "name": "wall", "validation": True},
+        2: {"color": [2, 2, 2], "name": "floor", "validation": True},
+        3: {"color": [3, 3, 3], "name": "chair", "validation": True},
+        4: {"color": [4, 4, 4], "name": "table", "validation": True},
+    }
+    _write_yaml(root / "label_database.yaml", labels)
+    _write_yaml(root / "scannet.yaml", {"valid_class_ids": [3, 4]})
+
+    records = []
+    for scene, semantic in (
+        ("scene0154_00", 2),
+        ("scene0636_00", 2),
+        ("scene0700_00", 3),
+    ):
+        npy = root / "train" / f"{scene[5:]}.npy"
+        gt = root / "instance_gt" / "train" / f"{scene}.txt"
+        npy.parent.mkdir(parents=True, exist_ok=True)
+        gt.parent.mkdir(parents=True, exist_ok=True)
+        np.save(npy, _points(semantic, 7))
+        gt.write_text("1\n1\n", encoding="utf-8")
+        records.append(
+            {
+                "filepath": str(npy),
+                "instance_gt_filepath": str(gt),
+                "file_len": 2,
+            }
+        )
+    _write_yaml(root / "train_database.yaml", records)
+    return root
+
+
 def _dataset(
     root: Path,
     mode: str,
@@ -137,6 +172,26 @@ def _dataset(
         label_offset=2,
         temporal_window=temporal_window,
         fail_closed=fail_closed,
+        exclude_unsupervised_sequences=exclude,
+    )
+
+
+def _scannet_t1_dataset(root: Path, *, exclude: bool):
+    return SemanticSegmentationDataset(
+        dataset_name="scannet",
+        data_dir=str(root),
+        label_db_filepath=str(root / "label_database.yaml"),
+        color_mean_std=((0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+        mode="train",
+        add_colors=True,
+        add_normals=False,
+        add_raw_coordinates=False,
+        add_instance=True,
+        num_labels=4,
+        filter_out_classes=[0, 1],
+        label_offset=2,
+        temporal_window=1,
+        fail_closed=True,
         exclude_unsupervised_sequences=exclude,
     )
 
@@ -205,6 +260,60 @@ def test_temporal_window_one_keeps_all_scans_when_common_flag_is_true(
     assert dataset.excluded_unsupervised_sequences == []
 
 
+def test_scannet_t1_filter_removes_empty_scans_and_keeps_supervised_targets(
+    scannet_t1_fixture,
+):
+    disabled = _scannet_t1_dataset(scannet_t1_fixture, exclude=False)
+    assert len(disabled) == 3
+    assert disabled.excluded_unsupervised_sequences == []
+
+    dataset = _scannet_t1_dataset(scannet_t1_fixture, exclude=True)
+
+    assert dataset.sequence_names == ["scene0700_00"]
+    assert dataset.excluded_unsupervised_sequences == [
+        "scene0154_00",
+        "scene0636_00",
+    ]
+    assert dataset.unsupervised_sequence_filter["enabled"] is True
+    assert dataset.sequence_indices.shape == (1, 1)
+    assert dataset.change_files == [None]
+    assert dataset.ambiguities == [None]
+    assert all(
+        dataset._scan_has_instance_supervision(index, {3, 4})
+        for index in dataset.sequence_indices[:, 0]
+    )
+
+
+def test_real_scannet_t1_filter_removes_the_two_empty_train_scans():
+    dataset = SemanticSegmentationDataset(
+        dataset_name="scannet",
+        data_dir="data/processed/scannet",
+        label_db_filepath="data/processed/scannet/label_database.yaml",
+        color_mean_std="data/processed/scannet/color_mean_std.yaml",
+        mode="train",
+        add_colors=True,
+        add_normals=False,
+        add_raw_coordinates=False,
+        add_instance=True,
+        num_labels=20,
+        filter_out_classes=[0, 1, 255],
+        label_offset=2,
+        temporal_window=1,
+        fail_closed=True,
+        exclude_unsupervised_sequences=True,
+    )
+
+    assert len(dataset) == 1199
+    assert dataset.excluded_unsupervised_sequences == [
+        "scene0154_00",
+        "scene0636_00",
+    ]
+    assert all(
+        dataset._scan_has_instance_supervision(index, set(p2_preflight.NYU40_INSTANCE_IDS))
+        for index in dataset.sequence_indices[:, 0]
+    )
+
+
 def test_enabled_filter_rejects_taxonomy_outside_active_label_database(
     sequence_fixture,
 ):
@@ -243,7 +352,7 @@ def test_filtered_dataset_preserves_multidataset_epoch_alignment(sequence_fixtur
 
 def test_p2_filtered_mix_keeps_formal_effective_epoch_batch():
     mixed = MultiDataset(
-        datasets=[_SizedDataset(1174), _SizedDataset(1201)],
+        datasets=[_SizedDataset(1174), _SizedDataset(1199)],
         weights=[1.0, 0.8],
         epoch_sample_multiple=32,
         sampler_seed=45,

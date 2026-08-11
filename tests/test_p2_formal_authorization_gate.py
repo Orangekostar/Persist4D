@@ -511,7 +511,7 @@ def _formal_artifact(cfg, *, issued_at: datetime | None = None) -> dict:
             "status": "pass",
             "implementation": "datasets.multi_dataset.MultiDataset",
             "dataset_names": ["rio", "scannet"],
-            "dataset_sizes": [1174, 1201],
+            "dataset_sizes": [1174, 1199],
             "weights": [1.0, 0.8],
             "temporal_windows": [2, 1],
             "sampler": "WeightedRandomSampler",
@@ -1152,7 +1152,7 @@ def test_formal_mix_size_must_match_the_exact_pinned_t2_baseline(
     cfg = _compose(P2_CONFIG_NAME)
     artifact_path = tmp_path / "scannet_preflight.json"
     artifact = _formal_artifact(cfg)
-    artifact["mix_instantiation"]["dataset_sizes"] = [1, 1201]
+    artifact["mix_instantiation"]["dataset_sizes"] = [1, 1199]
     artifact["authorization"]["artifact_payload_sha256"] = _artifact_sha256(
         artifact
     )

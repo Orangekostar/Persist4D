@@ -144,7 +144,7 @@ def _valid_preflight() -> dict[str, Any]:
             "status": "pass",
             "implementation": "datasets.multi_dataset.MultiDataset",
             "dataset_names": ["rio", "scannet"],
-            "dataset_sizes": [1174, 1201],
+            "dataset_sizes": [1174, 1199],
             "sampler_num_samples": 2112,
             "epoch_sample_multiple": 32,
             "weights": [1.0, 0.8],

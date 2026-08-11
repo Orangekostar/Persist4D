@@ -24,6 +24,7 @@ from utils.p2_preflight import (
     P2_FORMAL_SAMPLER_NUM_SAMPLES,
     P2_PREFLIGHT_SCHEMA_VERSION,
     P2_RIO_SEQUENCE_FILTER_COUNTS,
+    P2_SCANNET_SEQUENCE_FILTER_COUNTS,
     require_p2_preflight_authorization,
 )
 
@@ -289,7 +290,7 @@ def _full_pass_contract(
         and mix.get("dataset_names") == ["rio", "scannet"]
         and mix.get("dataset_sizes") == [
             P2_RIO_SEQUENCE_FILTER_COUNTS["train"]["retained_count"],
-            1201,
+            P2_SCANNET_SEQUENCE_FILTER_COUNTS["train"]["retained_count"],
         ]
         and mix.get("weights") == [1.0, 0.8]
         and mix.get("temporal_windows") == [2, 1]

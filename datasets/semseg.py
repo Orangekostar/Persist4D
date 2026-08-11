@@ -86,8 +86,18 @@ class SemanticSegmentationDataset(Dataset):
         self.known_empty_scan_substitution_count = 0
         self.exclude_unsupervised_sequences = exclude_unsupervised_sequences
         self.excluded_unsupervised_sequences = []
+        self._unsupervised_sequence_filter_applies = bool(
+            exclude_unsupervised_sequences
+            and (
+                temporal_window > 1
+                or (
+                    temporal_window == 1
+                    and dataset_name in {"scannet", "scannet200"}
+                )
+            )
+        )
         self.unsupervised_sequence_filter = {
-            "enabled": bool(exclude_unsupervised_sequences and temporal_window > 1),
+            "enabled": self._unsupervised_sequence_filter_applies,
             "mode": mode,
             "taxonomy_label_ids": [],
             "excluded_sequences": [],
@@ -298,8 +308,8 @@ class SemanticSegmentationDataset(Dataset):
             # Combine sequence indices from all directories
             self.sequence_indices = np.vstack(all_sequence_indices)
 
-            if self.exclude_unsupervised_sequences:
-                self._exclude_unsupervised_sequences()
+        if self._unsupervised_sequence_filter_applies:
+            self._exclude_unsupervised_sequences()
 
         self.known_empty_scan_contexts = self._find_known_empty_scan_contexts()
         if (

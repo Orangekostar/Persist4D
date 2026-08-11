@@ -116,6 +116,14 @@ P2_KNOWN_EMPTY_RIO_SEQUENCES = [
     "scene0171_01-scene0171_02",
 ]
 P2_KNOWN_EMPTY_SCANNET_SCAN_IDS = ["scene0154_00", "scene0636_00"]
+P2_SCANNET_SEQUENCE_FILTER_COUNTS = {
+    "train": {
+        "sequence_count": OFFICIAL_SPLIT_COUNTS["train"],
+        "excluded_count": len(P2_KNOWN_EMPTY_SCANNET_SCAN_IDS),
+        "retained_count": OFFICIAL_SPLIT_COUNTS["train"]
+        - len(P2_KNOWN_EMPTY_SCANNET_SCAN_IDS),
+    }
+}
 P2_TRAINING_SEMANTIC_SHA256 = (
     "a5ac75f69c1b918e33a0cfc9a380a882209bd69af963f207547058a902af17aa"
 )
@@ -1964,7 +1972,11 @@ def _validate_taxonomy_and_mix(artifact: Mapping[str, Any], errors: list[str]) -
     if (
         not isinstance(sizes, list)
         or len(sizes) != 2
-        or sizes != [P2_RIO_SEQUENCE_FILTER_COUNTS["train"]["retained_count"], OFFICIAL_SPLIT_COUNTS["train"]]
+        or sizes
+        != [
+            P2_RIO_SEQUENCE_FILTER_COUNTS["train"]["retained_count"],
+            P2_SCANNET_SEQUENCE_FILTER_COUNTS["train"]["retained_count"],
+        ]
     ):
         errors.append("mix_instantiation.dataset_sizes mismatch")
 

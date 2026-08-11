@@ -35,6 +35,7 @@ from utils.p2_preflight import (
     P2_RIO_SEQUENCE_DATABASE_SHA256,
     P2_RIO_SEQUENCE_FILTER_COUNTS,
     P2_RIO_SEQUENCE_FILTER_SHA256,
+    P2_SCANNET_SEQUENCE_FILTER_COUNTS,
     P2_TRAINING_CONTRACT_SCHEMA_VERSION,
     P2_TRAINING_SEMANTIC_SHA256,
     SCANNET_OFFICIAL_COMMIT,
@@ -2473,6 +2474,8 @@ def _build_environment_manifest(
 def _instantiate_real_mix(
     processed_scannet_dir: Path,
     rio_processed_dir: Path,
+    *,
+    require_formal_sizes: bool = False,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     try:
         import hydra
@@ -2518,6 +2521,11 @@ def _instantiate_real_mix(
             "sampler_num_samples": P2_FORMAL_SAMPLER_NUM_SAMPLES,
             "epoch_sample_multiple": P2_FORMAL_EPOCH_SAMPLE_MULTIPLE,
         }
+        if require_formal_sizes:
+            expected["dataset_sizes"] = [
+                P2_RIO_SEQUENCE_FILTER_COUNTS["train"]["retained_count"],
+                P2_SCANNET_SEQUENCE_FILTER_COUNTS["train"]["retained_count"],
+            ]
         if any(result[key] != value for key, value in expected.items()) or any(
             size <= 0 for size in result["dataset_sizes"]
         ):
@@ -2903,7 +2911,11 @@ def run_audit(
     if errors:
         mix = {"attempted": False, "status": "blocked_prerequisites"}
     else:
-        mix, mix_errors = _instantiate_real_mix(processed_scannet_dir, rio_processed_dir)
+        mix, mix_errors = _instantiate_real_mix(
+            processed_scannet_dir,
+            rio_processed_dir,
+            require_formal_sizes=official_counts,
+        )
         errors.extend(mix_errors)
 
     if official_counts and not errors and mix.get("status") == "pass":
