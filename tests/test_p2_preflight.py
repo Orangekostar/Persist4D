@@ -663,7 +663,7 @@ def test_artifacts_bind_the_exact_p2_target_and_current_reproduction_config(
     assert diff["reproduction_code_relation"] == {
         "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
         "local_fix_commit": "3c6b11a3af600aa98c93128361c2ecb4900ea186",
-        "runtime_safety_fix_commit": "6d5a74707373c4b4c54737a31f2f4e0fa754458c",
+        "runtime_safety_fix_commit": "611ba161454cdfde7fe047fcae1e0d7b81387bf2",
         "official_code_used_unchanged": False,
         "status": "local_alignment_and_safety_patch_set",
     }
@@ -717,7 +717,7 @@ def test_artifacts_bind_the_exact_p2_target_and_current_reproduction_config(
         and fix["official_code_commit"]
         == "fb2fe42eb8f1e926567c48eea9acb874e608ee10"
         and fix["local_fix_commit"]
-        == "6d5a74707373c4b4c54737a31f2f4e0fa754458c"
+        == "611ba161454cdfde7fe047fcae1e0d7b81387bf2"
         and "paper_alignment" not in fix
         for fix_id, fix in fixes.items()
         if fix_id in safety_fix_ids
