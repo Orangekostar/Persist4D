@@ -38,16 +38,19 @@ data:
   voxel_size: 0.02
   train_dataset:
     filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: true
     fail_closed: true
     known_empty_scan_policy: official_substitute
     epoch_sample_multiple: 32
     sampler_seed: 45
   validation_dataset:
     filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: true
     fail_closed: true
     known_empty_scan_policy: official_substitute
   test_dataset:
     filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: true
     fail_closed: true
     known_empty_scan_policy: official_substitute
 

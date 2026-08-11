@@ -20,7 +20,10 @@ if str(REPO_ROOT) not in sys.path:
 
 from utils.p2_preflight import (
     P2_CONFIG_NAME,
+    P2_FORMAL_EPOCH_SAMPLE_MULTIPLE,
+    P2_FORMAL_SAMPLER_NUM_SAMPLES,
     P2_PREFLIGHT_SCHEMA_VERSION,
+    P2_RIO_SEQUENCE_FILTER_COUNTS,
     require_p2_preflight_authorization,
 )
 
@@ -284,10 +287,15 @@ def _full_pass_contract(
         and mix.get("status") == "pass"
         and mix.get("implementation") == "datasets.multi_dataset.MultiDataset"
         and mix.get("dataset_names") == ["rio", "scannet"]
-        and mix.get("dataset_sizes") == [1178, 1201]
+        and mix.get("dataset_sizes") == [
+            P2_RIO_SEQUENCE_FILTER_COUNTS["train"]["retained_count"],
+            1201,
+        ]
         and mix.get("weights") == [1.0, 0.8]
         and mix.get("temporal_windows") == [2, 1]
         and mix.get("sampler") == "WeightedRandomSampler"
+        and mix.get("sampler_num_samples") == P2_FORMAL_SAMPLER_NUM_SAMPLES
+        and mix.get("epoch_sample_multiple") == P2_FORMAL_EPOCH_SAMPLE_MULTIPLE
     ):
         return False
     return artifact_path is not None and _shared_p2_authorization_gate(artifact_path)

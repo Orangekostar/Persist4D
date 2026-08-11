@@ -20,6 +20,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_DIR = REPO_ROOT / "conf"
 P2_CONFIG_NAME = "config_p2_rescene4d_concerto_t2"
 OFFICIAL_SPLIT_COUNTS = {"train": 1201, "validation": 312, "test": 100}
+_FORMAL_DATA_ROOT_CONTRACT = p2_preflight.p2_data_root_reference_contract()
 NYU40_INSTANCE_IDS = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 24, 28, 33, 34, 36, 39]
 NYU40_INSTANCE_LABELS = [
     "cabinet",
@@ -41,6 +42,22 @@ NYU40_INSTANCE_LABELS = [
     "bathtub",
     "otherfurniture",
 ]
+P2_EXCLUDED_SEQUENCE_NAMES = {
+    "train": [
+        "scene0242_00-scene0242_01",
+        "scene0242_01-scene0242_02",
+        "scene0242_02-scene0242_00",
+        "scene0245_01-scene0245_02",
+    ],
+    "validation": [
+        "scene0439_00-scene0439_02",
+        "scene0439_01-scene0439_00",
+        "scene0439_02-scene0439_01",
+    ],
+}
+P2_EXCLUDED_SEQUENCE_NAMES["test"] = list(
+    P2_EXCLUDED_SEQUENCE_NAMES["validation"]
+)
 SCANNET_OFFICIAL_COMMIT = "3830fce7f8b2e48ef047ef7fd76ea5f62903f51c"
 OFFICIAL_SPLIT_SHA256 = {
     "train": "96acca299b7855f02824c496b19077904d80996e7ced1bb9f0dac98f7dd4d0c8",
@@ -51,8 +68,10 @@ FORMAL_INPUT_MANIFEST = {
     "schema_version": 1,
     "status": "pass",
     "roots": {
-        "scannet": "repo:data/processed/scannet",
-        "rio": "repo:data/processed/rio",
+        "scannet": _FORMAL_DATA_ROOT_CONTRACT["expected_resolved"][
+            "scannet"
+        ],
+        "rio": _FORMAL_DATA_ROOT_CONTRACT["expected_resolved"]["rio"],
     },
     "scannet": {
         "file_count": 4842,
@@ -303,6 +322,32 @@ def _formal_artifact(cfg, *, issued_at: datetime | None = None) -> dict:
     instance_scenes = (
         OFFICIAL_SPLIT_COUNTS["train"] + OFFICIAL_SPLIT_COUNTS["validation"]
     )
+    filter_by_split = {
+        "train": {
+            "sequence_count": 1178,
+            "excluded_count": 4,
+            "retained_count": 1174,
+            "excluded_sequences": list(P2_EXCLUDED_SEQUENCE_NAMES["train"]),
+        },
+        "validation": {
+            "sequence_count": 157,
+            "excluded_count": 3,
+            "retained_count": 154,
+            "excluded_sequences": list(
+                P2_EXCLUDED_SEQUENCE_NAMES["validation"]
+            ),
+        },
+        "test": {
+            "sequence_count": 157,
+            "excluded_count": 3,
+            "retained_count": 154,
+            "excluded_sequences": list(P2_EXCLUDED_SEQUENCE_NAMES["test"]),
+        },
+    }
+    filter_names_payload = {
+        split: value["excluded_sequences"]
+        for split, value in filter_by_split.items()
+    }
     artifact = {
         "schema_version": p2_preflight.P2_PREFLIGHT_SCHEMA_VERSION,
         "status": "pass",
@@ -426,24 +471,14 @@ def _formal_artifact(cfg, *, issued_at: datetime | None = None) -> dict:
         },
         "data_root_bindings": {
             "status": "pass",
-            "expected": {
-                "raw_scannet": "repo:data/raw/scannet/scannet",
-                "scannet": "repo:data/processed/scannet",
-                "rio": "repo:data/processed/rio",
-                "split_metadata": (
-                    "repo:third_party/ScanNet/Tasks/Benchmark"
-                ),
-                "test_segments": "repo:data/raw/scannet_test_segments",
-            },
-            "observed": {
-                "raw_scannet": "repo:data/raw/scannet/scannet",
-                "scannet": "repo:data/processed/scannet",
-                "rio": "repo:data/processed/rio",
-                "split_metadata": (
-                    "repo:third_party/ScanNet/Tasks/Benchmark"
-                ),
-                "test_segments": "repo:data/raw/scannet_test_segments",
-            },
+            "expected": _FORMAL_DATA_ROOT_CONTRACT["expected"],
+            "observed": _FORMAL_DATA_ROOT_CONTRACT["expected"],
+            "expected_resolved": _FORMAL_DATA_ROOT_CONTRACT[
+                "expected_resolved"
+            ],
+            "observed_resolved": _FORMAL_DATA_ROOT_CONTRACT[
+                "expected_resolved"
+            ],
         },
         "rio_path_integrity": {
             "status": "pass",
@@ -455,6 +490,20 @@ def _formal_artifact(cfg, *, issued_at: datetime | None = None) -> dict:
             "content_validation": "pass",
             "supervised_record_count": 1326,
             "unsupervised_sequences": [],
+            "excluded_unsupervised_sequences": filter_names_payload,
+            "filtered_sequence_counts": {
+                "train": 1174,
+                "validation": 154,
+            },
+        },
+        "unsupervised_sequence_filter": {
+            "schema_version": 1,
+            "status": "pass",
+            "enabled": True,
+            "source": "real_npy",
+            "taxonomy_label_ids": list(NYU40_INSTANCE_IDS),
+            "by_split": filter_by_split,
+            "sequence_name_sha256": p2_preflight.P2_RIO_SEQUENCE_FILTER_SHA256,
         },
         "input_manifest": copy.deepcopy(FORMAL_INPUT_MANIFEST),
         "mix_instantiation": {
@@ -462,10 +511,12 @@ def _formal_artifact(cfg, *, issued_at: datetime | None = None) -> dict:
             "status": "pass",
             "implementation": "datasets.multi_dataset.MultiDataset",
             "dataset_names": ["rio", "scannet"],
-            "dataset_sizes": [1178, 1201],
+            "dataset_sizes": [1174, 1201],
             "weights": [1.0, 0.8],
             "temporal_windows": [2, 1],
             "sampler": "WeightedRandomSampler",
+            "sampler_num_samples": 2112,
+            "epoch_sample_multiple": 32,
         },
         "errors": [],
         "config_contract": {
@@ -473,10 +524,10 @@ def _formal_artifact(cfg, *, issued_at: datetime | None = None) -> dict:
             "status": "pass",
             "errors": [],
             "expected_semantic_sha256": (
-                "898cc3588218d63fe0295aa274dbf63c51b29ad8aa1f32f918427d99e7e6060d"
+                p2_preflight.P2_TRAINING_SEMANTIC_SHA256
             ),
             "observed_semantic_sha256": (
-                "898cc3588218d63fe0295aa274dbf63c51b29ad8aa1f32f918427d99e7e6060d"
+                p2_preflight.P2_TRAINING_SEMANTIC_SHA256
             ),
         },
         "authorization": {

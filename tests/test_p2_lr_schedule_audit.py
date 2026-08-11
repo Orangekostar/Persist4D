@@ -255,14 +255,17 @@ def test_metadata_records_planned_batch_contract_while_formal_run_is_blocked(
         "effective_batch": 32,
         "formula": "2 GPUs * 4 samples/GPU * 4 accumulation steps = 32",
     }
+    assert result["formal_training"]["primary_dataset_samples"] == 1174
+    assert result["formal_training"]["raw_sampler_num_samples"] == 2113
+    assert result["formal_training"]["sampler_num_samples"] == 2112
     assert result["formal_training"] == {
         "status": "blocked_missing_scannet",
         "contract_kind": "planned_not_observed",
         "observed_formal_run": False,
         "dataset_mix": "3RScan T=2 (1.0) + ScanNet T=1 (0.8)",
-        "primary_dataset_samples": 1178,
+        "primary_dataset_samples": 1174,
         "dataset_weights": [1.0, 0.8],
-        "raw_sampler_num_samples": 2120,
+        "raw_sampler_num_samples": 2113,
         "epoch_sample_multiple": 32,
         "sampler_num_samples": 2112,
         "sampler_seed": 45,
@@ -314,6 +317,7 @@ def test_metadata_records_planned_batch_contract_while_formal_run_is_blocked(
     assert "formal run observed: false" in report
     assert "formal epochs: 450" in report
     assert "planned sampler num_samples: 2112" in report
+    assert "planned raw sampler num_samples: 2113" in report
     assert (
         "planned sampler seed scope: "
         "fresh_start_and_completed_epoch_boundary_resume"

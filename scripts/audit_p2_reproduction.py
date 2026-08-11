@@ -25,17 +25,23 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from utils.p2_preflight import (
+    P2_FORMAL_EPOCH_SAMPLE_MULTIPLE,
+    P2_FORMAL_SAMPLER_NUM_SAMPLES,
     P2_KNOWN_EMPTY_RIO_SCAN_ID,
     P2_KNOWN_EMPTY_RIO_SEQUENCES,
     P2_KNOWN_EMPTY_SCANNET_SCAN_IDS,
     P2_PREFLIGHT_SCHEMA_VERSION,
     P2_RIO_SEQUENCE_DATABASE_REF,
     P2_RIO_SEQUENCE_DATABASE_SHA256,
+    P2_RIO_SEQUENCE_FILTER_COUNTS,
+    P2_RIO_SEQUENCE_FILTER_SHA256,
     P2_TRAINING_CONTRACT_SCHEMA_VERSION,
     P2_TRAINING_SEMANTIC_SHA256,
     SCANNET_OFFICIAL_COMMIT,
     SCANNET_OFFICIAL_REPOSITORY_REF,
     SCANNET_SPLIT_SHA256,
+    _lexical_root_ref,
+    _resolved_root_ref,
     build_p2_input_manifest,
     build_p2_runtime_environment_contract,
     build_p2_runtime_source_contract,
@@ -443,34 +449,34 @@ def _audit_formal_data_roots(
             path = Path(str(by_name[name].data_dir)).expanduser()
             expected_paths[name] = (
                 path if path.is_absolute() else REPO_ROOT / path
-            ).resolve()
+            )
         expected_paths.update(
             {
                 "raw_scannet": (
                     REPO_ROOT / "data" / "raw" / "scannet" / "scannet"
-                ).resolve(),
+                ),
                 "split_metadata": (
                     REPO_ROOT
                     / "third_party"
                     / "ScanNet"
                     / "Tasks"
                     / "Benchmark"
-                ).resolve(),
+                ),
                 "test_segments": (
                     REPO_ROOT / "data" / "raw" / "scannet_test_segments"
-                ).resolve(),
+                ),
             }
         )
     except (AttributeError, KeyError, TypeError, ValueError):
         errors.append(_error("formal_data_root_config_invalid"))
 
-    observed_paths = {
-        "scannet": Path(processed_scannet_dir).expanduser().resolve(),
-        "rio": Path(rio_processed_dir).expanduser().resolve(),
+    observed_input_paths = {
+        "scannet": Path(processed_scannet_dir).expanduser(),
+        "rio": Path(rio_processed_dir).expanduser(),
         "raw_scannet": Path(
             raw_scannet_dir
             or REPO_ROOT / "data" / "raw" / "scannet" / "scannet"
-        ).expanduser().resolve(),
+        ).expanduser(),
         "split_metadata": Path(
             split_dir
             or REPO_ROOT
@@ -478,11 +484,14 @@ def _audit_formal_data_roots(
             / "ScanNet"
             / "Tasks"
             / "Benchmark"
-        ).expanduser().resolve(),
+        ).expanduser(),
         "test_segments": Path(
             test_segments_dir
             or REPO_ROOT / "data" / "raw" / "scannet_test_segments"
-        ).expanduser().resolve(),
+        ).expanduser(),
+    }
+    observed_paths = {
+        name: path.resolve() for name, path in observed_input_paths.items()
     }
     for name in (
         "raw_scannet",
@@ -492,19 +501,25 @@ def _audit_formal_data_roots(
         "test_segments",
     ):
         expected = expected_paths.get(name)
-        if expected is not None and observed_paths[name] != expected:
+        if expected is not None and observed_paths[name] != expected.resolve():
             errors.append(_error(f"formal_{name}_data_root_mismatch"))
 
     expected_refs = {
-        name: _portable_ref(path, f"configured_{name}_processed")
+        name: _lexical_root_ref(path, REPO_ROOT, f"configured_{name}_processed")
         for name, path in expected_paths.items()
     }
     observed_refs = {
-        name: (
-            expected_refs[name]
-            if name in expected_paths and path == expected_paths[name]
-            else _portable_ref(path, f"audited_{name}_processed")
+        name: _lexical_root_ref(
+            path, REPO_ROOT, f"audited_{name}_processed"
         )
+        for name, path in observed_input_paths.items()
+    }
+    expected_resolved_refs = {
+        name: _resolved_root_ref(path, REPO_ROOT, f"data_root/{name}")
+        for name, path in expected_paths.items()
+    }
+    observed_resolved_refs = {
+        name: _resolved_root_ref(path, REPO_ROOT, f"data_root/{name}")
         for name, path in observed_paths.items()
     }
     return (
@@ -512,6 +527,8 @@ def _audit_formal_data_roots(
             "status": "pass" if not errors else "fail",
             "expected": expected_refs,
             "observed": observed_refs,
+            "expected_resolved": expected_resolved_refs,
+            "observed_resolved": observed_resolved_refs,
         },
         errors,
     )
@@ -1023,6 +1040,7 @@ def _audit_rio_record_paths(
     rio_processed_dir: Path,
     *,
     validate_content: bool = False,
+    exclude_unsupervised_sequences: bool = False,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Bind every P2-active RIO record to its canonical processed asset."""
     errors: list[dict[str, Any]] = []
@@ -1195,7 +1213,10 @@ def _audit_rio_record_paths(
         split: {scene: [0, 0] for scene in scenes}
         for split, scenes in scenes_by_split.items()
     }
-    observed_unsupervised_sequences: list[str] = []
+    observed_unsupervised_sequences: dict[str, list[str]] = {
+        "train": [],
+        "validation": [],
+    }
     for sequence, entry in sequences.items():
         if not isinstance(entry, Mapping) or entry.get("type") not in sequence_counts:
             continue
@@ -1226,7 +1247,7 @@ def _audit_rio_record_paths(
             if validate_content and not any(
                 scene_supervision.get(name, False) for name in names
             ):
-                observed_unsupervised_sequences.append(str(sequence))
+                observed_unsupervised_sequences[split].append(str(sequence))
 
         filepath = entry.get("filepath")
         lexical_path = Path(filepath) if isinstance(filepath, str) else None
@@ -1263,16 +1284,87 @@ def _audit_rio_record_paths(
 
     if validate_content and not any(supervision_observed):
         errors.append(_error("rio_dataset_instance_supervision_empty"))
-    if validate_content and observed_unsupervised_sequences:
+    observed_unsupervised_by_split = {
+        split: sorted(set(names))
+        for split, names in observed_unsupervised_sequences.items()
+    }
+    if validate_content and not exclude_unsupervised_sequences and any(
+        observed_unsupervised_by_split.values()
+    ):
         errors.append(
             _error(
                 "rio_active_sequence_supervision_empty",
-                sequence_count=len(observed_unsupervised_sequences),
-                sequences=observed_unsupervised_sequences,
+                sequence_count=sum(
+                    len(names) for names in observed_unsupervised_by_split.values()
+                ),
+                sequences=[
+                    sequence
+                    for split in ("train", "validation")
+                    for sequence in observed_unsupervised_by_split[split]
+                ],
+            )
+        )
+    if validate_content and exclude_unsupervised_sequences and any(
+        sequence_counts[split] - len(names) <= 0
+        for split, names in observed_unsupervised_by_split.items()
+    ):
+        errors.append(_error("rio_unsupervised_sequence_filter_empty"))
+
+    sequence_filter_by_split = {
+        "train": {
+            "sequence_count": sequence_counts["train"],
+            "excluded_count": len(observed_unsupervised_by_split["train"]),
+            "retained_count": sequence_counts["train"]
+            - len(observed_unsupervised_by_split["train"]),
+            "excluded_sequences": observed_unsupervised_by_split["train"],
+        },
+        "validation": {
+            "sequence_count": sequence_counts["validation"],
+            "excluded_count": len(observed_unsupervised_by_split["validation"]),
+            "retained_count": sequence_counts["validation"]
+            - len(observed_unsupervised_by_split["validation"]),
+            "excluded_sequences": observed_unsupervised_by_split["validation"],
+        },
+    }
+    sequence_filter_by_split["test"] = dict(sequence_filter_by_split["validation"])
+    if validate_content and exclude_unsupervised_sequences:
+        for split, expected in P2_RIO_SEQUENCE_FILTER_COUNTS.items():
+            if any(
+                sequence_filter_by_split[split][field] != expected[field]
+                for field in ("sequence_count", "excluded_count", "retained_count")
+            ):
+                errors.append(
+                    _error(
+                        "rio_unsupervised_sequence_filter_count_mismatch",
+                        split=split,
+                    )
+                )
+    sequence_filter_payload = {
+        split: sequence_filter_by_split[split]["excluded_sequences"]
+        for split in ("train", "validation", "test")
+    }
+    sequence_filter_digest = hashlib.sha256(
+        json.dumps(
+            sequence_filter_payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+        ).encode("utf-8")
+    ).hexdigest()
+    if (
+        validate_content
+        and exclude_unsupervised_sequences
+        and sequence_filter_digest != P2_RIO_SEQUENCE_FILTER_SHA256
+    ):
+        errors.append(
+            _error(
+                "rio_unsupervised_sequence_filter_contract_mismatch",
+                observed_sha256=sequence_filter_digest,
             )
         )
     rio_content_errors = any(
         error["code"].startswith("rio_processed_")
+        or error["code"].startswith("rio_unsupervised_sequence_filter")
         or error["code"]
         in {
             "rio_dataset_instance_supervision_empty",
@@ -1297,8 +1389,50 @@ def _audit_rio_record_paths(
                 sum(supervision_observed) if validate_content else None
             ),
             "unsupervised_sequences": (
-                observed_unsupervised_sequences if validate_content else None
+                []
+                if validate_content and exclude_unsupervised_sequences
+                else [
+                    sequence
+                    for split in ("train", "validation")
+                    for sequence in observed_unsupervised_by_split[split]
+                ]
+                if validate_content
+                else None
             ),
+            "excluded_unsupervised_sequences": (
+                sequence_filter_payload if validate_content else None
+            ),
+            "filtered_sequence_counts": (
+                {
+                    "train": sequence_filter_by_split["train"]["retained_count"],
+                    "validation": sequence_filter_by_split["validation"][
+                        "retained_count"
+                    ],
+                }
+                if validate_content and exclude_unsupervised_sequences
+                else None
+            ),
+            "unsupervised_sequence_filter": {
+                "schema_version": 1,
+                "status": (
+                    "pass"
+                    if validate_content and exclude_unsupervised_sequences
+                    and not any(
+                        error["code"].startswith(
+                            "rio_unsupervised_sequence_filter"
+                        )
+                        for error in errors
+                    )
+                    else "not_run_diagnostic"
+                    if not validate_content
+                    else "fail"
+                ),
+                "enabled": bool(exclude_unsupervised_sequences),
+                "source": "real_npy",
+                "taxonomy_label_ids": list(NYU40_INSTANCE_IDS),
+                "by_split": sequence_filter_by_split,
+                "sequence_name_sha256": sequence_filter_digest,
+            },
         },
         errors,
     )
@@ -2372,6 +2506,8 @@ def _instantiate_real_mix(
             "weights": [float(weight) for weight in dataset.weights],
             "temporal_windows": [int(child.temporal_window) for child in dataset.datasets],
             "sampler": dataset.sampler.__class__.__name__,
+            "sampler_num_samples": int(dataset.sampler.num_samples),
+            "epoch_sample_multiple": int(dataset.epoch_sample_multiple),
         }
         expected = {
             "implementation": "datasets.multi_dataset.MultiDataset",
@@ -2379,6 +2515,8 @@ def _instantiate_real_mix(
             "weights": [1.0, 0.8],
             "temporal_windows": [2, 1],
             "sampler": "WeightedRandomSampler",
+            "sampler_num_samples": P2_FORMAL_SAMPLER_NUM_SAMPLES,
+            "epoch_sample_multiple": P2_FORMAL_EPOCH_SAMPLE_MULTIPLE,
         }
         if any(result[key] != value for key, value in expected.items()) or any(
             size <= 0 for size in result["dataset_sizes"]
@@ -2572,6 +2710,18 @@ def _invalidate_formal_preflight(output_dir: Path) -> None:
     )
 
 
+def _p2_unsupervised_sequence_filter_enabled(config: Any) -> bool:
+    try:
+        values = (
+            config.data.train_dataset.exclude_unsupervised_sequences,
+            config.data.validation_dataset.exclude_unsupervised_sequences,
+            config.data.test_dataset.exclude_unsupervised_sequences,
+        )
+    except (AttributeError, KeyError, TypeError):
+        return False
+    return all(type(value) is bool and value for value in values)
+
+
 def run_audit(
     *,
     raw_scannet_dir: Path,
@@ -2691,9 +2841,13 @@ def run_audit(
         rio_processed_dir,
         "rio",
     )
+    exclude_unsupervised_sequences = _p2_unsupervised_sequence_filter_enabled(
+        p2_config
+    )
     rio_path_integrity, rio_path_errors = _audit_rio_record_paths(
         rio_processed_dir,
         validate_content=official_counts,
+        exclude_unsupervised_sequences=exclude_unsupervised_sequences,
     )
     errors = [
         *checkpoint_errors,
@@ -2831,6 +2985,9 @@ def run_audit(
         "known_empty_scan_substitutions": known_empty_substitutions,
         "data_root_bindings": data_root_bindings,
         "rio_path_integrity": rio_path_integrity,
+        "unsupervised_sequence_filter": rio_path_integrity.get(
+            "unsupervised_sequence_filter"
+        ),
         "input_manifest": input_manifest,
         "config_contract": config_contract,
         "mix_instantiation": mix,

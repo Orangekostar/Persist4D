@@ -244,8 +244,8 @@ def test_real_tiny_overfit_artifacts_pass_all_gates() -> None:
     assert provenance["resolved_composed_config"] == {
         "format": "canonical-json-sort-keys-v1",
         "portable_references": True,
-        "serialized_bytes": 9306,
-        "sha256": "42670aa8d514ca5e8ff4f9e0dc80f8d30984b438e804e38da7fbce97c58697f8",
+        "serialized_bytes": 9420,
+        "sha256": "1e3b2f333ae8dbc676dc8df969105c832cb9f0f06bc65651640bbbf1a5eacf6b",
     }
     assert len(provenance["processed_point_clouds"]) == 2
     assert len(provenance["instance_ground_truth"]) == 2

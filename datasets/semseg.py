@@ -53,6 +53,7 @@ class SemanticSegmentationDataset(Dataset):
         max_points_per_sample: Optional[int] = None,
         fail_closed: bool = False,
         known_empty_scan_policy: str = "official_substitute",
+        exclude_unsupervised_sequences: bool = False,
     ):
 
         if known_empty_scan_policy not in {"official_substitute", "error"}:
@@ -60,6 +61,8 @@ class SemanticSegmentationDataset(Dataset):
                 "known_empty_scan_policy must be 'official_substitute' or 'error', "
                 f"got {known_empty_scan_policy!r}"
             )
+        if type(exclude_unsupervised_sequences) is not bool:
+            raise ValueError("exclude_unsupervised_sequences must be a boolean")
 
         self.dataset_name = dataset_name
 
@@ -81,6 +84,15 @@ class SemanticSegmentationDataset(Dataset):
         self.fail_closed = fail_closed
         self.known_empty_scan_policy = known_empty_scan_policy
         self.known_empty_scan_substitution_count = 0
+        self.exclude_unsupervised_sequences = exclude_unsupervised_sequences
+        self.excluded_unsupervised_sequences = []
+        self.unsupervised_sequence_filter = {
+            "enabled": bool(exclude_unsupervised_sequences and temporal_window > 1),
+            "mode": mode,
+            "taxonomy_label_ids": [],
+            "excluded_sequences": [],
+            "excluded_count": 0,
+        }
 
         # loading database files
         self._data = []
@@ -285,6 +297,9 @@ class SemanticSegmentationDataset(Dataset):
 
             # Combine sequence indices from all directories
             self.sequence_indices = np.vstack(all_sequence_indices)
+
+            if self.exclude_unsupervised_sequences:
+                self._exclude_unsupervised_sequences()
 
         self.known_empty_scan_contexts = self._find_known_empty_scan_contexts()
         if (
@@ -507,6 +522,7 @@ class SemanticSegmentationDataset(Dataset):
                 features=color,
                 labels=labels,
             )
+
             coordinates, color, normals, labels = (
                 aug["points"],
                 aug["features"],
@@ -540,11 +556,11 @@ class SemanticSegmentationDataset(Dataset):
                 features = np.hstack((features[None, ...], coordinates))
             else:
                 features = np.hstack((features, coordinates))
-                
+
         # only augment the xyz coordinates, not the temporal dim
-        # revert to original temporal dim 
+        # revert to original temporal dim
         coordinates[:, 3:] = raw_coordinates[:, 3:]
-                
+
         return (
             coordinates,
             features,
@@ -556,6 +572,135 @@ class SemanticSegmentationDataset(Dataset):
             idx,
             self.ambiguities[idx],
         )
+
+    def _instance_evaluation_label_ids(self):
+        """Resolve raw semantic IDs for the active instance taxonomy."""
+        metric_path = Path(self.data_dir[0]) / f"{self.dataset_name}.yaml"
+        if metric_path.is_file():
+            metric_spec = self._load_yaml(metric_path)
+            metric_ids = metric_spec.get("valid_class_ids")
+            if not isinstance(metric_ids, list) or not all(
+                type(label_id) is int for label_id in metric_ids
+            ):
+                raise ValueError(
+                    f"Metric taxonomy {metric_path} must contain integer "
+                    "valid_class_ids"
+                )
+            label_ids = {int(label_id) for label_id in self._labels}
+            validation_label_ids = {
+                int(raw_id)
+                for raw_id, metadata in self._labels.items()
+                if metadata.get("validation") is True
+            }
+            if not set(metric_ids).issubset(label_ids):
+                raise ValueError(
+                    f"Metric taxonomy {metric_path} references labels absent "
+                    "from the active label database"
+                )
+            if not set(metric_ids).issubset(validation_label_ids):
+                raise ValueError(
+                    f"Metric taxonomy {metric_path} references labels outside "
+                    "the active validation label database"
+                )
+            return set(metric_ids)
+
+        if self.fail_closed and self.exclude_unsupervised_sequences:
+            raise FileNotFoundError(
+                f"Metric taxonomy is required for supervised sequence filtering: "
+                f"{metric_path}"
+            )
+
+        excluded_remapped = {
+            int(label_id)
+            for label_id in self.filter_out_classes
+            if type(label_id) is int
+        }
+        return {
+            int(raw_id)
+            for remapped_id, (raw_id, metadata) in enumerate(self._labels.items())
+            if metadata.get("validation", False)
+            and remapped_id not in excluded_remapped
+            and int(raw_id) != int(self.ignore_label)
+        }
+
+    @staticmethod
+    def _supervised_npy_path(record):
+        return Path(str(record["filepath"]).replace("../../", ""))
+
+    def _scan_has_instance_supervision(self, scan_index, taxonomy_label_ids):
+        path = self._supervised_npy_path(self.data[int(scan_index)])
+        try:
+            points = np.load(path, mmap_mode="r", allow_pickle=False)
+        except (OSError, ValueError, TypeError) as error:
+            if self.fail_closed:
+                raise RuntimeError(
+                    f"Cannot inspect supervised sequence asset {path}"
+                ) from error
+            logger.warning("Cannot inspect supervised sequence asset %s", path)
+            return False
+
+        if points.ndim != 2 or points.shape[1] < 12:
+            if self.fail_closed:
+                raise ValueError(
+                    f"Supervised sequence asset {path} must have at least 12 "
+                    f"columns, got {getattr(points, 'shape', None)}"
+                )
+            return False
+        return bool(
+            np.any(
+                np.isin(points[:, 10], list(taxonomy_label_ids))
+                & (points[:, 11] >= 0)
+            )
+        )
+
+    def _exclude_unsupervised_sequences(self):
+        taxonomy_label_ids = self._instance_evaluation_label_ids()
+        supervision_cache = {}
+        kept_indices = []
+        excluded_names = []
+        for sequence_index, scan_indices in enumerate(self.sequence_indices):
+            has_supervision = False
+            for scan_index in scan_indices:
+                scan_index = int(scan_index)
+                if scan_index not in supervision_cache:
+                    supervision_cache[scan_index] = self._scan_has_instance_supervision(
+                        scan_index,
+                        taxonomy_label_ids,
+                    )
+                if supervision_cache[scan_index]:
+                    has_supervision = True
+                    break
+            if has_supervision:
+                kept_indices.append(sequence_index)
+            else:
+                excluded_names.append(self.sequence_names[sequence_index])
+
+        kept_indices_array = np.asarray(kept_indices, dtype=int)
+        if kept_indices:
+            self.sequence_indices = self.sequence_indices[kept_indices_array]
+        else:
+            self.sequence_indices = np.empty(
+                (0, self.temporal_window),
+                dtype=int,
+            )
+        self.sequence_names = [
+            self.sequence_names[index] for index in kept_indices
+        ]
+        self.change_files = [self.change_files[index] for index in kept_indices]
+        self.ambiguities = [self.ambiguities[index] for index in kept_indices]
+        self.excluded_unsupervised_sequences = sorted(excluded_names)
+        self.unsupervised_sequence_filter = {
+            "enabled": True,
+            "mode": self.mode,
+            "taxonomy_label_ids": sorted(taxonomy_label_ids),
+            "excluded_sequences": list(self.excluded_unsupervised_sequences),
+            "excluded_count": len(self.excluded_unsupervised_sequences),
+            "retained_count": len(self.sequence_names),
+        }
+        if not kept_indices and self.fail_closed:
+            raise ValueError(
+                "Supervised sequence filtering removed every active sequence"
+            )
 
 
     @property

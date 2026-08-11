@@ -117,9 +117,39 @@ P2_KNOWN_EMPTY_RIO_SEQUENCES = [
 ]
 P2_KNOWN_EMPTY_SCANNET_SCAN_IDS = ["scene0154_00", "scene0636_00"]
 P2_TRAINING_SEMANTIC_SHA256 = (
-    "898cc3588218d63fe0295aa274dbf63c51b29ad8aa1f32f918427d99e7e6060d"
+    "a5ac75f69c1b918e33a0cfc9a380a882209bd69af963f207547058a902af17aa"
 )
 NYU40_INSTANCE_IDS = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 24, 28, 33, 34, 36, 39]
+P2_RIO_SEQUENCE_FILTER_COUNTS = {
+    "train": {
+        "sequence_count": 1178,
+        "excluded_count": 4,
+        "retained_count": 1174,
+    },
+    "validation": {
+        "sequence_count": 157,
+        "excluded_count": 3,
+        "retained_count": 154,
+    },
+    "test": {
+        "sequence_count": 157,
+        "excluded_count": 3,
+        "retained_count": 154,
+    },
+}
+P2_RIO_SEQUENCE_FILTER_SHA256 = (
+    "476c6e8819c6dce9ac9284d0e6dcf9ff65d117e1bff6647850dd950004162073"
+)
+P2_FORMAL_EPOCH_SAMPLE_MULTIPLE = 32
+P2_FORMAL_DATASET_WEIGHTS = (1.0, 0.8)
+P2_FORMAL_RAW_SAMPLER_NUM_SAMPLES = int(
+    P2_RIO_SEQUENCE_FILTER_COUNTS["train"]["retained_count"]
+    * (1 + sum(P2_FORMAL_DATASET_WEIGHTS[1:]) / P2_FORMAL_DATASET_WEIGHTS[0])
+)
+P2_FORMAL_SAMPLER_NUM_SAMPLES = (
+    P2_FORMAL_RAW_SAMPLER_NUM_SAMPLES
+    - P2_FORMAL_RAW_SAMPLER_NUM_SAMPLES % P2_FORMAL_EPOCH_SAMPLE_MULTIPLE
+)
 NYU40_INSTANCE_LABELS = [
     "cabinet",
     "bed",
@@ -148,6 +178,58 @@ def _portable_root_ref(path: Path, repo_root: Path, role: str) -> str:
     except (OSError, ValueError):
         return f"external:{role}"
     return f"repo:{relative.as_posix()}"
+
+
+def _lexical_root_ref(path: Path, repo_root: Path, role: str) -> str:
+    """Encode a configured path without resolving repository symlinks."""
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        candidate = repo_root / candidate
+    try:
+        relative = candidate.relative_to(repo_root)
+    except ValueError:
+        return f"external:{role}"
+    return f"repo:{relative.as_posix()}"
+
+
+def _resolved_root_ref(path: Path, repo_root: Path, role: str) -> str:
+    """Encode resolved identity while keeping external paths private."""
+    resolved = Path(path).resolve()
+    try:
+        relative = resolved.relative_to(repo_root.resolve())
+    except (OSError, ValueError):
+        digest = hashlib.sha256(str(resolved).encode("utf-8")).hexdigest()
+        return f"external:{role}/{digest}"
+    return f"repo:{relative.as_posix()}"
+
+
+P2_DATA_ROOT_RELATIVE_PATHS = {
+    "raw_scannet": Path("data/raw/scannet/scannet"),
+    "scannet": Path("data/processed/scannet"),
+    "rio": Path("data/processed/rio"),
+    "split_metadata": Path("third_party/ScanNet/Tasks/Benchmark"),
+    "test_segments": Path("data/raw/scannet_test_segments"),
+}
+
+
+def p2_data_root_reference_contract(
+    *, repo_root: str | Path | None = None
+) -> dict[str, dict[str, str]]:
+    repository = Path(repo_root or REPO_ROOT).resolve()
+    paths = {
+        name: repository / relative
+        for name, relative in P2_DATA_ROOT_RELATIVE_PATHS.items()
+    }
+    return {
+        "expected": {
+            name: _lexical_root_ref(path, repository, f"configured_{name}")
+            for name, path in paths.items()
+        },
+        "expected_resolved": {
+            name: _resolved_root_ref(path, repository, f"data_root/{name}")
+            for name, path in paths.items()
+        },
+    }
 
 
 def _sha256_file_stable(path: Path) -> tuple[int, str]:
@@ -1010,7 +1092,7 @@ def build_p2_input_manifest(
         "schema_version": 1,
         "status": "pass",
         "roots": {
-            name: _portable_root_ref(path, repository, f"{name}_processed")
+            name: _resolved_root_ref(path, repository, f"data_root/{name}")
             for name, path in roots.items()
         },
     }
@@ -1260,6 +1342,7 @@ def validate_p2_training_config_contract(cfg: Any) -> list[str]:
         ),
         "data.train_dataset.weights": [1.0, 0.8],
         "data.train_dataset.filter_out_classes": [0, 1, 255],
+        "data.train_dataset.exclude_unsupervised_sequences": True,
         "data.train_dataset.fail_closed": True,
         "data.train_dataset.known_empty_scan_policy": "official_substitute",
         "data.train_dataset.epoch_sample_multiple": 32,
@@ -1271,6 +1354,7 @@ def validate_p2_training_config_contract(cfg: Any) -> list[str]:
         "data.validation_dataset.data_dir": "data/processed/rio",
         "data.validation_dataset.temporal_window": 2,
         "data.validation_dataset.filter_out_classes": [0, 1, 255],
+        "data.validation_dataset.exclude_unsupervised_sequences": True,
         "data.validation_dataset.fail_closed": True,
         "data.validation_dataset.known_empty_scan_policy": (
             "official_substitute"
@@ -1282,6 +1366,7 @@ def validate_p2_training_config_contract(cfg: Any) -> list[str]:
         "data.test_dataset.data_dir": "data/processed/rio",
         "data.test_dataset.temporal_window": 2,
         "data.test_dataset.filter_out_classes": [0, 1, 255],
+        "data.test_dataset.exclude_unsupervised_sequences": True,
         "data.test_dataset.fail_closed": True,
         "data.test_dataset.known_empty_scan_policy": "official_substitute",
         "backbone._target_": "models.PointceptBackbone",
@@ -1492,10 +1577,11 @@ def _validate_input_manifest(
         errors.append("input_manifest.schema_version mismatch")
     if manifest.get("status") != "pass":
         errors.append("input_manifest.status is not pass")
-    if manifest.get("roots") != {
-        "scannet": "repo:data/processed/scannet",
-        "rio": "repo:data/processed/rio",
-    }:
+    expected_roots = p2_data_root_reference_contract()["expected_resolved"]
+    expected_roots = {
+        name: expected_roots[name] for name in ("scannet", "rio")
+    }
+    if manifest.get("roots") != expected_roots:
         errors.append("input_manifest.roots mismatch")
     for dataset in ("scannet", "rio"):
         record = manifest.get(dataset)
@@ -1868,6 +1954,8 @@ def _validate_taxonomy_and_mix(artifact: Mapping[str, Any], errors: list[str]) -
         "weights": [1.0, 0.8],
         "temporal_windows": [2, 1],
         "sampler": "WeightedRandomSampler",
+        "sampler_num_samples": P2_FORMAL_SAMPLER_NUM_SAMPLES,
+        "epoch_sample_multiple": P2_FORMAL_EPOCH_SAMPLE_MULTIPLE,
     }
     for field, expected in expected_mix.items():
         if mix.get(field) != expected:
@@ -1876,9 +1964,85 @@ def _validate_taxonomy_and_mix(artifact: Mapping[str, Any], errors: list[str]) -
     if (
         not isinstance(sizes, list)
         or len(sizes) != 2
-        or sizes != [1178, OFFICIAL_SPLIT_COUNTS["train"]]
+        or sizes != [P2_RIO_SEQUENCE_FILTER_COUNTS["train"]["retained_count"], OFFICIAL_SPLIT_COUNTS["train"]]
     ):
         errors.append("mix_instantiation.dataset_sizes mismatch")
+
+
+def _validate_unsupervised_sequence_filter(
+    artifact: Mapping[str, Any],
+    errors: list[str],
+) -> None:
+    evidence = artifact.get("unsupervised_sequence_filter")
+    if not isinstance(evidence, Mapping):
+        errors.append("unsupervised_sequence_filter is missing")
+        return
+    expected_header = {
+        "schema_version": 1,
+        "status": "pass",
+        "enabled": True,
+        "source": "real_npy",
+        "taxonomy_label_ids": NYU40_INSTANCE_IDS,
+    }
+    for field, expected in expected_header.items():
+        if evidence.get(field) != expected:
+            errors.append(f"unsupervised_sequence_filter.{field} mismatch")
+
+    by_split = evidence.get("by_split")
+    if not isinstance(by_split, Mapping):
+        errors.append("unsupervised_sequence_filter.by_split is missing")
+        return
+    if set(by_split) != set(P2_RIO_SEQUENCE_FILTER_COUNTS):
+        errors.append("unsupervised_sequence_filter.by_split keys mismatch")
+        return
+
+    names_by_split: dict[str, list[str]] = {}
+    for split, expected_counts in P2_RIO_SEQUENCE_FILTER_COUNTS.items():
+        record = by_split.get(split)
+        if not isinstance(record, Mapping):
+            errors.append(f"unsupervised_sequence_filter.by_split.{split} is missing")
+            continue
+        for field, expected in expected_counts.items():
+            if record.get(field) != expected:
+                errors.append(
+                    f"unsupervised_sequence_filter.by_split.{split}.{field} mismatch"
+                )
+        names = record.get("excluded_sequences")
+        if not isinstance(names, list) or any(type(name) is not str for name in names):
+            errors.append(
+                f"unsupervised_sequence_filter.by_split.{split}.excluded_sequences invalid"
+            )
+            continue
+        if names != sorted(set(names)):
+            errors.append(
+                f"unsupervised_sequence_filter.by_split.{split}.excluded_sequences ordering mismatch"
+            )
+        if len(names) != expected_counts["excluded_count"]:
+            errors.append(
+                f"unsupervised_sequence_filter.by_split.{split}.excluded_sequences count mismatch"
+            )
+        names_by_split[split] = names
+
+    if set(names_by_split) == set(P2_RIO_SEQUENCE_FILTER_COUNTS):
+        observed_digest = _canonical_sha256(names_by_split)
+        if observed_digest != P2_RIO_SEQUENCE_FILTER_SHA256:
+            errors.append("unsupervised_sequence_filter.sequence_name_sha256 mismatch")
+    if evidence.get("sequence_name_sha256") != P2_RIO_SEQUENCE_FILTER_SHA256:
+        errors.append("unsupervised_sequence_filter.sequence_name_sha256 mismatch")
+
+    path_integrity = artifact.get("rio_path_integrity")
+    if isinstance(path_integrity, Mapping):
+        if path_integrity.get("unsupervised_sequences") != []:
+            errors.append("rio_path_integrity.unsupervised_sequences mismatch")
+        if path_integrity.get("excluded_unsupervised_sequences") != names_by_split:
+            errors.append(
+                "rio_path_integrity.excluded_unsupervised_sequences mismatch"
+            )
+        if path_integrity.get("filtered_sequence_counts") != {
+            "train": P2_RIO_SEQUENCE_FILTER_COUNTS["train"]["retained_count"],
+            "validation": P2_RIO_SEQUENCE_FILTER_COUNTS["validation"]["retained_count"],
+        }:
+            errors.append("rio_path_integrity.filtered_sequence_counts mismatch")
 
 
 def _validate_known_empty_substitutions(
@@ -1918,17 +2082,13 @@ def _validate_data_root_bindings(
     errors: list[str],
 ) -> None:
     bindings = artifact.get("data_root_bindings")
-    expected_roots = {
-        "raw_scannet": "repo:data/raw/scannet/scannet",
-        "scannet": "repo:data/processed/scannet",
-        "rio": "repo:data/processed/rio",
-        "split_metadata": "repo:third_party/ScanNet/Tasks/Benchmark",
-        "test_segments": "repo:data/raw/scannet_test_segments",
-    }
+    root_contract = p2_data_root_reference_contract()
     expected = {
         "status": "pass",
-        "expected": expected_roots,
-        "observed": expected_roots,
+        "expected": root_contract["expected"],
+        "observed": root_contract["expected"],
+        "expected_resolved": root_contract["expected_resolved"],
+        "observed_resolved": root_contract["expected_resolved"],
     }
     if not isinstance(bindings, Mapping):
         errors.append("data_root_bindings is missing")
@@ -2040,6 +2200,7 @@ def validate_p2_preflight_authorization(
     )
     _validate_asset_summaries(artifact, errors)
     _validate_taxonomy_and_mix(artifact, errors)
+    _validate_unsupervised_sequence_filter(artifact, errors)
     _validate_known_empty_substitutions(artifact, errors)
     _validate_data_root_bindings(artifact, errors)
     _validate_rio_path_integrity(artifact, errors)

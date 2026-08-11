@@ -97,7 +97,9 @@ def test_p2_config_locks_the_reproduction_contract(monkeypatch) -> None:
         == "official_substitute"
     )
     assert list(cfg.data.train_dataset.filter_out_classes) == [0, 1, 255]
+    assert cfg.data.train_dataset.exclude_unsupervised_sequences is True
     assert cfg.data.validation_dataset.fail_closed is True
+    assert cfg.data.validation_dataset.exclude_unsupervised_sequences is True
     assert (
         cfg.data.validation_dataset.known_empty_scan_policy
         == "official_substitute"
@@ -109,6 +111,7 @@ def test_p2_config_locks_the_reproduction_contract(monkeypatch) -> None:
         == "official_substitute"
     )
     assert list(cfg.data.test_dataset.filter_out_classes) == [0, 1, 255]
+    assert cfg.data.test_dataset.exclude_unsupervised_sequences is True
     assert list(cfg.data.train_collation.filter_out_classes) == [0, 1, 255]
     assert list(cfg.data.validation_collation.filter_out_classes) == [0, 1, 255]
     assert list(cfg.data.test_collation.filter_out_classes) == [0, 1, 255]

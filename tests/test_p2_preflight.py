@@ -920,10 +920,12 @@ def test_complete_injected_fixture_is_diagnostic_only_with_non_official_counts(
         "status": "pass",
         "implementation": "datasets.multi_dataset.MultiDataset",
         "dataset_names": ["rio", "scannet"],
-        "dataset_sizes": [1178, 1],
+        "dataset_sizes": [1174, 1],
         "weights": [1.0, 0.8],
         "temporal_windows": [2, 1],
         "sampler": "WeightedRandomSampler",
+        "sampler_num_samples": 2112,
+        "epoch_sample_multiple": 32,
     }
     blocker = fixture["output_dir"] / "BLOCKED_MISSING_SCANNET.md"
     assert blocker.is_file()
@@ -1279,6 +1281,8 @@ def test_formal_audit_rejects_data_roots_other_than_the_resolved_p2_config(
         "split_metadata": "repo:third_party/ScanNet/Tasks/Benchmark",
         "test_segments": "repo:data/raw/scannet_test_segments",
     }
+    assert set(evidence["expected_resolved"]) == set(evidence["expected"])
+    assert set(evidence["observed_resolved"]) == set(evidence["expected"])
     assert {error["code"] for error in errors} == {
         "formal_raw_scannet_data_root_mismatch",
         "formal_scannet_data_root_mismatch",
@@ -1286,6 +1290,41 @@ def test_formal_audit_rejects_data_roots_other_than_the_resolved_p2_config(
         "formal_split_metadata_data_root_mismatch",
         "formal_test_segments_data_root_mismatch",
     }
+
+
+def test_formal_audit_accepts_lexical_repo_refs_for_external_data_symlinks() -> None:
+    *_, p2_config = audit._compose_config_snapshot()
+    evidence, errors = audit._audit_formal_data_roots(
+        p2_config,
+        REPO_ROOT / "data" / "processed" / "scannet",
+        REPO_ROOT / "data" / "processed" / "rio",
+    )
+
+    assert errors == []
+    assert evidence["status"] == "pass"
+    assert evidence["expected"]["scannet"] == "repo:data/processed/scannet"
+    assert evidence["observed"]["scannet"] == "repo:data/processed/scannet"
+    assert evidence["expected_resolved"] == evidence["observed_resolved"]
+
+
+def test_consumer_rejects_resolved_data_root_identity_drift() -> None:
+    contract = p2_preflight.p2_data_root_reference_contract()
+    bindings = {
+        "status": "pass",
+        "expected": contract["expected"],
+        "observed": contract["expected"],
+        "expected_resolved": contract["expected_resolved"],
+        "observed_resolved": dict(contract["expected_resolved"]),
+    }
+    bindings["observed_resolved"]["scannet"] = (
+        "external:data_root/scannet/drift"
+    )
+    errors: list[str] = []
+    p2_preflight._validate_data_root_bindings(
+        {"data_root_bindings": bindings}, errors
+    )
+
+    assert "data_root_bindings.observed_resolved mismatch" in errors
 
 
 def test_input_manifest_digest_changes_when_a_training_input_changes(

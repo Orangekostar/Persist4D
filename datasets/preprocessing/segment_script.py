@@ -1,4 +1,5 @@
 import json
+import shutil
 import subprocess
 from pathlib import Path
 import numpy as np
@@ -25,7 +26,7 @@ def run_segmentation(ply_path, output_path, k_thresh=0.01, min_verts=20):
         
         # Move to desired output location
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        seg_json.rename(output_path)
+        shutil.move(str(seg_json), str(output_path))
         
         return True
     except subprocess.CalledProcessError as e:
