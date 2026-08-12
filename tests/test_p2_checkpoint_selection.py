@@ -217,7 +217,7 @@ def _formal_checkpoint(cfg, *, epoch: int, global_step: int) -> dict:
         "processed": epoch + 1,
     }
     optimizer_progress = {"ready": global_step, "completed": global_step}
-    batch_count = (epoch + 1) * 264
+    batch_count = (epoch + 1) * 528
     batch_progress = {
         "ready": batch_count,
         "completed": batch_count,

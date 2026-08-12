@@ -619,10 +619,10 @@ def normalize_formal_p2_epoch_boundary_checkpoint(checkpoint, config):
     batch_fields = ("ready", "completed", "started", "processed")
     if not progress_matches(
         current_batches,
-        {field: 264 for field in batch_fields},
+        {field: 528 for field in batch_fields},
     ) or not progress_matches(
         total_batches,
-        {field: completed_epochs * 264 for field in batch_fields},
+        {field: completed_epochs * 528 for field in batch_fields},
     ):
         fail("invalid cumulative train batch progress")
 

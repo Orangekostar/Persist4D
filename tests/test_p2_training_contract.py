@@ -155,9 +155,9 @@ def test_p2_config_locks_the_reproduction_contract(monkeypatch) -> None:
     assert cfg.trainer.max_epochs == 450
     assert cfg.trainer.precision == "32-true"
 
-    assert cfg.data.batch_size == 4
-    assert cfg.data.train_dataloader.batch_size == 4
-    assert cfg.trainer.accumulate_grad_batches == 4
+    assert cfg.data.batch_size == 2
+    assert cfg.data.train_dataloader.batch_size == 2
+    assert cfg.trainer.accumulate_grad_batches == 8
     assert (
         cfg.general.gpus * cfg.data.batch_size * cfg.trainer.accumulate_grad_batches
         == 32

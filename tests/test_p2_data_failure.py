@@ -187,7 +187,7 @@ def test_multi_dataset_default_epoch_sample_count_is_unchanged() -> None:
     assert dataset.fail_closed is False
 
 
-def test_aligned_sampler_yields_264_microbatches_per_ddp_rank() -> None:
+def test_aligned_sampler_yields_528_microbatches_per_ddp_rank() -> None:
     dataset = MultiDataset(
         [SizedDataset(1178), SizedDataset(1201)],
         weights=[1.0, 0.8],
@@ -205,16 +205,16 @@ def test_aligned_sampler_yields_264_microbatches_per_ddp_rank() -> None:
     )
     loader = DataLoader(
         dataset,
-        batch_size=4,
+        batch_size=2,
         sampler=rank_sampler,
         drop_last=False,
     )
 
     assert len(rank_sampler) == 1056
-    assert len(loader) == 264
-    assert len(loader) % 4 == 0
-    assert len(loader) // 4 == 66
-    assert len(loader) // 4 * 450 == 29700
+    assert len(loader) == 528
+    assert len(loader) % 8 == 0
+    assert len(loader) // 8 == 66
+    assert len(loader) // 8 * 450 == 29700
 
 
 def test_multi_dataset_from_config_routes_epoch_sample_multiple(

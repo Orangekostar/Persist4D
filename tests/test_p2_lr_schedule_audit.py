@@ -186,22 +186,21 @@ def test_runtime_audit_uses_lightning_automatic_optimization_and_tail_window(
     assert result["runtime"]["accelerator"] == "cpu"
     assert result["runtime"]["simulation_devices"] == 1
     assert result["runtime"]["simulation_microbatches"] == 10
-    assert result["runtime"]["simulation_total_steps"] == 3
+    assert result["runtime"]["simulation_total_steps"] == 2
     assert len(rows) == 10
     assert [row["micro_step"] for row in rows] == list(range(1, 11))
     assert [row["micro_step"] for row in rows if row["did_optimizer_step"]] == [
-        4,
         8,
         10,
     ]
     assert rows[-1]["accumulation_window_size"] == 2
-    assert rows[-1]["optimizer_step_after"] == 3
-    assert rows[-1]["global_step_after"] == 3
+    assert rows[-1]["optimizer_step_after"] == 2
+    assert rows[-1]["global_step_after"] == 2
     assert all(row["target_window_samples"] == 32 for row in rows[:8])
-    assert all(row["target_window_samples"] == 16 for row in rows[8:])
-    assert all(row["normalization_denominator_microbatches"] == 4 for row in rows)
+    assert all(row["target_window_samples"] == 8 for row in rows[8:])
+    assert all(row["normalization_denominator_microbatches"] == 8 for row in rows)
     assert all(row["relative_gradient_scale"] == 1.0 for row in rows[:8])
-    assert all(row["relative_gradient_scale"] == 0.5 for row in rows[8:])
+    assert all(row["relative_gradient_scale"] == 0.25 for row in rows[8:])
     assert (output_dir / "lr_schedule_audit.csv").is_file()
     assert (output_dir / "lr_schedule_audit.md").is_file()
 
@@ -249,11 +248,11 @@ def test_metadata_records_planned_batch_contract_while_formal_run_is_blocked(
 
     assert result["target_topology"] == {
         "gpus": 2,
-        "batch_per_gpu": 4,
-        "physical_global_batch": 8,
-        "gradient_accumulation": 4,
+        "batch_per_gpu": 2,
+        "physical_global_batch": 4,
+        "gradient_accumulation": 8,
         "effective_batch": 32,
-        "formula": "2 GPUs * 4 samples/GPU * 4 accumulation steps = 32",
+        "formula": "2 GPUs * 2 samples/GPU * 8 accumulation steps = 32",
     }
     assert result["formal_training"]["primary_dataset_samples"] == 1174
     assert result["formal_training"]["raw_sampler_num_samples"] == 2113
@@ -289,8 +288,8 @@ def test_metadata_records_planned_batch_contract_while_formal_run_is_blocked(
         "epoch_microbatch_divisibility": {
             "status": "planned_aligned",
             "scope": "per_rank",
-            "epoch_microbatches": 264,
-            "accumulation_steps": 4,
+            "epoch_microbatches": 528,
+            "accumulation_steps": 8,
             "remainder": 0,
             "drop_last": False,
         },
@@ -304,7 +303,8 @@ def test_metadata_records_planned_batch_contract_while_formal_run_is_blocked(
     report = (output_dir / "lr_schedule_audit.md").read_text(encoding="utf-8")
     assert "scheduler semantics preflight" in report
     assert "not formal mixed-data training" in report
-    assert "2 GPUs * 4 samples/GPU * 4 accumulation steps = 32" in report
+    assert "2 GPUs * 2 samples/GPU * 8 accumulation steps = 32" in report
+    assert "accumulation windows: 8 + 2 microbatches" in report
     assert "sampler checkpoint scope: completed_epoch_boundary_only" in report
     assert (
         "sampler checkpoint save timing: "
@@ -327,10 +327,10 @@ def test_metadata_records_planned_batch_contract_while_formal_run_is_blocked(
     assert "planned optimizer steps per epoch: 66" in report
     assert "planned total_steps: 29700" in report
     assert "planned epoch microbatch divisibility: planned_aligned" in report
-    assert "planned epoch microbatches per rank: 264" in report
+    assert "planned epoch microbatches per rank: 528" in report
     assert "planned accumulation remainder: 0" in report
-    assert "tail target samples=16" in report
-    assert "relative gradient scale=0.5" in report
+    assert "tail target samples=4" in report
+    assert "relative gradient scale=0.25" in report
     assert "lr_before is applied to the current optimizer update" in report
     assert "lr_after is scheduled for the next optimizer update" in report
     assert "short simulation need not reach max_lr exactly" in report
@@ -439,7 +439,7 @@ def test_cli_generates_both_artifacts_and_exits_zero(tmp_path: Path) -> None:
         "lr_schedule_audit.csv",
         "lr_schedule_audit.md",
     ]
-    assert "optimizer_steps=3" in result.stdout
+    assert "optimizer_steps=2" in result.stdout
     assert "formal_status=blocked_missing_scannet" in result.stdout
     assert "planned_total_steps=29700" in result.stdout
     assert "formal_run_observed=false" in result.stdout

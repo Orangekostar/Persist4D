@@ -1098,7 +1098,7 @@ def _run_lightning_checkpoint_resume(
             devices=[device.index],
             max_epochs=max_epochs,
             max_steps=max_steps,
-            accumulate_grad_batches=4,
+            accumulate_grad_batches=8,
             limit_train_batches=_P2_FORMAL_TRAIN_BATCHES_PER_EPOCH,
             limit_val_batches=limit_val_batches,
             num_sanity_val_steps=0,
@@ -1363,7 +1363,7 @@ def _run_lightning_checkpoint_resume(
                 generator=expected_stream_generator,
             )
         )
-        expected_next_indices = [next(expected_stream) for _ in range(4)]
+        expected_next_indices = [next(expected_stream) for _ in range(8)]
         sampler_class = (
             f"{type(source_loader.sampler).__module__}."
             f"{type(source_loader.sampler).__name__}"
@@ -1804,7 +1804,7 @@ def _run_lightning_checkpoint_resume(
             "peak_allocated_vram_mib": peak_vram_mib,
             "formal_optimizer_steps_per_epoch": (_P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH),
             "formal_train_batches_per_epoch": (_P2_FORMAL_TRAIN_BATCHES_PER_EPOCH),
-            "gradient_accumulation_steps": 4,
+            "gradient_accumulation_steps": 8,
             "formal_completed_epoch_boundary": (
                 saved_epoch == 0
                 and saved_global_step == _P2_FORMAL_OPTIMIZER_STEPS_PER_EPOCH

@@ -105,7 +105,7 @@ EXPECTED_INPUT_PROVENANCE = {
         "format": "canonical-json-sort-keys-v1",
         "portable_references": True,
         "serialized_bytes": 9420,
-        "sha256": "1e3b2f333ae8dbc676dc8df969105c832cb9f0f06bc65651640bbbf1a5eacf6b",
+        "sha256": "c04291fd18ac761e44d545e615639c88054cd625d5af96ece09dd5b70c03eec6",
     },
 }
 
@@ -1201,7 +1201,7 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
             devices=1,
             max_epochs=max_epochs,
             max_steps=max_steps,
-            accumulate_grad_batches=4,
+            accumulate_grad_batches=8,
             limit_train_batches=_P2_FORMAL_TRAIN_BATCHES_PER_EPOCH,
             limit_val_batches=1,
             num_sanity_val_steps=0,
@@ -1237,7 +1237,7 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
         val_dataloaders=validation_loader,
     )
     assert checkpoint.is_file()
-    assert len(source_dataset.sampled_indices) == 264
+    assert len(source_dataset.sampled_indices) == 528
     raw_saved = torch.load(checkpoint, map_location="cpu", weights_only=False)
     assert type(raw_saved["hyper_parameters"]).__name__ == "DictConfig"
     assert p2_preflight.p2_training_semantic_sha256(
@@ -1277,7 +1277,7 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
         == 66
     )
     assert fit_loop["epoch_loop.scheduler_progress"]["total"]["completed"] == 66
-    assert fit_loop["epoch_loop.batch_progress"]["total"]["completed"] == 264
+    assert fit_loop["epoch_loop.batch_progress"]["total"]["completed"] == 528
     assert fit_loop["epoch_loop.state_dict"]["_batches_that_stepped"] == 66
     assert fit_loop["epoch_loop.val_loop.batch_progress"]["total"]["completed"] == 0
     saved_optimizer = saved["optimizer_states"][0]
@@ -1315,7 +1315,7 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
             generator=expected_generator,
         )
     )
-    expected_next_indices = [next(expected_stream) for _ in range(4)]
+    expected_next_indices = [next(expected_stream) for _ in range(8)]
 
     probe = RestoredStateProbe()
     resumed_checkpoint_callbacks = smoke._instantiate_formal_checkpoint_callbacks(
@@ -1371,7 +1371,7 @@ def test_lightning_completed_epoch_boundary_restores_before_next_batch(
     ]
     assert resumed_monitored_state["current_score"] is None
     assert monitored_state["current_score"] is not None
-    assert len(resumed_dataset.sampled_indices) == 4
+    assert len(resumed_dataset.sampled_indices) == 8
     assert resumed_dataset.sampled_indices == expected_next_indices
     assert resumed_trainer.global_step == 67
     assert resumed_trainer.lr_scheduler_configs[0].scheduler.last_epoch == 67
@@ -1606,14 +1606,14 @@ def test_real_native_smoke_artifact_passes_all_gates() -> None:
         "batches_that_stepped": 66,
         "optimizer_steps_completed": 66,
         "scheduler_steps_completed": 66,
-        "train_batches_completed": 264,
+        "train_batches_completed": 528,
         "validation_batches_completed": 0,
     }
     assert lightning_resume["lightning_ckpt_path_restore"] is True
     assert lightning_resume["lightning_fit_weights_only"] is False
     assert lightning_resume["formal_optimizer_steps_per_epoch"] == 66
-    assert lightning_resume["formal_train_batches_per_epoch"] == 264
-    assert lightning_resume["gradient_accumulation_steps"] == 4
+    assert lightning_resume["formal_train_batches_per_epoch"] == 528
+    assert lightning_resume["gradient_accumulation_steps"] == 8
     assert lightning_resume["formal_completed_epoch_boundary"] is True
     assert lightning_resume["trainable_parameter_tensor_count"] > 0
     assert (

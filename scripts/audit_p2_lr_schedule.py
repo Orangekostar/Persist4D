@@ -36,8 +36,8 @@ DEFAULT_SCANNET_PREFLIGHT = PROJECT_ROOT / "artifacts" / "P2" / "scannet_preflig
 
 SEED = 45
 TARGET_GPUS = 2
-TARGET_BATCH_PER_GPU = 4
-TARGET_ACCUMULATION = 4
+TARGET_BATCH_PER_GPU = 2
+TARGET_ACCUMULATION = 8
 TARGET_PHYSICAL_GLOBAL_BATCH = TARGET_GPUS * TARGET_BATCH_PER_GPU
 TARGET_EFFECTIVE_BATCH = TARGET_PHYSICAL_GLOBAL_BATCH * TARGET_ACCUMULATION
 TARGET_EPOCHS = 450
@@ -483,7 +483,7 @@ def _validate_trace(rows: Sequence[Mapping[str, Any]], expected_steps: int) -> N
         if lr_changed:
             lr_change_events.append(int(row["micro_step"]))
 
-    if optimizer_events != [4, 8, 10]:
+    if optimizer_events != [8, 10]:
         raise AssertionError(f"unexpected accumulation boundaries: {optimizer_events}")
     if not lr_change_events:
         raise AssertionError(
@@ -528,10 +528,10 @@ def _write_markdown(result: Mapping[str, Any], path: Path) -> None:
         f"- automatic optimization: {str(runtime['automatic_optimization']).lower()}",
         "- runtime: single-process CPU synthetic microbatches; not formal mixed-data training",
         f"- target topology: {topology['formula']}",
-        "- accumulation windows: 4 + 4 + 2 microbatches",
+        "- accumulation windows: 8 + 2 microbatches",
         (
-            "- tail-window demonstration only: tail target samples=16; "
-            "normalization denominator microbatches=4; relative gradient scale=0.5"
+            "- tail-window demonstration only: tail target samples=4; "
+            "normalization denominator microbatches=8; relative gradient scale=0.25"
         ),
         f"- simulated optimizer steps: {runtime['simulation_total_steps']}",
         f"- scheduler: {scheduler['name']}, interval={scheduler['interval']}",
@@ -581,7 +581,7 @@ def _write_markdown(result: Mapping[str, Any], path: Path) -> None:
         f"- planned epoch microbatches per rank: {divisibility['epoch_microbatches']}",
         f"- planned accumulation remainder: {divisibility['remainder']}",
         (
-            "- formal readiness condition: epoch_microbatches % 4 == 0, or an "
+            f"- formal readiness condition: epoch_microbatches % {TARGET_ACCUMULATION} == 0, or an "
             "explicit drop_last/tail-normalization policy; otherwise formal training "
             "is prohibited"
         ),
@@ -683,7 +683,7 @@ def run_audit(
             "physical_global_batch": TARGET_PHYSICAL_GLOBAL_BATCH,
             "gradient_accumulation": TARGET_ACCUMULATION,
             "effective_batch": TARGET_EFFECTIVE_BATCH,
-            "formula": "2 GPUs * 4 samples/GPU * 4 accumulation steps = 32",
+            "formula": "2 GPUs * 2 samples/GPU * 8 accumulation steps = 32",
         },
         "scheduler": {
             "name": "OneCycleLR",

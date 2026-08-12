@@ -366,12 +366,12 @@ def test_p2_filtered_mix_keeps_formal_effective_epoch_batch():
         seed=45,
         drop_last=False,
     )
-    loader = DataLoader(mixed, batch_size=4, sampler=rank_sampler)
+    loader = DataLoader(mixed, batch_size=2, sampler=rank_sampler)
 
     assert mixed.sampler.num_samples == 2112
     assert len(rank_sampler) == 1056
-    assert len(loader) == 264
-    assert len(loader) // 4 == 66
+    assert len(loader) == 528
+    assert len(loader) // 8 == 66
 
 
 def test_real_audit_binds_exact_filter_names_and_rejects_drift():

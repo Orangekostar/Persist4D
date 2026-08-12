@@ -158,9 +158,9 @@ REPRODUCTION_TARGET: dict[str, Any] = {
     },
     "local_recommended_topology": {
         "gpus": 2,
-        "batch_per_gpu": 4,
-        "gradient_accumulation": 4,
-        "physical_global_batch": 8,
+        "batch_per_gpu": 2,
+        "gradient_accumulation": 8,
+        "physical_global_batch": 4,
         "effective_batch": 32,
     },
     "checkpoint": {
@@ -2183,14 +2183,14 @@ def _build_config_diff(
                 "covered_stage_failure": {
                     "additional_all_gather_object_count": 1,
                 },
-                "train_optimizer_step_accumulation_4": {
-                    "safety_int32_max_all_reduce_count": 13,
+                "train_optimizer_step_accumulation_8": {
+                    "safety_int32_max_all_reduce_count": 25,
                     "optimizer_gradient_int32_max_all_reduce_count": 1,
-                    "criterion_float_num_masks_all_reduce_count": 4,
-                    "total_all_reduce_count": 17,
+                    "criterion_float_num_masks_all_reduce_count": 8,
+                    "total_all_reduce_count": 33,
                 },
             },
-            "performance_cost": "three blocking scalar int32 MAX all_reduce operations per normal train DDP microbatch, four per validation microbatch, and three per test microbatch; train accumulation=4 costs twelve microbatch safety all-reduces, one optimizer-gradient safety all-reduce, and four criterion float num_masks all-reduces per optimizer step (17 total); all_gather_object adds one call only on a covered stage failure",
+            "performance_cost": "three blocking scalar int32 MAX all_reduce operations per normal train DDP microbatch, four per validation microbatch, and three per test microbatch; train accumulation=8 costs twenty-four microbatch safety all-reduces, one optimizer-gradient safety all-reduce, and eight criterion float num_masks all-reduces per optimizer step (33 total); all_gather_object adds one call only on a covered stage failure",
             "coverage_boundary": "consensus covers input, recursive model output, criterion, objective, evaluation metadata and metrics, plus pre-optimizer gradient finiteness; exceptions outside those covered stages retain native behavior",
             "evidence_refs": [
                 "external:github/GradientSpaces/rescene4d@fb2fe42/trainer/trainer.py",
@@ -2575,7 +2575,7 @@ def _config_audit_markdown(diff: Mapping[str, Any], preflight: Mapping[str, Any]
             f"These are local reproduction safety fixes, not paper-alignment loss fixes, and are not unchanged behavior from official code commit `{diff['reproduction_code_relation']['official_code_commit']}`. They are bound to local runtime safety commit `{diff['reproduction_code_relation']['runtime_safety_fix_commit']}`.",
             "",
             "- Fail-closed data validation: split and temporal databases, sequence scan references, every configured mixed child, and sampling weights are validated before sampling. This prevents missing ScanNet from degrading the required mix to RIO-only and prevents an unknown temporal scan from retaining zero indices.",
-            "- DDP batch-contract consensus: covered input, recursive output, criterion, objective, evaluation, and gradient failures raise across ranks instead of returning `None` or updating non-finite parameters. The normal path adds three scalar int32 MAX all-reduces per train microbatch, four per validation and three per test microbatch. At train accumulation=4, this is twelve microbatch safety plus one optimizer-gradient safety and four criterion float num_masks all-reduces per optimizer step (17 total); all_gather_object only on a covered failure. This is a deliberate performance cost.",
+            "- DDP batch-contract consensus: covered input, recursive output, criterion, objective, evaluation, and gradient failures raise across ranks instead of returning `None` or updating non-finite parameters. The normal path adds three scalar int32 MAX all-reduces per train microbatch, four per validation and three per test microbatch. At train accumulation=8, this is twenty-four microbatch safety plus one optimizer-gradient safety and eight criterion float num_masks all-reduces per optimizer step (33 total); all_gather_object only on a covered failure. This is a deliberate performance cost.",
             "- Full-state checkpoint selection: candidates receive static Lightning state validation, latest selection uses checkpoint epoch/global_step plus numeric filename version metadata, and an all-corrupt directory refuses a silent fresh start. Static validation is not a real Lightning restore; `trainer.fit` does not automatically retry another candidate after a restore failure.",
             "",
             "## Data Gate Evidence",

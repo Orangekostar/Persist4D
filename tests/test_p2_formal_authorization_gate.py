@@ -700,7 +700,7 @@ def _formal_loop_states(*, epoch: int, global_step: int) -> dict:
         "completed": 0,
         "started": 0,
     }
-    batches = (epoch + 1) * 264
+    batches = (epoch + 1) * 528
     batch_total = {
         "ready": batches,
         "completed": batches,

@@ -105,7 +105,7 @@ def _patch_dataset_instantiation(
 
 def _raw_epoch_end_loops(epochs: int) -> dict:
     global_step = epochs * 66
-    total_batches = epochs * 264
+    total_batches = epochs * 528
     epoch_progress = {
         "ready": epochs,
         "completed": epochs - 1,
@@ -119,10 +119,10 @@ def _raw_epoch_end_loops(epochs: int) -> dict:
         "processed": total_batches,
     }
     current_batch_progress = {
-        "ready": 264,
-        "completed": 264,
-        "started": 264,
-        "processed": 264,
+        "ready": 528,
+        "completed": 528,
+        "started": 528,
+        "processed": 528,
     }
     optimizer_progress = {"ready": global_step, "completed": global_step}
     current_optimizer_progress = {"ready": 66, "completed": 66}
@@ -565,7 +565,7 @@ def test_lightning_checkpoint_resume_restores_next_epoch_sampler_stream(
         def train_dataloader(self):
             return DataLoader(
                 self.train_dataset,
-                batch_size=4,
+                batch_size=2,
                 sampler=self.train_dataset.sampler,
                 num_workers=0,
             )

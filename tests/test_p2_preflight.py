@@ -565,9 +565,9 @@ def test_artifacts_bind_the_exact_p2_target_and_current_reproduction_config(
     }
     assert target["local_recommended_topology"] == {
         "gpus": 2,
-        "batch_per_gpu": 4,
-        "gradient_accumulation": 4,
-        "physical_global_batch": 8,
+        "batch_per_gpu": 2,
+        "gradient_accumulation": 8,
+        "physical_global_batch": 4,
         "effective_batch": 32,
     }
     assert target["reproduction_choices"]["sequence_database"] == {
@@ -750,20 +750,20 @@ def test_artifacts_bind_the_exact_p2_target_and_current_reproduction_config(
         "covered_stage_failure": {
             "additional_all_gather_object_count": 1,
         },
-        "train_optimizer_step_accumulation_4": {
-            "safety_int32_max_all_reduce_count": 13,
+        "train_optimizer_step_accumulation_8": {
+            "safety_int32_max_all_reduce_count": 25,
             "optimizer_gradient_int32_max_all_reduce_count": 1,
-            "criterion_float_num_masks_all_reduce_count": 4,
-            "total_all_reduce_count": 17,
+            "criterion_float_num_masks_all_reduce_count": 8,
+            "total_all_reduce_count": 33,
         },
     }
     assert fixes["ddp_batch_contract_consensus"]["performance_cost"] == (
         "three blocking scalar int32 MAX all_reduce operations per normal train "
         "DDP microbatch, four per validation microbatch, and three per test "
         "microbatch; train "
-        "accumulation=4 costs twelve microbatch safety all-reduces, one "
-        "optimizer-gradient safety all-reduce, and four criterion float num_masks "
-        "all-reduces per optimizer step (17 total); all_gather_object adds one "
+        "accumulation=8 costs twenty-four microbatch safety all-reduces, one "
+        "optimizer-gradient safety all-reduce, and eight criterion float num_masks "
+        "all-reduces per optimizer step (33 total); all_gather_object adds one "
         "call only on a covered stage failure"
     )
     assert fixes["full_state_checkpoint_resume_selection"]["local_behavior"] == (
@@ -795,7 +795,7 @@ def test_artifacts_bind_the_exact_p2_target_and_current_reproduction_config(
     )
     assert "four per validation and three per test microbatch" in audit_markdown
     assert (
-        "twelve microbatch safety plus one optimizer-gradient safety and four "
+        "twenty-four microbatch safety plus one optimizer-gradient safety and eight "
         "criterion float num_masks all-reduces"
         in audit_markdown
     )

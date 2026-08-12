@@ -125,7 +125,7 @@ P2_SCANNET_SEQUENCE_FILTER_COUNTS = {
     }
 }
 P2_TRAINING_SEMANTIC_SHA256 = (
-    "a5ac75f69c1b918e33a0cfc9a380a882209bd69af963f207547058a902af17aa"
+    "ce6be7b458d8371202ce19aed82e2f22a2417faa4f746f483b0fef0921f2f526"
 )
 NYU40_INSTANCE_IDS = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 24, 28, 33, 34, 36, 39]
 P2_RIO_SEQUENCE_FILTER_COUNTS = {
@@ -1342,8 +1342,8 @@ def validate_p2_training_config_contract(cfg: Any) -> list[str]:
         "general.save_dir": P2_SAVE_DIR,
         "general.p2_weighted_objective": True,
         "general.p2_fail_closed_runtime": True,
-        "data.batch_size": 4,
-        "data.train_dataloader.batch_size": 4,
+        "data.batch_size": 2,
+        "data.train_dataloader.batch_size": 2,
         "data.voxel_size": 0.02,
         "data.train_dataset._target_": (
             "datasets.multi_dataset.MultiDataset.from_config"
@@ -1419,7 +1419,7 @@ def validate_p2_training_config_contract(cfg: Any) -> list[str]:
         "scheduler.scheduler.last_epoch": -1,
         "scheduler.pytorch_lightning_params.interval": "step",
         "trainer.max_epochs": 450,
-        "trainer.accumulate_grad_batches": 4,
+        "trainer.accumulate_grad_batches": 8,
         "trainer.precision": "32-true",
         "trainer.strategy": "ddp_find_unused_parameters_true",
     }
