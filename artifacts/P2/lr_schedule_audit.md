@@ -5,10 +5,10 @@
 - PyTorch Lightning: 2.6.5
 - automatic optimization: true
 - runtime: single-process CPU synthetic microbatches; not formal mixed-data training
-- target topology: 2 GPUs * 4 samples/GPU * 4 accumulation steps = 32
-- accumulation windows: 4 + 4 + 2 microbatches
-- tail-window demonstration only: tail target samples=16; normalization denominator microbatches=4; relative gradient scale=0.5
-- simulated optimizer steps: 3
+- target topology: 2 GPUs * 2 samples/GPU * 8 accumulation steps = 32
+- accumulation windows: 8 + 2 microbatches
+- tail-window demonstration only: tail target samples=4; normalization denominator microbatches=8; relative gradient scale=0.25
+- simulated optimizer steps: 2
 - scheduler: OneCycleLR, interval=step
 - max_lr contract: 0.00050000000000000001
 - the short simulation need not reach max_lr exactly; it verifies the configured ceiling and step semantics
@@ -32,22 +32,22 @@
 - planned optimizer steps per epoch: 66
 - planned total_steps: 29700
 - planned epoch microbatch divisibility: planned_aligned
-- planned epoch microbatches per rank: 264
+- planned epoch microbatches per rank: 528
 - planned accumulation remainder: 0
-- formal readiness condition: epoch_microbatches % 4 == 0, or an explicit drop_last/tail-normalization policy; otherwise formal training is prohibited
+- formal readiness condition: epoch_microbatches % 8 == 0, or an explicit drop_last/tail-normalization policy; otherwise formal training is prohibited
 - formal dataset ref: repo:data/processed/scannet
 - formal gate ref: repo:artifacts/P2/scannet_preflight.json
 - formal status reason: This scheduler-only preflight records the locked planned contract but does not instantiate or observe a formal mixed-data training run.
 
 | micro | window | window size | target samples | norm denom | rel grad | optimizer before | optimizer after | global before | global after | scheduler before | scheduler after | LR before | LR after | optimizer step |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |
-| 1 | 1 | 4 | 32 | 4 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0.00049720771772545583 | 0.00049720771772545583 | False |
-| 2 | 1 | 4 | 32 | 4 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0.00049720771772545583 | 0.00049720771772545583 | False |
-| 3 | 1 | 4 | 32 | 4 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0.00049720771772545583 | 0.00049720771772545583 | False |
-| 4 | 1 | 4 | 32 | 4 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0.00049720771772545583 | 0.00023131855133348751 | True |
-| 5 | 2 | 4 | 32 | 4 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0.00023131855133348751 | 0.00023131855133348751 | False |
-| 6 | 2 | 4 | 32 | 4 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0.00023131855133348751 | 0.00023131855133348751 | False |
-| 7 | 2 | 4 | 32 | 4 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0.00023131855133348751 | 0.00023131855133348751 | False |
-| 8 | 2 | 4 | 32 | 4 | 1 | 1 | 2 | 1 | 2 | 1 | 2 | 0.00023131855133348751 | 2.0000000000000001e-09 | True |
-| 9 | 3 | 2 | 16 | 4 | 0.5 | 2 | 2 | 2 | 2 | 2 | 2 | 2.0000000000000001e-09 | 2.0000000000000001e-09 | False |
-| 10 | 3 | 2 | 16 | 4 | 0.5 | 2 | 3 | 2 | 3 | 2 | 3 | 2.0000000000000001e-09 | 0.00023131855133348762 | True |
+| 1 | 1 | 8 | 32 | 8 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0.00040587282697488147 | 0.00040587282697488147 | False |
+| 2 | 1 | 8 | 32 | 8 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0.00040587282697488147 | 0.00040587282697488147 | False |
+| 3 | 1 | 8 | 32 | 8 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0.00040587282697488147 | 0.00040587282697488147 | False |
+| 4 | 1 | 8 | 32 | 8 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0.00040587282697488147 | 0.00040587282697488147 | False |
+| 5 | 1 | 8 | 32 | 8 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0.00040587282697488147 | 0.00040587282697488147 | False |
+| 6 | 1 | 8 | 32 | 8 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0.00040587282697488147 | 0.00040587282697488147 | False |
+| 7 | 1 | 8 | 32 | 8 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0.00040587282697488147 | 0.00040587282697488147 | False |
+| 8 | 1 | 8 | 32 | 8 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0.00040587282697488147 | 2.0000000000000001e-09 | True |
+| 9 | 2 | 2 | 8 | 8 | 0.25 | 1 | 1 | 1 | 1 | 1 | 1 | 2.0000000000000001e-09 | 2.0000000000000001e-09 | False |
+| 10 | 2 | 2 | 8 | 8 | 0.25 | 1 | 2 | 1 | 2 | 1 | 2 | 2.0000000000000001e-09 | 0.00040587282697488147 | True |

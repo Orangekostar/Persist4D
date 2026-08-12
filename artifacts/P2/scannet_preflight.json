@@ -1,14 +1,14 @@
 {
   "authorization": {
-    "artifact_payload_sha256": "bb95a6d6b7707292518158258800c70acff55bc4ede6154f8aa7574304d5cbf2",
+    "artifact_payload_sha256": "f966dc15f47b6eb9e8b2f6d3545299ba6051cd07ecedc2369ab730a8eff4c46c",
     "config_ref": "repo:conf/config_p2_rescene4d_concerto_t2.yaml",
-    "config_sha256": "653a3aa1a64fc187eed4d42677dfae461fee67bb66ac599e57b1ea6db0b19496",
+    "config_sha256": "5536d84788106732ff404b0377a1aa497d29aecb498bdc9f0d13640620789424",
     "expected_split_counts": {
       "test": 100,
       "train": 1201,
       "validation": 312
     },
-    "issued_at_utc": "2026-08-11T23:00:11.329273Z",
+    "issued_at_utc": "2026-08-12T00:36:57.088154Z",
     "max_age_seconds": 86400,
     "schema_version": 1,
     "status": "issued"
@@ -60,8 +60,8 @@
   },
   "config_contract": {
     "errors": [],
-    "expected_semantic_sha256": "a5ac75f69c1b918e33a0cfc9a380a882209bd69af963f207547058a902af17aa",
-    "observed_semantic_sha256": "a5ac75f69c1b918e33a0cfc9a380a882209bd69af963f207547058a902af17aa",
+    "expected_semantic_sha256": "ce6be7b458d8371202ce19aed82e2f22a2417faa4f746f483b0fef0921f2f526",
+    "observed_semantic_sha256": "ce6be7b458d8371202ce19aed82e2f22a2417faa4f746f483b0fef0921f2f526",
     "schema_version": 1,
     "status": "pass"
   },
@@ -144,7 +144,7 @@
     "status": "pass",
     "temporal_window": 2
   },
-  "local_source_commit": "97744692df0028e37ecabcb593e8eb664470a31e",
+  "local_source_commit": "6c74c58be467e5cb136590c41b14a79c94dc9c5f",
   "mix_instantiation": {
     "attempted": true,
     "dataset_names": [
@@ -681,17 +681,26 @@
     ],
     "committed_paths_since_source": [],
     "dirty_paths": [
-      "artifacts/P2/scannet_preflight.json"
+      "artifacts/P2/config_audit.md",
+      "artifacts/P2/environment_manifest.json",
+      "artifacts/P2/lr_schedule_audit.csv",
+      "artifacts/P2/lr_schedule_audit.md",
+      "artifacts/P2/native_smoke_report.json",
+      "artifacts/P2/official_vs_repro_config_diff.json",
+      "artifacts/P2/reproduction_target.yaml",
+      "artifacts/P2/scannet_preflight.json",
+      "artifacts/P2/tiny_overfit_report.json",
+      "artifacts/P2/tiny_overfit_report.md"
     ],
     "disallowed_committed_paths": [],
     "disallowed_dirty_paths": [],
     "errors": [],
-    "expected_tracked_tree_sha256": "f123b17bb7a8adbfd5d5cb35bd0c0c685a387a3bcd7dcb72e8422affdd8fd32a",
+    "expected_tracked_tree_sha256": "fe49033942eea1c4ca8abef9329706315a3ce3e12db1eeae26c8c8fc009f92a1",
     "index_flag_paths": [],
-    "observed_head": "97744692df0028e37ecabcb593e8eb664470a31e",
-    "observed_tracked_tree_sha256": "f123b17bb7a8adbfd5d5cb35bd0c0c685a387a3bcd7dcb72e8422affdd8fd32a",
+    "observed_head": "6c74c58be467e5cb136590c41b14a79c94dc9c5f",
+    "observed_tracked_tree_sha256": "fe49033942eea1c4ca8abef9329706315a3ce3e12db1eeae26c8c8fc009f92a1",
     "schema_version": 1,
-    "source_commit": "97744692df0028e37ecabcb593e8eb664470a31e",
+    "source_commit": "6c74c58be467e5cb136590c41b14a79c94dc9c5f",
     "status": "pass"
   },
   "split_metadata": {

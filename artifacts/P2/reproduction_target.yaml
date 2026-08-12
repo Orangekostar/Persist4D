@@ -40,9 +40,9 @@ training:
   precision: 32-true
 local_recommended_topology:
   gpus: 2
-  batch_per_gpu: 4
-  gradient_accumulation: 4
-  physical_global_batch: 8
+  batch_per_gpu: 2
+  gradient_accumulation: 8
+  physical_global_batch: 4
   effective_batch: 32
 checkpoint:
   reference: local_cache:persist4d/concerto/concerto_base.pth

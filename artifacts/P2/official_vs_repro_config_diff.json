@@ -122,11 +122,11 @@
           "safety_int32_max_all_reduce_count": 4,
           "total_all_reduce_count": 5
         },
-        "train_optimizer_step_accumulation_4": {
-          "criterion_float_num_masks_all_reduce_count": 4,
+        "train_optimizer_step_accumulation_8": {
+          "criterion_float_num_masks_all_reduce_count": 8,
           "optimizer_gradient_int32_max_all_reduce_count": 1,
-          "safety_int32_max_all_reduce_count": 13,
-          "total_all_reduce_count": 17
+          "safety_int32_max_all_reduce_count": 25,
+          "total_all_reduce_count": 33
         }
       },
       "coverage_boundary": "consensus covers input, recursive model output, criterion, objective, evaluation metadata and metrics, plus pre-optimizer gradient finiteness; exceptions outside those covered stages retain native behavior",
@@ -139,7 +139,7 @@
       "local_behavior": "staged input, recursive output, criterion, objective, and evaluation consensus cover train, validation, and test microbatches; a pre-optimizer gradient-finiteness consensus prevents parameter updates after non-finite gradients",
       "local_fix_commit": "611ba161454cdfde7fe047fcae1e0d7b81387bf2",
       "official_code_commit": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
-      "performance_cost": "three blocking scalar int32 MAX all_reduce operations per normal train DDP microbatch, four per validation microbatch, and three per test microbatch; train accumulation=4 costs twelve microbatch safety all-reduces, one optimizer-gradient safety all-reduce, and four criterion float num_masks all-reduces per optimizer step (17 total); all_gather_object adds one call only on a covered stage failure",
+      "performance_cost": "three blocking scalar int32 MAX all_reduce operations per normal train DDP microbatch, four per validation microbatch, and three per test microbatch; train accumulation=8 costs twenty-four microbatch safety all-reduces, one optimizer-gradient safety all-reduce, and eight criterion float num_masks all-reduces per optimizer step (33 total); all_gather_object adds one call only on a covered stage failure",
       "upstream_behavior": "training returned None for empty targets or the recognized single-point cross-attention error; evaluation returned 0.0 or None for empty coordinates or that error, without cross-rank consensus",
       "upstream_semantic_effect": "asymmetric rank-local skipping could desynchronize optimizer and scheduler progress or hang later DDP collectives"
     },
