@@ -1470,6 +1470,26 @@ def test_formal_p2_resume_accepts_real_lightning_callback_save_order(
     training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
 
 
+def test_formal_p2_resume_accepts_none_current_score_at_epoch399_periodic_boundary(
+    tmp_path: Path,
+) -> None:
+    cfg = _compose(P2_CONFIG_NAME)
+    cfg.general.save_dir = str(tmp_path / "verified-snapshots")
+    checkpoint = tmp_path / "periodic-epoch=399.ckpt"
+    payload = _formal_resume_payload(cfg, epoch=399)
+    monitor_state = next(
+        state
+        for state in payload["callbacks"].values()
+        if state["monitor"] == "val_mean_t-AP"
+    )
+    monitor_state["current_score"] = None
+    torch.save(payload, checkpoint)
+
+    verified = training_entrypoint.require_p2_resume_checkpoint(cfg, checkpoint)
+
+    assert Path(verified).is_file()
+
+
 @pytest.mark.parametrize(
     ("field", "invalid_value"),
     [

@@ -5,9 +5,12 @@
 MaskFormer criterion.
 """
 
+from functools import partial
+
 import torch
 import torch.nn.functional as F
 from torch import nn
+from torch.utils.checkpoint import checkpoint as activation_checkpoint
 
 from detectron2.utils.comm import get_world_size
 from detectron2.projects.point_rend.point_features import (
@@ -249,6 +252,156 @@ def _build_instance_structures(instance_masks: torch.Tensor):
     return inst_points, inst_ids_per_point, device
 
 
+_INFO_NCE_SIMILARITY_BLOCK_BYTES = 8 * 1024**2
+
+
+def _info_nce_accumulation_dtype(dtype: torch.dtype) -> torch.dtype:
+    if dtype in (torch.float16, torch.bfloat16):
+        return torch.float32
+    return dtype
+
+
+def _merge_block_logsumexp(
+    accumulated: torch.Tensor,
+    accumulated_valid: torch.Tensor,
+    block: torch.Tensor,
+    block_valid: torch.Tensor,
+):
+    """Merge row-wise log-sums while keeping empty blocks out of the graph."""
+    zeros = torch.zeros_like(accumulated)
+    safe_accumulated = torch.where(accumulated_valid, accumulated, zeros)
+    safe_block = torch.where(block_valid, block, zeros)
+    both = accumulated_valid & block_valid
+    merged_both = torch.logaddexp(safe_accumulated, safe_block)
+    merged = torch.where(
+        both,
+        merged_both,
+        torch.where(block_valid, block, accumulated),
+    )
+    return merged, accumulated_valid | block_valid
+
+
+def _streaming_info_nce_chunk(
+    anchor_features: torch.Tensor,
+    all_features: torch.Tensor,
+    positive_rows: torch.Tensor,
+    positive_cols: torch.Tensor,
+    positive_weights: torch.Tensor,
+    logit_scale: torch.Tensor,
+    bias: torch.Tensor,
+    *,
+    anchor_start: int,
+    candidate_chunk_size: int,
+    include_self: bool,
+    norm_type: str,
+    clamp_limits,
+):
+    """Compute exact numerator and denominator log-sums in candidate blocks."""
+    device = anchor_features.device
+    dtype = anchor_features.dtype
+    accumulation_dtype = _info_nce_accumulation_dtype(dtype)
+    num_anchors = anchor_features.shape[0]
+    num_candidates = all_features.shape[0]
+    denominator_log = torch.zeros(
+        num_anchors,
+        device=device,
+        dtype=accumulation_dtype,
+    )
+    numerator_log = torch.zeros_like(denominator_log)
+    denominator_valid = torch.zeros(num_anchors, device=device, dtype=torch.bool)
+    numerator_valid = torch.zeros_like(denominator_valid)
+
+    for candidate_start in range(0, num_candidates, candidate_chunk_size):
+        candidate_end = min(candidate_start + candidate_chunk_size, num_candidates)
+        similarities = (
+            anchor_features @ all_features[candidate_start:candidate_end].T
+        )
+
+        if norm_type == "log_odds" and clamp_limits is not None:
+            similarities = torch.clamp(similarities, *clamp_limits)
+            similarities = 2 * torch.atanh(similarities)
+        elif norm_type == "clamp":
+            similarities = ((1 + similarities) / 2).clamp(min=0, max=1)
+
+        similarities = similarities.to(accumulation_dtype)
+        similarities = (
+            similarities * logit_scale.to(accumulation_dtype)
+            + bias.to(accumulation_dtype)
+        )
+
+        if not include_self:
+            overlap_start = max(anchor_start, candidate_start)
+            overlap_end = min(
+                anchor_start + num_anchors,
+                candidate_end,
+            )
+            if overlap_start < overlap_end:
+                self_indices = torch.arange(
+                    overlap_start,
+                    overlap_end,
+                    device=device,
+                )
+                similarities[
+                    self_indices - anchor_start,
+                    self_indices - candidate_start,
+                ] = -torch.inf
+
+        block_max = similarities.max(dim=1).values
+        block_valid = torch.isfinite(block_max)
+        safe_block_max = torch.where(
+            block_valid,
+            block_max,
+            torch.zeros_like(block_max),
+        )
+        exp_values = torch.exp(similarities - safe_block_max.unsqueeze(1))
+        denominator_sum = exp_values.sum(dim=1)
+        safe_denominator_sum = torch.where(
+            block_valid,
+            denominator_sum,
+            torch.ones_like(denominator_sum),
+        )
+        block_denominator_log = (
+            torch.log(safe_denominator_sum) + safe_block_max
+        )
+        denominator_log, denominator_valid = _merge_block_logsumexp(
+            denominator_log,
+            denominator_valid,
+            block_denominator_log,
+            block_valid,
+        )
+
+        in_block = (positive_cols >= candidate_start) & (
+            positive_cols < candidate_end
+        )
+        block_rows = positive_rows[in_block]
+        block_cols = positive_cols[in_block] - candidate_start
+        block_weights = positive_weights[in_block].to(accumulation_dtype)
+        positive_sum = torch.zeros_like(block_max)
+        block_positive_valid = torch.zeros_like(block_valid)
+        if block_rows.numel() > 0:
+            positive_sum = positive_sum.index_add(
+                0,
+                block_rows,
+                exp_values[block_rows, block_cols] * block_weights,
+            )
+            block_positive_valid.index_fill_(0, block_rows, True)
+        block_positive_valid = block_positive_valid & block_valid
+        safe_positive_sum = torch.where(
+            block_positive_valid,
+            positive_sum,
+            torch.ones_like(positive_sum),
+        )
+        block_numerator_log = torch.log(safe_positive_sum) + safe_block_max
+        numerator_log, numerator_valid = _merge_block_logsumexp(
+            numerator_log,
+            numerator_valid,
+            block_numerator_log,
+            block_positive_valid,
+        )
+
+    return denominator_log, numerator_log
+
+
 def _get_positive_indices_for_point(
     point_idx: int,
     inst_points,
@@ -291,13 +444,14 @@ def infoNCE_chunked_loss(
     assume_single_label: bool = False,
     norm_type: str = "temperature",
     clamp_limits = None,
+    candidate_chunk_size: int | None = None,
 ) -> torch.Tensor:
     """
-    Faster memory-efficient supervised InfoNCE loss:
-      - Dense matmul per chunk for similarities
+    Memory-bounded supervised InfoNCE loss:
+      - Candidate-blocked matmul with streaming log-sum-exp
       - Positive numerators via vectorized pair gather + index_add
+      - Activation checkpointing so block activations are not retained for backward
       - Optional temporal stage weights
-      - 5-20x faster than looped version
 
     Args:
       features: (N, C) float tensor
@@ -312,6 +466,8 @@ def infoNCE_chunked_loss(
       stage_weight_cross: weight for cross-stage positives
       assume_single_label: set True if each point belongs to at most one instance
                            to skip dedup and gain extra speed
+      candidate_chunk_size: optional upper bound for candidates per block. The
+                            implementation also enforces a fixed byte budget.
 
     Returns:
       Scalar loss averaged over anchors that have at least one positive.
@@ -323,9 +479,9 @@ def infoNCE_chunked_loss(
     z = _sanitize_features(features)
     if normalize:
         z = _normalize_features(z)
-    zT = z.T  # reuse transposed once
 
     inst_points = _instances_points(instance_masks)
+    stages = temporal_stages.to(device) if temporal_stages is not None else None
 
     total = torch.zeros((), device=device, dtype=dtype)
     counted = 0
@@ -336,12 +492,18 @@ def infoNCE_chunked_loss(
     except Exception:
         pass
 
-    if isinstance(logit_scale, (float, int)):
-        logit_scale_t = None
-        logit_scale_val = float(logit_scale)
-    else:
-        logit_scale_t = logit_scale
-        logit_scale_val = None
+    logit_scale_t = torch.as_tensor(logit_scale, device=device, dtype=dtype)
+    bias_t = torch.as_tensor(bias, device=device, dtype=dtype)
+    if candidate_chunk_size is not None and candidate_chunk_size <= 0:
+        raise ValueError("candidate_chunk_size must be positive")
+    accumulation_element_size = 4 if dtype in (
+        torch.float16,
+        torch.bfloat16,
+    ) else features.element_size()
+    max_block_elements = max(
+        1,
+        _INFO_NCE_SIMILARITY_BLOCK_BYTES // accumulation_element_size,
+    )
 
     for start in range(0, N, chunk_size):
         end = min(start + chunk_size, N)
@@ -354,7 +516,7 @@ def infoNCE_chunked_loss(
             end=end,
             N=N,
             include_self=include_self,
-            temporal_stages=temporal_stages.to(device) if temporal_stages is not None else None,
+            temporal_stages=stages,
             stage_weight_same=stage_weight_same,
             stage_weight_cross=stage_weight_cross,
             device=device,
@@ -366,53 +528,43 @@ def infoNCE_chunked_loss(
         if row_has_pos.any().item() is False:
             continue
 
-        # Dense similarities for the chunk
-        sim_chunk = z[start:end] @ zT  # (B, N)
-        
-        # Apply norm_type transformations (matching old implementation)
-        if norm_type == "log_odds" and clamp_limits is not None:
-            sim_chunk = torch.clamp(sim_chunk, *clamp_limits)
-            sim_chunk = 2 * torch.atanh(sim_chunk)
-        elif norm_type == "clamp":
-            sim_chunk = ((1 + sim_chunk) / 2).clamp(min=0, max=1)
-        
-        # Apply logit_scale (temperature) and bias
-        if logit_scale_t is not None:
-            sim_chunk = sim_chunk * logit_scale_t
-        elif logit_scale_val != 1.0:
-            sim_chunk = sim_chunk * logit_scale_val
-        if isinstance(bias, torch.Tensor):
-            sim_chunk = sim_chunk + bias
-        elif bias != 0.0:
-            sim_chunk = sim_chunk + bias
-        
-        # Exclude self-similarity from denominator (matching old implementation)
-        # For each anchor j in chunk, set sim_chunk[j_rel, start+j_rel] = -inf
-        if not include_self:
-            anchor_indices = torch.arange(B, device=device, dtype=torch.long)
-            self_col_indices = torch.arange(start, end, device=device, dtype=torch.long)
-            sim_chunk[anchor_indices, self_col_indices] = -torch.inf
-
-        # Stable log-sum-exp: subtract rowwise max before exp
-        m = sim_chunk.max(dim=1, keepdim=True).values  # (B, 1)
-        sim_shift = sim_chunk - m                      # (B, N)
-        exp_vals = torch.exp(sim_shift)                # (B, N)
-
-        # Denominator = log(sum exp(sim)) = log(sum exp(sim_shift)) + m
-        # Note: self-similarity is -inf, so exp(-inf) = 0, effectively excluded
-        denom_sum = exp_vals.sum(dim=1)                # (B,)
-        denom_log = torch.log(denom_sum) + m.squeeze(1)
-
-        # Numerator: sum over positives of exp(sim) with weights
-        # Gather exp(sim_shift) at (rows, cols), multiply by weights, then scatter-add per row
-        pos_vals = (exp_vals[rows, cols] * weights).to(dtype=dtype)  # (P,) - ensure dtype match
-        num_sum = torch.zeros(B, dtype=dtype, device=device)
-        num_sum.index_add_(0, rows, pos_vals)          # sums per row
-        # log numerator = log(sum_wexp) + m_row
-        num_log = torch.empty(B, dtype=dtype, device=device)
-        # Only for rows with positives; others ignored
-        # Ensure dtype match for mixed precision (float16)
-        num_log[row_has_pos] = (torch.log(num_sum[row_has_pos]) + m.squeeze(1)[row_has_pos]).to(dtype=dtype)
+        dynamic_candidate_chunk_size = max(1, max_block_elements // B)
+        if candidate_chunk_size is not None:
+            dynamic_candidate_chunk_size = min(
+                dynamic_candidate_chunk_size,
+                candidate_chunk_size,
+            )
+        dynamic_candidate_chunk_size = min(N, dynamic_candidate_chunk_size)
+        chunk_function = partial(
+            _streaming_info_nce_chunk,
+            anchor_start=start,
+            candidate_chunk_size=dynamic_candidate_chunk_size,
+            include_self=include_self,
+            norm_type=norm_type,
+            clamp_limits=clamp_limits,
+        )
+        chunk_inputs = (
+            z[start:end],
+            z,
+            rows,
+            cols,
+            weights,
+            logit_scale_t,
+            bias_t,
+        )
+        requires_checkpoint = torch.is_grad_enabled() and any(
+            tensor.requires_grad
+            for tensor in (z, logit_scale_t, bias_t)
+        )
+        if requires_checkpoint:
+            denom_log, num_log = activation_checkpoint(
+                chunk_function,
+                *chunk_inputs,
+                use_reentrant=False,
+                preserve_rng_state=False,
+            )
+        else:
+            denom_log, num_log = chunk_function(*chunk_inputs)
 
         # Loss for valid rows
         loss_rows = denom_log[row_has_pos] - num_log[row_has_pos]

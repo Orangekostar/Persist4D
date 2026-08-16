@@ -1046,9 +1046,18 @@ def _formal_p2_callback_history_validation_error(
     best_score = state["best_model_score"]
     current_score = state["current_score"]
     best_k_models = state["best_k_models"]
+    validation_cadence = first_validation_epoch + 1
+    current_score_is_expected_none = (
+        epoch > first_validation_epoch
+        and completed_epochs % validation_cadence != 0
+        and current_score is None
+    )
     if (
         not _is_checkpoint_scalar(best_score, finite=True)
-        or not _is_checkpoint_scalar(current_score, finite=True)
+        or (
+            not current_score_is_expected_none
+            and not _is_checkpoint_scalar(current_score, finite=True)
+        )
         or not isinstance(best_k_models, Mapping)
         or not best_k_models
         or best_path not in best_k_models
