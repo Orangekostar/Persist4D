@@ -2165,8 +2165,13 @@ def _record_entrypoint_fit(monkeypatch):
     return model, fit_calls
 
 
-def test_csv_logger_does_not_enter_wandb_sweep_handling(monkeypatch) -> None:
+def test_csv_logger_does_not_enter_wandb_sweep_handling(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
     cfg = _compose(P2_CONFIG_NAME)
+    with open_dict(cfg):
+        cfg.general.save_dir = str(tmp_path)
     csv_logger = type("FakeCSVLogger", (), {"experiment": object()})()
     monkeypatch.setattr(
         training_entrypoint,

@@ -1,6 +1,6 @@
 {
   "authorization": {
-    "artifact_payload_sha256": "f966dc15f47b6eb9e8b2f6d3545299ba6051cd07ecedc2369ab730a8eff4c46c",
+    "artifact_payload_sha256": "4120d96577dfa727a8a940e4c05c447437fb82f6dcce17dbefa25e73d8b0bfd9",
     "config_ref": "repo:conf/config_p2_rescene4d_concerto_t2.yaml",
     "config_sha256": "5536d84788106732ff404b0377a1aa497d29aecb498bdc9f0d13640620789424",
     "expected_split_counts": {
@@ -8,7 +8,7 @@
       "train": 1201,
       "validation": 312
     },
-    "issued_at_utc": "2026-08-12T00:36:57.088154Z",
+    "issued_at_utc": "2026-08-16T10:28:16.333663Z",
     "max_age_seconds": 86400,
     "schema_version": 1,
     "status": "issued"
@@ -144,7 +144,7 @@
     "status": "pass",
     "temporal_window": 2
   },
-  "local_source_commit": "6c74c58be467e5cb136590c41b14a79c94dc9c5f",
+  "local_source_commit": "54e29f800565f4dcd7b70f022442560be5c5af4e",
   "mix_instantiation": {
     "attempted": true,
     "dataset_names": [
@@ -681,26 +681,18 @@
     ],
     "committed_paths_since_source": [],
     "dirty_paths": [
-      "artifacts/P2/config_audit.md",
       "artifacts/P2/environment_manifest.json",
-      "artifacts/P2/lr_schedule_audit.csv",
-      "artifacts/P2/lr_schedule_audit.md",
-      "artifacts/P2/native_smoke_report.json",
-      "artifacts/P2/official_vs_repro_config_diff.json",
-      "artifacts/P2/reproduction_target.yaml",
-      "artifacts/P2/scannet_preflight.json",
-      "artifacts/P2/tiny_overfit_report.json",
-      "artifacts/P2/tiny_overfit_report.md"
+      "artifacts/P2/scannet_preflight.json"
     ],
     "disallowed_committed_paths": [],
     "disallowed_dirty_paths": [],
     "errors": [],
-    "expected_tracked_tree_sha256": "fe49033942eea1c4ca8abef9329706315a3ce3e12db1eeae26c8c8fc009f92a1",
+    "expected_tracked_tree_sha256": "4025cf82b75f603893a7976bf46071f9143f790f029332cd16a2c676929a426c",
     "index_flag_paths": [],
-    "observed_head": "6c74c58be467e5cb136590c41b14a79c94dc9c5f",
-    "observed_tracked_tree_sha256": "fe49033942eea1c4ca8abef9329706315a3ce3e12db1eeae26c8c8fc009f92a1",
+    "observed_head": "54e29f800565f4dcd7b70f022442560be5c5af4e",
+    "observed_tracked_tree_sha256": "4025cf82b75f603893a7976bf46071f9143f790f029332cd16a2c676929a426c",
     "schema_version": 1,
-    "source_commit": "6c74c58be467e5cb136590c41b14a79c94dc9c5f",
+    "source_commit": "54e29f800565f4dcd7b70f022442560be5c5af4e",
     "status": "pass"
   },
   "split_metadata": {

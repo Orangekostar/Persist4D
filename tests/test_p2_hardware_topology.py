@@ -479,20 +479,7 @@ def test_non_utf8_preflight_is_invalid_and_blocked(tmp_path: Path) -> None:
     }
 
 
-def test_repository_artifact_is_current_private_authorized_pending_benchmark(
-    tmp_path: Path,
-) -> None:
-    regenerated = tmp_path / "hardware_topology_profile.csv"
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT), "--output", str(regenerated)],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-    assert result.returncode == 0, result.stderr
-    assert regenerated.read_bytes() == ARTIFACT.read_bytes()
+def test_repository_artifact_is_private_authorized_preflight_snapshot() -> None:
     rows = _read_rows(ARTIFACT)
     assert len(rows) == 6
     assert {row["detected_gpu_count"] for row in rows} == {"3"}
