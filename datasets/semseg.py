@@ -1,4 +1,5 @@
 import logging
+import operator
 from numbers import Integral
 from pathlib import Path
 from random import random
@@ -415,14 +416,15 @@ class SemanticSegmentationDataset(Dataset):
         *,
         change_file=_USE_SEQUENCE_CHANGE_FILE,
     ):
-        if isinstance(context_idx, (bool, np.bool_)) or not isinstance(
-            context_idx, Integral
-        ):
+        if isinstance(context_idx, (bool, np.bool_)):
             raise ValueError("context_idx must be an integer")
-        context_idx = int(context_idx)
-        if context_idx < 0 or context_idx >= len(self.sequence_indices):
+        try:
+            context_index = operator.index(context_idx)
+        except TypeError as error:
+            raise ValueError("context_idx must be an integer") from error
+        if context_index < 0 or context_index >= len(self.sequence_indices):
             raise IndexError(
-                f"context_idx {context_idx} is outside [0, "
+                f"context_idx {context_index} is outside [0, "
                 f"{len(self.sequence_indices)})"
             )
 
@@ -457,7 +459,7 @@ class SemanticSegmentationDataset(Dataset):
             raise ValueError("scan_indices must not contain duplicate indices")
 
         if change_file is _USE_SEQUENCE_CHANGE_FILE:
-            change_file = self.change_files[context_idx]
+            change_file = self.change_files[context_index]
 
         return self._load_scan_sequence(
             context_idx=context_idx,

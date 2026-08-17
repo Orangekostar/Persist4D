@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import torch
 import yaml
 
 from datasets.semseg import SemanticSegmentationDataset
@@ -155,6 +156,8 @@ def _make_dataset(
     fail_closed: bool = True,
     temporal_window: int = 3,
     known_empty_scan_policy: str | None = None,
+    mode: str = "validation",
+    max_points_per_sample: int | None = None,
 ) -> SemanticSegmentationDataset:
     kwargs = {
         "dataset_name": "rio",
@@ -162,7 +165,7 @@ def _make_dataset(
         "label_db_filepath": str(processed_dir / "label_database.yaml"),
         "change_label_db_filepath": str(processed_dir / "change_label_database.yaml"),
         "color_mean_std": str(processed_dir / "color_mean_std.yaml"),
-        "mode": "validation",
+        "mode": mode,
         "add_colors": True,
         "add_normals": False,
         "add_raw_coordinates": False,
@@ -173,6 +176,7 @@ def _make_dataset(
         "label_offset": 2,
         "temporal_window": temporal_window,
         "fail_closed": fail_closed,
+        "max_points_per_sample": max_points_per_sample,
     }
     if known_empty_scan_policy is not None:
         kwargs["known_empty_scan_policy"] = known_empty_scan_policy
@@ -182,17 +186,31 @@ def _make_dataset(
 def _load_with_seed(loader):
     random.seed(45)
     np.random.seed(45)
+    torch.manual_seed(45)
     return loader()
 
 
 def _assert_loader_results_equal(actual, expected) -> None:
     assert len(actual) == len(expected)
     for actual_item, expected_item in zip(actual, expected, strict=True):
+        assert type(actual_item) is type(expected_item)
         if isinstance(expected_item, np.ndarray):
-            assert isinstance(actual_item, np.ndarray)
+            assert actual_item.dtype == expected_item.dtype
+            assert actual_item.shape == expected_item.shape
             np.testing.assert_array_equal(actual_item, expected_item)
         else:
             assert actual_item == expected_item
+
+
+def test_getitem_preserves_context_index_scalar_type(tmp_path: Path) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    dataset = _make_dataset(processed_dir)
+
+    numpy_result = dataset[np.int64(0)]
+    python_result = dataset[0]
+
+    assert type(numpy_result[7]) is np.int64
+    assert type(python_result[7]) is int
 
 
 def test_load_scan_indices_matches_default_and_explicit_change_file(
@@ -214,6 +232,45 @@ def test_load_scan_indices_matches_default_and_explicit_change_file(
         )
     )
 
+    _assert_loader_results_equal(default_result, item_result)
+    _assert_loader_results_equal(explicit_result, item_result)
+
+
+def test_training_loader_preserves_seeded_default_and_explicit_parity(
+    tmp_path: Path,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    validation_database = yaml.safe_load(
+        (processed_dir / "validation_database.yaml").read_text(encoding="utf-8")
+    )
+    _write_yaml(processed_dir / "train_database.yaml", validation_database)
+    sequence_path = processed_dir / "sequence_database_sliding_3.yaml"
+    sequence_database = yaml.safe_load(sequence_path.read_text(encoding="utf-8"))
+    for entry in sequence_database.values():
+        entry["type"] = "train"
+    _write_yaml(sequence_path, sequence_database)
+
+    dataset = _make_dataset(
+        processed_dir,
+        mode="train",
+        max_points_per_sample=4,
+    )
+    scan_indices = dataset.sequence_indices[0].copy()
+
+    item_result = _load_with_seed(lambda: dataset[0])
+    default_result = _load_with_seed(
+        lambda: dataset.load_scan_indices(0, scan_indices)
+    )
+    explicit_result = _load_with_seed(
+        lambda: dataset.load_scan_indices(
+            0,
+            scan_indices,
+            change_file=dataset.change_files[0],
+        )
+    )
+
+    assert item_result[0].shape[0] == 4
+    assert not np.array_equal(item_result[0][:, :3], item_result[6][:, :3])
     _assert_loader_results_equal(default_result, item_result)
     _assert_loader_results_equal(explicit_result, item_result)
 
