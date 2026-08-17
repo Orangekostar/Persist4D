@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import replace
 
 import pytest
 import torch
@@ -55,6 +56,7 @@ class _FakeReScene(nn.Module):
         super().__init__()
         self.return_query_features = True
         self.output = dict(_base_output() if output is None else output)
+        self.call_count = 0
         self.calls: list[tuple[object, object, object, bool]] = []
 
     def forward(
@@ -64,22 +66,60 @@ class _FakeReScene(nn.Module):
         raw_coordinates: object = None,
         is_eval: bool = False,
     ) -> dict[str, object]:
+        self.call_count += 1
         self.calls.append((x, point2segment, raw_coordinates, is_eval))
         return self.output
+
+
+def _empty_state(
+    *,
+    batch_size: int = 1,
+    capacity: int = 3,
+    stage_watermark: int = -1,
+) -> PersistentMemoryState:
+    state = PersistentMemoryState.empty(
+        batch_size=batch_size,
+        capacity=capacity,
+        feature_dim=2,
+        class_count=3,
+        device="cpu",
+        dtype=torch.float32,
+    )
+    return replace(
+        state,
+        stage_watermark=torch.full(
+            (batch_size,),
+            stage_watermark,
+            dtype=torch.long,
+        ),
+    )
+
+
+class _IndexableStage:
+    def __index__(self) -> int:
+        return 6
 
 
 def _forward_step(
     wrapper: StreamingReScene,
     *,
     state: PersistentMemoryState | None = None,
-    stage_index: int = 1,
+    stage_index: object = 1,
     segment_stages: list[torch.Tensor] | object | None = None,
+    point2segment: object | None = None,
 ) -> tuple[dict[str, object], PersistentMemoryState]:
     if segment_stages is None:
         segment_stages = [torch.tensor([0, 1])]
+    if point2segment is None:
+        batch_size = (
+            len(segment_stages)
+            if isinstance(segment_stages, list) and segment_stages
+            else 1
+        )
+        point2segment = [torch.tensor([0, 1]) for _ in range(batch_size)]
     return wrapper.forward_step(
         x=object(),
-        point2segment=[torch.tensor([0, 1])],
+        point2segment=point2segment,
         raw_coordinates=None,
         segment_stages=segment_stages,
         state=state,
@@ -125,17 +165,71 @@ def test_init_rejects_invalid_module_types() -> None:
 def test_init_rejects_missing_observation_setting(missing_key: str) -> None:
     settings = _settings()
     del settings[missing_key]
+    base_model = _FakeReScene()
 
     with pytest.raises(ValueError, match="exactly"):
-        StreamingReScene(_FakeReScene(), PersistentMemory(), settings)
+        StreamingReScene(base_model, PersistentMemory(), settings)
+
+    assert base_model.call_count == 0
 
 
 def test_init_rejects_unknown_observation_setting() -> None:
     settings = _settings()
     settings["unknown"] = 1
+    base_model = _FakeReScene()
 
     with pytest.raises(ValueError, match="exactly"):
-        StreamingReScene(_FakeReScene(), PersistentMemory(), settings)
+        StreamingReScene(base_model, PersistentMemory(), settings)
+
+    assert base_model.call_count == 0
+
+
+@pytest.mark.parametrize(
+    ("setting_name", "invalid_value"),
+    [
+        ("background_class", -1),
+        ("background_class", 1.0),
+        ("background_class", True),
+        ("confidence_threshold", -0.01),
+        ("confidence_threshold", 1.01),
+        ("confidence_threshold", float("nan")),
+        ("confidence_threshold", float("inf")),
+        ("confidence_threshold", True),
+        ("mask_threshold", -0.01),
+        ("mask_threshold", 1.01),
+        ("mask_threshold", float("nan")),
+        ("mask_threshold", float("inf")),
+        ("mask_threshold", False),
+        ("minimum_mask_support", 0),
+        ("minimum_mask_support", -1),
+        ("minimum_mask_support", 1.0),
+        ("minimum_mask_support", True),
+    ],
+)
+def test_init_rejects_invalid_observation_setting_values(
+    setting_name: str,
+    invalid_value: object,
+) -> None:
+    settings = _settings()
+    settings[setting_name] = invalid_value
+    base_model = _FakeReScene()
+
+    with pytest.raises(ValueError, match=setting_name):
+        StreamingReScene(base_model, PersistentMemory(), settings)
+
+    assert base_model.call_count == 0
+
+
+def test_forward_step_checks_background_class_upper_bound_after_inference() -> None:
+    settings = _settings()
+    settings["background_class"] = 3
+    base_model = _FakeReScene()
+    wrapper = StreamingReScene(base_model, PersistentMemory(), settings)
+
+    with pytest.raises(ValueError, match="background_class"):
+        _forward_step(wrapper)
+
+    assert base_model.call_count == 1
 
 
 def test_init_defensively_copies_observation_settings() -> None:
@@ -161,6 +255,11 @@ def test_forward_step_preserves_predictions_and_passes_base_arguments() -> None:
     original_value_ids = {
         key: id(value) for key, value in base_model.output.items()
     }
+    original_pred_logits = base_model.output["pred_logits"].clone()
+    original_query_features = base_model.output["query_features"].clone()
+    original_pred_masks = [
+        mask.clone() for mask in base_model.output["pred_masks"]
+    ]
     wrapper = StreamingReScene(
         base_model,
         PersistentMemory(capacity=3),
@@ -186,6 +285,20 @@ def test_forward_step_preserves_predictions_and_passes_base_arguments() -> None:
     for key, value in base_model.output.items():
         assert result[key] is value
         assert id(value) == original_value_ids[key]
+    torch.testing.assert_close(
+        base_model.output["pred_logits"],
+        original_pred_logits,
+    )
+    torch.testing.assert_close(
+        base_model.output["query_features"],
+        original_query_features,
+    )
+    for actual, expected in zip(
+        base_model.output["pred_masks"],
+        original_pred_masks,
+        strict=True,
+    ):
+        torch.testing.assert_close(actual, expected)
     assert tuple(base_model.output) == original_keys
     assert _PERSISTENT_KEYS.isdisjoint(base_model.output)
     assert torch.equal(result["persistent_slot_ids"], torch.tensor([[0, 1]]))
@@ -265,16 +378,15 @@ def test_forward_step_state_none_resets_memory() -> None:
 
 
 def test_forward_step_rejects_state_batch_mismatch() -> None:
-    base_model = _FakeReScene()
+    base_model = _FakeReScene(_base_output(batch_size=2))
     wrapper = StreamingReScene(
         base_model,
         PersistentMemory(capacity=3),
         _settings(),
     )
-    _, one_item_state = _forward_step(wrapper)
-    base_model.output = _base_output(batch_size=2)
+    one_item_state = _empty_state(batch_size=1)
 
-    with pytest.raises(ValueError, match="batch sizes"):
+    with pytest.raises(ValueError, match="batch"):
         _forward_step(
             wrapper,
             state=one_item_state,
@@ -282,17 +394,125 @@ def test_forward_step_rejects_state_batch_mismatch() -> None:
             segment_stages=[torch.tensor([1, 2]), torch.tensor([0, 2])],
         )
 
+    assert base_model.call_count == 0
 
-def test_forward_step_rejects_decreasing_global_stage() -> None:
+
+@pytest.mark.parametrize("stage_index", [3, 4])
+def test_forward_step_rejects_non_increasing_global_stage(
+    stage_index: int,
+) -> None:
+    base_model = _FakeReScene()
     wrapper = StreamingReScene(
-        _FakeReScene(),
+        base_model,
         PersistentMemory(capacity=3),
         _settings(),
     )
-    _, state = _forward_step(wrapper, stage_index=4)
+    state = _empty_state(stage_watermark=4)
 
     with pytest.raises(ValueError, match="later than"):
-        _forward_step(wrapper, state=state, stage_index=3)
+        _forward_step(wrapper, state=state, stage_index=stage_index)
+
+    assert base_model.call_count == 0
+
+
+@pytest.mark.parametrize(
+    "stage_index",
+    [True, -1, 1.0, None, torch.iinfo(torch.long).max + 1],
+)
+def test_forward_step_rejects_invalid_global_stage_before_inference(
+    stage_index: object,
+) -> None:
+    base_model = _FakeReScene()
+    wrapper = StreamingReScene(
+        base_model,
+        PersistentMemory(capacity=3),
+        _settings(),
+    )
+
+    with pytest.raises(ValueError, match="stage_index"):
+        _forward_step(wrapper, stage_index=stage_index)
+
+    assert base_model.call_count == 0
+
+
+def test_forward_step_accepts_an_indexable_global_stage() -> None:
+    base_model = _FakeReScene()
+    wrapper = StreamingReScene(
+        base_model,
+        PersistentMemory(capacity=3),
+        _settings(),
+    )
+
+    _, state = _forward_step(wrapper, stage_index=_IndexableStage())
+
+    assert base_model.call_count == 1
+    assert torch.equal(state.stage_watermark, torch.tensor([6]))
+
+
+def test_forward_step_validates_state_before_inference() -> None:
+    base_model = _FakeReScene()
+    wrapper = StreamingReScene(
+        base_model,
+        PersistentMemory(capacity=3),
+        _settings(),
+    )
+    invalid_state = replace(
+        _empty_state(),
+        stage_watermark=torch.tensor([-2]),
+    )
+
+    with pytest.raises(ValueError, match="stage_watermark"):
+        _forward_step(wrapper, state=invalid_state)
+
+    assert base_model.call_count == 0
+
+
+def test_forward_step_rejects_invalid_state_type_before_inference() -> None:
+    base_model = _FakeReScene()
+    wrapper = StreamingReScene(
+        base_model,
+        PersistentMemory(capacity=3),
+        _settings(),
+    )
+
+    with pytest.raises(ValueError, match="PersistentMemoryState"):
+        _forward_step(wrapper, state=object())
+
+    assert base_model.call_count == 0
+
+
+def test_forward_step_rejects_state_capacity_mismatch_before_inference() -> None:
+    base_model = _FakeReScene()
+    wrapper = StreamingReScene(
+        base_model,
+        PersistentMemory(capacity=3),
+        _settings(),
+    )
+
+    with pytest.raises(ValueError, match="capacity"):
+        _forward_step(wrapper, state=_empty_state(capacity=2))
+
+    assert base_model.call_count == 0
+
+
+@pytest.mark.parametrize(
+    "point2segment",
+    [[], [torch.tensor([0]), torch.tensor([0])], object()],
+)
+def test_forward_step_rejects_point_batch_mismatch_before_inference(
+    point2segment: object,
+) -> None:
+    base_model = _FakeReScene()
+    wrapper = StreamingReScene(
+        base_model,
+        PersistentMemory(capacity=3),
+        _settings(),
+    )
+
+    with pytest.raises(ValueError, match="point2segment"):
+        _forward_step(wrapper, point2segment=point2segment)
+
+    assert base_model.call_count == 0
 
 
 def test_forward_step_rejects_missing_query_features() -> None:
@@ -333,6 +553,10 @@ def test_forward_step_rejects_non_finite_base_outputs(output_key: str) -> None:
         [object()],
         [torch.tensor([])],
         [torch.tensor([[0, 1]])],
+        [torch.tensor([0.0, 1.0])],
+        [torch.tensor([False, True])],
+        [torch.tensor([-1, 0])],
+        [torch.tensor([0.0, float("inf")])],
     ],
 )
 def test_forward_step_rejects_invalid_local_stage_collections(
@@ -348,12 +572,13 @@ def test_forward_step_rejects_invalid_local_stage_collections(
     with pytest.raises(ValueError, match="segment_stages"):
         _forward_step(wrapper, segment_stages=segment_stages)
 
-    assert not base_model.calls
+    assert base_model.call_count == 0
 
 
 def test_forward_step_rejects_mixed_latest_local_stages() -> None:
+    base_model = _FakeReScene(_base_output(batch_size=2))
     wrapper = StreamingReScene(
-        _FakeReScene(_base_output(batch_size=2)),
+        base_model,
         PersistentMemory(capacity=3),
         _settings(),
     )
@@ -364,11 +589,19 @@ def test_forward_step_rejects_mixed_latest_local_stages() -> None:
             segment_stages=[torch.tensor([0, 1]), torch.tensor([0, 2])],
         )
 
+    assert base_model.call_count == 0
+
 
 def test_forward_step_uses_maximum_as_latest_local_stage() -> None:
     output = _base_output()
     output["pred_masks"] = [
-        torch.tensor([[10.0, 10.0], [-10.0, -10.0]])
+        torch.tensor(
+            [
+                [-10.0, -10.0],
+                [10.0, 10.0],
+                [-10.0, -10.0],
+            ]
+        )
     ]
     wrapper = StreamingReScene(
         _FakeReScene(output),
@@ -378,7 +611,7 @@ def test_forward_step_uses_maximum_as_latest_local_stage() -> None:
 
     result, _ = _forward_step(
         wrapper,
-        segment_stages=[torch.tensor([2, 0])],
+        segment_stages=[torch.tensor([0, 2, 1])],
     )
 
     assert torch.equal(result["persistent_slot_ids"], torch.tensor([[0, 1]]))
