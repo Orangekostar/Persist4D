@@ -1,0 +1,107 @@
+{
+  "bounded_state": {
+    "constant_shape": true,
+    "maximum_state_bytes": 63808
+  },
+  "checkpoint": {
+    "ref": "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt",
+    "sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e"
+  },
+  "errors": [],
+  "horizons": [
+    {
+      "T": 2,
+      "correct_reactivations": 0,
+      "identity_switches": 63,
+      "loaded_sequences": 154,
+      "matched_identity_observations": 1875,
+      "mean_latency_ms": 634.0483910035246,
+      "peak_allocated_cuda_bytes": 3391337472,
+      "per_stage_AP": {
+        "1": 0.3547440767288208,
+        "2": 0.33918824791908264
+      },
+      "reactivation_accuracy": null,
+      "reactivation_events": 0,
+      "rejected_births": 0,
+      "serialized_state_bytes": 63808,
+      "t_REC": 0.29019036889076233,
+      "t_mAP": 0.23071081936359406,
+      "throughput_sequences_per_second": 1.5771666866266698
+    },
+    {
+      "T": 3,
+      "correct_reactivations": 100,
+      "identity_switches": 111,
+      "loaded_sequences": 120,
+      "matched_identity_observations": 2188,
+      "mean_latency_ms": 992.4023444104629,
+      "peak_allocated_cuda_bytes": 2714904064,
+      "per_stage_AP": {
+        "1": 0.33794981241226196,
+        "2": 0.332704097032547,
+        "3": 0.32050856947898865
+      },
+      "reactivation_accuracy": 0.8695652173913043,
+      "reactivation_events": 115,
+      "rejected_births": 0,
+      "serialized_state_bytes": 63808,
+      "t_REC": 0.1742779165506363,
+      "t_mAP": 0.1571209579706192,
+      "throughput_sequences_per_second": 1.0076558218874931
+    },
+    {
+      "T": 4,
+      "correct_reactivations": 137,
+      "identity_switches": 131,
+      "loaded_sequences": 75,
+      "matched_identity_observations": 1918,
+      "mean_latency_ms": 1407.8396310160558,
+      "peak_allocated_cuda_bytes": 2714928128,
+      "per_stage_AP": {
+        "1": 0.38251766562461853,
+        "2": 0.38214388489723206,
+        "3": 0.3679162263870239,
+        "4": 0.3793530762195587
+      },
+      "reactivation_accuracy": 0.8058823529411765,
+      "reactivation_events": 170,
+      "rejected_births": 0,
+      "serialized_state_bytes": 63808,
+      "t_REC": 0.18955133855342865,
+      "t_mAP": 0.12641212344169617,
+      "throughput_sequences_per_second": 0.7103081757105298
+    },
+    {
+      "T": 5,
+      "correct_reactivations": 181,
+      "identity_switches": 110,
+      "loaded_sequences": 43,
+      "matched_identity_observations": 1441,
+      "mean_latency_ms": 1841.442155673407,
+      "peak_allocated_cuda_bytes": 2714982912,
+      "per_stage_AP": {
+        "1": 0.30153435468673706,
+        "2": 0.3026134669780731,
+        "3": 0.3098187744617462,
+        "4": 0.299939900636673,
+        "5": 0.2943556010723114
+      },
+      "reactivation_accuracy": 0.8341013824884793,
+      "reactivation_events": 217,
+      "rejected_births": 0,
+      "serialized_state_bytes": 63808,
+      "t_REC": 0.17374111711978912,
+      "t_mAP": 0.045563679188489914,
+      "throughput_sequences_per_second": 0.5430526269419007
+    }
+  ],
+  "method": "persist4d_p5_single_memory",
+  "schema_version": 1,
+  "settings": {
+    "capacity": 100,
+    "local_window": 2
+  },
+  "source_commit": "455ebd6b3015d14081e96b3af0c70b3054e2f21d",
+  "status": "pass"
+}

@@ -1,7 +1,13 @@
 from __future__ import annotations
 
+import hashlib
+import json
+import math
+import os
+import re
 from collections.abc import Mapping
 from dataclasses import replace
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -20,6 +26,59 @@ _PERSISTENT_KEYS = {
     "persistent_association_scores",
     "persistent_rejected_births",
 }
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+_P5_ARTIFACT = _REPO_ROOT / "artifacts" / "P5" / "persist4d_mvp_eval.json"
+_P5_REPORT = _REPO_ROOT / "artifacts" / "P5" / "persist4d_mvp_eval.md"
+_VERIFY_REAL_GPU = os.environ.get("P5_VERIFY_GPU_ARTIFACTS") == "1"
+_P5_ROOT_KEYS = {
+    "schema_version",
+    "status",
+    "method",
+    "source_commit",
+    "checkpoint",
+    "settings",
+    "horizons",
+    "bounded_state",
+    "errors",
+}
+_P5_HORIZON_KEYS = {
+    "T",
+    "loaded_sequences",
+    "t_mAP",
+    "t_REC",
+    "per_stage_AP",
+    "matched_identity_observations",
+    "identity_switches",
+    "reactivation_events",
+    "correct_reactivations",
+    "reactivation_accuracy",
+    "rejected_births",
+    "peak_allocated_cuda_bytes",
+    "mean_latency_ms",
+    "throughput_sequences_per_second",
+    "serialized_state_bytes",
+}
+_UUID_PATTERN = re.compile(
+    r"\b[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\b"
+)
+
+
+def _load_p5_artifact() -> dict[str, object]:
+    assert _P5_ARTIFACT.is_file(), (
+        "missing real Persist4D artifact; run scripts/evaluate_persist4d.py "
+        "on GPU0"
+    )
+    payload = json.loads(_P5_ARTIFACT.read_text(encoding="utf-8"))
+    assert isinstance(payload, dict)
+    return payload
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def test_causal_windows_preserve_order_and_emit_bootstrap_window() -> None:
@@ -648,3 +707,155 @@ def test_forward_step_uses_maximum_as_latest_local_stage() -> None:
     )
 
     assert torch.equal(result["persistent_slot_ids"], torch.tensor([[0, 1]]))
+
+
+@pytest.mark.skipif(
+    not _VERIFY_REAL_GPU,
+    reason="set P5_VERIFY_GPU_ARTIFACTS=1 after the real GPU0 evaluation",
+)
+def test_real_persist4d_artifact_passes_bounded_gpu_gate() -> None:
+    from scripts.evaluate_persist4d import (
+        _build_parser,
+        _validate_complete_artifact,
+    )
+
+    artifact = _load_p5_artifact()
+    assert set(artifact) == _P5_ROOT_KEYS
+    assert artifact["schema_version"] == 1
+    assert artifact["status"] == "pass"
+    assert artifact["method"] == "persist4d_p5_single_memory"
+    assert artifact["errors"] == []
+
+    checkpoint = _REPO_ROOT / "checkpoints" / "rescene4d_concerto_t2_repro.ckpt"
+    assert checkpoint.is_file()
+    assert not checkpoint.is_symlink()
+    assert artifact["checkpoint"] == {
+        "ref": "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt",
+        "sha256": _sha256(checkpoint),
+    }
+
+    horizons = artifact["horizons"]
+    assert [horizon["T"] for horizon in horizons] == [2, 3, 4, 5]
+    state_sizes = []
+    for horizon in horizons:
+        assert set(horizon) == _P5_HORIZON_KEYS
+        assert horizon["loaded_sequences"] > 0
+        assert set(horizon["per_stage_AP"]) == {
+            str(stage) for stage in range(1, horizon["T"] + 1)
+        }
+        for field in ("t_mAP", "t_REC", "mean_latency_ms"):
+            assert math.isfinite(horizon[field])
+        assert math.isfinite(horizon["throughput_sequences_per_second"])
+        assert horizon["mean_latency_ms"] > 0.0
+        assert horizon["throughput_sequences_per_second"] > 0.0
+        assert horizon["peak_allocated_cuda_bytes"] > 0
+        assert horizon["serialized_state_bytes"] > 0
+        state_sizes.append(horizon["serialized_state_bytes"])
+
+    bounded = artifact["bounded_state"]
+    assert bounded["constant_shape"] is True
+    assert bounded["maximum_state_bytes"] == max(state_sizes)
+
+    args = _build_parser().parse_args(
+        [
+            "--checkpoint",
+            str(checkpoint),
+            "--output",
+            str(_P5_ARTIFACT),
+            "--markdown",
+            str(_P5_REPORT),
+            "--horizons",
+            "2",
+            "3",
+            "4",
+            "5",
+            "--device",
+            "cuda:0",
+        ]
+    )
+    _validate_complete_artifact(artifact, args=args)
+
+
+@pytest.mark.skipif(
+    not _VERIFY_REAL_GPU,
+    reason="set P5_VERIFY_GPU_ARTIFACTS=1 after the real GPU0 evaluation",
+)
+def test_real_persist4d_markdown_matches_json_measurements() -> None:
+    artifact = _load_p5_artifact()
+    assert _P5_REPORT.is_file()
+    report = _P5_REPORT.read_text(encoding="utf-8")
+    assert "Persist4D MVP" in report
+    assert "not an official AP target" in report
+    assert "T=2 legacy predictions unchanged: `true`" in report
+    assert "fixed-capacity state" in report
+    assert "internal no-memory baseline" in report
+
+    conclusion_match = re.search(
+        r"^Conclusion: `([^`]+)`$",
+        report,
+        flags=re.MULTILINE,
+    )
+    assert conclusion_match is not None
+    conclusion = conclusion_match.group(1)
+    assert conclusion in {
+        "P5_MVP_PASS",
+        "P5_ASSOCIATION_DIAGNOSIS",
+        "P5_STREAMING_BLOCKED",
+    }
+    assert conclusion == "P5_ASSOCIATION_DIAGNOSIS"
+
+    expected_rows = []
+    for horizon in artifact["horizons"]:
+        per_stage = "; ".join(
+            f"{stage}={horizon['per_stage_AP'][str(stage)]:.6f}"
+            for stage in range(1, horizon["T"] + 1)
+        )
+        accuracy = horizon["reactivation_accuracy"]
+        rendered_accuracy = "n/a" if accuracy is None else f"{accuracy:.6f}"
+        expected_rows.append(
+            f"| {horizon['T']} | {horizon['loaded_sequences']} | "
+            f"{horizon['t_mAP']:.6f} | {horizon['t_REC']:.6f} | "
+            f"{per_stage} | {horizon['matched_identity_observations']} | "
+            f"{horizon['identity_switches']} | "
+            f"{horizon['reactivation_events']} | "
+            f"{horizon['correct_reactivations']} | {rendered_accuracy} | "
+            f"{horizon['rejected_births']} | "
+            f"{horizon['peak_allocated_cuda_bytes']} | "
+            f"{horizon['mean_latency_ms']:.6f} | "
+            f"{horizon['throughput_sequences_per_second']:.6f} | "
+            f"{horizon['serialized_state_bytes']} |"
+        )
+    measured_rows = [
+        line for line in report.splitlines() if re.match(r"^\| [2-5] \|", line)
+    ]
+    assert measured_rows == expected_rows
+    assert (
+        f"Maximum serialized state bytes: "
+        f"`{artifact['bounded_state']['maximum_state_bytes']}`"
+    ) in report
+
+
+@pytest.mark.skipif(
+    not _VERIFY_REAL_GPU,
+    reason="set P5_VERIFY_GPU_ARTIFACTS=1 after the real GPU0 evaluation",
+)
+def test_real_persist4d_artifacts_are_portable_and_private() -> None:
+    artifact = _load_p5_artifact()
+    assert _P5_REPORT.is_file()
+    serialized = _P5_ARTIFACT.read_text(encoding="utf-8") + _P5_REPORT.read_text(
+        encoding="utf-8"
+    )
+    serialized.encode("ascii")
+
+    assert artifact["checkpoint"]["ref"].startswith("repo:")
+    assert not _UUID_PATTERN.search(serialized)
+    assert not re.search(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", serialized)
+    for private_marker in (
+        "/home/",
+        "/Users/",
+        "/mnt/",
+        "\\Users\\",
+        "CUDA_VISIBLE_DEVICES",
+        "CONCERTO_CHECKPOINT",
+    ):
+        assert private_marker not in serialized
