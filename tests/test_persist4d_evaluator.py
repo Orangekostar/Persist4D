@@ -6,14 +6,24 @@ import sys
 from dataclasses import fields
 from pathlib import Path
 
+import numpy as np
 import pytest
 import torch
 
+import scripts.evaluate_persist4d as evaluator
 from scripts.evaluate_persist4d import (
     METHOD_NAME,
     SequenceAccumulator,
+    _accumulate_shared_stage,
+    _begin_source_tree_contract,
     _compose_runtime_config,
+    _derive_conclusion,
+    _finalize_source_tree_contract,
+    _legacy_parity_result,
+    _render_markdown,
+    _summarize_method_metrics,
     identity_diagnostics,
+    local_identity_ids,
     main,
 )
 
@@ -141,6 +151,262 @@ def test_sequence_accumulator_clones_stored_masks() -> None:
     )
 
 
+def test_local_identity_baseline_uses_query_index_for_valid_observations() -> None:
+    valid = torch.tensor([True, False, True, True])
+
+    identities = local_identity_ids(valid, capacity=4)
+
+    assert torch.equal(identities, torch.tensor([0, -1, 2, 3]))
+    assert identities.device == valid.device
+
+
+@pytest.mark.parametrize(
+    ("valid", "capacity", "message"),
+    [
+        (torch.ones(2, 1, dtype=torch.bool), 2, "shape"),
+        (torch.ones(2), 2, "bool"),
+        (torch.ones(2, dtype=torch.bool), 3, "capacity"),
+        (torch.ones(2, dtype=torch.bool), True, "capacity"),
+    ],
+)
+def test_local_identity_baseline_rejects_invalid_contract(
+    valid: object,
+    capacity: object,
+    message: str,
+) -> None:
+    with pytest.raises(ValueError, match=message):
+        local_identity_ids(valid, capacity=capacity)
+
+
+def test_stage_comparison_reuses_masks_and_classes_with_local_baseline_ids() -> None:
+    persistent = SequenceAccumulator.empty(capacity=4, class_count=2)
+    baseline = SequenceAccumulator.empty(capacity=4, class_count=2)
+    masks = torch.tensor(
+        [
+            [True, False, False],
+            [False, True, False],
+            [False, False, True],
+            [True, True, False],
+        ]
+    )
+    class_prob = torch.tensor(
+        [[0.9, 0.1], [0.8, 0.2], [0.3, 0.7], [0.4, 0.6]]
+    )
+
+    baseline_ids = _accumulate_shared_stage(
+        persistent=persistent,
+        baseline=baseline,
+        masks=masks,
+        class_prob=class_prob,
+        persistent_slot_ids=torch.tensor([2, -1, 0, 1]),
+        valid_observations=torch.tensor([True, False, True, True]),
+    )
+
+    assert torch.equal(baseline_ids, torch.tensor([0, -1, 2, 3]))
+    assert set(persistent.stage_masks[0]) == {0, 1, 2}
+    assert set(baseline.stage_masks[0]) == {0, 2, 3}
+    torch.testing.assert_close(persistent.class_prob_sum[2], class_prob[0])
+    torch.testing.assert_close(baseline.class_prob_sum[0], class_prob[0])
+    torch.testing.assert_close(persistent.class_prob_sum[0], class_prob[2])
+    torch.testing.assert_close(baseline.class_prob_sum[2], class_prob[2])
+
+
+def test_method_metric_summary_is_shared_by_persistent_and_baseline() -> None:
+    class Metric:
+        def compute(self):
+            return {
+                "val_mean_t-AP": torch.tensor(0.25, dtype=torch.float64),
+                "val_mean_t-REC": torch.tensor(0.5, dtype=torch.float64),
+                "val_mean_stage1-AP": torch.tensor(0.2, dtype=torch.float64),
+                "val_mean_stage2-AP": torch.tensor(0.3, dtype=torch.float64),
+            }
+
+    identity = {
+        "matched_identity_observations": 4,
+        "identity_switches": 1,
+        "reactivation_events": 2,
+        "correct_reactivations": 1,
+    }
+
+    persistent = _summarize_method_metrics(
+        Metric(),
+        horizon=2,
+        identity_totals=identity,
+        rejected_births=3,
+    )
+    baseline = _summarize_method_metrics(
+        Metric(),
+        horizon=2,
+        identity_totals=identity,
+    )
+
+    expected = {
+        "t_mAP": 0.25,
+        "t_REC": 0.5,
+        "per_stage_AP": {"1": 0.2, "2": 0.3},
+        **identity,
+        "reactivation_accuracy": 0.5,
+    }
+    assert persistent == {**expected, "rejected_births": 3}
+    assert baseline == expected
+
+
+def _git(repo: Path, *arguments: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *arguments],
+        cwd=repo,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+
+
+def _temporary_git_repo(tmp_path: Path) -> Path:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git(repo, "init", "-q")
+    _git(repo, "config", "user.email", "tests@example.invalid")
+    _git(repo, "config", "user.name", "Persist4D Tests")
+    (repo / ".gitignore").write_text("data/\nthird_party/\n", encoding="utf-8")
+    (repo / "source.py").write_text("VALUE = 1\n", encoding="utf-8")
+    _git(repo, "add", ".gitignore", "source.py")
+    _git(repo, "commit", "-qm", "initial")
+    return repo
+
+
+@pytest.mark.parametrize("staged", [False, True], ids=["unstaged", "staged"])
+def test_source_tree_contract_rejects_tracked_source_changes(
+    tmp_path: Path,
+    staged: bool,
+) -> None:
+    repo = _temporary_git_repo(tmp_path)
+    (repo / "source.py").write_text("VALUE = 2\n", encoding="utf-8")
+    if staged:
+        _git(repo, "add", "source.py")
+
+    with pytest.raises(RuntimeError, match="tracked source"):
+        _begin_source_tree_contract(
+            repo_root=repo,
+            output_paths=(repo / "result.json", repo / "result.md"),
+        )
+
+
+def test_source_tree_contract_rejects_untracked_non_output(
+    tmp_path: Path,
+) -> None:
+    repo = _temporary_git_repo(tmp_path)
+    (repo / "notes.txt").write_text("not an artifact\n", encoding="utf-8")
+
+    with pytest.raises(RuntimeError, match="untracked"):
+        _begin_source_tree_contract(
+            repo_root=repo,
+            output_paths=(repo / "result.json", repo / "result.md"),
+        )
+
+
+def test_source_tree_contract_rejects_hidden_index_flags(tmp_path: Path) -> None:
+    repo = _temporary_git_repo(tmp_path)
+    _git(repo, "update-index", "--skip-worktree", "source.py")
+
+    with pytest.raises(RuntimeError, match="index flags"):
+        _begin_source_tree_contract(
+            repo_root=repo,
+            output_paths=(repo / "result.json", repo / "result.md"),
+        )
+
+
+def test_source_tree_contract_allows_only_exact_outputs_and_ignored_inputs(
+    tmp_path: Path,
+) -> None:
+    repo = _temporary_git_repo(tmp_path)
+    output = repo / "artifacts" / "P5" / "result.json"
+    markdown = repo / "artifacts" / "P5" / "result.md"
+    output.parent.mkdir(parents=True)
+    output.write_text("{}\n", encoding="utf-8")
+    markdown.write_text("report\n", encoding="utf-8")
+    (repo / "data").mkdir()
+    (repo / "data" / "dataset.bin").write_bytes(b"ignored")
+    (repo / "third_party").mkdir()
+    (repo / "third_party" / "dependency.py").write_text(
+        "ignored = True\n",
+        encoding="utf-8",
+    )
+
+    guard = _begin_source_tree_contract(
+        repo_root=repo,
+        output_paths=(output, markdown),
+    )
+    contract = _finalize_source_tree_contract(guard)
+
+    commit = _git(repo, "rev-parse", "HEAD").stdout.strip()
+    assert contract == {
+        "schema_version": 1,
+        "status": "pass",
+        "source_commit": commit,
+        "tracked_tree_clean": True,
+        "index_clean": True,
+        "allowed_untracked_outputs": [
+            "repo:artifacts/P5/result.json",
+            "repo:artifacts/P5/result.md",
+        ],
+        "only_declared_outputs_untracked": True,
+        "generation_head_unchanged": True,
+    }
+
+
+def test_source_tree_contract_rejects_head_change_during_generation(
+    tmp_path: Path,
+) -> None:
+    repo = _temporary_git_repo(tmp_path)
+    guard = _begin_source_tree_contract(
+        repo_root=repo,
+        output_paths=(repo / "result.json", repo / "result.md"),
+    )
+    (repo / "source.py").write_text("VALUE = 3\n", encoding="utf-8")
+    _git(repo, "add", "source.py")
+    _git(repo, "commit", "-qm", "change head")
+
+    with pytest.raises(RuntimeError, match="HEAD changed"):
+        _finalize_source_tree_contract(guard)
+
+
+def test_real_cli_path_publishes_only_declared_outputs_from_clean_head(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    repo = _temporary_git_repo(tmp_path)
+    output = repo / "artifacts" / "P5" / "result.json"
+    markdown = repo / "artifacts" / "P5" / "result.md"
+    commit = _git(repo, "rev-parse", "HEAD").stdout.strip()
+
+    def runner(_args):
+        artifact = _complete_artifact()
+        artifact["source_commit"] = commit
+        artifact["source_tree_contract"]["source_commit"] = commit
+        return artifact
+
+    monkeypatch.setattr(evaluator, "PROJECT_ROOT", repo)
+    monkeypatch.setattr(evaluator, "_validate_options", lambda _args: None)
+    monkeypatch.setattr(evaluator, "run_real_evaluation", runner)
+
+    return_code = main(
+        [
+            "--output",
+            str(output),
+            "--markdown",
+            str(markdown),
+        ]
+    )
+
+    artifact = json.loads(output.read_text(encoding="utf-8"))
+    assert return_code == 0
+    assert artifact["source_tree_contract"]["allowed_untracked_outputs"] == [
+        "repo:artifacts/P5/result.json",
+        "repo:artifacts/P5/result.md",
+    ]
+    assert markdown.read_text(encoding="utf-8") == _render_markdown(artifact)
+
+
 def test_sequence_accumulator_has_only_fixed_bookkeeping_fields() -> None:
     accumulator = SequenceAccumulator.empty(capacity=4, class_count=3)
 
@@ -223,43 +489,143 @@ def test_sequence_accumulator_empty_rejects_invalid_dimensions(
         SequenceAccumulator.empty(capacity=capacity, class_count=class_count)
 
 
+def _metric_block(
+    horizon: int,
+    *,
+    t_map: float,
+    t_rec: float,
+    per_stage_ap: float,
+    observations: int | None = None,
+    switches: int = 0,
+    reactivations: int = 0,
+    correct_reactivations: int = 0,
+) -> dict[str, object]:
+    accuracy = (
+        correct_reactivations / reactivations if reactivations else None
+    )
+    return {
+        "t_mAP": t_map,
+        "t_REC": t_rec,
+        "per_stage_AP": {
+            str(stage): per_stage_ap for stage in range(1, horizon + 1)
+        },
+        "matched_identity_observations": (
+            horizon if observations is None else observations
+        ),
+        "identity_switches": switches,
+        "reactivation_events": reactivations,
+        "correct_reactivations": correct_reactivations,
+        "reactivation_accuracy": accuracy,
+    }
+
+
+def _metric_delta(
+    persistent: dict[str, object],
+    baseline: dict[str, object],
+) -> dict[str, object]:
+    return {
+        "t_mAP": persistent["t_mAP"] - baseline["t_mAP"],
+        "t_REC": persistent["t_REC"] - baseline["t_REC"],
+        "per_stage_AP": {
+            stage: persistent["per_stage_AP"][stage]
+            - baseline["per_stage_AP"][stage]
+            for stage in persistent["per_stage_AP"]
+        },
+        "matched_identity_observations": (
+            persistent["matched_identity_observations"]
+            - baseline["matched_identity_observations"]
+        ),
+        "identity_switches": (
+            persistent["identity_switches"] - baseline["identity_switches"]
+        ),
+        "reactivation_events": (
+            persistent["reactivation_events"]
+            - baseline["reactivation_events"]
+        ),
+        "correct_reactivations": (
+            persistent["correct_reactivations"]
+            - baseline["correct_reactivations"]
+        ),
+        "reactivation_accuracy": (
+            persistent["reactivation_accuracy"]
+            - baseline["reactivation_accuracy"]
+            if persistent["reactivation_accuracy"] is not None
+            and baseline["reactivation_accuracy"] is not None
+            else None
+        ),
+    }
+
+
 def _horizon_result(horizon: int) -> dict[str, object]:
+    persistent = _metric_block(
+        horizon,
+        t_map=0.25,
+        t_rec=0.5,
+        per_stage_ap=0.25,
+    )
+    persistent["rejected_births"] = 0
+    baseline = _metric_block(
+        horizon,
+        t_map=0.2,
+        t_rec=0.5,
+        per_stage_ap=0.2,
+    )
     return {
         "T": horizon,
         "loaded_sequences": 1,
-        "t_mAP": 0.25,
-        "t_REC": 0.5,
-        "per_stage_AP": {
-            str(stage): 0.25 for stage in range(1, horizon + 1)
+        "persistent": persistent,
+        "internal_baseline": baseline,
+        "delta": _metric_delta(persistent, baseline),
+        "resources": {
+            "peak_allocated_cuda_bytes": 1024,
+            "mean_latency_ms": 2.0,
+            "throughput_sequences_per_second": 500.0,
+            "serialized_state_bytes": 256,
         },
-        "matched_identity_observations": horizon,
-        "identity_switches": 0,
-        "reactivation_events": 0,
-        "correct_reactivations": 0,
-        "reactivation_accuracy": None,
-        "rejected_births": 0,
-        "peak_allocated_cuda_bytes": 1024,
-        "mean_latency_ms": 2.0,
-        "throughput_sequences_per_second": 500.0,
-        "serialized_state_bytes": 256,
     }
 
 
 def _complete_artifact() -> dict[str, object]:
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": "pass",
         "method": METHOD_NAME,
         "source_commit": "a" * 40,
+        "source_tree_contract": {
+            "schema_version": 1,
+            "status": "pass",
+            "source_commit": "a" * 40,
+            "tracked_tree_clean": True,
+            "index_clean": True,
+            "allowed_untracked_outputs": [],
+            "only_declared_outputs_untracked": True,
+            "generation_head_unchanged": True,
+        },
         "checkpoint": {
             "ref": "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt",
             "sha256": "b" * 64,
         },
-        "settings": {"capacity": 100, "local_window": 2},
+        "settings": {
+            "capacity": 100,
+            "local_window": 2,
+            "internal_baseline_identity": "local_query_index",
+            "shared_rescene_outputs": True,
+        },
+        "legacy_parity": {
+            "verified_by": "in_evaluator_fixed_t2_sample_toggle",
+            "sample_count": 1,
+            "legacy_predictions_unchanged": True,
+            "query_feature_shape": [1, 100, 128],
+        },
         "horizons": [_horizon_result(value) for value in (2, 3, 4, 5)],
         "bounded_state": {
             "constant_shape": True,
             "maximum_state_bytes": 256,
+        },
+        "conclusion": {
+            "label": "P5_ASSOCIATION_DIAGNOSIS",
+            "reason": "bounded_execution_without_t4_t5_identity_improvement",
+            "identity_improvements": [],
         },
         "errors": [],
     }
@@ -275,6 +641,154 @@ def _run_mock_artifact(
         runner=lambda _args: artifact,
     )
     return return_code, json.loads(output.read_text(encoding="utf-8"))
+
+
+def test_legacy_parity_result_requires_exact_legacy_predictions() -> None:
+    disabled = {
+        "pred_logits": torch.tensor([[1.0, 2.0]]),
+        "nested": [torch.tensor([3]), {"value": "same"}],
+    }
+    enabled = {
+        "pred_logits": disabled["pred_logits"].clone(),
+        "nested": [torch.tensor([3]), {"value": "same"}],
+        "query_features": torch.ones(1, 4, 8),
+        "persistent_slot_ids": torch.arange(4).unsqueeze(0),
+        "persistent_association_scores": torch.ones(1, 4),
+        "persistent_rejected_births": torch.zeros(1, 4, dtype=torch.bool),
+    }
+
+    result = _legacy_parity_result(disabled, enabled, capacity=4)
+
+    assert result == {
+        "verified_by": "in_evaluator_fixed_t2_sample_toggle",
+        "sample_count": 1,
+        "legacy_predictions_unchanged": True,
+        "query_feature_shape": [1, 4, 8],
+    }
+
+
+def test_legacy_parity_result_rejects_changed_legacy_prediction() -> None:
+    disabled = {"pred_logits": torch.tensor([[1.0, 2.0]])}
+    enabled = {
+        "pred_logits": torch.tensor([[1.0, 3.0]]),
+        "query_features": torch.ones(1, 2, 4),
+        "persistent_slot_ids": torch.arange(2).unsqueeze(0),
+        "persistent_association_scores": torch.ones(1, 2),
+        "persistent_rejected_births": torch.zeros(1, 2, dtype=torch.bool),
+    }
+
+    with pytest.raises(RuntimeError, match="legacy prediction"):
+        _legacy_parity_result(disabled, enabled, capacity=2)
+
+
+def test_legacy_parity_handles_numpy_and_type_only_runtime_outputs() -> None:
+    class SparseOutput:
+        pass
+
+    disabled = {
+        "sampled_coords": np.array([[1.0, 2.0]], dtype=np.float32),
+        "backbone_features": SparseOutput(),
+    }
+    enabled = {
+        "sampled_coords": disabled["sampled_coords"].copy(),
+        "backbone_features": SparseOutput(),
+        "query_features": torch.ones(1, 2, 4),
+        "persistent_slot_ids": torch.arange(2).unsqueeze(0),
+        "persistent_association_scores": torch.ones(1, 2),
+        "persistent_rejected_births": torch.zeros(1, 2, dtype=torch.bool),
+    }
+
+    result = _legacy_parity_result(disabled, enabled, capacity=2)
+
+    assert result["legacy_predictions_unchanged"] is True
+
+
+@pytest.mark.parametrize(
+    ("metric", "expected_evidence"),
+    [
+        ("t_REC", "T4:t_REC"),
+        ("identity_switches", "T4:identity_switches"),
+        ("reactivation_accuracy", "T4:reactivation_accuracy"),
+    ],
+)
+def test_conclusion_pass_requires_derived_t4_or_t5_identity_improvement(
+    metric: str,
+    expected_evidence: str,
+) -> None:
+    artifact = _complete_artifact()
+    horizon = artifact["horizons"][2]
+    persistent = horizon["persistent"]
+    baseline = horizon["internal_baseline"]
+    if metric == "t_REC":
+        persistent["t_REC"] = 0.6
+    elif metric == "identity_switches":
+        baseline["identity_switches"] = 1
+    else:
+        persistent.update(
+            {
+                "identity_switches": 1,
+                "reactivation_events": 1,
+                "correct_reactivations": 1,
+                "reactivation_accuracy": 1.0,
+            }
+        )
+        baseline.update(
+            {
+                "identity_switches": 1,
+                "reactivation_events": 1,
+                "correct_reactivations": 0,
+                "reactivation_accuracy": 0.0,
+            }
+        )
+    horizon["delta"] = _metric_delta(persistent, baseline)
+
+    conclusion = _derive_conclusion(
+        artifact["horizons"],
+        artifact["bounded_state"],
+    )
+
+    assert conclusion == {
+        "label": "P5_MVP_PASS",
+        "reason": "bounded_execution_with_t4_t5_identity_improvement",
+        "identity_improvements": [expected_evidence],
+    }
+
+
+def test_conclusion_does_not_compare_switches_with_different_observations() -> None:
+    artifact = _complete_artifact()
+    horizon = artifact["horizons"][2]
+    horizon["persistent"]["matched_identity_observations"] = 3
+    horizon["internal_baseline"]["matched_identity_observations"] = 4
+    horizon["internal_baseline"]["identity_switches"] = 1
+    horizon["delta"] = _metric_delta(
+        horizon["persistent"],
+        horizon["internal_baseline"],
+    )
+
+    conclusion = _derive_conclusion(
+        artifact["horizons"],
+        artifact["bounded_state"],
+    )
+
+    assert conclusion["label"] == "P5_ASSOCIATION_DIAGNOSIS"
+    assert conclusion["identity_improvements"] == []
+
+
+def test_markdown_renderer_covers_evidence_contract() -> None:
+    report = _render_markdown(_complete_artifact())
+
+    assert "Checkpoint SHA-256: `" + "b" * 64 + "`" in report
+    assert "Legacy predictions unchanged: `true`" in report
+    assert "Internal baseline identity: `local_query_index`" in report
+    assert "| 2 | 1 | persistent |" in report
+    assert "| 2 | 1 | internal_baseline |" in report
+    assert "| 2 | delta (persistent - baseline) |" in report
+    assert "Peak CUDA bytes" in report
+    assert "Conclusion: `P5_ASSOCIATION_DIAGNOSIS`" in report
+    assert (
+        "Reason: `bounded_execution_without_t4_t5_identity_improvement`"
+        in report
+    )
 
 
 def test_importing_evaluator_does_not_import_real_runtime_dependencies() -> None:
@@ -302,6 +816,7 @@ def test_cli_requires_output_path() -> None:
 
 def test_cli_writes_complete_mock_result_atomically(tmp_path: Path) -> None:
     output = tmp_path / "nested" / "result.json"
+    markdown = tmp_path / "nested" / "result.md"
     seen = []
 
     def runner(args):
@@ -309,12 +824,18 @@ def test_cli_writes_complete_mock_result_atomically(tmp_path: Path) -> None:
         assert not output.exists()
         return _complete_artifact()
 
-    return_code = main(["--output", str(output)], runner=runner)
+    return_code = main(
+        ["--output", str(output), "--markdown", str(markdown)],
+        runner=runner,
+    )
 
     assert return_code == 0
     assert len(seen) == 1
     assert json.loads(output.read_text(encoding="utf-8")) == _complete_artifact()
-    assert list(output.parent.iterdir()) == [output]
+    assert markdown.read_text(encoding="utf-8") == _render_markdown(
+        _complete_artifact()
+    )
+    assert set(output.parent.iterdir()) == {output, markdown}
 
 
 def test_cli_rejects_existing_output_without_running_or_overwriting(
@@ -358,9 +879,14 @@ def test_cli_rejects_external_checkpoint_before_running(
     assert return_code != 0
     assert call_count == 0
     assert json.loads(report_text) == {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": "failed",
         "method": METHOD_NAME,
+        "conclusion": {
+            "label": "P5_STREAMING_BLOCKED",
+            "reason": "evaluation_failed",
+            "identity_improvements": [],
+        },
         "errors": [{"type": "ValueError", "code": "invalid_input"}],
     }
     assert str(checkpoint) not in report_text
@@ -401,9 +927,14 @@ def test_cli_writes_failed_artifact_when_runner_raises(tmp_path: Path) -> None:
 
     assert return_code != 0
     assert json.loads(output.read_text(encoding="utf-8")) == {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": "failed",
         "method": METHOD_NAME,
+        "conclusion": {
+            "label": "P5_STREAMING_BLOCKED",
+            "reason": "evaluation_failed",
+            "identity_improvements": [],
+        },
         "errors": [
             {
                 "type": "RuntimeError",
@@ -471,6 +1002,25 @@ def test_cli_writes_failed_artifact_for_malformed_horizons(
     assert report["errors"][0]["type"] == "ValueError"
 
 
+def test_cli_requires_q100_capacity_before_running(tmp_path: Path) -> None:
+    output = tmp_path / "result.json"
+    call_count = 0
+
+    def runner(_args):
+        nonlocal call_count
+        call_count += 1
+        return _complete_artifact()
+
+    return_code = main(
+        ["--output", str(output), "--capacity", "99"],
+        runner=runner,
+    )
+
+    assert return_code != 0
+    assert call_count == 0
+    assert json.loads(output.read_text(encoding="utf-8"))["status"] == "failed"
+
+
 @pytest.mark.parametrize(
     "reference",
     [
@@ -512,13 +1062,15 @@ def test_cli_rejects_nonformal_checkpoint_references(
         ("t_REC", float("inf")),
     ],
 )
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
 def test_cli_rejects_invalid_bounded_horizon_metrics(
     tmp_path: Path,
     field: str,
     invalid_value: float,
+    method: str,
 ) -> None:
     artifact = _complete_artifact()
-    artifact["horizons"][0][field] = invalid_value
+    artifact["horizons"][0][method][field] = invalid_value
 
     return_code, report = _run_mock_artifact(tmp_path, artifact)
 
@@ -528,12 +1080,14 @@ def test_cli_rejects_invalid_bounded_horizon_metrics(
 
 
 @pytest.mark.parametrize("invalid_value", [-0.01, 1.01, float("nan")])
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
 def test_cli_rejects_invalid_per_stage_ap(
     tmp_path: Path,
     invalid_value: float,
+    method: str,
 ) -> None:
     artifact = _complete_artifact()
-    artifact["horizons"][0]["per_stage_AP"]["1"] = invalid_value
+    artifact["horizons"][0][method]["per_stage_AP"]["1"] = invalid_value
 
     return_code, report = _run_mock_artifact(tmp_path, artifact)
 
@@ -542,23 +1096,30 @@ def test_cli_rejects_invalid_per_stage_ap(
 
 
 @pytest.mark.parametrize(
-    "field",
+    ("section", "field"),
     [
-        "matched_identity_observations",
-        "identity_switches",
-        "reactivation_events",
-        "correct_reactivations",
-        "rejected_births",
-        "peak_allocated_cuda_bytes",
-        "serialized_state_bytes",
+        (method, field)
+        for method in ("persistent", "internal_baseline")
+        for field in (
+            "matched_identity_observations",
+            "identity_switches",
+            "reactivation_events",
+            "correct_reactivations",
+        )
+    ]
+    + [
+        ("persistent", "rejected_births"),
+        ("resources", "peak_allocated_cuda_bytes"),
+        ("resources", "serialized_state_bytes"),
     ],
 )
 def test_cli_rejects_negative_horizon_counts(
     tmp_path: Path,
+    section: str,
     field: str,
 ) -> None:
     artifact = _complete_artifact()
-    artifact["horizons"][0][field] = -1
+    artifact["horizons"][0][section][field] = -1
 
     return_code, report = _run_mock_artifact(tmp_path, artifact)
 
@@ -567,12 +1128,14 @@ def test_cli_rejects_negative_horizon_counts(
 
 
 @pytest.mark.parametrize("invalid_value", [1.5, True])
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
 def test_cli_rejects_nonintegral_horizon_counts(
     tmp_path: Path,
     invalid_value: object,
+    method: str,
 ) -> None:
     artifact = _complete_artifact()
-    artifact["horizons"][0]["identity_switches"] = invalid_value
+    artifact["horizons"][0][method]["identity_switches"] = invalid_value
 
     return_code, report = _run_mock_artifact(tmp_path, artifact)
 
@@ -599,6 +1162,7 @@ def test_cli_rejects_nonintegral_horizon_counts(
         (3, 0, 2, 1, 0.4),
     ],
 )
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
 def test_cli_rejects_impossible_identity_statistics(
     tmp_path: Path,
     observations: int,
@@ -606,10 +1170,11 @@ def test_cli_rejects_impossible_identity_statistics(
     reactivations: int,
     correct_reactivations: int,
     accuracy: float | None,
+    method: str,
 ) -> None:
     artifact = _complete_artifact()
-    horizon = artifact["horizons"][0]
-    horizon.update(
+    metrics = artifact["horizons"][0][method]
+    metrics.update(
         {
             "matched_identity_observations": observations,
             "identity_switches": switches,
@@ -626,12 +1191,14 @@ def test_cli_rejects_impossible_identity_statistics(
 
 
 @pytest.mark.parametrize("invalid_accuracy", [-0.01, 1.01, float("nan")])
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
 def test_cli_rejects_invalid_reactivation_accuracy(
     tmp_path: Path,
     invalid_accuracy: float,
+    method: str,
 ) -> None:
     artifact = _complete_artifact()
-    artifact["horizons"][0].update(
+    artifact["horizons"][0][method].update(
         {
             "matched_identity_observations": 3,
             "identity_switches": 1,
@@ -664,7 +1231,10 @@ def test_cli_rejects_invalid_horizon_runtime_measurements(
     invalid_value: float,
 ) -> None:
     artifact = _complete_artifact()
-    artifact["horizons"][0][field] = invalid_value
+    if field == "loaded_sequences":
+        artifact["horizons"][0][field] = invalid_value
+    else:
+        artifact["horizons"][0]["resources"][field] = invalid_value
 
     return_code, report = _run_mock_artifact(tmp_path, artifact)
 
@@ -676,7 +1246,7 @@ def test_cli_rejects_inconsistent_latency_and_throughput(
     tmp_path: Path,
 ) -> None:
     artifact = _complete_artifact()
-    artifact["horizons"][0].update(
+    artifact["horizons"][0]["resources"].update(
         {
             "mean_latency_ms": 2.0,
             "throughput_sequences_per_second": 499.9,
@@ -693,7 +1263,7 @@ def test_cli_accepts_latency_and_throughput_within_rounding_tolerance(
     tmp_path: Path,
 ) -> None:
     artifact = _complete_artifact()
-    artifact["horizons"][0].update(
+    artifact["horizons"][0]["resources"].update(
         {
             "mean_latency_ms": 2.0,
             "throughput_sequences_per_second": 500.04,
@@ -710,7 +1280,8 @@ def test_cli_accepts_consistent_nonzero_reactivation_statistics(
     tmp_path: Path,
 ) -> None:
     artifact = _complete_artifact()
-    artifact["horizons"][0].update(
+    horizon = artifact["horizons"][0]
+    horizon["persistent"].update(
         {
             "matched_identity_observations": 3,
             "identity_switches": 1,
@@ -719,8 +1290,146 @@ def test_cli_accepts_consistent_nonzero_reactivation_statistics(
             "reactivation_accuracy": 0.5,
         }
     )
+    horizon["delta"] = _metric_delta(
+        horizon["persistent"],
+        horizon["internal_baseline"],
+    )
 
     return_code, report = _run_mock_artifact(tmp_path, artifact)
 
     assert return_code == 0
     assert report == artifact
+
+
+@pytest.mark.parametrize(
+    ("field", "invalid_value"),
+    [
+        ("tracked_tree_clean", False),
+        ("index_clean", False),
+        ("only_declared_outputs_untracked", False),
+        ("generation_head_unchanged", False),
+        ("allowed_untracked_outputs", ["repo:artifacts/other.json"]),
+        ("source_commit", "c" * 40),
+    ],
+)
+def test_cli_rejects_invalid_source_tree_contract(
+    tmp_path: Path,
+    field: str,
+    invalid_value: object,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["source_tree_contract"][field] = invalid_value
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize(
+    ("field", "invalid_value"),
+    [
+        ("verified_by", "external_test_claim"),
+        ("sample_count", 0),
+        ("legacy_predictions_unchanged", False),
+        ("query_feature_shape", [1, 99, 128]),
+    ],
+)
+def test_cli_rejects_invalid_legacy_parity(
+    tmp_path: Path,
+    field: str,
+    invalid_value: object,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["legacy_parity"][field] = invalid_value
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+def test_cli_rejects_baseline_that_does_not_share_rescene_outputs(
+    tmp_path: Path,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["settings"]["shared_rescene_outputs"] = False
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "t_mAP",
+        "t_REC",
+        "per_stage_AP",
+        "matched_identity_observations",
+        "identity_switches",
+        "reactivation_events",
+        "correct_reactivations",
+        "reactivation_accuracy",
+    ],
+)
+def test_cli_rejects_delta_not_derived_from_both_methods(
+    tmp_path: Path,
+    field: str,
+) -> None:
+    artifact = _complete_artifact()
+    delta = artifact["horizons"][0]["delta"]
+    if field == "per_stage_AP":
+        delta[field]["1"] += 0.01
+    elif field == "reactivation_accuracy":
+        delta[field] = 0.0
+    else:
+        delta[field] += 1
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+def test_cli_rejects_handwritten_conclusion_after_metric_change(
+    tmp_path: Path,
+) -> None:
+    artifact = _complete_artifact()
+    horizon = artifact["horizons"][2]
+    horizon["persistent"]["t_REC"] = 0.6
+    horizon["delta"] = _metric_delta(
+        horizon["persistent"],
+        horizon["internal_baseline"],
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+def test_cli_accepts_automatically_derived_t4_improvement(
+    tmp_path: Path,
+) -> None:
+    artifact = _complete_artifact()
+    horizon = artifact["horizons"][2]
+    horizon["persistent"]["t_REC"] = 0.6
+    horizon["delta"] = _metric_delta(
+        horizon["persistent"],
+        horizon["internal_baseline"],
+    )
+    artifact["conclusion"] = _derive_conclusion(
+        artifact["horizons"],
+        artifact["bounded_state"],
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code == 0
+    assert report["conclusion"] == {
+        "label": "P5_MVP_PASS",
+        "reason": "bounded_execution_with_t4_t5_identity_improvement",
+        "identity_improvements": ["T4:t_REC"],
+    }

@@ -35,15 +35,24 @@ _P5_ROOT_KEYS = {
     "status",
     "method",
     "source_commit",
+    "source_tree_contract",
     "checkpoint",
     "settings",
+    "legacy_parity",
     "horizons",
     "bounded_state",
+    "conclusion",
     "errors",
 }
 _P5_HORIZON_KEYS = {
     "T",
     "loaded_sequences",
+    "persistent",
+    "internal_baseline",
+    "delta",
+    "resources",
+}
+_P5_METRIC_KEYS = {
     "t_mAP",
     "t_REC",
     "per_stage_AP",
@@ -52,7 +61,11 @@ _P5_HORIZON_KEYS = {
     "reactivation_events",
     "correct_reactivations",
     "reactivation_accuracy",
+}
+_P5_PERSISTENT_METRIC_KEYS = _P5_METRIC_KEYS | {
     "rejected_births",
+}
+_P5_RESOURCE_KEYS = {
     "peak_allocated_cuda_bytes",
     "mean_latency_ms",
     "throughput_sequences_per_second",
@@ -716,15 +729,43 @@ def test_forward_step_uses_maximum_as_latest_local_stage() -> None:
 def test_real_persist4d_artifact_passes_bounded_gpu_gate() -> None:
     from scripts.evaluate_persist4d import (
         _build_parser,
+        _derive_conclusion,
         _validate_complete_artifact,
     )
 
     artifact = _load_p5_artifact()
     assert set(artifact) == _P5_ROOT_KEYS
-    assert artifact["schema_version"] == 1
+    assert artifact["schema_version"] == 2
     assert artifact["status"] == "pass"
     assert artifact["method"] == "persist4d_p5_single_memory"
     assert artifact["errors"] == []
+    assert artifact["settings"] == {
+        "capacity": 100,
+        "local_window": 2,
+        "internal_baseline_identity": "local_query_index",
+        "shared_rescene_outputs": True,
+    }
+
+    source_contract = artifact["source_tree_contract"]
+    assert source_contract == {
+        "schema_version": 1,
+        "status": "pass",
+        "source_commit": artifact["source_commit"],
+        "tracked_tree_clean": True,
+        "index_clean": True,
+        "allowed_untracked_outputs": [
+            "repo:artifacts/P5/persist4d_mvp_eval.json",
+            "repo:artifacts/P5/persist4d_mvp_eval.md",
+        ],
+        "only_declared_outputs_untracked": True,
+        "generation_head_unchanged": True,
+    }
+
+    parity = artifact["legacy_parity"]
+    assert parity["verified_by"] == "in_evaluator_fixed_t2_sample_toggle"
+    assert parity["sample_count"] == 1
+    assert parity["legacy_predictions_unchanged"] is True
+    assert parity["query_feature_shape"] == [1, 100, 128]
 
     checkpoint = _REPO_ROOT / "checkpoints" / "rescene4d_concerto_t2_repro.ckpt"
     assert checkpoint.is_file()
@@ -740,21 +781,34 @@ def test_real_persist4d_artifact_passes_bounded_gpu_gate() -> None:
     for horizon in horizons:
         assert set(horizon) == _P5_HORIZON_KEYS
         assert horizon["loaded_sequences"] > 0
-        assert set(horizon["per_stage_AP"]) == {
-            str(stage) for stage in range(1, horizon["T"] + 1)
-        }
-        for field in ("t_mAP", "t_REC", "mean_latency_ms"):
-            assert math.isfinite(horizon[field])
-        assert math.isfinite(horizon["throughput_sequences_per_second"])
-        assert horizon["mean_latency_ms"] > 0.0
-        assert horizon["throughput_sequences_per_second"] > 0.0
-        assert horizon["peak_allocated_cuda_bytes"] > 0
-        assert horizon["serialized_state_bytes"] > 0
-        state_sizes.append(horizon["serialized_state_bytes"])
+        assert set(horizon["persistent"]) == _P5_PERSISTENT_METRIC_KEYS
+        assert set(horizon["internal_baseline"]) == _P5_METRIC_KEYS
+        assert set(horizon["delta"]) == _P5_METRIC_KEYS
+        for method in ("persistent", "internal_baseline"):
+            metrics = horizon[method]
+            assert set(metrics["per_stage_AP"]) == {
+                str(stage) for stage in range(1, horizon["T"] + 1)
+            }
+            assert math.isfinite(metrics["t_mAP"])
+            assert math.isfinite(metrics["t_REC"])
+        resources = horizon["resources"]
+        assert set(resources) == _P5_RESOURCE_KEYS
+        assert math.isfinite(resources["mean_latency_ms"])
+        assert math.isfinite(resources["throughput_sequences_per_second"])
+        assert resources["mean_latency_ms"] > 0.0
+        assert resources["throughput_sequences_per_second"] > 0.0
+        assert resources["peak_allocated_cuda_bytes"] > 0
+        assert resources["serialized_state_bytes"] > 0
+        state_sizes.append(resources["serialized_state_bytes"])
 
     bounded = artifact["bounded_state"]
     assert bounded["constant_shape"] is True
     assert bounded["maximum_state_bytes"] == max(state_sizes)
+    assert artifact["conclusion"] == _derive_conclusion(horizons, bounded)
+    assert artifact["conclusion"]["label"] in {
+        "P5_MVP_PASS",
+        "P5_ASSOCIATION_DIAGNOSIS",
+    }
 
     args = _build_parser().parse_args(
         [
@@ -781,54 +835,22 @@ def test_real_persist4d_artifact_passes_bounded_gpu_gate() -> None:
     reason="set P5_VERIFY_GPU_ARTIFACTS=1 after the real GPU0 evaluation",
 )
 def test_real_persist4d_markdown_matches_json_measurements() -> None:
+    from scripts.evaluate_persist4d import _render_markdown
+
     artifact = _load_p5_artifact()
     assert _P5_REPORT.is_file()
     report = _P5_REPORT.read_text(encoding="utf-8")
+    assert report == _render_markdown(artifact)
     assert "Persist4D MVP" in report
     assert "not an official AP target" in report
-    assert "T=2 legacy predictions unchanged: `true`" in report
+    assert "Legacy predictions unchanged: `true`" in report
     assert "fixed-capacity state" in report
     assert "internal no-memory baseline" in report
-
-    conclusion_match = re.search(
-        r"^Conclusion: `([^`]+)`$",
-        report,
-        flags=re.MULTILINE,
+    assert (
+        f"Conclusion: `{artifact['conclusion']['label']}`"
+        in report
     )
-    assert conclusion_match is not None
-    conclusion = conclusion_match.group(1)
-    assert conclusion in {
-        "P5_MVP_PASS",
-        "P5_ASSOCIATION_DIAGNOSIS",
-        "P5_STREAMING_BLOCKED",
-    }
-    assert conclusion == "P5_ASSOCIATION_DIAGNOSIS"
-
-    expected_rows = []
-    for horizon in artifact["horizons"]:
-        per_stage = "; ".join(
-            f"{stage}={horizon['per_stage_AP'][str(stage)]:.6f}"
-            for stage in range(1, horizon["T"] + 1)
-        )
-        accuracy = horizon["reactivation_accuracy"]
-        rendered_accuracy = "n/a" if accuracy is None else f"{accuracy:.6f}"
-        expected_rows.append(
-            f"| {horizon['T']} | {horizon['loaded_sequences']} | "
-            f"{horizon['t_mAP']:.6f} | {horizon['t_REC']:.6f} | "
-            f"{per_stage} | {horizon['matched_identity_observations']} | "
-            f"{horizon['identity_switches']} | "
-            f"{horizon['reactivation_events']} | "
-            f"{horizon['correct_reactivations']} | {rendered_accuracy} | "
-            f"{horizon['rejected_births']} | "
-            f"{horizon['peak_allocated_cuda_bytes']} | "
-            f"{horizon['mean_latency_ms']:.6f} | "
-            f"{horizon['throughput_sequences_per_second']:.6f} | "
-            f"{horizon['serialized_state_bytes']} |"
-        )
-    measured_rows = [
-        line for line in report.splitlines() if re.match(r"^\| [2-5] \|", line)
-    ]
-    assert measured_rows == expected_rows
+    assert f"Reason: `{artifact['conclusion']['reason']}`" in report
     assert (
         f"Maximum serialized state bytes: "
         f"`{artifact['bounded_state']['maximum_state_bytes']}`"

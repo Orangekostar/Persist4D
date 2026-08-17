@@ -26,7 +26,7 @@ from torch import Tensor
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 METHOD_NAME = "persist4d_p5_single_memory"
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 DEFAULT_CHECKPOINT = PROJECT_ROOT / "checkpoints" / (
     "rescene4d_concerto_t2_repro.ckpt"
 )
@@ -43,10 +43,13 @@ _ROOT_KEYS = frozenset(
         "status",
         "method",
         "source_commit",
+        "source_tree_contract",
         "checkpoint",
         "settings",
+        "legacy_parity",
         "horizons",
         "bounded_state",
+        "conclusion",
         "errors",
     }
 )
@@ -54,6 +57,14 @@ _HORIZON_KEYS = frozenset(
     {
         "T",
         "loaded_sequences",
+        "persistent",
+        "internal_baseline",
+        "delta",
+        "resources",
+    }
+)
+_METRIC_KEYS = frozenset(
+    {
         "t_mAP",
         "t_REC",
         "per_stage_AP",
@@ -62,11 +73,50 @@ _HORIZON_KEYS = frozenset(
         "reactivation_events",
         "correct_reactivations",
         "reactivation_accuracy",
+    }
+)
+_PERSISTENT_METRIC_KEYS = frozenset(
+    {
+        *_METRIC_KEYS,
         "rejected_births",
+    }
+)
+_RESOURCE_KEYS = frozenset(
+    {
         "peak_allocated_cuda_bytes",
         "mean_latency_ms",
         "throughput_sequences_per_second",
         "serialized_state_bytes",
+    }
+)
+_SOURCE_TREE_KEYS = frozenset(
+    {
+        "schema_version",
+        "status",
+        "source_commit",
+        "tracked_tree_clean",
+        "index_clean",
+        "allowed_untracked_outputs",
+        "only_declared_outputs_untracked",
+        "generation_head_unchanged",
+    }
+)
+_LEGACY_PARITY_KEYS = frozenset(
+    {
+        "verified_by",
+        "sample_count",
+        "legacy_predictions_unchanged",
+        "query_feature_shape",
+    }
+)
+_CONCLUSION_KEYS = frozenset(
+    {"label", "reason", "identity_improvements"}
+)
+_PERSISTENT_OUTPUT_KEYS = frozenset(
+    {
+        "persistent_slot_ids",
+        "persistent_association_scores",
+        "persistent_rejected_births",
     }
 )
 
@@ -80,6 +130,26 @@ def _positive_integer(value: object, *, name: str) -> int:
     if normalized <= 0:
         raise ValueError(f"{name} must be a positive integer")
     return normalized
+
+
+def local_identity_ids(valid: Tensor, *, capacity: object) -> Tensor:
+    """Map valid observations to stage-local query identities."""
+
+    validated_capacity = _positive_integer(capacity, name="capacity")
+    if not isinstance(valid, Tensor):
+        raise ValueError("valid must be a tensor")  # noqa: TRY004
+    if valid.ndim != 1:
+        raise ValueError("valid must have shape [Q]")
+    if valid.dtype != torch.bool:
+        raise ValueError("valid must use bool dtype")
+    if valid.shape[0] != validated_capacity:
+        raise ValueError("valid query count must equal baseline capacity")
+    query_ids = torch.arange(
+        validated_capacity,
+        dtype=torch.long,
+        device=valid.device,
+    )
+    return torch.where(valid, query_ids, -torch.ones_like(query_ids))
 
 
 @dataclass(frozen=True)
@@ -233,6 +303,28 @@ class SequenceAccumulator:
         self.stage_masks.append(stage)
 
 
+def _accumulate_shared_stage(
+    *,
+    persistent: SequenceAccumulator,
+    baseline: SequenceAccumulator,
+    masks: Tensor | list[Tensor],
+    class_prob: Tensor,
+    persistent_slot_ids: Tensor,
+    valid_observations: Tensor,
+) -> Tensor:
+    if persistent.capacity != baseline.capacity:
+        raise ValueError("persistent and baseline capacities must match")
+    if persistent.class_prob_sum.shape != baseline.class_prob_sum.shape:
+        raise ValueError("persistent and baseline class dimensions must match")
+    baseline_ids = local_identity_ids(
+        valid_observations,
+        capacity=baseline.capacity,
+    )
+    persistent.add_stage(masks, class_prob, persistent_slot_ids)
+    baseline.add_stage(masks, class_prob, baseline_ids)
+    return baseline_ids
+
+
 def _validate_stage_masks(
     masks: Tensor | list[Tensor],
 ) -> tuple[list[Tensor], int, torch.device]:
@@ -347,6 +439,200 @@ def _identity_id(value: object, *, name: str) -> int:
     return normalized
 
 
+def _require_legacy_value_equal(
+    actual: object,
+    expected: object,
+    *,
+    path: str,
+) -> None:
+    if type(actual) is not type(expected):
+        raise RuntimeError(f"legacy prediction changed at {path}")
+    if isinstance(expected, Tensor):
+        if (
+            actual.shape != expected.shape
+            or actual.dtype != expected.dtype
+            or actual.device != expected.device
+            or not torch.equal(actual, expected)
+        ):
+            raise RuntimeError(f"legacy prediction changed at {path}")
+        return
+    if type(expected).__module__.startswith("numpy"):
+        import numpy as np
+
+        if isinstance(expected, np.ndarray) and not np.array_equal(
+            actual,
+            expected,
+        ):
+            raise RuntimeError(f"legacy prediction changed at {path}")
+        return
+    if isinstance(expected, Mapping):
+        if tuple(actual) != tuple(expected):
+            raise RuntimeError(f"legacy prediction changed at {path}")
+        for key in expected:
+            _require_legacy_value_equal(
+                actual[key],
+                expected[key],
+                path=f"{path}.{key}",
+            )
+        return
+    if isinstance(expected, Sequence) and not isinstance(
+        expected,
+        (str, bytes, bytearray),
+    ):
+        if len(actual) != len(expected):
+            raise RuntimeError(f"legacy prediction changed at {path}")
+        for index, (actual_item, expected_item) in enumerate(
+            zip(actual, expected, strict=True)
+        ):
+            _require_legacy_value_equal(
+                actual_item,
+                expected_item,
+                path=f"{path}[{index}]",
+            )
+        return
+    if expected is None or isinstance(expected, (str, bytes, int, float, bool)):
+        if actual == expected:
+            return
+        raise RuntimeError(f"legacy prediction changed at {path}")
+
+
+def _legacy_parity_result(
+    disabled_output: Mapping[str, object],
+    enabled_output: Mapping[str, object],
+    *,
+    capacity: object,
+) -> dict[str, object]:
+    validated_capacity = _positive_integer(capacity, name="capacity")
+    if not isinstance(disabled_output, Mapping) or not isinstance(
+        enabled_output, Mapping
+    ):
+        raise RuntimeError(  # noqa: TRY004 - a parity gate execution failure.
+            "legacy parity outputs must be mappings"
+        )
+    if _PERSISTENT_OUTPUT_KEYS.intersection(disabled_output):
+        raise RuntimeError("disabled legacy output contains persistent fields")
+    if not _PERSISTENT_OUTPUT_KEYS.issubset(enabled_output):
+        raise RuntimeError("enabled output is missing persistent fields")
+    enabled_base = {
+        key: value
+        for key, value in enabled_output.items()
+        if key not in _PERSISTENT_OUTPUT_KEYS
+    }
+    if set(enabled_base) != {*disabled_output, "query_features"}:
+        raise RuntimeError("legacy prediction keys changed")
+    for key, expected in disabled_output.items():
+        _require_legacy_value_equal(
+            enabled_base[key],
+            expected,
+            path=key,
+        )
+    query_features = enabled_base["query_features"]
+    if (
+        not isinstance(query_features, Tensor)
+        or query_features.ndim != 3
+        or query_features.shape[0] != 1
+        or query_features.shape[1] != validated_capacity
+        or query_features.shape[2] <= 0
+        or not query_features.is_floating_point()
+        or not torch.isfinite(query_features).all().item()
+    ):
+        raise RuntimeError("query feature export failed the parity contract")
+    return {
+        "verified_by": "in_evaluator_fixed_t2_sample_toggle",
+        "sample_count": 1,
+        "legacy_predictions_unchanged": True,
+        "query_feature_shape": list(query_features.shape),
+    }
+
+
+def _comparison_delta(
+    persistent: Mapping[str, object],
+    baseline: Mapping[str, object],
+) -> dict[str, object]:
+    persistent_stages = persistent["per_stage_AP"]
+    baseline_stages = baseline["per_stage_AP"]
+    return {
+        "t_mAP": float(persistent["t_mAP"]) - float(baseline["t_mAP"]),
+        "t_REC": float(persistent["t_REC"]) - float(baseline["t_REC"]),
+        "per_stage_AP": {
+            stage: float(persistent_stages[stage])
+            - float(baseline_stages[stage])
+            for stage in persistent_stages
+        },
+        "matched_identity_observations": int(
+            persistent["matched_identity_observations"]
+        )
+        - int(baseline["matched_identity_observations"]),
+        "identity_switches": int(persistent["identity_switches"])
+        - int(baseline["identity_switches"]),
+        "reactivation_events": int(persistent["reactivation_events"])
+        - int(baseline["reactivation_events"]),
+        "correct_reactivations": int(persistent["correct_reactivations"])
+        - int(baseline["correct_reactivations"]),
+        "reactivation_accuracy": (
+            float(persistent["reactivation_accuracy"])
+            - float(baseline["reactivation_accuracy"])
+            if persistent["reactivation_accuracy"] is not None
+            and baseline["reactivation_accuracy"] is not None
+            else None
+        ),
+    }
+
+
+def _derive_conclusion(
+    horizons: Sequence[Mapping[str, object]],
+    bounded_state: Mapping[str, object],
+) -> dict[str, object]:
+    improvements: list[str] = []
+    if bounded_state.get("constant_shape") is True:
+        for horizon in horizons:
+            stage_count = horizon.get("T")
+            if stage_count not in {4, 5}:
+                continue
+            persistent = horizon["persistent"]
+            baseline = horizon["internal_baseline"]
+            if float(persistent["t_REC"]) > float(baseline["t_REC"]):
+                improvements.append(f"T{stage_count}:t_REC")
+            same_observations = (
+                persistent["matched_identity_observations"]
+                == baseline["matched_identity_observations"]
+            )
+            if (
+                same_observations
+                and int(persistent["identity_switches"])
+                < int(baseline["identity_switches"])
+            ):
+                improvements.append(f"T{stage_count}:identity_switches")
+            persistent_accuracy = persistent["reactivation_accuracy"]
+            baseline_accuracy = baseline["reactivation_accuracy"]
+            if (
+                same_observations
+                and persistent["reactivation_events"]
+                == baseline["reactivation_events"]
+                and int(persistent["reactivation_events"]) > 0
+                and persistent_accuracy is not None
+                and baseline_accuracy is not None
+                and float(persistent_accuracy) > float(baseline_accuracy)
+            ):
+                improvements.append(f"T{stage_count}:reactivation_accuracy")
+    if improvements:
+        return {
+            "label": "P5_MVP_PASS",
+            "reason": "bounded_execution_with_t4_t5_identity_improvement",
+            "identity_improvements": improvements,
+        }
+    reason = (
+        "bounded_execution_without_t4_t5_identity_improvement"
+        if bounded_state.get("constant_shape") is True
+        else "bounded_execution_not_proven"
+    )
+    return {
+        "label": "P5_ASSOCIATION_DIAGNOSIS",
+        "reason": reason,
+        "identity_improvements": [],
+    }
+
+
 class _CliUsageError(ValueError):
     pass
 
@@ -391,6 +677,11 @@ def _failure_artifact(error: BaseException) -> dict[str, object]:
         "schema_version": SCHEMA_VERSION,
         "status": "failed",
         "method": METHOD_NAME,
+        "conclusion": {
+            "label": "P5_STREAMING_BLOCKED",
+            "reason": "evaluation_failed",
+            "identity_improvements": [],
+        },
         "errors": [
             {
                 "type": type(error).__name__,
@@ -480,7 +771,8 @@ def _write_failure_if_possible(output: Path, error: BaseException) -> None:
 def _validate_options(args: argparse.Namespace) -> None:
     if tuple(args.horizons) != DEFAULT_HORIZONS:
         raise ValueError("horizons must be exactly 2 3 4 5 for a complete run")
-    _positive_integer(args.capacity, name="capacity")
+    if _positive_integer(args.capacity, name="capacity") != 100:
+        raise ValueError("capacity must equal the fixed Q=100 query count")
     if args.markdown is not None and args.markdown.resolve() == args.output.resolve():
         raise ValueError("JSON and Markdown output paths must be distinct")
     if args.markdown is not None and args.markdown.exists():
@@ -519,6 +811,12 @@ def _require_integer(
     if normalized < minimum:
         raise ValueError(f"{name} must be at least {minimum}")
     return normalized
+
+
+def _require_signed_integer(value: object, *, name: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, Integral):
+        raise ValueError(f"{name} must be an integer")  # noqa: TRY004
+    return int(value)
 
 
 def _require_finite_number(value: object, *, name: str) -> float:
@@ -563,6 +861,175 @@ def _require_formal_checkpoint_reference(value: object) -> str:
     return value
 
 
+def _validate_source_tree_contract(
+    value: object,
+    *,
+    source_commit: str,
+    args: argparse.Namespace,
+) -> None:
+    contract = _require_exact_keys(
+        value,
+        _SOURCE_TREE_KEYS,
+        name="source_tree_contract",
+    )
+    if contract["schema_version"] != 1 or contract["status"] != "pass":
+        raise ValueError("source_tree_contract must be passing schema 1")
+    if contract["source_commit"] != source_commit:
+        raise ValueError("source_tree_contract source_commit mismatch")
+    for field in (
+        "tracked_tree_clean",
+        "index_clean",
+        "only_declared_outputs_untracked",
+        "generation_head_unchanged",
+    ):
+        if contract[field] is not True:
+            raise ValueError(f"source_tree_contract.{field} must be true")
+    allowed = contract["allowed_untracked_outputs"]
+    if not isinstance(allowed, list) or any(
+        not isinstance(path, str) for path in allowed
+    ):
+        raise ValueError(
+            "source_tree_contract.allowed_untracked_outputs must be a list"
+        )
+    output_paths = [args.output]
+    if args.markdown is not None:
+        output_paths.append(args.markdown)
+    expected = [
+        f"repo:{path}"
+        for path in _repository_output_paths(PROJECT_ROOT, output_paths)
+    ]
+    if allowed != expected:
+        raise ValueError(
+            "source_tree_contract allowed outputs do not match the CLI"
+        )
+
+
+def _validate_legacy_parity(value: object, *, capacity: int) -> None:
+    parity = _require_exact_keys(
+        value,
+        _LEGACY_PARITY_KEYS,
+        name="legacy_parity",
+    )
+    if parity["verified_by"] != "in_evaluator_fixed_t2_sample_toggle":
+        raise ValueError("legacy_parity verification method is invalid")
+    if parity["sample_count"] != 1:
+        raise ValueError("legacy_parity must verify exactly one sample")
+    if parity["legacy_predictions_unchanged"] is not True:
+        raise ValueError("legacy_parity must preserve every legacy prediction")
+    shape = parity["query_feature_shape"]
+    if not isinstance(shape, list) or len(shape) != 3:
+        raise ValueError("legacy_parity query_feature_shape is invalid")
+    dimensions = [
+        _require_integer(item, name="query_feature_shape", minimum=1)
+        for item in shape
+    ]
+    if dimensions[0] != 1 or dimensions[1] != capacity:
+        raise ValueError("legacy_parity query_feature_shape is invalid")
+
+
+def _validate_metric_block(
+    value: object,
+    *,
+    horizon: int,
+    name: str,
+    persistent: bool,
+) -> Mapping[str, object]:
+    expected_keys = _PERSISTENT_METRIC_KEYS if persistent else _METRIC_KEYS
+    metrics = _require_exact_keys(value, expected_keys, name=name)
+    _require_unit_interval(metrics["t_mAP"], name=f"{name}.t_mAP")
+    _require_unit_interval(metrics["t_REC"], name=f"{name}.t_REC")
+    per_stage = metrics["per_stage_AP"]
+    expected_stages = {str(stage) for stage in range(1, horizon + 1)}
+    if not isinstance(per_stage, Mapping) or set(per_stage) != expected_stages:
+        raise ValueError(f"{name}.per_stage_AP must contain every stage")
+    for stage, stage_value in per_stage.items():
+        _require_unit_interval(
+            stage_value,
+            name=f"{name}.per_stage_AP.{stage}",
+        )
+    observations = _require_integer(
+        metrics["matched_identity_observations"],
+        name=f"{name}.matched_identity_observations",
+    )
+    switches = _require_integer(
+        metrics["identity_switches"],
+        name=f"{name}.identity_switches",
+    )
+    reactivations = _require_integer(
+        metrics["reactivation_events"],
+        name=f"{name}.reactivation_events",
+    )
+    correct_reactivations = _require_integer(
+        metrics["correct_reactivations"],
+        name=f"{name}.correct_reactivations",
+    )
+    if persistent:
+        _require_integer(
+            metrics["rejected_births"],
+            name=f"{name}.rejected_births",
+        )
+    if switches > max(observations - 1, 0):
+        raise ValueError(f"{name}.identity_switches are impossible")
+    if reactivations > max(observations - 1, 0):
+        raise ValueError(f"{name}.reactivation_events are impossible")
+    if correct_reactivations > reactivations:
+        raise ValueError(f"{name}.correct_reactivations are impossible")
+    if reactivations - correct_reactivations > switches:
+        raise ValueError(f"{name}.incorrect reactivations exceed switches")
+    accuracy = metrics["reactivation_accuracy"]
+    if reactivations == 0:
+        if accuracy is not None:
+            raise ValueError(
+                f"{name}.reactivation_accuracy must be null without events"
+            )
+    else:
+        if accuracy is None:
+            raise ValueError(
+                f"{name}.reactivation_accuracy is required with events"
+            )
+        normalized_accuracy = _require_unit_interval(
+            accuracy,
+            name=f"{name}.reactivation_accuracy",
+        )
+        if normalized_accuracy != correct_reactivations / reactivations:
+            raise ValueError(
+                f"{name}.reactivation_accuracy does not match counts"
+            )
+    return metrics
+
+
+def _validate_delta(
+    value: object,
+    *,
+    horizon: int,
+    persistent: Mapping[str, object],
+    baseline: Mapping[str, object],
+) -> None:
+    delta = _require_exact_keys(value, _METRIC_KEYS, name="delta")
+    _require_finite_number(delta["t_mAP"], name="delta.t_mAP")
+    _require_finite_number(delta["t_REC"], name="delta.t_REC")
+    per_stage = delta["per_stage_AP"]
+    expected_stages = {str(stage) for stage in range(1, horizon + 1)}
+    if not isinstance(per_stage, Mapping) or set(per_stage) != expected_stages:
+        raise ValueError("delta.per_stage_AP must contain every stage")
+    for stage, stage_value in per_stage.items():
+        _require_finite_number(stage_value, name=f"delta.per_stage_AP.{stage}")
+    for field in (
+        "matched_identity_observations",
+        "identity_switches",
+        "reactivation_events",
+        "correct_reactivations",
+    ):
+        _require_signed_integer(delta[field], name=f"delta.{field}")
+    if delta["reactivation_accuracy"] is not None:
+        _require_finite_number(
+            delta["reactivation_accuracy"],
+            name="delta.reactivation_accuracy",
+        )
+    if dict(delta) != _comparison_delta(persistent, baseline):
+        raise ValueError("delta must equal persistent minus internal_baseline")
+
+
 def _validate_complete_artifact(
     artifact: object,
     *,
@@ -577,7 +1044,7 @@ def _validate_complete_artifact(
         )
         != SCHEMA_VERSION
     ):
-        raise ValueError("artifact schema_version must be 1")
+        raise ValueError("artifact schema_version must be 2")
     if root["status"] != "pass":
         raise ValueError("completed evaluation must have status=pass")
     if root["method"] != METHOD_NAME:
@@ -592,6 +1059,11 @@ def _validate_complete_artifact(
         or any(character not in "0123456789abcdef" for character in source_commit)
     ):
         raise ValueError("source_commit must be a lowercase 40-character Git hash")
+    _validate_source_tree_contract(
+        root["source_tree_contract"],
+        source_commit=source_commit,
+        args=args,
+    )
 
     checkpoint = _require_exact_keys(
         root["checkpoint"],
@@ -609,7 +1081,14 @@ def _validate_complete_artifact(
 
     settings = _require_exact_keys(
         root["settings"],
-        frozenset({"capacity", "local_window"}),
+        frozenset(
+            {
+                "capacity",
+                "local_window",
+                "internal_baseline_identity",
+                "shared_rescene_outputs",
+            }
+        ),
         name="settings",
     )
     capacity = _require_integer(
@@ -624,6 +1103,11 @@ def _validate_complete_artifact(
     )
     if capacity != args.capacity or local_window != LOCAL_WINDOW:
         raise ValueError("artifact settings do not match the requested evaluation")
+    if settings["internal_baseline_identity"] != "local_query_index":
+        raise ValueError("artifact internal baseline identity is invalid")
+    if settings["shared_rescene_outputs"] is not True:
+        raise ValueError("baseline must reuse the persistent ReScene outputs")
+    _validate_legacy_parity(root["legacy_parity"], capacity=capacity)
 
     horizons = root["horizons"]
     if not isinstance(horizons, list):
@@ -645,82 +1129,45 @@ def _validate_complete_artifact(
             name="loaded_sequences",
             minimum=1,
         )
-        _require_unit_interval(horizon["t_mAP"], name="t_mAP")
-        _require_unit_interval(horizon["t_REC"], name="t_REC")
-        per_stage = horizon["per_stage_AP"]
-        if not isinstance(per_stage, Mapping) or set(per_stage) != {
-            str(stage) for stage in range(1, expected_horizon + 1)
-        }:
-            raise ValueError("per_stage_AP must contain every stage")
-        for value in per_stage.values():
-            _require_unit_interval(value, name="per_stage_AP")
-        observations = _require_integer(
-            horizon["matched_identity_observations"],
-            name="matched_identity_observations",
+        persistent = _validate_metric_block(
+            horizon["persistent"],
+            horizon=expected_horizon,
+            name="persistent",
+            persistent=True,
         )
-        switches = _require_integer(
-            horizon["identity_switches"],
-            name="identity_switches",
+        baseline = _validate_metric_block(
+            horizon["internal_baseline"],
+            horizon=expected_horizon,
+            name="internal_baseline",
+            persistent=False,
         )
-        reactivations = _require_integer(
-            horizon["reactivation_events"],
-            name="reactivation_events",
+        _validate_delta(
+            horizon["delta"],
+            horizon=expected_horizon,
+            persistent=persistent,
+            baseline=baseline,
         )
-        correct_reactivations = _require_integer(
-            horizon["correct_reactivations"],
-            name="correct_reactivations",
+        resources = _require_exact_keys(
+            horizon["resources"],
+            _RESOURCE_KEYS,
+            name="resources",
         )
-        _require_integer(horizon["rejected_births"], name="rejected_births")
         _require_integer(
-            horizon["peak_allocated_cuda_bytes"],
-            name="peak_allocated_cuda_bytes",
+            resources["peak_allocated_cuda_bytes"],
+            name="resources.peak_allocated_cuda_bytes",
         )
         serialized_state_bytes = _require_integer(
-            horizon["serialized_state_bytes"],
-            name="serialized_state_bytes",
+            resources["serialized_state_bytes"],
+            name="resources.serialized_state_bytes",
             minimum=1,
         )
-        if switches > max(observations - 1, 0):
-            raise ValueError(
-                "identity_switches exceed possible observation transitions"
-            )
-        if reactivations > max(observations - 1, 0):
-            raise ValueError("reactivation_events exceed possible observations")
-        if correct_reactivations > reactivations:
-            raise ValueError(
-                "correct_reactivations cannot exceed reactivation_events"
-            )
-        if reactivations - correct_reactivations > switches:
-            raise ValueError(
-                "incorrect reactivations cannot exceed identity_switches"
-            )
-        accuracy = horizon["reactivation_accuracy"]
-        if reactivations == 0:
-            if accuracy is not None:
-                raise ValueError(
-                    "reactivation_accuracy must be null without reactivations"
-                )
-        else:
-            if accuracy is None:
-                raise ValueError(
-                    "reactivation_accuracy is required for reactivations"
-                )
-            normalized_accuracy = _require_unit_interval(
-                accuracy,
-                name="reactivation_accuracy",
-            )
-            expected_accuracy = correct_reactivations / reactivations
-            if normalized_accuracy != expected_accuracy:
-                raise ValueError(
-                    "reactivation_accuracy does not match identity counts"
-                )
         mean_latency_ms = _require_finite_number(
-            horizon["mean_latency_ms"],
-            name="mean_latency_ms",
+            resources["mean_latency_ms"],
+            name="resources.mean_latency_ms",
         )
         throughput = _require_finite_number(
-            horizon["throughput_sequences_per_second"],
-            name="throughput_sequences_per_second",
+            resources["throughput_sequences_per_second"],
+            name="resources.throughput_sequences_per_second",
         )
         if mean_latency_ms <= 0.0:
             raise ValueError("mean_latency_ms must be positive")
@@ -752,38 +1199,159 @@ def _validate_complete_artifact(
     )
     if maximum_state_bytes != max(serialized_sizes):
         raise ValueError("maximum_state_bytes does not match horizon measurements")
+    conclusion = _require_exact_keys(
+        root["conclusion"],
+        _CONCLUSION_KEYS,
+        name="conclusion",
+    )
+    if dict(conclusion) != _derive_conclusion(horizons, bounded):
+        raise ValueError("conclusion must be derived from measured evidence")
 
 
 def _render_markdown(artifact: Mapping[str, object]) -> str:
+    conclusion = artifact["conclusion"]
+    checkpoint = artifact["checkpoint"]
+    source_contract = artifact["source_tree_contract"]
+    parity = artifact["legacy_parity"]
+    settings = artifact["settings"]
+    improvements = conclusion["identity_improvements"]
+    rendered_improvements = ", ".join(improvements) if improvements else "none"
+    allowed_outputs = source_contract["allowed_untracked_outputs"]
+    rendered_outputs = ", ".join(allowed_outputs) if allowed_outputs else "none"
     lines = [
-        "# Persist4D P5 Evaluation",
+        "# Persist4D P5 MVP Evaluation",
+        "",
+        (
+            "Purpose: fixed-capacity streaming association diagnosis; metrics "
+            "are not an official AP target."
+        ),
         "",
         f"Status: `{artifact['status']}`",
         "",
+        f"Conclusion: `{conclusion['label']}`",
+        "",
+        f"Reason: `{conclusion['reason']}`",
+        "",
+        f"Identity improvements: `{rendered_improvements}`",
+        "",
+        f"Source commit: `{artifact['source_commit']}`",
+        "",
+        f"Source tree contract: `{source_contract['status']}`",
+        "",
+        f"Allowed untracked outputs: `{rendered_outputs}`",
+        "",
+        f"Checkpoint reference: `{checkpoint['ref']}`",
+        "",
+        f"Checkpoint SHA-256: `{checkpoint['sha256']}`",
+        "",
+        f"Legacy predictions unchanged: `{str(parity['legacy_predictions_unchanged']).lower()}`",
+        "",
+        f"Legacy parity verification: `{parity['verified_by']}`",
+        "",
+        f"Query feature shape: `{parity['query_feature_shape']}`",
+        "",
+        f"Internal baseline identity: `{settings['internal_baseline_identity']}`",
+        "",
         (
-            "| T | Sequences | t-mAP | t-REC | ID switches | Reactivation | "
-            "Peak CUDA bytes | Mean latency (ms) | Throughput (seq/s) | "
-            "State bytes |"
+            "The internal no-memory baseline reuses each persistent run's same "
+            "latest-stage valid ReScene observations, masks, and classifications; "
+            "only the cross-stage identity is the local query index."
         ),
-        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "",
+        "## Persistent And Baseline Metrics",
+        "",
+        (
+            "| T | Sequences | Method | t-mAP | t-REC | Per-stage AP | "
+            "Matched ID obs | ID switches | Reactivation events | "
+            "Correct reactivations | Reactivation accuracy | Rejected births |"
+        ),
+        "|---:|---:|:---|---:|---:|:---|---:|---:|---:|---:|---:|---:|",
     ]
     for horizon in artifact["horizons"]:
-        accuracy = horizon["reactivation_accuracy"]
-        rendered_accuracy = "n/a" if accuracy is None else f"{accuracy:.6f}"
+        for method in ("persistent", "internal_baseline"):
+            metrics = horizon[method]
+            per_stage = "; ".join(
+                f"{stage}={metrics['per_stage_AP'][str(stage)]:.6f}"
+                for stage in range(1, horizon["T"] + 1)
+            )
+            accuracy = metrics["reactivation_accuracy"]
+            rendered_accuracy = (
+                "n/a" if accuracy is None else f"{accuracy:.6f}"
+            )
+            rejected_births = (
+                str(metrics["rejected_births"])
+                if method == "persistent"
+                else "n/a"
+            )
+            lines.append(
+                f"| {horizon['T']} | {horizon['loaded_sequences']} | {method} | "
+                f"{metrics['t_mAP']:.6f} | {metrics['t_REC']:.6f} | "
+                f"{per_stage} | {metrics['matched_identity_observations']} | "
+                f"{metrics['identity_switches']} | "
+                f"{metrics['reactivation_events']} | "
+                f"{metrics['correct_reactivations']} | {rendered_accuracy} | "
+                f"{rejected_births} |"
+            )
+    lines.extend(
+        [
+            "",
+            "## Differences",
+            "",
+            (
+                "| T | Comparison | Delta t-mAP | Delta t-REC | "
+                "Delta per-stage AP | Delta matched obs | Delta switches | "
+                "Delta reactivation events | Delta correct reactivations | "
+                "Delta reactivation accuracy |"
+            ),
+            "|---:|:---|---:|---:|:---|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for horizon in artifact["horizons"]:
+        delta = horizon["delta"]
+        per_stage = "; ".join(
+            f"{stage}={delta['per_stage_AP'][str(stage)]:+.6f}"
+            for stage in range(1, horizon["T"] + 1)
+        )
+        accuracy = delta["reactivation_accuracy"]
+        rendered_accuracy = "n/a" if accuracy is None else f"{accuracy:+.6f}"
         lines.append(
-            f"| {horizon['T']} | {horizon['loaded_sequences']} | "
-            f"{horizon['t_mAP']:.6f} | {horizon['t_REC']:.6f} | "
-            f"{horizon['identity_switches']} | {rendered_accuracy} | "
-            f"{horizon['peak_allocated_cuda_bytes']} | "
-            f"{horizon['mean_latency_ms']:.6f} | "
-            f"{horizon['throughput_sequences_per_second']:.6f} | "
-            f"{horizon['serialized_state_bytes']} |"
+            f"| {horizon['T']} | delta (persistent - baseline) | "
+            f"{delta['t_mAP']:+.6f} | {delta['t_REC']:+.6f} | {per_stage} | "
+            f"{delta['matched_identity_observations']:+d} | "
+            f"{delta['identity_switches']:+d} | "
+            f"{delta['reactivation_events']:+d} | "
+            f"{delta['correct_reactivations']:+d} | {rendered_accuracy} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Resources And State",
+            "",
+            (
+                "| T | Peak CUDA bytes | Mean latency (ms) | "
+                "Throughput (seq/s) | State bytes |"
+            ),
+            "|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for horizon in artifact["horizons"]:
+        resources = horizon["resources"]
+        lines.append(
+            f"| {horizon['T']} | {resources['peak_allocated_cuda_bytes']} | "
+            f"{resources['mean_latency_ms']:.6f} | "
+            f"{resources['throughput_sequences_per_second']:.6f} | "
+            f"{resources['serialized_state_bytes']} |"
         )
     bounded = artifact["bounded_state"]
     lines.extend(
         [
             "",
-            f"Constant state shape: `{bounded['constant_shape']}`",
+            (
+                "The fixed-capacity state remained constant in shape across "
+                "T=2/3/4/5."
+            ),
+            "",
+            f"Constant state shape: `{str(bounded['constant_shape']).lower()}`",
             "",
             f"Maximum serialized state bytes: `{bounded['maximum_state_bytes']}`",
             "",
@@ -814,6 +1382,145 @@ def git_commit(repo_root: Path = PROJECT_ROOT) -> str:
     ):
         raise RuntimeError("git rev-parse returned an invalid source commit")
     return commit
+
+
+@dataclass(frozen=True)
+class _SourceTreeGuard:
+    repo_root: Path
+    source_commit: str
+    allowed_untracked_paths: tuple[str, ...]
+
+
+def _git_paths(repo_root: Path, *arguments: str) -> tuple[str, ...]:
+    completed = subprocess.run(
+        ["git", *arguments],
+        cwd=repo_root,
+        capture_output=True,
+        check=True,
+    )
+    return tuple(
+        os.fsdecode(item)
+        for item in completed.stdout.split(b"\0")
+        if item
+    )
+
+
+def _repository_output_paths(
+    repo_root: Path,
+    output_paths: Iterable[Path],
+) -> tuple[str, ...]:
+    repository = repo_root.resolve()
+    relative_paths: set[str] = set()
+    for output_path in output_paths:
+        candidate = Path(output_path)
+        if not candidate.is_absolute():
+            candidate = Path.cwd() / candidate
+        try:
+            relative = candidate.resolve().relative_to(repository)
+        except ValueError:
+            continue
+        if relative == Path("."):
+            raise ValueError("an output path cannot be the repository root")
+        relative_paths.add(relative.as_posix())
+    return tuple(sorted(relative_paths))
+
+
+def _git_index_flag_paths(repo_root: Path) -> tuple[str, ...]:
+    completed = subprocess.run(
+        ["git", "ls-files", "-v", "-z"],
+        cwd=repo_root,
+        capture_output=True,
+        check=True,
+    )
+    flagged: list[str] = []
+    for raw_record in completed.stdout.split(b"\0"):
+        if not raw_record:
+            continue
+        record = os.fsdecode(raw_record)
+        if len(record) < 3 or record[1] != " ":
+            raise RuntimeError("git ls-files returned an invalid index record")
+        tag = record[0]
+        if tag == "S" or tag.islower():
+            flagged.append(record[2:])
+    return tuple(sorted(set(flagged)))
+
+
+def _require_clean_source_snapshot(guard: _SourceTreeGuard) -> None:
+    if git_commit(guard.repo_root) != guard.source_commit:
+        raise RuntimeError("Git HEAD changed during evaluation")
+    staged = _git_paths(
+        guard.repo_root,
+        "diff",
+        "--cached",
+        "--name-only",
+        "-z",
+        "--no-ext-diff",
+    )
+    unstaged = _git_paths(
+        guard.repo_root,
+        "diff",
+        "--name-only",
+        "-z",
+        "--no-ext-diff",
+    )
+    if staged or unstaged:
+        raise RuntimeError("tracked source changes are forbidden")
+    if _git_index_flag_paths(guard.repo_root):
+        raise RuntimeError("hidden Git index flags are forbidden")
+    untracked = set(
+        _git_paths(
+            guard.repo_root,
+            "ls-files",
+            "--others",
+            "--exclude-standard",
+            "-z",
+        )
+    )
+    disallowed = untracked.difference(guard.allowed_untracked_paths)
+    if disallowed:
+        raise RuntimeError("untracked files outside declared outputs are forbidden")
+
+
+def _begin_source_tree_contract(
+    *,
+    repo_root: Path,
+    output_paths: Iterable[Path],
+) -> _SourceTreeGuard:
+    repository = repo_root.resolve()
+    guard = _SourceTreeGuard(
+        repo_root=repository,
+        source_commit=git_commit(repository),
+        allowed_untracked_paths=_repository_output_paths(
+            repository,
+            output_paths,
+        ),
+    )
+    _require_clean_source_snapshot(guard)
+    return guard
+
+
+def _source_tree_contract_payload(
+    guard: _SourceTreeGuard,
+) -> dict[str, object]:
+    return {
+        "schema_version": 1,
+        "status": "pass",
+        "source_commit": guard.source_commit,
+        "tracked_tree_clean": True,
+        "index_clean": True,
+        "allowed_untracked_outputs": [
+            f"repo:{path}" for path in guard.allowed_untracked_paths
+        ],
+        "only_declared_outputs_untracked": True,
+        "generation_head_unchanged": True,
+    }
+
+
+def _finalize_source_tree_contract(
+    guard: _SourceTreeGuard,
+) -> dict[str, object]:
+    _require_clean_source_snapshot(guard)
+    return _source_tree_contract_payload(guard)
 
 
 def _compose_runtime_config() -> tuple[Any, Any]:
@@ -1183,6 +1890,157 @@ def _instantiate_metric(dataset: Any, horizon: int) -> Any:
     )
 
 
+def _summarize_method_metrics(
+    metric: Any,
+    *,
+    horizon: int,
+    identity_totals: Mapping[str, int],
+    rejected_births: int | None = None,
+) -> dict[str, object]:
+    computed = metric.compute()
+    reactivation_events = int(identity_totals["reactivation_events"])
+    correct_reactivations = int(identity_totals["correct_reactivations"])
+    result: dict[str, object] = {
+        "t_mAP": _metric_value(computed, "val_mean_t-AP"),
+        "t_REC": _metric_value(computed, "val_mean_t-REC"),
+        "per_stage_AP": {
+            str(stage): _metric_value(
+                computed,
+                f"val_mean_stage{stage}-AP",
+            )
+            for stage in range(1, horizon + 1)
+        },
+        **{key: int(value) for key, value in identity_totals.items()},
+        "reactivation_accuracy": (
+            correct_reactivations / reactivation_events
+            if reactivation_events
+            else None
+        ),
+    }
+    if rejected_births is not None:
+        result["rejected_births"] = int(rejected_births)
+    return result
+
+
+def _cpu_snapshot(value: object) -> object:
+    if isinstance(value, Tensor):
+        return value.detach().cpu().clone()
+    if isinstance(value, Mapping):
+        return {key: _cpu_snapshot(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_cpu_snapshot(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_cpu_snapshot(item) for item in value)
+    if type(value).__module__.startswith("numpy"):
+        import numpy as np
+
+        if isinstance(value, np.ndarray):
+            return value.copy()
+    if value is None or isinstance(value, (str, bytes, int, float, bool)):
+        return copy.deepcopy(value)
+    value_type = type(value)
+    return ("opaque_type", value_type.__module__, value_type.__qualname__)
+
+
+def _run_legacy_parity_step(
+    streaming: Any,
+    *,
+    x: Any,
+    point2segment: list[Tensor],
+    raw_coordinates: Any,
+    segment_stages: list[Tensor],
+    state: Any,
+    stage_index: int,
+    device: torch.device,
+    capacity: int,
+) -> tuple[dict[str, object], Any, float, dict[str, object]]:
+    import random
+
+    import numpy as np
+
+    base_model = streaming.base_model
+    original_query_export = base_model.return_query_features
+    python_state = random.getstate()
+    numpy_state = np.random.get_state()
+    deterministic_enabled = torch.are_deterministic_algorithms_enabled()
+    deterministic_warn_only = torch.is_deterministic_algorithms_warn_only_enabled()
+    cudnn_benchmark = torch.backends.cudnn.benchmark
+    cudnn_deterministic = torch.backends.cudnn.deterministic
+    cuda_allow_tf32 = torch.backends.cuda.matmul.allow_tf32
+    cudnn_allow_tf32 = torch.backends.cudnn.allow_tf32
+    matmul_precision = torch.get_float32_matmul_precision()
+
+    def seed_fixed_inference() -> None:
+        random.seed(45)
+        np.random.seed(45)
+        torch.manual_seed(45)
+        torch.cuda.manual_seed_all(45)
+
+    try:
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
+        torch.set_float32_matmul_precision("highest")
+        torch.use_deterministic_algorithms(True)
+        with torch.random.fork_rng(devices=[device.index]):
+            base_model.return_query_features = False
+            seed_fixed_inference()
+            with torch.inference_mode():
+                disabled_output = base_model(
+                    x,
+                    point2segment,
+                    raw_coordinates=raw_coordinates,
+                    is_eval=True,
+                )
+            disabled_snapshot = _cpu_snapshot(disabled_output)
+            del disabled_output
+
+            base_model.return_query_features = True
+            seed_fixed_inference()
+            torch.cuda.synchronize(device)
+            started = time.perf_counter()
+            with torch.inference_mode():
+                enabled_output, next_state = streaming.forward_step(
+                    x=x,
+                    point2segment=point2segment,
+                    raw_coordinates=raw_coordinates,
+                    segment_stages=segment_stages,
+                    state=state,
+                    stage_index=stage_index,
+                    is_eval=True,
+                )
+            torch.cuda.synchronize(device)
+            elapsed = time.perf_counter() - started
+            enabled_snapshot = {
+                key: (
+                    None
+                    if key in _PERSISTENT_OUTPUT_KEYS
+                    else _cpu_snapshot(value)
+                )
+                for key, value in enabled_output.items()
+            }
+            parity = _legacy_parity_result(
+                disabled_snapshot,
+                enabled_snapshot,
+                capacity=capacity,
+            )
+    finally:
+        base_model.return_query_features = original_query_export
+        random.setstate(python_state)
+        np.random.set_state(numpy_state)
+        torch.use_deterministic_algorithms(
+            deterministic_enabled,
+            warn_only=deterministic_warn_only,
+        )
+        torch.backends.cudnn.benchmark = cudnn_benchmark
+        torch.backends.cudnn.deterministic = cudnn_deterministic
+        torch.backends.cuda.matmul.allow_tf32 = cuda_allow_tf32
+        torch.backends.cudnn.allow_tf32 = cudnn_allow_tf32
+        torch.set_float32_matmul_precision(matmul_precision)
+    return enabled_output, next_state, elapsed, parity
+
+
 def _evaluate_horizon(
     *,
     system: Any,
@@ -1191,12 +2049,16 @@ def _evaluate_horizon(
     horizon: int,
     capacity: int,
     device: torch.device,
-) -> tuple[dict[str, object], list[tuple[tuple[str, tuple[int, ...], str], ...]]]:
+) -> tuple[
+    dict[str, object],
+    list[tuple[tuple[str, tuple[int, ...], str], ...]],
+    dict[str, object] | None,
+]:
     import hydra
     from omegaconf import OmegaConf
 
     from datasets.streaming_sequence import causal_windows
-    from models.persistent_memory import PersistentMemory
+    from models.persistent_memory import PersistentMemory, build_local_observation
     from models.streaming_rescene import StreamingReScene
 
     dataset_config = OmegaConf.create(
@@ -1205,7 +2067,8 @@ def _evaluate_horizon(
     dataset_config.temporal_window = horizon
     dataset = hydra.utils.instantiate(dataset_config)
     collate = hydra.utils.instantiate(config.data.validation_collation)
-    metric = _instantiate_metric(dataset, horizon)
+    persistent_metric = _instantiate_metric(dataset, horizon)
+    baseline_metric = _instantiate_metric(dataset, horizon)
     memory = PersistentMemory(
         capacity=capacity,
         class_weight=float(memory_config.class_weight),
@@ -1226,24 +2089,35 @@ def _evaluate_horizon(
     loaded_sequences = 0
     rejected_births = 0
     identity_totals = {
-        "matched_identity_observations": 0,
-        "identity_switches": 0,
-        "reactivation_events": 0,
-        "correct_reactivations": 0,
+        method: {
+            "matched_identity_observations": 0,
+            "identity_switches": 0,
+            "reactivation_events": 0,
+            "correct_reactivations": 0,
+        }
+        for method in ("persistent", "internal_baseline")
     }
     sequence_latency_seconds: list[float] = []
     state_signatures: list[
         tuple[tuple[str, tuple[int, ...], str], ...]
     ] = []
     state_sizes: list[int] = []
+    legacy_parity: dict[str, object] | None = None
 
     torch.cuda.empty_cache()
     torch.cuda.reset_peak_memory_stats(device)
     for sequence_index, scan_indices in enumerate(dataset.sequence_indices):
-        accumulator: SequenceAccumulator | None = None
+        persistent_accumulator: SequenceAccumulator | None = None
+        baseline_accumulator: SequenceAccumulator | None = None
         state = None
-        gt_ids_by_stage: list[list[int]] = []
-        predicted_ids_by_stage: list[list[int]] = []
+        gt_ids_by_stage: dict[str, list[list[int]]] = {
+            "persistent": [],
+            "internal_baseline": [],
+        }
+        predicted_ids_by_stage: dict[str, list[list[int]]] = {
+            "persistent": [],
+            "internal_baseline": [],
+        }
         stage_point_counts: list[int] = []
         forward_seconds = 0.0
 
@@ -1251,7 +2125,9 @@ def _evaluate_horizon(
             data = targets = output = next_state = None
             sample = segment_stages = raw_coordinates = None
             class_prob = slot_ids = full_masks = full_target = None
-            cpu_class_prob = cpu_slot_ids = None
+            observation = cpu_class_prob = cpu_slot_ids = None
+            cpu_full_masks = cpu_valid = baseline_ids = None
+            predicted_classes = None
             try:
                 sample = dataset.load_scan_indices(
                     sequence_index,
@@ -1267,22 +2143,53 @@ def _evaluate_horizon(
                 latest_local_stage = int(segment_stages.max().item())
                 raw_coordinates = system._process_raw_coordinates(data)
 
-                torch.cuda.synchronize(device)
-                started = time.perf_counter()
-                with torch.inference_mode():
-                    output, next_state = streaming.forward_step(
+                verify_legacy_parity = (
+                    horizon == 2
+                    and sequence_index == 0
+                    and tuple(window) == tuple(scan_indices)
+                    and legacy_parity is None
+                )
+                if verify_legacy_parity:
+                    (
+                        output,
+                        next_state,
+                        elapsed,
+                        legacy_parity,
+                    ) = _run_legacy_parity_step(
+                        streaming,
                         x=data,
                         point2segment=[targets[0]["point2segment"]],
                         raw_coordinates=raw_coordinates,
                         segment_stages=[segment_stages],
                         state=state,
                         stage_index=global_stage,
-                        is_eval=True,
+                        device=device,
+                        capacity=capacity,
                     )
-                torch.cuda.synchronize(device)
-                forward_seconds += time.perf_counter() - started
+                    forward_seconds += elapsed
+                else:
+                    torch.cuda.synchronize(device)
+                    started = time.perf_counter()
+                    with torch.inference_mode():
+                        output, next_state = streaming.forward_step(
+                            x=data,
+                            point2segment=[targets[0]["point2segment"]],
+                            raw_coordinates=raw_coordinates,
+                            segment_stages=[segment_stages],
+                            state=state,
+                            stage_index=global_stage,
+                            is_eval=True,
+                        )
+                    torch.cuda.synchronize(device)
+                    forward_seconds += time.perf_counter() - started
 
-                class_prob = output["pred_logits"][0].softmax(dim=-1)
+                observation = build_local_observation(
+                    output,
+                    [segment_stages],
+                    latest_stage=latest_local_stage,
+                    **observation_settings,
+                )
+                class_prob = observation.class_prob[0]
                 slot_ids = output["persistent_slot_ids"][0]
                 full_masks = _latest_full_resolution_masks(
                     system,
@@ -1291,15 +2198,28 @@ def _evaluate_horizon(
                     data,
                     latest_local_stage=latest_local_stage,
                 )
-                if accumulator is None:
-                    accumulator = SequenceAccumulator.empty(
+                if persistent_accumulator is None:
+                    persistent_accumulator = SequenceAccumulator.empty(
+                        capacity=capacity,
+                        class_count=class_prob.shape[1],
+                    )
+                    baseline_accumulator = SequenceAccumulator.empty(
                         capacity=capacity,
                         class_count=class_prob.shape[1],
                     )
                 cpu_class_prob = class_prob.detach().cpu()
                 cpu_slot_ids = slot_ids.detach().cpu()
-                accumulator.add_stage(full_masks, cpu_class_prob, cpu_slot_ids)
-                stage_point_counts.append(full_masks.shape[1])
+                cpu_full_masks = full_masks.detach().cpu()
+                cpu_valid = observation.valid[0].detach().cpu()
+                baseline_ids = _accumulate_shared_stage(
+                    persistent=persistent_accumulator,
+                    baseline=baseline_accumulator,
+                    masks=cpu_full_masks,
+                    class_prob=cpu_class_prob,
+                    persistent_slot_ids=cpu_slot_ids,
+                    valid_observations=cpu_valid,
+                )
+                stage_point_counts.append(cpu_full_masks.shape[1])
                 rejected_births += int(
                     output["persistent_rejected_births"].sum().item()
                 )
@@ -1310,22 +2230,32 @@ def _evaluate_horizon(
                     == latest_local_stage
                 )
                 present_gt = full_target["masks"][:, full_stage_selector].any(dim=1)
-                valid_predictions = cpu_slot_ids >= 0
-                matched_gt, matched_predicted = _match_stage_identities(
-                    gt_ids=full_target["ids"][present_gt].detach().cpu(),
-                    gt_classes=full_target["labels"][present_gt].detach().cpu(),
-                    gt_masks=full_target["masks"][present_gt][
-                        :, full_stage_selector
-                    ].detach().cpu().bool(),
-                    predicted_ids=cpu_slot_ids[valid_predictions],
-                    predicted_classes=_foreground_classes(
-                        cpu_class_prob,
-                        observation_settings["background_class"],
-                    )[valid_predictions],
-                    predicted_masks=full_masks[valid_predictions],
+                predicted_classes = _foreground_classes(
+                    cpu_class_prob,
+                    observation_settings["background_class"],
                 )
-                gt_ids_by_stage.append(matched_gt)
-                predicted_ids_by_stage.append(matched_predicted)
+                for method, predicted_identity_ids in (
+                    ("persistent", cpu_slot_ids),
+                    ("internal_baseline", baseline_ids),
+                ):
+                    valid_predictions = predicted_identity_ids >= 0
+                    matched_gt, matched_predicted = _match_stage_identities(
+                        gt_ids=full_target["ids"][present_gt].detach().cpu(),
+                        gt_classes=full_target["labels"][present_gt]
+                        .detach()
+                        .cpu(),
+                        gt_masks=full_target["masks"][present_gt][
+                            :, full_stage_selector
+                        ]
+                        .detach()
+                        .cpu()
+                        .bool(),
+                        predicted_ids=predicted_identity_ids[valid_predictions],
+                        predicted_classes=predicted_classes[valid_predictions],
+                        predicted_masks=cpu_full_masks[valid_predictions],
+                    )
+                    gt_ids_by_stage[method].append(matched_gt)
+                    predicted_ids_by_stage[method].append(matched_predicted)
 
                 state = next_state.detach()
                 state_signatures.append(_state_signature(state))
@@ -1343,71 +2273,100 @@ def _evaluate_horizon(
                     slot_ids,
                     full_masks,
                     full_target,
+                    observation,
                     cpu_class_prob,
                     cpu_slot_ids,
+                    cpu_full_masks,
+                    cpu_valid,
+                    baseline_ids,
+                    predicted_classes,
                 )
 
-        if accumulator is None or state is None:
+        if (
+            persistent_accumulator is None
+            or baseline_accumulator is None
+            or state is None
+        ):
             raise RuntimeError("sequence produced no streaming stages")
-        diagnostic = identity_diagnostics(gt_ids_by_stage, predicted_ids_by_stage)
-        for key in identity_totals:
-            identity_totals[key] += int(diagnostic[key])
+        for method in ("persistent", "internal_baseline"):
+            diagnostic = identity_diagnostics(
+                gt_ids_by_stage[method],
+                predicted_ids_by_stage[method],
+            )
+            for key in identity_totals[method]:
+                identity_totals[method][key] += int(diagnostic[key])
 
         full_data = full_targets = None
+        persistent_prediction = baseline_prediction = target = None
         try:
             full_sample = dataset[sequence_index]
             full_data, full_targets, names = collate([full_sample])
             if len(full_targets) != 1 or list(names) != [dataset.sequence_names[sequence_index]]:
                 raise ValueError("full metric target does not match the sequence")
-            prediction = _accumulated_prediction(
-                accumulator,
+            persistent_prediction = _accumulated_prediction(
+                persistent_accumulator,
+                stage_point_counts,
+                background_class=observation_settings["background_class"],
+                dataset=dataset,
+            )
+            baseline_prediction = _accumulated_prediction(
+                baseline_accumulator,
                 stage_point_counts,
                 background_class=observation_settings["background_class"],
                 dataset=dataset,
             )
             target = _metric_target(full_data.target_full[0], dataset)
-            if prediction["pred_masks"].shape[0] != target["masks"].shape[1]:
+            if any(
+                prediction["pred_masks"].shape[0] != target["masks"].shape[1]
+                for prediction in (persistent_prediction, baseline_prediction)
+            ):
                 raise ValueError("accumulated predictions do not align with metric target")
-            metric.update([prediction], [target])
+            persistent_metric.update([persistent_prediction], [target])
+            baseline_metric.update([baseline_prediction], [target])
         finally:
-            del full_data, full_targets
+            del (
+                full_data,
+                full_targets,
+                persistent_prediction,
+                baseline_prediction,
+                target,
+            )
         loaded_sequences += 1
         sequence_latency_seconds.append(forward_seconds)
-        del accumulator, state
+        del persistent_accumulator, baseline_accumulator, state
 
     if loaded_sequences == 0 or not state_signatures or not state_sizes:
         raise RuntimeError(f"T={horizon} validation dataset produced no sequences")
-    metrics = metric.compute()
-    t_map = _metric_value(metrics, "val_mean_t-AP")
-    t_rec = _metric_value(metrics, "val_mean_t-REC")
-    per_stage = {
-        str(stage): _metric_value(metrics, f"val_mean_stage{stage}-AP")
-        for stage in range(1, horizon + 1)
-    }
     total_seconds = sum(sequence_latency_seconds)
     if total_seconds <= 0.0:
         raise RuntimeError("measured evaluation latency must be positive")
-    reactivation_events = identity_totals["reactivation_events"]
-    correct_reactivations = identity_totals["correct_reactivations"]
+    persistent = _summarize_method_metrics(
+        persistent_metric,
+        horizon=horizon,
+        identity_totals=identity_totals["persistent"],
+        rejected_births=rejected_births,
+    )
+    baseline = _summarize_method_metrics(
+        baseline_metric,
+        horizon=horizon,
+        identity_totals=identity_totals["internal_baseline"],
+    )
     result = {
         "T": horizon,
         "loaded_sequences": loaded_sequences,
-        "t_mAP": t_map,
-        "t_REC": t_rec,
-        "per_stage_AP": per_stage,
-        **identity_totals,
-        "reactivation_accuracy": (
-            correct_reactivations / reactivation_events
-            if reactivation_events
-            else None
-        ),
-        "rejected_births": rejected_births,
-        "peak_allocated_cuda_bytes": int(torch.cuda.max_memory_allocated(device)),
-        "mean_latency_ms": 1000.0 * total_seconds / loaded_sequences,
-        "throughput_sequences_per_second": loaded_sequences / total_seconds,
-        "serialized_state_bytes": max(state_sizes),
+        "persistent": persistent,
+        "internal_baseline": baseline,
+        "delta": _comparison_delta(persistent, baseline),
+        "resources": {
+            "peak_allocated_cuda_bytes": int(
+                torch.cuda.max_memory_allocated(device)
+            ),
+            "mean_latency_ms": 1000.0 * total_seconds / loaded_sequences,
+            "throughput_sequences_per_second": loaded_sequences / total_seconds,
+            "serialized_state_bytes": max(state_sizes),
+        },
     }
-    return result, state_signatures
+    return result, state_signatures, legacy_parity
 
 
 def run_real_evaluation(args: argparse.Namespace) -> dict[str, object]:
@@ -1423,8 +2382,9 @@ def run_real_evaluation(args: argparse.Namespace) -> dict[str, object]:
         system = _load_system(config, checkpoint, device)
         horizon_results = []
         signatures = []
+        legacy_parity_results = []
         for horizon in args.horizons:
-            result, horizon_signatures = _evaluate_horizon(
+            result, horizon_signatures, legacy_parity = _evaluate_horizon(
                 system=system,
                 config=config,
                 memory_config=memory_config,
@@ -1434,6 +2394,8 @@ def run_real_evaluation(args: argparse.Namespace) -> dict[str, object]:
             )
             horizon_results.append(result)
             signatures.extend(horizon_signatures)
+            if legacy_parity is not None:
+                legacy_parity_results.append(legacy_parity)
     finally:
         os.chdir(original_directory)
 
@@ -1442,10 +2404,17 @@ def run_real_evaluation(args: argparse.Namespace) -> dict[str, object]:
     constant_shape = bool(signatures) and len(set(signatures)) == 1
     if not constant_shape:
         raise RuntimeError("persistent state shape changed across the completed run")
+    if len(legacy_parity_results) != 1:
+        raise RuntimeError("T=2 legacy parity must run exactly once")
     maximum_state_bytes = max(
-        int(horizon["serialized_state_bytes"]) for horizon in horizon_results
+        int(horizon["resources"]["serialized_state_bytes"])
+        for horizon in horizon_results
     )
-    return {
+    bounded_state = {
+        "constant_shape": constant_shape,
+        "maximum_state_bytes": maximum_state_bytes,
+    }
+    artifact = {
         "schema_version": SCHEMA_VERSION,
         "status": "pass",
         "method": METHOD_NAME,
@@ -1454,14 +2423,19 @@ def run_real_evaluation(args: argparse.Namespace) -> dict[str, object]:
             "ref": FORMAL_CHECKPOINT_REFERENCE,
             "sha256": checkpoint_sha256,
         },
-        "settings": {"capacity": args.capacity, "local_window": LOCAL_WINDOW},
-        "horizons": horizon_results,
-        "bounded_state": {
-            "constant_shape": constant_shape,
-            "maximum_state_bytes": maximum_state_bytes,
+        "settings": {
+            "capacity": args.capacity,
+            "local_window": LOCAL_WINDOW,
+            "internal_baseline_identity": "local_query_index",
+            "shared_rescene_outputs": True,
         },
+        "legacy_parity": legacy_parity_results[0],
+        "horizons": horizon_results,
+        "bounded_state": bounded_state,
+        "conclusion": _derive_conclusion(horizon_results, bounded_state),
         "errors": [],
     }
+    return artifact
 
 
 def main(
@@ -1489,16 +2463,41 @@ def main(
         return 2
 
     selected_runner = run_real_evaluation if runner is None else runner
+    source_guard: _SourceTreeGuard | None = None
+    published_paths: list[Path] = []
     try:
         _validate_options(args)
+        if runner is None:
+            declared_outputs = [args.output]
+            if args.markdown is not None:
+                declared_outputs.append(args.markdown)
+            source_guard = _begin_source_tree_contract(
+                repo_root=PROJECT_ROOT,
+                output_paths=declared_outputs,
+            )
         artifact = dict(selected_runner(args))
+        if source_guard is not None:
+            if artifact.get("source_commit") != source_guard.source_commit:
+                raise RuntimeError(
+                    "evaluator source commit differs from source tree guard"
+                )
+            artifact["source_tree_contract"] = _source_tree_contract_payload(
+                source_guard
+            )
         _validate_complete_artifact(artifact, args=args)
         files_to_publish: list[tuple[Path, str]] = []
         if args.markdown is not None:
             files_to_publish.append((args.markdown, _render_markdown(artifact)))
         files_to_publish.append((args.output, _json_text(artifact)))
         _publish_text_files_new(files_to_publish)
+        published_paths = [path for path, _ in files_to_publish]
+        if source_guard is not None:
+            finalized = _finalize_source_tree_contract(source_guard)
+            if finalized != artifact["source_tree_contract"]:
+                raise RuntimeError("source tree contract changed during evaluation")
     except Exception as error:  # noqa: BLE001 - every runtime fault is persisted.
+        for path in published_paths:
+            path.unlink(missing_ok=True)
         try:
             _write_failure_if_possible(args.output, error)
         except Exception as write_error:  # noqa: BLE001 - final CLI fallback.
