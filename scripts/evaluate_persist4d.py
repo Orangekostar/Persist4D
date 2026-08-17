@@ -1085,7 +1085,10 @@ def _validate_metric_block(
         if rejected_births > maximum_query_events:
             raise ValueError(f"{name}.rejected_births exceed query bound")
     maximum_transitions = _maximum_identity_transitions(observations, horizon)
-    maximum_reactivations = _maximum_reactivation_events(observations, horizon)
+    maximum_reactivations = min(
+        _maximum_reactivation_events(observations, horizon),
+        loaded_sequences * capacity * max(horizon - 2, 0),
+    )
     if switches > maximum_transitions:
         raise ValueError(f"{name}.identity_switches are impossible")
     if reactivations > maximum_reactivations:

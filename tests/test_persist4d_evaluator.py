@@ -1537,6 +1537,50 @@ def test_cli_rejects_reactivations_above_aggregate_horizon_bound(
     assert report["status"] == "failed"
 
 
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
+def test_cli_accepts_reactivations_at_t3_capacity_saturation_bound(
+    tmp_path: Path,
+    method: str,
+) -> None:
+    artifact = _complete_artifact()
+    _set_identity_statistics(
+        artifact,
+        horizon_index=1,
+        method=method,
+        observations=24_000,
+        switches=0,
+        reactivations=12_000,
+        correct_reactivations=12_000,
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code == 0
+    assert report == artifact
+
+
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
+def test_cli_rejects_reactivations_above_t3_capacity_saturation_bound(
+    tmp_path: Path,
+    method: str,
+) -> None:
+    artifact = _complete_artifact()
+    _set_identity_statistics(
+        artifact,
+        horizon_index=1,
+        method=method,
+        observations=24_002,
+        switches=0,
+        reactivations=12_001,
+        correct_reactivations=12_001,
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
 @pytest.mark.parametrize(
     (
         "observations",
