@@ -62,6 +62,8 @@ class LocalInstanceObservation:
             ("class_prob", self.class_prob),
             ("confidence", self.confidence),
         ):
+            if not tensor.is_floating_point():
+                raise ValueError(f"{name} must have a floating dtype")
             if not torch.isfinite(tensor).all().item():
                 raise ValueError(f"{name} must contain only finite values")
 

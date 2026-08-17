@@ -319,3 +319,12 @@ def test_observation_validation_rejects_non_finite_values(field: str) -> None:
 
     with pytest.raises(ValueError):
         replace(observation, **{field: value}).validate()
+
+
+@pytest.mark.parametrize("field", ["features", "class_prob", "confidence"])
+def test_observation_validation_rejects_non_floating_values(field: str) -> None:
+    observation = _valid_observation()
+    value = getattr(observation, field).long()
+
+    with pytest.raises(ValueError, match="floating dtype"):
+        replace(observation, **{field: value}).validate()
