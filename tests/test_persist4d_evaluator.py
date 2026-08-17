@@ -12,9 +12,16 @@ import torch
 from scripts.evaluate_persist4d import (
     METHOD_NAME,
     SequenceAccumulator,
+    _compose_runtime_config,
     identity_diagnostics,
     main,
 )
+
+
+def test_runtime_config_explicitly_enables_query_feature_export() -> None:
+    config, _ = _compose_runtime_config()
+
+    assert config.model.return_query_features is True
 
 
 def test_identity_diagnostics_count_switches_and_reactivation() -> None:

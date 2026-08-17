@@ -3,15 +3,15 @@ import random
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from types import SimpleNamespace
+from typing import ClassVar
 
 import numpy as np
 import pytest
 import torch
-import torch.nn as nn
 import yaml
+from torch import nn
 
 from models.rescene import ReScene
-
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BASE_OUTPUT_KEYS = {
@@ -36,7 +36,7 @@ class _SparseBatch:
 
 
 class _StubBackbone(nn.Module):
-    PLANES = [4, 4, 4, 4, 4]
+    PLANES: ClassVar[list[int]] = [4, 4, 4, 4, 4]
 
     def __init__(self):
         super().__init__()
@@ -203,12 +203,12 @@ def _assert_nested_exact(actual, expected, *, path: str) -> None:
         assert actual == expected, path
 
 
-def test_rescene_config_disables_query_features_by_default():
+def test_rescene_config_preserves_legacy_shape_without_query_feature_key():
     config = yaml.safe_load(
         (REPO_ROOT / "conf" / "model" / "rescene.yaml").read_text(encoding="utf-8")
     )
 
-    assert config["return_query_features"] is False
+    assert "return_query_features" not in config
 
 
 def test_default_output_keys_are_unchanged():

@@ -828,7 +828,7 @@ def _compose_runtime_config() -> tuple[Any, Any]:
             config_name="config_p2_rescene4d_concerto_t2",
             overrides=[
                 "logging=local_csv",
-                "model.return_query_features=true",
+                "+model.return_query_features=true",
                 "general.gpus=1",
                 "general.train_mode=false",
             ],
