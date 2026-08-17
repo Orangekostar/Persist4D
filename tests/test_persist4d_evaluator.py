@@ -410,6 +410,36 @@ def test_cli_writes_failed_artifact_for_malformed_horizons(
 
 
 @pytest.mark.parametrize(
+    "reference",
+    [
+        "repo:",
+        "repo:/home/private/model.ckpt",
+        "repo:./checkpoints/rescene4d_concerto_t2_repro.ckpt",
+        "repo:checkpoints/../rescene4d_concerto_t2_repro.ckpt",
+        "repo:checkpoints//rescene4d_concerto_t2_repro.ckpt",
+        "repo:checkpoints/",
+        r"repo:checkpoints\rescene4d_concerto_t2_repro.ckpt",
+        "repo:home/private/model.ckpt",
+        "repo:mnt/shared/model.ckpt",
+        "repo:checkpoints/other.ckpt",
+        "external:stable-model-token",
+        "external:/home/private/model.ckpt",
+    ],
+)
+def test_cli_rejects_nonformal_checkpoint_references(
+    tmp_path: Path,
+    reference: str,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["checkpoint"]["ref"] = reference
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize(
     ("field", "invalid_value"),
     [
         ("t_mAP", -0.01),
@@ -498,7 +528,9 @@ def test_cli_rejects_nonintegral_horizon_counts(
     ),
     [
         (1, 2, 0, 0, None),
+        (1, 1, 0, 0, None),
         (1, 0, 1, 0, 0.0),
+        (3, 0, 1, 0, 0.0),
         (3, 0, 1, 2, 1.0),
         (3, 0, 0, 0, 0.0),
         (3, 0, 2, 1, None),
@@ -540,6 +572,7 @@ def test_cli_rejects_invalid_reactivation_accuracy(
     artifact["horizons"][0].update(
         {
             "matched_identity_observations": 3,
+            "identity_switches": 1,
             "reactivation_events": 2,
             "correct_reactivations": 1,
             "reactivation_accuracy": invalid_accuracy,
@@ -577,6 +610,40 @@ def test_cli_rejects_invalid_horizon_runtime_measurements(
     assert report["status"] == "failed"
 
 
+def test_cli_rejects_inconsistent_latency_and_throughput(
+    tmp_path: Path,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["horizons"][0].update(
+        {
+            "mean_latency_ms": 2.0,
+            "throughput_sequences_per_second": 499.9,
+        }
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+def test_cli_accepts_latency_and_throughput_within_rounding_tolerance(
+    tmp_path: Path,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["horizons"][0].update(
+        {
+            "mean_latency_ms": 2.0,
+            "throughput_sequences_per_second": 500.04,
+        }
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code == 0
+    assert report == artifact
+
+
 def test_cli_accepts_consistent_nonzero_reactivation_statistics(
     tmp_path: Path,
 ) -> None:
@@ -584,6 +651,7 @@ def test_cli_accepts_consistent_nonzero_reactivation_statistics(
     artifact["horizons"][0].update(
         {
             "matched_identity_observations": 3,
+            "identity_switches": 1,
             "reactivation_events": 2,
             "correct_reactivations": 1,
             "reactivation_accuracy": 0.5,

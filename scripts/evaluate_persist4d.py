@@ -17,7 +17,7 @@ import time
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, fields
 from numbers import Integral, Real
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 import torch
@@ -29,8 +29,12 @@ SCHEMA_VERSION = 1
 DEFAULT_CHECKPOINT = PROJECT_ROOT / "checkpoints" / (
     "rescene4d_concerto_t2_repro.ckpt"
 )
+FORMAL_CHECKPOINT_REFERENCE = (
+    "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt"
+)
 DEFAULT_HORIZONS = (2, 3, 4, 5)
 LOCAL_WINDOW = 2
+RUNTIME_RECIPROCAL_RTOL = 1e-4
 
 _ROOT_KEYS = frozenset(
     {
@@ -533,6 +537,30 @@ def _require_unit_interval(value: object, *, name: str) -> float:
     return normalized
 
 
+def _require_formal_checkpoint_reference(value: object) -> str:
+    if not isinstance(value, str):
+        raise ValueError(  # noqa: TRY004 - artifact validation contract.
+            "checkpoint ref must be a string"
+        )
+    scheme, separator, payload = value.partition(":")
+    segments = payload.split("/")
+    if (
+        separator != ":"
+        or scheme != "repo"
+        or not payload
+        or payload.startswith("/")
+        or "\\" in payload
+        or any(segment in {"", ".", ".."} for segment in segments)
+        or segments[0].casefold() in {"home", "mnt"}
+        or PurePosixPath(payload).is_absolute()
+        or PurePosixPath(payload).as_posix() != payload
+    ):
+        raise ValueError("checkpoint ref must be a canonical repository path")
+    if value != FORMAL_CHECKPOINT_REFERENCE:
+        raise ValueError("checkpoint ref is not the formal evaluation checkpoint")
+    return value
+
+
 def _validate_complete_artifact(
     artifact: object,
     *,
@@ -568,11 +596,7 @@ def _validate_complete_artifact(
         frozenset({"ref", "sha256"}),
         name="checkpoint",
     )
-    reference = checkpoint["ref"]
-    if not isinstance(reference, str) or not reference.startswith(
-        ("repo:", "external:")
-    ):
-        raise ValueError("checkpoint ref must be portable")
+    _require_formal_checkpoint_reference(checkpoint["ref"])
     sha256 = checkpoint["sha256"]
     if (
         not isinstance(sha256, str)
@@ -654,13 +678,19 @@ def _validate_complete_artifact(
             name="serialized_state_bytes",
             minimum=1,
         )
-        if switches > observations:
-            raise ValueError("identity_switches cannot exceed observations")
+        if switches > max(observations - 1, 0):
+            raise ValueError(
+                "identity_switches exceed possible observation transitions"
+            )
         if reactivations > max(observations - 1, 0):
             raise ValueError("reactivation_events exceed possible observations")
         if correct_reactivations > reactivations:
             raise ValueError(
                 "correct_reactivations cannot exceed reactivation_events"
+            )
+        if reactivations - correct_reactivations > switches:
+            raise ValueError(
+                "incorrect reactivations cannot exceed identity_switches"
             )
         accuracy = horizon["reactivation_accuracy"]
         if reactivations == 0:
@@ -682,9 +712,28 @@ def _validate_complete_artifact(
                 raise ValueError(
                     "reactivation_accuracy does not match identity counts"
                 )
-        for name in ("mean_latency_ms", "throughput_sequences_per_second"):
-            if _require_finite_number(horizon[name], name=name) <= 0.0:
-                raise ValueError(f"{name} must be positive")
+        mean_latency_ms = _require_finite_number(
+            horizon["mean_latency_ms"],
+            name="mean_latency_ms",
+        )
+        throughput = _require_finite_number(
+            horizon["throughput_sequences_per_second"],
+            name="throughput_sequences_per_second",
+        )
+        if mean_latency_ms <= 0.0:
+            raise ValueError("mean_latency_ms must be positive")
+        if throughput <= 0.0:
+            raise ValueError("throughput_sequences_per_second must be positive")
+        if not math.isclose(
+            mean_latency_ms * throughput,
+            1000.0,
+            rel_tol=RUNTIME_RECIPROCAL_RTOL,
+            abs_tol=1e-9,
+        ):
+            raise ValueError(
+                "mean_latency_ms and throughput_sequences_per_second "
+                "must be reciprocal"
+            )
         serialized_sizes.append(serialized_state_bytes)
 
     bounded = _require_exact_keys(
