@@ -1384,7 +1384,7 @@ def _render_markdown(artifact: Mapping[str, object]) -> str:
     allowed_outputs = source_contract["allowed_untracked_outputs"]
     rendered_outputs = ", ".join(allowed_outputs) if allowed_outputs else "none"
     lines = [
-        "# Persist4D P5 MVP Evaluation",
+        "# Persist4D MVP P5 Evaluation",
         "",
         (
             "Purpose: fixed-capacity streaming association diagnosis; metrics "
