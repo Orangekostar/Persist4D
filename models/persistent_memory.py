@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import math
+import operator
+import sys
 from collections.abc import Mapping
 from dataclasses import dataclass
 
@@ -428,14 +430,22 @@ class PersistentMemoryState:
             raise ValueError("last_seen must be at least -1")
         if torch.any(self.stage_watermark < -1).item():
             raise ValueError("stage_watermark must be at least -1")
+        batch_stage_watermark = self.stage_watermark.unsqueeze(1)
         invalid_occupied_last_seen = self.occupied & (
             (self.last_seen < 0)
-            | (self.last_seen > self.stage_watermark.unsqueeze(1))
+            | (self.last_seen > batch_stage_watermark)
         )
         if torch.any(invalid_occupied_last_seen).item():
             raise ValueError(
                 "occupied slots must have last_seen between zero and the "
                 "batch stage watermark"
+            )
+        if torch.any(
+            self.active & (self.last_seen != batch_stage_watermark)
+        ).item():
+            raise ValueError(
+                "active slots must have last_seen equal to the batch stage "
+                "watermark"
             )
         if torch.any((~self.occupied) & (self.last_seen != -1)).item():
             raise ValueError("unoccupied slots must use the last_seen sentinel")
@@ -730,11 +740,15 @@ class PersistentMemory(nn.Module):
         max_update_rate: float = 0.2,
     ) -> None:
         super().__init__()
-        if (
-            not isinstance(capacity, int)
-            or isinstance(capacity, bool)
-            or capacity <= 0
-        ):
+        if isinstance(capacity, bool):
+            raise ValueError(  # noqa: TRY004
+                "capacity must be a positive integer"
+            )
+        try:
+            validated_capacity = operator.index(capacity)
+        except TypeError as error:
+            raise ValueError("capacity must be a positive integer") from error
+        if not 0 < validated_capacity <= sys.maxsize:
             raise ValueError("capacity must be a positive integer")
 
         validated_class_weight = _finite_numeric_parameter(
@@ -757,7 +771,7 @@ class PersistentMemory(nn.Module):
                 "max_update_rate <= 1"
             )
 
-        self.capacity = capacity
+        self.capacity = validated_capacity
         self.class_weight = validated_class_weight
         self.association_threshold = validated_association_threshold
         self.update_rate = validated_update_rate
@@ -876,29 +890,9 @@ class PersistentMemory(nn.Module):
                     batch_index, matched_queries
                 ].to(dtype=compute_dtype)
                 old_weights = 1.0 - vector_rates
-                old_embedding = torch.where(
-                    old_weights > 0,
-                    old_embedding,
-                    torch.zeros_like(old_embedding),
-                )
-                observed_embedding = torch.where(
-                    vector_rates > 0,
-                    observed_embedding,
-                    torch.zeros_like(observed_embedding),
-                )
-                shared_scale = torch.maximum(
-                    old_embedding.abs().amax(dim=-1, keepdim=True),
-                    observed_embedding.abs().amax(dim=-1, keepdim=True),
-                )
-                safe_shared_scale = torch.where(
-                    shared_scale > 0,
-                    shared_scale,
-                    torch.ones_like(shared_scale),
-                )
                 updated_embedding = (
-                    old_weights * (old_embedding / safe_shared_scale)
-                    + vector_rates
-                    * (observed_embedding / safe_shared_scale)
+                    old_weights * old_embedding
+                    + vector_rates * observed_embedding
                 )
                 embedding[batch_index, matched_slots] = (
                     _normalize_feature_vectors(updated_embedding).to(

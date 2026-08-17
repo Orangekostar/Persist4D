@@ -1,3 +1,4 @@
+import sys
 from dataclasses import FrozenInstanceError, replace
 from pathlib import Path
 
@@ -142,6 +143,8 @@ def test_persistent_memory_is_module_with_expected_defaults() -> None:
         ("capacity", True),
         ("capacity", 1.0),
         ("capacity", None),
+        ("capacity", sys.maxsize + 1),
+        ("capacity", 10**1000),
         ("class_weight", -0.01),
         ("class_weight", 1.01),
         ("class_weight", float("nan")),
@@ -199,6 +202,16 @@ def test_persistent_memory_accepts_constructor_boundaries(
 
     for name, value in parameters.items():
         assert getattr(memory, name) == value
+
+
+def test_persistent_memory_accepts_indexable_capacity() -> None:
+    class IndexableCapacity:
+        def __index__(self) -> int:
+            return 3
+
+    memory = PersistentMemory(capacity=IndexableCapacity())
+
+    assert memory.capacity == 3
 
 
 @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
@@ -712,6 +725,114 @@ def test_step_updates_remain_connected_to_autograd() -> None:
         assert torch.isfinite(tensor.grad).all()
 
 
+def test_step_endpoint_gradients_match_direct_ema_formula() -> None:
+    dtype = torch.float64
+    state_embedding = torch.tensor(
+        [[[1.0, 0.0]]], dtype=dtype, requires_grad=True
+    )
+    state_class_prob = torch.tensor(
+        [[[0.8, 0.2]]], dtype=dtype, requires_grad=True
+    )
+    state_confidence = torch.tensor(
+        [[3.0]], dtype=dtype, requires_grad=True
+    )
+    observation_features = torch.tensor(
+        [[[0.0, 2.0]]], dtype=dtype, requires_grad=True
+    )
+    observation_class_prob = torch.tensor(
+        [[[0.1, 0.9]]], dtype=dtype, requires_grad=True
+    )
+    observation_confidence = torch.tensor(
+        [[1.0]], dtype=dtype, requires_grad=True
+    )
+    state = PersistentMemoryState(
+        embedding=state_embedding,
+        class_prob=state_class_prob,
+        confidence=state_confidence,
+        occupied=torch.tensor([[True]]),
+        active=torch.tensor([[True]]),
+        age=torch.tensor([[0]]),
+        last_seen=torch.tensor([[0]]),
+        stage_watermark=torch.tensor([0]),
+    )
+    observation = _step_observation(
+        observation_features,
+        observation_class_prob,
+        confidence=observation_confidence,
+    )
+
+    result = PersistentMemory(
+        capacity=1,
+        class_weight=0.0,
+        association_threshold=-1.0,
+        update_rate=1.0,
+        max_update_rate=1.0,
+    ).step(observation, state, stage_index=1)
+
+    update_rate = observation_confidence.clamp(min=0.0, max=1.0)
+    vector_rate = update_rate.unsqueeze(-1)
+    reference_outputs = (
+        F.normalize(
+            (1.0 - vector_rate) * state_embedding
+            + vector_rate * observation_features,
+            dim=-1,
+        ),
+        (1.0 - vector_rate) * state_class_prob
+        + vector_rate * observation_class_prob,
+        (1.0 - update_rate) * state_confidence
+        + update_rate * observation_confidence,
+    )
+    actual_outputs = (
+        result.state.embedding,
+        result.state.class_prob,
+        result.state.confidence,
+    )
+    output_gradients = (
+        torch.tensor([[[0.4, -0.7]]], dtype=dtype),
+        torch.tensor([[[0.3, -0.9]]], dtype=dtype),
+        torch.ones(1, 1, dtype=dtype),
+    )
+    inputs = (
+        state_embedding,
+        state_class_prob,
+        state_confidence,
+        observation_features,
+        observation_class_prob,
+        observation_confidence,
+    )
+
+    for field_index, (actual, reference, output_gradient) in enumerate(
+        zip(actual_outputs, reference_outputs, output_gradients, strict=True)
+    ):
+        torch.testing.assert_close(actual, reference)
+        actual_gradients = torch.autograd.grad(
+            actual,
+            inputs,
+            grad_outputs=output_gradient,
+            retain_graph=True,
+            allow_unused=True,
+        )
+        reference_gradients = torch.autograd.grad(
+            reference,
+            inputs,
+            grad_outputs=output_gradient,
+            retain_graph=True,
+            allow_unused=True,
+        )
+        for actual_gradient, reference_gradient in zip(
+            actual_gradients, reference_gradients, strict=True
+        ):
+            if reference_gradient is None:
+                assert actual_gradient is None
+            else:
+                assert actual_gradient is not None
+                torch.testing.assert_close(actual_gradient, reference_gradient)
+        if field_index == 2:
+            torch.testing.assert_close(
+                actual_gradients[-1], torch.tensor([[-1.0]], dtype=dtype)
+            )
+
+
 @pytest.mark.parametrize("path", ["birth", "update"])
 def test_step_normalizes_float16_zero_vectors_without_nan(path: str) -> None:
     if path == "birth":
@@ -1152,6 +1273,23 @@ def test_state_validation_rejects_mixed_devices(
 def test_state_validation_rejects_active_unoccupied_slot() -> None:
     state = replace(
         _valid_state(), active=torch.tensor([[True, False, False]] * 2)
+    )
+
+    with pytest.raises(ValueError):
+        state.validate()
+
+
+def test_state_validation_rejects_active_slot_not_seen_at_watermark() -> None:
+    state = replace(
+        _valid_state(),
+        occupied=torch.tensor(
+            [[True, False, False], [False, False, False]]
+        ),
+        active=torch.tensor(
+            [[True, False, False], [False, False, False]]
+        ),
+        last_seen=torch.tensor([[1, -1, -1], [-1, -1, -1]]),
+        stage_watermark=torch.tensor([2, -1]),
     )
 
     with pytest.raises(ValueError):
