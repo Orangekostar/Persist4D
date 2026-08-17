@@ -10,6 +10,7 @@ import io
 import json
 import math
 import os
+import stat
 import subprocess
 import sys
 import tempfile
@@ -486,6 +487,7 @@ def _validate_options(args: argparse.Namespace) -> None:
         raise FileExistsError(
             f"refusing to overwrite existing output: {args.markdown}"
         )
+    args.checkpoint = _resolve_checkpoint(args.checkpoint)
 
 
 def _require_exact_keys(
@@ -814,15 +816,6 @@ def git_commit(repo_root: Path = PROJECT_ROOT) -> str:
     return commit
 
 
-def _checkpoint_reference(path: Path) -> str:
-    resolved = path.resolve()
-    try:
-        relative = resolved.relative_to(PROJECT_ROOT.resolve())
-    except ValueError:
-        return "external:rescene4d_checkpoint"
-    return f"repo:{relative.as_posix()}"
-
-
 def _compose_runtime_config() -> tuple[Any, Any]:
     import hydra
     from hydra import compose, initialize_config_dir
@@ -850,12 +843,21 @@ def _resolve_checkpoint(path: Path) -> Path:
     candidate = path.expanduser()
     if not candidate.is_absolute():
         candidate = PROJECT_ROOT / candidate
-    resolved = candidate.resolve()
-    if not resolved.is_file():
-        raise FileNotFoundError(
-            f"required checkpoint does not exist: {_checkpoint_reference(resolved)}"
-        )
-    return resolved
+    formal = DEFAULT_CHECKPOINT
+    try:
+        candidate_mode = candidate.lstat().st_mode
+        formal_mode = formal.lstat().st_mode
+        resolved = candidate.resolve(strict=True)
+        resolved_formal = formal.resolve(strict=True)
+    except OSError as error:
+        raise ValueError("formal checkpoint must be an existing regular file") from error
+    if candidate.is_symlink() or formal.is_symlink():
+        raise ValueError("formal checkpoint must not be a symbolic link")
+    if not stat.S_ISREG(candidate_mode) or not stat.S_ISREG(formal_mode):
+        raise ValueError("formal checkpoint must be a regular file")
+    if resolved != resolved_formal:
+        raise ValueError("checkpoint must be the formal repository checkpoint")
+    return resolved_formal
 
 
 def _validate_cuda_device(device_name: str) -> torch.device:
@@ -1409,10 +1411,10 @@ def _evaluate_horizon(
 
 
 def run_real_evaluation(args: argparse.Namespace) -> dict[str, object]:
-    device = _validate_cuda_device(args.device)
     checkpoint = _resolve_checkpoint(args.checkpoint)
     source_commit = git_commit()
     checkpoint_sha256 = sha256_file(checkpoint)
+    device = _validate_cuda_device(args.device)
 
     original_directory = Path.cwd()
     try:
@@ -1449,7 +1451,7 @@ def run_real_evaluation(args: argparse.Namespace) -> dict[str, object]:
         "method": METHOD_NAME,
         "source_commit": source_commit,
         "checkpoint": {
-            "ref": _checkpoint_reference(checkpoint),
+            "ref": FORMAL_CHECKPOINT_REFERENCE,
             "sha256": checkpoint_sha256,
         },
         "settings": {"capacity": args.capacity, "local_window": LOCAL_WINDOW},

@@ -329,6 +329,61 @@ def test_cli_rejects_existing_output_without_running_or_overwriting(
     assert output.read_text(encoding="utf-8") == "keep-me\n"
 
 
+def test_cli_rejects_external_checkpoint_before_running(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "result.json"
+    checkpoint = tmp_path / "external.ckpt"
+    checkpoint.write_bytes(b"not-a-formal-checkpoint")
+    call_count = 0
+
+    def runner(_args):
+        nonlocal call_count
+        call_count += 1
+        return _complete_artifact()
+
+    return_code = main(
+        ["--output", str(output), "--checkpoint", str(checkpoint)],
+        runner=runner,
+    )
+
+    report_text = output.read_text(encoding="utf-8")
+    assert return_code != 0
+    assert call_count == 0
+    assert json.loads(report_text) == {
+        "schema_version": 1,
+        "status": "failed",
+        "method": METHOD_NAME,
+        "errors": [{"type": "ValueError", "code": "invalid_input"}],
+    }
+    assert str(checkpoint) not in report_text
+
+
+def test_cli_rejects_checkpoint_symlink_before_running(tmp_path: Path) -> None:
+    output = tmp_path / "result.json"
+    checkpoint = tmp_path / "checkpoint.ckpt"
+    checkpoint.symlink_to(
+        Path(__file__).resolve().parents[1]
+        / "checkpoints"
+        / "rescene4d_concerto_t2_repro.ckpt"
+    )
+    call_count = 0
+
+    def runner(_args):
+        nonlocal call_count
+        call_count += 1
+        return _complete_artifact()
+
+    return_code = main(
+        ["--output", str(output), "--checkpoint", str(checkpoint)],
+        runner=runner,
+    )
+
+    assert return_code != 0
+    assert call_count == 0
+    assert json.loads(output.read_text(encoding="utf-8"))["status"] == "failed"
+
+
 def test_cli_writes_failed_artifact_when_runner_raises(tmp_path: Path) -> None:
     output = tmp_path / "failure" / "result.json"
 
