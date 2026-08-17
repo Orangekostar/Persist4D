@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 import torch
+from scipy.optimize import linear_sum_assignment
 from torch import Tensor
 
 
@@ -427,3 +428,124 @@ class PersistentMemoryState:
             self.age,
             self.last_seen,
         )
+
+
+@dataclass(frozen=True)
+class AssociationResult:
+    slot_for_query: Tensor
+    query_for_slot: Tensor
+    score_for_query: Tensor
+
+
+def associate_observations(
+    observation: LocalInstanceObservation,
+    state: PersistentMemoryState,
+    *,
+    class_weight: float,
+    association_threshold: float,
+) -> AssociationResult:
+    observation.validate()
+    state.validate()
+
+    if observation.features.shape[0] != state.batch_size:
+        raise ValueError("observation and state batch sizes must match")
+    if observation.features.shape[2] != state.feature_dim:
+        raise ValueError("observation and state feature dimensions must match")
+    if observation.class_prob.shape[2] != state.class_count:
+        raise ValueError("observation and state class dimensions must match")
+    if observation.features.device != state.embedding.device:
+        raise ValueError("observation and state must use the same device")
+
+    if (
+        not isinstance(class_weight, (int, float))
+        or isinstance(class_weight, bool)
+        or not math.isfinite(class_weight)
+        or class_weight < 0.0
+    ):
+        raise ValueError("class_weight must be finite and non-negative")
+    if (
+        not isinstance(association_threshold, (int, float))
+        or isinstance(association_threshold, bool)
+        or not math.isfinite(association_threshold)
+    ):
+        raise ValueError("association_threshold must be finite")
+
+    score_dtype = observation.features.dtype
+    for dtype in (
+        observation.class_prob.dtype,
+        state.embedding.dtype,
+        state.class_prob.dtype,
+    ):
+        score_dtype = torch.promote_types(score_dtype, dtype)
+    if score_dtype in (torch.float16, torch.bfloat16):
+        score_dtype = torch.float32
+
+    query_features = observation.features.to(dtype=score_dtype)
+    memory_features = state.embedding.to(dtype=score_dtype)
+    normalization_floor = torch.finfo(score_dtype).tiny
+    query_features = query_features / torch.linalg.vector_norm(
+        query_features, dim=-1, keepdim=True
+    ).clamp_min(normalization_floor)
+    memory_features = memory_features / torch.linalg.vector_norm(
+        memory_features, dim=-1, keepdim=True
+    ).clamp_min(normalization_floor)
+
+    cosine_score = torch.einsum("bkd,bqd->bkq", memory_features, query_features)
+    class_score = torch.einsum(
+        "bkc,bqc->bkq",
+        state.class_prob.to(dtype=score_dtype),
+        observation.class_prob.to(dtype=score_dtype),
+    )
+    score = cosine_score + class_weight * class_score
+
+    batch_size, query_count = observation.valid.shape
+    capacity = state.capacity
+    device = observation.features.device
+    slot_for_query = torch.full(
+        (batch_size, query_count), -1, dtype=torch.long, device=device
+    )
+    query_for_slot = torch.full(
+        (batch_size, capacity), -1, dtype=torch.long, device=device
+    )
+    score_for_query = score.new_full((batch_size, query_count), -torch.inf)
+
+    for batch_index in range(batch_size):
+        occupied_slots = state.occupied[batch_index].nonzero(as_tuple=True)[0]
+        valid_queries = observation.valid[batch_index].nonzero(as_tuple=True)[0]
+        if occupied_slots.numel() == 0 or valid_queries.numel() == 0:
+            continue
+
+        candidate_score = score[batch_index][occupied_slots][:, valid_queries]
+        assignment_score = candidate_score.detach().to(
+            device="cpu", dtype=torch.float64
+        )
+        row_rank = torch.arange(
+            assignment_score.shape[0], dtype=torch.float64
+        ).unsqueeze(1)
+        column_rank = torch.arange(
+            assignment_score.shape[1], dtype=torch.float64
+        ).unsqueeze(0)
+        tie_scale = math.ulp(max(1.0, assignment_score.abs().amax().item()))
+        # Non-separable rank distance breaks ties toward aligned low indices.
+        assignment_score = assignment_score - tie_scale * (row_rank - column_rank).abs()
+        assigned_rows, assigned_columns = linear_sum_assignment(
+            -assignment_score.numpy()
+        )
+
+        assigned_rows = torch.from_numpy(assigned_rows).to(device=device)
+        assigned_columns = torch.from_numpy(assigned_columns).to(device=device)
+        assigned_scores = candidate_score[assigned_rows, assigned_columns]
+        accepted = assigned_scores >= association_threshold
+        accepted_slots = occupied_slots[assigned_rows[accepted]]
+        accepted_queries = valid_queries[assigned_columns[accepted]]
+        accepted_scores = assigned_scores[accepted]
+
+        slot_for_query[batch_index, accepted_queries] = accepted_slots
+        query_for_slot[batch_index, accepted_slots] = accepted_queries
+        score_for_query[batch_index, accepted_queries] = accepted_scores
+
+    return AssociationResult(
+        slot_for_query=slot_for_query,
+        query_for_slot=query_for_slot,
+        score_for_query=score_for_query,
+    )
