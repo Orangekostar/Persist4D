@@ -259,6 +259,31 @@ def test_associate_observations_breaks_ties_stably_by_low_index_alignment() -> N
         )
 
 
+def test_associate_observations_preserves_a_strict_float64_optimum() -> None:
+    state = _state(
+        torch.zeros(1, 3, 1, dtype=torch.float64),
+        torch.tensor(
+            [[[0.9999999999999999], [0.0], [1.0000000000000002]]],
+            dtype=torch.float64,
+        ),
+    )
+    observation = _observation(
+        torch.zeros(1, 1, 1, dtype=torch.float64),
+        torch.ones(1, 1, 1, dtype=torch.float64),
+    )
+
+    result = associate_observations(
+        observation,
+        state,
+        class_weight=1.0,
+        association_threshold=0.0,
+    )
+
+    assert result.slot_for_query.item() == 2
+    assert torch.equal(result.query_for_slot, torch.tensor([[-1, -1, 0]]))
+    assert result.score_for_query.item() == 1.0000000000000002
+
+
 @pytest.mark.parametrize("invalid_input", ["observation", "state"])
 def test_associate_observations_validates_each_input(invalid_input: str) -> None:
     state = _state(

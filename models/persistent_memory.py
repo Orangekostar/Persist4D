@@ -437,6 +437,75 @@ class AssociationResult:
     score_for_query: Tensor
 
 
+def _score_as_exact_integers(score: Tensor) -> list[list[int]]:
+    ratios = [[value.as_integer_ratio() for value in row] for row in score.tolist()]
+    # IEEE float denominators are powers of two, so the maximum is common.
+    common_denominator = max(denominator for row in ratios for _, denominator in row)
+    return [
+        [
+            numerator * (common_denominator // denominator)
+            for numerator, denominator in row
+        ]
+        for row in ratios
+    ]
+
+
+def _optimal_assignment_with_stable_ties(
+    score: Tensor,
+) -> tuple[Tensor, Tensor]:
+    row_count, column_count = score.shape
+    size = max(row_count, column_count)
+    padded_score = torch.zeros(size, size, dtype=torch.float64)
+    padded_score[:row_count, :column_count] = score.detach().to(
+        device="cpu", dtype=torch.float64
+    )
+
+    initial_rows, initial_columns = linear_sum_assignment(-padded_score.numpy())
+    matched_column = [-1] * size
+    for row, column in zip(initial_rows, initial_columns, strict=True):
+        matched_column[row] = column
+
+    score_units = _score_as_exact_integers(padded_score)
+    # Matched-edge difference constraints recover an exact optimal dual.
+    column_potential = [0] * size
+    for _ in range(size - 1):
+        updated = False
+        for row, row_score in enumerate(score_units):
+            matched = matched_column[row]
+            matched_score = row_score[matched]
+            matched_potential = column_potential[matched]
+            for column, pair_score in enumerate(row_score):
+                upper_bound = matched_potential + matched_score - pair_score
+                if column_potential[column] > upper_bound:
+                    column_potential[column] = upper_bound
+                    updated = True
+        if not updated:
+            break
+
+    tie_cost = torch.full((size, size), torch.inf, dtype=torch.float64)
+    for row, row_score in enumerate(score_units):
+        matched = matched_column[row]
+        matched_score = row_score[matched]
+        matched_potential = column_potential[matched]
+        for column, pair_score in enumerate(row_score):
+            if column_potential[column] != (
+                matched_potential + matched_score - pair_score
+            ):
+                continue
+            if row < row_count and column < column_count:
+                tie_cost[row, column] = abs(row - column)
+            else:
+                tie_cost[row, column] = 0.0
+
+    # Every complete matching on these exact dual-tight edges has the
+    # original optimal total, so this secondary objective cannot change it.
+    assigned_rows, assigned_columns = linear_sum_assignment(tie_cost.numpy())
+    assigned_rows = torch.from_numpy(assigned_rows)
+    assigned_columns = torch.from_numpy(assigned_columns)
+    real_pair = (assigned_rows < row_count) & (assigned_columns < column_count)
+    return assigned_rows[real_pair], assigned_columns[real_pair]
+
+
 def associate_observations(
     observation: LocalInstanceObservation,
     state: PersistentMemoryState,
@@ -516,24 +585,12 @@ def associate_observations(
             continue
 
         candidate_score = score[batch_index][occupied_slots][:, valid_queries]
-        assignment_score = candidate_score.detach().to(
-            device="cpu", dtype=torch.float64
-        )
-        row_rank = torch.arange(
-            assignment_score.shape[0], dtype=torch.float64
-        ).unsqueeze(1)
-        column_rank = torch.arange(
-            assignment_score.shape[1], dtype=torch.float64
-        ).unsqueeze(0)
-        tie_scale = math.ulp(max(1.0, assignment_score.abs().amax().item()))
-        # Non-separable rank distance breaks ties toward aligned low indices.
-        assignment_score = assignment_score - tie_scale * (row_rank - column_rank).abs()
-        assigned_rows, assigned_columns = linear_sum_assignment(
-            -assignment_score.numpy()
+        assigned_rows, assigned_columns = _optimal_assignment_with_stable_ties(
+            candidate_score
         )
 
-        assigned_rows = torch.from_numpy(assigned_rows).to(device=device)
-        assigned_columns = torch.from_numpy(assigned_columns).to(device=device)
+        assigned_rows = assigned_rows.to(device=device)
+        assigned_columns = assigned_columns.to(device=device)
         assigned_scores = candidate_score[assigned_rows, assigned_columns]
         accepted = assigned_scores >= association_threshold
         accepted_slots = occupied_slots[assigned_rows[accepted]]
