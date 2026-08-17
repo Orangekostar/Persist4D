@@ -61,6 +61,7 @@ def test_identity_diagnostics_returns_none_without_reactivation() -> None:
         ([[1], [2]], [[1], []], "align"),
         ([[1, 1]], [[2, 3]], "duplicate"),
         ([[-1]], [[2]], "non-negative"),
+        ([[1]], [[-1]], "non-negative"),
         ([[True]], [[2]], "integral"),
         ([[1]], [[False]], "integral"),
         ([[1.0]], [[2]], "integral"),
@@ -73,6 +74,11 @@ def test_identity_diagnostics_rejects_malformed_ids(
 ) -> None:
     with pytest.raises(ValueError, match=message):
         identity_diagnostics(gt_ids, predicted_ids)
+
+
+def test_identity_diagnostics_rejects_duplicate_predicted_ids() -> None:
+    with pytest.raises(ValueError, match="predicted.*duplicate"):
+        identity_diagnostics([[1, 2]], [[7, 7]])
 
 
 def test_sequence_accumulator_stores_cpu_masks_and_class_means() -> None:
@@ -108,6 +114,23 @@ def test_sequence_accumulator_stores_cpu_masks_and_class_means() -> None:
     torch.testing.assert_close(
         accumulator.class_prob_mean(),
         torch.tensor([[0.1, 0.9], [0.0, 0.0], [0.7, 0.3]]),
+    )
+
+
+def test_sequence_accumulator_clones_stored_masks() -> None:
+    accumulator = SequenceAccumulator.empty(capacity=2, class_count=2)
+    source_masks = torch.tensor([[True, False]])
+
+    accumulator.add_stage(
+        source_masks,
+        torch.tensor([[0.25, 0.75]]),
+        torch.tensor([1]),
+    )
+    source_masks.fill_(False)
+
+    assert torch.equal(
+        accumulator.stage_masks[0][1],
+        torch.tensor([True, False]),
     )
 
 
@@ -235,6 +258,18 @@ def _complete_artifact() -> dict[str, object]:
     }
 
 
+def _run_mock_artifact(
+    tmp_path: Path,
+    artifact: dict[str, object],
+) -> tuple[int, dict[str, object]]:
+    output = tmp_path / "result.json"
+    return_code = main(
+        ["--output", str(output)],
+        runner=lambda _args: artifact,
+    )
+    return return_code, json.loads(output.read_text(encoding="utf-8"))
+
+
 def test_importing_evaluator_does_not_import_real_runtime_dependencies() -> None:
     code = """
 import sys
@@ -310,10 +345,33 @@ def test_cli_writes_failed_artifact_when_runner_raises(tmp_path: Path) -> None:
         "errors": [
             {
                 "type": "RuntimeError",
-                "message": "synthetic evaluator failure",
+                "code": "runtime_error",
             }
         ],
     }
+
+
+def test_cli_failure_artifact_redacts_exception_paths(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    output = tmp_path / "result.json"
+    private_path = "/home/private/checkpoints/missing.ckpt"
+
+    def runner(_args):
+        raise FileNotFoundError(private_path)
+
+    return_code = main(["--output", str(output)], runner=runner)
+
+    report_text = output.read_text(encoding="utf-8")
+    report = json.loads(report_text)
+    assert return_code != 0
+    assert report["errors"] == [
+        {"type": "FileNotFoundError", "code": "missing_file"}
+    ]
+    assert private_path not in report_text
+    assert "/home/" not in report_text
+    assert private_path in capsys.readouterr().err
 
 
 def test_cli_turns_incomplete_mock_result_into_failed_artifact(
@@ -349,3 +407,190 @@ def test_cli_writes_failed_artifact_for_malformed_horizons(
     assert return_code != 0
     assert report["status"] == "failed"
     assert report["errors"][0]["type"] == "ValueError"
+
+
+@pytest.mark.parametrize(
+    ("field", "invalid_value"),
+    [
+        ("t_mAP", -0.01),
+        ("t_mAP", 1.01),
+        ("t_mAP", float("nan")),
+        ("t_REC", -0.01),
+        ("t_REC", 1.01),
+        ("t_REC", float("inf")),
+    ],
+)
+def test_cli_rejects_invalid_bounded_horizon_metrics(
+    tmp_path: Path,
+    field: str,
+    invalid_value: float,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["horizons"][0][field] = invalid_value
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+    assert report["errors"] == [{"type": "ValueError", "code": "invalid_input"}]
+
+
+@pytest.mark.parametrize("invalid_value", [-0.01, 1.01, float("nan")])
+def test_cli_rejects_invalid_per_stage_ap(
+    tmp_path: Path,
+    invalid_value: float,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["horizons"][0]["per_stage_AP"]["1"] = invalid_value
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "matched_identity_observations",
+        "identity_switches",
+        "reactivation_events",
+        "correct_reactivations",
+        "rejected_births",
+        "peak_allocated_cuda_bytes",
+        "serialized_state_bytes",
+    ],
+)
+def test_cli_rejects_negative_horizon_counts(
+    tmp_path: Path,
+    field: str,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["horizons"][0][field] = -1
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize("invalid_value", [1.5, True])
+def test_cli_rejects_nonintegral_horizon_counts(
+    tmp_path: Path,
+    invalid_value: object,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["horizons"][0]["identity_switches"] = invalid_value
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize(
+    (
+        "observations",
+        "switches",
+        "reactivations",
+        "correct_reactivations",
+        "accuracy",
+    ),
+    [
+        (1, 2, 0, 0, None),
+        (1, 0, 1, 0, 0.0),
+        (3, 0, 1, 2, 1.0),
+        (3, 0, 0, 0, 0.0),
+        (3, 0, 2, 1, None),
+        (3, 0, 2, 1, 0.4),
+    ],
+)
+def test_cli_rejects_impossible_identity_statistics(
+    tmp_path: Path,
+    observations: int,
+    switches: int,
+    reactivations: int,
+    correct_reactivations: int,
+    accuracy: float | None,
+) -> None:
+    artifact = _complete_artifact()
+    horizon = artifact["horizons"][0]
+    horizon.update(
+        {
+            "matched_identity_observations": observations,
+            "identity_switches": switches,
+            "reactivation_events": reactivations,
+            "correct_reactivations": correct_reactivations,
+            "reactivation_accuracy": accuracy,
+        }
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize("invalid_accuracy", [-0.01, 1.01, float("nan")])
+def test_cli_rejects_invalid_reactivation_accuracy(
+    tmp_path: Path,
+    invalid_accuracy: float,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["horizons"][0].update(
+        {
+            "matched_identity_observations": 3,
+            "reactivation_events": 2,
+            "correct_reactivations": 1,
+            "reactivation_accuracy": invalid_accuracy,
+        }
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize(
+    ("field", "invalid_value"),
+    [
+        ("loaded_sequences", 0),
+        ("mean_latency_ms", 0.0),
+        ("mean_latency_ms", float("nan")),
+        ("throughput_sequences_per_second", 0.0),
+        ("throughput_sequences_per_second", float("inf")),
+        ("serialized_state_bytes", 0),
+    ],
+)
+def test_cli_rejects_invalid_horizon_runtime_measurements(
+    tmp_path: Path,
+    field: str,
+    invalid_value: float,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["horizons"][0][field] = invalid_value
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+def test_cli_accepts_consistent_nonzero_reactivation_statistics(
+    tmp_path: Path,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["horizons"][0].update(
+        {
+            "matched_identity_observations": 3,
+            "reactivation_events": 2,
+            "correct_reactivations": 1,
+            "reactivation_accuracy": 0.5,
+        }
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code == 0
+    assert report == artifact

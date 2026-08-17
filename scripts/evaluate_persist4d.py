@@ -216,7 +216,9 @@ class SequenceAccumulator:
         for query_index, slot in enumerate(cpu_slots):
             if slot < 0:
                 continue
-            stage[slot] = normalized_masks[query_index].detach().bool().cpu()
+            stage[slot] = (
+                normalized_masks[query_index].detach().bool().cpu().clone()
+            )
 
         for query_index, slot in enumerate(cpu_slots):
             if slot < 0:
@@ -299,6 +301,10 @@ def identity_diagnostics(
         ]
         if len(set(normalized_gt)) != len(normalized_gt):
             raise ValueError("a GT identity cannot be duplicate within one stage")
+        if len(set(normalized_predicted)) != len(normalized_predicted):
+            raise ValueError(
+                "a predicted identity cannot be duplicate within one stage"
+            )
 
         for gt_id, predicted_id in zip(
             normalized_gt,
@@ -383,10 +389,28 @@ def _failure_artifact(error: BaseException) -> dict[str, object]:
         "errors": [
             {
                 "type": type(error).__name__,
-                "message": str(error),
+                "code": _failure_code(error),
             }
         ],
     }
+
+
+def _failure_code(error: BaseException) -> str:
+    if isinstance(error, FileNotFoundError):
+        return "missing_file"
+    if isinstance(error, FileExistsError):
+        return "output_exists"
+    if isinstance(error, PermissionError):
+        return "permission_denied"
+    if isinstance(error, _CliUsageError):
+        return "invalid_arguments"
+    if isinstance(error, ValueError):
+        return "invalid_input"
+    if isinstance(error, RuntimeError):
+        return "runtime_error"
+    if isinstance(error, OSError):
+        return "io_error"
+    return "evaluation_error"
 
 
 def _json_text(payload: Mapping[str, object]) -> str:
@@ -502,13 +526,27 @@ def _require_finite_number(value: object, *, name: str) -> float:
     return normalized
 
 
+def _require_unit_interval(value: object, *, name: str) -> float:
+    normalized = _require_finite_number(value, name=name)
+    if not 0.0 <= normalized <= 1.0:
+        raise ValueError(f"{name} must be within [0, 1]")
+    return normalized
+
+
 def _validate_complete_artifact(
     artifact: object,
     *,
     args: argparse.Namespace,
 ) -> None:
     root = _require_exact_keys(artifact, _ROOT_KEYS, name="artifact root")
-    if root["schema_version"] != SCHEMA_VERSION:
+    if (
+        _require_integer(
+            root["schema_version"],
+            name="schema_version",
+            minimum=1,
+        )
+        != SCHEMA_VERSION
+    ):
         raise ValueError("artifact schema_version must be 1")
     if root["status"] != "pass":
         raise ValueError("completed evaluation must have status=pass")
@@ -548,7 +586,17 @@ def _validate_complete_artifact(
         frozenset({"capacity", "local_window"}),
         name="settings",
     )
-    if settings["capacity"] != args.capacity or settings["local_window"] != 2:
+    capacity = _require_integer(
+        settings["capacity"],
+        name="settings.capacity",
+        minimum=1,
+    )
+    local_window = _require_integer(
+        settings["local_window"],
+        name="settings.local_window",
+        minimum=1,
+    )
+    if capacity != args.capacity or local_window != LOCAL_WINDOW:
         raise ValueError("artifact settings do not match the requested evaluation")
 
     horizons = root["horizons"]
@@ -561,46 +609,83 @@ def _validate_complete_artifact(
     serialized_sizes: list[int] = []
     for expected_horizon, item in zip(args.horizons, horizons, strict=True):
         horizon = _require_exact_keys(item, _HORIZON_KEYS, name="horizon")
-        if horizon["T"] != expected_horizon:
+        if (
+            _require_integer(horizon["T"], name="T", minimum=1)
+            != expected_horizon
+        ):
             raise ValueError("horizons are incomplete or out of order")
-        loaded = _require_integer(
+        _require_integer(
             horizon["loaded_sequences"],
             name="loaded_sequences",
             minimum=1,
         )
-        if loaded <= 0:
-            raise ValueError("a passing horizon must load at least one sequence")
-        _require_finite_number(horizon["t_mAP"], name="t_mAP")
-        _require_finite_number(horizon["t_REC"], name="t_REC")
+        _require_unit_interval(horizon["t_mAP"], name="t_mAP")
+        _require_unit_interval(horizon["t_REC"], name="t_REC")
         per_stage = horizon["per_stage_AP"]
         if not isinstance(per_stage, Mapping) or set(per_stage) != {
             str(stage) for stage in range(1, expected_horizon + 1)
         }:
             raise ValueError("per_stage_AP must contain every stage")
         for value in per_stage.values():
-            _require_finite_number(value, name="per_stage_AP")
-        for name in (
-            "matched_identity_observations",
-            "identity_switches",
-            "reactivation_events",
-            "correct_reactivations",
-            "rejected_births",
-            "peak_allocated_cuda_bytes",
-            "serialized_state_bytes",
-        ):
-            _require_integer(horizon[name], name=name)
+            _require_unit_interval(value, name="per_stage_AP")
+        observations = _require_integer(
+            horizon["matched_identity_observations"],
+            name="matched_identity_observations",
+        )
+        switches = _require_integer(
+            horizon["identity_switches"],
+            name="identity_switches",
+        )
+        reactivations = _require_integer(
+            horizon["reactivation_events"],
+            name="reactivation_events",
+        )
+        correct_reactivations = _require_integer(
+            horizon["correct_reactivations"],
+            name="correct_reactivations",
+        )
+        _require_integer(horizon["rejected_births"], name="rejected_births")
+        _require_integer(
+            horizon["peak_allocated_cuda_bytes"],
+            name="peak_allocated_cuda_bytes",
+        )
+        serialized_state_bytes = _require_integer(
+            horizon["serialized_state_bytes"],
+            name="serialized_state_bytes",
+            minimum=1,
+        )
+        if switches > observations:
+            raise ValueError("identity_switches cannot exceed observations")
+        if reactivations > max(observations - 1, 0):
+            raise ValueError("reactivation_events exceed possible observations")
+        if correct_reactivations > reactivations:
+            raise ValueError(
+                "correct_reactivations cannot exceed reactivation_events"
+            )
         accuracy = horizon["reactivation_accuracy"]
-        if accuracy is not None:
-            normalized_accuracy = _require_finite_number(
+        if reactivations == 0:
+            if accuracy is not None:
+                raise ValueError(
+                    "reactivation_accuracy must be null without reactivations"
+                )
+        else:
+            if accuracy is None:
+                raise ValueError(
+                    "reactivation_accuracy is required for reactivations"
+                )
+            normalized_accuracy = _require_unit_interval(
                 accuracy,
                 name="reactivation_accuracy",
             )
-            if not 0.0 <= normalized_accuracy <= 1.0:
-                raise ValueError("reactivation_accuracy must be within [0, 1]")
+            expected_accuracy = correct_reactivations / reactivations
+            if normalized_accuracy != expected_accuracy:
+                raise ValueError(
+                    "reactivation_accuracy does not match identity counts"
+                )
         for name in ("mean_latency_ms", "throughput_sequences_per_second"):
             if _require_finite_number(horizon[name], name=name) <= 0.0:
                 raise ValueError(f"{name} must be positive")
-        serialized_sizes.append(int(horizon["serialized_state_bytes"]))
+        serialized_sizes.append(serialized_state_bytes)
 
     bounded = _require_exact_keys(
         root["bounded_state"],
