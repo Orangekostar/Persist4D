@@ -96,8 +96,8 @@ def build_local_observation(
         if (
             not isinstance(threshold, (int, float))
             or isinstance(threshold, bool)
-            or not math.isfinite(threshold)
             or not 0.0 <= threshold <= 1.0
+            or not math.isfinite(threshold)
         ):
             raise ValueError(f"{name} must be finite and within [0, 1]")
     if (
