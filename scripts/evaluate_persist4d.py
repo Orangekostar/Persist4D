@@ -34,6 +34,7 @@ FORMAL_CHECKPOINT_REFERENCE = (
     "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt"
 )
 DEFAULT_HORIZONS = (2, 3, 4, 5)
+OFFICIAL_FILTERED_SEQUENCE_COUNTS = {2: 154, 3: 120, 4: 75, 5: 43}
 LOCAL_WINDOW = 2
 RUNTIME_RECIPROCAL_RTOL = 1e-4
 
@@ -439,6 +440,70 @@ def _identity_id(value: object, *, name: str) -> int:
     return normalized
 
 
+@dataclass(frozen=True)
+class _LegacyTensorSnapshot:
+    device: torch.device
+    dtype: torch.dtype
+    shape: tuple[int, ...]
+    content: Tensor
+
+
+@dataclass(frozen=True)
+class _LegacyArraySnapshot:
+    dtype: Any
+    shape: tuple[int, ...]
+    content: Any
+
+
+def _legacy_value_snapshot(value: object, *, path: str) -> object:
+    if isinstance(value, (_LegacyTensorSnapshot, _LegacyArraySnapshot)):
+        return value
+    if isinstance(value, Tensor):
+        return _LegacyTensorSnapshot(
+            device=value.device,
+            dtype=value.dtype,
+            shape=tuple(value.shape),
+            content=value.detach().cpu().clone(),
+        )
+
+    import numpy as np
+
+    if isinstance(value, np.ndarray):
+        return _LegacyArraySnapshot(
+            dtype=value.dtype,
+            shape=tuple(value.shape),
+            content=value.copy(),
+        )
+    if isinstance(value, Mapping):
+        snapshot: dict[object, object] = {}
+        for key, item in value.items():
+            if key is not None and type(key) not in {str, int, float, bool}:
+                raise ValueError(
+                    f"unsupported legacy parity value at {path}.<key>"
+                )
+            snapshot[key] = _legacy_value_snapshot(
+                item,
+                path=f"{path}.{key}",
+            )
+        return snapshot
+    if type(value) is list:
+        return [
+            _legacy_value_snapshot(item, path=f"{path}[{index}]")
+            for index, item in enumerate(value)
+        ]
+    if type(value) is tuple:
+        return tuple(
+            _legacy_value_snapshot(item, path=f"{path}[{index}]")
+            for index, item in enumerate(value)
+        )
+    if value is None or type(value) in {str, int, float, bool}:
+        return value
+    raise ValueError(
+        f"unsupported legacy parity value at {path}: "
+        f"{type(value).__module__}.{type(value).__qualname__}"
+    )
+
+
 def _require_legacy_value_equal(
     actual: object,
     expected: object,
@@ -447,21 +512,22 @@ def _require_legacy_value_equal(
 ) -> None:
     if type(actual) is not type(expected):
         raise RuntimeError(f"legacy prediction changed at {path}")
-    if isinstance(expected, Tensor):
+    if isinstance(expected, _LegacyTensorSnapshot):
         if (
-            actual.shape != expected.shape
+            actual.device != expected.device
             or actual.dtype != expected.dtype
-            or actual.device != expected.device
-            or not torch.equal(actual, expected)
+            or actual.shape != expected.shape
+            or not torch.equal(actual.content, expected.content)
         ):
             raise RuntimeError(f"legacy prediction changed at {path}")
         return
-    if type(expected).__module__.startswith("numpy"):
+    if isinstance(expected, _LegacyArraySnapshot):
         import numpy as np
 
-        if isinstance(expected, np.ndarray) and not np.array_equal(
-            actual,
-            expected,
+        if (
+            actual.dtype != expected.dtype
+            or actual.shape != expected.shape
+            or not np.array_equal(actual.content, expected.content)
         ):
             raise RuntimeError(f"legacy prediction changed at {path}")
         return
@@ -475,10 +541,7 @@ def _require_legacy_value_equal(
                 path=f"{path}.{key}",
             )
         return
-    if isinstance(expected, Sequence) and not isinstance(
-        expected,
-        (str, bytes, bytearray),
-    ):
+    if type(expected) in {list, tuple}:
         if len(actual) != len(expected):
             raise RuntimeError(f"legacy prediction changed at {path}")
         for index, (actual_item, expected_item) in enumerate(
@@ -490,10 +553,11 @@ def _require_legacy_value_equal(
                 path=f"{path}[{index}]",
             )
         return
-    if expected is None or isinstance(expected, (str, bytes, int, float, bool)):
+    if expected is None or type(expected) in {str, int, float, bool}:
         if actual == expected:
             return
         raise RuntimeError(f"legacy prediction changed at {path}")
+    raise ValueError(f"unsupported legacy parity value at {path}")
 
 
 def _legacy_parity_result(
@@ -520,21 +584,34 @@ def _legacy_parity_result(
     }
     if set(enabled_base) != {*disabled_output, "query_features"}:
         raise RuntimeError("legacy prediction keys changed")
-    for key, expected in disabled_output.items():
+    disabled_snapshot = _legacy_value_snapshot(
+        disabled_output,
+        path="disabled_output",
+    )
+    enabled_snapshot = _legacy_value_snapshot(
+        enabled_base,
+        path="enabled_output",
+    )
+    if not isinstance(disabled_snapshot, Mapping) or not isinstance(
+        enabled_snapshot,
+        Mapping,
+    ):
+        raise TypeError("legacy parity snapshots must be mappings")
+    for key, expected in disabled_snapshot.items():
         _require_legacy_value_equal(
-            enabled_base[key],
+            enabled_snapshot[key],
             expected,
             path=key,
         )
-    query_features = enabled_base["query_features"]
+    query_features = enabled_snapshot["query_features"]
     if (
-        not isinstance(query_features, Tensor)
-        or query_features.ndim != 3
+        not isinstance(query_features, _LegacyTensorSnapshot)
+        or len(query_features.shape) != 3
         or query_features.shape[0] != 1
         or query_features.shape[1] != validated_capacity
         or query_features.shape[2] <= 0
-        or not query_features.is_floating_point()
-        or not torch.isfinite(query_features).all().item()
+        or not query_features.content.is_floating_point()
+        or not torch.isfinite(query_features.content).all().item()
     ):
         raise RuntimeError("query feature export failed the parity contract")
     return {
@@ -872,7 +949,15 @@ def _validate_source_tree_contract(
         _SOURCE_TREE_KEYS,
         name="source_tree_contract",
     )
-    if contract["schema_version"] != 1 or contract["status"] != "pass":
+    if (
+        _require_integer(
+            contract["schema_version"],
+            name="source_tree_contract.schema_version",
+            minimum=1,
+        )
+        != 1
+        or contract["status"] != "pass"
+    ):
         raise ValueError("source_tree_contract must be passing schema 1")
     if contract["source_commit"] != source_commit:
         raise ValueError("source_tree_contract source_commit mismatch")
@@ -912,7 +997,14 @@ def _validate_legacy_parity(value: object, *, capacity: int) -> None:
     )
     if parity["verified_by"] != "in_evaluator_fixed_t2_sample_toggle":
         raise ValueError("legacy_parity verification method is invalid")
-    if parity["sample_count"] != 1:
+    if (
+        _require_integer(
+            parity["sample_count"],
+            name="legacy_parity.sample_count",
+            minimum=1,
+        )
+        != 1
+    ):
         raise ValueError("legacy_parity must verify exactly one sample")
     if parity["legacy_predictions_unchanged"] is not True:
         raise ValueError("legacy_parity must preserve every legacy prediction")
@@ -931,6 +1023,8 @@ def _validate_metric_block(
     value: object,
     *,
     horizon: int,
+    loaded_sequences: int,
+    capacity: int,
     name: str,
     persistent: bool,
 ) -> Mapping[str, object]:
@@ -963,11 +1057,16 @@ def _validate_metric_block(
         metrics["correct_reactivations"],
         name=f"{name}.correct_reactivations",
     )
+    maximum_query_events = loaded_sequences * horizon * capacity
+    if observations > maximum_query_events:
+        raise ValueError(f"{name}.matched_identity_observations exceed query bound")
     if persistent:
-        _require_integer(
+        rejected_births = _require_integer(
             metrics["rejected_births"],
             name=f"{name}.rejected_births",
         )
+        if rejected_births > maximum_query_events:
+            raise ValueError(f"{name}.rejected_births exceed query bound")
     if switches > max(observations - 1, 0):
         raise ValueError(f"{name}.identity_switches are impossible")
     if reactivations > max(observations - 1, 0):
@@ -976,6 +1075,10 @@ def _validate_metric_block(
         raise ValueError(f"{name}.correct_reactivations are impossible")
     if reactivations - correct_reactivations > switches:
         raise ValueError(f"{name}.incorrect reactivations exceed switches")
+    if switches + correct_reactivations > max(observations - 1, 0):
+        raise ValueError(f"{name}.identity transition counts are impossible")
+    if horizon == 2 and (reactivations != 0 or correct_reactivations != 0):
+        raise ValueError(f"{name}.T2 reactivation counts must be zero")
     accuracy = metrics["reactivation_accuracy"]
     if reactivations == 0:
         if accuracy is not None:
@@ -1114,30 +1217,40 @@ def _validate_complete_artifact(
         raise ValueError(  # noqa: TRY004 - artifact validation contract.
             "horizons must be a list"
         )
-    if len(horizons) != len(args.horizons):
+    if tuple(args.horizons) != DEFAULT_HORIZONS:
+        raise ValueError("artifact validation requires horizons 2 3 4 5")
+    if len(horizons) != len(DEFAULT_HORIZONS):
         raise ValueError("horizons must contain every requested horizon")
     serialized_sizes: list[int] = []
-    for expected_horizon, item in zip(args.horizons, horizons, strict=True):
+    for expected_horizon, item in zip(DEFAULT_HORIZONS, horizons, strict=True):
         horizon = _require_exact_keys(item, _HORIZON_KEYS, name="horizon")
         if (
             _require_integer(horizon["T"], name="T", minimum=1)
             != expected_horizon
         ):
             raise ValueError("horizons are incomplete or out of order")
-        _require_integer(
+        loaded_sequences = _require_integer(
             horizon["loaded_sequences"],
             name="loaded_sequences",
             minimum=1,
         )
+        if loaded_sequences != OFFICIAL_FILTERED_SEQUENCE_COUNTS[expected_horizon]:
+            raise ValueError(
+                "loaded_sequences does not match the official filtered database"
+            )
         persistent = _validate_metric_block(
             horizon["persistent"],
             horizon=expected_horizon,
+            loaded_sequences=loaded_sequences,
+            capacity=capacity,
             name="persistent",
             persistent=True,
         )
         baseline = _validate_metric_block(
             horizon["internal_baseline"],
             horizon=expected_horizon,
+            loaded_sequences=loaded_sequences,
+            capacity=capacity,
             name="internal_baseline",
             persistent=False,
         )
@@ -1155,6 +1268,7 @@ def _validate_complete_artifact(
         _require_integer(
             resources["peak_allocated_cuda_bytes"],
             name="resources.peak_allocated_cuda_bytes",
+            minimum=1,
         )
         serialized_state_bytes = _require_integer(
             resources["serialized_state_bytes"],
@@ -1463,10 +1577,7 @@ def _require_clean_source_snapshot(guard: _SourceTreeGuard) -> None:
         "-z",
         "--no-ext-diff",
     )
-    if staged or unstaged:
-        raise RuntimeError("tracked source changes are forbidden")
-    if _git_index_flag_paths(guard.repo_root):
-        raise RuntimeError("hidden Git index flags are forbidden")
+    index_flag_paths = _git_index_flag_paths(guard.repo_root)
     untracked = set(
         _git_paths(
             guard.repo_root,
@@ -1476,6 +1587,12 @@ def _require_clean_source_snapshot(guard: _SourceTreeGuard) -> None:
             "-z",
         )
     )
+    if git_commit(guard.repo_root) != guard.source_commit:
+        raise RuntimeError("Git HEAD changed during evaluation")
+    if staged or unstaged:
+        raise RuntimeError("tracked source changes are forbidden")
+    if index_flag_paths:
+        raise RuntimeError("hidden Git index flags are forbidden")
     disallowed = untracked.difference(guard.allowed_untracked_paths)
     if disallowed:
         raise RuntimeError("untracked files outside declared outputs are forbidden")
@@ -1922,26 +2039,6 @@ def _summarize_method_metrics(
     return result
 
 
-def _cpu_snapshot(value: object) -> object:
-    if isinstance(value, Tensor):
-        return value.detach().cpu().clone()
-    if isinstance(value, Mapping):
-        return {key: _cpu_snapshot(item) for key, item in value.items()}
-    if isinstance(value, list):
-        return [_cpu_snapshot(item) for item in value]
-    if isinstance(value, tuple):
-        return tuple(_cpu_snapshot(item) for item in value)
-    if type(value).__module__.startswith("numpy"):
-        import numpy as np
-
-        if isinstance(value, np.ndarray):
-            return value.copy()
-    if value is None or isinstance(value, (str, bytes, int, float, bool)):
-        return copy.deepcopy(value)
-    value_type = type(value)
-    return ("opaque_type", value_type.__module__, value_type.__qualname__)
-
-
 def _run_legacy_parity_step(
     streaming: Any,
     *,
@@ -1993,7 +2090,10 @@ def _run_legacy_parity_step(
                     raw_coordinates=raw_coordinates,
                     is_eval=True,
                 )
-            disabled_snapshot = _cpu_snapshot(disabled_output)
+            disabled_snapshot = _legacy_value_snapshot(
+                disabled_output,
+                path="disabled_output",
+            )
             del disabled_output
 
             base_model.return_query_features = True
@@ -2016,7 +2116,10 @@ def _run_legacy_parity_step(
                 key: (
                     None
                     if key in _PERSISTENT_OUTPUT_KEYS
-                    else _cpu_snapshot(value)
+                    else _legacy_value_snapshot(
+                        value,
+                        path=f"enabled_output.{key}",
+                    )
                 )
                 for key, value in enabled_output.items()
             }

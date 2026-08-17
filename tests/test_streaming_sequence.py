@@ -777,10 +777,15 @@ def test_real_persist4d_artifact_passes_bounded_gpu_gate() -> None:
 
     horizons = artifact["horizons"]
     assert [horizon["T"] for horizon in horizons] == [2, 3, 4, 5]
+    assert [horizon["loaded_sequences"] for horizon in horizons] == [
+        154,
+        120,
+        75,
+        43,
+    ]
     state_sizes = []
     for horizon in horizons:
         assert set(horizon) == _P5_HORIZON_KEYS
-        assert horizon["loaded_sequences"] > 0
         assert set(horizon["persistent"]) == _P5_PERSISTENT_METRIC_KEYS
         assert set(horizon["internal_baseline"]) == _P5_METRIC_KEYS
         assert set(horizon["delta"]) == _P5_METRIC_KEYS

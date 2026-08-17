@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
-from dataclasses import fields
+from dataclasses import fields, replace
 from pathlib import Path
 
 import numpy as np
@@ -370,6 +370,32 @@ def test_source_tree_contract_rejects_head_change_during_generation(
         _finalize_source_tree_contract(guard)
 
 
+def test_source_tree_contract_rechecks_head_after_all_status_queries(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    repo = _temporary_git_repo(tmp_path)
+    guard = _begin_source_tree_contract(
+        repo_root=repo,
+        output_paths=(repo / "result.json", repo / "result.md"),
+    )
+    original_git_paths = evaluator._git_paths
+
+    def git_paths_with_head_change(
+        repo_root: Path,
+        *arguments: str,
+    ) -> tuple[str, ...]:
+        paths = original_git_paths(repo_root, *arguments)
+        if arguments[:2] == ("ls-files", "--others"):
+            _git(repo, "commit", "--allow-empty", "-qm", "change during status")
+        return paths
+
+    monkeypatch.setattr(evaluator, "_git_paths", git_paths_with_head_change)
+
+    with pytest.raises(RuntimeError, match="HEAD changed"):
+        _finalize_source_tree_contract(guard)
+
+
 def test_real_cli_path_publishes_only_declared_outputs_from_clean_head(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -572,7 +598,7 @@ def _horizon_result(horizon: int) -> dict[str, object]:
     )
     return {
         "T": horizon,
-        "loaded_sequences": 1,
+        "loaded_sequences": {2: 154, 3: 120, 4: 75, 5: 43}[horizon],
         "persistent": persistent,
         "internal_baseline": baseline,
         "delta": _metric_delta(persistent, baseline),
@@ -631,6 +657,26 @@ def _complete_artifact() -> dict[str, object]:
     }
 
 
+def _set_artifact_path(
+    artifact: dict[str, object],
+    path: tuple[str | int, ...],
+    value: object,
+) -> None:
+    cursor: object = artifact
+    for component in path[:-1]:
+        if isinstance(component, int):
+            assert isinstance(cursor, list)
+        else:
+            assert isinstance(cursor, dict)
+        cursor = cursor[component]
+    final = path[-1]
+    if isinstance(final, int):
+        assert isinstance(cursor, list)
+    else:
+        assert isinstance(cursor, dict)
+    cursor[final] = value
+
+
 def _run_mock_artifact(
     tmp_path: Path,
     artifact: dict[str, object],
@@ -681,17 +727,12 @@ def test_legacy_parity_result_rejects_changed_legacy_prediction() -> None:
         _legacy_parity_result(disabled, enabled, capacity=2)
 
 
-def test_legacy_parity_handles_numpy_and_type_only_runtime_outputs() -> None:
-    class SparseOutput:
-        pass
-
+def test_legacy_parity_handles_numpy_outputs() -> None:
     disabled = {
         "sampled_coords": np.array([[1.0, 2.0]], dtype=np.float32),
-        "backbone_features": SparseOutput(),
     }
     enabled = {
         "sampled_coords": disabled["sampled_coords"].copy(),
-        "backbone_features": SparseOutput(),
         "query_features": torch.ones(1, 2, 4),
         "persistent_slot_ids": torch.arange(2).unsqueeze(0),
         "persistent_association_scores": torch.ones(1, 2),
@@ -701,6 +742,75 @@ def test_legacy_parity_handles_numpy_and_type_only_runtime_outputs() -> None:
     result = _legacy_parity_result(disabled, enabled, capacity=2)
 
     assert result["legacy_predictions_unchanged"] is True
+
+
+@pytest.mark.parametrize("same_type", [True, False], ids=["same", "different"])
+def test_legacy_parity_rejects_unknown_runtime_outputs(same_type: bool) -> None:
+    class FirstUnknown:
+        pass
+
+    class SecondUnknown:
+        pass
+
+    disabled = {"runtime_output": FirstUnknown()}
+    enabled = {
+        "runtime_output": FirstUnknown() if same_type else SecondUnknown(),
+        "query_features": torch.ones(1, 2, 4),
+        "persistent_slot_ids": torch.arange(2).unsqueeze(0),
+        "persistent_association_scores": torch.ones(1, 2),
+        "persistent_rejected_births": torch.zeros(1, 2, dtype=torch.bool),
+    }
+
+    with pytest.raises(ValueError, match="unsupported legacy parity value"):
+        _legacy_parity_result(disabled, enabled, capacity=2)
+
+
+def test_legacy_parity_rejects_numpy_dtype_change() -> None:
+    disabled = {"sampled_coords": np.array([[1.0, 2.0]], dtype=np.float32)}
+    enabled = {
+        "sampled_coords": np.array([[1.0, 2.0]], dtype=np.float64),
+        "query_features": torch.ones(1, 2, 4),
+        "persistent_slot_ids": torch.arange(2).unsqueeze(0),
+        "persistent_association_scores": torch.ones(1, 2),
+        "persistent_rejected_births": torch.zeros(1, 2, dtype=torch.bool),
+    }
+
+    with pytest.raises(RuntimeError, match="legacy prediction"):
+        _legacy_parity_result(disabled, enabled, capacity=2)
+
+
+def test_legacy_snapshot_records_tensor_metadata_and_clones_content() -> None:
+    source = torch.tensor([[1.0, 2.0]], dtype=torch.float32)
+
+    snapshot = evaluator._legacy_value_snapshot(source, path="pred_logits")
+    source.fill_(9.0)
+
+    assert snapshot.device == torch.device("cpu")
+    assert snapshot.dtype == torch.float32
+    assert snapshot.shape == (1, 2)
+    assert torch.equal(snapshot.content, torch.tensor([[1.0, 2.0]]))
+
+    changed_device = replace(snapshot, device=torch.device("meta"))
+    with pytest.raises(RuntimeError, match="legacy prediction"):
+        evaluator._require_legacy_value_equal(
+            changed_device,
+            snapshot,
+            path="pred_logits",
+        )
+
+
+def test_legacy_snapshot_records_ndarray_metadata_and_copies_content() -> None:
+    source = np.array([[1.0, 2.0]], dtype=np.float32)
+
+    snapshot = evaluator._legacy_value_snapshot(source, path="sampled_coords")
+    source.fill(9.0)
+
+    assert snapshot.dtype == np.dtype(np.float32)
+    assert snapshot.shape == (1, 2)
+    assert np.array_equal(
+        snapshot.content,
+        np.array([[1.0, 2.0]], dtype=np.float32),
+    )
 
 
 @pytest.mark.parametrize(
@@ -780,8 +890,8 @@ def test_markdown_renderer_covers_evidence_contract() -> None:
     assert "Checkpoint SHA-256: `" + "b" * 64 + "`" in report
     assert "Legacy predictions unchanged: `true`" in report
     assert "Internal baseline identity: `local_query_index`" in report
-    assert "| 2 | 1 | persistent |" in report
-    assert "| 2 | 1 | internal_baseline |" in report
+    assert "| 2 | 154 | persistent |" in report
+    assert "| 2 | 154 | internal_baseline |" in report
     assert "| 2 | delta (persistent - baseline) |" in report
     assert "Peak CUDA bytes" in report
     assert "Conclusion: `P5_ASSOCIATION_DIAGNOSIS`" in report
@@ -1144,6 +1254,149 @@ def test_cli_rejects_nonintegral_horizon_counts(
 
 
 @pytest.mark.parametrize(
+    "path",
+    [
+        ("schema_version",),
+        ("source_tree_contract", "schema_version"),
+        ("settings", "capacity"),
+        ("settings", "local_window"),
+        ("legacy_parity", "sample_count"),
+        ("legacy_parity", "query_feature_shape", 0),
+        ("horizons", 0, "T"),
+        ("horizons", 0, "loaded_sequences"),
+        ("horizons", 0, "persistent", "matched_identity_observations"),
+        ("horizons", 0, "persistent", "identity_switches"),
+        ("horizons", 0, "persistent", "reactivation_events"),
+        ("horizons", 0, "persistent", "correct_reactivations"),
+        ("horizons", 0, "persistent", "rejected_births"),
+        ("horizons", 0, "internal_baseline", "matched_identity_observations"),
+        ("horizons", 0, "internal_baseline", "identity_switches"),
+        ("horizons", 0, "internal_baseline", "reactivation_events"),
+        ("horizons", 0, "internal_baseline", "correct_reactivations"),
+        ("horizons", 0, "delta", "identity_switches"),
+        ("horizons", 0, "resources", "peak_allocated_cuda_bytes"),
+        ("horizons", 0, "resources", "serialized_state_bytes"),
+        ("bounded_state", "maximum_state_bytes"),
+    ],
+)
+def test_cli_rejects_boolean_values_for_integer_schema_fields(
+    tmp_path: Path,
+    path: tuple[str | int, ...],
+) -> None:
+    artifact = _complete_artifact()
+    _set_artifact_path(artifact, path, True)
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize(
+    ("horizon_index", "expected_count"),
+    [(0, 154), (1, 120), (2, 75), (3, 43)],
+)
+def test_cli_requires_official_filtered_sequence_counts(
+    tmp_path: Path,
+    horizon_index: int,
+    expected_count: int,
+) -> None:
+    artifact = _complete_artifact()
+    artifact["horizons"][horizon_index]["loaded_sequences"] = expected_count + 1
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
+def test_cli_rejects_matched_observations_above_query_event_bound(
+    tmp_path: Path,
+    method: str,
+) -> None:
+    artifact = _complete_artifact()
+    horizon = artifact["horizons"][1]
+    maximum_query_events = horizon["loaded_sequences"] * horizon["T"] * 100
+    horizon[method]["matched_identity_observations"] = maximum_query_events + 1
+    horizon["delta"] = _metric_delta(
+        horizon["persistent"],
+        horizon["internal_baseline"],
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+def test_cli_rejects_birth_rejections_above_query_event_bound(
+    tmp_path: Path,
+) -> None:
+    artifact = _complete_artifact()
+    horizon = artifact["horizons"][1]
+    maximum_query_events = horizon["loaded_sequences"] * horizon["T"] * 100
+    horizon["persistent"]["rejected_births"] = maximum_query_events + 1
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
+def test_cli_rejects_t2_reactivation_events(
+    tmp_path: Path,
+    method: str,
+) -> None:
+    artifact = _complete_artifact()
+    horizon = artifact["horizons"][0]
+    horizon[method].update(
+        {
+            "reactivation_events": 1,
+            "correct_reactivations": 1,
+            "reactivation_accuracy": 1.0,
+        }
+    )
+    horizon["delta"] = _metric_delta(
+        horizon["persistent"],
+        horizon["internal_baseline"],
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
+def test_cli_rejects_identity_transition_union_above_observations(
+    tmp_path: Path,
+    method: str,
+) -> None:
+    artifact = _complete_artifact()
+    horizon = artifact["horizons"][1]
+    horizon[method].update(
+        {
+            "matched_identity_observations": 3,
+            "identity_switches": 2,
+            "reactivation_events": 1,
+            "correct_reactivations": 1,
+            "reactivation_accuracy": 1.0,
+        }
+    )
+    horizon["delta"] = _metric_delta(
+        horizon["persistent"],
+        horizon["internal_baseline"],
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize(
     (
         "observations",
         "switches",
@@ -1222,6 +1475,7 @@ def test_cli_rejects_invalid_reactivation_accuracy(
         ("mean_latency_ms", float("nan")),
         ("throughput_sequences_per_second", 0.0),
         ("throughput_sequences_per_second", float("inf")),
+        ("peak_allocated_cuda_bytes", 0),
         ("serialized_state_bytes", 0),
     ],
 )
@@ -1280,7 +1534,7 @@ def test_cli_accepts_consistent_nonzero_reactivation_statistics(
     tmp_path: Path,
 ) -> None:
     artifact = _complete_artifact()
-    horizon = artifact["horizons"][0]
+    horizon = artifact["horizons"][1]
     horizon["persistent"].update(
         {
             "matched_identity_observations": 3,
