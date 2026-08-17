@@ -4,6 +4,7 @@ import json
 import subprocess
 import sys
 from dataclasses import fields, replace
+from itertools import product
 from pathlib import Path
 
 import numpy as np
@@ -1399,6 +1400,62 @@ def _set_identity_statistics(
     )
 
 
+def _enumerated_aggregate_reactivation_maxima(
+    horizon: int,
+    maximum_tracks: int,
+) -> list[int]:
+    best_single_track = [-1] * (horizon + 1)
+    for trajectory in product((False, True), repeat=horizon):
+        observations = sum(trajectory)
+        seen_observation = False
+        previous_observation = False
+        reactivations = 0
+        for observed in trajectory:
+            if observed and seen_observation and not previous_observation:
+                reactivations += 1
+            seen_observation = seen_observation or observed
+            previous_observation = observed
+        best_single_track[observations] = max(
+            best_single_track[observations],
+            reactivations,
+        )
+
+    maxima = [-1] * (horizon * maximum_tracks + 1)
+    maxima[0] = 0
+    for _ in range(maximum_tracks):
+        next_maxima = [-1] * len(maxima)
+        for accumulated_observations, accumulated_reactivations in enumerate(
+            maxima
+        ):
+            if accumulated_reactivations < 0:
+                continue
+            for observations, reactivations in enumerate(best_single_track):
+                total_observations = accumulated_observations + observations
+                if total_observations >= len(maxima):
+                    continue
+                next_maxima[total_observations] = max(
+                    next_maxima[total_observations],
+                    accumulated_reactivations + reactivations,
+                )
+        maxima = next_maxima
+    return maxima
+
+
+def test_exact_reactivation_bound_matches_exhaustive_track_dp() -> None:
+    for horizon in range(2, 6):
+        for maximum_tracks in range(1, 5):
+            expected_maxima = _enumerated_aggregate_reactivation_maxima(
+                horizon,
+                maximum_tracks,
+            )
+            for observations, expected in enumerate(expected_maxima):
+                assert evaluator._maximum_aggregate_reactivations(
+                    observations,
+                    horizon=horizon,
+                    maximum_tracks=maximum_tracks,
+                ) == expected, (horizon, maximum_tracks, observations)
+
+
 @pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
 @pytest.mark.parametrize(
     ("horizon_index", "observations", "switches"),
@@ -1537,20 +1594,49 @@ def test_cli_rejects_reactivations_above_aggregate_horizon_bound(
     assert report["status"] == "failed"
 
 
+_EXACT_REACTIVATION_BOUNDARIES = [
+    pytest.param(0, 30_800, 0, id="T2_2M"),
+    pytest.param(1, 24_000, 12_000, id="T3_2M"),
+    pytest.param(1, 24_001, 11_999, id="T3_2M_plus_1"),
+    pytest.param(1, 36_000, 0, id="T3_3M"),
+    pytest.param(2, 15_000, 7_500, id="T4_2M"),
+    pytest.param(2, 15_001, 7_500, id="T4_2M_plus_1"),
+    pytest.param(2, 22_500, 7_500, id="T4_3M"),
+    pytest.param(2, 22_501, 7_499, id="T4_3M_plus_1"),
+    pytest.param(2, 30_000, 0, id="T4_4M"),
+    pytest.param(3, 12_900, 8_600, id="T5_3M"),
+    pytest.param(3, 12_901, 8_599, id="T5_3M_plus_1"),
+    pytest.param(
+        3,
+        17_200,
+        4_300,
+        id="T5_review_counterexample_4M",
+    ),
+    pytest.param(3, 21_500, 0, id="T5_5M"),
+]
+
+
 @pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
-def test_cli_accepts_reactivations_at_t3_capacity_saturation_bound(
+@pytest.mark.parametrize(
+    ("horizon_index", "observations", "maximum_reactivations"),
+    _EXACT_REACTIVATION_BOUNDARIES,
+)
+def test_cli_accepts_exact_aggregate_reactivation_bound(
     tmp_path: Path,
     method: str,
+    horizon_index: int,
+    observations: int,
+    maximum_reactivations: int,
 ) -> None:
     artifact = _complete_artifact()
     _set_identity_statistics(
         artifact,
-        horizon_index=1,
+        horizon_index=horizon_index,
         method=method,
-        observations=24_000,
+        observations=observations,
         switches=0,
-        reactivations=12_000,
-        correct_reactivations=12_000,
+        reactivations=maximum_reactivations,
+        correct_reactivations=maximum_reactivations,
     )
 
     return_code, report = _run_mock_artifact(tmp_path, artifact)
@@ -1560,19 +1646,26 @@ def test_cli_accepts_reactivations_at_t3_capacity_saturation_bound(
 
 
 @pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
-def test_cli_rejects_reactivations_above_t3_capacity_saturation_bound(
+@pytest.mark.parametrize(
+    ("horizon_index", "observations", "maximum_reactivations"),
+    _EXACT_REACTIVATION_BOUNDARIES,
+)
+def test_cli_rejects_reactivations_above_exact_aggregate_bound(
     tmp_path: Path,
     method: str,
+    horizon_index: int,
+    observations: int,
+    maximum_reactivations: int,
 ) -> None:
     artifact = _complete_artifact()
     _set_identity_statistics(
         artifact,
-        horizon_index=1,
+        horizon_index=horizon_index,
         method=method,
-        observations=24_002,
+        observations=observations,
         switches=0,
-        reactivations=12_001,
-        correct_reactivations=12_001,
+        reactivations=maximum_reactivations + 1,
+        correct_reactivations=maximum_reactivations + 1,
     )
 
     return_code, report = _run_mock_artifact(tmp_path, artifact)

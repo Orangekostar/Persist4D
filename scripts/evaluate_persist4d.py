@@ -1026,14 +1026,30 @@ def _maximum_identity_transitions(observations: int, horizon: int) -> int:
     return observations - minimum_tracks
 
 
-def _maximum_reactivation_events(observations: int, horizon: int) -> int:
-    maximum_per_track = (horizon - 1) // 2
-    if observations == 0 or maximum_per_track == 0:
+def _maximum_aggregate_reactivations(
+    observations: int,
+    *,
+    horizon: int,
+    maximum_tracks: int,
+) -> int:
+    """Return the exact aggregate bound for the fixed T=2..5 contract."""
+    if horizon == 2:
         return 0
-    minimum_tracks = (
-        observations + maximum_per_track
-    ) // (maximum_per_track + 1)
-    return observations - minimum_tracks
+    if horizon == 3:
+        if observations <= 2 * maximum_tracks:
+            return observations // 2
+        return max(0, 3 * maximum_tracks - observations)
+    if horizon == 4:
+        if observations <= 2 * maximum_tracks:
+            return observations // 2
+        if observations <= 3 * maximum_tracks:
+            return maximum_tracks
+        return max(0, 4 * maximum_tracks - observations)
+    if horizon == 5:
+        if observations <= 3 * maximum_tracks:
+            return (2 * observations) // 3
+        return max(0, 5 * maximum_tracks - observations)
+    raise ValueError("reactivation bound requires horizon 2..5")
 
 
 def _validate_metric_block(
@@ -1085,9 +1101,10 @@ def _validate_metric_block(
         if rejected_births > maximum_query_events:
             raise ValueError(f"{name}.rejected_births exceed query bound")
     maximum_transitions = _maximum_identity_transitions(observations, horizon)
-    maximum_reactivations = min(
-        _maximum_reactivation_events(observations, horizon),
-        loaded_sequences * capacity * max(horizon - 2, 0),
+    maximum_reactivations = _maximum_aggregate_reactivations(
+        observations,
+        horizon=horizon,
+        maximum_tracks=loaded_sequences * capacity,
     )
     if switches > maximum_transitions:
         raise ValueError(f"{name}.identity_switches are impossible")
