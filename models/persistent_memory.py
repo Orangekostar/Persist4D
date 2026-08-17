@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 import torch
@@ -73,6 +75,171 @@ class LocalInstanceObservation:
                 raise ValueError(f"{name} must have a floating dtype")
             if not torch.isfinite(tensor).all().item():
                 raise ValueError(f"{name} must contain only finite values")
+
+
+def build_local_observation(
+    outputs: Mapping[str, object],
+    segment_stages: list[Tensor],
+    *,
+    latest_stage: int,
+    background_class: int,
+    confidence_threshold: float,
+    mask_threshold: float,
+    minimum_mask_support: int,
+) -> LocalInstanceObservation:
+    if not isinstance(latest_stage, int) or isinstance(latest_stage, bool):
+        raise ValueError("latest_stage must be an integer")  # noqa: TRY004
+    for name, threshold in (
+        ("confidence_threshold", confidence_threshold),
+        ("mask_threshold", mask_threshold),
+    ):
+        if (
+            not isinstance(threshold, (int, float))
+            or isinstance(threshold, bool)
+            or not math.isfinite(threshold)
+            or not 0.0 <= threshold <= 1.0
+        ):
+            raise ValueError(f"{name} must be finite and within [0, 1]")
+    if (
+        not isinstance(minimum_mask_support, int)
+        or isinstance(minimum_mask_support, bool)
+        or minimum_mask_support <= 0
+    ):
+        raise ValueError("minimum_mask_support must be a positive integer")
+
+    if not isinstance(outputs, Mapping):
+        raise ValueError("outputs must be a mapping")  # noqa: TRY004
+    required_keys = ("query_features", "pred_logits", "pred_masks")
+    for key in required_keys:
+        if key not in outputs:
+            raise ValueError(f"outputs is missing required key: {key}")
+
+    features = outputs["query_features"]
+    logits = outputs["pred_logits"]
+    mask_logits_by_batch = outputs["pred_masks"]
+    if not isinstance(features, Tensor):
+        raise ValueError("query_features must be a tensor")  # noqa: TRY004
+    if not isinstance(logits, Tensor):
+        raise ValueError("pred_logits must be a tensor")  # noqa: TRY004
+    if features.ndim != 3:
+        raise ValueError("query_features must have shape [B, Q, D]")
+    if logits.ndim != 3:
+        raise ValueError("pred_logits must have shape [B, Q, C]")
+    if features.shape[:2] != logits.shape[:2]:
+        raise ValueError("query_features and pred_logits must share B and Q")
+    if logits.shape[2] < 2:
+        raise ValueError("pred_logits must contain at least two classes")
+    if (
+        not isinstance(background_class, int)
+        or isinstance(background_class, bool)
+        or not 0 <= background_class < logits.shape[2]
+    ):
+        raise ValueError("background_class must index the class dimension")
+    if not features.is_floating_point():
+        raise ValueError("query_features must have a floating dtype")
+    if not logits.is_floating_point():
+        raise ValueError("pred_logits must have a floating dtype")
+
+    batch_size, query_count = features.shape[:2]
+    if not isinstance(mask_logits_by_batch, list):
+        raise ValueError("pred_masks must be a list")  # noqa: TRY004
+    if len(mask_logits_by_batch) != batch_size:
+        raise ValueError("pred_masks must contain one tensor per batch item")
+    if not isinstance(segment_stages, list):
+        raise ValueError("segment_stages must be a list")  # noqa: TRY004
+    if len(segment_stages) != batch_size:
+        raise ValueError("segment_stages must contain one tensor per batch item")
+
+    expected_device = features.device
+    if logits.device != expected_device:
+        raise ValueError("all observation inputs must use the same device")
+    for batch_index, (mask_logits, stages) in enumerate(
+        zip(mask_logits_by_batch, segment_stages, strict=True)
+    ):
+        if not isinstance(mask_logits, Tensor):
+            raise ValueError(  # noqa: TRY004
+                f"pred_masks[{batch_index}] must be a tensor"
+            )
+        if not isinstance(stages, Tensor):
+            raise ValueError(  # noqa: TRY004
+                f"segment_stages[{batch_index}] must be a tensor"
+            )
+        if mask_logits.ndim != 2 or mask_logits.shape[1] != query_count:
+            raise ValueError(
+                f"pred_masks[{batch_index}] must have shape [S, Q]"
+            )
+        if stages.ndim != 1 or stages.shape[0] != mask_logits.shape[0]:
+            raise ValueError(
+                f"segment_stages[{batch_index}] must have shape [S]"
+            )
+        if not mask_logits.is_floating_point():
+            raise ValueError(
+                f"pred_masks[{batch_index}] must have a floating dtype"
+            )
+        if (
+            mask_logits.device != expected_device
+            or stages.device != expected_device
+        ):
+            raise ValueError("all observation inputs must use the same device")
+
+    finite_inputs = (("query_features", features), ("pred_logits", logits))
+    for name, tensor in finite_inputs:
+        if not torch.isfinite(tensor).all().item():
+            raise ValueError(f"{name} must contain only finite values")
+    for batch_index, (mask_logits, stages) in enumerate(
+        zip(mask_logits_by_batch, segment_stages, strict=True)
+    ):
+        if not torch.isfinite(mask_logits).all().item():
+            raise ValueError(
+                f"pred_masks[{batch_index}] must contain only finite values"
+            )
+        if not torch.isfinite(stages).all().item():
+            raise ValueError(
+                f"segment_stages[{batch_index}] must contain only finite values"
+            )
+
+    class_prob = logits.softmax(dim=-1)
+    foreground_prob = torch.cat(
+        (
+            class_prob[..., :background_class],
+            class_prob[..., background_class + 1 :],
+        ),
+        dim=-1,
+    )
+    confidence = foreground_prob.amax(dim=-1)
+
+    latest_mask: list[Tensor] = []
+    mask_support: list[Tensor] = []
+    for batch_index, (mask_logits, stages) in enumerate(
+        zip(mask_logits_by_batch, segment_stages, strict=True)
+    ):
+        latest_selector = stages == latest_stage
+        if not torch.any(latest_selector).item():
+            raise ValueError(
+                f"segment_stages[{batch_index}] does not contain latest_stage"
+            )
+        selected_mask = mask_logits[latest_selector].transpose(0, 1)
+        latest_mask.append(selected_mask)
+        mask_support.append(
+            (selected_mask.sigmoid() >= mask_threshold).sum(dim=1)
+        )
+
+    if mask_support:
+        support = torch.stack(mask_support)
+    else:
+        support = torch.empty_like(confidence, dtype=torch.long)
+    valid = (confidence >= confidence_threshold) & (
+        support >= minimum_mask_support
+    )
+    observation = LocalInstanceObservation(
+        features=features,
+        class_prob=class_prob,
+        confidence=confidence,
+        latest_mask=latest_mask,
+        valid=valid,
+    )
+    observation.validate()
+    return observation
 
 
 @dataclass(frozen=True)

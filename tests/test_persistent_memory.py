@@ -3,7 +3,11 @@ from dataclasses import replace
 import pytest
 import torch
 
-from models.persistent_memory import LocalInstanceObservation, PersistentMemoryState
+from models.persistent_memory import (
+    LocalInstanceObservation,
+    PersistentMemoryState,
+    build_local_observation,
+)
 
 
 def _valid_state() -> PersistentMemoryState:
@@ -25,6 +29,42 @@ def _valid_observation() -> LocalInstanceObservation:
         latest_mask=[torch.zeros(3, 7), torch.zeros(3, 0)],
         valid=torch.ones(2, 3, dtype=torch.bool),
     )
+
+
+def _valid_builder_inputs() -> tuple[dict[str, object], list[torch.Tensor]]:
+    outputs = {
+        "query_features": torch.tensor(
+            [
+                [[1.0, 2.0], [3.0, 4.0]],
+                [[5.0, 6.0], [7.0, 8.0]],
+            ]
+        ),
+        "pred_logits": torch.tensor(
+            [
+                [[2.0, 0.0, 1.0], [0.0, 2.0, 1.0]],
+                [[2.0, 0.0, 1.0], [1.0, 0.0, 2.0]],
+            ]
+        ),
+        "pred_masks": [
+            torch.tensor(
+                [
+                    [10.0, 10.0],
+                    [-10.0, 10.0],
+                    [10.0, -10.0],
+                ]
+            ),
+            torch.tensor(
+                [
+                    [10.0, -10.0],
+                    [10.0, 10.0],
+                    [-10.0, 10.0],
+                    [10.0, 10.0],
+                ]
+            ),
+        ],
+    }
+    segment_stages = [torch.tensor([1, 2, 2]), torch.tensor([2, 1, 2, 2])]
+    return outputs, segment_stages
 
 
 def test_empty_state_has_expected_shapes_dtypes_and_sentinels() -> None:
@@ -364,3 +404,295 @@ def test_observation_validation_rejects_non_floating_values(field: str) -> None:
 
     with pytest.raises(ValueError, match="floating dtype"):
         replace(observation, **{field: value}).validate()
+
+
+def test_build_local_observation_selects_latest_masks_and_filters_queries() -> None:
+    outputs, segment_stages = _valid_builder_inputs()
+
+    observation = build_local_observation(
+        outputs,
+        segment_stages,
+        latest_stage=2,
+        background_class=1,
+        confidence_threshold=0.5,
+        mask_threshold=0.5,
+        minimum_mask_support=1,
+    )
+
+    assert observation.features is outputs["query_features"]
+    torch.testing.assert_close(
+        observation.class_prob,
+        outputs["pred_logits"].softmax(dim=-1),
+    )
+    expected_confidence = observation.class_prob[:, :, [0, 2]].amax(dim=-1)
+    torch.testing.assert_close(observation.confidence, expected_confidence)
+    assert [mask.shape for mask in observation.latest_mask] == [(2, 2), (2, 3)]
+    torch.testing.assert_close(
+        observation.latest_mask[0],
+        torch.tensor([[-10.0, 10.0], [10.0, -10.0]]),
+    )
+    assert torch.equal(
+        observation.valid,
+        torch.tensor([[True, False], [True, True]]),
+    )
+    assert observation.validate() is None
+
+
+@pytest.mark.parametrize("missing_key", ["query_features", "pred_logits", "pred_masks"])
+def test_build_local_observation_rejects_missing_output_key(
+    missing_key: str,
+) -> None:
+    outputs, segment_stages = _valid_builder_inputs()
+    del outputs[missing_key]
+
+    with pytest.raises(ValueError, match=missing_key):
+        build_local_observation(
+            outputs,
+            segment_stages,
+            latest_stage=2,
+            background_class=1,
+            confidence_threshold=0.5,
+            mask_threshold=0.5,
+            minimum_mask_support=1,
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("query_features", torch.zeros(2, 2)),
+        ("pred_logits", torch.zeros(2, 2)),
+        ("pred_logits", torch.zeros(1, 2, 3)),
+        ("pred_logits", torch.zeros(2, 3, 3)),
+        ("pred_masks", (torch.zeros(3, 2), torch.zeros(4, 2))),
+        ("pred_masks", [torch.zeros(3, 2)]),
+    ],
+)
+def test_build_local_observation_rejects_invalid_output_shapes(
+    field: str, value: object
+) -> None:
+    outputs, segment_stages = _valid_builder_inputs()
+    outputs[field] = value
+
+    with pytest.raises(ValueError):
+        build_local_observation(
+            outputs,
+            segment_stages,
+            latest_stage=2,
+            background_class=1,
+            confidence_threshold=0.5,
+            mask_threshold=0.5,
+            minimum_mask_support=1,
+        )
+
+
+@pytest.mark.parametrize(
+    ("mask", "stages"),
+    [
+        (torch.zeros(3, 2, 1), torch.tensor([1, 2, 2])),
+        (torch.zeros(3, 3), torch.tensor([1, 2, 2])),
+        (torch.zeros(3, 2), torch.tensor([[1, 2, 2]])),
+        (torch.zeros(3, 2), torch.tensor([1, 2])),
+    ],
+)
+def test_build_local_observation_rejects_invalid_mask_stage_shapes(
+    mask: torch.Tensor, stages: torch.Tensor
+) -> None:
+    outputs, segment_stages = _valid_builder_inputs()
+    outputs["pred_masks"][0] = mask
+    segment_stages[0] = stages
+
+    with pytest.raises(ValueError):
+        build_local_observation(
+            outputs,
+            segment_stages,
+            latest_stage=2,
+            background_class=1,
+            confidence_threshold=0.5,
+            mask_threshold=0.5,
+            minimum_mask_support=1,
+        )
+
+
+@pytest.mark.parametrize(
+    ("masks", "stages"),
+    [
+        ([torch.zeros(3, 2)], [torch.tensor([1, 2, 2])] * 2),
+        (
+            [torch.zeros(3, 2), torch.zeros(4, 2)],
+            (torch.tensor([1, 2, 2]), torch.tensor([2, 1, 2, 2])),
+        ),
+    ],
+)
+def test_build_local_observation_rejects_invalid_batch_collections(
+    masks: object, stages: object
+) -> None:
+    outputs, _ = _valid_builder_inputs()
+    outputs["pred_masks"] = masks
+
+    with pytest.raises(ValueError):
+        build_local_observation(
+            outputs,
+            stages,
+            latest_stage=2,
+            background_class=1,
+            confidence_threshold=0.5,
+            mask_threshold=0.5,
+            minimum_mask_support=1,
+        )
+
+
+def test_build_local_observation_rejects_absent_latest_stage() -> None:
+    outputs, segment_stages = _valid_builder_inputs()
+    segment_stages[1] = torch.tensor([0, 0, 1, 1])
+
+    with pytest.raises(ValueError, match="latest_stage"):
+        build_local_observation(
+            outputs,
+            segment_stages,
+            latest_stage=2,
+            background_class=1,
+            confidence_threshold=0.5,
+            mask_threshold=0.5,
+            minimum_mask_support=1,
+        )
+
+
+@pytest.mark.parametrize("background_class", [-1, 3, 1.0, True])
+def test_build_local_observation_rejects_invalid_background_class(
+    background_class: object,
+) -> None:
+    outputs, segment_stages = _valid_builder_inputs()
+
+    with pytest.raises(ValueError, match="background_class"):
+        build_local_observation(
+            outputs,
+            segment_stages,
+            latest_stage=2,
+            background_class=background_class,
+            confidence_threshold=0.5,
+            mask_threshold=0.5,
+            minimum_mask_support=1,
+        )
+
+
+def test_build_local_observation_requires_a_foreground_class() -> None:
+    outputs, segment_stages = _valid_builder_inputs()
+    outputs["pred_logits"] = torch.zeros(2, 2, 1)
+
+    with pytest.raises(ValueError, match="at least two classes"):
+        build_local_observation(
+            outputs,
+            segment_stages,
+            latest_stage=2,
+            background_class=0,
+            confidence_threshold=0.5,
+            mask_threshold=0.5,
+            minimum_mask_support=1,
+        )
+
+
+@pytest.mark.parametrize(
+    ("source", "value"),
+    [
+        ("query_features", float("inf")),
+        ("pred_logits", float("nan")),
+        ("pred_masks", float("inf")),
+        ("segment_stages", float("nan")),
+    ],
+)
+def test_build_local_observation_rejects_non_finite_inputs(
+    source: str, value: float
+) -> None:
+    outputs, segment_stages = _valid_builder_inputs()
+    if source in {"query_features", "pred_logits"}:
+        outputs[source][0, 0, 0] = value
+    elif source == "pred_masks":
+        outputs[source][0][0, 0] = value
+    else:
+        segment_stages[0] = segment_stages[0].float()
+        segment_stages[0][0] = value
+
+    with pytest.raises(ValueError, match="finite"):
+        build_local_observation(
+            outputs,
+            segment_stages,
+            latest_stage=2,
+            background_class=1,
+            confidence_threshold=0.5,
+            mask_threshold=0.5,
+            minimum_mask_support=1,
+        )
+
+
+@pytest.mark.parametrize(
+    ("parameter", "value"),
+    [
+        ("latest_stage", 2.0),
+        ("latest_stage", True),
+        ("confidence_threshold", -0.01),
+        ("confidence_threshold", 1.01),
+        ("confidence_threshold", float("nan")),
+        ("confidence_threshold", True),
+        ("mask_threshold", -0.01),
+        ("mask_threshold", 1.01),
+        ("mask_threshold", float("inf")),
+        ("mask_threshold", False),
+        ("minimum_mask_support", 0),
+        ("minimum_mask_support", -1),
+        ("minimum_mask_support", 1.0),
+        ("minimum_mask_support", True),
+    ],
+)
+def test_build_local_observation_rejects_invalid_parameters(
+    parameter: str, value: object
+) -> None:
+    outputs, segment_stages = _valid_builder_inputs()
+    parameters = {
+        "latest_stage": 2,
+        "background_class": 1,
+        "confidence_threshold": 0.5,
+        "mask_threshold": 0.5,
+        "minimum_mask_support": 1,
+    }
+    parameters[parameter] = value
+
+    with pytest.raises(ValueError):
+        build_local_observation(outputs, segment_stages, **parameters)
+
+
+@pytest.mark.parametrize(
+    ("confidence_threshold", "mask_threshold"), [(0.0, 0.0), (1.0, 1.0)]
+)
+def test_build_local_observation_accepts_threshold_boundaries(
+    confidence_threshold: float, mask_threshold: float
+) -> None:
+    outputs, segment_stages = _valid_builder_inputs()
+
+    observation = build_local_observation(
+        outputs,
+        segment_stages,
+        latest_stage=2,
+        background_class=1,
+        confidence_threshold=confidence_threshold,
+        mask_threshold=mask_threshold,
+        minimum_mask_support=1,
+    )
+
+    assert observation.valid.shape == (2, 2)
+
+
+def test_build_local_observation_rejects_mixed_devices() -> None:
+    outputs, segment_stages = _valid_builder_inputs()
+    outputs["pred_masks"][1] = outputs["pred_masks"][1].to("meta")
+
+    with pytest.raises(ValueError, match="same device"):
+        build_local_observation(
+            outputs,
+            segment_stages,
+            latest_stage=2,
+            background_class=1,
+            confidence_threshold=0.5,
+            mask_threshold=0.5,
+            minimum_mask_support=1,
+        )
