@@ -88,6 +88,13 @@ def _state(
             torch.zeros_like(occupied, dtype=torch.long),
             torch.full_like(occupied, -1, dtype=torch.long),
         ),
+        stage_watermark=torch.where(
+            occupied.any(dim=1),
+            torch.zeros(batch_size, dtype=torch.long, device=embedding.device),
+            torch.full(
+                (batch_size,), -1, dtype=torch.long, device=embedding.device
+            ),
+        ),
     )
 
 
@@ -505,6 +512,7 @@ def test_associate_observations_rejects_device_mismatch(
                     "active",
                     "age",
                     "last_seen",
+                    "stage_watermark",
                 ),
                 state.tensors(),
                 strict=True,

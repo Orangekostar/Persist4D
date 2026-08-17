@@ -6,7 +6,6 @@ from dataclasses import dataclass
 
 import torch
 from torch import Tensor, nn
-from torch.nn import functional as F
 
 
 @dataclass(frozen=True)
@@ -252,6 +251,8 @@ class PersistentMemoryState:
     active: Tensor
     age: Tensor
     last_seen: Tensor
+    # Latest successfully processed stage for each batch item.
+    stage_watermark: Tensor
 
     @classmethod
     def empty(
@@ -321,6 +322,12 @@ class PersistentMemoryState:
                 device=target_device,
                 dtype=torch.long,
             ),
+            stage_watermark=torch.full(
+                (batch_size,),
+                -1,
+                device=target_device,
+                dtype=torch.long,
+            ),
         )
         state.validate()
         return state
@@ -358,6 +365,7 @@ class PersistentMemoryState:
             ("active", self.active),
             ("age", self.age),
             ("last_seen", self.last_seen),
+            ("stage_watermark", self.stage_watermark),
         )
         for name, tensor in tensors:
             if not isinstance(tensor, Tensor):
@@ -367,9 +375,11 @@ class PersistentMemoryState:
             raise ValueError("embedding must have shape [B, K, D]")
         if self.class_prob.ndim != 3:
             raise ValueError("class_prob must have shape [B, K, C]")
-        for name, tensor in tensors[2:]:
+        for name, tensor in tensors[2:7]:
             if tensor.ndim != 2:
                 raise ValueError(f"{name} must have shape [B, K]")
+        if self.stage_watermark.ndim != 1:
+            raise ValueError("stage_watermark must have shape [B]")
 
         batch_size, capacity, feature_dim = self.embedding.shape
         if batch_size <= 0 or capacity <= 0 or feature_dim <= 0:
@@ -379,9 +389,11 @@ class PersistentMemoryState:
         if self.class_prob.shape[2] <= 0:
             raise ValueError("class_prob must have a positive class dimension")
         expected_shape = (batch_size, capacity)
-        for name, tensor in tensors[2:]:
+        for name, tensor in tensors[2:7]:
             if tensor.shape != expected_shape:
                 raise ValueError(f"{name} must match embedding batch and capacity")
+        if self.stage_watermark.shape != (batch_size,):
+            raise ValueError("stage_watermark must match embedding batch size")
 
         expected_device = self.embedding.device
         if any(tensor.device != expected_device for _, tensor in tensors[1:]):
@@ -402,6 +414,8 @@ class PersistentMemoryState:
             raise ValueError("occupied and active must have bool dtype")
         if self.age.dtype != torch.long or self.last_seen.dtype != torch.long:
             raise ValueError("age and last_seen must have long dtype")
+        if self.stage_watermark.dtype != torch.long:
+            raise ValueError("stage_watermark must have long dtype")
 
         for name, tensor in tensors[:3]:
             if not torch.isfinite(tensor).all().item():
@@ -412,13 +426,19 @@ class PersistentMemoryState:
             raise ValueError("age must be non-negative")
         if torch.any(self.last_seen < -1).item():
             raise ValueError("last_seen must be at least -1")
+        if torch.any(self.stage_watermark < -1).item():
+            raise ValueError("stage_watermark must be at least -1")
+        if torch.any((~self.occupied) & (self.last_seen != -1)).item():
+            raise ValueError("unoccupied slots must use the last_seen sentinel")
 
     def detach(self) -> PersistentMemoryState:
         return PersistentMemoryState(*(tensor.detach() for tensor in self.tensors()))
 
     def tensors(
         self,
-    ) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
+    ) -> tuple[
+        Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor
+    ]:
         return (
             self.embedding,
             self.class_prob,
@@ -427,6 +447,7 @@ class PersistentMemoryState:
             self.active,
             self.age,
             self.last_seen,
+            self.stage_watermark,
         )
 
 
@@ -604,15 +625,12 @@ def associate_observations(
     if score_dtype in (torch.float16, torch.bfloat16):
         score_dtype = torch.float32
 
-    query_features = observation.features.to(dtype=score_dtype)
-    memory_features = state.embedding.to(dtype=score_dtype)
-    normalization_floor = torch.finfo(score_dtype).tiny
-    query_features = query_features / torch.linalg.vector_norm(
-        query_features, dim=-1, keepdim=True
-    ).clamp_min(normalization_floor)
-    memory_features = memory_features / torch.linalg.vector_norm(
-        memory_features, dim=-1, keepdim=True
-    ).clamp_min(normalization_floor)
+    query_features = _normalize_feature_vectors(
+        observation.features.to(dtype=score_dtype)
+    )
+    memory_features = _normalize_feature_vectors(
+        state.embedding.to(dtype=score_dtype)
+    )
 
     cosine_score = torch.einsum("bkd,bqd->bkq", memory_features, query_features)
     class_score = torch.einsum(
@@ -681,7 +699,16 @@ def _normalize_feature_vectors(features: Tensor) -> Tensor:
     compute_dtype = (
         torch.float64 if features.dtype == torch.float64 else torch.float32
     )
-    return F.normalize(features.to(dtype=compute_dtype), dim=-1)
+    compute_features = features.to(dtype=compute_dtype)
+    max_abs = compute_features.abs().amax(dim=-1, keepdim=True)
+    nonzero = max_abs > 0
+    safe_max_abs = torch.where(nonzero, max_abs, torch.ones_like(max_abs))
+    scaled_features = compute_features / safe_max_abs
+    vector_norm = torch.linalg.vector_norm(
+        scaled_features, dim=-1, keepdim=True
+    )
+    safe_norm = torch.where(nonzero, vector_norm, torch.ones_like(vector_norm))
+    return scaled_features / safe_norm
 
 
 class PersistentMemory(nn.Module):
@@ -786,8 +813,8 @@ class PersistentMemory(nn.Module):
             )
         ):
             raise ValueError("observation and state must use the same dtype")
-        latest_seen = state.last_seen.max().item()
-        if stage_index <= latest_seen:
+        latest_processed_stage = state.stage_watermark.max().item()
+        if stage_index <= latest_processed_stage:
             raise ValueError(
                 "stage_index must be later than the processed-stage watermark"
             )
@@ -800,6 +827,7 @@ class PersistentMemory(nn.Module):
             active,
             age,
             last_seen,
+            stage_watermark,
         ) = (tensor.clone() for tensor in state.tensors())
         age.add_(occupied.to(dtype=torch.long))
         active.zero_()
@@ -832,15 +860,36 @@ class PersistentMemory(nn.Module):
                     self.update_rate * observation_confidence
                 ).clamp(min=0.0, max=self.max_update_rate)
                 vector_rates = update_rates.unsqueeze(-1)
+                old_embedding = state.embedding[
+                    batch_index, matched_slots
+                ].to(dtype=compute_dtype)
+                observed_embedding = observation.features[
+                    batch_index, matched_queries
+                ].to(dtype=compute_dtype)
+                old_weights = 1.0 - vector_rates
+                old_embedding = torch.where(
+                    old_weights > 0,
+                    old_embedding,
+                    torch.zeros_like(old_embedding),
+                )
+                observed_embedding = torch.where(
+                    vector_rates > 0,
+                    observed_embedding,
+                    torch.zeros_like(observed_embedding),
+                )
+                shared_scale = torch.maximum(
+                    old_embedding.abs().amax(dim=-1, keepdim=True),
+                    observed_embedding.abs().amax(dim=-1, keepdim=True),
+                )
+                safe_shared_scale = torch.where(
+                    shared_scale > 0,
+                    shared_scale,
+                    torch.ones_like(shared_scale),
+                )
                 updated_embedding = (
-                    (1.0 - vector_rates)
-                    * state.embedding[batch_index, matched_slots].to(
-                        dtype=compute_dtype
-                    )
+                    old_weights * (old_embedding / safe_shared_scale)
                     + vector_rates
-                    * observation.features[
-                        batch_index, matched_queries
-                    ].to(dtype=compute_dtype)
+                    * (observed_embedding / safe_shared_scale)
                 )
                 embedding[batch_index, matched_slots] = (
                     _normalize_feature_vectors(updated_embedding).to(
@@ -897,8 +946,7 @@ class PersistentMemory(nn.Module):
                     batch_index, unmatched_queries[birth_count:]
                 ] = True
 
-        # Free-slot last_seen entries carry the global processed-stage watermark.
-        last_seen[~occupied] = stage_index
+        stage_watermark.fill_(stage_index)
         next_state = PersistentMemoryState(
             embedding=embedding,
             class_prob=class_prob,
@@ -907,6 +955,7 @@ class PersistentMemory(nn.Module):
             active=active,
             age=age,
             last_seen=last_seen,
+            stage_watermark=stage_watermark,
         )
         next_state.validate()
         return MemoryStepResult(

@@ -264,6 +264,7 @@ def test_step_births_in_query_order_into_lowest_free_slots() -> None:
         active=torch.tensor([[True, False, True, False]]),
         age=torch.tensor([[4, 0, 1, 0]]),
         last_seen=torch.tensor([[2, -1, 2, -1]]),
+        stage_watermark=torch.tensor([2]),
     )
 
     result = memory.step(observation, state, stage_index=3)
@@ -360,6 +361,7 @@ def test_step_clamps_confidence_scaled_update_rate(
         active=torch.tensor([[True]]),
         age=torch.tensor([[0]]),
         last_seen=torch.tensor([[0]]),
+        stage_watermark=torch.tensor([0]),
     )
 
     result = memory.step(observation, state, stage_index=1)
@@ -439,7 +441,7 @@ def test_step_marks_only_valid_unmatched_queries_as_rejected_when_full() -> None
         valid=torch.tensor([[True, False]]),
     )
 
-    result = memory.step(observation, full_state, stage_index=1)
+    result = memory.step(observation, full_state, stage_index=5)
 
     assert torch.equal(result.slot_ids, torch.tensor([[-1, -1]]))
     assert torch.isneginf(result.association_scores).all()
@@ -448,6 +450,9 @@ def test_step_marks_only_valid_unmatched_queries_as_rejected_when_full() -> None
     assert not result.state.active[0, 0]
     assert result.state.age[0, 0].item() == 1
     assert result.state.last_seen[0, 0].item() == 0
+    assert torch.equal(result.state.stage_watermark, torch.tensor([5]))
+    with pytest.raises(ValueError, match="later"):
+        memory.step(observation, result.state, stage_index=0)
 
 
 @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
@@ -586,7 +591,7 @@ def test_step_rejects_invalid_stage_index(stage_index: object) -> None:
 
 
 @pytest.mark.parametrize("stage_index", [4, 3, 0])
-def test_step_requires_stage_later_than_every_occupied_slot(
+def test_step_requires_stage_later_than_processed_stage_watermark(
     stage_index: int,
 ) -> None:
     observation = _step_observation(
@@ -601,7 +606,7 @@ def test_step_requires_stage_later_than_every_occupied_slot(
         memory.step(observation, state, stage_index=stage_index)
 
 
-def test_step_watermarks_empty_invalid_stage_and_still_uses_free_slot() -> None:
+def test_step_tracks_empty_invalid_stage_and_still_uses_free_slot() -> None:
     memory = PersistentMemory(capacity=2)
     invalid_observation = _step_observation(
         torch.tensor([[[1.0, 0.0]]]),
@@ -613,7 +618,8 @@ def test_step_watermarks_empty_invalid_stage_and_still_uses_free_slot() -> None:
     processed = memory.step(invalid_observation, empty_state, stage_index=5)
 
     assert not torch.any(processed.state.occupied)
-    assert torch.equal(processed.state.last_seen, torch.tensor([[5, 5]]))
+    assert torch.equal(processed.state.last_seen, torch.tensor([[-1, -1]]))
+    assert torch.equal(processed.state.stage_watermark, torch.tensor([5]))
     with pytest.raises(ValueError, match="later"):
         memory.step(invalid_observation, processed.state, stage_index=0)
 
@@ -624,7 +630,8 @@ def test_step_watermarks_empty_invalid_stage_and_still_uses_free_slot() -> None:
 
     assert torch.equal(born.slot_ids, torch.tensor([[0]]))
     assert torch.equal(born.state.occupied, torch.tensor([[True, False]]))
-    assert torch.equal(born.state.last_seen, torch.tensor([[6, 6]]))
+    assert torch.equal(born.state.last_seen, torch.tensor([[6, -1]]))
+    assert torch.equal(born.state.stage_watermark, torch.tensor([6]))
 
 
 def test_step_keeps_capacity_and_shapes_constant_for_one_hundred_stages() -> None:
@@ -646,6 +653,7 @@ def test_step_keeps_capacity_and_shapes_constant_for_one_hundred_stages() -> Non
 
     assert torch.all(state.occupied)
     assert torch.equal(state.last_seen, torch.tensor([[0, 1, 2, 3]]))
+    assert torch.equal(state.stage_watermark, torch.tensor([99]))
     assert torch.equal(result.slot_ids, torch.tensor([[-1]]))
     assert torch.equal(result.rejected_births, torch.tensor([[True]]))
 
@@ -662,6 +670,7 @@ def test_step_updates_remain_connected_to_autograd() -> None:
         active=torch.tensor([[True]]),
         age=torch.tensor([[0]]),
         last_seen=torch.tensor([[0]]),
+        stage_watermark=torch.tensor([0]),
     )
     observation_features = torch.tensor(
         [[[0.8, 0.6]]], requires_grad=True
@@ -733,6 +742,7 @@ def test_step_normalizes_float16_zero_vectors_without_nan(path: str) -> None:
             active=torch.tensor([[True]]),
             age=torch.tensor([[0]]),
             last_seen=torch.tensor([[0]]),
+            stage_watermark=torch.tensor([0]),
         )
         stage_index = 1
 
@@ -744,12 +754,17 @@ def test_step_normalizes_float16_zero_vectors_without_nan(path: str) -> None:
     assert torch.isfinite(result.state.embedding).all()
 
 
+@pytest.mark.parametrize("dtype", [torch.float16, torch.float32, torch.float64])
 @pytest.mark.parametrize("path", ["birth", "update"])
-def test_step_normalizes_small_float16_vectors_in_float32(path: str) -> None:
-    feature = torch.tensor([[[1e-5, 0.0]]], dtype=torch.float16)
+def test_step_scale_safely_normalizes_tiny_features(
+    path: str, dtype: torch.dtype
+) -> None:
+    zero = torch.tensor(0.0, dtype=dtype)
+    tiny = torch.nextafter(zero, torch.tensor(1.0, dtype=dtype))
+    feature = torch.stack((tiny, zero)).reshape(1, 1, 2)
     observation = _step_observation(
         feature.clone(),
-        torch.zeros(1, 1, 2, dtype=torch.float16),
+        torch.zeros(1, 1, 2, dtype=dtype),
     )
     memory = PersistentMemory(
         capacity=1,
@@ -762,24 +777,74 @@ def test_step_normalizes_small_float16_vectors_in_float32(path: str) -> None:
     else:
         state = PersistentMemoryState(
             embedding=feature.clone(),
-            class_prob=torch.zeros(1, 1, 2, dtype=torch.float16),
-            confidence=torch.ones(1, 1, dtype=torch.float16),
+            class_prob=torch.zeros(1, 1, 2, dtype=dtype),
+            confidence=torch.ones(1, 1, dtype=dtype),
             occupied=torch.tensor([[True]]),
             active=torch.tensor([[True]]),
             age=torch.tensor([[0]]),
             last_seen=torch.tensor([[0]]),
+            stage_watermark=torch.tensor([0]),
         )
         stage_index = 1
 
     result = memory.step(observation, state, stage_index=stage_index)
 
     stored_feature = result.state.embedding[0, 0]
+    if path == "update":
+        assert result.slot_ids.item() == 0
     assert torch.isfinite(stored_feature).all()
     torch.testing.assert_close(
-        torch.linalg.vector_norm(stored_feature.float()),
-        torch.tensor(1.0),
+        torch.linalg.vector_norm(stored_feature.to(dtype=torch.float64)),
+        torch.tensor(1.0, dtype=torch.float64),
         rtol=0.0,
         atol=1e-3,
+    )
+
+
+@pytest.mark.parametrize("endpoint", ["old", "observed"])
+def test_step_scale_safe_feature_ema_respects_rate_endpoints(
+    endpoint: str,
+) -> None:
+    tiny = torch.nextafter(torch.tensor(0.0), torch.tensor(1.0))
+    tiny_feature = torch.stack((tiny, torch.tensor(0.0))).reshape(1, 1, 2)
+    huge_feature = torch.tensor([[[0.0, torch.finfo(torch.float32).max]]])
+    if endpoint == "old":
+        state_embedding = tiny_feature
+        observation_feature = huge_feature
+        observation_confidence = torch.tensor([[-1.0]])
+        update_rate = 0.2
+    else:
+        state_embedding = huge_feature
+        observation_feature = tiny_feature
+        observation_confidence = torch.tensor([[1.0]])
+        update_rate = 1.0
+    state = PersistentMemoryState(
+        embedding=state_embedding,
+        class_prob=torch.zeros(1, 1, 2),
+        confidence=torch.ones(1, 1),
+        occupied=torch.tensor([[True]]),
+        active=torch.tensor([[True]]),
+        age=torch.tensor([[0]]),
+        last_seen=torch.tensor([[0]]),
+        stage_watermark=torch.tensor([0]),
+    )
+    observation = _step_observation(
+        observation_feature,
+        torch.zeros(1, 1, 2),
+        confidence=observation_confidence,
+    )
+
+    result = PersistentMemory(
+        capacity=1,
+        class_weight=0.0,
+        association_threshold=-1.0,
+        update_rate=update_rate,
+        max_update_rate=update_rate,
+    ).step(observation, state, stage_index=1)
+
+    torch.testing.assert_close(
+        result.state.embedding,
+        torch.tensor([[[1.0, 0.0]]]),
     )
 
 
@@ -798,6 +863,7 @@ def test_step_preserves_float64_precision_during_feature_ema() -> None:
         active=torch.tensor([[True]]),
         age=torch.tensor([[0]]),
         last_seen=torch.tensor([[0]]),
+        stage_watermark=torch.tensor([0]),
     )
     observation = _step_observation(
         observation_feature,
@@ -861,6 +927,7 @@ def test_empty_state_has_expected_shapes_dtypes_and_sentinels() -> None:
     assert state.active.shape == (2, 3)
     assert state.age.shape == (2, 3)
     assert state.last_seen.shape == (2, 3)
+    assert state.stage_watermark.shape == (2,)
     assert state.embedding.dtype == torch.float64
     assert state.class_prob.dtype == torch.float64
     assert state.confidence.dtype == torch.float64
@@ -868,6 +935,7 @@ def test_empty_state_has_expected_shapes_dtypes_and_sentinels() -> None:
     assert state.active.dtype == torch.bool
     assert state.age.dtype == torch.long
     assert state.last_seen.dtype == torch.long
+    assert state.stage_watermark.dtype == torch.long
     assert torch.count_nonzero(state.embedding) == 0
     assert torch.count_nonzero(state.class_prob) == 0
     assert torch.count_nonzero(state.confidence) == 0
@@ -875,6 +943,7 @@ def test_empty_state_has_expected_shapes_dtypes_and_sentinels() -> None:
     assert not torch.any(state.active)
     assert torch.count_nonzero(state.age) == 0
     assert torch.all(state.last_seen == -1)
+    assert torch.all(state.stage_watermark == -1)
     assert state.batch_size == 2
     assert state.capacity == 3
     assert state.feature_dim == 4
@@ -938,6 +1007,7 @@ def test_state_tensors_follow_field_order() -> None:
         state.active,
         state.age,
         state.last_seen,
+        state.stage_watermark,
     )
 
 
@@ -971,6 +1041,7 @@ def test_detach_returns_new_state_without_mutating_source() -> None:
         ),
         age=torch.tensor([[0, 2, 0], [1, 0, 0]], dtype=torch.long),
         last_seen=torch.tensor([[4, 1, -1], [3, -1, -1]], dtype=torch.long),
+        stage_watermark=torch.tensor([4, 3], dtype=torch.long),
     )
     original_values = tuple(tensor.clone() for tensor in state.tensors())
 
@@ -1000,6 +1071,7 @@ def test_detach_returns_new_state_without_mutating_source() -> None:
         ("active", torch.zeros(2, 3, 1, dtype=torch.bool)),
         ("age", torch.zeros(2, 3, 1, dtype=torch.long)),
         ("last_seen", torch.zeros(2, 3, 1, dtype=torch.long)),
+        ("stage_watermark", torch.zeros(2, 1, dtype=torch.long)),
     ],
 )
 def test_state_validation_rejects_wrong_ranks(
@@ -1020,6 +1092,7 @@ def test_state_validation_rejects_wrong_ranks(
         ("active", torch.zeros(2, 4, dtype=torch.bool)),
         ("age", torch.zeros(1, 3, dtype=torch.long)),
         ("last_seen", torch.zeros(2, 4, dtype=torch.long)),
+        ("stage_watermark", torch.zeros(1, dtype=torch.long)),
     ],
 )
 def test_state_validation_rejects_inconsistent_batch_or_capacity(
@@ -1051,6 +1124,7 @@ def test_state_validation_rejects_non_finite_values(field: str) -> None:
         ("active", torch.zeros(2, 3, dtype=torch.long)),
         ("age", torch.zeros(2, 3, dtype=torch.int32)),
         ("last_seen", torch.zeros(2, 3, dtype=torch.int32)),
+        ("stage_watermark", torch.zeros(2, dtype=torch.int32)),
     ],
 )
 def test_state_validation_rejects_invalid_dtypes(
@@ -1060,11 +1134,19 @@ def test_state_validation_rejects_invalid_dtypes(
         replace(_valid_state(), **{field: value}).validate()
 
 
-def test_state_validation_rejects_mixed_devices() -> None:
-    class_prob = torch.zeros(2, 3, 5, device="meta")
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("class_prob", torch.zeros(2, 3, 5, device="meta")),
+        ("stage_watermark", torch.zeros(2, dtype=torch.long, device="meta")),
+    ],
+)
+def test_state_validation_rejects_mixed_devices(
+    field: str, value: torch.Tensor
+) -> None:
 
     with pytest.raises(ValueError):
-        replace(_valid_state(), class_prob=class_prob).validate()
+        replace(_valid_state(), **{field: value}).validate()
 
 
 def test_state_validation_rejects_active_unoccupied_slot() -> None:
@@ -1094,13 +1176,24 @@ def test_state_validation_rejects_last_seen_below_sentinel() -> None:
         state.validate()
 
 
-def test_state_validation_allows_watermarks_on_unoccupied_slots() -> None:
+def test_state_validation_rejects_last_seen_on_unoccupied_slots() -> None:
     state = replace(
         _valid_state(),
         last_seen=torch.full((2, 3), 5, dtype=torch.long),
     )
 
-    assert state.validate() is None
+    with pytest.raises(ValueError):
+        state.validate()
+
+
+def test_state_validation_rejects_stage_watermark_below_sentinel() -> None:
+    state = replace(
+        _valid_state(),
+        stage_watermark=torch.tensor([-1, -2], dtype=torch.long),
+    )
+
+    with pytest.raises(ValueError):
+        state.validate()
 
 
 def test_valid_observation_accepts_variable_and_empty_latest_masks() -> None:
