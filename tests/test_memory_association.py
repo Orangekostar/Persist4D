@@ -3,6 +3,7 @@ from dataclasses import FrozenInstanceError, replace
 import pytest
 import torch
 
+from models import persistent_memory
 from models.persistent_memory import (
     AssociationResult,
     LocalInstanceObservation,
@@ -284,6 +285,37 @@ def test_associate_observations_preserves_a_strict_float64_optimum() -> None:
     assert result.score_for_query.item() == 1.0000000000000002
 
 
+def test_tie_refinement_falls_back_when_exact_dual_has_a_negative_cycle(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    raw_rows = torch.tensor([0, 1]).numpy()
+    raw_columns = torch.tensor([1, 0]).numpy()
+    call_count = 0
+
+    def non_optimal_first_assignment(
+        _: object,
+    ) -> tuple[object, object]:
+        nonlocal call_count
+        call_count += 1
+        if call_count > 1:
+            raise AssertionError("tie refinement must be skipped")
+        return raw_rows, raw_columns
+
+    monkeypatch.setattr(
+        persistent_memory,
+        "linear_sum_assignment",
+        non_optimal_first_assignment,
+    )
+
+    rows, columns = persistent_memory._optimal_assignment_with_stable_ties(
+        torch.tensor([[1.0, 0.0], [0.0, 1.0]], dtype=torch.float64)
+    )
+
+    assert call_count == 1
+    assert torch.equal(rows, torch.tensor([0, 1]))
+    assert torch.equal(columns, torch.tensor([1, 0]))
+
+
 @pytest.mark.parametrize("invalid_input", ["observation", "state"])
 def test_associate_observations_validates_each_input(invalid_input: str) -> None:
     state = _state(
@@ -416,3 +448,48 @@ def test_associate_observations_rejects_invalid_parameters(
             class_weight=class_weight,
             association_threshold=association_threshold,
         )
+
+
+@pytest.mark.parametrize(
+    "class_weight",
+    [1.0000000000000002, float(2**53), 1e39],
+)
+def test_associate_observations_rejects_class_weight_above_one(
+    class_weight: float,
+) -> None:
+    state = _state(
+        torch.tensor([[[1.0]]]),
+        torch.tensor([[[1.0]]]),
+    )
+    observation = _observation(
+        torch.tensor([[[1.0]]]),
+        torch.tensor([[[1.0]]]),
+    )
+
+    with pytest.raises(ValueError, match=r"class_weight.*\[0, 1\]"):
+        associate_observations(
+            observation,
+            state,
+            class_weight=class_weight,
+            association_threshold=0.0,
+        )
+
+
+def test_associate_observations_accepts_class_weight_one() -> None:
+    state = _state(
+        torch.tensor([[[1.0]]]),
+        torch.tensor([[[1.0]]]),
+    )
+    observation = _observation(
+        torch.tensor([[[1.0]]]),
+        torch.tensor([[[1.0]]]),
+    )
+
+    result = associate_observations(
+        observation,
+        state,
+        class_weight=1.0,
+        association_threshold=0.0,
+    )
+
+    assert result.slot_for_query.item() == 0

@@ -482,6 +482,27 @@ def _optimal_assignment_with_stable_ties(
         if not updated:
             break
 
+    dual_is_feasible = True
+    for row, row_score in enumerate(score_units):
+        matched = matched_column[row]
+        matched_score = row_score[matched]
+        matched_potential = column_potential[matched]
+        if any(
+            column_potential[column]
+            > matched_potential + matched_score - pair_score
+            for column, pair_score in enumerate(row_score)
+        ):
+            dual_is_feasible = False
+            break
+    if not dual_is_feasible:
+        # Refinement is safe only when the raw assignment admits an exact dual.
+        assigned_rows = torch.from_numpy(initial_rows)
+        assigned_columns = torch.from_numpy(initial_columns)
+        real_pair = (assigned_rows < row_count) & (
+            assigned_columns < column_count
+        )
+        return assigned_rows[real_pair], assigned_columns[real_pair]
+
     tie_cost = torch.full((size, size), torch.inf, dtype=torch.float64)
     for row, row_score in enumerate(score_units):
         matched = matched_column[row]
@@ -529,9 +550,9 @@ def associate_observations(
         not isinstance(class_weight, (int, float))
         or isinstance(class_weight, bool)
         or not math.isfinite(class_weight)
-        or class_weight < 0.0
+        or not 0.0 <= class_weight <= 1.0
     ):
-        raise ValueError("class_weight must be finite and non-negative")
+        raise ValueError("class_weight must be finite and within [0, 1]")
     if (
         not isinstance(association_threshold, (int, float))
         or isinstance(association_threshold, bool)
