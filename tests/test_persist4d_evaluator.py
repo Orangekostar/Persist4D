@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import random
 import subprocess
 import sys
 from dataclasses import fields, replace
@@ -1475,6 +1476,43 @@ def test_t5_stage_capacity_allows_interleaved_gt_reactivations() -> None:
     ) == 3
 
 
+def test_joint_identity_event_bound_accepts_random_diagnostics() -> None:
+    generator = random.Random(4517)
+
+    assert evaluator._maximum_counted_identity_transitions(0, 0, 5) == 0
+    for horizon in range(2, 6):
+        for _ in range(500):
+            gt_ids_by_stage: list[list[int]] = []
+            predicted_ids_by_stage: list[list[int]] = []
+            for _stage in range(horizon):
+                active_gt = [
+                    gt_id
+                    for gt_id in range(7)
+                    if generator.random() < 0.55
+                ]
+                predicted_slots = list(range(7))
+                generator.shuffle(predicted_slots)
+                gt_ids_by_stage.append(active_gt)
+                predicted_ids_by_stage.append(
+                    predicted_slots[: len(active_gt)]
+                )
+
+            diagnostics = identity_diagnostics(
+                gt_ids_by_stage,
+                predicted_ids_by_stage,
+            )
+            maximum = evaluator._maximum_counted_identity_transitions(
+                diagnostics["matched_identity_observations"],
+                diagnostics["reactivation_events"],
+                horizon,
+            )
+            assert (
+                diagnostics["identity_switches"]
+                + diagnostics["correct_reactivations"]
+                <= maximum
+            )
+
+
 @pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
 @pytest.mark.parametrize(
     ("horizon_index", "observations", "switches"),
@@ -1532,7 +1570,36 @@ def test_cli_rejects_identity_switches_above_aggregate_track_bound(
 
 
 @pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
-def test_cli_rejects_counted_transitions_above_aggregate_track_bound(
+@pytest.mark.parametrize(
+    ("switches", "correct_reactivations"),
+    [(0, 1), (1, 0)],
+    ids=["correct_reactivation", "incorrect_reactivation_is_switch"],
+)
+def test_cli_accepts_t3_joint_identity_event_boundary(
+    tmp_path: Path,
+    method: str,
+    switches: int,
+    correct_reactivations: int,
+) -> None:
+    artifact = _complete_artifact()
+    _set_identity_statistics(
+        artifact,
+        horizon_index=1,
+        method=method,
+        observations=3,
+        switches=switches,
+        reactivations=1,
+        correct_reactivations=correct_reactivations,
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code == 0
+    assert report == artifact
+
+
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
+def test_cli_rejects_t3_joint_identity_events_above_bound(
     tmp_path: Path,
     method: str,
 ) -> None:
@@ -1541,8 +1608,8 @@ def test_cli_rejects_counted_transitions_above_aggregate_track_bound(
         artifact,
         horizon_index=1,
         method=method,
-        observations=4,
-        switches=2,
+        observations=3,
+        switches=1,
         reactivations=1,
         correct_reactivations=1,
     )

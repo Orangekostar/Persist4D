@@ -1026,6 +1026,19 @@ def _maximum_identity_transitions(observations: int, horizon: int) -> int:
     return observations - minimum_tracks
 
 
+def _maximum_counted_identity_transitions(
+    observations: int,
+    reactivations: int,
+    horizon: int,
+) -> int:
+    if observations == 0:
+        return 0
+    minimum_tracks = (
+        observations + reactivations + horizon - 1
+    ) // horizon
+    return observations - minimum_tracks
+
+
 def _maximum_aggregate_reactivations(
     observations: int,
     *,
@@ -1110,7 +1123,12 @@ def _validate_metric_block(
         raise ValueError(f"{name}.correct_reactivations are impossible")
     if reactivations - correct_reactivations > switches:
         raise ValueError(f"{name}.incorrect reactivations exceed switches")
-    if switches + correct_reactivations > maximum_transitions:
+    maximum_counted_transitions = _maximum_counted_identity_transitions(
+        observations,
+        reactivations,
+        horizon,
+    )
+    if switches + correct_reactivations > maximum_counted_transitions:
         raise ValueError(f"{name}.identity transition counts are impossible")
     accuracy = metrics["reactivation_accuracy"]
     if reactivations == 0:
