@@ -57,6 +57,13 @@ class LocalInstanceObservation:
             if mask.ndim != 2 or mask.shape[0] != query_count:
                 raise ValueError("latest_mask entries must have shape [Q, S_latest]")
 
+        expected_device = self.features.device
+        if any(
+            tensor.device != expected_device
+            for tensor in (self.class_prob, self.confidence, self.valid)
+        ) or any(mask.device != expected_device for mask in self.latest_mask):
+            raise ValueError("all observation tensors must use the same device")
+
         for name, tensor in (
             ("features", self.features),
             ("class_prob", self.class_prob),
@@ -99,6 +106,8 @@ class PersistentMemoryState:
             if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
                 raise ValueError(f"{name} must be a positive integer")
 
+        if not isinstance(dtype, torch.dtype):
+            raise ValueError("dtype must be a floating torch dtype")  # noqa: TRY004
         try:
             dtype_probe = torch.empty((), dtype=dtype)
         except (TypeError, RuntimeError) as error:
@@ -150,18 +159,26 @@ class PersistentMemoryState:
 
     @property
     def batch_size(self) -> int:
+        if not isinstance(self.embedding, Tensor) or self.embedding.ndim != 3:
+            raise ValueError("embedding must have shape [B, K, D]")
         return self.embedding.shape[0]
 
     @property
     def capacity(self) -> int:
+        if not isinstance(self.embedding, Tensor) or self.embedding.ndim != 3:
+            raise ValueError("embedding must have shape [B, K, D]")
         return self.embedding.shape[1]
 
     @property
     def feature_dim(self) -> int:
+        if not isinstance(self.embedding, Tensor) or self.embedding.ndim != 3:
+            raise ValueError("embedding must have shape [B, K, D]")
         return self.embedding.shape[2]
 
     @property
     def class_count(self) -> int:
+        if not isinstance(self.class_prob, Tensor) or self.class_prob.ndim != 3:
+            raise ValueError("class_prob must have shape [B, K, C]")
         return self.class_prob.shape[2]
 
     def validate(self) -> None:

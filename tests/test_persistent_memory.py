@@ -97,7 +97,8 @@ def test_empty_state_rejects_non_positive_dimensions(
         )
 
 
-def test_empty_state_rejects_non_floating_dtype() -> None:
+@pytest.mark.parametrize("dtype", [torch.long, None, "float32"])
+def test_empty_state_rejects_invalid_dtype(dtype: object) -> None:
     with pytest.raises(ValueError):
         PersistentMemoryState.empty(
             batch_size=2,
@@ -105,7 +106,7 @@ def test_empty_state_rejects_non_floating_dtype() -> None:
             feature_dim=4,
             class_count=5,
             device=torch.device("cpu"),
-            dtype=torch.long,
+            dtype=dtype,
         )
 
 
@@ -121,6 +122,20 @@ def test_state_tensors_follow_field_order() -> None:
         state.age,
         state.last_seen,
     )
+
+
+@pytest.mark.parametrize(
+    "property_name", ["batch_size", "capacity", "feature_dim", "class_count"]
+)
+@pytest.mark.parametrize("value", [None, torch.zeros(2, 3)])
+def test_state_properties_reject_invalid_source_tensors(
+    property_name: str, value: object
+) -> None:
+    source_field = "class_prob" if property_name == "class_count" else "embedding"
+    state = replace(_valid_state(), **{source_field: value})
+
+    with pytest.raises(ValueError):
+        getattr(state, property_name)
 
 
 def test_detach_returns_new_state_without_mutating_source() -> None:
@@ -266,6 +281,27 @@ def test_valid_observation_accepts_variable_and_empty_latest_masks() -> None:
     observation = _valid_observation()
 
     assert observation.validate() is None
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("class_prob", torch.zeros(2, 3, 5, device="meta")),
+        ("confidence", torch.zeros(2, 3, device="meta")),
+        ("valid", torch.ones(2, 3, dtype=torch.bool, device="meta")),
+        (
+            "latest_mask",
+            [torch.zeros(3, 7), torch.zeros(3, 0, device="meta")],
+        ),
+    ],
+)
+def test_observation_validation_rejects_mixed_devices(
+    field: str, value: object
+) -> None:
+    observation = replace(_valid_observation(), **{field: value})
+
+    with pytest.raises(ValueError, match="same device"):
+        observation.validate()
 
 
 @pytest.mark.parametrize(
