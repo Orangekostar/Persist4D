@@ -5,7 +5,6 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 import torch
-from scipy.optimize import linear_sum_assignment
 from torch import Tensor
 
 
@@ -450,81 +449,112 @@ def _score_as_exact_integers(score: Tensor) -> list[list[int]]:
     ]
 
 
+def _maximum_weight_assignment(weight: list[list[int]]) -> list[int]:
+    row_count = len(weight)
+    column_count = len(weight[0])
+    maximum_weight = max(max(row) for row in weight)
+    cost = [[maximum_weight - pair_weight for pair_weight in row] for row in weight]
+
+    row_potential = [0] * (row_count + 1)
+    column_potential = [0] * (column_count + 1)
+    matched_row = [0] * (column_count + 1)
+    previous_column = [0] * (column_count + 1)
+
+    for row in range(1, row_count + 1):
+        matched_row[0] = row
+        minimum_reduced_cost: list[int | None] = [None] * (column_count + 1)
+        used_column = [False] * (column_count + 1)
+        column = 0
+
+        while True:
+            used_column[column] = True
+            current_row = matched_row[column]
+            delta: int | None = None
+            next_column = 0
+            for candidate_column in range(1, column_count + 1):
+                if used_column[candidate_column]:
+                    continue
+                reduced_cost = (
+                    cost[current_row - 1][candidate_column - 1]
+                    - row_potential[current_row]
+                    - column_potential[candidate_column]
+                )
+                current_minimum = minimum_reduced_cost[candidate_column]
+                if current_minimum is None or reduced_cost < current_minimum:
+                    minimum_reduced_cost[candidate_column] = reduced_cost
+                    previous_column[candidate_column] = column
+                    current_minimum = reduced_cost
+                if delta is None or current_minimum < delta:
+                    delta = current_minimum
+                    next_column = candidate_column
+
+            if delta is None:
+                raise RuntimeError("assignment has no augmenting path")
+            for candidate_column in range(column_count + 1):
+                if used_column[candidate_column]:
+                    row_potential[matched_row[candidate_column]] += delta
+                    column_potential[candidate_column] -= delta
+                elif minimum_reduced_cost[candidate_column] is not None:
+                    minimum_reduced_cost[candidate_column] -= delta
+
+            column = next_column
+            if matched_row[column] == 0:
+                break
+
+        while True:
+            predecessor = previous_column[column]
+            matched_row[column] = matched_row[predecessor]
+            column = predecessor
+            if column == 0:
+                break
+
+    assigned_column = [-1] * row_count
+    for column in range(1, column_count + 1):
+        if matched_row[column] != 0:
+            assigned_column[matched_row[column] - 1] = column - 1
+    return assigned_column
+
+
 def _optimal_assignment_with_stable_ties(
     score: Tensor,
 ) -> tuple[Tensor, Tensor]:
     row_count, column_count = score.shape
-    size = max(row_count, column_count)
-    padded_score = torch.zeros(size, size, dtype=torch.float64)
-    padded_score[:row_count, :column_count] = score.detach().to(
-        device="cpu", dtype=torch.float64
-    )
+    exact_score = score.detach().to(device="cpu", dtype=torch.float64)
+    if not torch.isfinite(exact_score).all().item():
+        raise ValueError("association scores must be finite")
 
-    initial_rows, initial_columns = linear_sum_assignment(-padded_score.numpy())
-    matched_column = [-1] * size
-    for row, column in zip(initial_rows, initial_columns, strict=True):
-        matched_column[row] = column
-
-    score_units = _score_as_exact_integers(padded_score)
-    # Matched-edge difference constraints recover an exact optimal dual.
-    column_potential = [0] * size
-    for _ in range(size - 1):
-        updated = False
-        for row, row_score in enumerate(score_units):
-            matched = matched_column[row]
-            matched_score = row_score[matched]
-            matched_potential = column_potential[matched]
-            for column, pair_score in enumerate(row_score):
-                upper_bound = matched_potential + matched_score - pair_score
-                if column_potential[column] > upper_bound:
-                    column_potential[column] = upper_bound
-                    updated = True
-        if not updated:
-            break
-
-    dual_is_feasible = True
-    for row, row_score in enumerate(score_units):
-        matched = matched_column[row]
-        matched_score = row_score[matched]
-        matched_potential = column_potential[matched]
-        if any(
-            column_potential[column]
-            > matched_potential + matched_score - pair_score
+    score_units = _score_as_exact_integers(exact_score)
+    matching_size = min(row_count, column_count)
+    maximum_dimension = max(row_count, column_count)
+    tie_span = matching_size * maximum_dimension
+    # Any complete tie-score difference is smaller than this factor.
+    primary_factor = tie_span + 1
+    combined_weight = [
+        [
+            pair_score * primary_factor + maximum_dimension - abs(row - column)
             for column, pair_score in enumerate(row_score)
-        ):
-            dual_is_feasible = False
-            break
-    if not dual_is_feasible:
-        # Refinement is safe only when the raw assignment admits an exact dual.
-        assigned_rows = torch.from_numpy(initial_rows)
-        assigned_columns = torch.from_numpy(initial_columns)
-        real_pair = (assigned_rows < row_count) & (
-            assigned_columns < column_count
+        ]
+        for row, row_score in enumerate(score_units)
+    ]
+
+    transposed = row_count > column_count
+    if transposed:
+        combined_weight = [
+            [combined_weight[row][column] for row in range(row_count)]
+            for column in range(column_count)
+        ]
+
+    assigned_columns = _maximum_weight_assignment(combined_weight)
+    if transposed:
+        assignment = sorted(
+            (row, column) for column, row in enumerate(assigned_columns)
         )
-        return assigned_rows[real_pair], assigned_columns[real_pair]
-
-    tie_cost = torch.full((size, size), torch.inf, dtype=torch.float64)
-    for row, row_score in enumerate(score_units):
-        matched = matched_column[row]
-        matched_score = row_score[matched]
-        matched_potential = column_potential[matched]
-        for column, pair_score in enumerate(row_score):
-            if column_potential[column] != (
-                matched_potential + matched_score - pair_score
-            ):
-                continue
-            if row < row_count and column < column_count:
-                tie_cost[row, column] = abs(row - column)
-            else:
-                tie_cost[row, column] = 0.0
-
-    # Every complete matching on these exact dual-tight edges has the
-    # original optimal total, so this secondary objective cannot change it.
-    assigned_rows, assigned_columns = linear_sum_assignment(tie_cost.numpy())
-    assigned_rows = torch.from_numpy(assigned_rows)
-    assigned_columns = torch.from_numpy(assigned_columns)
-    real_pair = (assigned_rows < row_count) & (assigned_columns < column_count)
-    return assigned_rows[real_pair], assigned_columns[real_pair]
+    else:
+        assignment = list(enumerate(assigned_columns))
+    return (
+        torch.tensor([row for row, _ in assignment], dtype=torch.long),
+        torch.tensor([column for _, column in assignment], dtype=torch.long),
+    )
 
 
 def associate_observations(
