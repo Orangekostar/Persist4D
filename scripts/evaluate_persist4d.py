@@ -1019,6 +1019,23 @@ def _validate_legacy_parity(value: object, *, capacity: int) -> None:
         raise ValueError("legacy_parity query_feature_shape is invalid")
 
 
+def _maximum_identity_transitions(observations: int, horizon: int) -> int:
+    if observations == 0:
+        return 0
+    minimum_tracks = (observations + horizon - 1) // horizon
+    return observations - minimum_tracks
+
+
+def _maximum_reactivation_events(observations: int, horizon: int) -> int:
+    maximum_per_track = (horizon - 1) // 2
+    if observations == 0 or maximum_per_track == 0:
+        return 0
+    minimum_tracks = (
+        observations + maximum_per_track
+    ) // (maximum_per_track + 1)
+    return observations - minimum_tracks
+
+
 def _validate_metric_block(
     value: object,
     *,
@@ -1067,18 +1084,18 @@ def _validate_metric_block(
         )
         if rejected_births > maximum_query_events:
             raise ValueError(f"{name}.rejected_births exceed query bound")
-    if switches > max(observations - 1, 0):
+    maximum_transitions = _maximum_identity_transitions(observations, horizon)
+    maximum_reactivations = _maximum_reactivation_events(observations, horizon)
+    if switches > maximum_transitions:
         raise ValueError(f"{name}.identity_switches are impossible")
-    if reactivations > max(observations - 1, 0):
+    if reactivations > maximum_reactivations:
         raise ValueError(f"{name}.reactivation_events are impossible")
     if correct_reactivations > reactivations:
         raise ValueError(f"{name}.correct_reactivations are impossible")
     if reactivations - correct_reactivations > switches:
         raise ValueError(f"{name}.incorrect reactivations exceed switches")
-    if switches + correct_reactivations > max(observations - 1, 0):
+    if switches + correct_reactivations > maximum_transitions:
         raise ValueError(f"{name}.identity transition counts are impossible")
-    if horizon == 2 and (reactivations != 0 or correct_reactivations != 0):
-        raise ValueError(f"{name}.T2 reactivation counts must be zero")
     accuracy = metrics["reactivation_accuracy"]
     if reactivations == 0:
         if accuracy is not None:

@@ -1369,25 +1369,166 @@ def test_cli_rejects_t2_reactivation_events(
     assert report["status"] == "failed"
 
 
-@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
-def test_cli_rejects_identity_transition_union_above_observations(
-    tmp_path: Path,
+def _set_identity_statistics(
+    artifact: dict[str, object],
+    *,
+    horizon_index: int,
     method: str,
+    observations: int,
+    switches: int,
+    reactivations: int = 0,
+    correct_reactivations: int = 0,
 ) -> None:
-    artifact = _complete_artifact()
-    horizon = artifact["horizons"][1]
+    horizon = artifact["horizons"][horizon_index]
     horizon[method].update(
         {
-            "matched_identity_observations": 3,
-            "identity_switches": 2,
-            "reactivation_events": 1,
-            "correct_reactivations": 1,
-            "reactivation_accuracy": 1.0,
+            "matched_identity_observations": observations,
+            "identity_switches": switches,
+            "reactivation_events": reactivations,
+            "correct_reactivations": correct_reactivations,
+            "reactivation_accuracy": (
+                correct_reactivations / reactivations
+                if reactivations
+                else None
+            ),
         }
     )
     horizon["delta"] = _metric_delta(
         horizon["persistent"],
         horizon["internal_baseline"],
+    )
+
+
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
+@pytest.mark.parametrize(
+    ("horizon_index", "observations", "switches"),
+    [(1, 4, 2), (3, 6, 4)],
+    ids=["T3", "T5"],
+)
+def test_cli_accepts_identity_switches_at_aggregate_track_bound(
+    tmp_path: Path,
+    method: str,
+    horizon_index: int,
+    observations: int,
+    switches: int,
+) -> None:
+    artifact = _complete_artifact()
+    _set_identity_statistics(
+        artifact,
+        horizon_index=horizon_index,
+        method=method,
+        observations=observations,
+        switches=switches,
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code == 0
+    assert report == artifact
+
+
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
+@pytest.mark.parametrize(
+    ("horizon_index", "observations", "switches"),
+    [(1, 4, 3), (3, 6, 5)],
+    ids=["T3", "T5"],
+)
+def test_cli_rejects_identity_switches_above_aggregate_track_bound(
+    tmp_path: Path,
+    method: str,
+    horizon_index: int,
+    observations: int,
+    switches: int,
+) -> None:
+    artifact = _complete_artifact()
+    _set_identity_statistics(
+        artifact,
+        horizon_index=horizon_index,
+        method=method,
+        observations=observations,
+        switches=switches,
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
+def test_cli_rejects_counted_transitions_above_aggregate_track_bound(
+    tmp_path: Path,
+    method: str,
+) -> None:
+    artifact = _complete_artifact()
+    _set_identity_statistics(
+        artifact,
+        horizon_index=1,
+        method=method,
+        observations=4,
+        switches=2,
+        reactivations=1,
+        correct_reactivations=1,
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code != 0
+    assert report["status"] == "failed"
+
+
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
+@pytest.mark.parametrize(
+    ("horizon_index", "observations", "reactivations"),
+    [(1, 3, 1), (3, 3, 2)],
+    ids=["T3", "T5"],
+)
+def test_cli_accepts_reactivations_at_aggregate_horizon_bound(
+    tmp_path: Path,
+    method: str,
+    horizon_index: int,
+    observations: int,
+    reactivations: int,
+) -> None:
+    artifact = _complete_artifact()
+    _set_identity_statistics(
+        artifact,
+        horizon_index=horizon_index,
+        method=method,
+        observations=observations,
+        switches=0,
+        reactivations=reactivations,
+        correct_reactivations=reactivations,
+    )
+
+    return_code, report = _run_mock_artifact(tmp_path, artifact)
+
+    assert return_code == 0
+    assert report == artifact
+
+
+@pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
+@pytest.mark.parametrize(
+    ("horizon_index", "observations", "reactivations"),
+    [(1, 3, 2), (3, 4, 3)],
+    ids=["T3", "T5"],
+)
+def test_cli_rejects_reactivations_above_aggregate_horizon_bound(
+    tmp_path: Path,
+    method: str,
+    horizon_index: int,
+    observations: int,
+    reactivations: int,
+) -> None:
+    artifact = _complete_artifact()
+    _set_identity_statistics(
+        artifact,
+        horizon_index=horizon_index,
+        method=method,
+        observations=observations,
+        switches=0,
+        reactivations=reactivations,
+        correct_reactivations=reactivations,
     )
 
     return_code, report = _run_mock_artifact(tmp_path, artifact)
@@ -1451,7 +1592,7 @@ def test_cli_rejects_invalid_reactivation_accuracy(
     method: str,
 ) -> None:
     artifact = _complete_artifact()
-    artifact["horizons"][0][method].update(
+    artifact["horizons"][3][method].update(
         {
             "matched_identity_observations": 3,
             "identity_switches": 1,
@@ -1534,7 +1675,7 @@ def test_cli_accepts_consistent_nonzero_reactivation_statistics(
     tmp_path: Path,
 ) -> None:
     artifact = _complete_artifact()
-    horizon = artifact["horizons"][1]
+    horizon = artifact["horizons"][3]
     horizon["persistent"].update(
         {
             "matched_identity_observations": 3,
