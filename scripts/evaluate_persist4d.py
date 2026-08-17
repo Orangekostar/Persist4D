@@ -1030,25 +1030,21 @@ def _maximum_aggregate_reactivations(
     observations: int,
     *,
     horizon: int,
-    maximum_tracks: int,
+    stage_capacity: int,
 ) -> int:
-    """Return the exact aggregate bound for the fixed T=2..5 contract."""
+    """Return the exact bound under per-stage capacity for fixed T=2..5."""
     if horizon == 2:
         return 0
     if horizon == 3:
-        if observations <= 2 * maximum_tracks:
-            return observations // 2
-        return max(0, 3 * maximum_tracks - observations)
+        return min(stage_capacity, observations // 2)
     if horizon == 4:
-        if observations <= 2 * maximum_tracks:
-            return observations // 2
-        if observations <= 3 * maximum_tracks:
-            return maximum_tracks
-        return max(0, 4 * maximum_tracks - observations)
+        return min(2 * stage_capacity, observations // 2)
     if horizon == 5:
-        if observations <= 3 * maximum_tracks:
+        if observations <= 3 * stage_capacity:
             return (2 * observations) // 3
-        return max(0, 5 * maximum_tracks - observations)
+        return 2 * stage_capacity + (
+            observations - 3 * stage_capacity
+        ) // 2
     raise ValueError("reactivation bound requires horizon 2..5")
 
 
@@ -1104,7 +1100,7 @@ def _validate_metric_block(
     maximum_reactivations = _maximum_aggregate_reactivations(
         observations,
         horizon=horizon,
-        maximum_tracks=loaded_sequences * capacity,
+        stage_capacity=loaded_sequences * capacity,
     )
     if switches > maximum_transitions:
         raise ValueError(f"{name}.identity_switches are impossible")

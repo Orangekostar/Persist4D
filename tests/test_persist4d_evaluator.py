@@ -1400,13 +1400,14 @@ def _set_identity_statistics(
     )
 
 
-def _enumerated_aggregate_reactivation_maxima(
+def _enumerated_stage_capacity_reactivation_maxima(
     horizon: int,
-    maximum_tracks: int,
+    stage_capacity: int,
 ) -> list[int]:
-    best_single_track = [-1] * (horizon + 1)
+    patterns: list[tuple[tuple[bool, ...], int]] = []
     for trajectory in product((False, True), repeat=horizon):
-        observations = sum(trajectory)
+        if not any(trajectory):
+            continue
         seen_observation = False
         previous_observation = False
         reactivations = 0
@@ -1415,45 +1416,63 @@ def _enumerated_aggregate_reactivation_maxima(
                 reactivations += 1
             seen_observation = seen_observation or observed
             previous_observation = observed
-        best_single_track[observations] = max(
-            best_single_track[observations],
-            reactivations,
-        )
+        patterns.append((trajectory, reactivations))
 
-    maxima = [-1] * (horizon * maximum_tracks + 1)
-    maxima[0] = 0
-    for _ in range(maximum_tracks):
-        next_maxima = [-1] * len(maxima)
-        for accumulated_observations, accumulated_reactivations in enumerate(
-            maxima
-        ):
-            if accumulated_reactivations < 0:
-                continue
-            for observations, reactivations in enumerate(best_single_track):
-                total_observations = accumulated_observations + observations
-                if total_observations >= len(maxima):
-                    continue
-                next_maxima[total_observations] = max(
-                    next_maxima[total_observations],
-                    accumulated_reactivations + reactivations,
+    states = {(0,) * horizon: 0}
+    for trajectory, reactivations in patterns:
+        next_states: dict[tuple[int, ...], int] = {}
+        for occupancy, accumulated_reactivations in states.items():
+            maximum_count = min(
+                stage_capacity - occupancy[stage]
+                for stage, observed in enumerate(trajectory)
+                if observed
+            )
+            for count in range(maximum_count + 1):
+                next_occupancy = tuple(
+                    occupancy[stage] + count * observed
+                    for stage, observed in enumerate(trajectory)
                 )
-        maxima = next_maxima
+                next_states[next_occupancy] = max(
+                    next_states.get(next_occupancy, -1),
+                    accumulated_reactivations + count * reactivations,
+                )
+        states = next_states
+
+    maxima = [-1] * (horizon * stage_capacity + 1)
+    for occupancy, reactivations in states.items():
+        observations = sum(occupancy)
+        maxima[observations] = max(maxima[observations], reactivations)
     return maxima
 
 
-def test_exact_reactivation_bound_matches_exhaustive_track_dp() -> None:
+def test_reactivation_bound_matches_stage_capacity_pattern_dp() -> None:
     for horizon in range(2, 6):
-        for maximum_tracks in range(1, 5):
-            expected_maxima = _enumerated_aggregate_reactivation_maxima(
+        for stage_capacity in range(1, 4):
+            expected_maxima = _enumerated_stage_capacity_reactivation_maxima(
                 horizon,
-                maximum_tracks,
+                stage_capacity,
             )
             for observations, expected in enumerate(expected_maxima):
                 assert evaluator._maximum_aggregate_reactivations(
                     observations,
                     horizon=horizon,
-                    maximum_tracks=maximum_tracks,
-                ) == expected, (horizon, maximum_tracks, observations)
+                    stage_capacity=stage_capacity,
+                ) == expected, (horizon, stage_capacity, observations)
+
+
+def test_t5_stage_capacity_allows_interleaved_gt_reactivations() -> None:
+    diagnostics = identity_diagnostics(
+        gt_ids_by_stage=[[1], [2], [1], [2], [1]],
+        predicted_ids_by_stage=[[10], [20], [10], [20], [10]],
+    )
+
+    assert diagnostics["matched_identity_observations"] == 5
+    assert diagnostics["reactivation_events"] == 3
+    assert evaluator._maximum_aggregate_reactivations(
+        5,
+        horizon=5,
+        stage_capacity=1,
+    ) == 3
 
 
 @pytest.mark.parametrize("method", ["persistent", "internal_baseline"])
@@ -1596,23 +1615,22 @@ def test_cli_rejects_reactivations_above_aggregate_horizon_bound(
 
 _EXACT_REACTIVATION_BOUNDARIES = [
     pytest.param(0, 30_800, 0, id="T2_2M"),
+    pytest.param(1, 23_999, 11_999, id="T3_2M_minus_1"),
     pytest.param(1, 24_000, 12_000, id="T3_2M"),
-    pytest.param(1, 24_001, 11_999, id="T3_2M_plus_1"),
-    pytest.param(1, 36_000, 0, id="T3_3M"),
-    pytest.param(2, 15_000, 7_500, id="T4_2M"),
-    pytest.param(2, 15_001, 7_500, id="T4_2M_plus_1"),
-    pytest.param(2, 22_500, 7_500, id="T4_3M"),
-    pytest.param(2, 22_501, 7_499, id="T4_3M_plus_1"),
-    pytest.param(2, 30_000, 0, id="T4_4M"),
+    pytest.param(1, 24_001, 12_000, id="T3_2M_plus_1"),
+    pytest.param(1, 36_000, 12_000, id="T3_3M"),
+    pytest.param(2, 29_999, 14_999, id="T4_4M_minus_1"),
+    pytest.param(2, 30_000, 15_000, id="T4_4M"),
     pytest.param(3, 12_900, 8_600, id="T5_3M"),
-    pytest.param(3, 12_901, 8_599, id="T5_3M_plus_1"),
+    pytest.param(3, 12_901, 8_600, id="T5_3M_plus_1"),
+    pytest.param(3, 12_902, 8_601, id="T5_3M_plus_2"),
     pytest.param(
         3,
         17_200,
-        4_300,
-        id="T5_review_counterexample_4M",
+        10_750,
+        id="T5_official_4M",
     ),
-    pytest.param(3, 21_500, 0, id="T5_5M"),
+    pytest.param(3, 21_500, 12_900, id="T5_5M"),
 ]
 
 
