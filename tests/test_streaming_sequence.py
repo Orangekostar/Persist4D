@@ -3,10 +3,12 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import replace
 
+import numpy as np
 import pytest
 import torch
 from torch import nn
 
+from datasets.streaming_sequence import causal_windows
 from models.persistent_memory import (
     PersistentMemory,
     PersistentMemoryState,
@@ -18,6 +20,37 @@ _PERSISTENT_KEYS = {
     "persistent_association_scores",
     "persistent_rejected_births",
 }
+
+
+def test_causal_windows_preserve_order_and_emit_bootstrap_window() -> None:
+    assert causal_windows([4, 2, 9, 7]) == (
+        (4,),
+        (4, 2),
+        (2, 9),
+        (9, 7),
+    )
+
+
+@pytest.mark.parametrize("scan_indices", [[], [1]])
+def test_causal_windows_require_at_least_two_indices(scan_indices) -> None:
+    with pytest.raises(ValueError, match="scan_indices"):
+        causal_windows(scan_indices)
+
+
+@pytest.mark.parametrize(
+    "scan_indices",
+    [[1.0, 2], ["1", 2], [True, 2], [np.bool_(False), 2]],
+)
+def test_causal_windows_reject_non_integral_and_boolean_indices(
+    scan_indices,
+) -> None:
+    with pytest.raises(ValueError, match="scan_indices"):
+        causal_windows(scan_indices)
+
+
+def test_causal_windows_reject_duplicate_indices() -> None:
+    with pytest.raises(ValueError, match="duplicate"):
+        causal_windows([3, 1, 3])
 
 
 def _settings() -> dict[str, object]:

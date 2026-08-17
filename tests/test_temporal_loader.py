@@ -1,5 +1,6 @@
 import importlib
 import logging
+import random
 import re
 import subprocess
 import sys
@@ -176,6 +177,109 @@ def _make_dataset(
     if known_empty_scan_policy is not None:
         kwargs["known_empty_scan_policy"] = known_empty_scan_policy
     return SemanticSegmentationDataset(**kwargs)
+
+
+def _load_with_seed(loader):
+    random.seed(45)
+    np.random.seed(45)
+    return loader()
+
+
+def _assert_loader_results_equal(actual, expected) -> None:
+    assert len(actual) == len(expected)
+    for actual_item, expected_item in zip(actual, expected, strict=True):
+        if isinstance(expected_item, np.ndarray):
+            assert isinstance(actual_item, np.ndarray)
+            np.testing.assert_array_equal(actual_item, expected_item)
+        else:
+            assert actual_item == expected_item
+
+
+def test_load_scan_indices_matches_default_and_explicit_change_file(
+    tmp_path: Path,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    dataset = _make_dataset(processed_dir)
+    scan_indices = dataset.sequence_indices[0].copy()
+
+    item_result = _load_with_seed(lambda: dataset[0])
+    default_result = _load_with_seed(
+        lambda: dataset.load_scan_indices(0, scan_indices)
+    )
+    explicit_result = _load_with_seed(
+        lambda: dataset.load_scan_indices(
+            0,
+            scan_indices,
+            change_file=dataset.change_files[0],
+        )
+    )
+
+    _assert_loader_results_equal(default_result, item_result)
+    _assert_loader_results_equal(explicit_result, item_result)
+
+
+def test_load_scan_indices_relabels_subpair_stages_and_disables_changes(
+    tmp_path: Path,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    dataset = _make_dataset(processed_dir)
+
+    result = dataset.load_scan_indices(0, [1, 2], change_file=None)
+    coordinates, _, labels, sequence_name, *_, context_idx, ambiguities = result
+
+    np.testing.assert_array_equal(coordinates[:, 3], [0, 0, 1, 1])
+    np.testing.assert_array_equal(labels[:, 2], np.zeros(4, dtype=np.int32))
+    np.testing.assert_array_equal(labels[:, 3], [0, 1, 2, 3])
+    assert sequence_name == dataset.sequence_names[0]
+    assert context_idx == 0
+    assert ambiguities == dataset.ambiguities[0]
+
+
+@pytest.mark.parametrize("scan_indices", [[], np.array(0), [[0, 1]]])
+def test_load_scan_indices_requires_non_empty_one_dimensional_indices(
+    tmp_path: Path,
+    scan_indices,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    dataset = _make_dataset(processed_dir)
+
+    with pytest.raises(ValueError, match="scan_indices"):
+        dataset.load_scan_indices(0, scan_indices)
+
+
+@pytest.mark.parametrize(
+    "scan_indices",
+    [[0.0], ["0"], [True], [np.bool_(False)]],
+)
+def test_load_scan_indices_rejects_non_integral_and_boolean_indices(
+    tmp_path: Path,
+    scan_indices,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    dataset = _make_dataset(processed_dir)
+
+    with pytest.raises(ValueError, match="scan_indices"):
+        dataset.load_scan_indices(0, scan_indices)
+
+
+@pytest.mark.parametrize("scan_indices", [[-1], [3]])
+def test_load_scan_indices_rejects_out_of_range_indices(
+    tmp_path: Path,
+    scan_indices,
+) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    dataset = _make_dataset(processed_dir)
+
+    with pytest.raises(IndexError, match="scan_indices"):
+        dataset.load_scan_indices(0, scan_indices)
+
+
+def test_load_scan_indices_rejects_duplicate_indices(tmp_path: Path) -> None:
+    processed_dir, _ = _make_three_scan_fixture(tmp_path)
+    dataset = _make_dataset(processed_dir)
+
+    with pytest.raises(ValueError, match="duplicate"):
+        dataset.load_scan_indices(0, [0, 0])
 
 
 def test_official_loader_projects_three_scan_changes_to_first_transition(

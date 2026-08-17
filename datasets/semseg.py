@@ -1,4 +1,5 @@
 import logging
+from numbers import Integral
 from pathlib import Path
 from random import random
 from typing import List, Optional, Tuple, Union
@@ -17,6 +18,8 @@ from yaml import CLoader as Loader
 from torch.utils.data import Dataset
 
 logger = logging.getLogger(__name__)
+
+_USE_SEQUENCE_CHANGE_FILE = object()
 
 
 class SemanticSegmentationDataset(Dataset):
@@ -403,8 +406,66 @@ class SemanticSegmentationDataset(Dataset):
 
     def __getitem__(self, idx: int):
         idx = idx % len(self.sequence_indices)
+        return self.load_scan_indices(idx, self.sequence_indices[idx])
 
-        scan_indices = self.sequence_indices[idx]
+    def load_scan_indices(
+        self,
+        context_idx,
+        scan_indices,
+        *,
+        change_file=_USE_SEQUENCE_CHANGE_FILE,
+    ):
+        if isinstance(context_idx, (bool, np.bool_)) or not isinstance(
+            context_idx, Integral
+        ):
+            raise ValueError("context_idx must be an integer")
+        context_idx = int(context_idx)
+        if context_idx < 0 or context_idx >= len(self.sequence_indices):
+            raise IndexError(
+                f"context_idx {context_idx} is outside [0, "
+                f"{len(self.sequence_indices)})"
+            )
+
+        try:
+            scan_indices_array = np.asarray(scan_indices, dtype=object)
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                "scan_indices must be a non-empty one-dimensional sequence"
+            ) from error
+        if scan_indices_array.ndim != 1 or scan_indices_array.size == 0:
+            raise ValueError(
+                "scan_indices must be a non-empty one-dimensional sequence"
+            )
+
+        normalized_scan_indices = []
+        for scan_index in scan_indices_array:
+            if isinstance(scan_index, (bool, np.bool_)) or not isinstance(
+                scan_index, Integral
+            ):
+                raise ValueError(
+                    "scan_indices elements must be integral and not boolean"
+                )
+            normalized_scan_index = int(scan_index)
+            if normalized_scan_index < 0 or normalized_scan_index >= len(self.data):
+                raise IndexError(
+                    f"scan_indices element {normalized_scan_index} is outside "
+                    f"[0, {len(self.data)})"
+                )
+            normalized_scan_indices.append(normalized_scan_index)
+
+        if len(set(normalized_scan_indices)) != len(normalized_scan_indices):
+            raise ValueError("scan_indices must not contain duplicate indices")
+
+        if change_file is _USE_SEQUENCE_CHANGE_FILE:
+            change_file = self.change_files[context_idx]
+
+        return self._load_scan_sequence(
+            context_idx=context_idx,
+            scan_indices=tuple(normalized_scan_indices),
+            change_file=change_file,
+        )
+
+    def _load_scan_sequence(self, *, context_idx, scan_indices, change_file):
         total_points = sum(self.data[scan_idx]["file_len"] for scan_idx in scan_indices)
 
         # Pre-allocate arrays with exact size
@@ -438,7 +499,9 @@ class SemanticSegmentationDataset(Dataset):
             # update the new max 
             max_segment = np.max(segments[start_slice:end_slice]) + 1
 
-            known_empty_context = self._known_empty_scan_context(idx, int(scan_idx))
+            known_empty_context = self._known_empty_scan_context(
+                context_idx, int(scan_idx)
+            )
             if known_empty_context is not None:
                 if self.known_empty_scan_policy == "error":
                     raise ValueError(
@@ -451,7 +514,7 @@ class SemanticSegmentationDataset(Dataset):
                         "event": "known_empty_scan_substitution",
                         "policy": self.known_empty_scan_policy,
                         **known_empty_context,
-                        "requested_index": int(idx),
+                        "requested_index": int(context_idx),
                         "substitute_index": 0,
                         "substitution_count": (
                             self.known_empty_scan_substitution_count
@@ -466,8 +529,8 @@ class SemanticSegmentationDataset(Dataset):
             start_slice = end_slice
         
         #open(filename).read().splitlines()
-        if self.change_files[idx] is not None:
-            changes = np.genfromtxt(self.change_files[idx], dtype=int)
+        if change_file is not None:
+            changes = np.genfromtxt(change_file, dtype=int)
             # One change label per point. Future: per-transition labels (N, T-1) when T > 2 sequences.
             if changes.ndim == 2:
                 changes = changes[:, 0]
@@ -575,12 +638,12 @@ class SemanticSegmentationDataset(Dataset):
             coordinates,
             features,
             labels,
-            self.sequence_names[idx],
+            self.sequence_names[context_idx],
             raw_color,
             raw_normals,
             raw_coordinates,
-            idx,
-            self.ambiguities[idx],
+            context_idx,
+            self.ambiguities[context_idx],
         )
 
     def _instance_evaluation_label_ids(self):
