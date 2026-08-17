@@ -1,10 +1,15 @@
-from dataclasses import replace
+from dataclasses import FrozenInstanceError, replace
+from pathlib import Path
 
 import pytest
 import torch
+import torch.nn.functional as F
+from hydra import compose, initialize_config_dir
 
 from models.persistent_memory import (
     LocalInstanceObservation,
+    MemoryStepResult,
+    PersistentMemory,
     PersistentMemoryState,
     build_local_observation,
 )
@@ -28,6 +33,45 @@ def _valid_observation() -> LocalInstanceObservation:
         confidence=torch.zeros(2, 3),
         latest_mask=[torch.zeros(3, 7), torch.zeros(3, 0)],
         valid=torch.ones(2, 3, dtype=torch.bool),
+    )
+
+
+def _step_observation(
+    features: torch.Tensor,
+    class_prob: torch.Tensor,
+    *,
+    confidence: torch.Tensor | None = None,
+    valid: torch.Tensor | None = None,
+) -> LocalInstanceObservation:
+    batch_size, query_count = features.shape[:2]
+    if confidence is None:
+        confidence = torch.ones(
+            batch_size,
+            query_count,
+            device=features.device,
+            dtype=features.dtype,
+        )
+    if valid is None:
+        valid = torch.ones(
+            batch_size,
+            query_count,
+            device=features.device,
+            dtype=torch.bool,
+        )
+    return LocalInstanceObservation(
+        features=features,
+        class_prob=class_prob,
+        confidence=confidence,
+        latest_mask=[
+            torch.zeros(
+                query_count,
+                0,
+                device=features.device,
+                dtype=features.dtype,
+            )
+            for _ in range(batch_size)
+        ],
+        valid=valid,
     )
 
 
@@ -65,6 +109,634 @@ def _valid_builder_inputs() -> tuple[dict[str, object], list[torch.Tensor]]:
     }
     segment_stages = [torch.tensor([1, 2, 2]), torch.tensor([2, 1, 2, 2])]
     return outputs, segment_stages
+
+
+def test_memory_step_result_is_frozen() -> None:
+    result = MemoryStepResult(
+        state=_valid_state(),
+        slot_ids=torch.tensor([[0]]),
+        association_scores=torch.tensor([[1.0]]),
+        rejected_births=torch.tensor([[False]]),
+    )
+
+    with pytest.raises(FrozenInstanceError):
+        result.slot_ids = torch.tensor([[1]])
+
+
+def test_persistent_memory_is_module_with_expected_defaults() -> None:
+    memory = PersistentMemory()
+
+    assert isinstance(memory, torch.nn.Module)
+    assert memory.capacity == 100
+    assert memory.class_weight == 0.25
+    assert memory.association_threshold == 0.5
+    assert memory.update_rate == 0.2
+    assert memory.max_update_rate == 0.2
+
+
+@pytest.mark.parametrize(
+    ("parameter", "value"),
+    [
+        ("capacity", 0),
+        ("capacity", -1),
+        ("capacity", True),
+        ("capacity", 1.0),
+        ("capacity", None),
+        ("class_weight", -0.01),
+        ("class_weight", 1.01),
+        ("class_weight", float("nan")),
+        ("class_weight", float("inf")),
+        ("class_weight", True),
+        ("class_weight", 10**1000),
+        ("association_threshold", float("nan")),
+        ("association_threshold", float("-inf")),
+        ("association_threshold", False),
+        ("association_threshold", 10**1000),
+        ("association_threshold", "0.5"),
+        ("update_rate", -0.01),
+        ("update_rate", 0.21),
+        ("update_rate", float("nan")),
+        ("update_rate", True),
+        ("update_rate", 10**1000),
+        ("max_update_rate", -0.01),
+        ("max_update_rate", 0.19),
+        ("max_update_rate", 1.01),
+        ("max_update_rate", float("nan")),
+        ("max_update_rate", False),
+        ("max_update_rate", 10**1000),
+    ],
+)
+def test_persistent_memory_rejects_invalid_constructor_parameters(
+    parameter: str, value: object
+) -> None:
+    with pytest.raises(ValueError):
+        PersistentMemory(**{parameter: value})
+
+
+@pytest.mark.parametrize(
+    "parameters",
+    [
+        {
+            "capacity": 1,
+            "class_weight": 0.0,
+            "association_threshold": -1e300,
+            "update_rate": 0.0,
+            "max_update_rate": 0.0,
+        },
+        {
+            "capacity": 1,
+            "class_weight": 1.0,
+            "association_threshold": 1e300,
+            "update_rate": 1.0,
+            "max_update_rate": 1.0,
+        },
+    ],
+)
+def test_persistent_memory_accepts_constructor_boundaries(
+    parameters: dict[str, object],
+) -> None:
+    memory = PersistentMemory(**parameters)
+
+    for name, value in parameters.items():
+        assert getattr(memory, name) == value
+
+
+@pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+@pytest.mark.parametrize("device", ["cpu", "cuda"])
+def test_empty_state_follows_observation_shape_device_and_dtype(
+    dtype: torch.dtype, device: str
+) -> None:
+    if device == "cuda" and not torch.cuda.is_available():
+        pytest.skip("CUDA is unavailable")
+    observation = _step_observation(
+        torch.zeros(2, 3, 4, device=device, dtype=dtype),
+        torch.zeros(2, 3, 5, device=device, dtype=dtype),
+    )
+
+    state = PersistentMemory(capacity=7).empty_state(observation)
+
+    assert state.embedding.shape == (2, 7, 4)
+    assert state.class_prob.shape == (2, 7, 5)
+    assert state.confidence.shape == (2, 7)
+    assert state.occupied.shape == (2, 7)
+    assert all(tensor.device.type == device for tensor in state.tensors())
+    assert state.embedding.dtype == dtype
+    assert state.class_prob.dtype == dtype
+    assert state.confidence.dtype == dtype
+    assert not torch.any(state.occupied)
+    assert not torch.any(state.active)
+    assert torch.all(state.last_seen == -1)
+
+
+def test_empty_state_validates_observation() -> None:
+    observation = replace(
+        _valid_observation(),
+        valid=torch.ones(2, 3),
+    )
+
+    with pytest.raises(ValueError):
+        PersistentMemory().empty_state(observation)
+
+
+def test_empty_state_rejects_wrong_observation_type() -> None:
+    with pytest.raises(ValueError):
+        PersistentMemory().empty_state(None)
+
+
+def test_step_births_in_query_order_into_lowest_free_slots() -> None:
+    memory = PersistentMemory(capacity=4, association_threshold=2.0)
+    observation = _step_observation(
+        torch.tensor([[[0.0, 2.0], [5.0, 5.0], [2.0, 2.0]]]),
+        torch.tensor([[[0.2, 0.8], [0.5, 0.5], [0.7, 0.3]]]),
+        confidence=torch.tensor([[0.6, 0.4, 0.9]]),
+        valid=torch.tensor([[True, False, True]]),
+    )
+    state = replace(
+        memory.empty_state(observation),
+        embedding=torch.tensor(
+            [[[1.0, 0.0], [0.0, 0.0], [-1.0, 0.0], [0.0, 0.0]]]
+        ),
+        class_prob=torch.tensor(
+            [[[0.9, 0.1], [0.0, 0.0], [0.1, 0.9], [0.0, 0.0]]]
+        ),
+        confidence=torch.tensor([[0.8, 0.0, 0.7, 0.0]]),
+        occupied=torch.tensor([[True, False, True, False]]),
+        active=torch.tensor([[True, False, True, False]]),
+        age=torch.tensor([[4, 0, 1, 0]]),
+        last_seen=torch.tensor([[2, -1, 2, -1]]),
+    )
+
+    result = memory.step(observation, state, stage_index=3)
+
+    assert torch.equal(result.slot_ids, torch.tensor([[1, -1, 3]]))
+    assert torch.isneginf(result.association_scores).all()
+    assert not torch.any(result.rejected_births)
+    assert torch.equal(result.state.occupied, torch.ones(1, 4, dtype=torch.bool))
+    assert torch.equal(
+        result.state.active, torch.tensor([[False, True, False, True]])
+    )
+    assert torch.equal(result.state.age, torch.tensor([[5, 0, 2, 0]]))
+    assert torch.equal(result.state.last_seen, torch.tensor([[2, 3, 2, 3]]))
+    torch.testing.assert_close(result.state.embedding[0, 0], state.embedding[0, 0])
+    torch.testing.assert_close(result.state.embedding[0, 2], state.embedding[0, 2])
+    torch.testing.assert_close(result.state.embedding[0, 1], torch.tensor([0.0, 1.0]))
+    torch.testing.assert_close(
+        result.state.embedding[0, 3], F.normalize(torch.tensor([2.0, 2.0]), dim=0)
+    )
+    torch.testing.assert_close(
+        result.state.class_prob[0, [1, 3]], observation.class_prob[0, [0, 2]]
+    )
+    torch.testing.assert_close(
+        result.state.confidence[0, [1, 3]], observation.confidence[0, [0, 2]]
+    )
+
+
+def test_step_match_preserves_slot_and_applies_confidence_scaled_ema() -> None:
+    memory = PersistentMemory(
+        capacity=2,
+        class_weight=0.0,
+        association_threshold=0.75,
+        update_rate=0.2,
+        max_update_rate=0.2,
+    )
+    birth = _step_observation(
+        torch.tensor([[[2.0, 0.0]]]),
+        torch.tensor([[[0.8, 0.2]]]),
+        confidence=torch.tensor([[0.9]]),
+    )
+    source = memory.step(birth, memory.empty_state(birth), stage_index=0).state
+    snapshots = tuple(tensor.clone() for tensor in source.tensors())
+    observation = _step_observation(
+        torch.tensor([[[0.8, 0.6]]]),
+        torch.tensor([[[0.2, 0.8]]]),
+        confidence=torch.tensor([[0.5]]),
+    )
+
+    result = memory.step(observation, source, stage_index=1)
+
+    assert torch.equal(result.slot_ids, torch.tensor([[0]]))
+    torch.testing.assert_close(result.association_scores, torch.tensor([[0.8]]))
+    assert not torch.any(result.rejected_births)
+    expected_embedding = F.normalize(torch.tensor([0.98, 0.06]), dim=0)
+    torch.testing.assert_close(result.state.embedding[0, 0], expected_embedding)
+    torch.testing.assert_close(
+        result.state.class_prob[0, 0], torch.tensor([0.74, 0.26])
+    )
+    torch.testing.assert_close(result.state.confidence[0, 0], torch.tensor(0.86))
+    assert result.state.active[0, 0]
+    assert result.state.age[0, 0].item() == 1
+    assert result.state.last_seen[0, 0].item() == 1
+    for source_tensor, snapshot, result_tensor in zip(
+        source.tensors(), snapshots, result.state.tensors(), strict=True
+    ):
+        torch.testing.assert_close(source_tensor, snapshot)
+        assert result_tensor.data_ptr() != source_tensor.data_ptr()
+
+
+@pytest.mark.parametrize(
+    ("observation_confidence", "expected_rate"),
+    [(-2.0, 0.0), (2.0, 0.2)],
+)
+def test_step_clamps_confidence_scaled_update_rate(
+    observation_confidence: float, expected_rate: float
+) -> None:
+    memory = PersistentMemory(
+        capacity=1,
+        class_weight=0.0,
+        association_threshold=0.7,
+        update_rate=0.2,
+        max_update_rate=0.2,
+    )
+    observation = _step_observation(
+        torch.tensor([[[0.8, 0.6]]]),
+        torch.tensor([[[0.0, 1.0]]]),
+        confidence=torch.tensor([[observation_confidence]]),
+    )
+    state = PersistentMemoryState(
+        embedding=torch.tensor([[[1.0, 0.0]]]),
+        class_prob=torch.tensor([[[1.0, 0.0]]]),
+        confidence=torch.tensor([[0.4]]),
+        occupied=torch.tensor([[True]]),
+        active=torch.tensor([[True]]),
+        age=torch.tensor([[0]]),
+        last_seen=torch.tensor([[0]]),
+    )
+
+    result = memory.step(observation, state, stage_index=1)
+
+    expected_embedding = F.normalize(
+        (1.0 - expected_rate) * state.embedding[0, 0]
+        + expected_rate * observation.features[0, 0],
+        dim=0,
+    )
+    torch.testing.assert_close(result.state.embedding[0, 0], expected_embedding)
+    torch.testing.assert_close(
+        result.state.class_prob[0, 0],
+        torch.tensor([1.0 - expected_rate, expected_rate]),
+    )
+    expected_confidence = (
+        (1.0 - expected_rate) * 0.4
+        + expected_rate * observation_confidence
+    )
+    torch.testing.assert_close(
+        result.state.confidence[0, 0], torch.tensor(expected_confidence)
+    )
+
+
+def test_step_keeps_unmatched_slot_dormant_and_reactivates_same_slot() -> None:
+    memory = PersistentMemory(
+        capacity=2,
+        class_weight=0.0,
+        association_threshold=0.9,
+    )
+    valid_observation = _step_observation(
+        torch.tensor([[[1.0, 0.0]]]),
+        torch.tensor([[[0.75, 0.25]]]),
+        confidence=torch.tensor([[0.8]]),
+    )
+    born = memory.step(
+        valid_observation,
+        memory.empty_state(valid_observation),
+        stage_index=0,
+    )
+    invalid_observation = replace(
+        valid_observation, valid=torch.tensor([[False]])
+    )
+
+    dormant = memory.step(invalid_observation, born.state, stage_index=1)
+
+    assert torch.equal(dormant.slot_ids, torch.tensor([[-1]]))
+    assert torch.isneginf(dormant.association_scores).all()
+    assert not torch.any(dormant.rejected_births)
+    assert dormant.state.occupied[0, 0]
+    assert not dormant.state.active[0, 0]
+    assert dormant.state.age[0, 0].item() == 1
+    assert dormant.state.last_seen[0, 0].item() == 0
+    torch.testing.assert_close(dormant.state.embedding, born.state.embedding)
+    torch.testing.assert_close(dormant.state.class_prob, born.state.class_prob)
+    torch.testing.assert_close(dormant.state.confidence, born.state.confidence)
+
+    reactivated = memory.step(valid_observation, dormant.state, stage_index=2)
+
+    assert torch.equal(reactivated.slot_ids, torch.tensor([[0]]))
+    assert reactivated.state.active[0, 0]
+    assert reactivated.state.age[0, 0].item() == 2
+    assert reactivated.state.last_seen[0, 0].item() == 2
+
+
+def test_step_marks_only_valid_unmatched_queries_as_rejected_when_full() -> None:
+    memory = PersistentMemory(capacity=1, association_threshold=2.0)
+    birth = _step_observation(
+        torch.tensor([[[1.0, 0.0]]]),
+        torch.tensor([[[1.0, 0.0]]]),
+    )
+    full_state = memory.step(
+        birth, memory.empty_state(birth), stage_index=0
+    ).state
+    observation = _step_observation(
+        torch.tensor([[[0.0, 1.0], [1.0, 1.0]]]),
+        torch.tensor([[[0.0, 1.0], [0.5, 0.5]]]),
+        valid=torch.tensor([[True, False]]),
+    )
+
+    result = memory.step(observation, full_state, stage_index=1)
+
+    assert torch.equal(result.slot_ids, torch.tensor([[-1, -1]]))
+    assert torch.isneginf(result.association_scores).all()
+    assert torch.equal(result.rejected_births, torch.tensor([[True, False]]))
+    assert result.state.occupied[0, 0]
+    assert not result.state.active[0, 0]
+    assert result.state.age[0, 0].item() == 1
+    assert result.state.last_seen[0, 0].item() == 0
+
+
+@pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+@pytest.mark.parametrize("device", ["cpu", "cuda"])
+def test_step_preserves_batched_shapes_device_and_dtype(
+    dtype: torch.dtype, device: str
+) -> None:
+    if device == "cuda" and not torch.cuda.is_available():
+        pytest.skip("CUDA is unavailable")
+    observation = _step_observation(
+        torch.tensor(
+            [
+                [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
+                [[1.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+            ],
+            device=device,
+            dtype=dtype,
+        ),
+        torch.zeros(2, 2, 4, device=device, dtype=dtype),
+        valid=torch.tensor(
+            [[True, False], [True, True]], device=device, dtype=torch.bool
+        ),
+    )
+    memory = PersistentMemory(capacity=2)
+
+    result = memory.step(
+        observation, memory.empty_state(observation), stage_index=0
+    )
+
+    assert torch.equal(
+        result.slot_ids.cpu(), torch.tensor([[0, -1], [0, 1]])
+    )
+    assert result.slot_ids.shape == (2, 2)
+    assert result.slot_ids.dtype == torch.long
+    assert result.association_scores.shape == (2, 2)
+    assert result.association_scores.dtype == dtype
+    assert result.rejected_births.shape == (2, 2)
+    assert result.rejected_births.dtype == torch.bool
+    assert result.state.embedding.shape == (2, 2, 3)
+    assert result.state.class_prob.shape == (2, 2, 4)
+    assert all(tensor.device.type == device for tensor in result.state.tensors())
+    assert result.slot_ids.device.type == device
+    assert result.association_scores.device.type == device
+    assert result.rejected_births.device.type == device
+
+
+@pytest.mark.parametrize("mismatch", ["batch", "feature", "class", "dtype", "capacity"])
+def test_step_rejects_state_observation_contract_mismatch(mismatch: str) -> None:
+    memory = PersistentMemory(capacity=2)
+    base_observation = _step_observation(
+        torch.zeros(1, 1, 2),
+        torch.zeros(1, 1, 2),
+    )
+    state = memory.empty_state(base_observation)
+    observation = base_observation
+    if mismatch == "batch":
+        observation = _step_observation(
+            torch.zeros(2, 1, 2), torch.zeros(2, 1, 2)
+        )
+    elif mismatch == "feature":
+        observation = _step_observation(
+            torch.zeros(1, 1, 3), torch.zeros(1, 1, 2)
+        )
+    elif mismatch == "class":
+        observation = _step_observation(
+            torch.zeros(1, 1, 2), torch.zeros(1, 1, 3)
+        )
+    elif mismatch == "dtype":
+        observation = _step_observation(
+            torch.zeros(1, 1, 2, dtype=torch.float64),
+            torch.zeros(1, 1, 2, dtype=torch.float64),
+        )
+    else:
+        state = PersistentMemoryState.empty(
+            batch_size=1,
+            capacity=3,
+            feature_dim=2,
+            class_count=2,
+            device="cpu",
+            dtype=torch.float32,
+        )
+
+    with pytest.raises(ValueError):
+        memory.step(observation, state, stage_index=0)
+
+
+def test_step_rejects_device_mismatch() -> None:
+    if not torch.cuda.is_available():
+        pytest.skip("CUDA is unavailable")
+    memory = PersistentMemory(capacity=1)
+    cpu_observation = _step_observation(
+        torch.zeros(1, 1, 2), torch.zeros(1, 1, 2)
+    )
+    cuda_observation = _step_observation(
+        torch.zeros(1, 1, 2, device="cuda"),
+        torch.zeros(1, 1, 2, device="cuda"),
+    )
+
+    with pytest.raises(ValueError, match="device"):
+        memory.step(
+            cuda_observation,
+            memory.empty_state(cpu_observation),
+            stage_index=0,
+        )
+
+
+@pytest.mark.parametrize("invalid_input", ["observation", "state"])
+def test_step_validates_observation_and_state(invalid_input: str) -> None:
+    memory = PersistentMemory(capacity=1)
+    observation = _step_observation(
+        torch.zeros(1, 1, 2), torch.zeros(1, 1, 2)
+    )
+    state = memory.empty_state(observation)
+    if invalid_input == "observation":
+        observation = replace(observation, valid=torch.ones(1, 1))
+    else:
+        state = replace(state, occupied=torch.zeros(1, 1, dtype=torch.long))
+
+    with pytest.raises(ValueError):
+        memory.step(observation, state, stage_index=0)
+
+
+@pytest.mark.parametrize("stage_index", [-1, True, 0.0, None, 10**1000])
+def test_step_rejects_invalid_stage_index(stage_index: object) -> None:
+    observation = _step_observation(
+        torch.zeros(1, 1, 2), torch.zeros(1, 1, 2)
+    )
+    memory = PersistentMemory(capacity=1)
+
+    with pytest.raises(ValueError):
+        memory.step(
+            observation,
+            memory.empty_state(observation),
+            stage_index=stage_index,
+        )
+
+
+@pytest.mark.parametrize("stage_index", [4, 3, 0])
+def test_step_requires_stage_later_than_every_occupied_slot(
+    stage_index: int,
+) -> None:
+    observation = _step_observation(
+        torch.tensor([[[1.0, 0.0]]]), torch.tensor([[[1.0, 0.0]]])
+    )
+    memory = PersistentMemory(capacity=1)
+    state = memory.step(
+        observation, memory.empty_state(observation), stage_index=4
+    ).state
+
+    with pytest.raises(ValueError, match="later"):
+        memory.step(observation, state, stage_index=stage_index)
+
+
+def test_step_keeps_capacity_and_shapes_constant_for_one_hundred_stages() -> None:
+    memory = PersistentMemory(capacity=4, association_threshold=2.0)
+    observation = _step_observation(
+        torch.tensor([[[1.0, 1.0]]]), torch.tensor([[[1.0, 0.0]]])
+    )
+    state = memory.empty_state(observation)
+    expected_shapes = tuple(tensor.shape for tensor in state.tensors())
+
+    for stage_index in range(100):
+        observation = replace(
+            observation,
+            features=torch.tensor([[[float(stage_index + 1), 1.0]]]),
+        )
+        result = memory.step(observation, state, stage_index=stage_index)
+        state = result.state
+        assert tuple(tensor.shape for tensor in state.tensors()) == expected_shapes
+
+    assert torch.all(state.occupied)
+    assert torch.equal(state.last_seen, torch.tensor([[0, 1, 2, 3]]))
+    assert torch.equal(result.slot_ids, torch.tensor([[-1]]))
+    assert torch.equal(result.rejected_births, torch.tensor([[True]]))
+
+
+def test_step_updates_remain_connected_to_autograd() -> None:
+    state_embedding = torch.tensor([[[1.0, 0.0]]], requires_grad=True)
+    state_class_prob = torch.tensor([[[0.8, 0.2]]], requires_grad=True)
+    state_confidence = torch.tensor([[0.9]], requires_grad=True)
+    state = PersistentMemoryState(
+        embedding=state_embedding,
+        class_prob=state_class_prob,
+        confidence=state_confidence,
+        occupied=torch.tensor([[True]]),
+        active=torch.tensor([[True]]),
+        age=torch.tensor([[0]]),
+        last_seen=torch.tensor([[0]]),
+    )
+    observation_features = torch.tensor(
+        [[[0.8, 0.6]]], requires_grad=True
+    )
+    observation_class_prob = torch.tensor(
+        [[[0.2, 0.8]]], requires_grad=True
+    )
+    observation_confidence = torch.tensor([[0.5]], requires_grad=True)
+    observation = _step_observation(
+        observation_features,
+        observation_class_prob,
+        confidence=observation_confidence,
+    )
+
+    result = PersistentMemory(
+        capacity=1,
+        class_weight=0.0,
+        association_threshold=0.75,
+    ).step(observation, state, stage_index=1)
+    loss = (
+        result.state.embedding.sum()
+        + result.state.class_prob.sum()
+        + result.state.confidence.sum()
+    )
+    loss.backward()
+
+    assert result.state.embedding.requires_grad
+    assert result.state.class_prob.requires_grad
+    assert result.state.confidence.requires_grad
+    for tensor in (
+        state_embedding,
+        state_class_prob,
+        state_confidence,
+        observation_features,
+        observation_class_prob,
+        observation_confidence,
+    ):
+        assert tensor.grad is not None
+        assert torch.isfinite(tensor.grad).all()
+
+
+@pytest.mark.parametrize("path", ["birth", "update"])
+def test_step_normalizes_float16_zero_vectors_without_nan(path: str) -> None:
+    if path == "birth":
+        memory = PersistentMemory(capacity=1)
+        observation = _step_observation(
+            torch.zeros(1, 1, 2, dtype=torch.float16),
+            torch.zeros(1, 1, 2, dtype=torch.float16),
+        )
+        state = memory.empty_state(observation)
+        stage_index = 0
+    else:
+        memory = PersistentMemory(
+            capacity=1,
+            class_weight=0.0,
+            association_threshold=-1.0,
+            update_rate=0.5,
+            max_update_rate=0.5,
+        )
+        observation = _step_observation(
+            torch.tensor([[[-1.0, 0.0]]], dtype=torch.float16),
+            torch.zeros(1, 1, 2, dtype=torch.float16),
+        )
+        state = PersistentMemoryState(
+            embedding=torch.tensor([[[1.0, 0.0]]], dtype=torch.float16),
+            class_prob=torch.zeros(1, 1, 2, dtype=torch.float16),
+            confidence=torch.ones(1, 1, dtype=torch.float16),
+            occupied=torch.tensor([[True]]),
+            active=torch.tensor([[True]]),
+            age=torch.tensor([[0]]),
+            last_seen=torch.tensor([[0]]),
+        )
+        stage_index = 1
+
+    result = memory.step(observation, state, stage_index=stage_index)
+
+    assert torch.equal(
+        result.state.embedding, torch.zeros(1, 1, 2, dtype=torch.float16)
+    )
+    assert torch.isfinite(result.state.embedding).all()
+
+
+def test_persist4d_config_composes_into_persist4d_package() -> None:
+    config_dir = Path(__file__).resolve().parents[1] / "conf"
+    expected = {
+        "capacity": 100,
+        "class_weight": 0.25,
+        "association_threshold": 0.5,
+        "update_rate": 0.2,
+        "max_update_rate": 0.2,
+        "confidence_threshold": 0.5,
+        "mask_threshold": 0.5,
+        "minimum_mask_support": 1,
+        "background_class": 18,
+    }
+
+    with initialize_config_dir(config_dir=str(config_dir), version_base="1.2"):
+        config = compose(config_name="model/persist4d")
+
+    assert set(config) == {"persist4d"}
+    assert dict(config.persist4d) == expected
 
 
 def test_empty_state_has_expected_shapes_dtypes_and_sentinels() -> None:

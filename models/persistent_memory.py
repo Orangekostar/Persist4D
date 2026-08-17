@@ -5,7 +5,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 import torch
-from torch import Tensor
+from torch import Tensor, nn
+from torch.nn import functional as F
 
 
 @dataclass(frozen=True)
@@ -430,6 +431,14 @@ class PersistentMemoryState:
 
 
 @dataclass(frozen=True)
+class MemoryStepResult:
+    state: PersistentMemoryState
+    slot_ids: Tensor
+    association_scores: Tensor
+    rejected_births: Tensor
+
+
+@dataclass(frozen=True)
 class AssociationResult:
     slot_for_query: Tensor
     query_for_slot: Tensor
@@ -576,19 +585,14 @@ def associate_observations(
     if observation.features.device != state.embedding.device:
         raise ValueError("observation and state must use the same device")
 
-    if (
-        not isinstance(class_weight, (int, float))
-        or isinstance(class_weight, bool)
-        or not math.isfinite(class_weight)
-        or not 0.0 <= class_weight <= 1.0
-    ):
+    class_weight = _finite_numeric_parameter(
+        class_weight, name="class_weight"
+    )
+    if not 0.0 <= class_weight <= 1.0:
         raise ValueError("class_weight must be finite and within [0, 1]")
-    if (
-        not isinstance(association_threshold, (int, float))
-        or isinstance(association_threshold, bool)
-        or not math.isfinite(association_threshold)
-    ):
-        raise ValueError("association_threshold must be finite")
+    association_threshold = _finite_numeric_parameter(
+        association_threshold, name="association_threshold"
+    )
 
     score_dtype = observation.features.dtype
     for dtype in (
@@ -657,3 +661,239 @@ def associate_observations(
         query_for_slot=query_for_slot,
         score_for_query=score_for_query,
     )
+
+
+def _finite_numeric_parameter(value: object, *, name: str) -> float:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        raise ValueError(  # noqa: TRY004
+            f"{name} must be a finite number"
+        )
+    try:
+        finite = math.isfinite(value)
+    except (OverflowError, TypeError, ValueError) as error:
+        raise ValueError(f"{name} must be a finite number") from error
+    if not finite:
+        raise ValueError(f"{name} must be a finite number")
+    return float(value)
+
+
+def _normalize_feature_vectors(features: Tensor) -> Tensor:
+    return F.normalize(
+        features,
+        dim=-1,
+        eps=torch.finfo(features.dtype).tiny,
+    )
+
+
+class PersistentMemory(nn.Module):
+    def __init__(
+        self,
+        capacity: int = 100,
+        class_weight: float = 0.25,
+        association_threshold: float = 0.5,
+        update_rate: float = 0.2,
+        max_update_rate: float = 0.2,
+    ) -> None:
+        super().__init__()
+        if (
+            not isinstance(capacity, int)
+            or isinstance(capacity, bool)
+            or capacity <= 0
+        ):
+            raise ValueError("capacity must be a positive integer")
+
+        validated_class_weight = _finite_numeric_parameter(
+            class_weight, name="class_weight"
+        )
+        if not 0.0 <= validated_class_weight <= 1.0:
+            raise ValueError("class_weight must be finite and within [0, 1]")
+        validated_association_threshold = _finite_numeric_parameter(
+            association_threshold, name="association_threshold"
+        )
+        validated_update_rate = _finite_numeric_parameter(
+            update_rate, name="update_rate"
+        )
+        validated_max_update_rate = _finite_numeric_parameter(
+            max_update_rate, name="max_update_rate"
+        )
+        if not 0.0 <= validated_update_rate <= validated_max_update_rate <= 1.0:
+            raise ValueError(
+                "update rates must satisfy 0 <= update_rate <= "
+                "max_update_rate <= 1"
+            )
+
+        self.capacity = capacity
+        self.class_weight = validated_class_weight
+        self.association_threshold = validated_association_threshold
+        self.update_rate = validated_update_rate
+        self.max_update_rate = validated_max_update_rate
+
+    def empty_state(
+        self, observation: LocalInstanceObservation
+    ) -> PersistentMemoryState:
+        if not isinstance(observation, LocalInstanceObservation):
+            raise ValueError(  # noqa: TRY004
+                "observation must be a LocalInstanceObservation"
+            )
+        observation.validate()
+        return PersistentMemoryState.empty(
+            batch_size=observation.features.shape[0],
+            capacity=self.capacity,
+            feature_dim=observation.features.shape[2],
+            class_count=observation.class_prob.shape[2],
+            device=observation.features.device,
+            dtype=observation.features.dtype,
+        )
+
+    def step(
+        self,
+        observation: LocalInstanceObservation,
+        state: PersistentMemoryState,
+        stage_index: int,
+    ) -> MemoryStepResult:
+        if not isinstance(observation, LocalInstanceObservation):
+            raise ValueError(  # noqa: TRY004
+                "observation must be a LocalInstanceObservation"
+            )
+        if not isinstance(state, PersistentMemoryState):
+            raise ValueError(  # noqa: TRY004
+                "state must be a PersistentMemoryState"
+            )
+        observation.validate()
+        state.validate()
+
+        if (
+            not isinstance(stage_index, int)
+            or isinstance(stage_index, bool)
+            or not 0 <= stage_index <= torch.iinfo(torch.long).max
+        ):
+            raise ValueError("stage_index must be a non-negative integer")
+        if state.capacity != self.capacity:
+            raise ValueError("state capacity must match persistent memory capacity")
+        if observation.features.shape[0] != state.batch_size:
+            raise ValueError("observation and state batch sizes must match")
+        if observation.features.shape[2] != state.feature_dim:
+            raise ValueError("observation and state feature dimensions must match")
+        if observation.class_prob.shape[2] != state.class_count:
+            raise ValueError("observation and state class dimensions must match")
+        if observation.features.device != state.embedding.device:
+            raise ValueError("observation and state must use the same device")
+        if any(
+            tensor.dtype != state.embedding.dtype
+            for tensor in (
+                observation.features,
+                observation.class_prob,
+                observation.confidence,
+            )
+        ):
+            raise ValueError("observation and state must use the same dtype")
+        if torch.any(state.occupied).item():
+            latest_seen = state.last_seen[state.occupied].max().item()
+            if stage_index <= latest_seen:
+                raise ValueError(
+                    "stage_index must be later than every occupied slot"
+                )
+
+        (
+            embedding,
+            class_prob,
+            confidence,
+            occupied,
+            active,
+            age,
+            last_seen,
+        ) = (tensor.clone() for tensor in state.tensors())
+        age.add_(occupied.to(dtype=torch.long))
+        active.zero_()
+
+        association = associate_observations(
+            observation,
+            state,
+            class_weight=self.class_weight,
+            association_threshold=self.association_threshold,
+        )
+        slot_ids = association.slot_for_query.clone()
+        association_scores = association.score_for_query.clone()
+        rejected_births = torch.zeros_like(observation.valid)
+
+        for batch_index in range(state.batch_size):
+            matched_queries = (slot_ids[batch_index] >= 0).nonzero(
+                as_tuple=True
+            )[0]
+            if matched_queries.numel() > 0:
+                matched_slots = slot_ids[batch_index, matched_queries]
+                update_rates = (
+                    self.update_rate
+                    * observation.confidence[batch_index, matched_queries]
+                ).clamp(min=0.0, max=self.max_update_rate)
+                vector_rates = update_rates.unsqueeze(-1)
+                updated_embedding = (
+                    (1.0 - vector_rates)
+                    * state.embedding[batch_index, matched_slots]
+                    + vector_rates
+                    * observation.features[batch_index, matched_queries]
+                )
+                embedding[batch_index, matched_slots] = (
+                    _normalize_feature_vectors(updated_embedding)
+                )
+                class_prob[batch_index, matched_slots] = (
+                    (1.0 - vector_rates)
+                    * state.class_prob[batch_index, matched_slots]
+                    + vector_rates
+                    * observation.class_prob[batch_index, matched_queries]
+                )
+                confidence[batch_index, matched_slots] = (
+                    (1.0 - update_rates)
+                    * state.confidence[batch_index, matched_slots]
+                    + update_rates
+                    * observation.confidence[batch_index, matched_queries]
+                )
+                active[batch_index, matched_slots] = True
+                last_seen[batch_index, matched_slots] = stage_index
+
+            unmatched_queries = (
+                observation.valid[batch_index]
+                & (slot_ids[batch_index] < 0)
+            ).nonzero(as_tuple=True)[0]
+            free_slots = (~occupied[batch_index]).nonzero(as_tuple=True)[0]
+            birth_count = min(unmatched_queries.numel(), free_slots.numel())
+            if birth_count > 0:
+                birth_queries = unmatched_queries[:birth_count]
+                birth_slots = free_slots[:birth_count]
+                embedding[batch_index, birth_slots] = (
+                    _normalize_feature_vectors(
+                        observation.features[batch_index, birth_queries]
+                    )
+                )
+                class_prob[batch_index, birth_slots] = observation.class_prob[
+                    batch_index, birth_queries
+                ]
+                confidence[batch_index, birth_slots] = observation.confidence[
+                    batch_index, birth_queries
+                ]
+                occupied[batch_index, birth_slots] = True
+                active[batch_index, birth_slots] = True
+                age[batch_index, birth_slots] = 0
+                last_seen[batch_index, birth_slots] = stage_index
+                slot_ids[batch_index, birth_queries] = birth_slots
+            if birth_count < unmatched_queries.numel():
+                rejected_births[
+                    batch_index, unmatched_queries[birth_count:]
+                ] = True
+
+        next_state = PersistentMemoryState(
+            embedding=embedding,
+            class_prob=class_prob,
+            confidence=confidence,
+            occupied=occupied,
+            active=active,
+            age=age,
+            last_seen=last_seen,
+        )
+        next_state.validate()
+        return MemoryStepResult(
+            state=next_state,
+            slot_ids=slot_ids,
+            association_scores=association_scores,
+            rejected_births=rejected_births,
+        )

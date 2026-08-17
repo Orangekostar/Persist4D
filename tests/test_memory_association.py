@@ -533,11 +533,13 @@ def test_associate_observations_rejects_device_mismatch(
         (0.0, float("-inf")),
         (0.0, float("nan")),
         (0.0, False),
+        (10**1000, 0.0),
+        (0.0, 10**1000),
     ],
 )
 def test_associate_observations_rejects_invalid_parameters(
-    class_weight: float,
-    association_threshold: float,
+    class_weight: object,
+    association_threshold: object,
 ) -> None:
     state = _state(
         torch.tensor([[[1.0, 0.0]]]),

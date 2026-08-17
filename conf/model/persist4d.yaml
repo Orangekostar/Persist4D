@@ -1,0 +1,10 @@
+# @package persist4d
+capacity: 100
+class_weight: 0.25
+association_threshold: 0.5
+update_rate: 0.2
+max_update_rate: 0.2
+confidence_threshold: 0.5
+mask_threshold: 0.5
+minimum_mask_support: 1
+background_class: 18
