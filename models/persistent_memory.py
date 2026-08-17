@@ -428,6 +428,15 @@ class PersistentMemoryState:
             raise ValueError("last_seen must be at least -1")
         if torch.any(self.stage_watermark < -1).item():
             raise ValueError("stage_watermark must be at least -1")
+        invalid_occupied_last_seen = self.occupied & (
+            (self.last_seen < 0)
+            | (self.last_seen > self.stage_watermark.unsqueeze(1))
+        )
+        if torch.any(invalid_occupied_last_seen).item():
+            raise ValueError(
+                "occupied slots must have last_seen between zero and the "
+                "batch stage watermark"
+            )
         if torch.any((~self.occupied) & (self.last_seen != -1)).item():
             raise ValueError("unoccupied slots must use the last_seen sentinel")
 

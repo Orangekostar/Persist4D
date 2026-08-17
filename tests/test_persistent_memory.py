@@ -1176,6 +1176,33 @@ def test_state_validation_rejects_last_seen_below_sentinel() -> None:
         state.validate()
 
 
+def test_state_validation_rejects_missing_last_seen_on_occupied_slot() -> None:
+    state = replace(
+        _valid_state(),
+        occupied=torch.tensor(
+            [[True, False, False], [False, False, False]]
+        ),
+        stage_watermark=torch.tensor([0, -1]),
+    )
+
+    with pytest.raises(ValueError):
+        state.validate()
+
+
+def test_state_validation_rejects_last_seen_after_stage_watermark() -> None:
+    state = replace(
+        _valid_state(),
+        occupied=torch.tensor(
+            [[True, False, False], [False, False, False]]
+        ),
+        last_seen=torch.tensor([[2, -1, -1], [-1, -1, -1]]),
+        stage_watermark=torch.tensor([1, -1]),
+    )
+
+    with pytest.raises(ValueError):
+        state.validate()
+
+
 def test_state_validation_rejects_last_seen_on_unoccupied_slots() -> None:
     state = replace(
         _valid_state(),
