@@ -104,8 +104,8 @@ EXPECTED_INPUT_PROVENANCE = {
     "resolved_composed_config": {
         "format": "canonical-json-sort-keys-v1",
         "portable_references": True,
-        "serialized_bytes": 9420,
-        "sha256": "c04291fd18ac761e44d545e615639c88054cd625d5af96ece09dd5b70c03eec6",
+        "serialized_bytes": 9450,
+        "sha256": "494c95a92a0bd26dc07117a381167b59f36d368944383887a6a7ddb6abbb05c3",
     },
 }
 

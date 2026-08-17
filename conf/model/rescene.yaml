@@ -38,6 +38,7 @@ num_changes: ${general.num_changes}
 temporal_masking: false
 use_changes_loss: false
 save_segment_info: ${general.save_segment_info}
+return_query_features: false
 
 config:
   backbone: ${backbone}

@@ -42,6 +42,7 @@ class ReScene(nn.Module):
         temporal_masking,
         use_changes_loss,
         save_segment_info,
+        return_query_features=False,
     ):
         super().__init__()
 
@@ -72,6 +73,7 @@ class ReScene(nn.Module):
         self.num_changes = num_changes
         self.temporal_masking = temporal_masking
         self.save_segment_info = bool(save_segment_info)
+        self.return_query_features = bool(return_query_features)
 
         self.backbone = config.backbone
         self.num_levels = len(self.hlevels)
@@ -524,6 +526,9 @@ class ReScene(nn.Module):
             "backbone_features": pcd_features,
             "segment_features": segment_features,
         }
+
+        if self.return_query_features:
+            output_dict["query_features"] = self.decoder_norm(queries)
 
         # Optionally export segment-level GT info + temporal stage aggregated to segments.
         if self.save_segment_info:
