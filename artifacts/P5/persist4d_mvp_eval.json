@@ -1,0 +1,276 @@
+{
+  "bounded_state": {
+    "constant_shape": true,
+    "maximum_state_bytes": 63808
+  },
+  "checkpoint": {
+    "ref": "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt",
+    "sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e"
+  },
+  "conclusion": {
+    "identity_improvements": [
+      "T4:t_REC",
+      "T4:identity_switches",
+      "T4:reactivation_accuracy",
+      "T5:t_REC",
+      "T5:identity_switches",
+      "T5:reactivation_accuracy"
+    ],
+    "label": "P5_MVP_PASS",
+    "reason": "bounded_execution_with_t4_t5_identity_improvement"
+  },
+  "errors": [],
+  "horizons": [
+    {
+      "T": 2,
+      "delta": {
+        "correct_reactivations": 0,
+        "identity_switches": -590,
+        "matched_identity_observations": 0,
+        "per_stage_AP": {
+          "1": 0.017105400562286377,
+          "2": 0.006620645523071289
+        },
+        "reactivation_accuracy": null,
+        "reactivation_events": 0,
+        "t_REC": 0.13933677971363068,
+        "t_mAP": 0.23116211965680122
+      },
+      "internal_baseline": {
+        "correct_reactivations": 0,
+        "identity_switches": 660,
+        "matched_identity_observations": 1890,
+        "per_stage_AP": {
+          "1": 0.3406795263290405,
+          "2": 0.3425678312778473
+        },
+        "reactivation_accuracy": null,
+        "reactivation_events": 0,
+        "t_REC": 0.16623584926128387,
+        "t_mAP": 0.008160915225744247
+      },
+      "loaded_sequences": 154,
+      "persistent": {
+        "correct_reactivations": 0,
+        "identity_switches": 70,
+        "matched_identity_observations": 1890,
+        "per_stage_AP": {
+          "1": 0.3577849268913269,
+          "2": 0.3491884768009186
+        },
+        "reactivation_accuracy": null,
+        "reactivation_events": 0,
+        "rejected_births": 0,
+        "t_REC": 0.30557262897491455,
+        "t_mAP": 0.23932303488254547
+      },
+      "resources": {
+        "mean_latency_ms": 629.8343968734919,
+        "peak_allocated_cuda_bytes": 3391539200,
+        "serialized_state_bytes": 63808,
+        "throughput_sequences_per_second": 1.5877189384447976
+      }
+    },
+    {
+      "T": 3,
+      "delta": {
+        "correct_reactivations": 91,
+        "identity_switches": -955,
+        "matched_identity_observations": 0,
+        "per_stage_AP": {
+          "1": 0.03940573334693909,
+          "2": 0.010455965995788574,
+          "3": 0.02304065227508545
+        },
+        "reactivation_accuracy": 0.7982456140350878,
+        "reactivation_events": 0,
+        "t_REC": -0.002221331000328064,
+        "t_mAP": 0.15594001999124885
+      },
+      "internal_baseline": {
+        "correct_reactivations": 2,
+        "identity_switches": 1088,
+        "matched_identity_observations": 2218,
+        "per_stage_AP": {
+          "1": 0.30236461758613586,
+          "2": 0.31475135684013367,
+          "3": 0.3091471195220947
+        },
+        "reactivation_accuracy": 0.017543859649122806,
+        "reactivation_events": 114,
+        "t_REC": 0.1879633516073227,
+        "t_mAP": 0.002776897046715021
+      },
+      "loaded_sequences": 120,
+      "persistent": {
+        "correct_reactivations": 93,
+        "identity_switches": 133,
+        "matched_identity_observations": 2218,
+        "per_stage_AP": {
+          "1": 0.34177035093307495,
+          "2": 0.32520732283592224,
+          "3": 0.3321877717971802
+        },
+        "reactivation_accuracy": 0.8157894736842105,
+        "reactivation_events": 114,
+        "rejected_births": 0,
+        "t_REC": 0.18574202060699463,
+        "t_mAP": 0.15871691703796387
+      },
+      "resources": {
+        "mean_latency_ms": 962.3040477939261,
+        "peak_allocated_cuda_bytes": 2714871296,
+        "serialized_state_bytes": 63808,
+        "throughput_sequences_per_second": 1.039172600689451
+      }
+    },
+    {
+      "T": 4,
+      "delta": {
+        "correct_reactivations": 123,
+        "identity_switches": -996,
+        "matched_identity_observations": 0,
+        "per_stage_AP": {
+          "1": 0.045667827129364014,
+          "2": 0.030635148286819458,
+          "3": 0.021164029836654663,
+          "4": 0.021344691514968872
+        },
+        "reactivation_accuracy": 0.8092105263157894,
+        "reactivation_events": 0,
+        "t_REC": 0.062001802027225494,
+        "t_mAP": 0.12461235513910651
+      },
+      "internal_baseline": {
+        "correct_reactivations": 2,
+        "identity_switches": 1118,
+        "matched_identity_observations": 1913,
+        "per_stage_AP": {
+          "1": 0.33341678977012634,
+          "2": 0.3577827215194702,
+          "3": 0.33347296714782715,
+          "4": 0.3553462326526642
+        },
+        "reactivation_accuracy": 0.013157894736842105,
+        "reactivation_events": 152,
+        "t_REC": 0.11071839183568954,
+        "t_mAP": 0.0016038031317293644
+      },
+      "loaded_sequences": 75,
+      "persistent": {
+        "correct_reactivations": 125,
+        "identity_switches": 122,
+        "matched_identity_observations": 1913,
+        "per_stage_AP": {
+          "1": 0.37908461689949036,
+          "2": 0.3884178698062897,
+          "3": 0.3546369969844818,
+          "4": 0.37669092416763306
+        },
+        "reactivation_accuracy": 0.8223684210526315,
+        "reactivation_events": 152,
+        "rejected_births": 0,
+        "t_REC": 0.17272019386291504,
+        "t_mAP": 0.12621615827083588
+      },
+      "resources": {
+        "mean_latency_ms": 1373.6672090987365,
+        "peak_allocated_cuda_bytes": 2714983936,
+        "serialized_state_bytes": 63808,
+        "throughput_sequences_per_second": 0.7279783584963787
+      }
+    },
+    {
+      "T": 5,
+      "delta": {
+        "correct_reactivations": 183,
+        "identity_switches": -745,
+        "matched_identity_observations": 0,
+        "per_stage_AP": {
+          "1": 0.06719270348548889,
+          "2": 0.05646014213562012,
+          "3": 0.02836090326309204,
+          "4": 0.053656429052352905,
+          "5": 0.04510718584060669
+        },
+        "reactivation_accuracy": 0.8061674008810572,
+        "reactivation_events": 0,
+        "t_REC": 0.07281089201569557,
+        "t_mAP": 0.03422640170902014
+      },
+      "internal_baseline": {
+        "correct_reactivations": 1,
+        "identity_switches": 866,
+        "matched_identity_observations": 1419,
+        "per_stage_AP": {
+          "1": 0.2474817931652069,
+          "2": 0.23260581493377686,
+          "3": 0.26608166098594666,
+          "4": 0.2502804100513458,
+          "5": 0.25330403447151184
+        },
+        "reactivation_accuracy": 0.004405286343612335,
+        "reactivation_events": 227,
+        "t_REC": 0.042998190969228745,
+        "t_mAP": 0.001392086036503315
+      },
+      "loaded_sequences": 43,
+      "persistent": {
+        "correct_reactivations": 184,
+        "identity_switches": 121,
+        "matched_identity_observations": 1419,
+        "per_stage_AP": {
+          "1": 0.3146744966506958,
+          "2": 0.289065957069397,
+          "3": 0.2944425642490387,
+          "4": 0.30393683910369873,
+          "5": 0.29841122031211853
+        },
+        "reactivation_accuracy": 0.8105726872246696,
+        "reactivation_events": 227,
+        "rejected_births": 0,
+        "t_REC": 0.11580908298492432,
+        "t_mAP": 0.03561848774552345
+      },
+      "resources": {
+        "mean_latency_ms": 1811.279708454602,
+        "peak_allocated_cuda_bytes": 2714959872,
+        "serialized_state_bytes": 63808,
+        "throughput_sequences_per_second": 0.5520958443537182
+      }
+    }
+  ],
+  "legacy_parity": {
+    "legacy_predictions_unchanged": true,
+    "query_feature_shape": [
+      1,
+      100,
+      128
+    ],
+    "sample_count": 1,
+    "verified_by": "in_evaluator_fixed_t2_sample_toggle"
+  },
+  "method": "persist4d_p5_single_memory",
+  "schema_version": 2,
+  "settings": {
+    "capacity": 100,
+    "internal_baseline_identity": "local_query_index",
+    "local_window": 2,
+    "shared_rescene_outputs": true
+  },
+  "source_commit": "92bab01e93bacbc939606ec7c7f58d3f9b334fe6",
+  "source_tree_contract": {
+    "allowed_untracked_outputs": [
+      "repo:artifacts/P5/persist4d_mvp_eval.json",
+      "repo:artifacts/P5/persist4d_mvp_eval.md"
+    ],
+    "generation_head_unchanged": true,
+    "index_clean": true,
+    "only_declared_outputs_untracked": true,
+    "schema_version": 1,
+    "source_commit": "92bab01e93bacbc939606ec7c7f58d3f9b334fe6",
+    "status": "pass",
+    "tracked_tree_clean": true
+  },
+  "status": "pass"
+}
