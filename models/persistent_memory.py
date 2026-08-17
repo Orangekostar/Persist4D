@@ -678,11 +678,10 @@ def _finite_numeric_parameter(value: object, *, name: str) -> float:
 
 
 def _normalize_feature_vectors(features: Tensor) -> Tensor:
-    return F.normalize(
-        features,
-        dim=-1,
-        eps=torch.finfo(features.dtype).tiny,
+    compute_dtype = (
+        torch.float64 if features.dtype == torch.float64 else torch.float32
     )
+    return F.normalize(features.to(dtype=compute_dtype), dim=-1)
 
 
 class PersistentMemory(nn.Module):
@@ -787,12 +786,11 @@ class PersistentMemory(nn.Module):
             )
         ):
             raise ValueError("observation and state must use the same dtype")
-        if torch.any(state.occupied).item():
-            latest_seen = state.last_seen[state.occupied].max().item()
-            if stage_index <= latest_seen:
-                raise ValueError(
-                    "stage_index must be later than every occupied slot"
-                )
+        latest_seen = state.last_seen.max().item()
+        if stage_index <= latest_seen:
+            raise ValueError(
+                "stage_index must be later than the processed-stage watermark"
+            )
 
         (
             embedding,
@@ -822,32 +820,50 @@ class PersistentMemory(nn.Module):
             )[0]
             if matched_queries.numel() > 0:
                 matched_slots = slot_ids[batch_index, matched_queries]
+                compute_dtype = (
+                    torch.float64
+                    if state.embedding.dtype == torch.float64
+                    else torch.float32
+                )
+                observation_confidence = observation.confidence[
+                    batch_index, matched_queries
+                ].to(dtype=compute_dtype)
                 update_rates = (
-                    self.update_rate
-                    * observation.confidence[batch_index, matched_queries]
+                    self.update_rate * observation_confidence
                 ).clamp(min=0.0, max=self.max_update_rate)
                 vector_rates = update_rates.unsqueeze(-1)
                 updated_embedding = (
                     (1.0 - vector_rates)
-                    * state.embedding[batch_index, matched_slots]
+                    * state.embedding[batch_index, matched_slots].to(
+                        dtype=compute_dtype
+                    )
                     + vector_rates
-                    * observation.features[batch_index, matched_queries]
+                    * observation.features[
+                        batch_index, matched_queries
+                    ].to(dtype=compute_dtype)
                 )
                 embedding[batch_index, matched_slots] = (
-                    _normalize_feature_vectors(updated_embedding)
+                    _normalize_feature_vectors(updated_embedding).to(
+                        dtype=state.embedding.dtype
+                    )
                 )
                 class_prob[batch_index, matched_slots] = (
                     (1.0 - vector_rates)
-                    * state.class_prob[batch_index, matched_slots]
+                    * state.class_prob[batch_index, matched_slots].to(
+                        dtype=compute_dtype
+                    )
                     + vector_rates
-                    * observation.class_prob[batch_index, matched_queries]
-                )
+                    * observation.class_prob[
+                        batch_index, matched_queries
+                    ].to(dtype=compute_dtype)
+                ).to(dtype=state.class_prob.dtype)
                 confidence[batch_index, matched_slots] = (
                     (1.0 - update_rates)
-                    * state.confidence[batch_index, matched_slots]
-                    + update_rates
-                    * observation.confidence[batch_index, matched_queries]
-                )
+                    * state.confidence[batch_index, matched_slots].to(
+                        dtype=compute_dtype
+                    )
+                    + update_rates * observation_confidence
+                ).to(dtype=state.confidence.dtype)
                 active[batch_index, matched_slots] = True
                 last_seen[batch_index, matched_slots] = stage_index
 
@@ -863,7 +879,7 @@ class PersistentMemory(nn.Module):
                 embedding[batch_index, birth_slots] = (
                     _normalize_feature_vectors(
                         observation.features[batch_index, birth_queries]
-                    )
+                    ).to(dtype=state.embedding.dtype)
                 )
                 class_prob[batch_index, birth_slots] = observation.class_prob[
                     batch_index, birth_queries
@@ -881,6 +897,8 @@ class PersistentMemory(nn.Module):
                     batch_index, unmatched_queries[birth_count:]
                 ] = True
 
+        # Free-slot last_seen entries carry the global processed-stage watermark.
+        last_seen[~occupied] = stage_index
         next_state = PersistentMemoryState(
             embedding=embedding,
             class_prob=class_prob,
