@@ -21,6 +21,7 @@ from scripts.evaluate_persist4d_p6a import (
     publish_manifest_atomic,
     resolve_cache_entry,
     resolve_protocol_cache_request,
+    run_real_prediction_cache,
     stage_prediction_from_track_step,
 )
 from scripts.p6a_cache import load_cache_entry, write_cache_entry
@@ -287,6 +288,18 @@ def test_real_prediction_cache_producer_runs_one_exact_local_forward() -> None:
     assert forward_kwargs["is_eval"] is True
     assert payload["key"] == key
     assert payload["target"]["gt_ids"].tolist() == [10]
+
+
+def test_real_cache_run_rejects_repository_cache_before_runtime_setup() -> None:
+    with pytest.raises(ValueError, match="outside the repository"):
+        run_real_prediction_cache(
+            cache_directory=Path("artifacts/P6A/cache"),
+            protocol_manifest_path=Path("artifacts/P6A/protocol_b_manifest.json"),
+            cache_manifest_path=Path("artifacts/P6A/cache_manifest.json"),
+            metadata_path=Path("external/3RScan.json"),
+            checkpoint_path=Path("checkpoints/rescene4d_concerto_t2_repro.ckpt"),
+            device_name="cuda:0",
+        )
 
 
 def test_cache_payload_to_frozen_observation_detaches_all_cpu_tensors() -> None:

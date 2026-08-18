@@ -1,19 +1,15 @@
-"""Pure CPU orchestration helpers for the P6-A frozen prediction cache.
-
-The real ReScene forward pass is intentionally outside this module.  This
-module consumes validated cache payloads, freezes them once, and coordinates
-CPU-only trackers and metric accumulators without importing Hydra or touching
-CUDA state.
-"""
+"""P6-A frozen prediction cache and CPU-only evaluation orchestration."""
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import inspect
 import json
 import math
 import os
 import random
+import sys
 import tempfile
 from collections.abc import Callable, Hashable, Mapping, Sequence
 from contextlib import contextmanager
@@ -23,7 +19,12 @@ from typing import Any
 
 import numpy as np
 import torch
+import yaml
 from torch import Tensor
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from scripts.p6a_association import FrozenObservation, freeze_observation
 from scripts.p6a_cache import (
@@ -45,6 +46,9 @@ from scripts.p6a_metrics import (
 )
 
 _EXPECTED_ORDER_NAMES = ("canonical", "reverse", "sha256_seed45")
+EXPECTED_RESCENE_CHECKPOINT_SHA256 = (
+    "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e"
+)
 _OBSERVATION_KEYS = (
     "features",
     "class_prob",
@@ -499,6 +503,256 @@ def materialize_prediction_cache(
         cache_directory=cache_directory,
     )
     return manifest
+
+
+def _repository_path(path: Path) -> Path:
+    candidate = path.expanduser()
+    if not candidate.is_absolute():
+        candidate = PROJECT_ROOT / candidate
+    return candidate.resolve()
+
+
+def _external_cache_directory(path: Path) -> Path:
+    candidate = path.expanduser().resolve()
+    try:
+        candidate.relative_to(PROJECT_ROOT.resolve())
+    except ValueError:
+        return candidate
+    raise ValueError("prediction cache directory must be outside the repository")
+
+
+def _frozen_protocol_bundle(
+    *,
+    metadata_path: Path,
+) -> tuple[object, dict[str, object], bytes]:
+    from scripts.p6a_protocol import build_protocol_b, build_protocol_b_manifest
+
+    config_path = PROJECT_ROOT / "conf/p6a/default.yaml"
+    sequence_database = PROJECT_ROOT / (
+        "data/processed/rio/sequence_database_sliding_5.yaml"
+    )
+    scan_metadata = PROJECT_ROOT / "data/processed/rio/validation_database.yaml"
+    source_manifest = PROJECT_ROOT / "artifacts/environment/source_manifest.json"
+    p6a_bytes = config_path.read_bytes()
+    p6a_config = yaml.safe_load(p6a_bytes)
+    if not isinstance(p6a_config, Mapping):
+        raise ValueError("P6-A config must be a mapping")  # noqa: TRY004
+    protocol_config = _require_mapping(
+        p6a_config.get("protocol_b"), name="P6-A protocol_b config"
+    )
+    sources = _require_mapping(
+        protocol_config.get("sources"), name="P6-A protocol sources"
+    )
+    for name, path, digest_key in (
+        ("sequence database", sequence_database, "sequence_database_sha256"),
+        ("scan metadata", scan_metadata, "scan_metadata_sha256"),
+        ("3RScan metadata", metadata_path, "metadata_sha256"),
+    ):
+        expected_digest = sources.get(digest_key)
+        if expected_digest != _file_sha256(path):
+            raise ValueError(f"frozen {name} SHA-256 differs from P6-A config")
+    protocol = build_protocol_b(
+        sequence_database,
+        scan_metadata,
+        metadata_path=metadata_path,
+        expected_split=str(protocol_config["split"]),
+        expected_master_count=int(protocol_config["expected_master_count"]),
+        expected_cluster_count=int(
+            protocol_config["expected_reference_scene_clusters"]
+        ),
+        horizons=tuple(int(value) for value in protocol_config["horizons"]),
+        seed=int(protocol_config["seed"]),
+        require_supervised=bool(protocol_config["require_supervised"]),
+        substitution_policy=str(protocol_config["substitution_policy"]),
+    )
+    configured_references = protocol_config.get("reference_scene_ids")
+    actual_references = sorted(
+        {_field(master, "reference_scene_id") for master in _protocol_masters(protocol)}
+    )
+    if configured_references != actual_references:
+        raise ValueError("Protocol B reference-scene clusters differ from config")
+    manifest = build_protocol_b_manifest(
+        protocol,
+        sequence_database_path=sequence_database,
+        scan_metadata_path=scan_metadata,
+        metadata_path=metadata_path,
+        source_manifest_path=source_manifest,
+        config_path=config_path,
+        repository_root=PROJECT_ROOT,
+    )
+    if len(expected_cache_keys(protocol)) != 645:
+        raise ValueError("Protocol B must contain exactly 645 cache observations")
+    return protocol, manifest, p6a_bytes
+
+
+def run_real_prediction_cache(
+    *,
+    cache_directory: Path,
+    protocol_manifest_path: Path,
+    cache_manifest_path: Path,
+    metadata_path: Path,
+    checkpoint_path: Path,
+    device_name: str,
+) -> dict[str, object]:
+    """Materialize the complete frozen ReScene cache on one CUDA device."""
+
+    external_cache = _external_cache_directory(cache_directory)
+    protocol_output = _repository_path(protocol_manifest_path)
+    cache_output = _repository_path(cache_manifest_path)
+    metadata = _repository_path(metadata_path)
+
+    import hydra
+    from omegaconf import OmegaConf
+
+    from models.persistent_memory import build_local_observation
+    from scripts.evaluate_persist4d import (
+        _begin_source_tree_contract,
+        _compose_runtime_config,
+        _finalize_source_tree_contract,
+        _latest_full_resolution_masks,
+        _load_system,
+        _move_data_to_device,
+        _move_targets_to_device,
+        _resolve_checkpoint,
+        _segment_stages,
+        _validate_cuda_device,
+    )
+
+    guard = _begin_source_tree_contract(
+        repo_root=PROJECT_ROOT,
+        output_paths=(protocol_output, cache_output),
+    )
+    protocol, protocol_manifest, p6a_bytes = _frozen_protocol_bundle(
+        metadata_path=metadata
+    )
+    publish_manifest_atomic(protocol_output, protocol_manifest)
+    config, _memory_config = _compose_runtime_config()
+    checkpoint = _resolve_checkpoint(checkpoint_path)
+    if _file_sha256(checkpoint) != EXPECTED_RESCENE_CHECKPOINT_SHA256:
+        raise ValueError("formal ReScene checkpoint SHA-256 differs from P6-A")
+    runtime_bytes = OmegaConf.to_yaml(
+        config,
+        resolve=True,
+        sort_keys=True,
+    ).encode("utf-8")
+    provenance = build_cache_provenance(
+        source_commit=guard.source_commit,
+        checkpoint_path=checkpoint,
+        config_documents={"p6a": p6a_bytes, "runtime": runtime_bytes},
+        protocol_manifest=protocol_manifest,
+    )
+    device = _validate_cuda_device(device_name)
+    dataset_config = OmegaConf.create(
+        OmegaConf.to_container(config.data.validation_dataset, resolve=True)
+    )
+    dataset_config.temporal_window = 5
+    dataset = hydra.utils.instantiate(dataset_config)
+    collate = hydra.utils.instantiate(config.data.validation_collation)
+    system = _load_system(config, checkpoint, device)
+    p6a_config = yaml.safe_load(p6a_bytes)
+    settings = p6a_config["baselines"]["b4"]
+    producer = RealPredictionCacheProducer(
+        protocol=protocol,
+        provenance=provenance,
+        dataset=dataset,
+        collate=collate,
+        system=system,
+        device=device,
+        observation_settings={
+            "background_class": int(settings["background_class"]),
+            "confidence_threshold": float(settings["confidence_threshold"]),
+            "mask_threshold": float(settings["mask_threshold"]),
+            "minimum_mask_support": int(settings["minimum_mask_support"]),
+        },
+        move_data=_move_data_to_device,
+        move_targets=_move_targets_to_device,
+        segment_stages=_segment_stages,
+        latest_masks=_latest_full_resolution_masks,
+        observation_builder=build_local_observation,
+        seed=int(p6a_config["protocol_b"]["seed"]),
+    )
+
+    deterministic_enabled = torch.are_deterministic_algorithms_enabled()
+    deterministic_warn_only = torch.is_deterministic_algorithms_warn_only_enabled()
+    cudnn_benchmark = torch.backends.cudnn.benchmark
+    cudnn_deterministic = torch.backends.cudnn.deterministic
+    cuda_allow_tf32 = torch.backends.cuda.matmul.allow_tf32
+    cudnn_allow_tf32 = torch.backends.cudnn.allow_tf32
+    matmul_precision = torch.get_float32_matmul_precision()
+    try:
+        torch.use_deterministic_algorithms(True)
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
+        torch.set_float32_matmul_precision("highest")
+        manifest = materialize_prediction_cache(
+            protocol=protocol,
+            cache_directory=external_cache,
+            manifest_path=cache_output,
+            provenance=provenance,
+            producer=producer,
+        )
+        _finalize_source_tree_contract(guard)
+        return manifest
+    finally:
+        torch.use_deterministic_algorithms(
+            deterministic_enabled,
+            warn_only=deterministic_warn_only,
+        )
+        torch.backends.cudnn.benchmark = cudnn_benchmark
+        torch.backends.cudnn.deterministic = cudnn_deterministic
+        torch.backends.cuda.matmul.allow_tf32 = cuda_allow_tf32
+        torch.backends.cudnn.allow_tf32 = cudnn_allow_tf32
+        torch.set_float32_matmul_precision(matmul_precision)
+
+
+def _argument_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Materialize the frozen P6-A ReScene prediction cache."
+    )
+    parser.add_argument("--cache-directory", type=Path, required=True)
+    parser.add_argument("--metadata", type=Path, required=True)
+    parser.add_argument(
+        "--protocol-manifest",
+        type=Path,
+        default=Path("artifacts/P6A/protocol_b_manifest.json"),
+    )
+    parser.add_argument(
+        "--cache-manifest",
+        type=Path,
+        default=Path("artifacts/P6A/cache_manifest.json"),
+    )
+    parser.add_argument(
+        "--checkpoint",
+        type=Path,
+        default=Path("checkpoints/rescene4d_concerto_t2_repro.ckpt"),
+    )
+    parser.add_argument("--device", default="cuda:0")
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    args = _argument_parser().parse_args(argv)
+    manifest = run_real_prediction_cache(
+        cache_directory=args.cache_directory,
+        protocol_manifest_path=args.protocol_manifest,
+        cache_manifest_path=args.cache_manifest,
+        metadata_path=args.metadata,
+        checkpoint_path=args.checkpoint,
+        device_name=args.device,
+    )
+    print(
+        json.dumps(
+            {
+                "status": manifest["status"],
+                "entry_count": manifest["entry_count"],
+                "entries_sha256": manifest["entries_sha256"],
+            },
+            sort_keys=True,
+        )
+    )
+    return 0
 
 
 def cache_payload_to_frozen_observation(
@@ -1357,5 +1611,10 @@ __all__ = [
     "publish_manifest_atomic",
     "resolve_cache_entry",
     "resolve_protocol_cache_request",
+    "run_real_prediction_cache",
     "stage_prediction_from_track_step",
 ]
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
