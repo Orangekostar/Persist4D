@@ -346,6 +346,43 @@ def test_b4_matches_direct_frozen_p5_step_and_exposes_detached_snapshot() -> Non
     assert tracker.state.embedding[0, 0, 0].item() != 99.0
 
 
+def test_b4_forwards_exact_persistent_memory_timing_without_changing_output() -> None:
+    source = _mask_observation(
+        [[1.0, 0.0]],
+        [[1.0, 0.0]],
+        [[10.0]],
+    )
+    untimed = B4PersistentTracker(sequence_id="untimed", capacity=1)
+    timed = B4PersistentTracker(sequence_id="timed", capacity=1)
+    clock_values = iter((1_000_000, 2_000_000, 5_000_000, 11_000_000))
+    timing_records: list[dict[str, float]] = []
+
+    untimed_result = untimed.step(source, stage_id=0)
+    timed_result = timed.step(
+        source,
+        stage_id=0,
+        timing_sink=timing_records.append,
+        clock_ns=lambda: next(clock_values),
+    )
+
+    assert timing_records == [
+        {
+            "association_overhead_ms": 3.0,
+            "memory_update_overhead_ms": 7.0,
+        }
+    ]
+    assert timed_result.track_ids == untimed_result.track_ids
+    assert timed_result.rejected_births == untimed_result.rejected_births
+    assert timed_result.state_snapshot is not None
+    assert untimed_result.state_snapshot is not None
+    for actual, expected in zip(
+        timed_result.state_snapshot.tensors(),
+        untimed_result.state_snapshot.tensors(),
+        strict=True,
+    ):
+        torch.testing.assert_close(actual, expected)
+
+
 def test_b4_has_dynamic_q_and_reports_capacity_rejection() -> None:
     tracker = B4PersistentTracker(sequence_id="scene", capacity=1)
     result = tracker.step(

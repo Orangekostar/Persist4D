@@ -10,7 +10,7 @@ implementation; Oracle is a post-hoc diagnostic with no inference state.
 from __future__ import annotations
 
 import math
-from collections.abc import Hashable, Iterable, Mapping, Sequence
+from collections.abc import Callable, Hashable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -1197,6 +1197,8 @@ class B4PersistentTracker:
         observation: FrozenObservation | LocalInstanceObservation | Mapping[str, Any],
         *,
         stage_id: int,
+        timing_sink: Callable[[Mapping[str, float]], object] | None = None,
+        clock_ns: Callable[[], int] | None = None,
     ) -> TrackStep:
         if (
             not isinstance(stage_id, int)
@@ -1219,7 +1221,15 @@ class B4PersistentTracker:
         )
         # This is the sole B4 transition.  The adapter intentionally does not
         # reimplement P5 scoring, assignment, or EMA updates.
-        result = self.memory.step(p5_observation, state_before, stage_id)
+        timing_kwargs: dict[str, Any] = {"timing_sink": timing_sink}
+        if clock_ns is not None:
+            timing_kwargs["clock_ns"] = clock_ns
+        result = self.memory.step(
+            p5_observation,
+            state_before,
+            stage_id,
+            **timing_kwargs,
+        )
         next_state = result.state
         slot_values = result.slot_ids[0].detach().cpu().tolist()
         score_values = result.association_scores[0].detach().cpu().tolist()
