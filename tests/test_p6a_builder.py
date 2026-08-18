@@ -23,6 +23,7 @@ from scripts.p6a_artifacts import (
 from scripts.p6a_builder import (
     _expected_cache_keys,
     _json_text,
+    _portable_runtime_config_text,
     build_p6a_root_artifact,
     metric_table_rows,
     seal_artifact_manifest,
@@ -31,6 +32,26 @@ from scripts.p6a_cache import build_cache_manifest
 from scripts.p6a_efficiency import build_efficiency_manifest
 from scripts.p6a_protocol import _seeded_permutation
 from tests.test_p6a_artifacts import _artifact, _efficiency_manifest
+
+
+def test_portable_runtime_config_redacts_concerto_local_paths() -> None:
+    local_checkpoint = "/" + "home/user/.cache/concerto/concerto_base.pth"
+    runtime = {
+        "backbone": {"model_lib": "concerto", "name": local_checkpoint},
+        "model": {
+            "config": {
+                "backbone": {"model_lib": "concerto", "name": local_checkpoint}
+            }
+        },
+    }
+
+    portable = _portable_runtime_config_text(yaml.safe_dump(runtime, sort_keys=True))
+    parsed = yaml.safe_load(portable)
+
+    expected = "external:concerto/concerto_base.pth"
+    assert local_checkpoint not in portable
+    assert parsed["backbone"]["name"] == expected
+    assert parsed["model"]["config"]["backbone"]["name"] == expected
 
 
 def _metric(value: float) -> dict[str, float | None]:

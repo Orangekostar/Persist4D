@@ -82,6 +82,33 @@ def _config_digest(documents: Mapping[str, bytes]) -> str:
     return hasher.hexdigest()
 
 
+def _portable_runtime_config_text(runtime_config_text: str) -> str:
+    document = yaml.safe_load(runtime_config_text)
+    if not isinstance(document, Mapping):
+        raise TypeError("runtime config must be a YAML mapping")
+    portable = copy.deepcopy(document)
+    replacements = 0
+
+    def visit(value: object) -> None:
+        nonlocal replacements
+        if isinstance(value, dict):
+            if value.get("model_lib") == "concerto":
+                checkpoint = value.get("name")
+                if isinstance(checkpoint, str) and Path(checkpoint).is_absolute():
+                    value["name"] = f"external:concerto/{Path(checkpoint).name}"
+                    replacements += 1
+            for child in value.values():
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    visit(portable)
+    if replacements == 0:
+        return runtime_config_text
+    return yaml.safe_dump(portable, allow_unicode=False, sort_keys=True)
+
+
 def _expected_cache_keys(protocol_manifest: Mapping[str, object]) -> list[dict[str, object]]:
     validate_protocol_b_manifest(protocol_manifest)
     masters = protocol_manifest["masters"]
@@ -413,6 +440,7 @@ def build_p6a_root_artifact(
         raise ValueError("P6-A requires 43 masters, six clusters, and 129 units")
     p6a_bytes = p6a_config_text.encode("utf-8")
     runtime_bytes = runtime_config_text.encode("utf-8")
+    portable_runtime_config_text = _portable_runtime_config_text(runtime_config_text)
     settings = yaml.safe_load(p6a_config_text)
     if not isinstance(settings, Mapping) or not isinstance(
         yaml.safe_load(runtime_config_text), Mapping
@@ -737,7 +765,9 @@ def build_p6a_root_artifact(
                 },
             },
             "yaml": {
-                "configs/resolved_runtime.yaml": {"text": runtime_config_text},
+                "configs/resolved_runtime.yaml": {
+                    "text": portable_runtime_config_text
+                },
                 "configs/p6a_default.yaml": {"text": p6a_config_text},
             },
         },
