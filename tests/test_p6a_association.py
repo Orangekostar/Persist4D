@@ -8,6 +8,7 @@ import torch
 
 from models.persistent_memory import LocalInstanceObservation, PersistentMemory
 from scripts.p6a_association import (
+    AssociationDiagnostics,
     B0SanityTracker,
     B0StageUniqueTracker,
     B1FeatureTracker,
@@ -450,3 +451,129 @@ def test_run_baseline_supports_b4_but_rejects_oracle_dispatch() -> None:
     assert run_baseline("b4", [observation], sequence_id="scene")[0].track_ids == (0,)
     with pytest.raises(ValueError, match="B4"):
         run_baseline("oracle", [observation], sequence_id="scene")
+
+
+def test_association_diagnostics_are_typed_and_query_aligned() -> None:
+    observations = [
+        _observation([[1.0, 0.0], [0.0, 1.0]]),
+        _observation([[0.8, 0.6], [0.0, 1.0]]),
+    ]
+    for step in run_b1(observations, sequence_id="scene") + run_b2(
+        observations, sequence_id="scene"
+    ) + run_b3(observations, sequence_id="scene"):
+        diagnostics = step.diagnostics
+        assert isinstance(diagnostics, AssociationDiagnostics)
+        assert diagnostics.query_count == step.query_count
+        for field in diagnostics.per_query_fields():
+            assert len(field) == step.query_count
+
+
+def test_b2_diagnostics_decompose_total_and_report_margin() -> None:
+    tracker = B2FeatureClassTracker(
+        sequence_id="scene", feature_threshold=-1.0, class_weight=0.25
+    )
+    tracker.step(
+        _observation(
+            [[1.0, 0.0], [0.0, 1.0]],
+            [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+        ),
+        stage_id=0,
+    )
+    result = tracker.step(
+        _observation(
+            [[0.8, 0.6], [0.0, 1.0]],
+            [[0.0, 1.0, 0.0], [0.0, 1.0, 0.0]],
+        ),
+        stage_id=1,
+    )
+    diagnostics = result.diagnostics
+    assert diagnostics is not None
+    assert diagnostics.selected_candidate_identity[0] == 0
+    assert diagnostics.chosen_class_similarity[0] == pytest.approx(1.0)
+    assert diagnostics.chosen_total_score[0] == pytest.approx(
+        diagnostics.chosen_feature_similarity[0]
+        + 0.25 * diagnostics.chosen_class_similarity[0]
+    )
+    assert diagnostics.best_score[0] is not None
+    assert diagnostics.second_best_score[0] is not None
+    assert diagnostics.score_margin[0] == pytest.approx(
+        diagnostics.best_score[0] - diagnostics.second_best_score[0]
+    )
+
+
+def test_global_assignment_can_select_a_non_best_candidate() -> None:
+    tracker = B1FeatureTracker(sequence_id="scene", feature_threshold=0.0)
+    tracker.step(
+        _observation([[1.0, 0.0], [0.9, 0.435889894]]), stage_id=0
+    )
+    result = tracker.step(
+        _observation([[1.0, 0.0], [0.8, -0.6]]), stage_id=1
+    )
+    diagnostics = result.diagnostics
+    assert diagnostics is not None
+    assert diagnostics.selected_candidate_identity[0] == 1
+    assert diagnostics.best_candidate_identity[0] == 0
+    assert diagnostics.selected_candidate_identity[0] != diagnostics.best_candidate_identity[0]
+
+
+def test_low_threshold_birth_keeps_best_candidate_diagnostic() -> None:
+    tracker = B1FeatureTracker(sequence_id="scene", feature_threshold=0.95)
+    tracker.step(_observation([[1.0, 0.0]]), stage_id=0)
+    result = tracker.step(_observation([[0.8, 0.6]]), stage_id=1)
+    diagnostics = result.diagnostics
+    assert result.births == (True,)
+    assert diagnostics is not None
+    assert diagnostics.selected_candidate_identity == (None,)
+    assert diagnostics.best_candidate_identity == (0,)
+    assert diagnostics.chosen_total_score == (None,)
+    assert diagnostics.best_score[0] == pytest.approx(0.8)
+    assert diagnostics.second_best_score == (None,)
+
+
+def test_b4_diagnostics_report_active_match_and_gap_reactivation_state() -> None:
+    tracker = B4PersistentTracker(sequence_id="scene", capacity=1)
+    source = _mask_observation([[1.0, 0.0]], [[1.0, 0.0]], [[10.0]])
+    missing = _mask_observation(
+        [[1.0, 0.0]], [[1.0, 0.0]], [[10.0]], valid=[False]
+    )
+
+    first = tracker.step(source, stage_id=0)
+    active = tracker.step(source, stage_id=1)
+    tracker.step(missing, stage_id=2)
+    recovered = tracker.step(source, stage_id=3)
+
+    assert first.diagnostics is not None
+    assert first.diagnostics.selected_candidate_identity == (None,)
+    active_diagnostics = active.diagnostics
+    assert active_diagnostics is not None
+    assert active_diagnostics.selected_candidate_identity == (0,)
+    assert active_diagnostics.slot_occupied == (True,)
+    assert active_diagnostics.slot_active == (True,)
+    assert active_diagnostics.slot_age == (0,)
+    assert active_diagnostics.last_seen_stage == (0,)
+    assert active_diagnostics.reactivation == (False,)
+
+    recovered_diagnostics = recovered.diagnostics
+    assert recovered_diagnostics is not None
+    assert recovered_diagnostics.selected_candidate_identity == (0,)
+    assert recovered_diagnostics.reactivation == (True,)
+    assert recovered_diagnostics.slot_active == (False,)
+    assert recovered_diagnostics.slot_occupied == (True,)
+    assert recovered_diagnostics.slot_age == (2,)
+    assert recovered_diagnostics.last_seen_stage == (1,)
+
+
+def test_diagnostics_do_not_change_existing_track_step_fields() -> None:
+    result = run_b1(
+        [_observation([[1.0, 0.0]]), _observation([[1.0, 0.0]])],
+        sequence_id="scene",
+    )
+    assert result[0].method == "B1"
+    assert result[0].sequence_id == "scene"
+    assert result[0].stage_id == 0
+    assert result[1].track_ids == (0,)
+    assert result[1].matched_previous == (0,)
+    assert result[1].scores == (1.0,)
+    assert result[1].births == (False,)
+    assert result[1].valid == (True,)
+    assert result[1].rejected_births == (False,)

@@ -22,6 +22,7 @@ from models.persistent_memory import (
     LocalInstanceObservation,
     PersistentMemory,
     PersistentMemoryState,
+    _normalize_feature_vectors,
 )
 from scripts.p6a_metrics import global_hungarian_match
 
@@ -206,6 +207,128 @@ class IdentityNamespace:
 
 
 @dataclass(frozen=True)
+class AssociationDiagnostics:
+    """Immutable, query-aligned association evidence for one stage."""
+
+    selected_candidate_identity: tuple[object | None, ...]
+    best_candidate_identity: tuple[object | None, ...]
+    chosen_feature_similarity: tuple[float | None, ...]
+    chosen_class_similarity: tuple[float | None, ...]
+    chosen_total_score: tuple[float | None, ...]
+    best_score: tuple[float | None, ...]
+    second_best_score: tuple[float | None, ...]
+    score_margin: tuple[float | None, ...]
+    slot_age: tuple[int | None, ...]
+    last_seen_stage: tuple[int | None, ...]
+    slot_active: tuple[bool | None, ...]
+    slot_occupied: tuple[bool | None, ...]
+    reactivation: tuple[bool | None, ...]
+
+    def __post_init__(self) -> None:
+        fields = self.per_query_fields()
+        if not all(isinstance(value, tuple) for value in fields):
+            raise ValueError("association diagnostics fields must be tuples")
+        lengths = {len(value) for value in fields}
+        if len(lengths) != 1:
+            raise ValueError("association diagnostics fields must be query-aligned")
+        for name in (
+            "chosen_feature_similarity",
+            "chosen_class_similarity",
+            "chosen_total_score",
+            "best_score",
+            "second_best_score",
+            "score_margin",
+        ):
+            for value in getattr(self, name):
+                if value is not None and (
+                    not isinstance(value, (int, float))
+                    or isinstance(value, bool)
+                    or not math.isfinite(float(value))
+                ):
+                    raise ValueError(f"{name} must contain finite floats or None")
+        for name in ("slot_age", "last_seen_stage"):
+            for value in getattr(self, name):
+                if value is not None and (
+                    not isinstance(value, int)
+                    or isinstance(value, bool)
+                    or (name == "slot_age" and value < 0)
+                    or (name == "last_seen_stage" and value < -1)
+                ):
+                    raise ValueError(f"{name} must contain integers or None")
+        for name in ("slot_active", "slot_occupied", "reactivation"):
+            for value in getattr(self, name):
+                if value is not None and not isinstance(value, bool):
+                    raise ValueError(f"{name} must contain booleans or None")
+
+    @classmethod
+    def empty(cls, query_count: int) -> AssociationDiagnostics:
+        if (
+            not isinstance(query_count, int)
+            or isinstance(query_count, bool)
+            or query_count < 0
+        ):
+            raise ValueError("query_count must be a non-negative integer")
+        none_values = (None,) * query_count
+        return cls(
+            selected_candidate_identity=none_values,
+            best_candidate_identity=none_values,
+            chosen_feature_similarity=none_values,
+            chosen_class_similarity=none_values,
+            chosen_total_score=none_values,
+            best_score=none_values,
+            second_best_score=none_values,
+            score_margin=none_values,
+            slot_age=none_values,
+            last_seen_stage=none_values,
+            slot_active=none_values,
+            slot_occupied=none_values,
+            reactivation=none_values,
+        )
+
+    @property
+    def query_count(self) -> int:
+        return len(self.selected_candidate_identity)
+
+    def per_query_fields(self) -> tuple[tuple[object, ...], ...]:
+        return (
+            self.selected_candidate_identity,
+            self.best_candidate_identity,
+            self.chosen_feature_similarity,
+            self.chosen_class_similarity,
+            self.chosen_total_score,
+            self.best_score,
+            self.second_best_score,
+            self.score_margin,
+            self.slot_age,
+            self.last_seen_stage,
+            self.slot_active,
+            self.slot_occupied,
+            self.reactivation,
+        )
+
+    # Short aliases keep the typed record convenient for tabular consumers.
+    @property
+    def selected_identity(self) -> tuple[object | None, ...]:
+        return self.selected_candidate_identity
+
+    @property
+    def best_identity(self) -> tuple[object | None, ...]:
+        return self.best_candidate_identity
+
+    @property
+    def feature_similarity(self) -> tuple[float | None, ...]:
+        return self.chosen_feature_similarity
+
+    @property
+    def class_similarity(self) -> tuple[float | None, ...]:
+        return self.chosen_class_similarity
+
+    @property
+    def total_score(self) -> tuple[float | None, ...]:
+        return self.chosen_total_score
+
+
+@dataclass(frozen=True)
 class TrackStep:
     """Immutable identity assignment for one stage."""
 
@@ -219,6 +342,7 @@ class TrackStep:
     valid: tuple[bool, ...]
     rejected_births: tuple[bool, ...] = ()
     state_snapshot: PersistentMemoryState | None = None
+    diagnostics: AssociationDiagnostics | None = None
 
     @property
     def evaluator_ids(self) -> tuple[object, ...]:
@@ -515,6 +639,73 @@ class _Track:
     query_index: int
 
 
+def _build_adjacent_diagnostics(
+    *,
+    score_matrix: Tensor,
+    feature_matrix: Tensor,
+    class_matrix: Tensor | None,
+    previous: tuple[_Track, ...],
+    current_indices: Sequence[int],
+    selected_by_query: Mapping[int, tuple[int, int]],
+    query_count: int,
+) -> AssociationDiagnostics:
+    selected_identity: list[object | None] = [None] * query_count
+    best_identity: list[object | None] = [None] * query_count
+    chosen_feature: list[float | None] = [None] * query_count
+    chosen_class: list[float | None] = [None] * query_count
+    chosen_total: list[float | None] = [None] * query_count
+    best_score: list[float | None] = [None] * query_count
+    second_score: list[float | None] = [None] * query_count
+    margin: list[float | None] = [None] * query_count
+
+    for compact_index, query_index in enumerate(current_indices):
+        if score_matrix.shape[0] == 0:
+            continue
+        ranked_rows = sorted(
+            range(score_matrix.shape[0]),
+            key=lambda row: (-float(score_matrix[row, compact_index].item()), row),
+        )
+        best_row = ranked_rows[0]
+        best_value = float(score_matrix[best_row, compact_index].item())
+        best_identity[query_index] = previous[best_row].identity
+        best_score[query_index] = best_value
+        if len(ranked_rows) > 1:
+            second_value = float(score_matrix[ranked_rows[1], compact_index].item())
+            second_score[query_index] = second_value
+            margin[query_index] = best_value - second_value
+        selected = selected_by_query.get(query_index)
+        if selected is None:
+            continue
+        previous_index, selected_compact_index = selected
+        selected_identity[query_index] = previous[previous_index].identity
+        chosen_feature[query_index] = float(
+            feature_matrix[previous_index, selected_compact_index].item()
+        )
+        if class_matrix is not None:
+            chosen_class[query_index] = float(
+                class_matrix[previous_index, selected_compact_index].item()
+            )
+        chosen_total[query_index] = float(
+            score_matrix[previous_index, selected_compact_index].item()
+        )
+
+    return AssociationDiagnostics(
+        selected_candidate_identity=tuple(selected_identity),
+        best_candidate_identity=tuple(best_identity),
+        chosen_feature_similarity=tuple(chosen_feature),
+        chosen_class_similarity=tuple(chosen_class),
+        chosen_total_score=tuple(chosen_total),
+        best_score=tuple(best_score),
+        second_best_score=tuple(second_score),
+        score_margin=tuple(margin),
+        slot_age=tuple(None for _ in range(query_count)),
+        last_seen_stage=tuple(None for _ in range(query_count)),
+        slot_active=tuple(None for _ in range(query_count)),
+        slot_occupied=tuple(None for _ in range(query_count)),
+        reactivation=tuple(None for _ in range(query_count)),
+    )
+
+
 class _AdjacentTracker:
     method = ""
     use_class = False
@@ -556,28 +747,37 @@ class _AdjacentTracker:
         if self._last_stage is not None and stage_id <= self._last_stage:
             raise ValueError("stage_id must increase for each tracker step")
 
-    def _score(self, previous: tuple[_Track, ...], current: FrozenObservation) -> Tensor:
+    def _score_components(
+        self,
+        previous: tuple[_Track, ...],
+        current: FrozenObservation,
+    ) -> tuple[Tensor, Tensor | None, Tensor]:
         if not previous:
-            return torch.empty(
+            empty = torch.empty(
                 (0, int(current.valid.sum().item())),
                 dtype=current.features.dtype,
                 device=current.features.device,
             )
+            return empty, None, empty
         previous_features = torch.stack([track.prototype for track in previous])
         current_indices = current.valid.nonzero(as_tuple=True)[0]
         current_features = current.features[current_indices]
+        feature_score = _cosine_scores(previous_features, current_features)
         if self.use_class:
             previous_class = torch.stack([track.class_prob for track in previous])
             current_class = current.class_prob[current_indices]
-            return association_score_matrix(
-                previous_features,
-                current_features,
-                previous_class_prob=previous_class,
-                current_class_prob=current_class,
-                class_weight=self.class_weight,
-                background_class=self.background_class,
+            previous_foreground = foreground_normalized_class_prob(
+                previous_class, background_class=self.background_class
             )
-        return _cosine_scores(previous_features, current_features)
+            current_foreground = foreground_normalized_class_prob(
+                current_class, background_class=self.background_class
+            )
+            class_score = previous_foreground @ current_foreground.transpose(0, 1)
+            return feature_score, class_score, feature_score + self.class_weight * class_score
+        return feature_score, None, feature_score
+
+    def _score(self, previous: tuple[_Track, ...], current: FrozenObservation) -> Tensor:
+        return self._score_components(previous, current)[2]
 
     def _new_track(
         self, current: FrozenObservation, query_index: int, identity: int
@@ -613,18 +813,22 @@ class _AdjacentTracker:
         contiguous = self._last_stage is not None and stage_id == self._last_stage + 1
         pairs: tuple[tuple[int, int], ...] = ()
         score_matrix = torch.empty((0, len(current_indices)), dtype=current.features.dtype)
+        feature_matrix = score_matrix
+        class_matrix: Tensor | None = None
         if contiguous and previous and current_indices:
-            score_matrix = self._score(previous, current)
+            feature_matrix, class_matrix, score_matrix = self._score_components(
+                previous, current
+            )
             pairs = threshold_aware_hungarian(score_matrix, self.feature_threshold)
 
-        matched_current: set[int] = set()
         next_tracks: list[_Track] = []
         matched_by_current: dict[int, _Track] = {}
+        selected_by_query: dict[int, tuple[int, int]] = {}
         for previous_index, compact_current_index in pairs:
             query_index = current_indices[compact_current_index]
             track = previous[previous_index]
-            matched_current.add(query_index)
             matched_by_current[query_index] = track
+            selected_by_query[query_index] = (previous_index, compact_current_index)
             track_ids[query_index] = track.identity
             matched_previous[query_index] = track.query_index
             scores[query_index] = float(score_matrix[previous_index, compact_current_index].item())
@@ -657,6 +861,15 @@ class _AdjacentTracker:
             births=tuple(births),
             valid=tuple(bool(value) for value in current.valid.tolist()),
             rejected_births=tuple(False for _ in range(query_count)),
+            diagnostics=_build_adjacent_diagnostics(
+                score_matrix=score_matrix,
+                feature_matrix=feature_matrix,
+                class_matrix=class_matrix,
+                previous=previous,
+                current_indices=current_indices,
+                selected_by_query=selected_by_query,
+                query_count=query_count,
+            ),
         )
 
 
@@ -732,6 +945,7 @@ class B0StageUniqueTracker:
             births=tuple(identity is not None for identity in track_ids),
             valid=tuple(bool(value) for value in current.valid.tolist()),
             rejected_births=tuple(False for _ in track_ids),
+            diagnostics=AssociationDiagnostics.empty(current.query_count),
         )
 
 
@@ -759,6 +973,7 @@ class B0SanityTracker(B0StageUniqueTracker):
             births=result.births,
             valid=result.valid,
             rejected_births=result.rejected_births,
+            diagnostics=result.diagnostics,
         )
 
 
@@ -794,6 +1009,148 @@ def _as_p5_observation(observation: FrozenObservation) -> LocalInstanceObservati
         confidence=observation.confidence.to(dtype=feature_dtype).unsqueeze(0),
         latest_mask=[latest_mask],
         valid=observation.valid.unsqueeze(0),
+    )
+
+
+def _p5_score_components(
+    observation: LocalInstanceObservation,
+    state: PersistentMemoryState,
+    *,
+    class_weight: float,
+) -> tuple[Tensor, Tensor, Tensor]:
+    """Read-only reproduction of P5's pre-step score components."""
+
+    score_dtype = observation.features.dtype
+    for dtype in (
+        observation.class_prob.dtype,
+        state.embedding.dtype,
+        state.class_prob.dtype,
+    ):
+        score_dtype = torch.promote_types(score_dtype, dtype)
+    if score_dtype in (torch.float16, torch.bfloat16):
+        score_dtype = torch.float32
+    query_features = _normalize_feature_vectors(
+        observation.features.to(dtype=score_dtype)
+    )
+    memory_features = _normalize_feature_vectors(
+        state.embedding.to(dtype=score_dtype)
+    )
+    feature_score = torch.einsum(
+        "bkd,bqd->bkq", memory_features, query_features
+    )
+    class_score = torch.einsum(
+        "bkc,bqc->bkq",
+        state.class_prob.to(dtype=score_dtype),
+        observation.class_prob.to(dtype=score_dtype),
+    )
+    return (
+        feature_score[0],
+        class_score[0],
+        feature_score[0] + class_weight * class_score[0],
+    )
+
+
+def _build_b4_diagnostics(
+    *,
+    current: FrozenObservation,
+    state_before: PersistentMemoryState,
+    feature_score: Tensor,
+    class_score: Tensor,
+    total_score: Tensor,
+    slot_values: Sequence[object],
+    score_values: Sequence[object],
+    rejected_values: Sequence[object],
+) -> AssociationDiagnostics:
+    query_count = current.query_count
+    selected_identity: list[object | None] = [None] * query_count
+    best_identity: list[object | None] = [None] * query_count
+    chosen_feature: list[float | None] = [None] * query_count
+    chosen_class: list[float | None] = [None] * query_count
+    chosen_total: list[float | None] = [None] * query_count
+    best_score: list[float | None] = [None] * query_count
+    second_score: list[float | None] = [None] * query_count
+    margin: list[float | None] = [None] * query_count
+    slot_age: list[int | None] = [None] * query_count
+    last_seen_stage: list[int | None] = [None] * query_count
+    slot_active: list[bool | None] = [None] * query_count
+    slot_occupied: list[bool | None] = [None] * query_count
+    reactivation: list[bool | None] = [None] * query_count
+
+    occupied_slots = state_before.occupied[0].nonzero(as_tuple=True)[0].tolist()
+    occupied_before = state_before.occupied[0].detach().cpu()
+    active_before = state_before.active[0].detach().cpu()
+    age_before = state_before.age[0].detach().cpu()
+    last_seen_before = state_before.last_seen[0].detach().cpu()
+
+    for query_index in range(query_count):
+        if not bool(current.valid[query_index]):
+            continue
+        ranked_slots = sorted(
+            occupied_slots,
+            key=lambda slot: (
+                -float(total_score[slot, query_index].item()),
+                int(slot),
+            ),
+        )
+        best_slot: int | None = None
+        if ranked_slots:
+            best_slot = int(ranked_slots[0])
+            best_value = float(total_score[best_slot, query_index].item())
+            best_identity[query_index] = best_slot
+            best_score[query_index] = best_value
+            if len(ranked_slots) > 1:
+                second_value = float(
+                    total_score[ranked_slots[1], query_index].item()
+                )
+                second_score[query_index] = second_value
+                margin[query_index] = best_value - second_value
+
+        selected_slot: int | None = None
+        if not bool(rejected_values[query_index]):
+            candidate_slot = int(slot_values[query_index])
+            if (
+                candidate_slot >= 0
+                and candidate_slot < state_before.capacity
+                and bool(occupied_before[candidate_slot])
+                and math.isfinite(float(score_values[query_index]))
+            ):
+                selected_slot = candidate_slot
+                selected_identity[query_index] = selected_slot
+                chosen_feature[query_index] = float(
+                    feature_score[selected_slot, query_index].item()
+                )
+                chosen_class[query_index] = float(
+                    class_score[selected_slot, query_index].item()
+                )
+                chosen_total[query_index] = float(
+                    score_values[query_index]
+                )
+
+        metadata_slot = selected_slot if selected_slot is not None else best_slot
+        if metadata_slot is None:
+            continue
+        slot_age[query_index] = int(age_before[metadata_slot].item())
+        last_seen_stage[query_index] = int(last_seen_before[metadata_slot].item())
+        slot_active[query_index] = bool(active_before[metadata_slot].item())
+        slot_occupied[query_index] = bool(occupied_before[metadata_slot].item())
+        reactivation[query_index] = False
+        if selected_slot is not None:
+            reactivation[query_index] = not bool(active_before[selected_slot].item())
+
+    return AssociationDiagnostics(
+        selected_candidate_identity=tuple(selected_identity),
+        best_candidate_identity=tuple(best_identity),
+        chosen_feature_similarity=tuple(chosen_feature),
+        chosen_class_similarity=tuple(chosen_class),
+        chosen_total_score=tuple(chosen_total),
+        best_score=tuple(best_score),
+        second_best_score=tuple(second_score),
+        score_margin=tuple(margin),
+        slot_age=tuple(slot_age),
+        last_seen_stage=tuple(last_seen_stage),
+        slot_active=tuple(slot_active),
+        slot_occupied=tuple(slot_occupied),
+        reactivation=tuple(reactivation),
     )
 
 
@@ -855,6 +1212,11 @@ class B4PersistentTracker:
         state_before = self._state
         if state_before is None:
             state_before = self.memory.empty_state(p5_observation)
+        feature_score, class_score, total_score = _p5_score_components(
+            p5_observation,
+            state_before,
+            class_weight=self.memory.class_weight,
+        )
         # This is the sole B4 transition.  The adapter intentionally does not
         # reimplement P5 scoring, assignment, or EMA updates.
         result = self.memory.step(p5_observation, state_before, stage_id)
@@ -904,6 +1266,16 @@ class B4PersistentTracker:
             valid=tuple(bool(value) for value in current.valid.tolist()),
             rejected_births=tuple(bool(value) for value in rejected_values),
             state_snapshot=_clone_persistent_state(next_state),
+            diagnostics=_build_b4_diagnostics(
+                current=current,
+                state_before=state_before,
+                feature_score=feature_score,
+                class_score=class_score,
+                total_score=total_score,
+                slot_values=slot_values,
+                score_values=score_values,
+                rejected_values=rejected_values,
+            ),
         )
 
 
@@ -1085,6 +1457,7 @@ def run_oracle_posthoc(
                 valid=tuple(bool(value) for value in current.valid.tolist()),
                 rejected_births=tuple(False for _ in track_ids),
                 state_snapshot=None,
+                diagnostics=AssociationDiagnostics.empty(current.query_count),
             )
         )
     return tuple(results)
@@ -1252,6 +1625,7 @@ def run_baseline(
 
 
 __all__ = [
+    "AssociationDiagnostics",
     "B0SanityTracker",
     "B0StageUniqueTracker",
     "B1FeatureTracker",
