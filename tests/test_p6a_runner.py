@@ -13,7 +13,9 @@ from scripts.evaluate_persist4d_p6a import (
     RealPredictionCacheProducer,
     atomic_manifest_payload,
     build_cache_provenance,
+    build_rio_class_mapper,
     build_temporal_target,
+    build_tracker_factories,
     cache_payload_from_inference,
     cache_payload_to_frozen_observation,
     evaluate_cached_task_metrics,
@@ -573,6 +575,7 @@ def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping(
         background_class=2,
     )
 
+    assert set(result.metric_blocks["raw"]) == {*factories, "Oracle"}
     assert set(result.metric_blocks["strict"]) == set(factories)
     assert set(result.metric_blocks["offline"]) == {*factories, "Oracle"}
     assert result.metric_blocks["raw"]["B0"]["T2"] == {"score": 0.2}
@@ -582,6 +585,67 @@ def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping(
     assert updates[("offline_reconstructed", "Oracle", 5)] == 1
     assert len(set(result.fingerprints["prediction"].values())) == 1
     assert len(set(result.fingerprints["cache"].values())) == 1
+
+
+def test_tracker_factories_lock_the_preregistered_baseline_parameters() -> None:
+    config = {
+        "baselines": {
+            "b0": {"name": "stage_unique_ids"},
+            "b0_sanity": {"name": "local_query_index"},
+            "b1": {"feature_threshold": 0.5},
+            "b2": {
+                "feature_threshold": 0.5,
+                "class_weight": 0.25,
+                "background_class": 18,
+            },
+            "b3": {
+                "feature_threshold": 0.5,
+                "class_weight": 0.25,
+                "background_class": 18,
+                "update_rate": 0.2,
+            },
+            "b4": {
+                "capacity": 100,
+                "association_threshold": 0.5,
+                "class_weight": 0.25,
+                "background_class": 18,
+                "update_rate": 0.2,
+            },
+        }
+    }
+
+    factories = build_tracker_factories(config)
+
+    assert tuple(factories) == ("B0", "B0_sanity", "B1", "B2", "B3", "B4")
+    trackers = {
+        method: factory("sequence") for method, factory in factories.items()
+    }
+    assert isinstance(trackers["B0"], B0StageUniqueTracker)
+    assert isinstance(trackers["B0_sanity"], B0SanityTracker)
+    assert trackers["B1"].feature_threshold == pytest.approx(0.5)
+    assert trackers["B2"].class_weight == pytest.approx(0.25)
+    assert trackers["B3"].update_rate == pytest.approx(0.2)
+    assert trackers["B4"].memory.capacity == 100
+    assert trackers["B4"].memory.association_threshold == pytest.approx(0.5)
+
+
+def test_rio_class_mapper_applies_label_offset_before_dataset_remap() -> None:
+    calls = []
+
+    class Dataset:
+        label_offset = 2
+
+        def _remap_model_output(self, values: torch.Tensor) -> torch.Tensor:
+            calls.append(values.clone())
+            return values + 100
+
+    mapper = build_rio_class_mapper(Dataset(), foreground_class_count=18)
+
+    assert mapper(0) == 102
+    assert mapper(17) == 119
+    assert [value.tolist() for value in calls] == [[2], [19]]
+    with pytest.raises(ValueError, match="foreground model class"):
+        mapper(18)
 
 
 def test_resumable_cache_reuses_manifest_entry_and_rejects_stale_provenance(

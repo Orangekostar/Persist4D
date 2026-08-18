@@ -27,7 +27,12 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from scripts.p6a_association import (
+    B0SanityTracker,
     B0StageUniqueTracker,
+    B1FeatureTracker,
+    B2FeatureClassTracker,
+    B3EmaTracker,
+    B4PersistentTracker,
     FrozenObservation,
     OracleStageTarget,
     freeze_observation,
@@ -1526,6 +1531,91 @@ def _official_metric_factory(
     return OfficialMetricAccumulator(mode=mode)
 
 
+def build_tracker_factories(
+    config: Mapping[str, object],
+) -> dict[str, Callable[[str], object]]:
+    """Construct the exact preregistered B0-B4 tracker factory set."""
+
+    root = _require_mapping(config, name="P6-A config")
+    baselines = _require_mapping(root.get("baselines"), name="P6-A baselines")
+    settings = {
+        name: _require_mapping(baselines.get(name), name=f"baseline {name}")
+        for name in ("b0", "b0_sanity", "b1", "b2", "b3", "b4")
+    }
+    b1 = settings["b1"]
+    b2 = settings["b2"]
+    b3 = settings["b3"]
+    b4 = settings["b4"]
+    return {
+        "B0": lambda sequence_id: B0StageUniqueTracker(sequence_id=sequence_id),
+        "B0_sanity": lambda sequence_id: B0SanityTracker(
+            sequence_id=sequence_id
+        ),
+        "B1": lambda sequence_id: B1FeatureTracker(
+            sequence_id=sequence_id,
+            feature_threshold=float(b1["feature_threshold"]),
+            class_weight=0.0,
+            background_class=int(b2["background_class"]),
+        ),
+        "B2": lambda sequence_id: B2FeatureClassTracker(
+            sequence_id=sequence_id,
+            feature_threshold=float(b2["feature_threshold"]),
+            class_weight=float(b2["class_weight"]),
+            background_class=int(b2["background_class"]),
+        ),
+        "B3": lambda sequence_id: B3EmaTracker(
+            sequence_id=sequence_id,
+            feature_threshold=float(b3["feature_threshold"]),
+            class_weight=float(b3["class_weight"]),
+            background_class=int(b3["background_class"]),
+            update_rate=float(b3["update_rate"]),
+        ),
+        "B4": lambda sequence_id: B4PersistentTracker(
+            sequence_id=sequence_id,
+            capacity=int(b4["capacity"]),
+            association_threshold=float(b4["association_threshold"]),
+            class_weight=float(b4["class_weight"]),
+            update_rate=float(b4["update_rate"]),
+            max_update_rate=float(b4["update_rate"]),
+        ),
+    }
+
+
+def build_rio_class_mapper(
+    dataset: object,
+    *,
+    foreground_class_count: int = 18,
+) -> Callable[[int], int]:
+    """Map ReScene model indices to raw RIO IDs through dataset semantics."""
+
+    offset = getattr(dataset, "label_offset", None)
+    remap = getattr(dataset, "_remap_model_output", None)
+    if isinstance(offset, bool) or not isinstance(offset, int):
+        raise TypeError("RIO dataset label_offset must be an integer")
+    if not callable(remap):
+        raise TypeError("RIO dataset must expose _remap_model_output")
+    if (
+        isinstance(foreground_class_count, bool)
+        or not isinstance(foreground_class_count, int)
+        or foreground_class_count <= 0
+    ):
+        raise ValueError("foreground_class_count must be positive")
+
+    def mapper(model_class: int) -> int:
+        if (
+            isinstance(model_class, bool)
+            or not isinstance(model_class, int)
+            or not 0 <= model_class < foreground_class_count
+        ):
+            raise ValueError("foreground model class is outside the registered range")
+        mapped = remap(torch.tensor([model_class + offset], dtype=torch.long))
+        if not isinstance(mapped, Tensor) or mapped.shape != (1,):
+            raise ValueError("RIO class remapper must return one tensor value")
+        return int(mapped.item())
+
+    return mapper
+
+
 def evaluate_cached_task_metrics(
     sequences: Sequence[CachedProtocolSequence],
     *,
@@ -1674,7 +1764,7 @@ def evaluate_cached_task_metrics(
             method: {
                 horizon: dict(values) for horizon, values in raw_result.items()
             }
-            for method in methods
+            for method in all_methods
         },
         "strict": {
             method: {
@@ -1949,7 +2039,9 @@ __all__ = [
     "atomic_manifest_publish",
     "build_atomic_manifest_payload",
     "build_cache_provenance",
+    "build_rio_class_mapper",
     "build_temporal_target",
+    "build_tracker_factories",
     "cache_payload_from_inference",
     "cache_payload_to_frozen_observation",
     "ensure_cache_entry",
