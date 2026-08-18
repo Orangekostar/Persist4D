@@ -3,7 +3,8 @@ from __future__ import annotations
 import math
 import operator
 import sys
-from collections.abc import Mapping
+import time
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 
 import torch
@@ -799,6 +800,9 @@ class PersistentMemory(nn.Module):
         observation: LocalInstanceObservation,
         state: PersistentMemoryState,
         stage_index: int,
+        *,
+        timing_sink: Callable[[Mapping[str, float]], object] | None = None,
+        clock_ns: Callable[[], int] = time.perf_counter_ns,
     ) -> MemoryStepResult:
         if not isinstance(observation, LocalInstanceObservation):
             raise ValueError(  # noqa: TRY004
@@ -842,6 +846,9 @@ class PersistentMemory(nn.Module):
                 "stage_index must be later than the processed-stage watermark"
             )
 
+        timing_enabled = timing_sink is not None
+        if timing_enabled:
+            memory_update_start_ns = clock_ns()
         (
             embedding,
             class_prob,
@@ -855,12 +862,16 @@ class PersistentMemory(nn.Module):
         age.add_(occupied.to(dtype=torch.long))
         active.zero_()
 
+        if timing_enabled:
+            association_start_ns = clock_ns()
         association = associate_observations(
             observation,
             state,
             class_weight=self.class_weight,
             association_threshold=self.association_threshold,
         )
+        if timing_enabled:
+            association_end_ns = clock_ns()
         slot_ids = association.slot_for_query.clone()
         association_scores = association.score_for_query.clone()
         rejected_births = torch.zeros_like(observation.valid)
@@ -961,9 +972,25 @@ class PersistentMemory(nn.Module):
             stage_watermark=stage_watermark,
         )
         next_state.validate()
-        return MemoryStepResult(
+        result = MemoryStepResult(
             state=next_state,
             slot_ids=slot_ids,
             association_scores=association_scores,
             rejected_births=rejected_births,
         )
+        if timing_enabled:
+            memory_update_end_ns = clock_ns()
+            timing_sink(
+                {
+                    "association_overhead_ms": (
+                        association_end_ns - association_start_ns
+                    )
+                    / 1_000_000.0,
+                    "memory_update_overhead_ms": (
+                        (association_start_ns - memory_update_start_ns)
+                        + (memory_update_end_ns - association_end_ns)
+                    )
+                    / 1_000_000.0,
+                }
+            )
+        return result
