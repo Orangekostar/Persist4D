@@ -1116,10 +1116,8 @@ def build_temporal_target(
         for index, gt_id in enumerate(ids):
             class_value = int(gt_classes[index].item())
             change_value = int(changes[index].item())
-            previous_class = class_values.get(gt_id)
-            if previous_class is not None and previous_class != class_value:
-                raise ValueError(f"GT {gt_id} has a class conflict")
-            class_values[gt_id] = class_value
+            # Match the official collator, which uses the first point in visit order.
+            class_values.setdefault(gt_id, class_value)
             if gt_id not in entity_index:
                 entity_index[gt_id] = len(entity_order)
                 entity_order.append(gt_id)

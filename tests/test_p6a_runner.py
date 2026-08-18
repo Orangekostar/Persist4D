@@ -473,12 +473,19 @@ def test_build_temporal_target_unions_ids_and_marks_absent_stages_false() -> Non
     assert all(value.device.type == "cpu" for value in target.values())
 
 
-def test_build_temporal_target_rejects_class_conflicts_or_nonzero_placeholders() -> None:
+def test_build_temporal_target_keeps_first_observed_class_for_conflicting_gt() -> None:
     first = _payload(0, gt_ids=(10,))
     second = _payload(1, gt_ids=(10,))
     second["target"]["gt_classes"][0] = 2
-    with pytest.raises(ValueError, match="class"):
-        build_temporal_target([first, second])
+
+    target = build_temporal_target([first, second])
+
+    assert target["ids"].tolist() == [10]
+    assert target["labels"].tolist() == [1]
+
+
+def test_build_temporal_target_rejects_nonzero_change_placeholders() -> None:
+    first = _payload(0, gt_ids=(10,))
 
     second = _payload(1, gt_ids=(10,))
     second["target"]["changes"][0] = 1
