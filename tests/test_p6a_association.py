@@ -1,17 +1,21 @@
 from __future__ import annotations
 
+import inspect
 from dataclasses import FrozenInstanceError
 
 import pytest
 import torch
 
+from models.persistent_memory import LocalInstanceObservation, PersistentMemory
 from scripts.p6a_association import (
     B0SanityTracker,
     B0StageUniqueTracker,
     B1FeatureTracker,
     B2FeatureClassTracker,
     B3EmaTracker,
+    B4PersistentTracker,
     IdentityNamespace,
+    OracleStageTarget,
     TrackStep,
     fan_out_observation,
     foreground_normalized_class_prob,
@@ -21,6 +25,8 @@ from scripts.p6a_association import (
     run_b1,
     run_b2,
     run_b3,
+    run_baseline,
+    run_oracle_posthoc,
     threshold_aware_hungarian,
 )
 
@@ -44,6 +50,18 @@ def _observation(
         "confidence": torch.ones(query_count, dtype=torch.float64),
         "valid": torch.tensor(valid, dtype=torch.bool),
     }
+
+
+def _mask_observation(
+    features: list[list[float]],
+    class_prob: list[list[float]],
+    mask_logits: list[list[float]],
+    *,
+    valid: list[bool] | None = None,
+) -> dict[str, torch.Tensor]:
+    observation = _observation(features, class_prob, valid=valid)
+    observation["latest_mask"] = torch.tensor(mask_logits, dtype=torch.float64)
+    return observation
 
 
 def _ids(step: TrackStep) -> tuple[object, ...]:
@@ -83,6 +101,8 @@ def test_b0_stage_unique_ids_are_not_local_query_ids() -> None:
     assert _ids(first) == ((0, 0), (0, 1))
     assert _ids(second) == ((1, 0), (1, 1))
     assert first.method == "B0"
+    assert first.scores == (None, None)
+    assert first.rejected_births == (False, False)
 
 
 def test_b0_sanity_explicitly_reuses_local_query_index() -> None:
@@ -93,6 +113,8 @@ def test_b0_sanity_explicitly_reuses_local_query_index() -> None:
     assert _ids(first) == (0, 1)
     assert _ids(second) == (0, 1)
     assert first.method == "B0-sanity"
+    assert first.scores == (None, None)
+    assert first.rejected_births == (False, False)
 
 
 def test_b1_is_threshold_aware_before_hungarian_assignment() -> None:
@@ -258,3 +280,173 @@ def test_input_observation_is_unchanged_by_all_baselines() -> None:
     for key, value in before.items():
         if isinstance(value, torch.Tensor):
             torch.testing.assert_close(stages[0][key], value)
+
+
+def test_track_step_scores_use_typed_none_for_invalid_and_births() -> None:
+    steps = run_b1(
+        [
+            _observation([[1.0, 0.0]], valid=[False]),
+            _observation([[1.0, 0.0]]),
+        ],
+        sequence_id="scene",
+    )
+
+    assert steps[0].scores == (None,)
+    assert steps[1].scores == (None,)
+    assert steps[0].rejected_births == (False,)
+    assert all(score is None or isinstance(score, float) for step in steps for score in step.scores)
+
+
+def test_b4_matches_direct_frozen_p5_step_and_exposes_detached_snapshot() -> None:
+    source = _mask_observation(
+        [[1.0, 0.0], [0.0, 1.0]],
+        [[1.0, 0.0], [1.0, 0.0]],
+        [[10.0, -10.0], [-10.0, 10.0]],
+    )
+    tracker = B4PersistentTracker(
+        sequence_id="scene",
+        capacity=2,
+        class_weight=0.25,
+        association_threshold=0.5,
+        update_rate=0.2,
+        max_update_rate=0.2,
+    )
+    result = tracker.step(source, stage_id=0)
+
+    frozen = freeze_observation(source)
+    p5_observation = LocalInstanceObservation(
+        features=frozen.features.unsqueeze(0),
+        class_prob=frozen.class_prob.unsqueeze(0),
+        confidence=frozen.confidence.unsqueeze(0),
+        latest_mask=[frozen.latest_mask[0]],
+        valid=frozen.valid.unsqueeze(0),
+    )
+    memory = PersistentMemory(
+        capacity=2,
+        class_weight=0.25,
+        association_threshold=0.5,
+        update_rate=0.2,
+        max_update_rate=0.2,
+    )
+    direct_state = memory.empty_state(p5_observation)
+    direct = memory.step(p5_observation, direct_state, stage_index=0)
+
+    assert result.track_ids == (0, 1)
+    assert result.scores == (None, None)
+    assert result.rejected_births == (False, False)
+    assert result.state_snapshot is not None
+    for actual, expected in zip(
+        result.state_snapshot.tensors(), direct.state.tensors(), strict=True
+    ):
+        torch.testing.assert_close(actual, expected)
+
+    result.state_snapshot.embedding[0, 0, 0] = 99.0
+    assert tracker.state is not None
+    assert tracker.state.embedding[0, 0, 0].item() != 99.0
+
+
+def test_b4_has_dynamic_q_and_reports_capacity_rejection() -> None:
+    tracker = B4PersistentTracker(sequence_id="scene", capacity=1)
+    result = tracker.step(
+        _mask_observation(
+            [[1.0, 0.0], [0.0, 1.0], [-1.0, 0.0]],
+            [[1.0, 0.0], [1.0, 0.0], [1.0, 0.0]],
+            [[10.0], [10.0], [10.0]],
+        ),
+        stage_id=0,
+    )
+
+    assert result.track_ids == (0, None, None)
+    assert result.rejected_births == (False, True, True)
+    assert result.state_snapshot is not None
+    assert result.state_snapshot.capacity == 1
+
+
+def test_b4_dormant_reactivation_reuses_slot_without_birth() -> None:
+    tracker = B4PersistentTracker(sequence_id="scene", capacity=1)
+    first = _mask_observation([[1.0, 0.0]], [[1.0, 0.0]], [[10.0]])
+    missing = _mask_observation(
+        [[1.0, 0.0]], [[1.0, 0.0]], [[10.0]], valid=[False]
+    )
+    recovered = _mask_observation([[1.0, 0.0]], [[1.0, 0.0]], [[10.0]])
+
+    assert tracker.step(first, stage_id=0).track_ids == (0,)
+    assert tracker.step(missing, stage_id=1).track_ids == (None,)
+    result = tracker.step(recovered, stage_id=2)
+
+    assert result.track_ids == (0,)
+    assert result.births == (False,)
+    assert result.matched_previous == (-1,)
+    assert result.scores[0] is not None
+
+
+def test_b4_reset_clears_state_and_slot_namespace() -> None:
+    tracker = B4PersistentTracker(sequence_id="scene", capacity=1)
+    source = _mask_observation([[1.0, 0.0]], [[1.0, 0.0]], [[10.0]])
+    assert tracker.step(source, stage_id=0).track_ids == (0,)
+    tracker.reset()
+    assert tracker.state is None
+    assert tracker.step(source, stage_id=5).track_ids == (0,)
+
+
+def test_b4_direct_step_signature_has_no_gt_argument() -> None:
+    for tracker_type in (
+        B0StageUniqueTracker,
+        B0SanityTracker,
+        B1FeatureTracker,
+        B2FeatureClassTracker,
+        B3EmaTracker,
+        B4PersistentTracker,
+    ):
+        parameters = inspect.signature(tracker_type.step).parameters
+        assert "gt" not in parameters
+        assert "target" not in parameters
+
+
+def _oracle_target() -> OracleStageTarget:
+    return OracleStageTarget(
+        gt_ids=(101, 7001),
+        classes=(1, 2),
+        masks=torch.tensor(
+            [[True, True, False, False], [False, False, True, True]]
+        ),
+    )
+
+
+def test_oracle_is_posthoc_class_compatible_and_deterministic() -> None:
+    observation = _mask_observation(
+        [[1.0, 0.0], [0.0, 1.0], [-1.0, 0.0]],
+        [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [0.0, 1.0, 0.0]],
+        [[10.0, 10.0, -10.0, -10.0], [-10.0, -10.0, 10.0, 10.0], [10.0, -10.0, 10.0, -10.0]],
+    )
+    targets = [_oracle_target()]
+    first = run_oracle_posthoc([observation], targets, sequence_id="scene")
+    second = run_oracle_posthoc([observation], targets, sequence_id="scene")
+
+    assert first == second
+    assert first[0].track_ids == (101, 7001, ("Oracle", 0, 2))
+    assert first[0].scores[0] == pytest.approx(1.0)
+    assert first[0].scores[1] == pytest.approx(1.0)
+    assert first[0].scores[2] is None
+    assert first[0].state_snapshot is None
+
+
+def test_oracle_clones_targets_and_observations_and_never_updates_tracker_state() -> None:
+    observation = _mask_observation(
+        [[1.0, 0.0]], [[0.0, 1.0, 0.0]], [[10.0, 10.0, -10.0, -10.0]]
+    )
+    target = _oracle_target()
+    original_feature = observation["features"].clone()
+    original_mask = target.masks.clone()
+    result = run_oracle_posthoc([observation], [target], sequence_id="scene")
+
+    assert torch.equal(observation["features"], original_feature)
+    assert torch.equal(target.masks, original_mask)
+    assert result[0].track_ids[0] == 101
+
+
+def test_run_baseline_supports_b4_but_rejects_oracle_dispatch() -> None:
+    observation = _mask_observation([[1.0, 0.0]], [[1.0, 0.0]], [[10.0]])
+    assert run_baseline("b4", [observation], sequence_id="scene")[0].track_ids == (0,)
+    with pytest.raises(ValueError, match="B4"):
+        run_baseline("oracle", [observation], sequence_id="scene")

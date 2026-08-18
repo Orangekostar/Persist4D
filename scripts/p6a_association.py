@@ -3,13 +3,14 @@
 The module deliberately keeps evaluator identities separate from P5's fixed
 memory capacity.  Each tracker consumes one frozen local observation per
 stage, retains only the state required by its declared baseline, and returns
-immutable step records.  B4 and Oracle are intentionally out of scope here.
+immutable step records.  B4 delegates state transitions to the frozen P5
+implementation; Oracle is a post-hoc diagnostic with no inference state.
 """
 
 from __future__ import annotations
 
 import math
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Hashable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -17,7 +18,12 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor
 
-from models.persistent_memory import LocalInstanceObservation
+from models.persistent_memory import (
+    LocalInstanceObservation,
+    PersistentMemory,
+    PersistentMemoryState,
+)
+from scripts.p6a_metrics import global_hungarian_match
 
 
 @dataclass(frozen=True)
@@ -208,9 +214,11 @@ class TrackStep:
     stage_id: int
     track_ids: tuple[object, ...]
     matched_previous: tuple[int, ...]
-    scores: tuple[float, ...]
+    scores: tuple[float | None, ...]
     births: tuple[bool, ...]
     valid: tuple[bool, ...]
+    rejected_births: tuple[bool, ...] = ()
+    state_snapshot: PersistentMemoryState | None = None
 
     @property
     def evaluator_ids(self) -> tuple[object, ...]:
@@ -598,7 +606,7 @@ class _AdjacentTracker:
         query_count = current.query_count
         track_ids: list[object] = [None] * query_count
         matched_previous = [-1] * query_count
-        scores = [float("-inf")] * query_count
+        scores: list[float | None] = [None] * query_count
         births = [False] * query_count
         current_indices = current.valid.nonzero(as_tuple=True)[0].tolist()
         previous = self._previous_tracks
@@ -648,6 +656,7 @@ class _AdjacentTracker:
             scores=tuple(scores),
             births=tuple(births),
             valid=tuple(bool(value) for value in current.valid.tolist()),
+            rejected_births=tuple(False for _ in range(query_count)),
         )
 
 
@@ -719,9 +728,10 @@ class B0StageUniqueTracker:
             stage_id=stage_id,
             track_ids=track_ids,
             matched_previous=tuple(-1 for _ in track_ids),
-            scores=tuple(0.0 if identity is not None else float("-inf") for identity in track_ids),
+            scores=tuple(None for _ in track_ids),
             births=tuple(identity is not None for identity in track_ids),
             valid=tuple(bool(value) for value in current.valid.tolist()),
+            rejected_births=tuple(False for _ in track_ids),
         )
 
 
@@ -748,7 +758,336 @@ class B0SanityTracker(B0StageUniqueTracker):
             scores=result.scores,
             births=result.births,
             valid=result.valid,
+            rejected_births=result.rejected_births,
         )
+
+
+def _clone_persistent_state(state: PersistentMemoryState) -> PersistentMemoryState:
+    return PersistentMemoryState(
+        *(tensor.detach().clone() for tensor in state.tensors())
+    )
+
+
+def _as_p5_observation(observation: FrozenObservation) -> LocalInstanceObservation:
+    """Adapt one unbatched frozen observation to the unchanged P5 contract."""
+
+    if observation.features.ndim != 2:
+        raise ValueError("P5 adaptation requires one unbatched observation")
+    feature_dtype = observation.features.dtype
+    if observation.latest_mask:
+        if len(observation.latest_mask) != 1:
+            raise ValueError("one observation must provide at most one latest mask")
+        latest_mask = observation.latest_mask[0]
+        if latest_mask.shape[0] != observation.query_count:
+            raise ValueError("latest_mask must match observation query count")
+        if latest_mask.dtype != feature_dtype:
+            latest_mask = latest_mask.to(dtype=feature_dtype)
+    else:
+        latest_mask = torch.empty(
+            (observation.query_count, 0),
+            device=observation.features.device,
+            dtype=feature_dtype,
+        )
+    return LocalInstanceObservation(
+        features=observation.features.unsqueeze(0),
+        class_prob=observation.class_prob.to(dtype=feature_dtype).unsqueeze(0),
+        confidence=observation.confidence.to(dtype=feature_dtype).unsqueeze(0),
+        latest_mask=[latest_mask],
+        valid=observation.valid.unsqueeze(0),
+    )
+
+
+class B4PersistentTracker:
+    """Thin evaluator adapter around the frozen P5 PersistentMemory module."""
+
+    method = "B4"
+
+    def __init__(
+        self,
+        *,
+        sequence_id: str,
+        capacity: int = 100,
+        class_weight: float = 0.25,
+        association_threshold: float = 0.5,
+        update_rate: float = 0.2,
+        max_update_rate: float = 0.2,
+    ) -> None:
+        self.sequence_id = str(sequence_id)
+        self.memory = PersistentMemory(
+            capacity=capacity,
+            class_weight=class_weight,
+            association_threshold=association_threshold,
+            update_rate=update_rate,
+            max_update_rate=max_update_rate,
+        )
+        self._state: PersistentMemoryState | None = None
+        self._last_stage: int | None = None
+        self._previous_slot_to_query: dict[int, int] = {}
+
+    @property
+    def state(self) -> PersistentMemoryState | None:
+        return self._state
+
+    def reset(self, *, sequence_id: str | None = None) -> None:
+        if sequence_id is not None:
+            self.sequence_id = str(sequence_id)
+        self._state = None
+        self._last_stage = None
+        self._previous_slot_to_query = {}
+
+    def step(
+        self,
+        observation: FrozenObservation | LocalInstanceObservation | Mapping[str, Any],
+        *,
+        stage_id: int,
+    ) -> TrackStep:
+        if (
+            not isinstance(stage_id, int)
+            or isinstance(stage_id, bool)
+            or stage_id < 0
+        ):
+            raise ValueError("stage_id must be a non-negative integer")
+        if self._last_stage is not None and stage_id <= self._last_stage:
+            raise ValueError("stage_id must increase for each tracker step")
+        current = _single_observation(freeze_observation(observation))
+        current.validate()
+        p5_observation = _as_p5_observation(current)
+        state_before = self._state
+        if state_before is None:
+            state_before = self.memory.empty_state(p5_observation)
+        # This is the sole B4 transition.  The adapter intentionally does not
+        # reimplement P5 scoring, assignment, or EMA updates.
+        result = self.memory.step(p5_observation, state_before, stage_id)
+        next_state = result.state
+        slot_values = result.slot_ids[0].detach().cpu().tolist()
+        score_values = result.association_scores[0].detach().cpu().tolist()
+        rejected_values = result.rejected_births[0].detach().cpu().tolist()
+        previous_slot_to_query = self._previous_slot_to_query
+        track_ids: list[object] = [None] * current.query_count
+        matched_previous = [-1] * current.query_count
+        scores: list[float | None] = [None] * current.query_count
+        births = [False] * current.query_count
+        current_slot_to_query: dict[int, int] = {}
+        occupied_before = state_before.occupied[0].detach().cpu()
+
+        for query_index in range(current.query_count):
+            if not bool(current.valid[query_index]):
+                continue
+            if bool(rejected_values[query_index]):
+                continue
+            slot = int(slot_values[query_index])
+            if slot < 0:
+                continue
+            track_ids[query_index] = slot
+            current_slot_to_query[slot] = query_index
+            previous_query = previous_slot_to_query.get(slot)
+            if previous_query is not None:
+                matched_previous[query_index] = previous_query
+            if not bool(occupied_before[slot]):
+                births[query_index] = True
+            if not births[query_index]:
+                score = float(score_values[query_index])
+                if math.isfinite(score):
+                    scores[query_index] = score
+
+        self._state = next_state
+        self._last_stage = stage_id
+        self._previous_slot_to_query = current_slot_to_query
+        return TrackStep(
+            method=self.method,
+            sequence_id=self.sequence_id,
+            stage_id=stage_id,
+            track_ids=tuple(track_ids),
+            matched_previous=tuple(matched_previous),
+            scores=tuple(scores),
+            births=tuple(births),
+            valid=tuple(bool(value) for value in current.valid.tolist()),
+            rejected_births=tuple(bool(value) for value in rejected_values),
+            state_snapshot=_clone_persistent_state(next_state),
+        )
+
+
+@dataclass(frozen=True)
+class OracleStageTarget:
+    """Typed GT input accepted only by the post-hoc Oracle diagnostic."""
+
+    gt_ids: tuple[Hashable, ...]
+    classes: tuple[Hashable, ...]
+    masks: Tensor
+
+    def __post_init__(self) -> None:
+        gt_ids = _normalize_oracle_values(self.gt_ids, name="gt_ids")
+        classes = _normalize_oracle_values(self.classes, name="classes")
+        masks = torch.as_tensor(self.masks).detach().cpu().clone()
+        if masks.ndim != 2:
+            raise ValueError("Oracle target masks must have shape [G, P]")
+        if len(gt_ids) != masks.shape[0] or len(classes) != masks.shape[0]:
+            raise ValueError("Oracle target fields must share the GT count")
+        if len(set(gt_ids)) != len(gt_ids):
+            raise ValueError("Oracle gt_ids must be unique within a stage")
+        object.__setattr__(self, "gt_ids", gt_ids)
+        object.__setattr__(self, "classes", classes)
+        object.__setattr__(self, "masks", masks.bool())
+
+    def validate(self) -> None:
+        if self.masks.ndim != 2:
+            raise ValueError("Oracle target masks must have shape [G, P]")
+        if len(self.gt_ids) != self.masks.shape[0] or len(self.classes) != self.masks.shape[0]:
+            raise ValueError("Oracle target fields must share the GT count")
+
+
+def _normalize_oracle_values(value: Any, *, name: str) -> tuple[Hashable, ...]:
+    if isinstance(value, Tensor):
+        if value.ndim != 1:
+            raise ValueError(f"Oracle {name} must have shape [G]")
+        values = value.detach().cpu().tolist()
+    else:
+        try:
+            values = tuple(value)
+        except TypeError as error:
+            raise ValueError(f"Oracle {name} must be a one-dimensional sequence") from error
+    normalized = tuple(values)
+    if any(not isinstance(item, Hashable) for item in normalized):
+        raise ValueError(f"Oracle {name} values must be hashable")
+    return normalized
+
+
+def _oracle_masks(
+    observation: FrozenObservation,
+    query_indices: Sequence[int],
+    point_count: int,
+) -> Tensor:
+    if not observation.latest_mask:
+        return torch.zeros(
+            (len(query_indices), point_count), dtype=torch.bool
+        )
+    mask_logits = observation.latest_mask[0]
+    if mask_logits.ndim != 2 or mask_logits.shape[0] != observation.query_count:
+        raise ValueError("Oracle latest_mask must have shape [Q, P]")
+    if mask_logits.shape[1] == 0:
+        return torch.zeros(
+            (len(query_indices), point_count), dtype=torch.bool
+        )
+    if mask_logits.shape[1] != point_count:
+        raise ValueError("Oracle masks must share the target point count")
+    selected = mask_logits[list(query_indices)].detach().cpu()
+    if selected.dtype == torch.bool:
+        return selected
+    return selected.sigmoid() >= 0.5
+
+
+def _mask_iou(gt_mask: Tensor, prediction_mask: Tensor) -> float:
+    intersection = (gt_mask & prediction_mask).sum().item()
+    union = (gt_mask | prediction_mask).sum().item()
+    return float(intersection / union) if union else 0.0
+
+
+def run_oracle_posthoc(
+    observations: Sequence[FrozenObservation | LocalInstanceObservation | Mapping[str, Any]],
+    targets: Sequence[OracleStageTarget],
+    *,
+    sequence_id: str,
+    stage_ids: Sequence[int] | None = None,
+    background_class: int = 0,
+    iou_threshold: float = 0.5,
+) -> tuple[TrackStep, ...]:
+    """Assign GT identities after inference without creating tracker state."""
+
+    if len(observations) != len(targets):
+        raise ValueError("observations and targets must have equal length")
+    if stage_ids is None:
+        stage_ids = tuple(range(len(observations)))
+    if len(stage_ids) != len(observations):
+        raise ValueError("stage_ids must match observations")
+    if (
+        not isinstance(background_class, int)
+        or isinstance(background_class, bool)
+        or background_class < 0
+    ):
+        raise ValueError("background_class must be a non-negative integer")
+    if not 0.0 <= float(iou_threshold) <= 1.0:
+        raise ValueError("iou_threshold must be in [0, 1]")
+
+    frozen_observations = [
+        _single_observation(freeze_observation(observation))
+        for observation in observations
+    ]
+    results: list[TrackStep] = []
+    for current, target, stage_id in zip(
+        frozen_observations, targets, stage_ids, strict=True
+    ):
+        if not isinstance(stage_id, int) or isinstance(stage_id, bool) or stage_id < 0:
+            raise ValueError("stage_id must be a non-negative integer")
+        if not isinstance(target, OracleStageTarget):
+            raise ValueError(  # noqa: TRY004
+                "targets must contain OracleStageTarget values"
+            )
+        target.validate()
+        if background_class >= current.class_prob.shape[-1]:
+            raise ValueError("background_class must index the observation classes")
+        valid_indices = current.valid.nonzero(as_tuple=True)[0].tolist()
+        prediction_masks = _oracle_masks(
+            current, valid_indices, int(target.masks.shape[1])
+        )
+        foreground_indices = [
+            index
+            for index in range(current.class_prob.shape[-1])
+            if index != background_class
+        ]
+        if not foreground_indices:
+            raise ValueError("observation must contain a foreground class")
+        if valid_indices:
+            foreground_prob = current.class_prob[valid_indices][
+                ..., foreground_indices
+            ]
+            prediction_classes = torch.tensor(
+                [
+                    foreground_indices[int(index)]
+                    for index in foreground_prob.argmax(dim=-1).detach().cpu().tolist()
+                ],
+                dtype=torch.long,
+            )
+        else:
+            prediction_classes = torch.empty(0, dtype=torch.long)
+        if valid_indices and target.masks.shape[0] and prediction_masks.shape[1]:
+            pairs = global_hungarian_match(
+                target.masks,
+                prediction_masks,
+                gt_classes=torch.as_tensor(target.classes),
+                pred_classes=prediction_classes,
+                threshold=float(iou_threshold),
+            )
+        else:
+            pairs = []
+        matched_predictions = {prediction: gt for gt, prediction in pairs}
+        track_ids: list[object] = [None] * current.query_count
+        scores: list[float | None] = [None] * current.query_count
+        births = [False] * current.query_count
+        for compact_index, query_index in enumerate(valid_indices):
+            if compact_index in matched_predictions:
+                gt_index = matched_predictions[compact_index]
+                track_ids[query_index] = target.gt_ids[gt_index]
+                scores[query_index] = _mask_iou(
+                    target.masks[gt_index], prediction_masks[compact_index]
+                )
+            else:
+                track_ids[query_index] = ("Oracle", int(stage_id), int(query_index))
+                births[query_index] = True
+        results.append(
+            TrackStep(
+                method="Oracle",
+                sequence_id=str(sequence_id),
+                stage_id=int(stage_id),
+                track_ids=tuple(track_ids),
+                matched_previous=tuple(-1 for _ in track_ids),
+                scores=tuple(scores),
+                births=tuple(births),
+                valid=tuple(bool(value) for value in current.valid.tolist()),
+                rejected_births=tuple(False for _ in track_ids),
+                state_snapshot=None,
+            )
+        )
+    return tuple(results)
 
 
 def _run_tracker(
@@ -857,6 +1196,31 @@ def run_b3(
     )
 
 
+def run_b4(
+    observations: Sequence[FrozenObservation | LocalInstanceObservation | Mapping[str, Any]],
+    *,
+    sequence_id: str,
+    stage_ids: Sequence[int] | None = None,
+    capacity: int = 100,
+    class_weight: float = 0.25,
+    association_threshold: float = 0.5,
+    update_rate: float = 0.2,
+    max_update_rate: float = 0.2,
+) -> tuple[TrackStep, ...]:
+    return _run_tracker(
+        B4PersistentTracker(
+            sequence_id=sequence_id,
+            capacity=capacity,
+            class_weight=class_weight,
+            association_threshold=association_threshold,
+            update_rate=update_rate,
+            max_update_rate=max_update_rate,
+        ),
+        observations,
+        stage_ids=stage_ids,
+    )
+
+
 def run_baseline(
     method: str,
     observations: Sequence[FrozenObservation | LocalInstanceObservation | Mapping[str, Any]],
@@ -875,9 +1239,10 @@ def run_baseline(
         "b1": run_b1,
         "b2": run_b2,
         "b3": run_b3,
+        "b4": run_b4,
     }
     if normalized not in runners:
-        raise ValueError("method must be one of B0, B0-sanity, B1, B2, or B3")
+        raise ValueError("method must be one of B0, B0-sanity, B1, B2, or B3/B4")
     return runners[normalized](
         observations,
         sequence_id=sequence_id,
@@ -892,11 +1257,13 @@ __all__ = [
     "B1FeatureTracker",
     "B2FeatureClassTracker",
     "B3EmaTracker",
+    "B4PersistentTracker",
     "FrozenObservation",
     "IdentityNamespace",
     "ImmutableObservation",
     "LocalInstanceObservation",
     "MatchingResult",
+    "OracleStageTarget",
     "TrackStep",
     "association_score_matrix",
     "fan_out_observation",
@@ -908,6 +1275,8 @@ __all__ = [
     "run_b1",
     "run_b2",
     "run_b3",
+    "run_b4",
     "run_baseline",
+    "run_oracle_posthoc",
     "threshold_aware_hungarian",
 ]
