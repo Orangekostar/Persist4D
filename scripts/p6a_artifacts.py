@@ -151,7 +151,7 @@ ONLINE_METHOD_SET = tuple(METHOD_IDS[:-1])
 ALL_HORIZONS = tuple(HORIZON_IDS)
 REACTIVATION_METHOD_SET = ("B1", "B2", "B3", "B4")
 REACTIVATION_HORIZONS = ("T3", "T4", "T5")
-FAILURE_CATEGORIES = tuple(f"F{index}" for index in range(1, 8))
+FAILURE_CATEGORIES = (*tuple(f"F{index}" for index in range(1, 8)), "unclassified")
 CAPACITY_METHOD = "B4"
 
 CSV_COLUMN_SCHEMAS = {
@@ -779,7 +779,9 @@ def _validate_error_rows(path: str, rows: Sequence[Mapping[str, object]]) -> Non
         raise ValueError(f"{path} must cover every method/horizon failure group")
     for group, group_rows in groups.items():
         if {row["category"] for row in group_rows} != set(FAILURE_CATEGORIES):
-            raise ValueError(f"{path} must contain F1 through F7 for {group}")
+            raise ValueError(
+                f"{path} must contain F1 through F7 and unclassified for {group}"
+            )
         if not math.isclose(
             sum(float(row["share"]) for row in group_rows), 1.0, abs_tol=1e-9
         ):

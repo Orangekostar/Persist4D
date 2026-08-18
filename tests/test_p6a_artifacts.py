@@ -285,7 +285,13 @@ def _derived_artifacts() -> dict[str, object]:
         }
     )
     error_rows = [
-        {"method": method, "T": horizon, "category": category, "count": 1, "share": 1 / 7}
+        {
+            "method": method,
+            "T": horizon,
+            "category": category,
+            "count": 1,
+            "share": 1 / len(p6a_artifacts.FAILURE_CATEGORIES),
+        }
         for method in methods
         for horizon in horizons
         for category in p6a_artifacts.FAILURE_CATEGORIES
@@ -465,7 +471,7 @@ def _artifact() -> dict[str, object]:
         },
         "analysis": {
             "association": {"path": "association_events.csv", "rows": 1, "status": "pass"},
-            "error": {"path": "error_breakdown.csv", "rows": 168, "status": "pass"},
+            "error": {"path": "error_breakdown.csv", "rows": 192, "status": "pass"},
             "reactivation": {"path": "reactivation_audit.csv", "rows": 12, "status": "pass"},
             "capacity": {"path": "capacity_audit.csv", "rows": 20, "status": "pass"},
             "efficiency": {"path": "efficiency_results.csv", "rows": 60, "status": "pass"},
@@ -590,6 +596,25 @@ def test_aggregate_csv_rows_must_be_reconstructible() -> None:
     error_rows = artifact["derived_artifacts"]["csv"]["error_breakdown.csv"]["rows"]
     error_rows[0]["count"] = 2
     with pytest.raises(ValueError, match="error_breakdown"):
+        validate_root_artifact(artifact)
+
+
+def test_error_breakdown_preserves_unclassified_failures() -> None:
+    artifact = _artifact()
+    csv_artifacts = artifact["derived_artifacts"]["csv"]
+    aggregate_rows = csv_artifacts["error_breakdown.csv"]["rows"]
+    aggregate_rows[:] = [
+        row for row in aggregate_rows if row["category"] != "unclassified"
+    ]
+    for row in aggregate_rows:
+        row["share"] = 1.0 / 7.0
+    for horizon in p6a_artifacts.HORIZON_IDS:
+        csv_artifacts[f"error_breakdown_{horizon}.csv"]["rows"] = [
+            row for row in aggregate_rows if row["T"] == horizon
+        ]
+    artifact["analysis"]["error"]["rows"] = 168
+
+    with pytest.raises(ValueError, match="unclassified"):
         validate_root_artifact(artifact)
 
 
