@@ -1,0 +1,948 @@
+"""Pure CPU orchestration helpers for the P6-A frozen prediction cache.
+
+The real ReScene forward pass is intentionally outside this module.  This
+module consumes validated cache payloads, freezes them once, and coordinates
+CPU-only trackers and metric accumulators without importing Hydra or touching
+CUDA state.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import inspect
+import json
+import math
+import os
+import tempfile
+from collections.abc import Callable, Hashable, Mapping, Sequence
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+import torch
+from torch import Tensor
+
+from scripts.p6a_association import FrozenObservation, freeze_observation
+from scripts.p6a_cache import (
+    ENTRY_KEYS,
+    KEY_KEYS,
+    build_cache_manifest,
+    load_cache_entry,
+    validate_cache_payload,
+    write_cache_entry,
+)
+from scripts.p6a_metrics import (
+    IdentityAccumulator,
+    build_offline_reconstructed_prediction,
+    build_online_endpoint_prediction,
+)
+
+_EXPECTED_ORDER_NAMES = ("canonical", "reverse", "sha256_seed45")
+_OBSERVATION_KEYS = (
+    "features",
+    "class_prob",
+    "confidence",
+    "valid",
+    "masks",
+)
+
+
+def _field(value: object, name: str, *, default: object = None) -> object:
+    if isinstance(value, Mapping):
+        return value.get(name, default)
+    return getattr(value, name, default)
+
+
+def _require_mapping(value: object, *, name: str) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping):
+        raise ValueError(f"{name} must be a mapping")  # noqa: TRY004
+    return value
+
+
+def _clone_cpu(value: object, *, name: str) -> Tensor:
+    if not isinstance(value, Tensor):
+        raise ValueError(f"{name} must be a tensor")  # noqa: TRY004
+    result = value.detach().cpu().clone()
+    if not result.requires_grad:
+        return result
+    return result.requires_grad_(False)
+
+
+def _finite_tensor(value: object, *, name: str, ndim: int | None = None) -> Tensor:
+    result = _clone_cpu(value, name=name)
+    if ndim is not None and result.ndim != ndim:
+        raise ValueError(f"{name} must have rank {ndim}")
+    if result.is_floating_point() and not torch.isfinite(result).all().item():
+        raise ValueError(f"{name} must contain finite values")
+    return result
+
+
+def _integer_tensor(value: object, *, name: str, ndim: int) -> Tensor:
+    result = _finite_tensor(value, name=name, ndim=ndim)
+    try:
+        torch.iinfo(result.dtype)
+    except (TypeError, RuntimeError) as error:
+        raise ValueError(f"{name} must use an integer dtype") from error
+    return result
+
+
+def _observation_mapping(payload: object) -> Mapping[str, Any]:
+    root = _require_mapping(payload, name="payload")
+    observation = root.get("observation", root)
+    observation = _require_mapping(observation, name="observation")
+    missing = [key for key in _OBSERVATION_KEYS if key not in observation]
+    if missing:
+        raise ValueError(f"observation is missing {missing}")
+    return observation
+
+
+def _stage_index(payload: object, *, fallback: int | None = None) -> int:
+    root = _require_mapping(payload, name="payload")
+    key = root.get("key")
+    value = _field(key, "stage_index") if key is not None else None
+    if value is None:
+        value = root.get("stage_index", root.get("stage"))
+    if value is None:
+        value = fallback
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ValueError("stage_index must be a non-negative integer")
+    return int(value)
+
+
+def _as_scan_ids(value: object, *, name: str) -> list[str]:
+    if not isinstance(value, (list, tuple)) or isinstance(value, (str, bytes)):
+        raise ValueError(f"{name} must be a sequence of scan IDs")  # noqa: TRY004
+    result = []
+    for item in value:
+        if not isinstance(item, str) or not item:
+            raise ValueError(f"{name} must contain non-empty strings")
+        result.append(item)
+    if not result or len(set(result)) != len(result):
+        raise ValueError(f"{name} must be non-empty and unique")
+    return result
+
+
+def _protocol_orders(protocol: object) -> tuple[str, ...]:
+    raw = _field(protocol, "order_variants")
+    if raw is None:
+        variants = _field(protocol, "variants")
+        if isinstance(variants, Mapping) and variants:
+            first = next(iter(variants.values()))
+            raw = tuple(first) if isinstance(first, Mapping) else None
+    if raw is None:
+        raw = _EXPECTED_ORDER_NAMES
+    if isinstance(raw, (str, bytes)) or not isinstance(raw, Sequence):
+        raise ValueError("protocol order_variants must be a sequence")  # noqa: TRY004
+    result = tuple(raw)
+    if result != _EXPECTED_ORDER_NAMES:
+        raise ValueError(
+            "Protocol B requires canonical, reverse, and sha256_seed45 orders"
+        )
+    return result
+
+
+def _protocol_masters(protocol: object) -> tuple[object, ...]:
+    masters = _field(protocol, "masters")
+    if isinstance(masters, (str, bytes)) or not isinstance(masters, Sequence):
+        raise ValueError("protocol masters must be a sequence")  # noqa: TRY004
+    if not masters:
+        raise ValueError("protocol masters must not be empty")
+    return tuple(masters)
+
+
+def _protocol_variant(protocol: object, master: object, order: str) -> object:
+    variants = _field(protocol, "variants")
+    if not isinstance(variants, Mapping):
+        raise ValueError("protocol must expose variants")  # noqa: TRY004
+    master_id = _field(master, "sequence_id")
+    if not isinstance(master_id, str) or not master_id:
+        raise ValueError("master sequence_id must be a non-empty string")
+    if master_id not in variants:
+        raise ValueError(f"protocol variants missing master {master_id!r}")
+    by_order = variants[master_id]
+    if not isinstance(by_order, Mapping) or order not in by_order:
+        raise ValueError(f"protocol variants missing order {order!r}")
+    return by_order[order]
+
+
+def expected_cache_keys(protocol: object) -> list[dict[str, object]]:
+    """Build the exact master x order x stage cache-key coverage."""
+
+    orders = _protocol_orders(protocol)
+    keys: list[dict[str, object]] = []
+    for master in _protocol_masters(protocol):
+        master_id = _field(master, "sequence_id")
+        reference_id = _field(master, "reference_scene_id")
+        if not isinstance(master_id, str) or not master_id:
+            raise ValueError("master sequence_id must be a non-empty string")
+        if not isinstance(reference_id, str) or not reference_id:
+            raise ValueError("master reference_scene_id must be a non-empty string")
+        for order in orders:
+            variant = _protocol_variant(protocol, master, order)
+            scan_ids = _as_scan_ids(
+                _field(variant, "scan_ids"), name=f"{master_id}/{order}/scan_ids"
+            )
+            if len(scan_ids) != 5:
+                raise ValueError(
+                    "each Protocol B order must contain exactly five scans"
+                )
+            for stage in range(5):
+                history = scan_ids[: stage + 1]
+                local_window = history[-1:] if stage == 0 else history[-2:]
+                keys.append(
+                    {
+                        "master_sequence_id": master_id,
+                        "reference_scene_id": reference_id,
+                        "order_id": order,
+                        "stage_index": stage,
+                        "history_scan_ids": list(history),
+                        "local_window_scan_ids": list(local_window),
+                    }
+                )
+    expected_count = len(_protocol_masters(protocol)) * 3 * 5
+    if len(keys) != expected_count or len(
+        {json.dumps(key, sort_keys=True) for key in keys}
+    ) != len(keys):
+        raise ValueError("Protocol B cache-key coverage is not exact and unique")
+    return keys
+
+
+def cache_payload_to_frozen_observation(
+    payload: Mapping[str, object],
+) -> FrozenObservation:
+    """Convert one cache payload into a detached CPU observation."""
+
+    if not isinstance(payload, Mapping):
+        raise ValueError("payload must be a mapping")  # noqa: TRY004
+    if "schema_version" in payload:
+        validate_cache_payload(payload)
+    observation = _observation_mapping(payload)
+    features = _finite_tensor(observation["features"], name="features", ndim=2)
+    class_prob = _finite_tensor(observation["class_prob"], name="class_prob", ndim=2)
+    confidence = _finite_tensor(observation["confidence"], name="confidence", ndim=1)
+    valid = _clone_cpu(observation["valid"], name="valid")
+    masks = _clone_cpu(observation["masks"], name="masks")
+    if valid.dtype != torch.bool:
+        raise ValueError("valid must use bool dtype")
+    if masks.dtype != torch.bool or masks.ndim != 2:
+        raise ValueError("masks must be a rank-2 bool tensor")
+    query_count = features.shape[0]
+    if (
+        class_prob.shape[0] != query_count
+        or confidence.shape[0] != query_count
+        or valid.shape[0] != query_count
+        or masks.shape[0] != query_count
+    ):
+        raise ValueError("observation tensors must agree on query count")
+    if class_prob.shape[1] <= 1 or masks.shape[1] <= 0:
+        raise ValueError("class and point dimensions must be positive")
+    if torch.any(class_prob < 0).item():
+        raise ValueError("class_prob must be non-negative")
+    if torch.any((confidence < 0) | (confidence > 1)).item():
+        raise ValueError("confidence must be within [0, 1]")
+    frozen = FrozenObservation(
+        features=features,
+        class_prob=class_prob,
+        confidence=confidence,
+        valid=valid,
+        # Trackers consume mask logits; cache masks are thresholded booleans.
+        latest_mask=(masks.to(dtype=features.dtype),),
+    )
+    frozen.validate()
+    return frozen
+
+
+def _stage_payloads(stage_payloads: object) -> tuple[Mapping[str, object], ...]:
+    if isinstance(stage_payloads, Mapping):
+        values = list(stage_payloads.values())
+    elif isinstance(stage_payloads, Sequence) and not isinstance(
+        stage_payloads, (str, bytes)
+    ):
+        values = list(stage_payloads)
+    else:
+        raise ValueError("stage_payloads must be a sequence or stage mapping")  # noqa: TRY004
+    if not values:
+        raise ValueError("stage_payloads must not be empty")
+    normalized = []
+    for value in values:
+        if not isinstance(value, Mapping):
+            raise ValueError("every stage payload must be a mapping")  # noqa: TRY004
+        normalized.append(value)
+    normalized.sort(key=lambda item: _stage_index(item))
+    stage_ids = [_stage_index(item) for item in normalized]
+    if stage_ids != list(range(len(normalized))):
+        raise ValueError("stage payloads must cover contiguous stages from zero")
+    return tuple(normalized)
+
+
+def _target_mapping(payload: Mapping[str, object]) -> Mapping[str, object]:
+    target = payload.get("target", payload)
+    if not isinstance(target, Mapping):
+        raise ValueError("target must be a mapping")  # noqa: TRY004
+    for key in ("gt_ids", "gt_classes", "gt_masks"):
+        if key not in target:
+            raise ValueError(f"target is missing {key}")
+    return target
+
+
+def build_temporal_target(
+    stage_payloads: Sequence[Mapping[str, object]]
+    | Mapping[object, Mapping[str, object]],
+) -> dict[str, Tensor]:
+    """Construct one full-prefix official metric target from stage cache entries."""
+
+    payloads = _stage_payloads(stage_payloads)
+    records: list[dict[str, Any]] = []
+    entity_order: list[int] = []
+    entity_index: dict[int, int] = {}
+    class_values: dict[int, int] = {}
+    change_values: dict[int, int] = {}
+    for stage, payload in enumerate(payloads):
+        target = _target_mapping(payload)
+        gt_ids = _integer_tensor(target["gt_ids"], name="gt_ids", ndim=1)
+        gt_classes = _integer_tensor(target["gt_classes"], name="gt_classes", ndim=1)
+        gt_masks = _clone_cpu(target["gt_masks"], name="gt_masks")
+        if gt_masks.ndim != 2 or gt_masks.dtype != torch.bool:
+            raise ValueError("gt_masks must be a rank-2 bool tensor")
+        if (
+            gt_classes.shape != gt_ids.shape
+            or gt_masks.shape[0] != gt_ids.shape[0]
+            or gt_masks.shape[1] <= 0
+        ):
+            raise ValueError("stage target tensors have incompatible shapes")
+        ids = [int(value) for value in gt_ids.tolist()]
+        if len(set(ids)) != len(ids):
+            raise ValueError("gt_ids must be unique within a stage")
+        changes_value = target.get("changes")
+        if changes_value is None:
+            changes = torch.zeros_like(gt_ids)
+        else:
+            changes = _integer_tensor(changes_value, name="changes", ndim=1)
+            if changes.shape != gt_ids.shape:
+                raise ValueError("changes must align with gt_ids")
+        for index, gt_id in enumerate(ids):
+            class_value = int(gt_classes[index].item())
+            change_value = int(changes[index].item())
+            previous_class = class_values.get(gt_id)
+            if previous_class is not None and previous_class != class_value:
+                raise ValueError(f"GT {gt_id} has a class conflict")
+            class_values[gt_id] = class_value
+            if gt_id not in entity_index:
+                entity_index[gt_id] = len(entity_order)
+                entity_order.append(gt_id)
+                change_values[gt_id] = change_value
+            elif change_values[gt_id] != change_value:
+                raise ValueError(f"GT {gt_id} has a change-label conflict")
+        records.append({"ids": ids, "masks": gt_masks, "stage": stage})
+
+    total_points = sum(int(record["masks"].shape[1]) for record in records)
+    output_masks = torch.zeros(
+        (len(entity_order), total_points), dtype=torch.bool, device="cpu"
+    )
+    temporal_stages: list[Tensor] = []
+    offset = 0
+    for record in records:
+        stage_masks = record["masks"]
+        point_count = stage_masks.shape[1]
+        temporal_stages.append(
+            torch.full((point_count,), record["stage"], dtype=torch.long)
+        )
+        for row, gt_id in enumerate(record["ids"]):
+            output_masks[entity_index[gt_id], offset : offset + point_count] = (
+                stage_masks[row]
+            )
+        offset += point_count
+    return {
+        "masks": output_masks.clone(),
+        "labels": torch.tensor(
+            [class_values[gt_id] for gt_id in entity_order], dtype=torch.long
+        ),
+        "ids": torch.tensor(entity_order, dtype=torch.long),
+        "changes": torch.tensor(
+            [change_values[gt_id] for gt_id in entity_order], dtype=torch.long
+        ),
+        "temporal_stages": torch.cat(temporal_stages).clone(),
+    }
+
+
+def _step_field(step: object, name: str, *, default: object = None) -> object:
+    value = _field(step, name, default=default)
+    if value is None and name == "track_ids":
+        raise ValueError("track step is missing track_ids")
+    return value
+
+
+def _sequence_values(value: object, *, name: str) -> list[object]:
+    if isinstance(value, Tensor):
+        if value.ndim != 1:
+            raise ValueError(f"{name} must have rank 1")
+        return value.detach().cpu().tolist()
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        return list(value)
+    raise ValueError(f"{name} must be a one-dimensional sequence")
+
+
+def _track_id_token(value: object) -> Hashable:
+    if value is None:
+        return ("none",)
+    if isinstance(value, float) and not math.isfinite(value):
+        raise ValueError("track IDs must be finite")
+    try:
+        hash(value)
+    except TypeError as error:
+        raise ValueError("track IDs must be hashable") from error
+    return (type(value).__name__, repr(value))
+
+
+def _map_class(class_mapper: object, value: int) -> int:
+    if class_mapper is None:
+        return value
+    if callable(class_mapper):
+        mapped = class_mapper(value)
+    elif isinstance(class_mapper, Mapping) and value in class_mapper:
+        mapped = class_mapper[value]
+    else:
+        raise ValueError("class_mapper must be callable or map every predicted class")
+    if isinstance(mapped, bool) or not isinstance(mapped, int):
+        raise ValueError("class_mapper must return integer class labels")  # noqa: TRY004
+    return int(mapped)
+
+
+def stage_prediction_from_track_step(
+    payload: Mapping[str, object],
+    step: object,
+    *,
+    class_mapper: Callable[[int], int] | Mapping[int, int] | None = None,
+    background_class: int = 18,
+) -> dict[str, object]:
+    """Convert a duck-typed tracker step into an official prediction mapping."""
+
+    observation = _observation_mapping(payload)
+    class_prob = _finite_tensor(observation["class_prob"], name="class_prob", ndim=2)
+    confidence = _finite_tensor(observation["confidence"], name="confidence", ndim=1)
+    valid_observation = _clone_cpu(observation["valid"], name="valid")
+    masks = _clone_cpu(observation["masks"], name="masks")
+    if (
+        valid_observation.dtype != torch.bool
+        or masks.dtype != torch.bool
+        or masks.ndim != 2
+    ):
+        raise ValueError(
+            "valid and masks must have bool dtype and masks must be rank 2"
+        )
+    query_count = int(class_prob.shape[0])
+    if (
+        confidence.shape != (query_count,)
+        or valid_observation.shape != (query_count,)
+        or masks.shape[0] != query_count
+    ):
+        raise ValueError("observation tensors must agree on query count")
+    if (
+        isinstance(background_class, bool)
+        or not isinstance(background_class, int)
+        or background_class < 0
+        or background_class >= class_prob.shape[1]
+    ):
+        raise ValueError("background_class must index class_prob")
+    if (
+        torch.any(class_prob < 0).item()
+        or torch.any((confidence < 0) | (confidence > 1)).item()
+    ):
+        raise ValueError("class_prob and confidence must be within valid ranges")
+
+    track_ids = _sequence_values(_step_field(step, "track_ids"), name="track_ids")
+    if len(track_ids) != query_count:
+        raise ValueError("track step track_ids must agree on query count")
+    query_property = _field(step, "query_count")
+    if query_property is not None and query_property != query_count:
+        raise ValueError("track step query_count does not match payload")
+    step_valid_value = _field(step, "valid")
+    if step_valid_value is None:
+        step_valid = valid_observation
+    else:
+        step_valid_values = _sequence_values(step_valid_value, name="valid")
+        if any(not isinstance(value, bool) for value in step_valid_values):
+            raise ValueError("track step valid must contain boolean values")
+        step_valid = torch.tensor(step_valid_values, dtype=torch.bool)
+    if step_valid.shape != (query_count,):
+        raise ValueError("track step valid must agree on query count")
+    tokens = [_track_id_token(value) for value in track_ids if value is not None]
+    if len(tokens) != len(set(tokens)):
+        raise ValueError("duplicate track IDs are not allowed")
+    stage = _stage_index(payload, fallback=_field(step, "stage_id"))
+    step_stage = _field(step, "stage_id")
+    if step_stage is not None:
+        if (
+            isinstance(step_stage, bool)
+            or not isinstance(step_stage, int)
+            or step_stage < 0
+        ):
+            raise ValueError("track step stage_id must be a non-negative integer")
+        if step_stage != stage:
+            raise ValueError("track step stage_id disagrees with payload")
+    selected = [
+        index
+        for index, track_id in enumerate(track_ids)
+        if track_id is not None
+        and bool(valid_observation[index])
+        and bool(step_valid[index])
+    ]
+    selected_tensor = torch.tensor(selected, dtype=torch.long)
+    foreground_prob = class_prob[selected_tensor].clone()
+    foreground_prob[:, background_class] = -float("inf")
+    predicted_classes = [
+        _map_class(class_mapper, int(value))
+        for value in torch.argmax(foreground_prob, dim=1).tolist()
+    ]
+    prediction_ids = [track_ids[index] for index in selected]
+    if prediction_ids and all(
+        isinstance(value, int) and not isinstance(value, bool)
+        for value in prediction_ids
+    ):
+        output_ids: object = torch.tensor(prediction_ids, dtype=torch.long)
+    else:
+        output_ids = tuple(prediction_ids)
+    return {
+        "stage": stage,
+        "pred_masks": masks[selected_tensor].transpose(0, 1).contiguous().clone(),
+        "pred_classes": torch.tensor(predicted_classes, dtype=torch.long),
+        "pred_scores": confidence[selected_tensor].clone().float(),
+        "class_probs": class_prob[selected_tensor].clone(),
+        "track_ids": output_ids,
+    }
+
+
+def _tensor_digest(value: Tensor, hasher: hashlib._Hash) -> None:
+    tensor = value.detach().cpu().contiguous()
+    hasher.update(str(tensor.dtype).encode("ascii"))
+    hasher.update(json.dumps(list(tensor.shape), separators=(",", ":")).encode("ascii"))
+    hasher.update(tensor.numpy().tobytes(order="C"))
+
+
+def observation_content_digest(observations: Sequence[FrozenObservation]) -> str:
+    if not isinstance(observations, Sequence) or not observations:
+        raise ValueError("observations must be a non-empty sequence")
+    hasher = hashlib.sha256()
+    for observation in observations:
+        if not isinstance(observation, FrozenObservation):
+            raise ValueError(  # noqa: TRY004
+                "observations must contain FrozenObservation values"
+            )
+        observation.validate()
+        for tensor in (
+            observation.features,
+            observation.class_prob,
+            observation.confidence,
+            observation.valid,
+            *observation.latest_mask,
+        ):
+            _tensor_digest(tensor, hasher)
+    return hasher.hexdigest()
+
+
+def _factory_call(factory: object, *, method: str, sequence_id: str) -> object:
+    if not callable(factory):
+        raise ValueError(  # noqa: TRY004
+            f"tracker factory for {method} must be callable"
+        )
+    try:
+        signature = inspect.signature(factory)
+    except (TypeError, ValueError):
+        return factory()
+    parameters = signature.parameters
+    kwargs: dict[str, object] = {}
+    if "method" in parameters:
+        kwargs["method"] = method
+    if "sequence_id" in parameters:
+        kwargs["sequence_id"] = sequence_id
+    if kwargs:
+        return factory(**kwargs)
+    required = [
+        parameter
+        for parameter in parameters.values()
+        if parameter.kind
+        in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+        and parameter.default is inspect.Parameter.empty
+    ]
+    if len(required) == 0:
+        return factory()
+    if len(required) == 1:
+        return factory(method)
+    if len(required) == 2:
+        return factory(method, sequence_id)
+    raise ValueError(f"tracker factory for {method} has unsupported signature")
+
+
+def _tracker_step(
+    tracker: object, observation: FrozenObservation, stage: int
+) -> object:
+    step = getattr(tracker, "step", None)
+    if not callable(step):
+        raise ValueError("tracker must provide callable step")  # noqa: TRY004
+    try:
+        signature = inspect.signature(step)
+    except (TypeError, ValueError):
+        return step(observation, stage)
+    accepts_keyword = "stage_id" in signature.parameters or any(
+        parameter.kind == inspect.Parameter.VAR_KEYWORD
+        for parameter in signature.parameters.values()
+    )
+    if accepts_keyword:
+        return step(observation, stage_id=stage)
+    return step(observation, stage)
+
+
+@dataclass(frozen=True)
+class PrefixCausalityResult:
+    """Online endpoint snapshots and a separately labeled offline run."""
+
+    online: dict[str, dict[int, IdentityAccumulator]]
+    offline: dict[str, IdentityAccumulator]
+    online_predictions: dict[str, dict[int, dict[str, object]]]
+    offline_predictions: dict[str, dict[str, object]]
+    content_digest: str
+    endpoints: tuple[int, ...]
+
+    def __getitem__(self, key: str) -> object:
+        return getattr(self, key)
+
+
+def prefix_causality_coordinator(
+    stage_payloads: Sequence[Mapping[str, object]],
+    tracker_factories: Mapping[str, object],
+    *,
+    endpoints: Sequence[int] | None = None,
+    sequence_id: str = "p6a-sequence",
+    background_class: int = 18,
+) -> PrefixCausalityResult:
+    """Run independent causal endpoint trackers and one full offline diagnostic."""
+
+    payloads = _stage_payloads(stage_payloads)
+    frozen = tuple(cache_payload_to_frozen_observation(payload) for payload in payloads)
+    digest = observation_content_digest(frozen)
+    if not isinstance(tracker_factories, Mapping) or not tracker_factories:
+        raise ValueError("tracker_factories must be a non-empty mapping")
+    methods = tuple(tracker_factories)
+    if any(not isinstance(method, str) or not method for method in methods):
+        raise ValueError("tracker method names must be non-empty strings")
+    if endpoints is None:
+        endpoint_values = tuple(range(1, len(payloads)))
+    else:
+        if isinstance(endpoints, (str, bytes)) or not isinstance(endpoints, Sequence):
+            raise ValueError("endpoints must be a sequence")
+        endpoint_values = tuple(endpoints)
+    if not endpoint_values:
+        raise ValueError("endpoints must not be empty")
+    if any(
+        isinstance(endpoint, bool)
+        or not isinstance(endpoint, int)
+        or endpoint < 0
+        or endpoint >= len(payloads)
+        for endpoint in endpoint_values
+    ):
+        raise ValueError("endpoints must be valid stage indices")
+    if tuple(sorted(set(endpoint_values))) != endpoint_values:
+        raise ValueError("endpoints must be sorted and unique")
+
+    online: dict[str, dict[int, IdentityAccumulator]] = {
+        method: {} for method in methods
+    }
+    online_predictions: dict[str, dict[int, dict[str, object]]] = {
+        method: {} for method in methods
+    }
+    for method in methods:
+        for endpoint in endpoint_values:
+            tracker = _factory_call(
+                tracker_factories[method], method=method, sequence_id=sequence_id
+            )
+            accumulator = IdentityAccumulator()
+            for stage in range(endpoint + 1):
+                observation = freeze_observation(frozen[stage])
+                step = _tracker_step(tracker, observation, stage)
+                prediction = stage_prediction_from_track_step(
+                    payloads[stage], step, background_class=background_class
+                )
+                accumulator.add_stage(prediction)
+            online[method][endpoint] = accumulator
+            online_predictions[method][endpoint] = build_online_endpoint_prediction(
+                accumulator, endpoint=endpoint
+            )
+
+    offline: dict[str, IdentityAccumulator] = {}
+    offline_predictions: dict[str, dict[str, object]] = {}
+    for method in methods:
+        tracker = _factory_call(
+            tracker_factories[method], method=method, sequence_id=sequence_id
+        )
+        accumulator = IdentityAccumulator()
+        for stage, payload in enumerate(payloads):
+            observation = freeze_observation(frozen[stage])
+            step = _tracker_step(tracker, observation, stage)
+            accumulator.add_stage(
+                stage_prediction_from_track_step(
+                    payload, step, background_class=background_class
+                )
+            )
+        offline[method] = accumulator
+        offline_predictions[method] = build_offline_reconstructed_prediction(
+            accumulator
+        )
+    return PrefixCausalityResult(
+        online=online,
+        offline=offline,
+        online_predictions=online_predictions,
+        offline_predictions=offline_predictions,
+        content_digest=digest,
+        endpoints=endpoint_values,
+    )
+
+
+def _normalize_key(value: object, *, name: str = "cache key") -> dict[str, object]:
+    key = _require_mapping(value, name=name)
+    if set(key) != KEY_KEYS:
+        raise ValueError(f"{name} keys differ from cache key schema")
+    stage = key["stage_index"]
+    if isinstance(stage, bool) or not isinstance(stage, int) or stage < 0:
+        raise ValueError(f"{name}.stage_index must be non-negative")
+    history = _as_scan_ids(key["history_scan_ids"], name=f"{name}.history_scan_ids")
+    local = _as_scan_ids(
+        key["local_window_scan_ids"], name=f"{name}.local_window_scan_ids"
+    )
+    expected_local = history[-1:] if stage == 0 else history[-2:]
+    if len(history) != stage + 1 or local != expected_local:
+        raise ValueError(f"{name} does not describe a causal prefix window")
+    for field_name in ("master_sequence_id", "reference_scene_id", "order_id"):
+        if not isinstance(key[field_name], str) or not key[field_name]:
+            raise ValueError(f"{name}.{field_name} must be non-empty")
+    if key["order_id"] not in _EXPECTED_ORDER_NAMES:
+        raise ValueError(f"{name}.order_id is not a registered Protocol B order")
+    if stage > 4:
+        raise ValueError(f"{name}.stage_index must be in [0, 4]")
+    return {
+        "master_sequence_id": key["master_sequence_id"],
+        "reference_scene_id": key["reference_scene_id"],
+        "order_id": key["order_id"],
+        "stage_index": stage,
+        "history_scan_ids": history,
+        "local_window_scan_ids": local,
+    }
+
+
+def _key_identity(value: Mapping[str, object]) -> str:
+    return json.dumps(_normalize_key(value), sort_keys=True, separators=(",", ":"))
+
+
+def _manifest_entries(manifest: object) -> list[Mapping[str, object]]:
+    root = _require_mapping(manifest, name="cache manifest")
+    entries = root.get("entries")
+    if isinstance(entries, (str, bytes)) or not isinstance(entries, Sequence):
+        raise ValueError("cache manifest entries must be a sequence")  # noqa: TRY004
+    result = []
+    for entry in entries:
+        if not isinstance(entry, Mapping) or set(entry) != ENTRY_KEYS:
+            raise ValueError("cache manifest contains an invalid entry")
+        result.append(entry)
+    return result
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+@dataclass(frozen=True)
+class CacheResolution:
+    payload: Mapping[str, object]
+    entry: Mapping[str, object]
+    reused: bool
+
+    def __getitem__(self, key: str) -> object:
+        if key in {"payload", "entry", "reused"}:
+            return getattr(self, key)
+        return self.entry[key]
+
+
+def _call_producer(producer: object, key: Mapping[str, object]) -> object:
+    if not callable(producer):
+        raise ValueError(  # noqa: TRY004
+            "producer must be callable when cache entry is missing"
+        )
+    try:
+        signature = inspect.signature(producer)
+    except (TypeError, ValueError):
+        return producer()
+    parameters = signature.parameters
+    if "key" in parameters:
+        return producer(key=key)
+    required = [
+        parameter
+        for parameter in parameters.values()
+        if parameter.kind
+        in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+        and parameter.default is inspect.Parameter.empty
+    ]
+    return producer() if not required else producer(key)
+
+
+def resolve_cache_entry(
+    cache_directory: str | Path,
+    logical_key: Mapping[str, object],
+    manifest: Mapping[str, object],
+    *,
+    expected_provenance: Mapping[str, object],
+    producer: Callable[..., Mapping[str, object]] | None,
+) -> CacheResolution:
+    """Resume one cache key without overwriting or accepting stale content."""
+
+    key = _normalize_key(logical_key)
+    manifest = _require_mapping(manifest, name="cache manifest")
+    if not isinstance(expected_provenance, Mapping):
+        raise ValueError("expected_provenance must be a mapping")  # noqa: TRY004
+    manifest_provenance = manifest.get("provenance")
+    if manifest_provenance is not None and dict(manifest_provenance) != dict(
+        expected_provenance
+    ):
+        raise ValueError("cache manifest provenance differs from the frozen run")
+    cache_dir = Path(cache_directory)
+    if cache_dir.is_symlink() or (cache_dir.exists() and not cache_dir.is_dir()):
+        raise ValueError("cache_directory must be a regular directory")
+    matches = [
+        entry
+        for entry in _manifest_entries(manifest)
+        if _key_identity(entry["key"]) == _key_identity(key)
+    ]
+    if len(matches) > 1:
+        raise ValueError("cache manifest contains duplicate logical keys")
+    if matches:
+        entry = matches[0]
+        filename = entry["filename"]
+        if not isinstance(filename, str) or Path(filename).name != filename:
+            raise ValueError("cache manifest filename must be a plain file name")
+        path = cache_dir / filename
+        if path.is_symlink() or not path.is_file():
+            raise ValueError("manifest entry points to a missing or symlink cache file")
+        if (
+            isinstance(entry["file_bytes"], bool)
+            or not isinstance(entry["file_bytes"], int)
+            or entry["file_bytes"] <= 0
+        ):
+            raise ValueError("cache manifest file_bytes must be positive")
+        if entry["file_bytes"] != path.stat().st_size:
+            raise ValueError("cache entry file size differs from manifest")
+        if entry["file_sha256"] != _file_sha256(path):
+            raise ValueError("cache entry file digest differs from manifest")
+        payload = load_cache_entry(path, expected_provenance=expected_provenance)
+        if _key_identity(payload["key"]) != _key_identity(key):
+            raise ValueError("loaded cache entry key differs from requested key")
+        return CacheResolution(payload=payload, entry=entry, reused=True)
+
+    payload = _call_producer(producer, key)
+    if not isinstance(payload, Mapping):
+        raise ValueError(  # noqa: TRY004
+            "cache producer must return a mapping payload"
+        )
+    validate_cache_payload(payload)
+    if _key_identity(payload["key"]) != _key_identity(key):
+        raise ValueError("cache producer returned a different logical key")
+    if dict(payload["provenance"]) != dict(expected_provenance):
+        raise ValueError("cache producer returned a different provenance")
+    entry = write_cache_entry(cache_dir, payload)
+    return CacheResolution(payload=payload, entry=entry, reused=False)
+
+
+def atomic_manifest_payload(
+    entries: Sequence[Mapping[str, object]],
+    *,
+    expected_keys: Sequence[Mapping[str, object]],
+    expected_provenance: Mapping[str, object],
+) -> dict[str, object]:
+    """Return a validated manifest payload without writing any P6-A artifact."""
+
+    if isinstance(entries, (str, bytes)) or not isinstance(entries, Sequence):
+        raise ValueError("entries must be a sequence")  # noqa: TRY004
+    normalized_keys = [
+        _normalize_key(key, name="expected key") for key in expected_keys
+    ]
+    return build_cache_manifest(
+        entries,
+        expected_keys=normalized_keys,
+        expected_provenance=expected_provenance,
+    )
+
+
+def publish_manifest_atomic(path: str | Path, manifest: Mapping[str, object]) -> None:
+    """Publish one already-built manifest with an atomic same-directory replace."""
+
+    destination = Path(path)
+    if destination.exists() and destination.is_symlink():
+        raise ValueError("manifest destination must not be a symlink")
+    if not isinstance(manifest, Mapping):
+        raise ValueError("manifest must be a mapping")  # noqa: TRY004
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    data = (
+        json.dumps(
+            manifest, allow_nan=False, ensure_ascii=True, sort_keys=True, indent=2
+        )
+        + "\n"
+    )
+    payload = data.encode("utf-8")
+    if destination.exists():
+        if destination.is_symlink():
+            raise ValueError("manifest destination must not be a symlink")
+        if destination.read_bytes() == payload:
+            return
+        raise FileExistsError(f"refusing to overwrite manifest: {destination}")
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent
+    )
+    os.close(descriptor)
+    temporary = Path(temporary_name)
+    try:
+        with temporary.open("wb") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        try:
+            os.link(temporary, destination)
+        except FileExistsError:
+            if destination.is_symlink() or destination.read_bytes() != payload:
+                raise FileExistsError(f"refusing to overwrite manifest: {destination}")
+        try:
+            directory_fd = os.open(destination.parent, os.O_RDONLY)
+        except OSError:
+            directory_fd = None
+        if directory_fd is not None:
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+load_or_create_cache_entry = resolve_cache_entry
+ensure_cache_entry = resolve_cache_entry
+atomic_manifest_publish = publish_manifest_atomic
+build_atomic_manifest_payload = atomic_manifest_payload
+
+
+__all__ = [
+    "CacheResolution",
+    "PrefixCausalityResult",
+    "atomic_manifest_payload",
+    "atomic_manifest_publish",
+    "build_atomic_manifest_payload",
+    "build_temporal_target",
+    "cache_payload_to_frozen_observation",
+    "ensure_cache_entry",
+    "expected_cache_keys",
+    "load_or_create_cache_entry",
+    "observation_content_digest",
+    "prefix_causality_coordinator",
+    "publish_manifest_atomic",
+    "resolve_cache_entry",
+    "stage_prediction_from_track_step",
+]
