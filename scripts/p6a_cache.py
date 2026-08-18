@@ -493,6 +493,30 @@ def load_cache_entry(
     return immutable_snapshot(payload)
 
 
+def discover_cache_entries(
+    cache_directory: Path,
+    *,
+    expected_provenance: Mapping[str, object],
+) -> list[dict[str, object]]:
+    """Rebuild trusted entry metadata from an interrupted cache directory."""
+
+    if not isinstance(cache_directory, Path):
+        raise TypeError("cache_directory must be a Path")
+    if cache_directory.is_symlink() or (
+        cache_directory.exists() and not cache_directory.is_dir()
+    ):
+        raise ValueError("cache_directory must be a regular directory")
+    cache_directory.mkdir(parents=True, exist_ok=True)
+    entries: list[dict[str, object]] = []
+    for path in sorted(cache_directory.iterdir(), key=lambda item: item.name):
+        if path.is_symlink() or not path.is_file() or path.suffix != ".pt":
+            raise ValueError(f"cache_directory contains unexpected path: {path.name}")
+        payload = load_cache_entry(path, expected_provenance=expected_provenance)
+        entries.append(_entry_from_path(path, payload))
+    normalized = _normalize_manifest_entries(entries)
+    return normalized
+
+
 def _key_identity(value: Mapping[str, object]) -> str:
     return json.dumps(_plain_key(value), sort_keys=True, separators=(",", ":"))
 

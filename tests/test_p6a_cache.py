@@ -13,6 +13,7 @@ from scripts.p6a_cache import (
     ORDER_IDS,
     build_cache_manifest,
     cache_payload_digest,
+    discover_cache_entries,
     load_cache_entry,
     load_cache_manifest,
     validate_cache_entry,
@@ -207,6 +208,26 @@ def test_cache_loader_rejects_symlink_and_corrupt_file(tmp_path: Path):
     path.write_bytes(b"not-a-cache")
     with pytest.raises(ValueError):
         load_cache_entry(path)
+
+
+def test_discover_cache_entries_revalidates_partial_cache_for_resume(
+    tmp_path: Path,
+) -> None:
+    first = write_cache_entry(tmp_path, _payload(stage_index=0))
+    second = write_cache_entry(tmp_path, _payload(stage_index=1))
+
+    discovered = discover_cache_entries(
+        tmp_path,
+        expected_provenance=PROVENANCE,
+    )
+
+    assert discovered == sorted(
+        [first, second],
+        key=lambda entry: entry["key"]["stage_index"],
+    )
+    (tmp_path / "unexpected.txt").write_text("not cache", encoding="utf-8")
+    with pytest.raises(ValueError, match="unexpected"):
+        discover_cache_entries(tmp_path, expected_provenance=PROVENANCE)
 
 
 def test_manifest_requires_exact_expected_unique_cache_keys(tmp_path: Path):

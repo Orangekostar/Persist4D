@@ -29,9 +29,11 @@ from scripts.p6a_cache import (
     KEY_KEYS,
     SCHEMA_VERSION,
     build_cache_manifest,
+    discover_cache_entries,
     load_cache_entry,
     validate_cache_payload,
     write_cache_entry,
+    write_cache_manifest,
 )
 from scripts.p6a_metrics import (
     IdentityAccumulator,
@@ -207,6 +209,56 @@ def expected_cache_keys(protocol: object) -> list[dict[str, object]]:
     ) != len(keys):
         raise ValueError("Protocol B cache-key coverage is not exact and unique")
     return keys
+
+
+def materialize_prediction_cache(
+    *,
+    protocol: object,
+    cache_directory: Path,
+    manifest_path: Path,
+    provenance: Mapping[str, object],
+    producer: Callable[..., Mapping[str, object]],
+) -> dict[str, object]:
+    """Resume exact Protocol B cache generation and publish only a full manifest."""
+
+    expected = expected_cache_keys(protocol)
+    existing = discover_cache_entries(
+        cache_directory,
+        expected_provenance=provenance,
+    )
+    expected_identities = {_key_identity(key) for key in expected}
+    if any(_key_identity(entry["key"]) not in expected_identities for entry in existing):
+        raise ValueError("cache_directory contains an unexpected logical key")
+    partial_manifest: dict[str, object] = {
+        "provenance": dict(provenance),
+        "entries": existing,
+    }
+    entries = list(existing)
+    for key in expected:
+        resolution = resolve_cache_entry(
+            cache_directory,
+            key,
+            partial_manifest,
+            expected_provenance=provenance,
+            producer=producer,
+        )
+        if not resolution.reused:
+            entries.append(dict(resolution.entry))
+            partial_manifest["entries"] = entries
+    manifest = build_cache_manifest(
+        entries,
+        expected_keys=expected,
+        expected_provenance=provenance,
+        cache_directory=cache_directory,
+    )
+    write_cache_manifest(
+        manifest_path,
+        manifest,
+        expected_keys=expected,
+        expected_provenance=provenance,
+        cache_directory=cache_directory,
+    )
+    return manifest
 
 
 def cache_payload_to_frozen_observation(
@@ -1052,6 +1104,7 @@ __all__ = [
     "ensure_cache_entry",
     "expected_cache_keys",
     "load_or_create_cache_entry",
+    "materialize_prediction_cache",
     "observation_content_digest",
     "prefix_causality_coordinator",
     "publish_manifest_atomic",

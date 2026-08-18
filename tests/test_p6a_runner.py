@@ -12,6 +12,7 @@ from scripts.evaluate_persist4d_p6a import (
     cache_payload_from_inference,
     cache_payload_to_frozen_observation,
     expected_cache_keys,
+    materialize_prediction_cache,
     prefix_causality_coordinator,
     publish_manifest_atomic,
     resolve_cache_entry,
@@ -362,6 +363,36 @@ def test_resumable_cache_reuses_manifest_entry_and_rejects_stale_provenance(
             expected_provenance={**payload["provenance"], "config_sha256": "f" * 64},
             producer=producer,
         )
+
+
+def test_materialize_prediction_cache_only_produces_missing_exact_keys(
+    tmp_path: Path,
+) -> None:
+    protocol = _protocol()
+    expected = expected_cache_keys(protocol)
+    provenance = _payload(0)["provenance"]
+    first_payload = _payload(0)
+    first_payload["key"] = expected[0]
+    write_cache_entry(tmp_path / "entries", first_payload)
+    produced: list[dict[str, object]] = []
+
+    def producer(key: dict[str, object]) -> dict[str, object]:
+        produced.append(dict(key))
+        payload = _payload(int(key["stage_index"]))
+        payload["key"] = dict(key)
+        return payload
+
+    manifest = materialize_prediction_cache(
+        protocol=protocol,
+        cache_directory=tmp_path / "entries",
+        manifest_path=tmp_path / "cache_manifest.json",
+        provenance=provenance,
+        producer=producer,
+    )
+
+    assert manifest["entry_count"] == 15
+    assert produced == expected[1:]
+    assert (tmp_path / "cache_manifest.json").is_file()
 
 
 def test_atomic_manifest_payload_and_publish_are_deterministic(tmp_path: Path) -> None:
