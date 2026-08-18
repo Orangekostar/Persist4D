@@ -12,7 +12,9 @@ from scripts.evaluate_persist4d_p6a import (
     CachedProtocolSequence,
     RealPredictionCacheProducer,
     atomic_manifest_payload,
+    build_association_events,
     build_cache_provenance,
+    build_capacity_snapshots,
     build_rio_class_mapper,
     build_temporal_target,
     build_tracker_factories,
@@ -22,6 +24,7 @@ from scripts.evaluate_persist4d_p6a import (
     expected_cache_keys,
     load_cached_protocol_sequences,
     materialize_prediction_cache,
+    normalize_official_metric_blocks,
     prefix_causality_coordinator,
     publish_manifest_atomic,
     resolve_cache_entry,
@@ -29,6 +32,7 @@ from scripts.evaluate_persist4d_p6a import (
     run_real_prediction_cache,
     stage_prediction_from_track_step,
 )
+from scripts.p6a_analysis import aggregate_event_metrics
 from scripts.p6a_association import (
     B0SanityTracker,
     B0StageUniqueTracker,
@@ -523,6 +527,14 @@ def test_prefix_coordinator_is_causal_and_separates_offline_reconstruction() -> 
     ]
     assert result.offline["B1"].stages == (0, 1, 2, 3, 4)
     assert result.online["B1"][1].stages == (0, 1)
+    assert tuple(step["stage_id"] for step in result.online_steps["B1"][1]) == (0, 1)
+    assert tuple(step["stage_id"] for step in result.offline_steps["B1"]) == (
+        0,
+        1,
+        2,
+        3,
+        4,
+    )
     assert result.content_digest
 
 
@@ -575,7 +587,7 @@ def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping(
         background_class=2,
     )
 
-    assert set(result.metric_blocks["raw"]) == {*factories, "Oracle"}
+    assert set(result.metric_blocks["raw"]) == set(factories)
     assert set(result.metric_blocks["strict"]) == set(factories)
     assert set(result.metric_blocks["offline"]) == {*factories, "Oracle"}
     assert result.metric_blocks["raw"]["B0"]["T2"] == {"score": 0.2}
@@ -585,6 +597,8 @@ def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping(
     assert updates[("offline_reconstructed", "Oracle", 5)] == 1
     assert len(set(result.fingerprints["prediction"].values())) == 1
     assert len(set(result.fingerprints["cache"].values())) == 1
+    assert result.association_events
+    assert len(result.capacity_snapshots) == 2 + 3 + 4 + 5
 
 
 def test_tracker_factories_lock_the_preregistered_baseline_parameters() -> None:
@@ -646,6 +660,202 @@ def test_rio_class_mapper_applies_label_offset_before_dataset_remap() -> None:
     assert [value.tolist() for value in calls] == [[2], [19]]
     with pytest.raises(ValueError, match="foreground model class"):
         mapper(18)
+
+
+def test_association_events_reconstruct_gap_reactivation_and_identity_history() -> None:
+    payloads = [_payload(stage, gt_ids=((10,) if stage != 1 else ())) for stage in range(3)]
+    for stage in (0, 2):
+        payloads[stage]["target"]["gt_masks"][0] = payloads[stage]["observation"][
+            "masks"
+        ][0]
+    payloads[1]["observation"]["valid"][:] = False
+    diagnostics = SimpleNamespace(
+        selected_candidate_identity=(5, None, None),
+        best_candidate_identity=(5, None, None),
+        chosen_feature_similarity=(0.9, None, None),
+        chosen_class_similarity=(0.8, None, None),
+        chosen_total_score=(1.1, None, None),
+        best_score=(1.1, None, None),
+        second_best_score=(0.2, None, None),
+        score_margin=(0.9, None, None),
+        slot_age=(2, None, None),
+        last_seen_stage=(0, None, None),
+        slot_active=(False, None, None),
+        slot_occupied=(True, None, None),
+        reactivation=(True, None, None),
+    )
+    steps = (
+        SimpleNamespace(
+            stage_id=0,
+            track_ids=(5, None, None),
+            valid=(True, False, False),
+            births=(True, False, False),
+            rejected_births=(False, False, False),
+            diagnostics=None,
+        ),
+        SimpleNamespace(
+            stage_id=1,
+            track_ids=(None, None, None),
+            valid=(False, False, False),
+            births=(False, False, False),
+            rejected_births=(False, False, False),
+            diagnostics=None,
+        ),
+        SimpleNamespace(
+            stage_id=2,
+            track_ids=(5, None, None),
+            valid=(True, False, False),
+            births=(False, False, False),
+            rejected_births=(False, False, False),
+            diagnostics=diagnostics,
+        ),
+    )
+
+    events = build_association_events(
+        payloads,
+        steps,
+        method="B4",
+        reference_scene_id="ref",
+        master_sequence_id="master",
+        order_id="canonical",
+        prefix=3,
+        cache_digest="a" * 64,
+        background_class=2,
+    )
+
+    assert len(events) == 2
+    first, reactivated = events
+    assert first.new_birth is True and first.is_failure is False
+    assert reactivated.transition_opportunity is True
+    assert reactivated.id_switch is False
+    assert reactivated.gap_opportunity is True
+    assert reactivated.reactivation_attempt is True
+    assert reactivated.reactivation_correct is True
+    assert reactivated.association_result == "reactivation_correct"
+    assert reactivated.score_margin == pytest.approx(0.9)
+    identity, reactivation = aggregate_event_metrics(events)
+    assert identity["transition_opportunities"] == 1
+    assert identity["id_switches"] == 0
+    assert reactivation["gap_opportunities"] == 1
+    assert reactivation["correct_reactivations"] == 1
+
+
+def test_capacity_snapshots_are_derived_only_from_bounded_b4_state() -> None:
+    payloads = [_payload(stage) for stage in range(2)]
+    result = prefix_causality_coordinator(
+        payloads,
+        {"B4": lambda sequence_id: B4PersistentTracker(sequence_id=sequence_id, capacity=3)},
+        endpoints=(1,),
+        background_class=2,
+    )
+
+    snapshots = build_capacity_snapshots(result.online_steps["B4"][1], horizon=2)
+
+    assert len(snapshots) == 2
+    assert [snapshot.stage_id for snapshot in snapshots] == [0, 1]
+    assert all(snapshot.capacity == 3 for snapshot in snapshots)
+    assert all(snapshot.feature_dim == 2 for snapshot in snapshots)
+    assert all(snapshot.class_count == 3 for snapshot in snapshots)
+    assert len({snapshot.persistent_state_bytes for snapshot in snapshots}) == 1
+    assert all(
+        snapshot.dormant_count
+        == snapshot.occupied_count - snapshot.active_count
+        for snapshot in snapshots
+    )
+
+
+def test_official_metric_blocks_are_normalized_without_mixing_raw_and_temporal() -> None:
+    blocks = {
+        "raw": {
+            "B4": {
+                "T2": {
+                    "raw_local_AP": 0.1,
+                    "raw_local_AP50": 0.2,
+                    "raw_local_AP25": 0.3,
+                    "raw_local_REC": 0.4,
+                    "raw_local_REC50": 0.5,
+                    "raw_local_REC25": 0.6,
+                }
+            }
+        },
+        "strict": {
+            "B4": {
+                "T2": {
+                    "online_t-mAP": 0.11,
+                    "online_t-mAP50": 0.21,
+                    "online_t-mAP25": 0.31,
+                    "online_t-REC": 0.41,
+                    "online_t-REC50": 0.51,
+                    "online_t-REC25": 0.61,
+                }
+            }
+        },
+        "offline": {
+            "Oracle": {
+                "T2": {
+                    "offline_reconstructed_t-mAP": 0.12,
+                    "offline_reconstructed_t-mAP50": 0.22,
+                    "offline_reconstructed_t-mAP25": 0.32,
+                    "offline_reconstructed_t-REC": 0.42,
+                    "offline_reconstructed_t-REC50": 0.52,
+                    "offline_reconstructed_t-REC25": 0.62,
+                }
+            }
+        },
+    }
+
+    normalized = normalize_official_metric_blocks(blocks)
+
+    assert normalized["raw"]["B4"]["T2"]["AP"] == pytest.approx(0.1)
+    assert normalized["raw"]["B4"]["T2"]["t_mAP"] is None
+    assert normalized["strict"]["B4"]["T2"]["AP"] is None
+    assert normalized["strict"]["B4"]["T2"]["t_REC25"] == pytest.approx(0.61)
+    assert normalized["offline"]["Oracle"]["T2"]["t_mAP"] == pytest.approx(0.12)
+
+
+def test_association_event_errors_separate_semantic_drift_from_local_miss() -> None:
+    semantic = _payload(0, gt_ids=(10,))
+    semantic["target"]["gt_masks"][0] = semantic["observation"]["masks"][0]
+    semantic["observation"]["class_prob"][0] = torch.tensor([0.8, 0.1, 0.1])
+    step = SimpleNamespace(
+        stage_id=0,
+        track_ids=(5, None, None),
+        valid=(True, False, False),
+        births=(True, False, False),
+        rejected_births=(False, False, False),
+        diagnostics=None,
+    )
+
+    semantic_events = build_association_events(
+        [semantic],
+        [step],
+        method="B4",
+        reference_scene_id="ref",
+        master_sequence_id="master",
+        order_id="canonical",
+        prefix=1,
+        cache_digest="b" * 64,
+        background_class=2,
+    )
+
+    assert {event.failure_category for event in semantic_events} == {"F6"}
+
+    local_miss = _payload(0, gt_ids=(10,))
+    local_miss["target"]["gt_masks"][0, 1] = True
+    miss_events = build_association_events(
+        [local_miss],
+        [step],
+        method="B4",
+        reference_scene_id="ref",
+        master_sequence_id="master",
+        order_id="canonical",
+        prefix=1,
+        cache_digest="c" * 64,
+        background_class=2,
+    )
+    gt_miss = next(event for event in miss_events if event.event_kind == "gt_miss")
+    assert gt_miss.local_perception_miss is True
+    assert gt_miss.failure_category == "F1"
 
 
 def test_resumable_cache_reuses_manifest_entry_and_rejects_stale_provenance(

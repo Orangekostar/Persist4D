@@ -13,7 +13,7 @@ import sys
 import tempfile
 from collections.abc import Callable, Hashable, Mapping, Sequence
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +26,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from scripts.p6a_analysis import (
+    AssociationEvent,
+    CapacitySnapshot,
+    classify_failure,
+    persistent_state_bytes,
+    validate_association_events,
+)
 from scripts.p6a_association import (
     B0SanityTracker,
     B0StageUniqueTracker,
@@ -58,6 +65,7 @@ from scripts.p6a_metrics import (
     assert_shared_raw_predictions,
     build_offline_reconstructed_prediction,
     build_online_endpoint_prediction,
+    match_instances_hungarian,
 )
 
 _EXPECTED_ORDER_NAMES = ("canonical", "reverse", "sha256_seed45")
@@ -1338,6 +1346,8 @@ class PrefixCausalityResult:
     offline: dict[str, IdentityAccumulator]
     online_predictions: dict[str, dict[int, dict[str, object]]]
     offline_predictions: dict[str, dict[str, object]]
+    online_steps: dict[str, dict[int, tuple[object, ...]]]
+    offline_steps: dict[str, tuple[object, ...]]
     content_digest: str
     endpoints: tuple[int, ...]
 
@@ -1380,6 +1390,8 @@ class TaskMetricEvaluation:
     metric_blocks: dict[str, dict[str, dict[str, dict[str, float]]]]
     fingerprints: dict[str, dict[str, str]]
     sequence_count: int
+    association_events: tuple[AssociationEvent, ...]
+    capacity_snapshots: tuple[CapacitySnapshot, ...]
 
 
 def prefix_causality_coordinator(
@@ -1425,40 +1437,50 @@ def prefix_causality_coordinator(
     online_predictions: dict[str, dict[int, dict[str, object]]] = {
         method: {} for method in methods
     }
+    online_steps: dict[str, dict[int, tuple[object, ...]]] = {
+        method: {} for method in methods
+    }
     for method in methods:
         for endpoint in endpoint_values:
             tracker = _factory_call(
                 tracker_factories[method], method=method, sequence_id=sequence_id
             )
             accumulator = IdentityAccumulator()
+            steps = []
             for stage in range(endpoint + 1):
                 observation = freeze_observation(frozen[stage])
                 step = _tracker_step(tracker, observation, stage)
+                steps.append(step)
                 prediction = stage_prediction_from_track_step(
                     payloads[stage], step, background_class=background_class
                 )
                 accumulator.add_stage(prediction)
             online[method][endpoint] = accumulator
+            online_steps[method][endpoint] = tuple(steps)
             online_predictions[method][endpoint] = build_online_endpoint_prediction(
                 accumulator, endpoint=endpoint
             )
 
     offline: dict[str, IdentityAccumulator] = {}
     offline_predictions: dict[str, dict[str, object]] = {}
+    offline_steps: dict[str, tuple[object, ...]] = {}
     for method in methods:
         tracker = _factory_call(
             tracker_factories[method], method=method, sequence_id=sequence_id
         )
         accumulator = IdentityAccumulator()
+        steps = []
         for stage, payload in enumerate(payloads):
             observation = freeze_observation(frozen[stage])
             step = _tracker_step(tracker, observation, stage)
+            steps.append(step)
             accumulator.add_stage(
                 stage_prediction_from_track_step(
                     payload, step, background_class=background_class
                 )
             )
         offline[method] = accumulator
+        offline_steps[method] = tuple(steps)
         offline_predictions[method] = build_offline_reconstructed_prediction(
             accumulator
         )
@@ -1467,6 +1489,8 @@ def prefix_causality_coordinator(
         offline=offline,
         online_predictions=online_predictions,
         offline_predictions=offline_predictions,
+        online_steps=online_steps,
+        offline_steps=offline_steps,
         content_digest=digest,
         endpoints=endpoint_values,
     )
@@ -1616,6 +1640,550 @@ def build_rio_class_mapper(
     return mapper
 
 
+def _event_identity(value: object) -> str | int | None:
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return f"bool:{value!r}"
+    if isinstance(value, int) and value >= 0:
+        return value
+    if isinstance(value, str) and value:
+        return value
+    return f"{type(value).__name__}:{value!r}"
+
+
+def _diagnostic_value(step: object, name: str, query_index: int) -> object:
+    diagnostics = _field(step, "diagnostics")
+    values = _field(diagnostics, name) if diagnostics is not None else None
+    if values is None:
+        return None
+    sequence = _sequence_values(values, name=f"diagnostics.{name}")
+    if query_index >= len(sequence):
+        raise ValueError("association diagnostics do not cover every query")
+    return sequence[query_index]
+
+
+def _binary_iou_matrix(gt_masks: Tensor, pred_masks: Tensor) -> Tensor:
+    if gt_masks.ndim != 2 or pred_masks.ndim != 2:
+        raise ValueError("instance masks must be rank-2")
+    if gt_masks.shape[1] != pred_masks.shape[0]:
+        raise ValueError("GT and prediction masks must share point dimension")
+    gt = gt_masks.to(dtype=torch.float64)
+    pred = pred_masks.transpose(0, 1).to(dtype=torch.float64)
+    intersection = gt @ pred.transpose(0, 1)
+    union = gt.sum(dim=1, keepdim=True) + pred.sum(dim=1).unsqueeze(0) - intersection
+    return torch.where(union > 0, intersection / union, torch.zeros_like(union))
+
+
+def build_association_events(
+    payloads: Sequence[Mapping[str, object]],
+    steps: Sequence[object],
+    *,
+    method: str,
+    reference_scene_id: str,
+    master_sequence_id: str,
+    order_id: str,
+    prefix: int,
+    cache_digest: str,
+    background_class: int = 18,
+    iou_threshold: float = 0.5,
+) -> tuple[AssociationEvent, ...]:
+    """Build reconstructable diagnostic events from one causal prefix run."""
+
+    normalized = _stage_payloads(payloads)
+    if len(normalized) != len(steps) or prefix != len(normalized):
+        raise ValueError("payloads, steps, and prefix must describe one exact run")
+    if not isinstance(method, str) or not method:
+        raise ValueError("method must be a non-empty string")
+    if not 0.0 <= float(iou_threshold) <= 1.0:
+        raise ValueError("iou_threshold must be in [0, 1]")
+    sequence_id = f"{master_sequence_id}:{order_id}"
+    gt_history: dict[int, tuple[int, str | int]] = {}
+    identity_history: dict[str | int, int] = {}
+    events: list[AssociationEvent] = []
+
+    for stage, (payload, step) in enumerate(zip(normalized, steps, strict=True)):
+        prediction = stage_prediction_from_track_step(
+            payload, step, background_class=background_class
+        )
+        observation = _observation_mapping(payload)
+        valid = _clone_cpu(observation["valid"], name="valid")
+        track_ids = _sequence_values(_step_field(step, "track_ids"), name="track_ids")
+        step_valid_raw = _field(step, "valid", default=valid)
+        step_valid = _sequence_values(step_valid_raw, name="step valid")
+        selected_queries = [
+            index
+            for index, track_id in enumerate(track_ids)
+            if track_id is not None and bool(valid[index]) and bool(step_valid[index])
+        ]
+        births = _sequence_values(
+            _field(step, "births", default=(False,) * len(track_ids)),
+            name="births",
+        )
+        rejected = _sequence_values(
+            _field(step, "rejected_births", default=(False,) * len(track_ids)),
+            name="rejected_births",
+        )
+        if len(births) != len(track_ids) or len(rejected) != len(track_ids):
+            raise ValueError("tracker decision fields must cover every query")
+        target = _target_mapping(payload)
+        gt_ids = _integer_tensor(target["gt_ids"], name="gt_ids", ndim=1)
+        gt_classes = _integer_tensor(
+            target["gt_classes"], name="gt_classes", ndim=1
+        )
+        gt_masks = _clone_cpu(target["gt_masks"], name="gt_masks")
+        pred_masks = prediction["pred_masks"]
+        pred_classes = prediction["pred_classes"]
+        pairs = match_instances_hungarian(
+            gt_masks,
+            pred_masks.transpose(0, 1),
+            gt_classes,
+            pred_classes,
+            threshold=iou_threshold,
+        )
+        ious = _binary_iou_matrix(gt_masks, pred_masks)
+        matched_gt = {gt_index for gt_index, _ in pairs}
+        pair_by_pred = {pred_index: gt_index for gt_index, pred_index in pairs}
+        current_matches: list[tuple[int, str | int]] = []
+        key = _require_mapping(payload["key"], name="cache key")
+        scene_id = str(key["history_scan_ids"][-1])
+        class_prob = _finite_tensor(
+            observation["class_prob"], name="class_prob", ndim=2
+        )
+        confidence = _finite_tensor(
+            observation["confidence"], name="confidence", ndim=1
+        )
+        mask_support = _integer_tensor(
+            observation["mask_support"], name="mask_support", ndim=1
+        )
+
+        for pred_index, query_index in enumerate(selected_queries):
+            predicted_identity = _event_identity(track_ids[query_index])
+            predicted_class = int(pred_classes[pred_index].item())
+            gt_index = pair_by_pred.get(pred_index)
+            gt_id = int(gt_ids[gt_index].item()) if gt_index is not None else None
+            prior_gt = gt_history.get(gt_id) if gt_id is not None else None
+            transition = prior_gt is not None
+            gap_length = stage - prior_gt[0] - 1 if prior_gt is not None else 0
+            gt_gap = transition and gap_length > 0
+            prior_identity_gt = identity_history.get(predicted_identity)
+            merge = gt_id is not None and (
+                prior_identity_gt is not None and prior_identity_gt != gt_id
+            )
+            switched = bool(
+                transition and predicted_identity != prior_gt[1]
+            )
+            fragmentation = switched and not merge
+            tracker_reactivation = (
+                _diagnostic_value(step, "reactivation", query_index) is True
+            )
+            reactivation = bool(
+                gt_gap
+                and (
+                    tracker_reactivation
+                    or (not bool(births[query_index]) and prior_identity_gt is not None)
+                )
+            )
+            reactivation_correct = (
+                bool(
+                    predicted_identity == prior_gt[1]
+                    and prior_identity_gt == gt_id
+                    and not merge
+                )
+                if reactivation
+                else None
+            )
+            new_birth = bool(births[query_index])
+            false_birth = bool(new_birth and (gt_id is None or transition))
+            semantic_drift = False
+            association_miss = False
+            if gt_id is None:
+                spatial = (
+                    torch.nonzero(ious[:, pred_index] >= iou_threshold)
+                    .flatten()
+                    .tolist()
+                )
+                semantic_drift = any(
+                    int(gt_classes[index].item()) != predicted_class
+                    for index in spatial
+                )
+                association_miss = not new_birth and not semantic_drift
+                if semantic_drift:
+                    false_birth = False
+            failure = bool(
+                gt_id is None
+                or switched
+                or merge
+                or false_birth
+                or reactivation_correct is False
+            )
+            if reactivation:
+                result = (
+                    "reactivation_correct"
+                    if reactivation_correct
+                    else "reactivation_wrong"
+                )
+            elif semantic_drift:
+                result = "semantic_drift"
+            elif false_birth:
+                result = "false_birth"
+            elif new_birth:
+                result = "birth"
+            elif failure:
+                result = "active_wrong"
+            else:
+                result = "active_correct"
+            probabilities = class_prob[query_index].clamp_min(1e-12)
+            entropy = float(-(probabilities * probabilities.log()).sum().item())
+            event = AssociationEvent(
+                event_id=(
+                    f"{method}:{master_sequence_id}:{order_id}:T{prefix}:"
+                    f"s{stage}:q{query_index}"
+                ),
+                scene_id=scene_id,
+                sequence_id=sequence_id,
+                reference_scene_id=reference_scene_id,
+                master_sequence_id=master_sequence_id,
+                order_id=order_id,
+                prefix=prefix,
+                method=method,
+                stage_id=stage,
+                query_id=query_index,
+                candidate_slot_id=_event_identity(
+                    _diagnostic_value(
+                        step, "selected_candidate_identity", query_index
+                    )
+                ),
+                predicted_identity_id=predicted_identity,
+                gt_entity_id=gt_id,
+                association_correct=(not failure),
+                feature_similarity=_diagnostic_value(
+                    step, "chosen_feature_similarity", query_index
+                ),
+                class_similarity=_diagnostic_value(
+                    step, "chosen_class_similarity", query_index
+                ),
+                total_score=_diagnostic_value(
+                    step, "chosen_total_score", query_index
+                ),
+                best_score=_diagnostic_value(step, "best_score", query_index),
+                second_best_score=_diagnostic_value(
+                    step, "second_best_score", query_index
+                ),
+                score_margin=_diagnostic_value(step, "score_margin", query_index),
+                observation_confidence=float(confidence[query_index].item()),
+                mask_support=float(mask_support[query_index].item()),
+                predicted_class=predicted_class,
+                class_entropy=entropy,
+                slot_age=_diagnostic_value(step, "slot_age", query_index),
+                last_seen_stage=_diagnostic_value(
+                    step, "last_seen_stage", query_index
+                ),
+                gap_length=gap_length,
+                slot_active=_diagnostic_value(step, "slot_active", query_index),
+                slot_occupied=_diagnostic_value(
+                    step, "slot_occupied", query_index
+                ),
+                association_result=result,
+                gt_present=gt_id is not None,
+                prediction_present=True,
+                transition_opportunity=transition,
+                id_switch=switched,
+                gap_opportunity=gt_gap,
+                reactivation_attempt=reactivation,
+                reactivation_correct=reactivation_correct,
+                new_birth=new_birth,
+                false_birth=false_birth,
+                reactivation=reactivation,
+                wrong_reactivation=reactivation_correct is False,
+                local_observation_available=True,
+                local_match_available=True if gt_id is not None else None,
+                raw_local_match=True if gt_id is not None else None,
+                raw_prediction_available=True,
+                association_miss=association_miss,
+                identity_fragmentation=fragmentation,
+                identity_merge=merge,
+                semantic_drift=semantic_drift,
+                capacity_failure=False,
+                birth_rejected=False,
+                is_failure=failure,
+                prediction_digest=cache_digest,
+                cache_digest=cache_digest,
+            )
+            if failure:
+                event = replace(event, failure_category=classify_failure(event))
+            events.append(event)
+            if gt_id is not None:
+                current_matches.append((gt_id, predicted_identity))
+
+        for query_index, is_rejected in enumerate(rejected):
+            if not is_rejected:
+                continue
+            probabilities = class_prob[query_index].clamp_min(1e-12)
+            predicted_class = int(
+                torch.argmax(
+                    torch.cat(
+                        (
+                            probabilities[:background_class],
+                            probabilities[background_class + 1 :],
+                        )
+                    )
+                ).item()
+            )
+            if predicted_class >= background_class:
+                predicted_class += 1
+            event = AssociationEvent(
+                event_id=(
+                    f"{method}:{master_sequence_id}:{order_id}:T{prefix}:"
+                    f"s{stage}:rejected-q{query_index}"
+                ),
+                scene_id=scene_id,
+                sequence_id=sequence_id,
+                reference_scene_id=reference_scene_id,
+                master_sequence_id=master_sequence_id,
+                order_id=order_id,
+                prefix=prefix,
+                method=method,
+                stage_id=stage,
+                query_id=query_index,
+                predicted_class=predicted_class,
+                observation_confidence=float(confidence[query_index].item()),
+                mask_support=float(mask_support[query_index].item()),
+                class_entropy=float(
+                    -(probabilities * probabilities.log()).sum().item()
+                ),
+                association_result="birth_rejected",
+                gt_present=False,
+                prediction_present=False,
+                association_correct=False,
+                transition_opportunity=False,
+                id_switch=False,
+                gap_opportunity=False,
+                reactivation_attempt=False,
+                reactivation=False,
+                new_birth=False,
+                false_birth=False,
+                birth_rejected=True,
+                capacity_failure=True,
+                is_failure=True,
+                failure_category="F7",
+                prediction_digest=cache_digest,
+                cache_digest=cache_digest,
+            )
+            events.append(event)
+
+        for gt_index in range(gt_ids.shape[0]):
+            if gt_index in matched_gt:
+                continue
+            gt_id = int(gt_ids[gt_index].item())
+            prior_gt = gt_history.get(gt_id)
+            gap_length = stage - prior_gt[0] - 1 if prior_gt is not None else 0
+            spatial_indices = (
+                torch.nonzero(ious[gt_index] >= iou_threshold).flatten().tolist()
+                if ious.shape[1]
+                else []
+            )
+            compatible = any(
+                int(pred_classes[index].item()) == int(gt_classes[gt_index].item())
+                for index in spatial_indices
+            )
+            semantic_drift = bool(spatial_indices and not compatible)
+            merge = bool(compatible)
+            local_miss = not spatial_indices
+            association_miss = compatible
+            event = AssociationEvent(
+                event_id=(
+                    f"{method}:{master_sequence_id}:{order_id}:T{prefix}:"
+                    f"s{stage}:gt{gt_id}-miss"
+                ),
+                scene_id=scene_id,
+                sequence_id=sequence_id,
+                reference_scene_id=reference_scene_id,
+                master_sequence_id=master_sequence_id,
+                order_id=order_id,
+                prefix=prefix,
+                method=method,
+                stage_id=stage,
+                event_kind="gt_miss",
+                gt_entity_id=gt_id,
+                association_result="no_attempt",
+                gt_present=True,
+                prediction_present=False,
+                transition_opportunity=False,
+                id_switch=False,
+                gap_opportunity=bool(prior_gt is not None and gap_length > 0),
+                reactivation_attempt=False,
+                reactivation=False,
+                new_birth=False,
+                false_birth=False,
+                local_observation_available=not local_miss,
+                local_match_available=True if compatible else None,
+                raw_local_match=True if compatible else None,
+                raw_prediction_available=bool(pred_masks.shape[1]),
+                local_perception_miss=local_miss,
+                association_miss=association_miss,
+                identity_merge=merge,
+                semantic_drift=semantic_drift,
+                is_failure=True,
+                prediction_digest=cache_digest,
+                cache_digest=cache_digest,
+            )
+            events.append(
+                replace(event, failure_category=classify_failure(event))
+            )
+
+        for gt_id, predicted_identity in current_matches:
+            gt_history[gt_id] = (stage, predicted_identity)
+            identity_history[predicted_identity] = gt_id
+
+    return validate_association_events(events)
+
+
+def build_capacity_snapshots(
+    steps: Sequence[object],
+    *,
+    horizon: int,
+    method: str = "B4",
+) -> tuple[CapacitySnapshot, ...]:
+    """Extract bounded persistent-state occupancy from one B4 prefix run."""
+
+    if not steps or len(steps) != horizon:
+        raise ValueError("steps must cover the exact horizon")
+    snapshots = []
+    for stage, step in enumerate(steps):
+        if _field(step, "stage_id") != stage:
+            raise ValueError("tracker steps must be contiguous from stage zero")
+        state = _field(step, "state_snapshot")
+        validate = getattr(state, "validate", None)
+        if not callable(validate):
+            raise TypeError("B4 steps must expose a validated state snapshot")
+        validate()
+        batch_size = int(state.batch_size)
+        if batch_size != 1:
+            raise ValueError("P6-A capacity snapshots require batch size one")
+        capacity = int(state.capacity)
+        feature_dim = int(state.feature_dim)
+        class_count = int(state.class_count)
+        occupied = int(state.occupied[0].sum().item())
+        active = int(state.active[0].sum().item())
+        births = _sequence_values(
+            _field(step, "births", default=()), name="births"
+        )
+        rejected = _sequence_values(
+            _field(step, "rejected_births", default=()), name="rejected_births"
+        )
+        snapshots.append(
+            CapacitySnapshot(
+                method=method,
+                horizon=horizon,
+                stage_id=stage,
+                capacity=capacity,
+                birth_count=sum(value is True for value in births),
+                occupied_count=occupied,
+                active_count=active,
+                dormant_count=occupied - active,
+                rejected_births=sum(value is True for value in rejected),
+                persistent_state_bytes=persistent_state_bytes(
+                    capacity,
+                    feature_dim,
+                    class_count,
+                    batch_size=batch_size,
+                ),
+                feature_dim=feature_dim,
+                class_count=class_count,
+                batch_size=batch_size,
+            )
+        )
+    for snapshot in snapshots:
+        snapshot.validate()
+    return tuple(snapshots)
+
+
+def normalize_official_metric_blocks(
+    metric_blocks: Mapping[str, object],
+) -> dict[str, dict[str, dict[str, dict[str, float | None]]]]:
+    """Normalize stmetrics keys into the exact P6-A root metric schema."""
+
+    blocks = _require_mapping(metric_blocks, name="metric_blocks")
+    if set(blocks) != {"raw", "strict", "offline"}:
+        raise ValueError("metric_blocks must contain raw, strict, and offline")
+    fields = (
+        "AP",
+        "AP50",
+        "AP25",
+        "REC",
+        "t_mAP",
+        "t_mAP50",
+        "t_mAP25",
+        "t_REC",
+        "t_REC50",
+        "t_REC25",
+    )
+    result: dict[str, dict[str, dict[str, dict[str, float | None]]]] = {}
+    for block_name in ("raw", "strict", "offline"):
+        methods = _require_mapping(blocks[block_name], name=f"{block_name} metrics")
+        result[block_name] = {}
+        source_fields = {
+            "raw": {
+                "raw_local_AP": "AP",
+                "raw_local_AP50": "AP50",
+                "raw_local_AP25": "AP25",
+                "raw_local_REC": "REC",
+                "raw_local_REC50": "REC50",
+                "raw_local_REC25": "REC25",
+            },
+            "strict": {
+                "online_t-mAP": "t_mAP",
+                "online_t-mAP50": "t_mAP50",
+                "online_t-mAP25": "t_mAP25",
+                "online_t-REC": "t_REC",
+                "online_t-REC50": "t_REC50",
+                "online_t-REC25": "t_REC25",
+            },
+            "offline": {
+                "offline_reconstructed_t-mAP": "t_mAP",
+                "offline_reconstructed_t-mAP50": "t_mAP50",
+                "offline_reconstructed_t-mAP25": "t_mAP25",
+                "offline_reconstructed_t-REC": "t_REC",
+                "offline_reconstructed_t-REC50": "t_REC50",
+                "offline_reconstructed_t-REC25": "t_REC25",
+            },
+        }[block_name]
+        expected_keys = set(source_fields)
+        for method, raw_horizons in methods.items():
+            if not isinstance(method, str) or not method:
+                raise ValueError("metric method names must be non-empty strings")
+            horizons = _require_mapping(
+                raw_horizons, name=f"{block_name}.{method} metrics"
+            )
+            result[block_name][method] = {}
+            for horizon, raw_values in horizons.items():
+                if not isinstance(horizon, str) or not horizon:
+                    raise ValueError("metric horizon names must be non-empty strings")
+                values = _require_mapping(
+                    raw_values, name=f"{block_name}.{method}.{horizon}"
+                )
+                if set(values) != expected_keys:
+                    raise ValueError(
+                        f"{block_name}.{method}.{horizon} metric keys differ"
+                    )
+                normalized: dict[str, float | None] = {
+                    field: None for field in fields
+                }
+                for source, destination in source_fields.items():
+                    value = values[source]
+                    if (
+                        isinstance(value, bool)
+                        or not isinstance(value, (int, float))
+                        or not math.isfinite(float(value))
+                        or not 0.0 <= float(value) <= 1.0
+                    ):
+                        raise ValueError("official metric values must be finite in [0, 1]")
+                    normalized[destination] = float(value)
+                result[block_name][method][horizon] = normalized
+    return result
+
+
 def evaluate_cached_task_metrics(
     sequences: Sequence[CachedProtocolSequence],
     *,
@@ -1655,6 +2223,8 @@ def evaluate_cached_task_metrics(
     }
     raw_predictions: list[dict[str, object]] = []
     cache_hasher = hashlib.sha256()
+    association_events: list[AssociationEvent] = []
+    capacity_snapshots: list[CapacitySnapshot] = []
 
     for sequence in sequences:
         if not isinstance(sequence, CachedProtocolSequence):
@@ -1739,6 +2309,19 @@ def evaluate_cached_task_metrics(
             raw_predictions.append(raw_prediction)
 
             for method in methods:
+                association_events.extend(
+                    build_association_events(
+                        payloads[:horizon],
+                        coordinated.online_steps[method][endpoint],
+                        method=method,
+                        reference_scene_id=sequence.reference_scene_id,
+                        master_sequence_id=sequence.master_sequence_id,
+                        order_id=sequence.order_id,
+                        prefix=horizon,
+                        cache_digest=coordinated.content_digest,
+                        background_class=background_class,
+                    )
+                )
                 strict_prediction = _remap_metric_prediction(
                     coordinated.online_predictions[method][endpoint], class_mapper
                 )
@@ -1750,6 +2333,13 @@ def evaluate_cached_task_metrics(
                     class_mapper,
                 )
                 offline_metrics[method][horizon].update(offline_prediction, target)
+            if "B4" in methods:
+                capacity_snapshots.extend(
+                    build_capacity_snapshots(
+                        coordinated.online_steps["B4"][endpoint],
+                        horizon=horizon,
+                    )
+                )
             oracle_prediction = _remap_metric_prediction(
                 build_offline_reconstructed_prediction(
                     oracle_accumulator, endpoint=endpoint
@@ -1764,7 +2354,7 @@ def evaluate_cached_task_metrics(
             method: {
                 horizon: dict(values) for horizon, values in raw_result.items()
             }
-            for method in all_methods
+            for method in methods
         },
         "strict": {
             method: {
@@ -1793,6 +2383,8 @@ def evaluate_cached_task_metrics(
         metric_blocks=metric_blocks,
         fingerprints=fingerprints,
         sequence_count=len(sequences),
+        association_events=tuple(association_events),
+        capacity_snapshots=tuple(capacity_snapshots),
     )
 
 
@@ -2037,8 +2629,10 @@ __all__ = [
     "TaskMetricEvaluation",
     "atomic_manifest_payload",
     "atomic_manifest_publish",
+    "build_association_events",
     "build_atomic_manifest_payload",
     "build_cache_provenance",
+    "build_capacity_snapshots",
     "build_rio_class_mapper",
     "build_temporal_target",
     "build_tracker_factories",
@@ -2050,6 +2644,7 @@ __all__ = [
     "load_cached_protocol_sequences",
     "load_or_create_cache_entry",
     "materialize_prediction_cache",
+    "normalize_official_metric_blocks",
     "observation_content_digest",
     "prefix_causality_coordinator",
     "publish_manifest_atomic",
