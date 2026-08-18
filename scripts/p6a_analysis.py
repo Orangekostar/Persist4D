@@ -346,6 +346,13 @@ class AssociationEvent:
             raise ValueError("prediction events require query_id")
         if self.gt_present is True and self.gt_entity_id is None:
             raise ValueError("gt_present=True requires gt_entity_id")
+        if self.id_switch is True and (
+            self.prediction_present is not True
+            or self.predicted_identity_id is None
+        ):
+            raise ValueError(
+                "id_switch requires prediction_present=True and predicted_identity_id"
+            )
         if self.prediction_present is False and self.predicted_identity_id is not None:
             raise ValueError(
                 "prediction_present=False cannot contain predicted identity"
@@ -356,8 +363,10 @@ class AssociationEvent:
             self.transition_opportunity is True
             or self.id_switch is True
             or self.gap_opportunity is True
-        ) and self.gt_entity_id is None:
-            raise ValueError("identity and gap opportunities require a GT entity")
+        ) and (self.gt_entity_id is None or self.gt_present is False):
+            raise ValueError(
+                "identity and gap opportunities require gt_present=True and a GT entity"
+            )
         if self.reactivation_attempt is True and self.gap_opportunity is not True:
             raise ValueError("reactivation_attempt requires a gap opportunity")
         if self.reactivation_attempt is True and self.reactivation is not True:
@@ -1525,6 +1534,25 @@ def _raw_metric_tree_valid(value: object) -> bool:
     return _unit_interval(value) is not None
 
 
+def _raw_metric_tree_shape(value: object) -> tuple[object, ...]:
+    """Return a value-independent signature for a raw metric tree."""
+
+    if isinstance(value, Mapping):
+        entries = []
+        for key, item in value.items():
+            key_signature = (
+                type(key).__module__,
+                type(key).__qualname__,
+                repr(key),
+            )
+            entries.append((key_signature, _raw_metric_tree_shape(item)))
+        entries.sort(key=lambda entry: entry[0])
+        return ("mapping", tuple(entries))
+    if isinstance(value, (list, tuple)):
+        return ("sequence", tuple(_raw_metric_tree_shape(item) for item in value))
+    return ("scalar",)
+
+
 def _raw_values(values: object) -> list[float]:
     if isinstance(values, Mapping):
         output: list[float] = []
@@ -1690,10 +1718,17 @@ def _gate_g6a3(data: Mapping[str, object], config: GateConfig) -> dict[str, obje
             set(fingerprints) if isinstance(fingerprints, Mapping) else set()
         )
         method_arrays = [_raw_values(value) for value in raw.values()]
+        raw_trees_valid = all(_raw_metric_tree_valid(value) for value in raw.values())
+        method_shapes = [
+            _raw_metric_tree_shape(value) for value in raw.values()
+        ]
+        raw_tree_shape_equal = bool(method_shapes) and all(
+            shape == method_shapes[0] for shape in method_shapes[1:]
+        )
         comparable = (
             len(method_arrays) >= 2
             and raw_methods == fingerprint_methods
-            and all(_raw_metric_tree_valid(value) for value in raw.values())
+            and raw_trees_valid
             and bool(method_arrays[0])
             and all(len(array) == len(method_arrays[0]) for array in method_arrays)
             and all(0.0 <= value <= 1.0 for array in method_arrays for value in array)
@@ -1703,8 +1738,10 @@ def _gate_g6a3(data: Mapping[str, object], config: GateConfig) -> dict[str, obje
             for array in method_arrays[1:]
             for index in range(len(method_arrays[0]))
         )
+        numeric_equal = numeric_equal and raw_tree_shape_equal
     else:
         numeric_equal = False
+        raw_tree_shape_equal = False
     passed = fingerprint_equal and numeric_equal
     return _gate_result(
         passed,
@@ -1713,6 +1750,7 @@ def _gate_g6a3(data: Mapping[str, object], config: GateConfig) -> dict[str, obje
             "raw_metric_range": max(numeric_values) - min(numeric_values)
             if numeric_values
             else None,
+            "raw_metric_tree_shape_equal": raw_tree_shape_equal,
             "numeric_equal": numeric_equal,
         },
         threshold={"absolute_tolerance": config.g6a3_abs_tolerance},

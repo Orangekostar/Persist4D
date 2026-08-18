@@ -172,6 +172,43 @@ def test_identity_and_gap_opportunities_require_a_gt_entity(
         )
 
 
+@pytest.mark.parametrize(
+    "opportunity",
+    ["transition_opportunity", "id_switch", "gap_opportunity"],
+)
+def test_identity_and_gap_opportunities_require_gt_presence(
+    opportunity: str,
+) -> None:
+    flags: dict[str, object] = {opportunity: True}
+    if opportunity == "id_switch":
+        flags["transition_opportunity"] = True
+    with pytest.raises(ValueError, match="gt_present"):
+        validate_association_events(
+            [_event(gt_present=False, gt_entity_id=7, **flags)]
+        )
+
+
+@pytest.mark.parametrize(
+    ("prediction_present", "predicted_identity_id"),
+    [(False, 10), (None, 10), (True, None)],
+)
+def test_id_switch_requires_explicit_predicted_identity(
+    prediction_present: object,
+    predicted_identity_id: object,
+) -> None:
+    with pytest.raises(ValueError, match="id_switch"):
+        validate_association_events(
+            [
+                _event(
+                    transition_opportunity=True,
+                    id_switch=True,
+                    prediction_present=prediction_present,
+                    predicted_identity_id=predicted_identity_id,
+                )
+            ]
+        )
+
+
 def test_event_table_reconstructs_identity_and_reactivation_aggregates() -> None:
     rows = [
         _event(stage_id=0, query_id="q0", association_result="birth", new_birth=True),
@@ -779,6 +816,28 @@ def test_local_invariance_gate_rejects_invalid_fingerprints(
 
 @pytest.mark.parametrize("raw", [0.5, [0.5, 0.5]])
 def test_local_invariance_gate_requires_method_wise_metrics(raw: object) -> None:
+    values = _gate_input()
+    values["raw_local_ap"] = raw
+    assert evaluate_gates(values)["G6A-3"]["passed"] is False
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        {
+            "Persist4D": {"T2": [0.5, 0.6]},
+            "EMA": {"T3": [0.5, 0.6]},
+        },
+        {
+            "Persist4D": {"T2": [0.5, 0.6]},
+            "EMA": {"T2": [0.5], "T3": [0.6]},
+        },
+        {"Persist4D": [[0.5, 0.6]], "EMA": [0.5, 0.6]},
+    ],
+)
+def test_local_invariance_gate_requires_identical_raw_metric_tree_shape(
+    raw: object,
+) -> None:
     values = _gate_input()
     values["raw_local_ap"] = raw
     assert evaluate_gates(values)["G6A-3"]["passed"] is False
