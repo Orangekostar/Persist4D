@@ -193,6 +193,7 @@ def _validate_records(records: object) -> list[_Row]:
         groups.setdefault((str(record["row_type"]), int(record["T"])), []).append(record)
     if set(groups) != expected:
         raise ValueError("records do not cover the exact bootstrap/new_visit/full_history groups")
+    expected_master_references: dict[str, str] | None = None
     for key, group in groups.items():
         if len(group) != _EXPECTED_GROUP_COUNTS[key]:
             raise ValueError(f"records coverage for {key} must contain exactly 129 rows")
@@ -210,6 +211,16 @@ def _validate_records(records: object) -> list[_Row]:
         ):
             raise ValueError(
                 f"records coverage for {key} must contain canonical/reverse/sha256_seed45 per master"
+            )
+        master_references = {
+            master: str(master_rows[0]["reference_scene_id"])
+            for master, master_rows in by_master.items()
+        }
+        if expected_master_references is None:
+            expected_master_references = master_references
+        elif master_references != expected_master_references:
+            raise ValueError(
+                "records must preserve one master/reference mapping across all groups"
             )
     ordered = sorted(normalized, key=_record_sort_key)
     if normalized != ordered:
@@ -305,6 +316,15 @@ def _mean(records: Sequence[Mapping[str, object]], field: str) -> float:
     return sum(values) / len(values)
 
 
+def _mean_total(
+    records: Sequence[Mapping[str, object]], *fields: str
+) -> float:
+    return sum(
+        sum(float(record[field]) for field in fields)
+        for record in records
+    ) / len(records)
+
+
 def _max_positive(records: Sequence[Mapping[str, object]], field: str) -> int:
     return max(int(record[field]) for record in records)
 
@@ -333,7 +353,9 @@ def aggregate_efficiency_rows(
     bootstrap = by_group[("bootstrap", 1)]
     bootstrap_values = {
         "count": len(bootstrap),
-        "bootstrap_latency_ms": _mean(bootstrap, "model_latency_ms"),
+        "bootstrap_latency_ms": _mean_total(
+            bootstrap, "model_latency_ms", "tracker_latency_ms"
+        ),
         "gpu_peak_memory_bytes": _max_positive(bootstrap, "gpu_peak_memory_bytes"),
         "persistent_state_bytes": _max_positive(bootstrap, "persistent_state_bytes"),
     }
@@ -365,7 +387,9 @@ def aggregate_efficiency_rows(
                     "row_type": "new_visit",
                     "count": len(group),
                     "bootstrap_latency_ms": None,
-                    "new_visit_latency_ms": _mean(group, "model_latency_ms"),
+                    "new_visit_latency_ms": _mean_total(
+                        group, "model_latency_ms", "tracker_latency_ms"
+                    ),
                     "association_overhead_ms": _mean(group, "association_overhead_ms"),
                     "memory_update_overhead_ms": _mean(group, "memory_update_overhead_ms"),
                     "full_history_latency_ms": None,

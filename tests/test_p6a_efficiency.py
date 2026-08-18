@@ -158,7 +158,7 @@ def test_aggregate_efficiency_rows_reuses_bootstrap_raw_values_for_all_horizons(
 
     bootstrap = [row for row in rows if row["row_type"] == "bootstrap"]
     assert all(row["stage_id"] == 0 and row["count"] == 129 for row in bootstrap)
-    assert {row["bootstrap_latency_ms"] for row in bootstrap} == {23.0}
+    assert {row["bootstrap_latency_ms"] for row in bootstrap} == {26.0}
     assert {row["new_visit_latency_ms"] for row in bootstrap} == {None}
     assert {row["association_overhead_ms"] for row in bootstrap} == {None}
     assert {row["gpu_peak_memory_bytes"] for row in bootstrap} == {142}
@@ -166,7 +166,7 @@ def test_aggregate_efficiency_rows_reuses_bootstrap_raw_values_for_all_horizons(
 
     new_visit = [row for row in rows if row["row_type"] == "new_visit"]
     assert all(row["stage_id"] == row["T"] - 1 for row in new_visit)
-    assert [row["new_visit_latency_ms"] for row in new_visit] == [24.0, 25.0, 26.0, 27.0]
+    assert [row["new_visit_latency_ms"] for row in new_visit] == [27.0, 28.0, 29.0, 30.0]
     assert all(row["association_overhead_ms"] == 1.0 for row in new_visit)
     assert all(row["memory_update_overhead_ms"] == 1.0 for row in new_visit)
     assert all(row["count"] == 129 for row in new_visit)
@@ -215,4 +215,18 @@ def test_manifest_requires_exact_coverage_and_tracker_decomposition() -> None:
 
     records = _records()[:-1]
     with pytest.raises(ValueError, match="coverage|record"):
+        _manifest(records)
+
+
+def test_manifest_requires_one_master_reference_mapping_across_all_groups() -> None:
+    records = _records()
+    for record in records:
+        if (
+            record["row_type"] == "new_visit"
+            and record["T"] == 2
+            and record["master_sequence_id"] == "master-00"
+        ):
+            record["master_sequence_id"] = "master-99"
+
+    with pytest.raises(ValueError, match="master/reference mapping"):
         _manifest(records)
