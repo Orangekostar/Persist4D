@@ -837,6 +837,18 @@ def test_official_metric_blocks_are_normalized_without_mixing_raw_and_temporal()
 
     normalized = normalize_official_metric_blocks(blocks)
 
+    assert set(normalized["raw"]["B4"]["T2"]) == {
+        "AP",
+        "AP50",
+        "AP25",
+        "REC",
+        "t_mAP",
+        "t_mAP50",
+        "t_mAP25",
+        "t_REC",
+        "t_REC50",
+        "t_REC25",
+    }
     assert normalized["raw"]["B4"]["T2"]["AP"] == pytest.approx(0.1)
     assert normalized["raw"]["B4"]["T2"]["t_mAP"] is None
     assert normalized["strict"]["B4"]["T2"]["AP"] is None

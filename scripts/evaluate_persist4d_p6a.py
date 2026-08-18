@@ -2203,7 +2203,8 @@ def normalize_official_metric_blocks(
                         or not 0.0 <= float(value) <= 1.0
                     ):
                         raise ValueError("official metric values must be finite in [0, 1]")
-                    normalized[destination] = float(value)
+                    if destination in normalized:
+                        normalized[destination] = float(value)
                 result[block_name][method][horizon] = normalized
     return result
 
