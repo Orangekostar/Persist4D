@@ -15,6 +15,7 @@ import json
 import math
 from collections.abc import Hashable, Mapping, Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from types import MappingProxyType
 from typing import Any
 
@@ -26,6 +27,8 @@ _STAGE_KEYS = ("temporal_stages", "timesteps", "stage_ids")
 _MASK_KEY = "pred_masks"
 _TARGET_MASK_KEY = "masks"
 _OFFICIAL_IOU_THRESHOLDS = (0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9)
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+_DEFAULT_DATASET_SPEC = _PROJECT_ROOT / "data/processed/rio/rio.yaml"
 
 
 def _clone_cpu(value: Any) -> Any:
@@ -55,14 +58,10 @@ def _canonical(value: Any) -> Any:
     if isinstance(value, Mapping):
         items = sorted(value.items(), key=lambda item: repr(item[0]))
         return {
-            "__mapping__": [
-                [_canonical(key), _canonical(item)] for key, item in items
-            ]
+            "__mapping__": [[_canonical(key), _canonical(item)] for key, item in items]
         }
     if isinstance(value, (list, tuple)):
-        return {
-            "__sequence__": [_canonical(item) for item in value]
-        }
+        return {"__sequence__": [_canonical(item) for item in value]}
     if isinstance(value, bytes):
         return {"__bytes__": base64.b64encode(value).decode("ascii")}
     if isinstance(value, (str, int, bool)) or value is None:
@@ -170,12 +169,15 @@ def _prediction_copy(prediction: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError(  # noqa: TRY004 - public input validation uses ValueError.
             "pred_classes and pred_scores must be tensors"
         )
-    if classes.ndim != 1 or scores.ndim != 1 or masks.shape[1] != len(classes) or len(classes) != len(scores):
+    if (
+        classes.ndim != 1
+        or scores.ndim != 1
+        or masks.shape[1] != len(classes)
+        or len(classes) != len(scores)
+    ):
         raise ValueError("prediction fields must agree on query count")
     return {
-        key: _clone_cpu(value)
-        for key, value in prediction.items()
-        if key in required
+        key: _clone_cpu(value) for key, value in prediction.items() if key in required
     }
 
 
@@ -220,6 +222,9 @@ def adapt_raw_local_target(
     else:
         copied[_TARGET_MASK_KEY] = masks.detach().cpu().clone()
     copied[_TARGET_MASK_KEY] = copied[_TARGET_MASK_KEY].bool()
+    copied["temporal_stages"] = torch.zeros(
+        copied[_TARGET_MASK_KEY].shape[1], dtype=torch.long
+    )
     return copied
 
 
@@ -231,7 +236,17 @@ def adapt_raw_local_pair(
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     if stage is None:
         selector = _stage_selector(target, None)
-        stage = None if selector is None else int(torch.as_tensor(target[next(key for key in _STAGE_KEYS if key in target)]).max().item())
+        stage = (
+            None
+            if selector is None
+            else int(
+                torch.as_tensor(
+                    target[next(key for key in _STAGE_KEYS if key in target)]
+                )
+                .max()
+                .item()
+            )
+        )
     return (
         adapt_raw_local_prediction(prediction, target, stage=stage),
         adapt_raw_local_target(target, stage=stage),
@@ -306,10 +321,16 @@ class IdentityAccumulator:
         if len(set(track_ids_tuple)) != len(track_ids_tuple):
             raise ValueError("track_ids must be unique within a stage")
         classes = _as_int_tuple(normalized["pred_classes"], name="pred_classes")
-        scores = tuple(float(item) for item in normalized["pred_scores"].detach().cpu().tolist())
+        scores = tuple(
+            float(item) for item in normalized["pred_scores"].detach().cpu().tolist()
+        )
         class_probs = prediction.get("class_probs", prediction.get("class_prob"))
         if class_probs is not None:
-            if not isinstance(class_probs, Tensor) or class_probs.ndim != 2 or class_probs.shape[0] != query_count:
+            if (
+                not isinstance(class_probs, Tensor)
+                or class_probs.ndim != 2
+                or class_probs.shape[0] != query_count
+            ):
                 raise ValueError("class_probs must have shape [K, C]")
             if not torch.isfinite(class_probs).all().item():
                 raise ValueError("class_probs must be finite")
@@ -368,12 +389,20 @@ class IdentityAccumulator:
             class_value = int(torch.argmax(mean_prob).item())
         else:
             class_value = observations[-1][0].classes[observations[-1][1]]
-        score = sum(stage.scores[index] for stage, index in observations) / len(observations)
+        score = sum(stage.scores[index] for stage, index in observations) / len(
+            observations
+        )
         return class_value, float(score)
 
-    def build_prediction(self, endpoint: int | None = None) -> dict[str, Any]:
-        stages = self._selected_stages(endpoint)
-        if not stages:
+    def build_prediction(
+        self,
+        endpoint: int | None = None,
+        *,
+        state_endpoint: int | None = None,
+    ) -> dict[str, Any]:
+        mask_stages = self._selected_stages(endpoint)
+        state_stages = self._selected_stages(state_endpoint)
+        if not mask_stages:
             return {
                 _MASK_KEY: torch.zeros((0, 0), dtype=torch.bool),
                 "pred_classes": torch.zeros(0, dtype=torch.long),
@@ -381,13 +410,13 @@ class IdentityAccumulator:
                 "track_ids": torch.zeros(0, dtype=torch.long),
             }
         identities = sorted(
-            {track_id for stage in stages for track_id in stage.track_ids},
+            {track_id for stage in mask_stages for track_id in stage.track_ids},
             key=_stable_key,
         )
         if not identities:
             return {
                 _MASK_KEY: torch.zeros(
-                    (sum(stage.masks.shape[0] for stage in stages), 0),
+                    (sum(stage.masks.shape[0] for stage in mask_stages), 0),
                     dtype=torch.bool,
                 ),
                 "pred_classes": torch.zeros(0, dtype=torch.long),
@@ -396,16 +425,23 @@ class IdentityAccumulator:
             }
         lookup = {track_id: column for column, track_id in enumerate(identities)}
         masks = torch.zeros(
-            (sum(stage.masks.shape[0] for stage in stages), len(identities)),
+            (sum(stage.masks.shape[0] for stage in mask_stages), len(identities)),
             dtype=torch.bool,
         )
         offset = 0
-        for stage in stages:
+        for stage in mask_stages:
             for query, track_id in enumerate(stage.track_ids):
-                masks[offset : offset + stage.masks.shape[0], lookup[track_id]] = stage.masks[:, query]
+                masks[offset : offset + stage.masks.shape[0], lookup[track_id]] = (
+                    stage.masks[:, query]
+                )
             offset += stage.masks.shape[0]
-        classes, scores = zip(*(self._track_state(track_id, stages) for track_id in identities))
-        if all(isinstance(track_id, int) and not isinstance(track_id, bool) for track_id in identities):
+        classes, scores = zip(
+            *(self._track_state(track_id, state_stages) for track_id in identities)
+        )
+        if all(
+            isinstance(track_id, int) and not isinstance(track_id, bool)
+            for track_id in identities
+        ):
             track_tensor: Any = torch.tensor(identities, dtype=torch.long)
         else:
             track_tensor = tuple(identities)
@@ -422,15 +458,17 @@ def build_online_endpoint_prediction(
 ) -> dict[str, Any]:
     if not isinstance(accumulator, IdentityAccumulator):
         raise TypeError("accumulator must be an IdentityAccumulator")
-    return accumulator.snapshot(endpoint).build_prediction()
+    return accumulator.build_prediction(endpoint, state_endpoint=endpoint)
 
 
 def build_offline_reconstructed_prediction(
     accumulator: IdentityAccumulator,
+    *,
+    endpoint: int | None = None,
 ) -> dict[str, Any]:
     if not isinstance(accumulator, IdentityAccumulator):
         raise TypeError("accumulator must be an IdentityAccumulator")
-    return accumulator.snapshot().build_prediction()
+    return accumulator.build_prediction(endpoint, state_endpoint=None)
 
 
 def _mask_iou_matrix(gt_masks: Tensor, pred_masks: Tensor) -> Tensor:
@@ -446,7 +484,11 @@ def _mask_iou_matrix(gt_masks: Tensor, pred_masks: Tensor) -> Tensor:
 def _normalize_iou_matrix(ious: Tensor | Sequence[Sequence[float]]) -> Tensor:
     if not isinstance(ious, Tensor) and isinstance(ious, Sequence) and not ious:
         return torch.empty((0, 0), dtype=torch.float32)
-    matrix = ious.detach().cpu().float() if isinstance(ious, Tensor) else torch.as_tensor(ious, dtype=torch.float32)
+    matrix = (
+        ious.detach().cpu().float()
+        if isinstance(ious, Tensor)
+        else torch.as_tensor(ious, dtype=torch.float32)
+    )
     if matrix.ndim != 2:
         raise ValueError("IoU matrix must have shape [G, K]")
     if not torch.isfinite(matrix).all().item():
@@ -463,7 +505,12 @@ def _class_mask(
         return torch.ones(shape, dtype=torch.bool)
     gt = torch.as_tensor(gt_classes).detach().cpu()
     pred = torch.as_tensor(pred_classes).detach().cpu()
-    if gt.ndim != 1 or pred.ndim != 1 or tuple(gt.shape) != (shape[0],) or tuple(pred.shape) != (shape[1],):
+    if (
+        gt.ndim != 1
+        or pred.ndim != 1
+        or tuple(gt.shape) != (shape[0],)
+        or tuple(pred.shape) != (shape[1],)
+    ):
         raise ValueError("class vectors must align with IoU matrix")
     return gt[:, None] == pred[None, :]
 
@@ -486,10 +533,23 @@ def global_hungarian_match(
         gt_tensor = torch.as_tensor(ious)
         pred_tensor = torch.as_tensor(pred_masks)
         if gt_tensor.numel() == 0 or pred_tensor.numel() == 0:
-            matrix = torch.empty((int(gt_tensor.shape[0]) if gt_tensor.ndim == 2 else 0, int(pred_tensor.shape[1]) if pred_tensor.ndim == 2 else 0))
-        elif gt_tensor.ndim == 2 and pred_tensor.ndim == 2 and gt_tensor.shape[1] == pred_tensor.shape[0]:
+            matrix = torch.empty(
+                (
+                    int(gt_tensor.shape[0]) if gt_tensor.ndim == 2 else 0,
+                    int(pred_tensor.shape[1]) if pred_tensor.ndim == 2 else 0,
+                )
+            )
+        elif (
+            gt_tensor.ndim == 2
+            and pred_tensor.ndim == 2
+            and gt_tensor.shape[1] == pred_tensor.shape[0]
+        ):
             matrix = _mask_iou_matrix(gt_tensor, pred_tensor.transpose(0, 1))
-        elif gt_tensor.ndim == 2 and pred_tensor.ndim == 2 and gt_tensor.shape[1] == pred_tensor.shape[1]:
+        elif (
+            gt_tensor.ndim == 2
+            and pred_tensor.ndim == 2
+            and gt_tensor.shape[1] == pred_tensor.shape[1]
+        ):
             matrix = _mask_iou_matrix(gt_tensor, pred_tensor)
         else:
             raise ValueError("GT and prediction masks must share point dimension")
@@ -549,7 +609,10 @@ def greedy_diagnostic_match(
         ]
         if not candidates:
             continue
-        col = min(candidates, key=lambda candidate: (-float(matrix[row, candidate]), candidate))
+        col = min(
+            candidates,
+            key=lambda candidate: (-float(matrix[row, candidate]), candidate),
+        )
         used.add(col)
         result.append((row, col))
     return result
@@ -613,7 +676,9 @@ def _single_frame_scores(
     matched: set[int] = set()
     y_true: list[bool] = []
     scores: list[float] = []
-    for pred_index in sorted(range(pred_masks.shape[1]), key=lambda idx: (-float(pred_scores[idx]), idx)):
+    for pred_index in sorted(
+        range(pred_masks.shape[1]), key=lambda idx: (-float(pred_scores[idx]), idx)
+    ):
         compatible = [
             gt_index
             for gt_index in range(gt_masks.shape[0])
@@ -622,7 +687,9 @@ def _single_frame_scores(
             and float(ious[gt_index, pred_index]) >= threshold
         ]
         if compatible:
-            gt_index = max(compatible, key=lambda idx: (float(ious[idx, pred_index]), -idx))
+            gt_index = max(
+                compatible, key=lambda idx: (float(ious[idx, pred_index]), -idx)
+            )
             matched.add(gt_index)
             y_true.append(True)
         else:
@@ -653,7 +720,9 @@ def compute_raw_local_metrics(
     for prediction, target in zip(predictions, targets, strict=True):
         prediction, target = adapt_raw_local_pair(prediction, target)
         for key, threshold in thresholds.items():
-            y_true, scores, gt_count, matched = _single_frame_scores(prediction, target, threshold)
+            y_true, scores, gt_count, matched = _single_frame_scores(
+                prediction, target, threshold
+            )
             ap = _average_precision(y_true, scores, gt_count)
             if ap is not None:
                 ap_values[key].append(ap)
@@ -666,23 +735,33 @@ def compute_raw_local_metrics(
             all_rec[threshold].append((matched, gt_count))
         ap_thresholds: list[float] = []
         for threshold in _OFFICIAL_IOU_THRESHOLDS:
-            y_true, scores, count, _ = _single_frame_scores(prediction, target, threshold)
+            y_true, scores, count, _ = _single_frame_scores(
+                prediction, target, threshold
+            )
             value = _average_precision(y_true, scores, count)
             if value is not None:
                 ap_thresholds.append(value)
         if ap_thresholds:
             all_ap.append(sum(ap_thresholds) / len(ap_thresholds))
+
     def mean(values: Sequence[float]) -> float:
         return float(sum(values) / len(values)) if values else 0.0
+
     def recall(values: Sequence[tuple[int, int]]) -> float:
         denominator = sum(total for _, total in values)
-        return float(sum(found for found, _ in values) / denominator) if denominator else 0.0
+        return (
+            float(sum(found for found, _ in values) / denominator)
+            if denominator
+            else 0.0
+        )
 
     result = {
         "AP": mean(all_ap),
         "AP50": mean(ap_values["AP50"]),
         "AP25": mean(ap_values["AP25"]),
-        "REC": mean([recall(all_rec[threshold]) for threshold in _OFFICIAL_IOU_THRESHOLDS]),
+        "REC": mean(
+            [recall(all_rec[threshold]) for threshold in _OFFICIAL_IOU_THRESHOLDS]
+        ),
         "REC50": recall(rec_values["AP50"]),
         "REC25": recall(rec_values["AP25"]),
     }
@@ -690,20 +769,29 @@ def compute_raw_local_metrics(
     return result
 
 
-def _target_stages(targets: Mapping[str, Any] | Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+def _target_stages(
+    targets: Mapping[str, Any] | Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
     if isinstance(targets, Mapping):
         key = next((name for name in _STAGE_KEYS if name in targets), None)
         if key is None:
             return [adapt_raw_local_target(targets)]
         stages = torch.as_tensor(targets[key]).detach().cpu()
-        return [adapt_raw_local_target(targets, stage=int(stage)) for stage in torch.unique(stages, sorted=True).tolist()]
+        return [
+            adapt_raw_local_target(targets, stage=int(stage))
+            for stage in torch.unique(stages, sorted=True).tolist()
+        ]
     result: list[dict[str, Any]] = []
     for index, target in enumerate(targets):
         key = next((name for name in _STAGE_KEYS if name in target), None)
         if key is None or torch.unique(torch.as_tensor(target[key])).numel() <= 1:
-            result.append(adapt_raw_local_target(target, stage=index if key is None else None))
+            result.append(
+                adapt_raw_local_target(target, stage=index if key is None else None)
+            )
         else:
-            for stage in torch.unique(torch.as_tensor(target[key]), sorted=True).tolist():
+            for stage in torch.unique(
+                torch.as_tensor(target[key]), sorted=True
+            ).tolist():
                 result.append(adapt_raw_local_target(target, stage=int(stage)))
     return result
 
@@ -725,13 +813,21 @@ def _temporal_scores(
     for target in targets:
         point_count = target["masks"].shape[1]
         stage_masks = pred_masks[offset : offset + point_count]
-        iou_by_stage.append(_mask_iou_matrix(target["masks"], stage_masks.transpose(0, 1)))
+        iou_by_stage.append(
+            _mask_iou_matrix(target["masks"], stage_masks.transpose(0, 1))
+        )
         offset += point_count
-    temporal_ious = torch.stack(iou_by_stage).amin(dim=0) if iou_by_stage else torch.zeros((gt_count, pred_masks.shape[1]))
+    temporal_ious = (
+        torch.stack(iou_by_stage).amin(dim=0)
+        if iou_by_stage
+        else torch.zeros((gt_count, pred_masks.shape[1]))
+    )
     matched: set[int] = set()
     y_true: list[bool] = []
     scores: list[float] = []
-    for pred_index in sorted(range(pred_masks.shape[1]), key=lambda idx: (-float(pred_scores[idx]), idx)):
+    for pred_index in sorted(
+        range(pred_masks.shape[1]), key=lambda idx: (-float(pred_scores[idx]), idx)
+    ):
         compatible = [
             gt_index
             for gt_index in range(gt_count)
@@ -740,7 +836,10 @@ def _temporal_scores(
             and float(temporal_ious[gt_index, pred_index]) >= threshold
         ]
         if compatible:
-            gt_index = max(compatible, key=lambda idx: (float(temporal_ious[idx, pred_index]), -idx))
+            gt_index = max(
+                compatible,
+                key=lambda idx: (float(temporal_ious[idx, pred_index]), -idx),
+            )
             matched.add(gt_index)
             y_true.append(True)
         else:
@@ -756,7 +855,9 @@ def _temporal_metric_values(
     ap_by_threshold: dict[float, float] = {}
     rec_by_threshold: dict[float, float] = {}
     for threshold in (0.5, 0.25):
-        y_true, scores, gt_count, matched = _temporal_scores(prediction, targets, threshold)
+        y_true, scores, gt_count, matched = _temporal_scores(
+            prediction, targets, threshold
+        )
         ap_by_threshold[threshold] = _average_precision(y_true, scores, gt_count) or 0.0
         rec_by_threshold[threshold] = matched / gt_count if gt_count else 0.0
     ap_values = []
@@ -793,15 +894,171 @@ def compute_endpoint_metrics(
         build_offline_reconstructed_prediction(accumulator), offline_targets
     )
     result = {f"online_{key}": value for key, value in online.items()}
-    result.update({f"offline_reconstructed_{key}": value for key, value in offline.items()})
     result.update(
-        {
-            key.replace("t-", "t_"): value
-            for key, value in result.items()
-            if "t-" in key
-        }
+        {f"offline_reconstructed_{key}": value for key, value in offline.items()}
+    )
+    result.update(
+        {key.replace("t-", "t_"): value for key, value in result.items() if "t-" in key}
     )
     return result
+
+
+class OfficialMetricAccumulator:
+    """Thin adapter around the frozen stmetrics AP/temporal semantics."""
+
+    _MODES = frozenset({"raw_local", "strict_online", "offline_reconstructed"})
+
+    def __init__(
+        self,
+        *,
+        mode: str,
+        dataset_spec: str | Path = _DEFAULT_DATASET_SPEC,
+        min_region_size: int = 100,
+    ) -> None:
+        if mode not in self._MODES:
+            raise ValueError(f"mode must be one of {sorted(self._MODES)}")
+        specification = Path(dataset_spec)
+        if not specification.is_file():
+            raise ValueError("dataset_spec must be an existing dataset YAML")
+        if (
+            isinstance(min_region_size, bool)
+            or not isinstance(min_region_size, int)
+            or min_region_size <= 0
+        ):
+            raise ValueError("min_region_size must be a positive integer")
+
+        from stmetrics import InstanceMetrics, LegacyAPEvaluator, TemporalEvaluator
+
+        head = (
+            LegacyAPEvaluator(recall=True, aux="changes")
+            if mode == "raw_local"
+            else TemporalEvaluator(recall=True, aux="changes")
+        )
+        self.mode = mode
+        self._updates = 0
+        self._metric = InstanceMetrics(
+            dataset=str(specification),
+            heads=[head],
+            log_prefix="val",
+            min_region_size=min_region_size,
+            timestep_key="temporal_stages",
+        )
+
+    def update(self, prediction: Mapping[str, Any], target: Mapping[str, Any]) -> None:
+        if self.mode == "raw_local":
+            normalized_prediction, normalized_target = adapt_raw_local_pair(
+                prediction, target
+            )
+        else:
+            normalized_prediction = _prediction_copy(prediction)
+            normalized_target = _clone_cpu(target)
+        required_target = {
+            "masks",
+            "labels",
+            "ids",
+            "changes",
+            "temporal_stages",
+        }
+        if not isinstance(normalized_target, Mapping) or not required_target.issubset(
+            normalized_target
+        ):
+            raise ValueError(
+                "official metric target must contain masks, labels, ids, changes, "
+                "and temporal_stages"
+            )
+        self._metric.update([normalized_prediction], [normalized_target])
+        self._updates += 1
+
+    def compute(self) -> dict[str, float]:
+        if self._updates == 0:
+            raise ValueError("official metric accumulator has no observations")
+        computed = self._metric.compute()
+        if self.mode == "raw_local":
+            mapping = {
+                "raw_local_AP": "val_mean_AP",
+                "raw_local_AP50": "val_mean_AP_50",
+                "raw_local_AP25": "val_mean_AP_25",
+                "raw_local_REC": "val_mean_REC",
+                "raw_local_REC50": "val_mean_REC_50",
+                "raw_local_REC25": "val_mean_REC_25",
+            }
+        else:
+            prefix = (
+                "online" if self.mode == "strict_online" else "offline_reconstructed"
+            )
+            mapping = {
+                f"{prefix}_t-mAP": "val_mean_t-AP",
+                f"{prefix}_t-mAP50": "val_mean_t-AP_50",
+                f"{prefix}_t-mAP25": "val_mean_t-AP_25",
+                f"{prefix}_t-REC": "val_mean_t-REC",
+                f"{prefix}_t-REC50": "val_mean_t-REC_50",
+                f"{prefix}_t-REC25": "val_mean_t-REC_25",
+            }
+        result: dict[str, float] = {}
+        for output_key, source_key in mapping.items():
+            if source_key not in computed:
+                raise ValueError(f"stmetrics did not emit required key {source_key}")
+            value = computed[source_key]
+            if isinstance(value, Tensor):
+                if value.numel() != 1:
+                    raise ValueError(f"stmetrics key {source_key} must be scalar")
+                value = value.detach().cpu().item()
+            number = float(value)
+            if not math.isfinite(number):
+                raise ValueError(f"stmetrics key {source_key} must be finite")
+            result[output_key] = number
+        return result
+
+
+def compute_official_raw_local_metrics(
+    predictions: Mapping[str, Any] | Sequence[Mapping[str, Any]],
+    targets: Mapping[str, Any] | Sequence[Mapping[str, Any]],
+    *,
+    dataset_spec: str | Path = _DEFAULT_DATASET_SPEC,
+    min_region_size: int = 100,
+) -> dict[str, float]:
+    if isinstance(predictions, Mapping):
+        predictions = [predictions]
+    if isinstance(targets, Mapping):
+        targets = [targets]
+    if len(predictions) != len(targets):
+        raise ValueError("predictions and targets must have equal length")
+    accumulator = OfficialMetricAccumulator(
+        mode="raw_local",
+        dataset_spec=dataset_spec,
+        min_region_size=min_region_size,
+    )
+    for prediction, target in zip(predictions, targets, strict=True):
+        accumulator.update(prediction, target)
+    return accumulator.compute()
+
+
+def compute_official_temporal_metrics(
+    predictions: Mapping[str, Any] | Sequence[Mapping[str, Any]],
+    targets: Mapping[str, Any] | Sequence[Mapping[str, Any]],
+    *,
+    mode: str = "strict_online",
+    dataset_spec: str | Path = _DEFAULT_DATASET_SPEC,
+    min_region_size: int = 100,
+) -> dict[str, float]:
+    if mode not in {"strict_online", "offline_reconstructed"}:
+        raise ValueError(
+            "temporal metric mode must be strict_online or offline_reconstructed"
+        )
+    if isinstance(predictions, Mapping):
+        predictions = [predictions]
+    if isinstance(targets, Mapping):
+        targets = [targets]
+    if len(predictions) != len(targets):
+        raise ValueError("predictions and targets must have equal length")
+    accumulator = OfficialMetricAccumulator(
+        mode=mode,
+        dataset_spec=dataset_spec,
+        min_region_size=min_region_size,
+    )
+    for prediction, target in zip(predictions, targets, strict=True):
+        accumulator.update(prediction, target)
+    return accumulator.compute()
 
 
 def relative_retention(numerator: float, denominator: float) -> float | None:
@@ -817,8 +1074,8 @@ def compute_retention(numerator: float, denominator: float) -> float | None:
 
 
 # Short aliases keep the pure layer convenient for protocol and analysis code.
-raw_local_metrics = compute_raw_local_metrics
-strict_online_metrics = compute_endpoint_metrics
+raw_local_metrics = compute_official_raw_local_metrics
+strict_online_metrics = compute_official_temporal_metrics
 hungarian_diagnostic_match = global_hungarian_match
 greedy_match = greedy_diagnostic_match
 
@@ -826,6 +1083,7 @@ greedy_match = greedy_diagnostic_match
 __all__ = [
     "FrozenRawObservation",
     "IdentityAccumulator",
+    "OfficialMetricAccumulator",
     "adapt_raw_local_pair",
     "adapt_raw_local_prediction",
     "adapt_raw_local_target",
@@ -833,6 +1091,8 @@ __all__ = [
     "build_offline_reconstructed_prediction",
     "build_online_endpoint_prediction",
     "compute_endpoint_metrics",
+    "compute_official_raw_local_metrics",
+    "compute_official_temporal_metrics",
     "compute_raw_local_metrics",
     "compute_retention",
     "freeze_raw_observation",
