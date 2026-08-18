@@ -144,9 +144,10 @@ class AssociationEvent:
     """One prediction decision or one GT-only miss decision.
 
     ``None`` means that a field is not applicable. In particular, no
-    negative/sentinel identity IDs are accepted. Optional evidence flags let
-    an adapter state the exact diagnostic decision without coupling this
-    module to tracker internals; missing flags are inferred where possible.
+    negative/sentinel identity IDs are accepted. Evidence flags let an adapter
+    state the exact diagnostic decision without coupling this module to
+    tracker internals. Reactivation flags are mandatory because partial rows
+    cannot reconstruct the preregistered accuracy/coverage denominators.
     """
 
     event_id: str
@@ -326,6 +327,9 @@ class AssociationEvent:
             raise ValueError("prediction_digest and cache_digest disagree")
         if self.is_failure is None:
             raise ValueError("is_failure must be explicit for every association event")
+        for name in ("gap_opportunity", "reactivation_attempt", "reactivation"):
+            if getattr(self, name) is None:
+                raise ValueError(f"{name} must be explicit for every association event")
 
         if event_kind == "gt_miss":
             if self.prediction_present is True:
@@ -348,10 +352,18 @@ class AssociationEvent:
             )
         if self.id_switch is True and self.transition_opportunity is False:
             raise ValueError("id_switch requires a transition opportunity")
+        if self.reactivation_attempt is True and self.gap_opportunity is not True:
+            raise ValueError("reactivation_attempt requires a gap opportunity")
+        if self.reactivation_attempt is True and self.reactivation is not True:
+            raise ValueError("reactivation_attempt requires a predicted reactivation")
         if self.reactivation_correct is not None and not (
             self.reactivation_attempt is True or self.reactivation is True
         ):
             raise ValueError("reactivation_correct requires a reactivation attempt")
+        if self.reactivation_correct is True and self.gt_entity_id is None:
+            raise ValueError("correct reactivation requires a GT entity")
+        if self.reactivation_correct is True and self.gap_opportunity is not True:
+            raise ValueError("correct reactivation requires a gap opportunity")
         if self.reactivation_correct is True and self.reactivation is not True:
             raise ValueError("correct reactivation requires a predicted reactivation")
         if self.reactivation is True and self.reactivation_correct is None:
@@ -391,6 +403,7 @@ def validate_association_events(
     result: list[AssociationEvent] = []
     event_ids: set[str] = set()
     decision_keys: set[tuple[object, ...]] = set()
+    gt_stage_keys: set[tuple[object, ...]] = set()
     for index, raw in enumerate(events):
         event = _coerce_event(raw)
         event.validate()
@@ -419,6 +432,13 @@ def validate_association_events(
         if key in decision_keys:
             raise ValueError(f"duplicate association decision at index {index}")
         decision_keys.add(key)
+        if event.gt_entity_id is not None and event.gt_present is not False:
+            gt_key = (*scope, event.stage_id, event.gt_entity_id)
+            if gt_key in gt_stage_keys:
+                raise ValueError(
+                    f"GT entity has duplicate stage decisions at index {index}"
+                )
+            gt_stage_keys.add(gt_key)
         result.append(event)
     return tuple(result)
 
@@ -533,9 +553,11 @@ def aggregate_identity_metrics(
         for event in validated
     )
     false_births = sum(
-        event.false_birth is True
-        or event.birth_rejected is True
-        or _event_result(event) in {"false_birth", "birth_rejected"}
+        event.false_birth is True or _event_result(event) == "false_birth"
+        for event in validated
+    )
+    rejected_births = sum(
+        event.birth_rejected is True or _event_result(event) == "birth_rejected"
         for event in validated
     )
     fragmentation_count = sum(
@@ -558,6 +580,7 @@ def aggregate_identity_metrics(
         "active_wrong_matches": int(active_wrong),
         "births": int(births),
         "false_births": int(false_births),
+        "rejected_births": int(rejected_births),
         "fragmentation_count": int(fragmentation_count),
         "merge_count": int(merge_count),
     }
@@ -580,7 +603,7 @@ def aggregate_reactivation_metrics(
     predicted_reactivations = 0
     for event in validated:
         result = _event_result(event)
-        attempt = event.reactivation_attempt is True
+        attempt = event.gap_opportunity is True and event.reactivation_attempt is True
         if attempt:
             attempts += 1
         predicted_reactivation = event.reactivation is True or result in {
@@ -706,14 +729,15 @@ def classify_failure(
     result = _evidence_value(evidence, "association_result")
     result_text = result.casefold().replace("-", "_") if isinstance(result, str) else ""
     if (
-        _evidence_value(
-            evidence,
-            "local_observation_available",
-            "local_match_available",
-            "raw_local_match",
-            "raw_prediction_available",
+        any(
+            _evidence_value(evidence, name) is False
+            for name in (
+                "local_observation_available",
+                "local_match_available",
+                "raw_local_match",
+                "raw_prediction_available",
+            )
         )
-        is False
         or _truth(evidence, "local_perception_miss")
         or result_text in {"local_miss", "perception_miss", "local_perception_miss"}
     ):
@@ -1204,32 +1228,35 @@ def _coerce_paired_rows(
                 baseline = common.pop("baseline_value")
                 common.pop("method", None)
                 common["metric"] = common.get("metric", metric or "metric")
-                result.extend(
-                    (
-                        PairedMetricRecord(
-                            method=method,
-                            value=persisted,
-                            **{
-                                key: value
-                                for key, value in common.items()
-                                if key
-                                in {field.name for field in fields(PairedMetricRecord)}
-                                and key not in {"value", "method"}
-                            },
-                        ),
-                        PairedMetricRecord(
-                            method=baseline_method,
-                            value=baseline,
-                            **{
-                                key: value
-                                for key, value in common.items()
-                                if key
-                                in {field.name for field in fields(PairedMetricRecord)}
-                                and key not in {"value", "method"}
-                            },
-                        ),
-                    )
+                records = (
+                    PairedMetricRecord(
+                        method=method,
+                        value=persisted,
+                        **{
+                            key: value
+                            for key, value in common.items()
+                            if key
+                            in {field.name for field in fields(PairedMetricRecord)}
+                            and key not in {"value", "method"}
+                        },
+                    ),
+                    PairedMetricRecord(
+                        method=baseline_method,
+                        value=baseline,
+                        **{
+                            key: value
+                            for key, value in common.items()
+                            if key
+                            in {field.name for field in fields(PairedMetricRecord)}
+                            and key not in {"value", "method"}
+                        },
+                    ),
                 )
+                for record in records:
+                    record.validate()
+                    if metric is not None and record.metric != metric:
+                        continue
+                    result.append(record)
                 continue
             record = PairedMetricRecord.from_mapping(raw)
         else:
@@ -1337,9 +1364,9 @@ def paired_cluster_bootstrap(
             )
         )
     clusters = sorted({item[0] for item in pair_deltas})
-    if len(clusters) < 2:
+    if len(clusters) != 6:
         raise ValueError(
-            "paired cluster bootstrap requires at least two reference scenes"
+            "paired cluster bootstrap requires exactly six reference scenes"
         )
     deltas_by_cluster: dict[str, list[float]] = {cluster: [] for cluster in clusters}
     method_by_cluster: dict[str, list[float]] = {cluster: [] for cluster in clusters}
@@ -1451,6 +1478,20 @@ def _numeric_value(value: object) -> float | None:
         return None
 
 
+def _unit_interval(value: object) -> float | None:
+    numeric = _numeric_value(value)
+    if numeric is None or not 0.0 <= numeric <= 1.0:
+        return None
+    return numeric
+
+
+def _exact_cluster_count(value: object) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, Integral):
+        return None
+    result = int(value)
+    return result if result == 6 else None
+
+
 def _raw_values(values: object) -> list[float]:
     if isinstance(values, Mapping):
         output: list[float] = []
@@ -1487,19 +1528,24 @@ def _gate_g6a1(data: Mapping[str, object], config: GateConfig) -> dict[str, obje
     passed = True
     for horizon in (4, 5):
         entry = _horizon_value(paired, horizon)
-        reduction = ci_high = None
+        reduction = ci_high = n_clusters = None
         if isinstance(entry, Mapping):
             reduction = _numeric_value(entry.get("relative_reduction"))
             ci_high = _numeric_value(entry.get("ci_high", entry.get("delta_ci_high")))
+            n_clusters = _exact_cluster_count(entry.get("n_clusters"))
+        reduction_in_domain = reduction is not None and reduction <= 1.0
+        ci_in_domain = ci_high is not None and -1.0 <= ci_high <= 1.0
         ok = (
-            reduction is not None
-            and ci_high is not None
+            reduction_in_domain
+            and ci_in_domain
+            and n_clusters == 6
             and reduction >= config.g6a1_relative_reduction
             and ci_high <= config.g6a1_ci_high
         )
         checks[f"T{horizon}"] = {
             "relative_reduction": reduction,
             "ci_high": ci_high,
+            "n_clusters": n_clusters,
             "passed": ok,
         }
         passed = passed and ok
@@ -1530,17 +1576,17 @@ def _gate_g6a2(
         base = _horizon_value(baseline_values, horizon)
         ours_accuracy = ours_recall = base_accuracy = base_recall = None
         if isinstance(ours, Mapping):
-            ours_accuracy = _numeric_value(
+            ours_accuracy = _unit_interval(
                 ours.get("accuracy", ours.get("reactivation_accuracy"))
             )
-            ours_recall = _numeric_value(
+            ours_recall = _unit_interval(
                 ours.get("recall", ours.get("reactivation_recall"))
             )
         if isinstance(base, Mapping):
-            base_accuracy = _numeric_value(
+            base_accuracy = _unit_interval(
                 base.get("accuracy", base.get("reactivation_accuracy"))
             )
-            base_recall = _numeric_value(
+            base_recall = _unit_interval(
                 base.get("recall", base.get("reactivation_recall"))
             )
         accuracy_improved = (
@@ -1588,7 +1634,13 @@ def _gate_g6a3(data: Mapping[str, object], config: GateConfig) -> dict[str, obje
     fingerprint_values = []
     if isinstance(fingerprints, Mapping):
         fingerprint_values = list(fingerprints.values())
-    fingerprint_equal = len(fingerprint_values) >= 2 and all(
+    fingerprints_valid = len(fingerprint_values) >= 2 and all(
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
+        for value in fingerprint_values
+    )
+    fingerprint_equal = fingerprints_valid and all(
         value == fingerprint_values[0] for value in fingerprint_values[1:]
     )
     raw = data.get("raw_local_ap", data.get("raw_local_metrics"))
@@ -1599,6 +1651,7 @@ def _gate_g6a3(data: Mapping[str, object], config: GateConfig) -> dict[str, obje
             len(method_arrays) >= 2
             and bool(method_arrays[0])
             and all(len(array) == len(method_arrays[0]) for array in method_arrays)
+            and all(0.0 <= value <= 1.0 for array in method_arrays for value in array)
         )
         numeric_equal = comparable and all(
             abs(array[index] - method_arrays[0][index]) <= config.g6a3_abs_tolerance
@@ -1608,6 +1661,7 @@ def _gate_g6a3(data: Mapping[str, object], config: GateConfig) -> dict[str, obje
     else:
         numeric_equal = (
             bool(numeric_values)
+            and all(0.0 <= value <= 1.0 for value in numeric_values)
             and max(numeric_values) - min(numeric_values) <= config.g6a3_abs_tolerance
         )
     passed = fingerprint_equal and numeric_equal
@@ -1630,7 +1684,7 @@ def _task_value(values: object, method: str, horizon: int, metric: str) -> float
     method_values = values.get(method)
     row = _horizon_value(method_values, horizon)
     if isinstance(row, Mapping):
-        return _numeric_value(row.get(metric))
+        return _unit_interval(row.get(metric))
     return None
 
 
@@ -1665,19 +1719,24 @@ def _gate_g6a4(
 
 
 def _gate_g6a5(data: Mapping[str, object], config: GateConfig) -> dict[str, object]:
-    share = _numeric_value(data.get("explainability_share"))
+    explicit_share = "explainability_share" in data
+    share = _unit_interval(data.get("explainability_share"))
     counts = data.get("failure_counts", data.get("failure_breakdown"))
     if isinstance(counts, Mapping) and isinstance(counts.get("counts"), Mapping):
         counts = counts["counts"]
-    if share is None and isinstance(counts, Mapping):
+    if not explicit_share and share is None and isinstance(counts, Mapping):
         values: dict[str, float] = {}
+        valid_counts = True
         for key, value in counts.items():
             numeric = _numeric_value(value)
-            if numeric is not None:
-                values[str(key)] = numeric
-        total = sum(values.values())
-        categorized = sum(values.get(code, 0.0) for code in FAILURE_CODES)
-        share = categorized / total if total else None
+            if numeric is None or numeric < 0.0:
+                valid_counts = False
+                break
+            values[str(key)] = numeric
+        if valid_counts:
+            total = sum(values.values())
+            categorized = sum(values.get(code, 0.0) for code in FAILURE_CODES)
+            share = categorized / total if total else None
     passed = share is not None and share >= config.g6a5_explainability
     return _gate_result(
         passed,

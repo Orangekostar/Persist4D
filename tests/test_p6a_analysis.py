@@ -48,6 +48,7 @@ def _event(**overrides: object) -> AssociationEvent:
         "gap_opportunity": False,
         "reactivation_attempt": False,
         "reactivation_correct": None,
+        "reactivation": False,
         "new_birth": False,
         "false_birth": False,
         "is_failure": False,
@@ -107,6 +108,45 @@ def test_partial_explicit_transition_flags_are_rejected() -> None:
     with pytest.raises(ValueError, match="all events or no events"):
         aggregate_event_metrics(
             [_event(event_id="one"), _event(event_id="two", stage_id=1, id_switch=None)]
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("gap_opportunity", None),
+        ("reactivation_attempt", None),
+        ("reactivation", None),
+    ],
+)
+def test_reactivation_audit_fields_are_required(field: str, value: object) -> None:
+    with pytest.raises(ValueError, match=field):
+        aggregate_reactivation_metrics([_event(**{field: value})])
+
+
+def test_correct_reactivation_requires_gt_and_gap_attempt() -> None:
+    with pytest.raises(ValueError, match="GT entity|gt_entity_id"):
+        aggregate_reactivation_metrics(
+            [
+                _event(
+                    gt_entity_id=None,
+                    gap_opportunity=True,
+                    reactivation_attempt=True,
+                    reactivation=True,
+                    reactivation_correct=True,
+                )
+            ]
+        )
+    with pytest.raises(ValueError, match="gap opportunity"):
+        aggregate_reactivation_metrics(
+            [
+                _event(
+                    gap_opportunity=False,
+                    reactivation_attempt=True,
+                    reactivation=True,
+                    reactivation_correct=True,
+                )
+            ]
         )
 
 
@@ -282,6 +322,47 @@ def test_reactivation_precision_uses_all_dormant_reuses_not_only_gt_gap_attempts
     assert result["reactivation_recall"] == 1.0
 
 
+def test_same_gt_cannot_receive_two_decisions_in_one_stage() -> None:
+    with pytest.raises(ValueError, match="GT entity has duplicate stage decisions"):
+        validate_association_events(
+            [
+                _event(event_id="one", query_id="q1"),
+                _event(event_id="two", query_id="q2", candidate_slot_id=11),
+            ]
+        )
+
+
+def test_rejected_birth_is_not_counted_as_a_created_false_birth() -> None:
+    identity, _ = aggregate_event_metrics(
+        [
+            _event(
+                association_correct=False,
+                association_result="birth_rejected",
+                birth_rejected=True,
+                new_birth=False,
+                is_failure=True,
+            )
+        ]
+    )
+    assert identity["births"] == 0
+    assert identity["false_births"] == 0
+    assert identity["rejected_births"] == 1
+
+
+def test_any_missing_local_evidence_classifies_as_perception_failure() -> None:
+    assert (
+        classify_failure(
+            _event(
+                association_correct=False,
+                local_observation_available=True,
+                local_match_available=False,
+                is_failure=True,
+            )
+        )
+        == "F1"
+    )
+
+
 @pytest.mark.parametrize(
     ("evidence", "expected"),
     [
@@ -442,7 +523,9 @@ def test_efficiency_rows_keep_bootstrap_and_new_visit_types_disjoint() -> None:
 
 def _paired_rows() -> list[PairedMetricRecord]:
     rows: list[PairedMetricRecord] = []
-    for index, reference in enumerate(("ref-a", "ref-b", "ref-c")):
+    for index, reference in enumerate(
+        ("ref-a", "ref-b", "ref-c", "ref-d", "ref-e", "ref-f")
+    ):
         common = {
             "reference_scene_id": reference,
             "master_sequence_id": f"master-{index}",
@@ -479,6 +562,10 @@ def test_paired_cluster_bootstrap_point_estimate_is_cluster_balanced() -> None:
     for reference, pair_count, ours, baseline in (
         ("ref-many", 3, 0.0, 1.0),
         ("ref-one", 1, 1.0, 1.0),
+        ("ref-two", 1, 1.0, 1.0),
+        ("ref-three", 1, 1.0, 1.0),
+        ("ref-four", 1, 1.0, 1.0),
+        ("ref-five", 1, 1.0, 1.0),
     ):
         for index in range(pair_count):
             common = {
@@ -493,10 +580,10 @@ def test_paired_cluster_bootstrap_point_estimate_is_cluster_balanced() -> None:
             rows.append(PairedMetricRecord(method="EMA", value=baseline, **common))
 
     result = paired_cluster_bootstrap(rows, method="Persist4D", baseline_method="EMA")
-    assert result["mean_delta"] == pytest.approx(-0.5)
-    assert result["method_mean"] == pytest.approx(0.5)
+    assert result["mean_delta"] == pytest.approx(-1.0 / 6.0)
+    assert result["method_mean"] == pytest.approx(5.0 / 6.0)
     assert result["baseline_mean"] == pytest.approx(1.0)
-    assert result["relative_reduction"] == pytest.approx(0.5)
+    assert result["relative_reduction"] == pytest.approx(1.0 / 6.0)
 
 
 @pytest.mark.parametrize("mutation", ["missing", "duplicate", "cross-cache"])
@@ -525,11 +612,33 @@ def test_window_bootstrap_is_rejected() -> None:
         )
 
 
+def test_paired_bootstrap_requires_all_six_reference_clusters() -> None:
+    with pytest.raises(ValueError, match="exactly six"):
+        paired_cluster_bootstrap(
+            _paired_rows()[:-2], method="Persist4D", baseline_method="EMA"
+        )
+
+
+def test_compact_paired_rows_cannot_bypass_record_validation() -> None:
+    row = {
+        "reference_scene_id": "ref-a",
+        "master_sequence_id": "master-a",
+        "prefix": 4,
+        "metric": "id_sw_rate",
+        "order_id": "",
+        "prediction_digest": "digest-a",
+        "persisted_value": 0.1,
+        "baseline_value": 0.2,
+    }
+    with pytest.raises(ValueError, match="order_id"):
+        paired_cluster_bootstrap([row], method="Persist4D", baseline_method="EMA")
+
+
 def _gate_input() -> dict[str, object]:
     return {
         "paired_idsw": {
-            4: {"relative_reduction": 0.20, "ci_high": 0.0},
-            5: {"relative_reduction": 0.20, "ci_high": 0.0},
+            4: {"relative_reduction": 0.20, "ci_high": 0.0, "n_clusters": 6},
+            5: {"relative_reduction": 0.20, "ci_high": 0.0, "n_clusters": 6},
         },
         "reactivation": {
             "Persist4D": {
@@ -544,8 +653,8 @@ def _gate_input() -> dict[str, object]:
             },
         },
         "raw_prediction_fingerprints": {
-            "Persist4D": "same-digest",
-            "EMA": "same-digest",
+            "Persist4D": "a" * 64,
+            "EMA": "a" * 64,
         },
         "raw_local_ap": {"Persist4D": [0.5, 0.6], "EMA": [0.5, 0.6]},
         "online_task": {
@@ -578,8 +687,12 @@ def test_preregistered_gates_accept_exact_boundaries() -> None:
 def test_gate_boundary_failures_are_not_rounded_up() -> None:
     values = _gate_input()
     values["paired_idsw"] = {
-        4: {"relative_reduction": 0.199999999, "ci_high": 0.0},
-        5: {"relative_reduction": 0.20, "ci_high": 0.0},
+        4: {
+            "relative_reduction": 0.199999999,
+            "ci_high": 0.0,
+            "n_clusters": 6,
+        },
+        5: {"relative_reduction": 0.20, "ci_high": 0.0, "n_clusters": 6},
     }
     result = evaluate_gates(values)
     assert result["G6A-1"]["passed"] is False
@@ -602,3 +715,39 @@ def test_local_invariance_gate_requires_both_fingerprint_and_metrics(
     values = _gate_input()
     values.pop(missing)
     assert evaluate_gates(values)["G6A-3"]["passed"] is False
+
+
+@pytest.mark.parametrize("fingerprint", [None, "", "not-a-sha256"])
+def test_local_invariance_gate_rejects_invalid_fingerprints(
+    fingerprint: object,
+) -> None:
+    values = _gate_input()
+    values["raw_prediction_fingerprints"]["EMA"] = fingerprint
+    assert evaluate_gates(values)["G6A-3"]["passed"] is False
+
+
+@pytest.mark.parametrize(
+    ("path", "value", "gate"),
+    [
+        (("paired_idsw", 4, "relative_reduction"), 1.01, "G6A-1"),
+        (("paired_idsw", 4, "n_clusters"), 5, "G6A-1"),
+        (("reactivation", "Persist4D", 3, "accuracy"), 1.01, "G6A-2"),
+        (("raw_local_ap", "Persist4D", 0), -0.01, "G6A-3"),
+        (("online_task", "Persist4D", 2, "t_mAP"), 1.01, "G6A-4"),
+    ],
+)
+def test_metric_gates_fail_closed_on_out_of_domain_values(
+    path: tuple[object, ...], value: object, gate: str
+) -> None:
+    values = _gate_input()
+    target: object = values
+    for key in path[:-1]:
+        target = target[key]
+    target[path[-1]] = value
+    assert evaluate_gates(values)[gate]["passed"] is False
+
+
+def test_explainability_gate_rejects_impossible_share() -> None:
+    values = _gate_input()
+    values["explainability_share"] = 2.0
+    assert evaluate_gates(values)["G6A-5"]["passed"] is False
