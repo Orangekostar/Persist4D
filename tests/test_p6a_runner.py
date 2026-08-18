@@ -396,7 +396,8 @@ def test_cache_payload_from_inference_freezes_latest_stage_without_change_gt() -
             ],
             dtype=torch.bool,
         ),
-        "temporal_stages": torch.tensor([0, 0, 1, 1, 1]),
+        # Pointcept preserves this coordinate column as float in real eval data.
+        "temporal_stages": torch.tensor([0, 0, 1, 1, 1], dtype=torch.float32),
     }
 
     payload = cache_payload_from_inference(
@@ -424,6 +425,17 @@ def test_cache_payload_from_inference_freezes_latest_stage_without_change_gt() -
     assert payload["target"]["gt_class_semantics"] == (
         "rescene_model_index_0_based"
     )
+
+    full_target["temporal_stages"][0] = 0.5
+    with pytest.raises(ValueError, match="integer stage indices"):
+        cache_payload_from_inference(
+            key=key,
+            provenance=provenance,
+            observation=Observation(),
+            full_masks=full_masks,
+            full_target=full_target,
+            latest_local_stage=1,
+        )
 
 
 def test_build_temporal_target_unions_ids_and_marks_absent_stages_false() -> None:

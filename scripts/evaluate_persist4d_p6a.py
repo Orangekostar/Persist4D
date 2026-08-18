@@ -120,6 +120,28 @@ def _integer_tensor(value: object, *, name: str, ndim: int) -> Tensor:
     return result
 
 
+def _stage_index_tensor(value: object, *, name: str, ndim: int) -> Tensor:
+    """Normalize integer-valued coordinate stages without accepting fractions."""
+
+    result = _finite_tensor(value, name=name, ndim=ndim)
+    if result.dtype == torch.bool or result.is_complex():
+        raise ValueError(f"{name} must contain integer stage indices")
+    if result.is_floating_point():
+        rounded = result.round()
+        if not torch.equal(result, rounded):
+            raise ValueError(f"{name} must contain integer stage indices")
+        result = rounded.to(dtype=torch.long)
+    else:
+        try:
+            torch.iinfo(result.dtype)
+        except (TypeError, RuntimeError) as error:
+            raise ValueError(f"{name} must contain integer stage indices") from error
+        result = result.to(dtype=torch.long)
+    if torch.any(result < 0).item():
+        raise ValueError(f"{name} must contain non-negative stage indices")
+    return result
+
+
 def _observation_mapping(payload: object) -> Mapping[str, Any]:
     root = _require_mapping(payload, name="payload")
     observation = root.get("observation", root)
@@ -967,7 +989,7 @@ def cache_payload_from_inference(
         target["labels"], name="full_target.labels", ndim=1
     )
     gt_masks = _clone_cpu(target["masks"], name="full_target.masks")
-    temporal_stages = _integer_tensor(
+    temporal_stages = _stage_index_tensor(
         target["temporal_stages"],
         name="full_target.temporal_stages",
         ndim=1,
