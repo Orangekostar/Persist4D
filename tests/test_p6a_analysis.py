@@ -11,6 +11,7 @@ from scripts.p6a_analysis import (
     EfficiencyRecord,
     PairedMetricRecord,
     aggregate_event_metrics,
+    aggregate_metrics_by_sequence,
     aggregate_reactivation_metrics,
     audit_capacity,
     classify_failure,
@@ -24,10 +25,12 @@ from scripts.p6a_analysis import (
 
 def _event(**overrides: object) -> AssociationEvent:
     values: dict[str, object] = {
+        "event_id": "event-placeholder",
         "scene_id": "scene-a",
         "sequence_id": "master-a",
         "reference_scene_id": "ref-a",
         "master_sequence_id": "master-a",
+        "order_id": "canonical",
         "prefix": 3,
         "method": "Persist4D",
         "stage_id": 0,
@@ -47,8 +50,24 @@ def _event(**overrides: object) -> AssociationEvent:
         "reactivation_correct": None,
         "new_birth": False,
         "false_birth": False,
+        "is_failure": False,
+        "prediction_digest": "cache-a",
+        "cache_digest": "cache-a",
     }
     values.update(overrides)
+    if "event_id" not in overrides:
+        identity = (
+            values["query_id"]
+            if values["event_kind"] == "prediction"
+            else values["gt_entity_id"]
+        )
+        values["event_id"] = (
+            ":".join(
+                str(values[key])
+                for key in ("method", "order_id", "prefix", "stage_id", "event_kind")
+            )
+            + f":{identity}"
+        )
     return AssociationEvent(**values)
 
 
@@ -58,6 +77,37 @@ def test_typed_event_rows_reject_nan_and_sentinel_ids() -> None:
 
     with pytest.raises(ValueError, match="sentinel"):
         validate_association_events([_event(candidate_slot_id=-1)])
+
+
+def test_event_mapping_rejects_unknown_fields_and_cache_mismatch() -> None:
+    row = _event().as_dict()
+    row["typo_score"] = 1.0
+    with pytest.raises(ValueError, match="unknown association event fields"):
+        validate_association_events([row])
+
+    with pytest.raises(ValueError, match="digest"):
+        validate_association_events([_event(cache_digest="cache-b")])
+
+
+def test_event_identity_is_unique_but_decisions_are_method_and_order_scoped() -> None:
+    first = _event(event_id="one")
+    second_method = _event(event_id="two", method="EMA")
+    second_order = _event(event_id="three", order_id="reverse")
+    assert len(validate_association_events([first, second_method, second_order])) == 3
+
+    with pytest.raises(ValueError, match="event_id"):
+        validate_association_events([first, replace(first, method="EMA")])
+    with pytest.raises(ValueError, match="duplicate association decision"):
+        validate_association_events(
+            [first, replace(first, event_id="different", candidate_slot_id=99)]
+        )
+
+
+def test_partial_explicit_transition_flags_are_rejected() -> None:
+    with pytest.raises(ValueError, match="all events or no events"):
+        aggregate_event_metrics(
+            [_event(event_id="one"), _event(event_id="two", stage_id=1, id_switch=None)]
+        )
 
 
 def test_event_table_reconstructs_identity_and_reactivation_aggregates() -> None:
@@ -80,6 +130,7 @@ def test_event_table_reconstructs_identity_and_reactivation_aggregates() -> None
             association_result="no_attempt",
             gap_opportunity=False,
             event_kind="gt_miss",
+            is_failure=True,
         ),
         _event(
             stage_id=3,
@@ -94,6 +145,7 @@ def test_event_table_reconstructs_identity_and_reactivation_aggregates() -> None
             reactivation_attempt=True,
             reactivation_correct=False,
             reactivation=True,
+            is_failure=True,
         ),
         _event(
             stage_id=1,
@@ -105,6 +157,7 @@ def test_event_table_reconstructs_identity_and_reactivation_aggregates() -> None
             association_result="birth",
             new_birth=True,
             false_birth=True,
+            is_failure=True,
         ),
     ]
     identity, reactivation = aggregate_event_metrics(rows)
@@ -117,6 +170,7 @@ def test_event_table_reconstructs_identity_and_reactivation_aggregates() -> None
     assert reactivation == {
         "gap_opportunities": 1,
         "reactivation_attempts": 1,
+        "predicted_reactivation_events": 1,
         "correct_reactivations": 0,
         "wrong_reactivations": 1,
         "no_attempts": 0,
@@ -140,16 +194,92 @@ def test_reactivation_no_attempt_is_explicit_and_zero_denominators_are_none() ->
         reactivation_attempt=False,
         reactivation_correct=None,
         event_kind="gt_miss",
+        is_failure=True,
     )
     result = aggregate_reactivation_metrics([row])
 
     assert result["gap_opportunities"] == 1
     assert result["reactivation_attempts"] == 0
+    assert result["predicted_reactivation_events"] == 0
     assert result["no_attempts"] == 1
     assert result["reactivation_accuracy"] is None
     assert result["reactivation_precision"] is None
     assert result["reactivation_recall"] == 0.0
     assert result["reactivation_coverage"] == 0.0
+
+
+def test_transition_inference_counts_next_match_across_a_gap_without_cross_scope_mixing() -> (
+    None
+):
+    rows = [
+        _event(
+            event_id="a0",
+            method="Persist4D",
+            stage_id=0,
+            transition_opportunity=None,
+            id_switch=None,
+        ),
+        _event(
+            event_id="a2",
+            method="Persist4D",
+            stage_id=2,
+            query_id="q2",
+            predicted_identity_id=11,
+            candidate_slot_id=11,
+            transition_opportunity=None,
+            id_switch=None,
+        ),
+        _event(
+            event_id="b1",
+            method="EMA",
+            stage_id=1,
+            query_id="q1",
+            predicted_identity_id=99,
+            candidate_slot_id=99,
+            transition_opportunity=None,
+            id_switch=None,
+        ),
+    ]
+    identity, _ = aggregate_event_metrics(rows)
+    assert identity["transition_opportunities"] == 1
+    assert identity["id_switches"] == 1
+
+
+def test_reactivation_precision_uses_all_dormant_reuses_not_only_gt_gap_attempts() -> (
+    None
+):
+    rows = [
+        _event(
+            event_id="correct",
+            stage_id=2,
+            gap_opportunity=True,
+            reactivation_attempt=True,
+            reactivation=True,
+            reactivation_correct=True,
+            association_result="reactivation_correct",
+        ),
+        _event(
+            event_id="false-reuse",
+            gt_entity_id=8,
+            stage_id=2,
+            query_id="q8",
+            gap_opportunity=False,
+            reactivation_attempt=False,
+            reactivation=True,
+            reactivation_correct=False,
+            wrong_reactivation=True,
+            association_correct=False,
+            association_result="reactivation_wrong",
+            is_failure=True,
+        ),
+    ]
+    result = aggregate_reactivation_metrics(rows)
+    assert result["gap_opportunities"] == 1
+    assert result["reactivation_attempts"] == 1
+    assert result["predicted_reactivation_events"] == 2
+    assert result["reactivation_accuracy"] == 1.0
+    assert result["reactivation_precision"] == 0.5
+    assert result["reactivation_recall"] == 1.0
 
 
 @pytest.mark.parametrize(
@@ -168,7 +298,10 @@ def test_reactivation_no_attempt_is_explicit_and_zero_denominators_are_none() ->
 def test_failure_categories_are_executable_and_mutually_exclusive(
     evidence: dict[str, object], expected: str
 ) -> None:
-    assert classify_failure(_event(association_correct=False, **evidence)) == expected
+    assert (
+        classify_failure(_event(association_correct=False, is_failure=True, **evidence))
+        == expected
+    )
 
 
 def test_failure_priority_assigns_one_primary_when_flags_repeat() -> None:
@@ -182,8 +315,39 @@ def test_failure_priority_assigns_one_primary_when_flags_repeat() -> None:
         reactivation_correct=False,
         semantic_drift=True,
         capacity_failure=True,
+        is_failure=True,
     )
     assert classify_failure(event) == "F1"
+
+
+def test_specific_failure_mechanism_precedes_generic_association_miss() -> None:
+    event = _event(
+        association_correct=False,
+        association_miss=True,
+        reactivation=True,
+        reactivation_correct=False,
+        wrong_reactivation=True,
+        is_failure=True,
+    )
+    assert classify_failure(event) == "F5"
+
+
+def test_sequence_aggregates_preserve_method_order_prefix_and_cache_scope() -> None:
+    rows = [
+        _event(event_id="one", method="Persist4D", order_id="canonical", prefix=2),
+        _event(event_id="two", method="EMA", order_id="canonical", prefix=2),
+        _event(event_id="three", method="Persist4D", order_id="reverse", prefix=3),
+    ]
+    result = aggregate_metrics_by_sequence(rows)
+    assert len(result) == 3
+    assert {
+        (row["method"], row["order_id"], row["prefix"], row["prediction_digest"])
+        for row in result
+    } == {
+        ("Persist4D", "canonical", 2, "cache-a"),
+        ("EMA", "canonical", 2, "cache-a"),
+        ("Persist4D", "reverse", 3, "cache-a"),
+    }
 
 
 def test_capacity_audit_enforces_state_invariants_and_formula() -> None:
@@ -285,10 +449,13 @@ def _paired_rows() -> list[PairedMetricRecord]:
             "prefix": 4,
             "prediction_digest": "digest-4",
             "metric": "id_sw_rate",
+            "order_id": "canonical",
         }
         rows.extend(
             [
-                PairedMetricRecord(method="Persist4D", value=0.08 + index * 0.01, **common),
+                PairedMetricRecord(
+                    method="Persist4D", value=0.08 + index * 0.01, **common
+                ),
                 PairedMetricRecord(method="EMA", value=0.10 + index * 0.01, **common),
             ]
         )
@@ -305,6 +472,31 @@ def test_paired_cluster_bootstrap_is_seeded_and_reference_scene_clustered() -> N
     assert first["n_bootstrap"] == 10_000
     assert first["seed"] == 45
     assert first["mean_delta"] == pytest.approx(-0.02)
+
+
+def test_paired_cluster_bootstrap_point_estimate_is_cluster_balanced() -> None:
+    rows: list[PairedMetricRecord] = []
+    for reference, pair_count, ours, baseline in (
+        ("ref-many", 3, 0.0, 1.0),
+        ("ref-one", 1, 1.0, 1.0),
+    ):
+        for index in range(pair_count):
+            common = {
+                "reference_scene_id": reference,
+                "master_sequence_id": f"{reference}-{index}",
+                "prefix": 4,
+                "prediction_digest": f"digest-{reference}-{index}",
+                "metric": "id_sw_rate",
+                "order_id": "canonical",
+            }
+            rows.append(PairedMetricRecord(method="Persist4D", value=ours, **common))
+            rows.append(PairedMetricRecord(method="EMA", value=baseline, **common))
+
+    result = paired_cluster_bootstrap(rows, method="Persist4D", baseline_method="EMA")
+    assert result["mean_delta"] == pytest.approx(-0.5)
+    assert result["method_mean"] == pytest.approx(0.5)
+    assert result["baseline_mean"] == pytest.approx(1.0)
+    assert result["relative_reduction"] == pytest.approx(0.5)
 
 
 @pytest.mark.parametrize("mutation", ["missing", "duplicate", "cross-cache"])
@@ -391,3 +583,22 @@ def test_gate_boundary_failures_are_not_rounded_up() -> None:
     }
     result = evaluate_gates(values)
     assert result["G6A-1"]["passed"] is False
+
+
+def test_reactivation_gate_requires_both_accuracy_and_recall_to_beat_baseline() -> None:
+    values = _gate_input()
+    values["reactivation"]["Persist4D"][4] = {"accuracy": 0.70, "recall": 0.25}
+    values["reactivation"]["EMA"][4] = {"accuracy": 0.60, "recall": 0.30}
+    result = evaluate_gates(values)
+    assert result["G6A-2"]["passed"] is False
+    assert result["G6A-2"]["checks"]["T4"]["accuracy_improved"] is True
+    assert result["G6A-2"]["checks"]["T4"]["recall_improved"] is False
+
+
+@pytest.mark.parametrize("missing", ["raw_prediction_fingerprints", "raw_local_ap"])
+def test_local_invariance_gate_requires_both_fingerprint_and_metrics(
+    missing: str,
+) -> None:
+    values = _gate_input()
+    values.pop(missing)
+    assert evaluate_gates(values)["G6A-3"]["passed"] is False
