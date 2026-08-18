@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 import time
 from collections.abc import Callable, Mapping, Sequence
 from contextlib import contextmanager
@@ -16,12 +17,15 @@ from typing import Any
 import torch
 import yaml
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 from scripts.p6a_analysis import persistent_state_bytes
 from scripts.p6a_association import B4PersistentTracker, FrozenObservation
 from scripts.p6a_efficiency import build_efficiency_manifest
 
 ORDER_IDS = ("canonical", "reverse", "sha256_seed45")
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 EFFICIENCY_CONFIG = {
     "warmup_per_group": 1,
     "measurements_per_unit": 1,

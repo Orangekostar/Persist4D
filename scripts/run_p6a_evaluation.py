@@ -6,10 +6,15 @@ import argparse
 import hashlib
 import json
 import shutil
+import sys
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import yaml
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from scripts.evaluate_persist4d import (
     _begin_source_tree_contract,
@@ -42,8 +47,6 @@ from scripts.p6a_artifacts import (
 from scripts.p6a_builder import _expected_cache_keys, build_p6a_root_artifact
 from scripts.p6a_cache import validate_cache_manifest
 from scripts.p6a_efficiency import validate_efficiency_manifest
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _canonical_json_bytes(value: Mapping[str, object]) -> bytes:

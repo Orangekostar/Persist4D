@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -226,3 +229,23 @@ def test_cli_defaults_to_repository_artifact_root() -> None:
 
     assert args.output_root == Path("artifacts/P6A")
     assert args.efficiency_manifest is None
+
+
+def test_evaluation_cli_help_works_outside_repository(tmp_path: Path) -> None:
+    environment = os.environ.copy()
+    environment.pop("PYTHONPATH", None)
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(Path(__file__).resolve().parents[1] / "scripts/run_p6a_evaluation.py"),
+            "--help",
+        ],
+        cwd=tmp_path,
+        env=environment,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert "--output-root" in completed.stdout

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 from collections import Counter
 from pathlib import Path
 from types import SimpleNamespace
@@ -318,6 +321,28 @@ def test_efficiency_cli_defaults_raw_manifest_inside_external_cache(
 
     assert args.output is None
     assert args.device == "cuda:0"
+
+
+def test_efficiency_profiler_cli_help_works_outside_repository(
+    tmp_path: Path,
+) -> None:
+    environment = os.environ.copy()
+    environment.pop("PYTHONPATH", None)
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(Path(__file__).resolve().parents[1] / "scripts/profile_p6a_efficiency.py"),
+            "--help",
+        ],
+        cwd=tmp_path,
+        env=environment,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert "--cache-directory" in completed.stdout
 
 
 def test_real_efficiency_profile_rejects_repository_cache_before_setup() -> None:
