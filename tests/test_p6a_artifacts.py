@@ -853,6 +853,12 @@ def test_publish_bundle_uses_one_directory_replace(tmp_path: Path, monkeypatch) 
         lambda value: value["provenance"]["config"].update(ref="repo:artifacts/P5/x"),
         lambda value: value["claims_supported"].append("10.0.0.1"),
         lambda value: value["claims_supported"].append("GPU-12345678-abcd"),
+        lambda value: value["claims_supported"].append(
+            "prefix=C:" + "\\Users\\alice\\private\\result.json"
+        ),
+        lambda value: value["claims_supported"].append(
+            "prefix=" + "\\" * 2 + "server\\private\\result.json"
+        ),
     ],
 )
 def test_root_artifact_fails_closed_on_invalid_contract(mutation):

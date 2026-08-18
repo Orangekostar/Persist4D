@@ -51,6 +51,7 @@ from scripts.p6a_cache import (
     KEY_KEYS,
     SCHEMA_VERSION,
     build_cache_manifest,
+    config_documents_sha256,
     discover_cache_entries,
     load_cache_entry,
     load_cache_manifest,
@@ -472,16 +473,7 @@ def build_cache_provenance(
         raise ValueError("source_commit must be a lowercase SHA-1")
     if checkpoint_path.is_symlink() or not checkpoint_path.is_file():
         raise ValueError("checkpoint_path must be a regular non-symlink file")
-    if not isinstance(config_documents, Mapping) or not config_documents:
-        raise ValueError("config_documents must be a non-empty mapping")
-    config_hasher = hashlib.sha256()
-    for name, content in sorted(config_documents.items()):
-        if not isinstance(name, str) or not name or "/" in name or "\\" in name:
-            raise ValueError("config document names must be portable identifiers")
-        if not isinstance(content, bytes) or not content:
-            raise ValueError("config documents must contain non-empty bytes")
-        config_hasher.update(name.encode("utf-8") + b"\0")
-        config_hasher.update(len(content).to_bytes(8, "big") + content)
+    config_digest = config_documents_sha256(config_documents)
     try:
         protocol_bytes = json.dumps(
             protocol_manifest,
@@ -495,7 +487,7 @@ def build_cache_provenance(
     return {
         "source_commit": source_commit,
         "checkpoint_sha256": _file_sha256(checkpoint_path),
-        "config_sha256": config_hasher.hexdigest(),
+        "config_sha256": config_digest,
         "dataset_sha256": hashlib.sha256(protocol_bytes).hexdigest(),
     }
 

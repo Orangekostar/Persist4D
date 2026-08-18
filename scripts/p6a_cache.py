@@ -2,16 +2,19 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import math
 import os
+import re
 import tempfile
 from collections.abc import Mapping, Sequence
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
 import torch
+import yaml
 from torch import Tensor
 
 SCHEMA_VERSION = 3
@@ -61,6 +64,87 @@ MANIFEST_ROOT_KEYS = {
     "entries_sha256",
     "entries",
 }
+_WINDOWS_ABSOLUTE_FRAGMENT = re.compile(
+    r"(?i)(?<![A-Za-z0-9])(?:[A-Za-z]:[\\/]|\\\\[^\\/\s]+[\\/])"
+)
+
+
+def contains_windows_absolute_path(value: str) -> bool:
+    """Return whether a scalar contains a Windows drive or UNC path."""
+
+    return _WINDOWS_ABSOLUTE_FRAGMENT.search(value) is not None
+
+
+def portable_runtime_config_text(runtime_config_text: str) -> str:
+    """Replace machine-local Concerto checkpoint paths with a stable reference."""
+
+    document = yaml.safe_load(runtime_config_text)
+    if not isinstance(document, Mapping):
+        raise TypeError("runtime config must be a YAML mapping")
+    portable = copy.deepcopy(document)
+    replacements = 0
+
+    def local_path_name(value: str) -> str | None:
+        posix_path = PurePosixPath(value)
+        if posix_path.is_absolute():
+            return posix_path.name
+        windows_path = PureWindowsPath(value)
+        if windows_path.is_absolute() or windows_path.drive:
+            return windows_path.name
+        return None
+
+    def visit(value: object) -> None:
+        nonlocal replacements
+        if isinstance(value, dict):
+            if value.get("model_lib") == "concerto":
+                checkpoint = value.get("name")
+                checkpoint_name = (
+                    local_path_name(checkpoint)
+                    if isinstance(checkpoint, str)
+                    else None
+                )
+                if checkpoint_name is not None:
+                    if not checkpoint_name:
+                        raise ValueError("Concerto checkpoint path has no file name")
+                    value["name"] = f"external:concerto/{checkpoint_name}"
+                    replacements += 1
+            for child in value.values():
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+        elif isinstance(value, str) and (
+            local_path_name(value) is not None
+            or contains_windows_absolute_path(value)
+        ):
+            raise ValueError("runtime config contains an unportable absolute path")
+
+    visit(portable)
+    if replacements == 0:
+        return runtime_config_text
+    return yaml.safe_dump(portable, allow_unicode=False, sort_keys=True)
+
+
+def config_documents_sha256(config_documents: Mapping[str, bytes]) -> str:
+    """Hash config bytes after canonicalizing machine-local runtime references."""
+
+    if not isinstance(config_documents, Mapping) or not config_documents:
+        raise ValueError("config_documents must be a non-empty mapping")
+    hasher = hashlib.sha256()
+    for name, content in sorted(config_documents.items()):
+        if not isinstance(name, str) or not name or "/" in name or "\\" in name:
+            raise ValueError("config document names must be portable identifiers")
+        if not isinstance(content, bytes) or not content:
+            raise ValueError("config documents must contain non-empty bytes")
+        if name == "runtime":
+            try:
+                runtime_text = content.decode("utf-8")
+            except UnicodeDecodeError as error:
+                raise ValueError("runtime config must use UTF-8") from error
+            content = portable_runtime_config_text(runtime_text).encode("utf-8")
+        hasher.update(name.encode("utf-8") + b"\0")
+        hasher.update(len(content).to_bytes(8, "big") + content)
+    return hasher.hexdigest()
 
 
 def _exact_mapping(

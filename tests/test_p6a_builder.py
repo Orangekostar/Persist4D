@@ -54,6 +54,23 @@ def test_portable_runtime_config_redacts_concerto_local_paths() -> None:
     assert parsed["model"]["config"]["backbone"]["name"] == expected
 
 
+@pytest.mark.parametrize(
+    "local_data",
+    (
+        "/" + "home/user/private/3RScan",
+        "prefix=C:" + "\\Users\\alice\\private\\3RScan",
+        "prefix=" + "\\" * 2 + "server\\private\\3RScan",
+    ),
+)
+def test_portable_runtime_config_rejects_unrecognized_absolute_paths(
+    local_data: str,
+) -> None:
+    runtime = yaml.safe_dump({"data": {"root": local_data}}, sort_keys=True)
+
+    with pytest.raises(ValueError, match="unportable absolute path"):
+        _portable_runtime_config_text(runtime)
+
+
 def _metric(value: float) -> dict[str, float | None]:
     return {
         "AP": value,
@@ -382,7 +399,14 @@ def _evaluation(protocol: dict[str, object]) -> TaskMetricEvaluation:
 
 def test_complete_builder_derives_and_seals_one_root_artifact() -> None:
     source_commit = "b" * 40
-    runtime_text = "runtime:\n  device: device-0\n"
+    local_checkpoint = "/" + "home/user/.cache/concerto/concerto_base.pth"
+    runtime_text = (
+        "backbone:\n"
+        "  model_lib: concerto\n"
+        f"  name: {local_checkpoint}\n"
+        "runtime:\n"
+        "  device: device-0\n"
+    )
     config_text, protocol = _config_and_manifest()
     protocol_digest = hashlib.sha256(
         json.dumps(
@@ -390,8 +414,9 @@ def test_complete_builder_derives_and_seals_one_root_artifact() -> None:
         ).encode()
     ).hexdigest()
     config_hasher = hashlib.sha256()
+    portable_runtime = _portable_runtime_config_text(runtime_text).encode()
     for name, content in sorted(
-        {"p6a": config_text.encode(), "runtime": runtime_text.encode()}.items()
+        {"p6a": config_text.encode(), "runtime": portable_runtime}.items()
     ):
         config_hasher.update(name.encode() + b"\0")
         config_hasher.update(len(content).to_bytes(8, "big") + content)

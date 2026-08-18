@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 import torch
+import yaml
 
 from scripts.evaluate_persist4d_p6a import (
     CachedProtocolSequence,
@@ -195,13 +196,13 @@ def test_cache_provenance_binds_checkpoint_configs_and_protocol(
     first = build_cache_provenance(
         source_commit="a" * 40,
         checkpoint_path=checkpoint,
-        config_documents={"p6a": b"p6a", "runtime": b"runtime"},
+        config_documents={"p6a": b"p6a", "runtime": b"runtime:\n  enabled: true\n"},
         protocol_manifest=protocol_manifest,
     )
     second = build_cache_provenance(
         source_commit="a" * 40,
         checkpoint_path=checkpoint,
-        config_documents={"runtime": b"runtime", "p6a": b"p6a"},
+        config_documents={"runtime": b"runtime:\n  enabled: true\n", "p6a": b"p6a"},
         protocol_manifest=protocol_manifest,
     )
 
@@ -215,10 +216,91 @@ def test_cache_provenance_binds_checkpoint_configs_and_protocol(
     changed = build_cache_provenance(
         source_commit="a" * 40,
         checkpoint_path=checkpoint,
-        config_documents={"p6a": b"changed", "runtime": b"runtime"},
+        config_documents={
+            "p6a": b"changed",
+            "runtime": b"runtime:\n  enabled: true\n",
+        },
         protocol_manifest=protocol_manifest,
     )
     assert changed["config_sha256"] != first["config_sha256"]
+
+
+def test_cache_provenance_uses_portable_concerto_checkpoint_reference(
+    tmp_path: Path,
+) -> None:
+    checkpoint = tmp_path / "model.ckpt"
+    checkpoint.write_bytes(b"checkpoint")
+    protocol_manifest = {"schema_version": "protocol-b-v1", "masters": [1]}
+    local_checkpoint = "/" + "home/user/.cache/concerto/concerto_base.pth"
+    local_runtime = (
+        "backbone:\n"
+        "  model_lib: concerto\n"
+        f"  name: {local_checkpoint}\n"
+    ).encode()
+    portable_runtime = (
+        b"backbone:\n"
+        b"  model_lib: concerto\n"
+        b"  name: external:concerto/concerto_base.pth\n"
+    )
+
+    local = build_cache_provenance(
+        source_commit="a" * 40,
+        checkpoint_path=checkpoint,
+        config_documents={"p6a": b"p6a", "runtime": local_runtime},
+        protocol_manifest=protocol_manifest,
+    )
+    portable = build_cache_provenance(
+        source_commit="a" * 40,
+        checkpoint_path=checkpoint,
+        config_documents={"p6a": b"p6a", "runtime": portable_runtime},
+        protocol_manifest=protocol_manifest,
+    )
+
+    assert local["config_sha256"] == portable["config_sha256"]
+
+
+@pytest.mark.parametrize(
+    "local_checkpoint",
+    (
+        "C:" + "\\Users\\alice\\models\\concerto_base.pth",
+        "\\" * 2 + "server\\models\\concerto_base.pth",
+    ),
+)
+def test_cache_provenance_portabilizes_windows_concerto_paths(
+    tmp_path: Path,
+    local_checkpoint: str,
+) -> None:
+    checkpoint = tmp_path / "model.ckpt"
+    checkpoint.write_bytes(b"checkpoint")
+    protocol_manifest = {"schema_version": "protocol-b-v1", "masters": [1]}
+    local_runtime = yaml.safe_dump(
+        {"backbone": {"model_lib": "concerto", "name": local_checkpoint}},
+        sort_keys=True,
+    ).encode()
+    portable_runtime = yaml.safe_dump(
+        {
+            "backbone": {
+                "model_lib": "concerto",
+                "name": "external:concerto/concerto_base.pth",
+            }
+        },
+        sort_keys=True,
+    ).encode()
+
+    local = build_cache_provenance(
+        source_commit="a" * 40,
+        checkpoint_path=checkpoint,
+        config_documents={"p6a": b"p6a", "runtime": local_runtime},
+        protocol_manifest=protocol_manifest,
+    )
+    portable = build_cache_provenance(
+        source_commit="a" * 40,
+        checkpoint_path=checkpoint,
+        config_documents={"p6a": b"p6a", "runtime": portable_runtime},
+        protocol_manifest=protocol_manifest,
+    )
+
+    assert local["config_sha256"] == portable["config_sha256"]
 
 
 def test_real_prediction_cache_producer_runs_one_exact_local_forward() -> None:

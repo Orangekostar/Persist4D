@@ -28,7 +28,11 @@ from scripts.p6a_artifacts import (
     validate_root_artifact,
     verify_artifact_manifest,
 )
-from scripts.p6a_cache import validate_cache_manifest
+from scripts.p6a_cache import (
+    config_documents_sha256,
+    portable_runtime_config_text,
+    validate_cache_manifest,
+)
 from scripts.p6a_efficiency import (
     aggregate_efficiency_rows,
     validate_efficiency_manifest,
@@ -75,38 +79,11 @@ def _json_text(value: Mapping[str, object]) -> str:
 
 
 def _config_digest(documents: Mapping[str, bytes]) -> str:
-    hasher = hashlib.sha256()
-    for name, content in sorted(documents.items()):
-        hasher.update(name.encode("utf-8") + b"\0")
-        hasher.update(len(content).to_bytes(8, "big") + content)
-    return hasher.hexdigest()
+    return config_documents_sha256(documents)
 
 
 def _portable_runtime_config_text(runtime_config_text: str) -> str:
-    document = yaml.safe_load(runtime_config_text)
-    if not isinstance(document, Mapping):
-        raise TypeError("runtime config must be a YAML mapping")
-    portable = copy.deepcopy(document)
-    replacements = 0
-
-    def visit(value: object) -> None:
-        nonlocal replacements
-        if isinstance(value, dict):
-            if value.get("model_lib") == "concerto":
-                checkpoint = value.get("name")
-                if isinstance(checkpoint, str) and Path(checkpoint).is_absolute():
-                    value["name"] = f"external:concerto/{Path(checkpoint).name}"
-                    replacements += 1
-            for child in value.values():
-                visit(child)
-        elif isinstance(value, list):
-            for child in value:
-                visit(child)
-
-    visit(portable)
-    if replacements == 0:
-        return runtime_config_text
-    return yaml.safe_dump(portable, allow_unicode=False, sort_keys=True)
+    return portable_runtime_config_text(runtime_config_text)
 
 
 def _expected_cache_keys(protocol_manifest: Mapping[str, object]) -> list[dict[str, object]]:

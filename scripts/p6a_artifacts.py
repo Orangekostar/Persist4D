@@ -22,6 +22,8 @@ from itertools import pairwise
 from pathlib import Path, PurePosixPath
 from typing import Any
 
+from scripts.p6a_cache import contains_windows_absolute_path
+
 SCHEMA_VERSION = 2
 ROOT_ARTIFACT_PATH = "p6a_eval.json"
 
@@ -395,7 +397,6 @@ P6A_REPORT_SECTIONS = (
 
 _HEX_40 = re.compile(r"^[0-9a-f]{40}$")
 _HEX_64 = re.compile(r"^[0-9a-f]{64}$")
-_WINDOWS_ABSOLUTE = re.compile(r"^(?:[A-Za-z]:[\\/]|\\\\)")
 _GPU_UUID = re.compile(r"(?:^|[^A-Za-z])GPU-[0-9A-Fa-f-]+")
 _IPV4 = re.compile(r"(?<![0-9A-Za-z])(?:[0-9]{1,3}\.){3}[0-9]{1,3}(?![0-9A-Za-z])")
 _IPV6 = re.compile(r"(?i)(?<![0-9A-F])(?:[0-9A-F]{1,4}:){2,}[0-9A-F:]+(?![0-9A-F])")
@@ -403,7 +404,6 @@ _PRIVATE_TEXT = (
     re.compile(r"/(?:home|Users|root|private|mnt)/"),
     _GPU_UUID,
     re.compile(r"ssh://"),
-    _WINDOWS_ABSOLUTE,
 )
 
 
@@ -462,7 +462,7 @@ def _validate_scalar_tree(value: object, *, path: str = "root") -> None:
         normalized_path = value.replace("\\", "/")
         if (
             PurePosixPath(value).is_absolute()
-            or _WINDOWS_ABSOLUTE.search(value)
+            or contains_windows_absolute_path(value)
             or ".." in PurePosixPath(normalized_path).parts
         ):
             raise ValueError(f"{path} contains an absolute or traversing path")
@@ -523,7 +523,7 @@ def _validate_relative_artifact_path(value: object, *, name: str) -> str:
         or "." in path.parts
         or ".." in path.parts
         or "\\" in text
-        or _WINDOWS_ABSOLUTE.search(text)
+        or contains_windows_absolute_path(text)
         or path.parts[0] in {"P5", "P6B", "artifacts"}
     ):
         raise ValueError(f"{name} must be a safe relative P6A path")
