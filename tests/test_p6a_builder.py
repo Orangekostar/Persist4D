@@ -27,7 +27,7 @@ from scripts.p6a_builder import (
 )
 from scripts.p6a_cache import build_cache_manifest
 from scripts.p6a_protocol import _seeded_permutation
-from tests.test_p6a_artifacts import _artifact
+from tests.test_p6a_artifacts import _artifact, _efficiency_manifest
 
 
 def _metric(value: float) -> dict[str, float | None]:
@@ -356,33 +356,6 @@ def _evaluation(protocol: dict[str, object]) -> TaskMetricEvaluation:
     )
 
 
-def _efficiency_rows() -> list[dict[str, object]]:
-    rows = []
-    for horizon in range(2, 6):
-        for method, row_type, field in (
-            ("B4", "bootstrap", "bootstrap_latency_ms"),
-            ("B4", "new_visit", "new_visit_latency_ms"),
-            ("full_history_rescene", "full_history", "full_history_latency_ms"),
-        ):
-            row = {
-                "method": method,
-                "T": horizon,
-                "stage_id": 0 if row_type == "bootstrap" else horizon - 1,
-                "row_type": row_type,
-                "count": 129,
-                "bootstrap_latency_ms": None,
-                "new_visit_latency_ms": None,
-                "association_overhead_ms": 0.1 if row_type == "new_visit" else None,
-                "memory_update_overhead_ms": 0.1 if row_type == "new_visit" else None,
-                "full_history_latency_ms": None,
-                "gpu_peak_memory_bytes": 1024,
-                "persistent_state_bytes": 63808 if method == "B4" else None,
-            }
-            row[field] = float(horizon)
-            rows.append(row)
-    return rows
-
-
 def test_complete_builder_derives_and_seals_one_root_artifact() -> None:
     source_commit = "b" * 40
     runtime_text = "runtime:\n  device: device-0\n"
@@ -429,7 +402,7 @@ def test_complete_builder_derives_and_seals_one_root_artifact() -> None:
         evaluation=_evaluation(protocol),
         protocol_manifest=protocol,
         cache_manifest=cache_manifest,
-        efficiency_rows=_efficiency_rows(),
+        efficiency_manifest=_efficiency_manifest(),
         source_commit=source_commit,
         p6a_config_text=config_text,
         runtime_config_text=runtime_text,
@@ -442,6 +415,13 @@ def test_complete_builder_derives_and_seals_one_root_artifact() -> None:
     assert len(
         artifact["derived_artifacts"]["csv"]["capacity_audit.csv"]["rows"]
     ) == 14
+    raw_manifest = json.loads(
+        artifact["derived_artifacts"]["json"]["efficiency_raw_manifest.json"]["text"]
+    )
+    assert len(raw_manifest["records"]) == 1161
+    assert len(
+        artifact["derived_artifacts"]["csv"]["efficiency_results.csv"]["rows"]
+    ) == 12
     assert artifact["gate_results"]["G6A-1"]["passed"] is True
     assert artifact["gate_results"]["G6A-5"]["passed"] is False
     assert verify_artifact_manifest(artifact, render_artifact_bundle(artifact))

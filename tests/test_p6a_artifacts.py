@@ -3,11 +3,13 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+from functools import lru_cache
 from pathlib import Path
 
 import pytest
 
 from scripts import p6a_artifacts
+from scripts.p6a_efficiency import aggregate_efficiency_rows, build_efficiency_manifest
 
 GATE_IDS = p6a_artifacts.GATE_IDS
 HORIZON_IDS = ("T2", "T3", "T4", "T5")
@@ -56,6 +58,53 @@ def _metric_block(methods: tuple[str, ...]) -> dict[str, object]:
         method: {horizon: _metric() for horizon in HORIZON_IDS}
         for method in methods
     }
+
+
+@lru_cache(maxsize=1)
+def _efficiency_manifest() -> dict[str, object]:
+    records = []
+    for row_type, horizons in (
+        ("bootstrap", (1,)),
+        ("new_visit", (2, 3, 4, 5)),
+        ("full_history", (2, 3, 4, 5)),
+    ):
+        for horizon in horizons:
+            for master_index in range(43):
+                for order_id in ("canonical", "reverse", "sha256_seed45"):
+                    is_full_history = row_type == "full_history"
+                    is_bootstrap = row_type == "bootstrap"
+                    records.append(
+                        {
+                            "reference_scene_id": f"reference-{master_index % 6}",
+                            "master_sequence_id": f"master-{master_index:02d}",
+                            "order_id": order_id,
+                            "T": horizon,
+                            "stage_id": 0 if is_bootstrap else horizon - 1,
+                            "row_type": row_type,
+                            "model_latency_ms": 3.0 if is_full_history else 1.0,
+                            "tracker_latency_ms": None
+                            if is_full_history
+                            else 0.2 if is_bootstrap else 0.4,
+                            "association_overhead_ms": None
+                            if is_full_history
+                            else 0.0 if is_bootstrap else 0.1,
+                            "memory_update_overhead_ms": None
+                            if is_full_history
+                            else 0.0 if is_bootstrap else 0.1,
+                            "gpu_peak_memory_bytes": 100,
+                            "persistent_state_bytes": None
+                            if is_full_history
+                            else 63808,
+                        }
+                    )
+    return build_efficiency_manifest(
+        records,
+        source_commit="1" * 40,
+        checkpoint_sha256="2" * 64,
+        config_sha256="3" * 64,
+        protocol_sha256="4" * 64,
+        cache_manifest_sha256="5" * 64,
+    )
 
 
 def _csv_spec(columns: tuple[str, ...] = ("value",)) -> dict[str, object]:
@@ -361,25 +410,8 @@ def _derived_artifacts() -> dict[str, object]:
         for horizon in horizons
         for stage in range(horizon)
     ]
-    efficiency_rows = [
-        {
-            "method": method,
-            "T": horizon,
-            "stage_id": stage,
-            "row_type": row_type,
-            "count": 1,
-            "bootstrap_latency_ms": 1.0 if row_type == "bootstrap" else None,
-            "new_visit_latency_ms": 1.0 if row_type == "new_visit" else None,
-            "association_overhead_ms": 0.1 if row_type == "new_visit" else None,
-            "memory_update_overhead_ms": 0.1 if row_type == "new_visit" else None,
-            "full_history_latency_ms": 1.0 if row_type == "full_history" else None,
-            "gpu_peak_memory_bytes": 100,
-            "persistent_state_bytes": 63808,
-        }
-        for method, row_type in (("B4", "bootstrap"), ("B4", "new_visit"), ("full_history_rescene", "full_history"))
-        for horizon in horizons
-        for stage in range(5)
-    ]
+    efficiency_manifest = _efficiency_manifest()
+    efficiency_rows = list(aggregate_efficiency_rows(efficiency_manifest))
     return {
         "csv": {
             "baseline_results.csv": {"columns": list(p6a_artifacts.CSV_COLUMN_SCHEMAS["baseline_results.csv"]), "rows": baseline_rows},
@@ -474,7 +506,7 @@ def _artifact() -> dict[str, object]:
             "error": {"path": "error_breakdown.csv", "rows": 192, "status": "pass"},
             "reactivation": {"path": "reactivation_audit.csv", "rows": 12, "status": "pass"},
             "capacity": {"path": "capacity_audit.csv", "rows": 14, "status": "pass"},
-            "efficiency": {"path": "efficiency_results.csv", "rows": 60, "status": "pass"},
+            "efficiency": {"path": "efficiency_results.csv", "rows": 12, "status": "pass"},
             "statistical": {"path": "statistical_analysis.md", "rows": 1, "status": "pass"},
         },
         "change_label_limitation": {
@@ -492,6 +524,19 @@ def _artifact() -> dict[str, object]:
         "claims_not_supported": ["metadata order is real chronology"],
         "next_action": "stop_after_p6a",
         "errors": [],
+    }
+    raw_manifest_text = (
+        json.dumps(
+            _efficiency_manifest(),
+            allow_nan=False,
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+    artifact["derived_artifacts"]["json"]["efficiency_raw_manifest.json"] = {
+        "text": raw_manifest_text
     }
     placeholder_paths = {
         "P6A_GO_NOGO_REPORT.md",
@@ -582,6 +627,45 @@ def test_protocol_manifest_and_derived_csv_semantics_are_validated() -> None:
         ("value",)
     )
     with pytest.raises(ValueError, match="baseline_results|columns|Table"):
+        validate_root_artifact(artifact)
+
+
+def test_efficiency_raw_manifest_is_required_and_validated() -> None:
+    artifact = _artifact()
+    raw_manifest = json.loads(
+        artifact["derived_artifacts"]["json"]["efficiency_raw_manifest.json"]["text"]
+    )
+    assert len(raw_manifest["records"]) == 1161
+    validate_root_artifact(artifact)
+
+    artifact["derived_artifacts"]["json"].pop("efficiency_raw_manifest.json")
+    with pytest.raises(ValueError, match="efficiency_raw_manifest"):
+        validate_root_artifact(artifact)
+
+
+def test_efficiency_aggregate_must_match_raw_manifest() -> None:
+    artifact = _artifact()
+    raw_manifest = json.loads(
+        artifact["derived_artifacts"]["json"]["efficiency_raw_manifest.json"]["text"]
+    )
+    raw_manifest["records"][0]["model_latency_ms"] = 999.0
+    raw_manifest = build_efficiency_manifest(
+        raw_manifest["records"],
+        **raw_manifest["provenance"],
+    )
+    artifact["derived_artifacts"]["json"]["efficiency_raw_manifest.json"]["text"] = (
+        json.dumps(raw_manifest, allow_nan=False, indent=2, sort_keys=True) + "\n"
+    )
+
+    with pytest.raises(ValueError, match="efficiency"):
+        validate_root_artifact(artifact)
+
+    artifact = _artifact()
+    artifact["derived_artifacts"]["csv"]["efficiency_results.csv"]["rows"][0][
+        "bootstrap_latency_ms"
+    ] = 999.0
+
+    with pytest.raises(ValueError, match="efficiency"):
         validate_root_artifact(artifact)
 
 

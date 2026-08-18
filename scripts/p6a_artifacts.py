@@ -131,7 +131,9 @@ REQUIRED_CSV_PATHS = frozenset(
         "efficiency_results.csv",
     }
 )
-REQUIRED_JSON_PATHS = frozenset({"protocol_b_manifest.json"})
+REQUIRED_JSON_PATHS = frozenset(
+    {"protocol_b_manifest.json", "efficiency_raw_manifest.json"}
+)
 REQUIRED_MARKDOWN_PATHS = frozenset({"statistical_analysis.md"})
 REQUIRED_YAML_PATHS = frozenset(
     {"configs/resolved_runtime.yaml", "configs/p6a_default.yaml"}
@@ -1262,6 +1264,48 @@ def _validate_derived_artifacts(value: object) -> None:
                     _validate_scalar_tree(parsed_yaml, path=f"{path}.parsed")
 
 
+def _validate_efficiency_aggregate_binding(
+    derived: Mapping[str, object],
+) -> None:
+    """Require the registered efficiency CSV to be an exact raw-manifest derivation."""
+
+    raw_spec = derived["json"]["efficiency_raw_manifest.json"]
+    csv_spec = derived["csv"]["efficiency_results.csv"]
+    if not isinstance(raw_spec, Mapping) or not isinstance(csv_spec, Mapping):
+        raise ValueError("efficiency derived artifacts must be mappings")  # noqa: TRY004
+    try:
+        raw_manifest = json.loads(raw_spec["text"])
+        from scripts.p6a_efficiency import (
+            aggregate_efficiency_rows,
+            validate_efficiency_manifest,
+        )
+
+        validate_efficiency_manifest(raw_manifest)
+        expected_rows = list(aggregate_efficiency_rows(raw_manifest))
+    except Exception as error:
+        raise ValueError("efficiency raw manifest cannot be aggregated") from error
+
+    expected_columns = list(CSV_COLUMN_SCHEMAS["efficiency_results.csv"])
+    if csv_spec["columns"] != expected_columns:
+        raise ValueError("efficiency_results.csv columns are not the registered schema")
+    actual_rows = csv_spec["rows"]
+    if not isinstance(actual_rows, list) or len(actual_rows) != len(expected_rows):
+        raise ValueError("efficiency_results.csv rows differ from raw manifest aggregation")
+    for row_index, (actual, expected) in enumerate(zip(actual_rows, expected_rows)):
+        if not isinstance(actual, Mapping) or tuple(actual) != tuple(expected):
+            raise ValueError(
+                f"efficiency_results.csv row {row_index} columns differ from raw manifest"
+            )
+        for field in expected_columns:
+            actual_value = actual[field]
+            expected_value = expected[field]
+            if type(actual_value) is not type(expected_value) or actual_value != expected_value:
+                raise ValueError(
+                    "efficiency_results.csv value differs from raw manifest "
+                    f"at row {row_index}, column {field}"
+                )
+
+
 def _validate_manifest(value: object, *, derived: Mapping[str, object]) -> None:
     if not isinstance(value, list) or not value:
         raise ValueError("artifact_manifest must be a non-empty list")
@@ -1393,6 +1437,7 @@ def validate_root_artifact(artifact: object) -> None:
     _nonempty_string(limitation["scope"], name="change_label_limitation.scope")
 
     _validate_derived_artifacts(root["derived_artifacts"])
+    _validate_efficiency_aggregate_binding(root["derived_artifacts"])
     _validate_manifest(root["artifact_manifest"], derived=root["derived_artifacts"])
 
     analysis_artifacts = root["derived_artifacts"]

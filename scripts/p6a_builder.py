@@ -29,6 +29,10 @@ from scripts.p6a_artifacts import (
     verify_artifact_manifest,
 )
 from scripts.p6a_cache import validate_cache_manifest
+from scripts.p6a_efficiency import (
+    aggregate_efficiency_rows,
+    validate_efficiency_manifest,
+)
 from scripts.p6a_figures import (
     render_figure_a_identity,
     render_figure_b_online_tmap,
@@ -390,7 +394,7 @@ def build_p6a_root_artifact(
     evaluation: TaskMetricEvaluation,
     protocol_manifest: Mapping[str, object],
     cache_manifest: Mapping[str, object],
-    efficiency_rows: Sequence[Mapping[str, object]],
+    efficiency_manifest: Mapping[str, object],
     source_commit: str,
     p6a_config_text: str,
     runtime_config_text: str,
@@ -399,6 +403,7 @@ def build_p6a_root_artifact(
     """Derive the complete P6-A root artifact from frozen machine evidence."""
 
     validate_protocol_b_manifest(protocol_manifest)
+    validate_efficiency_manifest(efficiency_manifest)
     protocol = protocol_manifest["protocol"]
     if (
         protocol["expected_master_count"] != 43
@@ -511,18 +516,7 @@ def build_p6a_root_artifact(
         seed=int(bootstrap["seed"]),
     )
 
-    efficiency = tuple(
-        {field: row[field] for field in CSV_COLUMN_SCHEMAS["efficiency_results.csv"]}
-        for row in sorted(
-            efficiency_rows,
-            key=lambda row: (
-                str(row["method"]),
-                int(row["T"]),
-                int(row["stage_id"]),
-                str(row["row_type"]),
-            ),
-        )
-    )
+    efficiency = aggregate_efficiency_rows(efficiency_manifest)
     csv_rows: dict[str, Sequence[Mapping[str, object]]] = {
         **metrics,
         "per_sequence_results.csv": per_sequence,
@@ -681,7 +675,12 @@ def build_p6a_root_artifact(
         },
         "derived_artifacts": {
             "csv": derived_csv,
-            "json": {"protocol_b_manifest.json": {"text": protocol_text}},
+            "json": {
+                "protocol_b_manifest.json": {"text": protocol_text},
+                "efficiency_raw_manifest.json": {
+                    "text": _json_text(efficiency_manifest)
+                },
+            },
             "markdown": {"statistical_analysis.md": {"text": statistical_text}},
             "svg": {
                 "figures/figure_a_identity.svg": {
