@@ -13,12 +13,15 @@ import inspect
 import json
 import math
 import os
+import random
 import tempfile
 from collections.abc import Callable, Hashable, Mapping, Sequence
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import torch
 from torch import Tensor
 
@@ -219,6 +222,132 @@ class ProtocolCacheRequest:
     order_id: str
     stage_index: int
     scan_indices: tuple[int, ...]
+
+
+@contextmanager
+def _frozen_inference_seed(seed: int, device: torch.device):
+    python_state = random.getstate()
+    numpy_state = np.random.get_state()
+    cuda_devices = [device.index] if device.type == "cuda" else []
+    try:
+        random.seed(seed)
+        np.random.seed(seed)
+        with torch.random.fork_rng(devices=cuda_devices):
+            torch.manual_seed(seed)
+            yield
+    finally:
+        random.setstate(python_state)
+        np.random.set_state(numpy_state)
+
+
+@dataclass
+class RealPredictionCacheProducer:
+    """Run one frozen ReScene local window for one exact Protocol B key."""
+
+    protocol: object
+    provenance: Mapping[str, object]
+    dataset: object
+    collate: Callable[[list[object]], tuple[object, object, object]]
+    system: object
+    device: torch.device
+    observation_settings: Mapping[str, object]
+    move_data: Callable[[object, torch.device], object]
+    move_targets: Callable[[object, torch.device], object]
+    segment_stages: Callable[[Mapping[str, object]], Tensor]
+    latest_masks: Callable[..., Tensor]
+    observation_builder: Callable[..., object]
+    seed: int = 45
+
+    def __call__(self, logical_key: Mapping[str, object]) -> dict[str, object]:
+        request = resolve_protocol_cache_request(self.protocol, logical_key)
+        master = next(
+            master
+            for master in _protocol_masters(self.protocol)
+            if _field(master, "sequence_id") == request.master_sequence_id
+        )
+        names = _field(self.dataset, "sequence_names")
+        indices = _field(self.dataset, "sequence_indices")
+        if (
+            isinstance(names, (str, bytes))
+            or not isinstance(names, Sequence)
+            or request.context_index >= len(names)
+            or names[request.context_index] != request.master_sequence_id
+        ):
+            raise ValueError("dataset context does not match the Protocol B master")
+        if isinstance(indices, (str, bytes)) or not hasattr(indices, "__getitem__"):
+            raise ValueError("dataset sequence indices are unavailable")
+        try:
+            dataset_indices = tuple(
+                int(index) for index in indices[request.context_index]
+            )
+        except (IndexError, TypeError, ValueError) as error:
+            raise ValueError("dataset sequence indices are unavailable") from error
+        master_indices = tuple(int(index) for index in _field(master, "scan_indices"))
+        if dataset_indices != master_indices:
+            raise ValueError("dataset scan indices differ from the Protocol B master")
+
+        with _frozen_inference_seed(self.seed, self.device):
+            sample = self.dataset.load_scan_indices(
+                request.context_index,
+                request.scan_indices,
+                change_file=None,
+            )
+            data, targets, collated_names = self.collate([sample])
+            if (
+                not isinstance(targets, Sequence)
+                or len(targets) != 1
+                or list(collated_names) != [request.master_sequence_id]
+            ):
+                raise ValueError("collator changed the requested Protocol B sample")
+            target_full = _field(data, "target_full")
+            if (
+                isinstance(target_full, (str, bytes))
+                or not isinstance(target_full, Sequence)
+                or len(target_full) != 1
+                or not isinstance(target_full[0], Mapping)
+            ):
+                raise ValueError("collated data must contain one full-resolution target")
+            full_target = target_full[0]
+            data = self.move_data(data, self.device)
+            targets = self.move_targets(targets, self.device)
+            target = targets[0]
+            if not isinstance(target, Mapping) or "point2segment" not in target:
+                raise ValueError("collated target is missing point2segment")
+            stages = self.segment_stages(target)
+            if not isinstance(stages, Tensor) or stages.ndim != 1 or stages.numel() == 0:
+                raise ValueError("segment stages must be a non-empty rank-1 tensor")
+            latest_local_stage = int(stages.max().item())
+            raw_coordinates = self.system._process_raw_coordinates(data)
+            with torch.inference_mode():
+                output = self.system(
+                    data,
+                    point2segment=[target["point2segment"]],
+                    raw_coordinates=raw_coordinates,
+                    is_eval=True,
+                )
+            if not isinstance(output, Mapping):
+                raise TypeError("ReScene output must be a mapping")
+            observation = self.observation_builder(
+                output,
+                [stages],
+                latest_stage=latest_local_stage,
+                **dict(self.observation_settings),
+            )
+            full_masks = self.latest_masks(
+                self.system,
+                output,
+                target,
+                data,
+                latest_local_stage=latest_local_stage,
+            )
+        return cache_payload_from_inference(
+            key=logical_key,
+            provenance=self.provenance,
+            observation=observation,
+            full_masks=full_masks,
+            full_target=full_target,
+            latest_local_stage=latest_local_stage,
+        )
 
 
 def resolve_protocol_cache_request(
@@ -1211,6 +1340,7 @@ __all__ = [
     "CacheResolution",
     "PrefixCausalityResult",
     "ProtocolCacheRequest",
+    "RealPredictionCacheProducer",
     "atomic_manifest_payload",
     "atomic_manifest_publish",
     "build_atomic_manifest_payload",

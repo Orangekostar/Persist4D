@@ -2,11 +2,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from types import SimpleNamespace
 
+import numpy as np
 import pytest
 import torch
 
 from scripts.evaluate_persist4d_p6a import (
+    RealPredictionCacheProducer,
     atomic_manifest_payload,
     build_cache_provenance,
     build_temporal_target,
@@ -196,6 +199,94 @@ def test_cache_provenance_binds_checkpoint_configs_and_protocol(
         protocol_manifest=protocol_manifest,
     )
     assert changed["config_sha256"] != first["config_sha256"]
+
+
+def test_real_prediction_cache_producer_runs_one_exact_local_forward() -> None:
+    protocol = _protocol()
+    key = expected_cache_keys(protocol)[6]
+    calls: list[tuple[object, ...]] = []
+
+    class Dataset:
+        def __init__(self) -> None:
+            self.sequence_names = ["master-0"]
+            self.sequence_indices = np.asarray([(0, 1, 2, 3, 4)], dtype=int)
+
+        def load_scan_indices(
+            self,
+            context_index: int,
+            scan_indices: tuple[int, ...],
+            *,
+            change_file: object,
+        ) -> str:
+            calls.append(("load", context_index, scan_indices, change_file))
+            return "sample"
+
+    full_target = {
+        "ids": torch.tensor([10]),
+        "labels": torch.tensor([1]),
+        "masks": torch.tensor([[False, True, False]]),
+        "temporal_stages": torch.tensor([1, 1, 1]),
+    }
+    data = SimpleNamespace(target_full=[full_target])
+    target = {
+        "point2segment": torch.tensor([0, 1]),
+        "temporal_stages": torch.tensor([0, 1]),
+    }
+
+    def collate(samples: list[str]):
+        calls.append(("collate", tuple(samples)))
+        return data, [target], ["master-0"]
+
+    class System:
+        def _process_raw_coordinates(self, received: object) -> torch.Tensor:
+            calls.append(("raw", received))
+            return torch.ones((2, 3))
+
+        def __call__(self, received: object, **kwargs: object):
+            calls.append(("forward", received, kwargs))
+            return {"output": True}
+
+    class Observation:
+        features = torch.tensor([[[1.0, 0.0], [0.0, 1.0]]])
+        class_prob = torch.tensor([[[0.8, 0.1, 0.1], [0.1, 0.7, 0.2]]])
+        confidence = torch.tensor([[0.8, 0.7]])
+        valid = torch.tensor([[True, True]])
+
+        def validate(self) -> None:
+            return None
+
+    producer = RealPredictionCacheProducer(
+        protocol=protocol,
+        provenance=_payload(0)["provenance"],
+        dataset=Dataset(),
+        collate=collate,
+        system=System(),
+        device=torch.device("cpu"),
+        observation_settings={
+            "background_class": 2,
+            "confidence_threshold": 0.5,
+            "mask_threshold": 0.5,
+            "minimum_mask_support": 1,
+        },
+        move_data=lambda received, _device: received,
+        move_targets=lambda received, _device: received,
+        segment_stages=lambda _target: torch.tensor([0, 1]),
+        latest_masks=lambda *_args, **_kwargs: torch.tensor(
+            [[True, False, True], [False, True, False]], dtype=torch.bool
+        ),
+        observation_builder=lambda *_args, **_kwargs: Observation(),
+    )
+
+    payload = producer(key)
+
+    assert calls[0] == ("load", 0, (4, 3), None)
+    assert calls[1] == ("collate", ("sample",))
+    assert [call[0] for call in calls].count("forward") == 1
+    forward_kwargs = next(call[2] for call in calls if call[0] == "forward")
+    assert forward_kwargs["point2segment"] == [target["point2segment"]]
+    assert forward_kwargs["is_eval"] is True
+    assert payload["key"] == key
+    assert payload["target"]["gt_ids"].tolist() == [10]
 
 
 def test_cache_payload_to_frozen_observation_detaches_all_cpu_tensors() -> None:
