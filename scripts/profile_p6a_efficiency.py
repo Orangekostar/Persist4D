@@ -135,6 +135,7 @@ class EfficiencyProfileUnit:
     master_sequence_id: str
     order_id: str
     context_index: int
+    context_scan_indices: tuple[int, ...]
     scan_indices: tuple[int, ...]
     observations: tuple[FrozenObservation, ...]
 
@@ -149,17 +150,23 @@ class EfficiencyProfileUnit:
             or self.context_index < 0
         ):
             raise ValueError("context_index must be a non-negative integer")
-        if (
-            len(self.scan_indices) != 5
-            or len(set(self.scan_indices)) != 5
-            or any(
-                isinstance(index, bool) or not isinstance(index, Integral) or index < 0
-                for index in self.scan_indices
-            )
+        for name, values in (
+            ("context_scan_indices", self.context_scan_indices),
+            ("scan_indices", self.scan_indices),
         ):
-            raise ValueError(
-                "scan_indices must contain five unique non-negative integers"
-            )
+            if (
+                len(values) != 5
+                or len(set(values)) != 5
+                or any(
+                    isinstance(index, bool)
+                    or not isinstance(index, Integral)
+                    or index < 0
+                    for index in values
+                )
+            ):
+                raise ValueError(
+                    f"{name} must contain five unique non-negative integers"
+                )
         if len(self.observations) != 5:
             raise ValueError("observations must contain five causal stages")
         for observation in self.observations:
@@ -497,10 +504,13 @@ def build_efficiency_profile_units(
         if not isinstance(by_order, Mapping) or order_id not in by_order:
             raise ValueError("cached sequence order is absent from Protocol B")
         raw_indices = _field(by_order[order_id], "scan_indices")
+        raw_context_indices = _field(master, "scan_indices")
         raw_payloads = _field(sequence, "payloads")
         if (
             isinstance(raw_indices, (str, bytes))
             or not isinstance(raw_indices, Sequence)
+            or isinstance(raw_context_indices, (str, bytes))
+            or not isinstance(raw_context_indices, Sequence)
             or isinstance(raw_payloads, (str, bytes))
             or not isinstance(raw_payloads, Sequence)
         ):
@@ -516,6 +526,9 @@ def build_efficiency_profile_units(
                 master_sequence_id=master_id,
                 order_id=order_id,
                 context_index=int(_field(master, "validation_index")),
+                context_scan_indices=tuple(
+                    int(index) for index in raw_context_indices
+                ),
                 scan_indices=tuple(int(index) for index in raw_indices),
                 observations=tuple(observations),
             )
@@ -567,9 +580,9 @@ class RealModelProfiler:
         ):
             raise ValueError("dataset context differs from the efficiency unit")
         if tuple(int(index) for index in indices[unit.context_index]) != tuple(
-            unit.scan_indices
+            unit.context_scan_indices
         ):
-            raise ValueError("dataset scan indices differ from Protocol B")
+            raise ValueError("dataset scan indices differ from Protocol B master")
 
         from scripts.evaluate_persist4d_p6a import _frozen_inference_seed
 

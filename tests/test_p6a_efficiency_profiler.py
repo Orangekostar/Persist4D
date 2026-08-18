@@ -43,13 +43,23 @@ def _observation(stage: int):
 
 
 def _units() -> tuple[EfficiencyProfileUnit, ...]:
+    permutations = {
+        "canonical": (0, 1, 2, 3, 4),
+        "reverse": (4, 3, 2, 1, 0),
+        "sha256_seed45": (2, 0, 4, 1, 3),
+    }
     return tuple(
         EfficiencyProfileUnit(
             reference_scene_id=f"reference-{master_index % 6}",
             master_sequence_id=f"master-{master_index:02d}",
             order_id=order,
             context_index=master_index,
-            scan_indices=tuple(master_index * 10 + stage for stage in range(5)),
+            context_scan_indices=tuple(
+                master_index * 10 + stage for stage in range(5)
+            ),
+            scan_indices=tuple(
+                master_index * 10 + stage for stage in permutations[order]
+            ),
             observations=tuple(_observation(stage) for stage in range(5)),
         )
         for master_index in range(43)
@@ -183,14 +193,15 @@ def _protocol_and_cached_sequences():
     for master_index in range(43):
         master_id = f"master-{master_index:02d}"
         reference_id = f"reference-{master_index % 6}"
+        canonical = tuple(master_index * 10 + stage for stage in range(5))
         masters.append(
             SimpleNamespace(
                 sequence_id=master_id,
                 reference_scene_id=reference_id,
                 validation_index=master_index,
+                scan_indices=canonical,
             )
         )
-        canonical = tuple(master_index * 10 + stage for stage in range(5))
         order_indices = {
             "canonical": canonical,
             "reverse": tuple(reversed(canonical)),
@@ -232,6 +243,7 @@ def test_build_efficiency_units_binds_protocol_order_to_cached_observations() ->
         if unit.master_sequence_id == "master-00" and unit.order_id == "reverse"
     )
     assert reverse.context_index == 0
+    assert reverse.context_scan_indices == (0, 1, 2, 3, 4)
     assert reverse.scan_indices == (4, 3, 2, 1, 0)
     assert len(reverse.observations) == 5
 
@@ -282,21 +294,23 @@ def test_real_model_profiler_keeps_setup_outside_measured_forward() -> None:
     unit = EfficiencyProfileUnit(
         reference_scene_id="reference-0",
         master_sequence_id="master-00",
-        order_id="canonical",
+        order_id="reverse",
         context_index=0,
-        scan_indices=(0, 1, 2, 3, 4),
+        context_scan_indices=(0, 1, 2, 3, 4),
+        scan_indices=(4, 3, 2, 1, 0),
         observations=tuple(_observation(stage) for stage in range(5)),
     )
 
     result = profiler(
         unit,
-        (2, 3),
+        (2, 1),
         "new_visit",
         4,
         warmup=False,
     )
 
     assert result == ModelMeasurement(1.25, 4096)
+    assert calls[0] == ("load", 0, (2, 1), None)
     assert [call[0] if isinstance(call, tuple) else call for call in calls] == [
         "load",
         "collate",
