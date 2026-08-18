@@ -76,7 +76,7 @@ def _rows_d() -> list[dict[str, object]]:
             "horizon": horizon,
             "category": category,
             "count": category_index,
-            "share": 1 / len(FAILURE_CATEGORIES),
+            "share": category_index / sum(range(1, len(FAILURE_CATEGORIES) + 1)),
         }
         for horizon, (category_index, category) in product(
             HORIZONS, enumerate(FAILURE_CATEGORIES, start=1)
@@ -91,7 +91,7 @@ def _rows_d_group(method: str, horizon: int) -> list[dict[str, object]]:
             "horizon": horizon,
             "category": category,
             "count": category_index,
-            "share": 1 / len(FAILURE_CATEGORIES),
+            "share": category_index / sum(range(1, len(FAILURE_CATEGORIES) + 1)),
         }
         for category_index, category in enumerate(FAILURE_CATEGORIES, start=1)
     ]
@@ -345,6 +345,18 @@ def test_failure_shares_must_close_and_categories_must_be_complete() -> None:
     rows[0]["share"] = 0.2
     with pytest.raises(ValueError, match="share"):
         render_figure_d_failures(rows)
+
+
+def test_failure_figure_preserves_a_zero_failure_group() -> None:
+    rows = _rows_d()
+    for row in rows:
+        if row["horizon"] == 2:
+            row["count"] = 0
+            row["share"] = 0.0
+
+    rendered = render_figure_d_failures(rows)
+
+    assert "b4 / T2" in rendered
 
     rows = _rows_d()
     rows = [

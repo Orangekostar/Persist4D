@@ -782,18 +782,21 @@ def _validate_error_rows(path: str, rows: Sequence[Mapping[str, object]]) -> Non
             raise ValueError(
                 f"{path} must contain F1 through F7 and unclassified for {group}"
             )
-        if not math.isclose(
-            sum(float(row["share"]) for row in group_rows), 1.0, abs_tol=1e-9
-        ):
-            raise ValueError(f"{path} failure shares must sum to one for {group}")
         total_count = sum(int(row["count"]) for row in group_rows)
-        if total_count <= 0:
-            raise ValueError(f"{path} failure counts must have a positive total for {group}")
-        for row in group_rows:
-            if not math.isclose(
-                float(row["share"]), int(row["count"]) / total_count, abs_tol=1e-9
-            ):
-                raise ValueError(f"{path} share does not match count for {group}")
+        expected_total = 1.0 if total_count else 0.0
+        if not math.isclose(
+            sum(float(row["share"]) for row in group_rows),
+            expected_total,
+            abs_tol=1e-9,
+        ) or any(
+            not math.isclose(
+                float(row["share"]),
+                int(row["count"]) / total_count if total_count else 0.0,
+                abs_tol=1e-9,
+            )
+            for row in group_rows
+        ):
+            raise ValueError(f"{path} share does not match count for {group}")
 
 
 def _validate_reactivation_audit(

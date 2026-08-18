@@ -618,6 +618,18 @@ def test_error_breakdown_preserves_unclassified_failures() -> None:
         validate_root_artifact(artifact)
 
 
+def test_error_breakdown_preserves_a_zero_failure_group() -> None:
+    artifact = _artifact()
+    csv_artifacts = artifact["derived_artifacts"]["csv"]
+    for path in ("error_breakdown.csv", "error_breakdown_T2.csv"):
+        for row in csv_artifacts[path]["rows"]:
+            if row["method"] == "B4" and row["T"] == 2:
+                row["count"] = 0
+                row["share"] = 0.0
+
+    validate_root_artifact(artifact)
+
+
 def test_reactivation_distributions_preserve_empty_outcomes() -> None:
     artifact = _artifact()
     csv_artifacts = artifact["derived_artifacts"]["csv"]

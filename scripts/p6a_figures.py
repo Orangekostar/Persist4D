@@ -294,9 +294,21 @@ def _d_records(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         categories = {record["category"] for record in group_records}
         if categories != set(FAILURE_CATEGORIES):
             raise ValueError("missing failure category group")
-        total = sum(record["share"] for record in group_records)
-        if not math.isclose(total, 1.0, abs_tol=TOLERANCE, rel_tol=0.0):
-            raise ValueError("failure share must close to 1")
+        total_count = sum(record["count"] for record in group_records)
+        expected_total = 1.0 if total_count else 0.0
+        total_share = sum(record["share"] for record in group_records)
+        if not math.isclose(
+            total_share, expected_total, abs_tol=TOLERANCE, rel_tol=0.0
+        ) or any(
+            not math.isclose(
+                record["share"],
+                record["count"] / total_count if total_count else 0.0,
+                abs_tol=TOLERANCE,
+                rel_tol=0.0,
+            )
+            for record in group_records
+        ):
+            raise ValueError("failure shares must match counts")
     b4_keys = {(method, horizon) for method, horizon, _ in seen if method == "b4"}
     if b4_keys != {("b4", horizon) for horizon in HORIZONS}:
         raise ValueError("missing b4 failure horizon group")
