@@ -32,7 +32,7 @@ from scripts.evaluate_persist4d_p6a import (
     run_real_prediction_cache,
     stage_prediction_from_track_step,
 )
-from scripts.p6a_analysis import aggregate_event_metrics
+from scripts.p6a_analysis import aggregate_event_metrics, aggregate_metrics_by_sequence
 from scripts.p6a_association import (
     B0SanityTracker,
     B0StageUniqueTracker,
@@ -599,6 +599,7 @@ def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping(
     assert len(set(result.fingerprints["cache"].values())) == 1
     assert result.association_events
     assert len(result.capacity_snapshots) == 2 + 3 + 4 + 5
+    assert len(aggregate_metrics_by_sequence(result.association_events)) == 6 * 4
 
 
 def test_tracker_factories_lock_the_preregistered_baseline_parameters() -> None:

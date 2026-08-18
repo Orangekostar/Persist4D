@@ -1745,8 +1745,7 @@ def build_association_events(
         matched_gt = {gt_index for gt_index, _ in pairs}
         pair_by_pred = {pred_index: gt_index for gt_index, pred_index in pairs}
         current_matches: list[tuple[int, str | int]] = []
-        key = _require_mapping(payload["key"], name="cache key")
-        scene_id = str(key["history_scan_ids"][-1])
+        scene_id = master_sequence_id
         class_prob = _finite_tensor(
             observation["class_prob"], name="class_prob", ndim=2
         )
