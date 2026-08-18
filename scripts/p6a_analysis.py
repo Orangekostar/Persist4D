@@ -352,6 +352,12 @@ class AssociationEvent:
             )
         if self.id_switch is True and self.transition_opportunity is False:
             raise ValueError("id_switch requires a transition opportunity")
+        if (
+            self.transition_opportunity is True
+            or self.id_switch is True
+            or self.gap_opportunity is True
+        ) and self.gt_entity_id is None:
+            raise ValueError("identity and gap opportunities require a GT entity")
         if self.reactivation_attempt is True and self.gap_opportunity is not True:
             raise ValueError("reactivation_attempt requires a gap opportunity")
         if self.reactivation_attempt is True and self.reactivation is not True:
@@ -440,6 +446,8 @@ def validate_association_events(
                 )
             gt_stage_keys.add(gt_key)
         result.append(event)
+    if not result:
+        raise ValueError("association event table requires at least one event")
     return tuple(result)
 
 
@@ -1492,6 +1500,31 @@ def _exact_cluster_count(value: object) -> int | None:
     return result if result == 6 else None
 
 
+def _exact_pair_count(value: object) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, Integral):
+        return None
+    result = int(value)
+    return result if result == 43 * 3 else None
+
+
+def _cluster_list(value: object) -> list[str] | None:
+    if not isinstance(value, list) or len(value) != 6:
+        return None
+    if any(not isinstance(item, str) or not item for item in value):
+        return None
+    return value if len(set(value)) == 6 else None
+
+
+def _raw_metric_tree_valid(value: object) -> bool:
+    if isinstance(value, Mapping):
+        return bool(value) and all(
+            _raw_metric_tree_valid(item) for item in value.values()
+        )
+    if isinstance(value, (list, tuple)):
+        return bool(value) and all(_raw_metric_tree_valid(item) for item in value)
+    return _unit_interval(value) is not None
+
+
 def _raw_values(values: object) -> list[float]:
     if isinstance(values, Mapping):
         output: list[float] = []
@@ -1528,17 +1561,21 @@ def _gate_g6a1(data: Mapping[str, object], config: GateConfig) -> dict[str, obje
     passed = True
     for horizon in (4, 5):
         entry = _horizon_value(paired, horizon)
-        reduction = ci_high = n_clusters = None
+        reduction = ci_high = n_clusters = n_pairs = clusters = None
         if isinstance(entry, Mapping):
             reduction = _numeric_value(entry.get("relative_reduction"))
             ci_high = _numeric_value(entry.get("ci_high", entry.get("delta_ci_high")))
             n_clusters = _exact_cluster_count(entry.get("n_clusters"))
+            n_pairs = _exact_pair_count(entry.get("n_pairs"))
+            clusters = _cluster_list(entry.get("clusters"))
         reduction_in_domain = reduction is not None and reduction <= 1.0
         ci_in_domain = ci_high is not None and -1.0 <= ci_high <= 1.0
         ok = (
             reduction_in_domain
             and ci_in_domain
             and n_clusters == 6
+            and n_pairs == 129
+            and clusters is not None
             and reduction >= config.g6a1_relative_reduction
             and ci_high <= config.g6a1_ci_high
         )
@@ -1546,6 +1583,8 @@ def _gate_g6a1(data: Mapping[str, object], config: GateConfig) -> dict[str, obje
             "relative_reduction": reduction,
             "ci_high": ci_high,
             "n_clusters": n_clusters,
+            "n_pairs": n_pairs,
+            "clusters": clusters,
             "passed": ok,
         }
         passed = passed and ok
@@ -1646,9 +1685,15 @@ def _gate_g6a3(data: Mapping[str, object], config: GateConfig) -> dict[str, obje
     raw = data.get("raw_local_ap", data.get("raw_local_metrics"))
     numeric_values = _raw_values(raw)
     if isinstance(raw, Mapping):
+        raw_methods = set(raw)
+        fingerprint_methods = (
+            set(fingerprints) if isinstance(fingerprints, Mapping) else set()
+        )
         method_arrays = [_raw_values(value) for value in raw.values()]
         comparable = (
             len(method_arrays) >= 2
+            and raw_methods == fingerprint_methods
+            and all(_raw_metric_tree_valid(value) for value in raw.values())
             and bool(method_arrays[0])
             and all(len(array) == len(method_arrays[0]) for array in method_arrays)
             and all(0.0 <= value <= 1.0 for array in method_arrays for value in array)
@@ -1659,11 +1704,7 @@ def _gate_g6a3(data: Mapping[str, object], config: GateConfig) -> dict[str, obje
             for index in range(len(method_arrays[0]))
         )
     else:
-        numeric_equal = (
-            bool(numeric_values)
-            and all(0.0 <= value <= 1.0 for value in numeric_values)
-            and max(numeric_values) - min(numeric_values) <= config.g6a3_abs_tolerance
-        )
+        numeric_equal = False
     passed = fingerprint_equal and numeric_equal
     return _gate_result(
         passed,
@@ -1719,24 +1760,33 @@ def _gate_g6a4(
 
 
 def _gate_g6a5(data: Mapping[str, object], config: GateConfig) -> dict[str, object]:
-    explicit_share = "explainability_share" in data
-    share = _unit_interval(data.get("explainability_share"))
+    has_explicit_share = "explainability_share" in data
+    explicit_share = _unit_interval(data.get("explainability_share"))
     counts = data.get("failure_counts", data.get("failure_breakdown"))
     if isinstance(counts, Mapping) and isinstance(counts.get("counts"), Mapping):
         counts = counts["counts"]
-    if not explicit_share and share is None and isinstance(counts, Mapping):
-        values: dict[str, float] = {}
+    share = None
+    expected_keys = {*FAILURE_CODES, "unclassified"}
+    if isinstance(counts, Mapping) and set(counts) == expected_keys:
+        values: dict[str, int] = {}
         valid_counts = True
         for key, value in counts.items():
-            numeric = _numeric_value(value)
-            if numeric is None or numeric < 0.0:
+            if isinstance(value, bool) or not isinstance(value, Integral) or value < 0:
                 valid_counts = False
                 break
-            values[str(key)] = numeric
+            values[str(key)] = int(value)
         if valid_counts:
             total = sum(values.values())
-            categorized = sum(values.get(code, 0.0) for code in FAILURE_CODES)
-            share = categorized / total if total else None
+            categorized = sum(values[code] for code in FAILURE_CODES)
+            derived_share = categorized / total if total else None
+            if derived_share is not None and (
+                not has_explicit_share
+                or (
+                    explicit_share is not None
+                    and abs(explicit_share - derived_share) <= 1e-12
+                )
+            ):
+                share = derived_share
     passed = share is not None and share >= config.g6a5_explainability
     return _gate_result(
         passed,

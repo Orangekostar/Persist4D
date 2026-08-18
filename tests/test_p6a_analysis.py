@@ -90,6 +90,11 @@ def test_event_mapping_rejects_unknown_fields_and_cache_mismatch() -> None:
         validate_association_events([_event(cache_digest="cache-b")])
 
 
+def test_event_table_cannot_be_empty() -> None:
+    with pytest.raises(ValueError, match="at least one"):
+        validate_association_events([])
+
+
 def test_event_identity_is_unique_but_decisions_are_method_and_order_scoped() -> None:
     first = _event(event_id="one")
     second_method = _event(event_id="two", method="EMA")
@@ -136,6 +141,23 @@ def test_correct_reactivation_requires_gt_and_gap_attempt() -> None:
                     reactivation_correct=True,
                 )
             ]
+        )
+
+
+@pytest.mark.parametrize(
+    "flags",
+    [
+        {"transition_opportunity": True, "id_switch": False},
+        {"transition_opportunity": True, "id_switch": True},
+        {"gap_opportunity": True},
+    ],
+)
+def test_identity_and_gap_opportunities_require_a_gt_entity(
+    flags: dict[str, object],
+) -> None:
+    with pytest.raises(ValueError, match="GT entity"):
+        validate_association_events(
+            [_event(gt_entity_id=None, gt_present=False, **flags)]
         )
     with pytest.raises(ValueError, match="gap opportunity"):
         aggregate_reactivation_metrics(
@@ -637,8 +659,20 @@ def test_compact_paired_rows_cannot_bypass_record_validation() -> None:
 def _gate_input() -> dict[str, object]:
     return {
         "paired_idsw": {
-            4: {"relative_reduction": 0.20, "ci_high": 0.0, "n_clusters": 6},
-            5: {"relative_reduction": 0.20, "ci_high": 0.0, "n_clusters": 6},
+            4: {
+                "relative_reduction": 0.20,
+                "ci_high": 0.0,
+                "n_clusters": 6,
+                "n_pairs": 129,
+                "clusters": [f"ref-{index}" for index in range(6)],
+            },
+            5: {
+                "relative_reduction": 0.20,
+                "ci_high": 0.0,
+                "n_clusters": 6,
+                "n_pairs": 129,
+                "clusters": [f"ref-{index}" for index in range(6)],
+            },
         },
         "reactivation": {
             "Persist4D": {
@@ -669,7 +703,16 @@ def _gate_input() -> dict[str, object]:
                 5: {"t_mAP": 0.80, "t_REC": 0.80},
             },
         },
-        "failure_counts": {"F1": 9, "unclassified": 1},
+        "failure_counts": {
+            "F1": 9,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0,
+            "F5": 0,
+            "F6": 0,
+            "F7": 0,
+            "unclassified": 1,
+        },
     }
 
 
@@ -691,8 +734,16 @@ def test_gate_boundary_failures_are_not_rounded_up() -> None:
             "relative_reduction": 0.199999999,
             "ci_high": 0.0,
             "n_clusters": 6,
+            "n_pairs": 129,
+            "clusters": [f"ref-{index}" for index in range(6)],
         },
-        5: {"relative_reduction": 0.20, "ci_high": 0.0, "n_clusters": 6},
+        5: {
+            "relative_reduction": 0.20,
+            "ci_high": 0.0,
+            "n_clusters": 6,
+            "n_pairs": 129,
+            "clusters": [f"ref-{index}" for index in range(6)],
+        },
     }
     result = evaluate_gates(values)
     assert result["G6A-1"]["passed"] is False
@@ -726,6 +777,13 @@ def test_local_invariance_gate_rejects_invalid_fingerprints(
     assert evaluate_gates(values)["G6A-3"]["passed"] is False
 
 
+@pytest.mark.parametrize("raw", [0.5, [0.5, 0.5]])
+def test_local_invariance_gate_requires_method_wise_metrics(raw: object) -> None:
+    values = _gate_input()
+    values["raw_local_ap"] = raw
+    assert evaluate_gates(values)["G6A-3"]["passed"] is False
+
+
 @pytest.mark.parametrize(
     ("path", "value", "gate"),
     [
@@ -751,3 +809,30 @@ def test_explainability_gate_rejects_impossible_share() -> None:
     values = _gate_input()
     values["explainability_share"] = 2.0
     assert evaluate_gates(values)["G6A-5"]["passed"] is False
+
+
+def test_explainability_gate_rejects_share_count_disagreement() -> None:
+    values = _gate_input()
+    values["explainability_share"] = 0.9
+    values["failure_counts"] = {
+        **{code: 0 for code in ("F1", "F2", "F3", "F4", "F5", "F6", "F7")},
+        "unclassified": 100,
+    }
+    assert evaluate_gates(values)["G6A-5"]["passed"] is False
+
+
+def test_explainability_gate_requires_integer_failure_counts() -> None:
+    values = _gate_input()
+    values["failure_counts"] = {
+        **{code: 0 for code in ("F2", "F3", "F4", "F5", "F6", "F7")},
+        "F1": 0.9,
+        "unclassified": 0.1,
+    }
+    assert evaluate_gates(values)["G6A-5"]["passed"] is False
+
+
+@pytest.mark.parametrize("missing", ["n_pairs", "clusters"])
+def test_identity_gate_requires_complete_paired_coverage(missing: str) -> None:
+    values = _gate_input()
+    values["paired_idsw"][4].pop(missing)
+    assert evaluate_gates(values)["G6A-1"]["passed"] is False
