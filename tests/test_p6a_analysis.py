@@ -764,6 +764,20 @@ def test_preregistered_gates_accept_exact_boundaries() -> None:
     assert result["overall_passed"] is True
 
 
+def test_quality_gate_accepts_normalized_horizon_tokens() -> None:
+    values = _gate_input()
+    values["online_task"] = {
+        method: {f"T{horizon}": metrics for horizon, metrics in horizons.items()}
+        for method, horizons in values["online_task"].items()
+    }
+
+    result = evaluate_gates(values)["G6A-4"]
+
+    assert result["passed"] is True
+    assert result["checks"]["T2_t_mAP"]["drop"] == pytest.approx(0.05)
+    assert result["checks"]["T4_t_REC"]["delta"] == pytest.approx(0.01)
+
+
 def test_gate_boundary_failures_are_not_rounded_up() -> None:
     values = _gate_input()
     values["paired_idsw"] = {

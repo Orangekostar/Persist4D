@@ -1483,7 +1483,7 @@ class GateConfig:
 def _horizon_value(values: object, horizon: int) -> object:
     if not isinstance(values, Mapping):
         return None
-    return values.get(horizon, values.get(str(horizon)))
+    return values.get(horizon, values.get(str(horizon), values.get(f"T{horizon}")))
 
 
 def _numeric_value(value: object) -> float | None:
