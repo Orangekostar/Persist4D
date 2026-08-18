@@ -359,3 +359,28 @@ def test_default_config_preregisters_histograms_and_capacity_aggregation() -> No
         "rejected_births": "sum",
         "peak_state": "maximum_over_sequences_and_prefix_stages",
     }
+
+
+def test_default_config_freezes_incremental_efficiency_measurement_contract() -> None:
+    config = yaml.safe_load((PROJECT_ROOT / "conf/p6a/default.yaml").read_text())
+
+    assert config["efficiency"] == {
+        "warmup_per_group": 1,
+        "measurements_per_unit": 1,
+        "bootstrap_records": 129,
+        "new_visit_records_per_horizon": 129,
+        "full_history_records_per_horizon": 129,
+        "total_records": 1161,
+        "seed_per_sample": 45,
+        "local_input": "latest_pair_plus_persistent_state",
+        "full_history_input": "exact_common_prefix",
+        "latency_boundary": "cuda_synchronized_model_forward_plus_cpu_tracker",
+        "excluded_from_latency": [
+            "dataset_load",
+            "collate",
+            "host_to_device",
+            "metric_postprocess",
+        ],
+        "gpu_peak_memory": "torch_cuda_max_memory_allocated",
+        "persistent_state_memory": "exact_tensor_storage_bytes",
+    }
