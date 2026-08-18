@@ -18,6 +18,7 @@ C_METHODS = ("b1", "b2", "b3", "b4")
 C_HORIZONS = (3, 4, 5)
 HORIZONS = (2, 3, 4, 5)
 E_METHODS = ("b4", "full_history_rescene")
+FAILURE_CATEGORIES = (*tuple(f"F{index}" for index in range(1, 8)), "unclassified")
 
 
 def _rows_a(*, include_oracle: bool = True) -> list[dict[str, object]]:
@@ -73,11 +74,13 @@ def _rows_d() -> list[dict[str, object]]:
         {
             "method_id": "b4",
             "horizon": horizon,
-            "category": f"F{category}",
-            "count": category,
-            "share": 1 / 7,
+            "category": category,
+            "count": category_index,
+            "share": 1 / len(FAILURE_CATEGORIES),
         }
-        for horizon, category in product(HORIZONS, range(1, 8))
+        for horizon, (category_index, category) in product(
+            HORIZONS, enumerate(FAILURE_CATEGORIES, start=1)
+        )
     ]
 
 
@@ -86,11 +89,11 @@ def _rows_d_group(method: str, horizon: int) -> list[dict[str, object]]:
         {
             "method_id": method,
             "horizon": horizon,
-            "category": f"F{category}",
-            "count": category,
-            "share": 1 / 7,
+            "category": category,
+            "count": category_index,
+            "share": 1 / len(FAILURE_CATEGORIES),
         }
-        for category in range(1, 8)
+        for category_index, category in enumerate(FAILURE_CATEGORIES, start=1)
     ]
 
 

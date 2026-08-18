@@ -17,7 +17,7 @@ LATENCY_METHOD_ORDER = ("b4", "full_history_rescene")
 HORIZONS = (2, 3, 4, 5)
 OUTCOMES = ("correct", "wrong")
 REACTIVATION_METRICS = ("best_score", "score_margin")
-FAILURE_CATEGORIES = tuple(f"F{index}" for index in range(1, 8))
+FAILURE_CATEGORIES = (*tuple(f"F{index}" for index in range(1, 8)), "unclassified")
 PHASES = ("bootstrap", "new_visit")
 TOLERANCE = 1e-9
 
@@ -59,8 +59,18 @@ _CATEGORY_FILLS = (
     "#999999",
     "#B8B8B8",
     "#D6D6D6",
+    "#F2F2F2",
 )
-_CATEGORY_DASHES = ("", "6 2", "2 2", "8 2 2 2", "1 2", "10 2", "4 2 1 2")
+_CATEGORY_DASHES = (
+    "",
+    "6 2",
+    "2 2",
+    "8 2 2 2",
+    "1 2",
+    "10 2",
+    "4 2 1 2",
+    "3 2 1 2",
+)
 
 _SCHEMA_A = frozenset(("method_id", "horizon", "id_switch_rate"))
 _SCHEMA_B = frozenset(("method_id", "horizon", "online_t_mAP"))
@@ -256,7 +266,7 @@ def _d_records(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         horizon = _horizon(row["horizon"])
         category = row["category"]
         if category not in FAILURE_CATEGORIES:
-            raise ValueError("category must be F1 through F7")
+            raise ValueError("category must be F1 through F7 or unclassified")
         key = (method, horizon, category)
         if key in seen:
             raise ValueError("duplicate primary key")
@@ -622,7 +632,7 @@ def render_figure_d_failures(rows: Iterable[Mapping[str, Any]]) -> str:
     parts = _svg_start(
         "D",
         "Figure D: Failure Composition",
-        "Exclusive F1 through F7 failure composition by method and horizon.",
+        "Exclusive F1 through F7 and unclassified failure composition by method and horizon.",
     )
     parts.append(_text(360, 38, "Horizon (T)", anchor="middle"))
     parts.append(_text(70, 38, "Method", anchor="start"))
