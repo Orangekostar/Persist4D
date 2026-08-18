@@ -78,6 +78,17 @@ diagnostics:
   gt_assignment: class_compatible_global_hungarian
   iou_threshold: 0.5
   identity_namespace: method_sequence_scoped
+  reactivation_histograms:
+    best_score_edges: [-1.0, -0.5, 0.0, 0.25, 0.5, 0.75, 1.0, 1.25]
+    score_margin_edges: [0.0, 0.05, 0.1, 0.2, 0.4, 0.8, 1.2, 2.25]
+    empty_outcome: zero_count_zero_fraction
+
+capacity_audit:
+  stage_state: maximum_occupied_snapshot
+  tie_break: maximum_active
+  birth_count: sum
+  rejected_births: sum
+  peak_state: maximum_over_sequences_and_prefix_stages
 
 bootstrap:
   unit: reference_scene_id

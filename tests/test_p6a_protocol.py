@@ -342,3 +342,20 @@ def test_default_config_freezes_complete_baseline_and_g6a4_parameters() -> None:
         "horizons": [4, 5],
         "metrics": ["t_mAP", "t_REC"],
     }
+
+
+def test_default_config_preregisters_histograms_and_capacity_aggregation() -> None:
+    config = yaml.safe_load((PROJECT_ROOT / "conf/p6a/default.yaml").read_text())
+
+    assert config["diagnostics"]["reactivation_histograms"] == {
+        "best_score_edges": [-1.0, -0.5, 0.0, 0.25, 0.5, 0.75, 1.0, 1.25],
+        "score_margin_edges": [0.0, 0.05, 0.1, 0.2, 0.4, 0.8, 1.2, 2.25],
+        "empty_outcome": "zero_count_zero_fraction",
+    }
+    assert config["capacity_audit"] == {
+        "stage_state": "maximum_occupied_snapshot",
+        "tie_break": "maximum_active",
+        "birth_count": "sum",
+        "rejected_births": "sum",
+        "peak_state": "maximum_over_sequences_and_prefix_stages",
+    }
