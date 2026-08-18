@@ -26,7 +26,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts.p6a_association import FrozenObservation, freeze_observation
+from scripts.p6a_association import (
+    B0StageUniqueTracker,
+    FrozenObservation,
+    OracleStageTarget,
+    freeze_observation,
+    run_oracle_posthoc,
+)
 from scripts.p6a_cache import (
     CHANGE_LABEL_SEMANTICS,
     ENTRY_KEYS,
@@ -35,12 +41,16 @@ from scripts.p6a_cache import (
     build_cache_manifest,
     discover_cache_entries,
     load_cache_entry,
+    load_cache_manifest,
+    validate_cache_entry,
     validate_cache_payload,
     write_cache_entry,
     write_cache_manifest,
 )
 from scripts.p6a_metrics import (
     IdentityAccumulator,
+    OfficialMetricAccumulator,
+    assert_shared_raw_predictions,
     build_offline_reconstructed_prediction,
     build_online_endpoint_prediction,
 )
@@ -503,6 +513,68 @@ def materialize_prediction_cache(
         cache_directory=cache_directory,
     )
     return manifest
+
+
+def load_cached_protocol_sequences(
+    *,
+    protocol: object,
+    cache_directory: Path,
+    manifest_path: Path,
+) -> tuple[CachedProtocolSequence, ...]:
+    """Load one validated five-stage sequence per Protocol B master and order."""
+
+    expected = expected_cache_keys(protocol)
+    try:
+        manifest_document = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise ValueError("cache manifest cannot be decoded") from error
+    manifest_root = _require_mapping(manifest_document, name="cache manifest")
+    provenance = _require_mapping(
+        manifest_root.get("provenance"), name="cache manifest provenance"
+    )
+    manifest = load_cache_manifest(
+        manifest_path,
+        expected_keys=expected,
+        expected_provenance=provenance,
+        cache_directory=cache_directory,
+    )
+    entries_by_key = {
+        _key_identity(entry["key"]): entry for entry in _manifest_entries(manifest)
+    }
+    payloads_by_key: dict[str, Mapping[str, object]] = {}
+    for key in expected:
+        identity = _key_identity(key)
+        entry = entries_by_key[identity]
+        filename = entry["filename"]
+        if not isinstance(filename, str) or Path(filename).name != filename:
+            raise ValueError("cache manifest filename must be a plain file name")
+        payloads_by_key[identity] = validate_cache_entry(
+            cache_directory / filename,
+            entry,
+            expected_provenance=provenance,
+        )
+
+    sequences = []
+    for master in _protocol_masters(protocol):
+        master_id = _field(master, "sequence_id")
+        reference_id = _field(master, "reference_scene_id")
+        for order in _protocol_orders(protocol):
+            keys = [
+                key
+                for key in expected
+                if key["master_sequence_id"] == master_id
+                and key["order_id"] == order
+            ]
+            keys.sort(key=lambda key: int(key["stage_index"]))
+            sequences.append(
+                CachedProtocolSequence(
+                    reference_scene_id=str(reference_id),
+                    master_sequence_id=str(master_id),
+                    order_id=order,
+                    payloads=tuple(payloads_by_key[_key_identity(key)] for key in keys),
+                )
+            )
+    return tuple(sequences)
 
 
 def _repository_path(path: Path) -> Path:
@@ -1268,6 +1340,43 @@ class PrefixCausalityResult:
         return getattr(self, key)
 
 
+@dataclass(frozen=True)
+class CachedProtocolSequence:
+    reference_scene_id: str
+    master_sequence_id: str
+    order_id: str
+    payloads: tuple[Mapping[str, object], ...]
+
+    def __post_init__(self) -> None:
+        for name in ("reference_scene_id", "master_sequence_id", "order_id"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value:
+                raise ValueError(f"{name} must be a non-empty string")
+        if self.order_id not in _EXPECTED_ORDER_NAMES:
+            raise ValueError("order_id is not a Protocol B order")
+        normalized = _stage_payloads(self.payloads)
+        if len(normalized) != 5:
+            raise ValueError("cached Protocol B sequences must contain five stages")
+        for stage, payload in enumerate(normalized):
+            validate_cache_payload(payload)
+            key = _require_mapping(payload["key"], name="cache key")
+            if (
+                key["master_sequence_id"] != self.master_sequence_id
+                or key["reference_scene_id"] != self.reference_scene_id
+                or key["order_id"] != self.order_id
+                or key["stage_index"] != stage
+            ):
+                raise ValueError("cache payload key differs from sequence identity")
+        object.__setattr__(self, "payloads", normalized)
+
+
+@dataclass(frozen=True)
+class TaskMetricEvaluation:
+    metric_blocks: dict[str, dict[str, dict[str, dict[str, float]]]]
+    fingerprints: dict[str, dict[str, str]]
+    sequence_count: int
+
+
 def prefix_causality_coordinator(
     stage_payloads: Sequence[Mapping[str, object]],
     tracker_factories: Mapping[str, object],
@@ -1355,6 +1464,245 @@ def prefix_causality_coordinator(
         offline_predictions=offline_predictions,
         content_digest=digest,
         endpoints=endpoint_values,
+    )
+
+
+def _remap_metric_prediction(
+    prediction: Mapping[str, object],
+    class_mapper: Callable[[int], int] | Mapping[int, int],
+) -> dict[str, object]:
+    result = {
+        key: value.detach().cpu().clone() if isinstance(value, Tensor) else value
+        for key, value in prediction.items()
+    }
+    classes = _integer_tensor(
+        result.get("pred_classes"), name="prediction pred_classes", ndim=1
+    )
+    result["pred_classes"] = torch.tensor(
+        [_map_class(class_mapper, int(value)) for value in classes.tolist()],
+        dtype=torch.long,
+    )
+    return result
+
+
+def _remap_metric_target(
+    target: Mapping[str, object],
+    class_mapper: Callable[[int], int] | Mapping[int, int],
+) -> dict[str, object]:
+    result = {
+        key: value.detach().cpu().clone() if isinstance(value, Tensor) else value
+        for key, value in target.items()
+    }
+    labels = _integer_tensor(result.get("labels"), name="target labels", ndim=1)
+    result["labels"] = torch.tensor(
+        [_map_class(class_mapper, int(value)) for value in labels.tolist()],
+        dtype=torch.long,
+    )
+    return result
+
+
+def _raw_local_target(payload: Mapping[str, object]) -> dict[str, Tensor]:
+    target = _target_mapping(payload)
+    masks = _clone_cpu(target["gt_masks"], name="gt_masks")
+    if masks.dtype != torch.bool or masks.ndim != 2:
+        raise ValueError("gt_masks must be a rank-2 bool tensor")
+    labels = _integer_tensor(target["gt_classes"], name="gt_classes", ndim=1)
+    ids = _integer_tensor(target["gt_ids"], name="gt_ids", ndim=1)
+    changes = _integer_tensor(target["changes"], name="changes", ndim=1)
+    if any(value.shape[0] != masks.shape[0] for value in (labels, ids, changes)):
+        raise ValueError("raw local target fields must share the GT dimension")
+    return {
+        "masks": masks,
+        "labels": labels,
+        "ids": ids,
+        "changes": changes,
+        "temporal_stages": torch.zeros(masks.shape[1], dtype=torch.long),
+    }
+
+
+def _official_metric_factory(
+    mode: str, _method: str, _horizon: int
+) -> OfficialMetricAccumulator:
+    return OfficialMetricAccumulator(mode=mode)
+
+
+def evaluate_cached_task_metrics(
+    sequences: Sequence[CachedProtocolSequence],
+    *,
+    tracker_factories: Mapping[str, object],
+    class_mapper: Callable[[int], int] | Mapping[int, int],
+    metric_factory: Callable[[str, str, int], object] = _official_metric_factory,
+    background_class: int = 18,
+) -> TaskMetricEvaluation:
+    """Evaluate raw, causal-prefix, and offline metrics from one frozen cache."""
+
+    if isinstance(sequences, (str, bytes)) or not isinstance(sequences, Sequence):
+        raise TypeError("sequences must be a sequence")
+    if not sequences:
+        raise ValueError("sequences must not be empty")
+    methods = tuple(tracker_factories)
+    if not methods or len(set(methods)) != len(methods):
+        raise ValueError("tracker_factories must contain unique methods")
+    all_methods = (*methods, "Oracle")
+    horizons = (2, 3, 4, 5)
+    raw_metrics = {
+        horizon: metric_factory("raw_local", "shared", horizon)
+        for horizon in horizons
+    }
+    strict_metrics = {
+        method: {
+            horizon: metric_factory("strict_online", method, horizon)
+            for horizon in horizons
+        }
+        for method in methods
+    }
+    offline_metrics = {
+        method: {
+            horizon: metric_factory("offline_reconstructed", method, horizon)
+            for horizon in horizons
+        }
+        for method in all_methods
+    }
+    raw_predictions: list[dict[str, object]] = []
+    cache_hasher = hashlib.sha256()
+
+    for sequence in sequences:
+        if not isinstance(sequence, CachedProtocolSequence):
+            raise TypeError("sequences must contain CachedProtocolSequence values")
+        payloads = sequence.payloads
+        sequence_id = (
+            f"{sequence.master_sequence_id}:{sequence.order_id}"
+        )
+        coordinated = prefix_causality_coordinator(
+            payloads,
+            tracker_factories,
+            endpoints=(1, 2, 3, 4),
+            sequence_id=sequence_id,
+            background_class=background_class,
+        )
+        frozen = tuple(cache_payload_to_frozen_observation(item) for item in payloads)
+        oracle_targets = tuple(
+            OracleStageTarget(
+                gt_ids=tuple(
+                    _integer_tensor(
+                        _target_mapping(payload)["gt_ids"],
+                        name="gt_ids",
+                        ndim=1,
+                    ).tolist()
+                ),
+                classes=tuple(
+                    _integer_tensor(
+                        _target_mapping(payload)["gt_classes"],
+                        name="gt_classes",
+                        ndim=1,
+                    ).tolist()
+                ),
+                masks=_clone_cpu(
+                    _target_mapping(payload)["gt_masks"], name="gt_masks"
+                ),
+            )
+            for payload in payloads
+        )
+        oracle_steps = run_oracle_posthoc(
+            frozen,
+            oracle_targets,
+            sequence_id=sequence_id,
+            background_class=background_class,
+        )
+        oracle_accumulator = IdentityAccumulator()
+        for payload, step in zip(payloads, oracle_steps, strict=True):
+            oracle_accumulator.add_stage(
+                stage_prediction_from_track_step(
+                    payload,
+                    step,
+                    background_class=background_class,
+                )
+            )
+
+        cache_hasher.update(sequence.reference_scene_id.encode("utf-8") + b"\0")
+        cache_hasher.update(sequence.master_sequence_id.encode("utf-8") + b"\0")
+        cache_hasher.update(sequence.order_id.encode("ascii") + b"\0")
+        cache_hasher.update(coordinated.content_digest.encode("ascii"))
+
+        for horizon in horizons:
+            endpoint = horizon - 1
+            target = _remap_metric_target(
+                build_temporal_target(payloads[:horizon]), class_mapper
+            )
+            raw_observation = frozen[endpoint]
+            raw_step = B0StageUniqueTracker(sequence_id=sequence_id).step(
+                raw_observation,
+                stage_id=endpoint,
+            )
+            raw_prediction = _remap_metric_prediction(
+                stage_prediction_from_track_step(
+                    payloads[endpoint],
+                    raw_step,
+                    background_class=background_class,
+                ),
+                class_mapper,
+            )
+            raw_target = _remap_metric_target(
+                _raw_local_target(payloads[endpoint]), class_mapper
+            )
+            raw_metrics[horizon].update(raw_prediction, raw_target)
+            raw_predictions.append(raw_prediction)
+
+            for method in methods:
+                strict_prediction = _remap_metric_prediction(
+                    coordinated.online_predictions[method][endpoint], class_mapper
+                )
+                strict_metrics[method][horizon].update(strict_prediction, target)
+                offline_prediction = _remap_metric_prediction(
+                    build_offline_reconstructed_prediction(
+                        coordinated.offline[method], endpoint=endpoint
+                    ),
+                    class_mapper,
+                )
+                offline_metrics[method][horizon].update(offline_prediction, target)
+            oracle_prediction = _remap_metric_prediction(
+                build_offline_reconstructed_prediction(
+                    oracle_accumulator, endpoint=endpoint
+                ),
+                class_mapper,
+            )
+            offline_metrics["Oracle"][horizon].update(oracle_prediction, target)
+
+    raw_result = {f"T{horizon}": raw_metrics[horizon].compute() for horizon in horizons}
+    metric_blocks = {
+        "raw": {
+            method: {
+                horizon: dict(values) for horizon, values in raw_result.items()
+            }
+            for method in methods
+        },
+        "strict": {
+            method: {
+                f"T{horizon}": strict_metrics[method][horizon].compute()
+                for horizon in horizons
+            }
+            for method in methods
+        },
+        "offline": {
+            method: {
+                f"T{horizon}": offline_metrics[method][horizon].compute()
+                for horizon in horizons
+            }
+            for method in all_methods
+        },
+    }
+    raw_fingerprint = assert_shared_raw_predictions(
+        {method: raw_predictions for method in all_methods}
+    )
+    cache_fingerprint = cache_hasher.hexdigest()
+    fingerprints = {
+        "prediction": {method: raw_fingerprint for method in all_methods},
+        "cache": {method: cache_fingerprint for method in all_methods},
+    }
+    return TaskMetricEvaluation(
+        metric_blocks=metric_blocks,
+        fingerprints=fingerprints,
+        sequence_count=len(sequences),
     )
 
 
@@ -1592,9 +1940,11 @@ build_atomic_manifest_payload = atomic_manifest_payload
 
 __all__ = [
     "CacheResolution",
+    "CachedProtocolSequence",
     "PrefixCausalityResult",
     "ProtocolCacheRequest",
     "RealPredictionCacheProducer",
+    "TaskMetricEvaluation",
     "atomic_manifest_payload",
     "atomic_manifest_publish",
     "build_atomic_manifest_payload",
@@ -1603,7 +1953,9 @@ __all__ = [
     "cache_payload_from_inference",
     "cache_payload_to_frozen_observation",
     "ensure_cache_entry",
+    "evaluate_cached_task_metrics",
     "expected_cache_keys",
+    "load_cached_protocol_sequences",
     "load_or_create_cache_entry",
     "materialize_prediction_cache",
     "observation_content_digest",

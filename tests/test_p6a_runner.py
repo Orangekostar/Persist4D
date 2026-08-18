@@ -9,13 +9,16 @@ import pytest
 import torch
 
 from scripts.evaluate_persist4d_p6a import (
+    CachedProtocolSequence,
     RealPredictionCacheProducer,
     atomic_manifest_payload,
     build_cache_provenance,
     build_temporal_target,
     cache_payload_from_inference,
     cache_payload_to_frozen_observation,
+    evaluate_cached_task_metrics,
     expected_cache_keys,
+    load_cached_protocol_sequences,
     materialize_prediction_cache,
     prefix_causality_coordinator,
     publish_manifest_atomic,
@@ -23,6 +26,14 @@ from scripts.evaluate_persist4d_p6a import (
     resolve_protocol_cache_request,
     run_real_prediction_cache,
     stage_prediction_from_track_step,
+)
+from scripts.p6a_association import (
+    B0SanityTracker,
+    B0StageUniqueTracker,
+    B1FeatureTracker,
+    B2FeatureClassTracker,
+    B3EmaTracker,
+    B4PersistentTracker,
 )
 from scripts.p6a_cache import load_cache_entry, write_cache_entry
 
@@ -513,6 +524,66 @@ def test_prefix_coordinator_is_causal_and_separates_offline_reconstruction() -> 
     assert result.content_digest
 
 
+def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping() -> None:
+    payloads = []
+    for stage in range(5):
+        payload = _payload(stage, gt_ids=(10,))
+        payload["target"]["gt_masks"][0, -1] = True
+        payloads.append(payload)
+    sequence = CachedProtocolSequence(
+        reference_scene_id="ref",
+        master_sequence_id="master",
+        order_id="canonical",
+        payloads=tuple(payloads),
+    )
+    updates: dict[tuple[str, str, int], int] = {}
+
+    class Metric:
+        def __init__(self, mode: str, method: str, horizon: int) -> None:
+            self.key = (mode, method, horizon)
+
+        def update(self, prediction, target) -> None:
+            assert torch.all(prediction["pred_classes"] >= 20)
+            assert torch.all(target["labels"] >= 20)
+            updates[self.key] = updates.get(self.key, 0) + 1
+
+        def compute(self) -> dict[str, float]:
+            return {"score": float(self.key[2]) / 10.0}
+
+    factories = {
+        "B0": lambda sequence_id: B0StageUniqueTracker(sequence_id=sequence_id),
+        "B0_sanity": lambda sequence_id: B0SanityTracker(sequence_id=sequence_id),
+        "B1": lambda sequence_id: B1FeatureTracker(sequence_id=sequence_id),
+        "B2": lambda sequence_id: B2FeatureClassTracker(
+            sequence_id=sequence_id, background_class=2
+        ),
+        "B3": lambda sequence_id: B3EmaTracker(
+            sequence_id=sequence_id, background_class=2
+        ),
+        "B4": lambda sequence_id: B4PersistentTracker(
+            sequence_id=sequence_id, capacity=3
+        ),
+    }
+
+    result = evaluate_cached_task_metrics(
+        [sequence],
+        tracker_factories=factories,
+        class_mapper=lambda value: value + 20,
+        metric_factory=lambda mode, method, horizon: Metric(mode, method, horizon),
+        background_class=2,
+    )
+
+    assert set(result.metric_blocks["strict"]) == set(factories)
+    assert set(result.metric_blocks["offline"]) == {*factories, "Oracle"}
+    assert result.metric_blocks["raw"]["B0"]["T2"] == {"score": 0.2}
+    assert result.metric_blocks["raw"]["B4"]["T5"] == {"score": 0.5}
+    assert updates[("raw_local", "shared", 2)] == 1
+    assert updates[("strict_online", "B4", 5)] == 1
+    assert updates[("offline_reconstructed", "Oracle", 5)] == 1
+    assert len(set(result.fingerprints["prediction"].values())) == 1
+    assert len(set(result.fingerprints["cache"].values())) == 1
+
+
 def test_resumable_cache_reuses_manifest_entry_and_rejects_stale_provenance(
     tmp_path: Path,
 ) -> None:
@@ -575,6 +646,46 @@ def test_materialize_prediction_cache_only_produces_missing_exact_keys(
     assert manifest["entry_count"] == 15
     assert produced == expected[1:]
     assert (tmp_path / "cache_manifest.json").is_file()
+
+
+def test_load_cached_protocol_sequences_reconstructs_exact_master_orders(
+    tmp_path: Path,
+) -> None:
+    protocol = _protocol()
+    provenance = _payload(0)["provenance"]
+
+    def producer(key: dict[str, object]) -> dict[str, object]:
+        payload = _payload(int(key["stage_index"]))
+        payload["key"] = dict(key)
+        return payload
+
+    cache_directory = tmp_path / "entries"
+    manifest_path = tmp_path / "cache_manifest.json"
+    materialize_prediction_cache(
+        protocol=protocol,
+        cache_directory=cache_directory,
+        manifest_path=manifest_path,
+        provenance=provenance,
+        producer=producer,
+    )
+
+    sequences = load_cached_protocol_sequences(
+        protocol=protocol,
+        cache_directory=cache_directory,
+        manifest_path=manifest_path,
+    )
+
+    assert len(sequences) == 3
+    assert [sequence.order_id for sequence in sequences] == [
+        "canonical",
+        "reverse",
+        "sha256_seed45",
+    ]
+    assert all(len(sequence.payloads) == 5 for sequence in sequences)
+    assert sequences[1].payloads[1]["key"]["local_window_scan_ids"] == [
+        "scene0000_04",
+        "scene0000_03",
+    ]
 
 
 def test_atomic_manifest_payload_and_publish_are_deterministic(tmp_path: Path) -> None:
