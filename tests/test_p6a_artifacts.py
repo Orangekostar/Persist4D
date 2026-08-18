@@ -525,9 +525,29 @@ def _artifact() -> dict[str, object]:
         "next_action": "stop_after_p6a",
         "errors": [],
     }
+    config_hasher = hashlib.sha256()
+    for name, path in (
+        ("p6a", "configs/p6a_default.yaml"),
+        ("runtime", "configs/resolved_runtime.yaml"),
+    ):
+        content = artifact["derived_artifacts"]["yaml"][path]["text"].encode()
+        config_hasher.update(name.encode() + b"\0")
+        config_hasher.update(len(content).to_bytes(8, "big") + content)
+    efficiency_manifest = build_efficiency_manifest(
+        _efficiency_manifest()["records"],
+        source_commit=artifact["source_commit"],
+        checkpoint_sha256=artifact["provenance"]["checkpoint"]["sha256"],
+        config_sha256=config_hasher.hexdigest(),
+        protocol_sha256=hashlib.sha256(
+            artifact["derived_artifacts"]["json"]["protocol_b_manifest.json"][
+                "text"
+            ].encode()
+        ).hexdigest(),
+        cache_manifest_sha256=artifact["provenance"]["prediction_cache"]["sha256"],
+    )
     raw_manifest_text = (
         json.dumps(
-            _efficiency_manifest(),
+            efficiency_manifest,
             allow_nan=False,
             ensure_ascii=True,
             indent=2,
@@ -658,6 +678,20 @@ def test_efficiency_aggregate_must_match_raw_manifest() -> None:
     )
 
     with pytest.raises(ValueError, match="efficiency"):
+        validate_root_artifact(artifact)
+
+
+def test_efficiency_raw_provenance_must_match_root_evidence() -> None:
+    artifact = _artifact()
+    raw_manifest = json.loads(
+        artifact["derived_artifacts"]["json"]["efficiency_raw_manifest.json"]["text"]
+    )
+    raw_manifest["provenance"]["source_commit"] = "f" * 40
+    artifact["derived_artifacts"]["json"]["efficiency_raw_manifest.json"]["text"] = (
+        json.dumps(raw_manifest, allow_nan=False, indent=2, sort_keys=True) + "\n"
+    )
+
+    with pytest.raises(ValueError, match="efficiency.*provenance"):
         validate_root_artifact(artifact)
 
     artifact = _artifact()

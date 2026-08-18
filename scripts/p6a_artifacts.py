@@ -1266,6 +1266,7 @@ def _validate_derived_artifacts(value: object) -> None:
 
 def _validate_efficiency_aggregate_binding(
     derived: Mapping[str, object],
+    root: Mapping[str, object],
 ) -> None:
     """Require the registered efficiency CSV to be an exact raw-manifest derivation."""
 
@@ -1304,6 +1305,29 @@ def _validate_efficiency_aggregate_binding(
                     "efficiency_results.csv value differs from raw manifest "
                     f"at row {row_index}, column {field}"
                 )
+
+    yaml_specs = derived["yaml"]
+    protocol_spec = derived["json"]["protocol_b_manifest.json"]
+    provenance = root["provenance"]
+    config_hasher = hashlib.sha256()
+    for name, path in (
+        ("p6a", "configs/p6a_default.yaml"),
+        ("runtime", "configs/resolved_runtime.yaml"),
+    ):
+        content = yaml_specs[path]["text"].encode("utf-8")
+        config_hasher.update(name.encode("utf-8") + b"\0")
+        config_hasher.update(len(content).to_bytes(8, "big") + content)
+    expected_provenance = {
+        "source_commit": root["source_commit"],
+        "checkpoint_sha256": provenance["checkpoint"]["sha256"],
+        "config_sha256": config_hasher.hexdigest(),
+        "protocol_sha256": hashlib.sha256(
+            protocol_spec["text"].encode("utf-8")
+        ).hexdigest(),
+        "cache_manifest_sha256": provenance["prediction_cache"]["sha256"],
+    }
+    if raw_manifest["provenance"] != expected_provenance:
+        raise ValueError("efficiency raw provenance differs from root evidence")
 
 
 def _validate_manifest(value: object, *, derived: Mapping[str, object]) -> None:
@@ -1437,7 +1461,7 @@ def validate_root_artifact(artifact: object) -> None:
     _nonempty_string(limitation["scope"], name="change_label_limitation.scope")
 
     _validate_derived_artifacts(root["derived_artifacts"])
-    _validate_efficiency_aggregate_binding(root["derived_artifacts"])
+    _validate_efficiency_aggregate_binding(root["derived_artifacts"], root)
     _validate_manifest(root["artifact_manifest"], derived=root["derived_artifacts"])
 
     analysis_artifacts = root["derived_artifacts"]

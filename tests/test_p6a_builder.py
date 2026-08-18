@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
 import yaml
 
 from scripts.evaluate_persist4d_p6a import TaskMetricEvaluation
@@ -21,11 +22,13 @@ from scripts.p6a_artifacts import (
 )
 from scripts.p6a_builder import (
     _expected_cache_keys,
+    _json_text,
     build_p6a_root_artifact,
     metric_table_rows,
     seal_artifact_manifest,
 )
 from scripts.p6a_cache import build_cache_manifest
+from scripts.p6a_efficiency import build_efficiency_manifest
 from scripts.p6a_protocol import _seeded_permutation
 from tests.test_p6a_artifacts import _artifact, _efficiency_manifest
 
@@ -397,12 +400,22 @@ def test_complete_builder_derives_and_seals_one_root_artifact() -> None:
         expected_keys=expected_keys,
         expected_provenance=provenance,
     )
+    efficiency_manifest = build_efficiency_manifest(
+        _efficiency_manifest()["records"],
+        source_commit=source_commit,
+        checkpoint_sha256=provenance["checkpoint_sha256"],
+        config_sha256=provenance["config_sha256"],
+        protocol_sha256=hashlib.sha256(_json_text(protocol).encode()).hexdigest(),
+        cache_manifest_sha256=hashlib.sha256(
+            _json_text(cache_manifest).encode()
+        ).hexdigest(),
+    )
 
     artifact = build_p6a_root_artifact(
         evaluation=_evaluation(protocol),
         protocol_manifest=protocol,
         cache_manifest=cache_manifest,
-        efficiency_manifest=_efficiency_manifest(),
+        efficiency_manifest=efficiency_manifest,
         source_commit=source_commit,
         p6a_config_text=config_text,
         runtime_config_text=runtime_text,
@@ -425,3 +438,16 @@ def test_complete_builder_derives_and_seals_one_root_artifact() -> None:
     assert artifact["gate_results"]["G6A-1"]["passed"] is True
     assert artifact["gate_results"]["G6A-5"]["passed"] is False
     assert verify_artifact_manifest(artifact, render_artifact_bundle(artifact))
+
+    wrong_efficiency = copy.deepcopy(efficiency_manifest)
+    wrong_efficiency["provenance"]["source_commit"] = "f" * 40
+    with pytest.raises(ValueError, match="efficiency provenance"):
+        build_p6a_root_artifact(
+            evaluation=_evaluation(protocol),
+            protocol_manifest=protocol,
+            cache_manifest=cache_manifest,
+            efficiency_manifest=wrong_efficiency,
+            source_commit=source_commit,
+            p6a_config_text=config_text,
+            runtime_config_text=runtime_text,
+        )

@@ -485,6 +485,20 @@ def build_p6a_root_artifact(
     )
     if dict(cache_provenance) != expected_provenance:
         raise ValueError("cache provenance differs from the P6-A build inputs")
+    efficiency_provenance = efficiency_manifest["provenance"]
+    expected_efficiency_provenance = {
+        "source_commit": source_commit,
+        "checkpoint_sha256": P5_FROZEN_VALUES["checkpoint_sha256"],
+        "config_sha256": expected_config_digest,
+        "protocol_sha256": _sha256(
+            _json_text(protocol_manifest).encode("utf-8")
+        ),
+        "cache_manifest_sha256": _sha256(
+            _json_text(cache_manifest).encode("utf-8")
+        ),
+    }
+    if efficiency_provenance != expected_efficiency_provenance:
+        raise ValueError("efficiency provenance differs from the P6-A build inputs")
 
     metric_blocks = normalize_official_metric_blocks(evaluation.metric_blocks)
     events = association_event_rows(evaluation.association_events)
