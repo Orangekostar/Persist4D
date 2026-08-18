@@ -15,6 +15,7 @@ import torch
 from torch import Tensor
 
 SCHEMA_VERSION = 1
+ORDER_IDS = ("canonical", "reverse", "sha256_seed45")
 ROOT_KEYS = {"schema_version", "key", "provenance", "observation", "target"}
 KEY_KEYS = {
     "master_sequence_id",
@@ -41,6 +42,14 @@ OBSERVATION_KEYS = {
 }
 TARGET_KEYS = {"gt_ids", "gt_classes", "gt_masks", "changes"}
 ENTRY_KEYS = {"filename", "content_sha256", "file_sha256", "file_bytes", "key"}
+MANIFEST_ROOT_KEYS = {
+    "schema_version",
+    "status",
+    "provenance",
+    "entry_count",
+    "entries_sha256",
+    "entries",
+}
 
 
 def _exact_mapping(
@@ -72,6 +81,41 @@ def _string_list(value: object, *, name: str) -> list[str]:
     if len(set(result)) != len(result):
         raise ValueError(f"{name} must not contain duplicates")
     return result
+
+
+def _validate_key(value: object, *, name: str = "cache key") -> Mapping[str, Any]:
+    key = _exact_mapping(value, KEY_KEYS, name=name)
+    _nonempty_string(key["master_sequence_id"], name="master_sequence_id")
+    _nonempty_string(key["reference_scene_id"], name="reference_scene_id")
+    if not isinstance(key["order_id"], str) or key["order_id"] not in ORDER_IDS:
+        raise ValueError(f"order_id must be one of {ORDER_IDS}")
+    stage_index = key["stage_index"]
+    if (
+        isinstance(stage_index, bool)
+        or not isinstance(stage_index, int)
+        or not 0 <= stage_index <= 4
+    ):
+        raise ValueError("stage_index must be an integer in [0, 4]")
+    history = _string_list(key["history_scan_ids"], name="history_scan_ids")
+    local_window = _string_list(
+        key["local_window_scan_ids"], name="local_window_scan_ids"
+    )
+    if len(history) != stage_index + 1:
+        raise ValueError("history_scan_ids must end at stage_index")
+    expected_window = history[-1:] if stage_index == 0 else history[-2:]
+    if local_window != expected_window:
+        raise ValueError("local_window_scan_ids must be the causal local window")
+    return key
+
+
+def _validate_provenance(
+    value: object, *, name: str = "provenance"
+) -> Mapping[str, Any]:
+    provenance = _exact_mapping(value, PROVENANCE_KEYS, name=name)
+    _sha(provenance["source_commit"], length=40, name=f"{name}.source_commit")
+    for key in ("checkpoint_sha256", "config_sha256", "dataset_sha256"):
+        _sha(provenance[key], length=64, name=f"{name}.{key}")
+    return provenance
 
 
 def _sha(value: object, *, length: int, name: str) -> str:
@@ -116,35 +160,14 @@ def validate_cache_payload(payload: object) -> None:
     root = _exact_mapping(payload, ROOT_KEYS, name="cache payload")
     if (
         isinstance(root["schema_version"], bool)
+        or not isinstance(root["schema_version"], int)
         or root["schema_version"] != SCHEMA_VERSION
     ):
         raise ValueError("unsupported cache schema_version")
 
-    key = _exact_mapping(root["key"], KEY_KEYS, name="cache key")
-    _nonempty_string(key["master_sequence_id"], name="master_sequence_id")
-    _nonempty_string(key["reference_scene_id"], name="reference_scene_id")
-    _nonempty_string(key["order_id"], name="order_id")
-    stage_index = key["stage_index"]
-    if (
-        isinstance(stage_index, bool)
-        or not isinstance(stage_index, int)
-        or stage_index < 0
-    ):
-        raise ValueError("stage_index must be a non-negative integer")
-    history = _string_list(key["history_scan_ids"], name="history_scan_ids")
-    local_window = _string_list(
-        key["local_window_scan_ids"], name="local_window_scan_ids"
-    )
-    if len(history) != stage_index + 1:
-        raise ValueError("history_scan_ids must end at stage_index")
-    expected_window = history[-1:] if stage_index == 0 else history[-2:]
-    if local_window != expected_window:
-        raise ValueError("local_window_scan_ids must be the causal local window")
+    _validate_key(root["key"])
 
-    provenance = _exact_mapping(root["provenance"], PROVENANCE_KEYS, name="provenance")
-    _sha(provenance["source_commit"], length=40, name="source_commit")
-    for name in ("checkpoint_sha256", "config_sha256", "dataset_sha256"):
-        _sha(provenance[name], length=64, name=name)
+    _validate_provenance(root["provenance"])
 
     observation = _exact_mapping(
         root["observation"], OBSERVATION_KEYS, name="observation"
@@ -205,6 +228,12 @@ def validate_cache_payload(payload: object) -> None:
         raise ValueError("prediction and target masks must cover the same points")
     if gt_ids.unique().numel() != gt_count:
         raise ValueError("gt_ids must be unique within a stage")
+    if torch.any(gt_ids < 0).item():
+        raise ValueError("gt_ids must be non-negative")
+    if torch.any(gt_classes < 0).item():
+        raise ValueError("gt_classes must be non-negative")
+    if torch.any(changes < 0).item():
+        raise ValueError("changes must be non-negative")
 
 
 def _update_digest(hasher: Any, value: object) -> None:
@@ -252,7 +281,7 @@ def _file_sha256(path: Path) -> str:
 
 
 def _plain_key(value: Mapping[str, object]) -> dict[str, object]:
-    key = _exact_mapping(value, KEY_KEYS, name="cache key")
+    key = _validate_key(value)
     return {
         "master_sequence_id": key["master_sequence_id"],
         "reference_scene_id": key["reference_scene_id"],
@@ -263,15 +292,127 @@ def _plain_key(value: Mapping[str, object]) -> dict[str, object]:
     }
 
 
+def _validate_entry_metadata(value: object) -> Mapping[str, Any]:
+    entry = _exact_mapping(value, ENTRY_KEYS, name="cache manifest entry")
+    _sha(entry["content_sha256"], length=64, name="content_sha256")
+    _sha(entry["file_sha256"], length=64, name="file_sha256")
+    if (
+        isinstance(entry["file_bytes"], bool)
+        or not isinstance(entry["file_bytes"], int)
+        or entry["file_bytes"] <= 0
+    ):
+        raise ValueError("file_bytes must be a positive integer")
+    filename = _nonempty_string(entry["filename"], name="filename")
+    if filename != f"{entry['content_sha256']}.pt" or Path(filename).name != filename:
+        raise ValueError("cache filename must be its content digest")
+    _validate_key(entry["key"])
+    return entry
+
+
+def _entry_sort_key(entry: Mapping[str, object]) -> tuple[object, ...]:
+    key = entry["key"]
+    return (
+        key["reference_scene_id"],
+        key["master_sequence_id"],
+        key["order_id"],
+        key["stage_index"],
+        tuple(key["history_scan_ids"]),
+        tuple(key["local_window_scan_ids"]),
+        entry["filename"],
+        entry["content_sha256"],
+        entry["file_sha256"],
+        entry["file_bytes"],
+    )
+
+
+def _entry_from_path(path: Path, payload: Mapping[str, object]) -> dict[str, object]:
+    return {
+        "filename": path.name,
+        "content_sha256": cache_payload_digest(payload),
+        "file_sha256": _file_sha256(path),
+        "file_bytes": path.stat().st_size,
+        "key": _plain_key(payload["key"]),
+    }
+
+
+def _clone_cpu_snapshot(value: object) -> object:
+    if isinstance(value, Tensor):
+        return value.detach().to(device="cpu").clone()
+    if isinstance(value, Mapping):
+        return {key: _clone_cpu_snapshot(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_clone_cpu_snapshot(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_clone_cpu_snapshot(item) for item in value)
+    return value
+
+
+def immutable_snapshot(payload: Mapping[str, object]) -> Mapping[str, object]:
+    """Return a validated, detached CPU snapshot for tracker fan-out."""
+
+    validate_cache_payload(payload)
+    snapshot = _clone_cpu_snapshot(payload)
+    if not isinstance(snapshot, Mapping):  # pragma: no cover - validated above.
+        raise TypeError("cache snapshot must be a mapping")
+    return snapshot
+
+
+def _require_regular_file(path: Path, *, name: str) -> None:
+    if path.is_symlink() or not path.is_file():
+        raise ValueError(f"{name} must be a regular non-symlink file")
+
+
+def _load_cache_payload(path: Path) -> Mapping[str, object]:
+    _require_regular_file(path, name="cache entry")
+    try:
+        bundle = torch.load(path, map_location="cpu", weights_only=True)
+    except Exception as error:
+        raise ValueError("cache entry cannot be loaded safely") from error
+    bundle = _exact_mapping(bundle, {"content_sha256", "payload"}, name="cache bundle")
+    _sha(bundle["content_sha256"], length=64, name="bundle.content_sha256")
+    payload = bundle["payload"]
+    validate_cache_payload(payload)
+    digest = cache_payload_digest(payload)
+    if bundle["content_sha256"] != digest or path.name != f"{digest}.pt":
+        raise ValueError("cache entry content digest does not match its identity")
+    return payload
+
+
+def _fsync_directory(directory: Path) -> None:
+    descriptor = os.open(
+        directory,
+        os.O_RDONLY | getattr(os, "O_DIRECTORY", 0),
+    )
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def _existing_cache_entry(
+    target: Path, payload: Mapping[str, object]
+) -> dict[str, object]:
+    loaded = load_cache_entry(target, expected_provenance=payload["provenance"])
+    entry = _entry_from_path(target, loaded)
+    if entry["content_sha256"] != cache_payload_digest(payload):
+        raise ValueError("existing cache entry has different content")
+    if entry["key"] != _plain_key(payload["key"]):
+        raise ValueError("existing cache entry has different logical key")
+    return entry
+
+
 def write_cache_entry(
     cache_directory: Path, payload: Mapping[str, object]
 ) -> dict[str, object]:
     validate_cache_payload(payload)
     digest = cache_payload_digest(payload)
+    if not isinstance(cache_directory, Path):
+        raise TypeError("cache_directory must be a Path")
     cache_directory.mkdir(parents=True, exist_ok=True)
     target = cache_directory / f"{digest}.pt"
     if target.exists() or target.is_symlink():
-        raise FileExistsError(f"refusing to overwrite cache entry: {target.name}")
+        return _existing_cache_entry(target, payload)
+
     descriptor, temporary_name = tempfile.mkstemp(
         prefix=f".{digest}.", suffix=".tmp", dir=cache_directory
     )
@@ -281,16 +422,46 @@ def write_cache_entry(
         torch.save({"content_sha256": digest, "payload": payload}, temporary)
         with temporary.open("rb") as handle:
             os.fsync(handle.fileno())
-        os.replace(temporary, target)
+        try:
+            # Hard-link publication is atomic and never replaces an existing target.
+            os.link(temporary, target)
+            _fsync_directory(cache_directory)
+        except FileExistsError:
+            return _existing_cache_entry(target, payload)
+        return _existing_cache_entry(target, payload)
     finally:
         temporary.unlink(missing_ok=True)
-    return {
-        "filename": target.name,
-        "content_sha256": digest,
-        "file_sha256": _file_sha256(target),
-        "file_bytes": target.stat().st_size,
-        "key": _plain_key(payload["key"]),
-    }
+
+
+def validate_cache_entry(
+    path: Path,
+    expected_entry: Mapping[str, object],
+    expected_provenance: Mapping[str, object] | None = None,
+) -> Mapping[str, object]:
+    """Validate file identity, serialized payload, logical key, and provenance."""
+
+    if not isinstance(path, Path):
+        raise TypeError("cache entry path must be a Path")
+    entry = _validate_entry_metadata(expected_entry)
+    _require_regular_file(path, name="cache entry")
+    if path.name != entry["filename"]:
+        raise ValueError("cache entry filename differs from manifest")
+    actual_bytes = path.stat().st_size
+    actual_sha = _file_sha256(path)
+    if actual_bytes != entry["file_bytes"] or actual_sha != entry["file_sha256"]:
+        raise ValueError("cache entry file evidence differs from manifest")
+    payload = _load_cache_payload(path)
+    if cache_payload_digest(payload) != entry["content_sha256"]:
+        raise ValueError("cache entry content differs from manifest")
+    if _plain_key(payload["key"]) != entry["key"]:
+        raise ValueError("cache entry key differs from manifest")
+    if expected_provenance is not None:
+        provenance = _validate_provenance(
+            expected_provenance, name="expected_provenance"
+        )
+        if dict(payload["provenance"]) != dict(provenance):
+            raise ValueError("cache entry provenance differs from the frozen run")
+    return immutable_snapshot(payload)
 
 
 def load_cache_entry(
@@ -298,76 +469,232 @@ def load_cache_entry(
     *,
     expected_provenance: Mapping[str, object] | None = None,
 ) -> Mapping[str, object]:
-    if path.is_symlink() or not path.is_file():
-        raise ValueError("cache entry must be a regular non-symlink file")
-    try:
-        bundle = torch.load(path, map_location="cpu", weights_only=True)
-    except Exception as error:
-        raise ValueError("cache entry cannot be loaded safely") from error
-    bundle = _exact_mapping(bundle, {"content_sha256", "payload"}, name="cache bundle")
-    payload = bundle["payload"]
-    validate_cache_payload(payload)
-    digest = cache_payload_digest(payload)
-    if bundle["content_sha256"] != digest or path.name != f"{digest}.pt":
-        raise ValueError("cache entry content digest does not match its identity")
-    if expected_provenance is not None and dict(payload["provenance"]) != dict(
-        expected_provenance
-    ):
-        raise ValueError("cache entry provenance differs from the frozen run")
-    return payload
+    payload = _load_cache_payload(path)
+    if expected_provenance is not None:
+        provenance = _validate_provenance(
+            expected_provenance, name="expected_provenance"
+        )
+        if dict(payload["provenance"]) != dict(provenance):
+            raise ValueError("cache entry provenance differs from the frozen run")
+    return immutable_snapshot(payload)
 
 
 def _key_identity(value: Mapping[str, object]) -> str:
     return json.dumps(_plain_key(value), sort_keys=True, separators=(",", ":"))
 
 
-def build_cache_manifest(
+def _normalize_manifest_entries(
     entries: Sequence[Mapping[str, object]],
-    *,
-    expected_keys: Sequence[Mapping[str, object]],
-) -> dict[str, object]:
+) -> list[dict[str, object]]:
+    if not isinstance(entries, Sequence) or isinstance(entries, (str, bytes)):
+        raise TypeError("cache manifest entries must be a sequence")
     normalized = []
-    identities = []
     for raw_entry in entries:
-        entry = _exact_mapping(raw_entry, ENTRY_KEYS, name="cache manifest entry")
-        _sha(entry["content_sha256"], length=64, name="content_sha256")
-        _sha(entry["file_sha256"], length=64, name="file_sha256")
-        if (
-            isinstance(entry["file_bytes"], bool)
-            or not isinstance(entry["file_bytes"], int)
-            or entry["file_bytes"] <= 0
-        ):
-            raise ValueError("file_bytes must be a positive integer")
-        filename = _nonempty_string(entry["filename"], name="filename")
-        if (
-            filename != f"{entry['content_sha256']}.pt"
-            or Path(filename).name != filename
-        ):
-            raise ValueError("cache filename must be its content digest")
+        entry = _validate_entry_metadata(raw_entry)
         plain = dict(entry)
         plain["key"] = _plain_key(entry["key"])
         normalized.append(plain)
-        identities.append(_key_identity(plain["key"]))
+    identities = [_key_identity(entry["key"]) for entry in normalized]
     if len(set(identities)) != len(identities):
         raise ValueError("cache manifest contains duplicate logical keys")
+    normalized.sort(key=_entry_sort_key)
+    return normalized
+
+
+def _validate_expected_coverage(
+    entries: Sequence[Mapping[str, object]],
+    expected_keys: Sequence[Mapping[str, object]],
+) -> None:
+    identities = [_key_identity(entry["key"]) for entry in entries]
     expected_identities = [_key_identity(key) for key in expected_keys]
     if len(set(expected_identities)) != len(expected_identities):
         raise ValueError("expected cache keys contain duplicates")
     if set(identities) != set(expected_identities):
         raise ValueError("cache manifest does not have exact expected coverage")
-    normalized.sort(
-        key=lambda entry: (
-            entry["key"]["master_sequence_id"],
-            entry["key"]["order_id"],
-            entry["key"]["stage_index"],
-        )
+
+
+def _validate_cache_directory(
+    cache_directory: Path, expected_filenames: set[str]
+) -> None:
+    if cache_directory.is_symlink() or not cache_directory.is_dir():
+        raise ValueError("cache_directory must be a regular directory")
+    unexpected = [
+        path
+        for path in cache_directory.iterdir()
+        if path.is_file() or path.is_symlink()
+        if path.name not in expected_filenames
+    ]
+    if unexpected:
+        raise ValueError(f"cache_directory contains unexpected files: {unexpected[0]}")
+
+
+def _manifest_root(
+    normalized: list[dict[str, object]],
+    expected_provenance: Mapping[str, object],
+) -> dict[str, object]:
+    provenance = dict(
+        _validate_provenance(expected_provenance, name="expected_provenance")
     )
     hasher = hashlib.sha256()
     _update_digest(hasher, normalized)
     return {
         "schema_version": SCHEMA_VERSION,
         "status": "pass",
+        "provenance": provenance,
         "entry_count": len(normalized),
         "entries_sha256": hasher.hexdigest(),
         "entries": normalized,
     }
+
+
+def validate_cache_manifest(
+    manifest: object,
+    *,
+    expected_keys: Sequence[Mapping[str, object]],
+    expected_provenance: Mapping[str, object] | None = None,
+    cache_directory: Path | None = None,
+) -> None:
+    root = _exact_mapping(manifest, MANIFEST_ROOT_KEYS, name="cache manifest")
+    if (
+        isinstance(root["schema_version"], bool)
+        or not isinstance(root["schema_version"], int)
+        or root["schema_version"] != SCHEMA_VERSION
+    ):
+        raise ValueError("unsupported cache manifest schema_version")
+    if root["status"] != "pass":
+        raise ValueError("cache manifest status must be pass")
+    provenance = _validate_provenance(root["provenance"])
+    if expected_provenance is not None:
+        expected = _validate_provenance(expected_provenance, name="expected_provenance")
+        if dict(provenance) != dict(expected):
+            raise ValueError("cache manifest provenance differs from the frozen run")
+    entries = root["entries"]
+    if not isinstance(entries, list):
+        raise TypeError("cache manifest entries must be a list")
+    normalized = _normalize_manifest_entries(entries)
+    if normalized != entries:
+        raise ValueError("cache manifest entries are not in canonical order")
+    _validate_expected_coverage(normalized, expected_keys)
+    if (
+        isinstance(root["entry_count"], bool)
+        or not isinstance(root["entry_count"], int)
+        or root["entry_count"] != len(normalized)
+    ):
+        raise ValueError("cache manifest entry_count is inconsistent")
+    _sha(root["entries_sha256"], length=64, name="entries_sha256")
+    hasher = hashlib.sha256()
+    _update_digest(hasher, normalized)
+    if root["entries_sha256"] != hasher.hexdigest():
+        raise ValueError("cache manifest entries_sha256 is inconsistent")
+    if cache_directory is not None:
+        if not isinstance(cache_directory, Path):
+            raise TypeError("cache_directory must be a Path")
+        expected_filenames = {entry["filename"] for entry in normalized}
+        _validate_cache_directory(cache_directory, expected_filenames)
+        for entry in normalized:
+            validate_cache_entry(cache_directory / entry["filename"], entry, provenance)
+
+
+def build_cache_manifest(
+    entries: Sequence[Mapping[str, object]],
+    *,
+    expected_keys: Sequence[Mapping[str, object]],
+    expected_provenance: Mapping[str, object],
+    cache_directory: Path | None = None,
+) -> dict[str, object]:
+    normalized = _normalize_manifest_entries(entries)
+    _validate_expected_coverage(normalized, expected_keys)
+    manifest = _manifest_root(normalized, expected_provenance)
+    validate_cache_manifest(
+        manifest,
+        expected_keys=expected_keys,
+        expected_provenance=expected_provenance,
+        cache_directory=cache_directory,
+    )
+    return manifest
+
+
+def _manifest_json_text(manifest: Mapping[str, object]) -> str:
+    return (
+        json.dumps(
+            manifest,
+            allow_nan=False,
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+
+
+def write_cache_manifest(
+    path: Path,
+    manifest: Mapping[str, object],
+    *,
+    expected_keys: Sequence[Mapping[str, object]],
+    expected_provenance: Mapping[str, object],
+    cache_directory: Path | None = None,
+) -> Mapping[str, object]:
+    validate_cache_manifest(
+        manifest,
+        expected_keys=expected_keys,
+        expected_provenance=expected_provenance,
+        cache_directory=cache_directory,
+    )
+    if not isinstance(path, Path):
+        raise TypeError("manifest path must be a Path")
+    text = _manifest_json_text(manifest)
+    payload = text.encode("utf-8")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists() or path.is_symlink():
+        _require_regular_file(path, name="cache manifest")
+        if path.read_bytes() == payload:
+            return manifest
+        raise FileExistsError(f"refusing to overwrite cache manifest: {path}")
+
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{path.name}.", suffix=".tmp", dir=path.parent
+    )
+    os.close(descriptor)
+    temporary = Path(temporary_name)
+    try:
+        with temporary.open("wb") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        try:
+            os.link(temporary, path)
+            _fsync_directory(path.parent)
+        except FileExistsError:
+            _require_regular_file(path, name="cache manifest")
+            if path.read_bytes() == payload:
+                return manifest
+            raise FileExistsError(f"refusing to overwrite cache manifest: {path}")
+        return manifest
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def load_cache_manifest(
+    path: Path,
+    *,
+    expected_keys: Sequence[Mapping[str, object]],
+    expected_provenance: Mapping[str, object],
+    cache_directory: Path | None = None,
+) -> dict[str, object]:
+    if not isinstance(path, Path):
+        raise TypeError("manifest path must be a Path")
+    _require_regular_file(path, name="cache manifest")
+    try:
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise ValueError("cache manifest cannot be decoded") from error
+    validate_cache_manifest(
+        manifest,
+        expected_keys=expected_keys,
+        expected_provenance=expected_provenance,
+        cache_directory=cache_directory,
+    )
+    if not isinstance(manifest, dict):  # pragma: no cover - exact mapping above.
+        raise TypeError("cache manifest must decode to a mapping")
+    return manifest
