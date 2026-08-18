@@ -298,3 +298,47 @@ def test_default_config_freezes_protocol_b_contract() -> None:
     assert config["protocol_b"]["sources"]["metadata_sha256"] == (
         "674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64"
     )
+
+
+def test_default_config_freezes_complete_baseline_and_g6a4_parameters() -> None:
+    config = yaml.safe_load((PROJECT_ROOT / "conf/p6a/default.yaml").read_text())
+    baselines = config["baselines"]
+
+    assert baselines["b1"] == {
+        "name": "previous_stage_feature_hungarian",
+        "feature_threshold": 0.5,
+    }
+    assert baselines["b2"] == {
+        "name": "previous_stage_feature_class_hungarian",
+        "feature_threshold": 0.5,
+        "class_weight": 0.25,
+        "background_class": 18,
+        "class_probability": "foreground_renormalized",
+    }
+    assert baselines["b3"] == {
+        "name": "active_previous_stage_ema",
+        "feature_threshold": 0.5,
+        "class_weight": 0.25,
+        "background_class": 18,
+        "update_rate": 0.2,
+        "dormant_lifecycle": False,
+    }
+    assert baselines["b4"] == {
+        "name": "frozen_p5_persist4d",
+        "capacity": 100,
+        "association_threshold": 0.5,
+        "class_weight": 0.25,
+        "background_class": 18,
+        "update_rate": 0.2,
+        "confidence_threshold": 0.5,
+        "mask_threshold": 0.5,
+        "minimum_mask_support": 1,
+    }
+
+    assert config["gates"]["G6A-4"] == {
+        "horizon": 2,
+        "online_metric_drop_max": 0.05,
+        "long_horizon_any_positive": True,
+        "horizons": [4, 5],
+        "metrics": ["t_mAP", "t_REC"],
+    }

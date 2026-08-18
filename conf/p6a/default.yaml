@@ -37,18 +37,27 @@ baselines:
     feature_threshold: 0.5
   b2:
     name: previous_stage_feature_class_hungarian
+    feature_threshold: 0.5
     class_weight: 0.25
+    background_class: 18
     class_probability: foreground_renormalized
   b3:
     name: active_previous_stage_ema
+    feature_threshold: 0.5
+    class_weight: 0.25
+    background_class: 18
     update_rate: 0.2
     dormant_lifecycle: false
   b4:
     name: frozen_p5_persist4d
     capacity: 100
-    feature_threshold: 0.5
+    association_threshold: 0.5
     class_weight: 0.25
+    background_class: 18
     update_rate: 0.2
+    confidence_threshold: 0.5
+    mask_threshold: 0.5
+    minimum_mask_support: 1
 
 metrics:
   raw_local:
@@ -92,5 +101,8 @@ gates:
   G6A-4:
     horizon: 2
     online_metric_drop_max: 0.05
+    long_horizon_any_positive: true
+    horizons: [4, 5]
+    metrics: [t_mAP, t_REC]
   G6A-5:
     primary_failure_share_min: 0.9
