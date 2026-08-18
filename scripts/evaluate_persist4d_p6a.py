@@ -1281,6 +1281,8 @@ def stage_prediction_from_track_step(
     selected_tensor = torch.tensor(selected, dtype=torch.long)
     foreground_prob = class_prob[selected_tensor].clone()
     foreground_prob[:, background_class] = -float("inf")
+    state_class_prob = class_prob[selected_tensor].clone()
+    state_class_prob[:, background_class] = 0
     predicted_classes = [
         _map_class(class_mapper, int(value))
         for value in torch.argmax(foreground_prob, dim=1).tolist()
@@ -1298,7 +1300,7 @@ def stage_prediction_from_track_step(
         "pred_masks": masks[selected_tensor].transpose(0, 1).contiguous().clone(),
         "pred_classes": torch.tensor(predicted_classes, dtype=torch.long),
         "pred_scores": confidence[selected_tensor].clone().float(),
-        "class_probs": class_prob[selected_tensor].clone(),
+        "class_probs": state_class_prob,
         "track_ids": output_ids,
     }
 

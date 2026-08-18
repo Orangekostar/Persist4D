@@ -508,6 +508,9 @@ def test_stage_prediction_filters_invalid_ids_and_excludes_background() -> None:
     assert prediction["pred_classes"].tolist() == [1]
     assert prediction["pred_scores"].tolist() == [pytest.approx(0.9)]
     assert prediction["class_probs"].shape == (1, 3)
+    assert prediction["class_probs"].tolist() == [
+        [pytest.approx(0.1), pytest.approx(0.8), 0.0]
+    ]
 
 
 def test_stage_prediction_rejects_nonfinite_or_duplicate_track_ids() -> None:
