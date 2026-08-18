@@ -1,0 +1,96 @@
+protocol_b:
+  name: common-prefix
+  split: validation
+  sequence_type: sliding
+  master_horizon: 5
+  horizons: [2, 3, 4, 5]
+  expected_master_count: 43
+  expected_reference_scene_clusters: 6
+  order_variants: [canonical, reverse, sha256_seed45]
+  seed: 45
+  order_semantics: metadata_order_only_no_timestamps
+  scan_index_resolution: explicit_scan_id_metadata_map
+  substitution_policy: reject
+  require_supervised: true
+  reference_scene_ids:
+    - 10b17940-3938-2467-8a7a-958300ba83d3
+    - 137a8158-1db5-2cc0-8003-31c12610471e
+    - 280d8ebb-6cc6-2788-9153-98959a2da801
+    - 5630cfcf-12bf-2860-8784-83d28a611a83
+    - 8eabc45f-5af7-2f32-8528-640861d2a135
+    - ddc73797-765b-241a-9e2c-097c5989baf6
+  sources:
+    sequence_database: repo:data/processed/rio/sequence_database_sliding_5.yaml
+    sequence_database_sha256: 252363f76524bb7eeff9f65b303aadda67dcd2646477daae1ac90f7f53398290
+    scan_metadata: repo:data/processed/rio/validation_database.yaml
+    scan_metadata_sha256: cc69f9de660e6be5b6aee739ee2580b614f132ad8c3a42ce2e301b4d4dbb1906
+    metadata: external:3RScan/3RScan.json
+    metadata_sha256: 674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64
+
+baselines:
+  b0:
+    name: stage_unique_ids
+  b0_sanity:
+    name: local_query_index
+  b1:
+    name: previous_stage_feature_hungarian
+    feature_threshold: 0.5
+  b2:
+    name: previous_stage_feature_class_hungarian
+    class_weight: 0.25
+    class_probability: foreground_renormalized
+  b3:
+    name: active_previous_stage_ema
+    update_rate: 0.2
+    dormant_lifecycle: false
+  b4:
+    name: frozen_p5_persist4d
+    capacity: 100
+    feature_threshold: 0.5
+    class_weight: 0.25
+    update_rate: 0.2
+
+metrics:
+  raw_local:
+    - raw_local_AP
+    - raw_local_AP50
+    - raw_local_AP25
+    - raw_local_REC
+  strict_online:
+    - online_t-mAP
+    - online_t-mAP50
+    - online_t-mAP25
+    - online_t-REC
+  offline_diagnostic:
+    - offline_reconstructed_t-mAP
+    - offline_reconstructed_t-REC
+
+diagnostics:
+  gt_assignment: class_compatible_global_hungarian
+  iou_threshold: 0.5
+  identity_namespace: method_sequence_scoped
+
+bootstrap:
+  unit: reference_scene_id
+  clusters: 6
+  replicates: 10000
+  seed: 45
+  paired: true
+
+gates:
+  G6A-1:
+    horizons: [4, 5]
+    id_switch_relative_reduction: 0.2
+    paired_delta_ci_high_max: 0.0
+  G6A-2:
+    horizons: [3, 4, 5]
+    reactivation_accuracy_min: 0.7
+    reactivation_recall_min: 0.25
+  G6A-3:
+    raw_prediction_fingerprint: exact
+    metric_absolute_tolerance: 1.0e-12
+  G6A-4:
+    horizon: 2
+    online_metric_drop_max: 0.05
+  G6A-5:
+    primary_failure_share_min: 0.9
