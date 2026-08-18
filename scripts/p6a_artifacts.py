@@ -18,10 +18,12 @@ import re
 import shutil
 import tempfile
 from collections.abc import Mapping, Sequence
+from itertools import pairwise
 from pathlib import Path, PurePosixPath
 from typing import Any
 
 SCHEMA_VERSION = 2
+ROOT_ARTIFACT_PATH = "p6a_eval.json"
 
 ROOT_KEYS = frozenset(
     {
@@ -50,9 +52,14 @@ ROOT_KEYS = frozenset(
     }
 )
 SOURCE_TREE_KEYS = frozenset({"status", "source_commit"})
-P5_FROZEN_KEYS = frozenset(
-    {"git_commit", "checkpoint_sha256", "config_sha256", "dataset_sha256"}
-)
+P5_FROZEN_VALUES = {
+    "source_commit": "92bab01e93bacbc939606ec7c7f58d3f9b334fe6",
+    "artifact_commit": "1380c4b9f37bec7933126ccc9bd70067de166f6f",
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "json_sha256": "7da68910b0c0b43b5f04d8ae7d56543a460231c0616c62b2fb9485b88fd781a1",
+    "markdown_sha256": "f2115bde732317e27aab8791dbe4744fcd2354b955ab8f1fe9338b0d351abe78",
+}
+P5_FROZEN_KEYS = frozenset(P5_FROZEN_VALUES)
 PROTOCOL_KEYS = frozenset(
     {
         "name",
@@ -67,7 +74,7 @@ PROVENANCE_KEYS = frozenset({"checkpoint", "config", "dataset", "prediction_cach
 PROVENANCE_RECORD_KEYS = frozenset({"ref", "sha256"})
 METHOD_RECORD_KEYS = frozenset({"mode", "metric_block"})
 HORIZON_IDS = ("T2", "T3", "T4", "T5")
-HORIZON_SEQUENCE_COUNTS = {"T2": 154, "T3": 120, "T4": 75, "T5": 43}
+HORIZON_SEQUENCE_COUNTS = {"T2": 129, "T3": 129, "T4": 129, "T5": 129}
 METHOD_IDS = ("B0", "B0_sanity", "B1", "B2", "B3", "B4", "Oracle")
 ONLINE_METHOD_IDS = METHOD_IDS[:-1]
 METRIC_BLOCK_IDS = ("raw", "strict", "offline")
@@ -80,6 +87,8 @@ METRIC_FIELDS = (
     "t_mAP50",
     "t_mAP25",
     "t_REC",
+    "t_REC50",
+    "t_REC25",
 )
 ANALYSIS_GROUPS = (
     "association",
@@ -94,12 +103,13 @@ CHANGE_LABEL_KEYS = frozenset({"available", "reason", "scope"})
 GATE_RECORD_KEYS = frozenset({"passed", "evidence"})
 GATE_IDS = tuple(f"G6A-{index}" for index in range(1, 6))
 MANIFEST_RECORD_KEYS = frozenset({"path", "bytes", "sha256"})
-DERIVED_KIND_IDS = ("csv", "json", "markdown", "svg")
+DERIVED_KIND_IDS = ("csv", "json", "markdown", "svg", "yaml")
 DERIVED_RECORD_KEYS = {
     "csv": frozenset({"columns", "rows"}),
     "json": frozenset({"text"}),
     "markdown": frozenset({"text"}),
     "svg": frozenset({"text"}),
+    "yaml": frozenset({"text"}),
 }
 REQUIRED_CSV_PATHS = frozenset(
     {
@@ -109,13 +119,23 @@ REQUIRED_CSV_PATHS = frozenset(
         "per_sequence_results.csv",
         "association_events.csv",
         "error_breakdown.csv",
+        "error_breakdown_T2.csv",
+        "error_breakdown_T3.csv",
+        "error_breakdown_T4.csv",
+        "error_breakdown_T5.csv",
         "reactivation_audit.csv",
+        "reactivation_score_distribution.csv",
+        "reactivation_margin_distribution.csv",
+        "reactivation_by_gap.csv",
         "capacity_audit.csv",
         "efficiency_results.csv",
     }
 )
 REQUIRED_JSON_PATHS = frozenset({"protocol_b_manifest.json"})
 REQUIRED_MARKDOWN_PATHS = frozenset({"statistical_analysis.md"})
+REQUIRED_YAML_PATHS = frozenset(
+    {"configs/resolved_runtime.yaml", "configs/p6a_default.yaml"}
+)
 REQUIRED_SVG_PATHS = frozenset(
     {
         "figures/figure_a_identity.svg",
@@ -126,6 +146,237 @@ REQUIRED_SVG_PATHS = frozenset(
     }
 )
 REPORT_PATH = "P6A_GO_NOGO_REPORT.md"
+
+ONLINE_METHOD_SET = tuple(METHOD_IDS[:-1])
+ALL_HORIZONS = tuple(HORIZON_IDS)
+REACTIVATION_METHOD_SET = ("B1", "B2", "B3", "B4")
+REACTIVATION_HORIZONS = ("T3", "T4", "T5")
+FAILURE_CATEGORIES = tuple(f"F{index}" for index in range(1, 8))
+CAPACITY_METHOD = "B4"
+
+CSV_COLUMN_SCHEMAS = {
+    "baseline_results.csv": (
+        "method",
+        "T",
+        "raw_AP",
+        "online_t_mAP",
+        "online_t_REC",
+        "id_switch_rate",
+        "reactivation_accuracy",
+    ),
+    "strict_online_results.csv": (
+        "method",
+        "T",
+        "t_mAP",
+        "t_mAP50",
+        "t_mAP25",
+        "t_REC",
+        "t_REC50",
+        "t_REC25",
+    ),
+    "raw_local_results.csv": ("method", "T", "AP", "AP50", "AP25", "REC"),
+    "per_sequence_results.csv": (
+        "method",
+        "reference_scene_id",
+        "master_sequence_id",
+        "scene_id",
+        "sequence_id",
+        "order_id",
+        "prefix",
+        "T",
+        "prediction_digest",
+        "id_switches",
+        "transition_opportunities",
+        "id_switch_rate",
+        "active_correct_matches",
+        "active_wrong_matches",
+        "births",
+        "false_births",
+        "rejected_births",
+        "fragmentation_count",
+        "merge_count",
+        "gap_opportunities",
+        "reactivation_attempts",
+        "predicted_reactivation_events",
+        "correct_reactivations",
+        "wrong_reactivations",
+        "no_attempts",
+        "reactivation_accuracy",
+        "reactivation_precision",
+        "reactivation_recall",
+        "reactivation_coverage",
+    ),
+    "association_events.csv": (
+        "event_id",
+        "scene_id",
+        "sequence_id",
+        "reference_scene_id",
+        "master_sequence_id",
+        "order_id",
+        "prefix",
+        "method",
+        "stage_id",
+        "event_kind",
+        "query_id",
+        "candidate_slot_id",
+        "predicted_identity_id",
+        "gt_entity_id",
+        "association_correct",
+        "feature_similarity",
+        "class_similarity",
+        "total_score",
+        "best_score",
+        "second_best_score",
+        "score_margin",
+        "observation_confidence",
+        "mask_support",
+        "predicted_class",
+        "class_entropy",
+        "slot_age",
+        "last_seen_stage",
+        "gap_length",
+        "slot_active",
+        "slot_occupied",
+        "association_result",
+        "gt_present",
+        "prediction_present",
+        "transition_opportunity",
+        "id_switch",
+        "gap_opportunity",
+        "reactivation_attempt",
+        "reactivation_correct",
+        "new_birth",
+        "false_birth",
+        "reactivation",
+        "wrong_reactivation",
+        "local_observation_available",
+        "local_match_available",
+        "raw_local_match",
+        "raw_prediction_available",
+        "local_perception_miss",
+        "association_miss",
+        "association_attempted",
+        "identity_fragmentation",
+        "identity_merge",
+        "fragmentation",
+        "merge",
+        "semantic_drift",
+        "semantic_mismatch",
+        "capacity_failure",
+        "capacity_birth_failure",
+        "birth_rejected",
+        "is_failure",
+        "failure_category",
+        "failure_code",
+        "prediction_digest",
+        "cache_digest",
+    ),
+    "error_breakdown.csv": ("method", "T", "category", "count", "share"),
+    "reactivation_audit.csv": (
+        "method",
+        "T",
+        "gap_opportunities",
+        "reactivation_attempts",
+        "correct_reactivations",
+        "wrong_reactivations",
+        "no_attempts",
+        "reactivation_accuracy",
+        "reactivation_precision",
+        "reactivation_recall",
+        "reactivation_coverage",
+    ),
+    "reactivation_score_distribution.csv": (
+        "method",
+        "T",
+        "outcome",
+        "bin_low",
+        "bin_high",
+        "count",
+        "fraction",
+    ),
+    "reactivation_margin_distribution.csv": (
+        "method",
+        "T",
+        "outcome",
+        "bin_low",
+        "bin_high",
+        "count",
+        "fraction",
+    ),
+    "reactivation_by_gap.csv": (
+        "method",
+        "T",
+        "gap_length",
+        "outcome",
+        "count",
+        "fraction",
+    ),
+    "capacity_audit.csv": (
+        "method",
+        "T",
+        "stage_id",
+        "capacity",
+        "birth_count",
+        "occupied_count",
+        "active_count",
+        "dormant_count",
+        "peak_occupied",
+        "peak_active",
+        "peak_dormant",
+        "occupancy_ratio",
+        "rejected_births",
+        "persistent_state_bytes",
+    ),
+    "efficiency_results.csv": (
+        "method",
+        "T",
+        "stage_id",
+        "row_type",
+        "count",
+        "bootstrap_latency_ms",
+        "new_visit_latency_ms",
+        "association_overhead_ms",
+        "memory_update_overhead_ms",
+        "full_history_latency_ms",
+        "gpu_peak_memory_bytes",
+        "persistent_state_bytes",
+    ),
+}
+CSV_PRIMARY_KEYS = {
+    "baseline_results.csv": ("method", "T"),
+    "strict_online_results.csv": ("method", "T"),
+    "raw_local_results.csv": ("method", "T"),
+    "per_sequence_results.csv": (
+        "method",
+        "reference_scene_id",
+        "master_sequence_id",
+        "scene_id",
+        "sequence_id",
+        "order_id",
+        "prefix",
+        "T",
+    ),
+    "association_events.csv": ("event_id",),
+    "error_breakdown.csv": ("method", "T", "category"),
+    "reactivation_audit.csv": ("method", "T"),
+    "reactivation_score_distribution.csv": (
+        "method",
+        "T",
+        "outcome",
+        "bin_low",
+        "bin_high",
+    ),
+    "reactivation_margin_distribution.csv": (
+        "method",
+        "T",
+        "outcome",
+        "bin_low",
+        "bin_high",
+    ),
+    "reactivation_by_gap.csv": ("method", "T", "gap_length", "outcome"),
+    "capacity_audit.csv": ("method", "T", "stage_id"),
+    "efficiency_results.csv": ("method", "T", "stage_id", "row_type"),
+}
 P6A_REPORT_SECTIONS = (
     "What was changed",
     "Why it was changed",
@@ -156,7 +407,7 @@ _PRIVATE_TEXT = (
 
 def _exact_keys(value: object, expected: frozenset[str] | set[str], *, name: str) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
-        raise ValueError(f"{name} must be a mapping")
+        raise ValueError(f"{name} must be a mapping")  # noqa: TRY004
     actual = set(value)
     if actual != set(expected):
         raise ValueError(
@@ -176,7 +427,7 @@ def _finite_number(value: object, *, name: str, allow_none: bool = False) -> Non
     if value is None and allow_none:
         return
     if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise ValueError(f"{name} must be a finite number")
+        raise ValueError(f"{name} must be a finite number")  # noqa: TRY004
     if isinstance(value, float) and not math.isfinite(value):
         raise ValueError(f"{name} must be a finite number")
 
@@ -189,7 +440,7 @@ def _nonempty_string(value: object, *, name: str) -> str:
 
 def _string_list(value: object, *, name: str, allow_empty: bool = True) -> list[str]:
     if not isinstance(value, list):
-        raise ValueError(f"{name} must be a list")
+        raise ValueError(f"{name} must be a list")  # noqa: TRY004
     if not allow_empty and not value:
         raise ValueError(f"{name} must not be empty")
     result = [_nonempty_string(item, name=f"{name} item") for item in value]
@@ -206,8 +457,13 @@ def _validate_scalar_tree(value: object, *, path: str = "root") -> None:
             raise ValueError(f"{path} contains a non-finite number")
         return
     if isinstance(value, str):
-        if PurePosixPath(value).is_absolute() or _WINDOWS_ABSOLUTE.search(value):
-            raise ValueError(f"{path} contains an absolute path")
+        normalized_path = value.replace("\\", "/")
+        if (
+            PurePosixPath(value).is_absolute()
+            or _WINDOWS_ABSOLUTE.search(value)
+            or ".." in PurePosixPath(normalized_path).parts
+        ):
+            raise ValueError(f"{path} contains an absolute or traversing path")
         if any(pattern.search(value) for pattern in _PRIVATE_TEXT):
             raise ValueError(f"{path} contains private or non-portable text")
         if _IPV4.search(value) or _IPV6.search(value):
@@ -222,7 +478,7 @@ def _validate_scalar_tree(value: object, *, path: str = "root") -> None:
     if isinstance(value, Mapping):
         for key, item in value.items():
             if not isinstance(key, str):
-                raise ValueError(f"{path} mapping keys must be strings")
+                raise ValueError(f"{path} mapping keys must be strings")  # noqa: TRY004
             _validate_scalar_tree(item, path=f"{path}.{key}")
         return
     if isinstance(value, (list, tuple)):
@@ -270,6 +526,597 @@ def _validate_relative_artifact_path(value: object, *, name: str) -> str:
     ):
         raise ValueError(f"{name} must be a safe relative P6A path")
     return path.as_posix()
+
+
+def _horizon_token(value: object, *, name: str) -> str:
+    if isinstance(value, bool):
+        raise ValueError(f"{name} must identify T2 through T5")  # noqa: TRY004
+    if isinstance(value, int) and value in (2, 3, 4, 5):
+        return f"T{value}"
+    if isinstance(value, str) and value in HORIZON_IDS:
+        return value
+    raise ValueError(f"{name} must identify T2 through T5")
+
+
+def _csv_schema_path(path: str) -> str:
+    if re.fullmatch(r"error_breakdown_T[2345]\.csv", path):
+        return "error_breakdown.csv"
+    return path
+
+
+def _csv_rows_with_schema(
+    path: str, columns: object, rows: object
+) -> list[Mapping[str, object]]:
+    schema_path = _csv_schema_path(path)
+    expected = CSV_COLUMN_SCHEMAS.get(schema_path)
+    if expected is None:
+        raise ValueError(f"{path} has no registered CSV schema")
+    if not isinstance(columns, list) or tuple(columns) != expected:
+        raise ValueError(f"{path} columns do not match the exact schema")
+    if not isinstance(rows, list) or not rows:
+        raise ValueError(f"{path} rows must not be empty")
+    validated: list[Mapping[str, object]] = []
+    for index, raw_row in enumerate(rows):
+        if not isinstance(raw_row, Mapping) or tuple(raw_row) != expected:
+            raise ValueError(f"{path} row {index} has schema drift")
+        _validate_scalar_tree(raw_row, path=f"{path}.rows[{index}]")
+        validated.append(raw_row)
+    primary_key = CSV_PRIMARY_KEYS[schema_path]
+    seen: set[tuple[object, ...]] = set()
+    for index, row in enumerate(validated):
+        key = tuple(row[field] for field in primary_key)
+        if any(value is None for value in key):
+            raise ValueError(f"{path} row {index} has a null primary-key field")
+        try:
+            duplicate = key in seen
+        except TypeError as error:
+            raise ValueError(
+                f"{path} row {index} has an unhashable primary-key field"
+            ) from error
+        if duplicate:
+            raise ValueError(f"{path} contains duplicate primary key")
+        seen.add(key)
+    return validated
+
+
+def _unit_or_none(value: object, *, name: str) -> None:
+    _finite_number(value, name=name, allow_none=True)
+    if value is not None and not 0.0 <= float(value) <= 1.0:
+        raise ValueError(f"{name} must be within [0, 1]")
+
+
+def _nonnegative_or_none(value: object, *, name: str) -> None:
+    if value is None:
+        return
+    _integer(value, name=name, minimum=0)
+
+
+def _nonnegative_integer(value: object, *, name: str) -> int:
+    return _integer(value, name=name, minimum=0)
+
+
+def _unit(value: object, *, name: str) -> None:
+    _finite_number(value, name=name)
+    if not 0.0 <= float(value) <= 1.0:
+        raise ValueError(f"{name} must be within [0, 1]")
+
+
+def _validate_ratio(
+    value: object, numerator: int, denominator: int, *, name: str
+) -> None:
+    expected = numerator / denominator if denominator else None
+    if expected is None:
+        if value is not None:
+            raise ValueError(f"{name} must be null when its denominator is zero")
+    elif value is None or not math.isclose(float(value), expected, abs_tol=1e-9):
+        raise ValueError(f"{name} does not match its count ratio")
+
+
+def _validate_method_horizon_grid(
+    path: str, rows: Sequence[Mapping[str, object]], methods: Sequence[str]
+) -> None:
+    actual = {
+        (
+            _nonempty_string(row["method"], name=f"{path}.method"),
+            _horizon_token(row["T"], name=f"{path}.T"),
+        )
+        for row in rows
+    }
+    expected = {(method, horizon) for method in methods for horizon in HORIZON_IDS}
+    if actual != expected:
+        raise ValueError(f"{path} must contain exactly one row per method and horizon")
+
+
+def _validate_metric_table(path: str, rows: Sequence[Mapping[str, object]]) -> None:
+    _validate_method_horizon_grid(path, rows, ONLINE_METHOD_SET)
+    fields = CSV_COLUMN_SCHEMAS[path][2:]
+    for row in rows:
+        for field in fields:
+            _unit_or_none(row[field], name=f"{path}.{field}")
+
+
+def _validate_per_sequence_rows(
+    path: str, rows: Sequence[Mapping[str, object]]
+) -> None:
+    counts: dict[tuple[object, str], int] = {}
+    units: dict[tuple[object, str], set[tuple[object, ...]]] = {}
+    for row in rows:
+        method = _nonempty_string(row["method"], name=f"{path}.method")
+        horizon = _horizon_token(row["T"], name=f"{path}.T")
+        prefix = _integer(row["prefix"], name=f"{path}.prefix", minimum=2)
+        if prefix != int(horizon[1]):
+            raise ValueError(f"{path}.prefix does not match T")
+        for field in (
+            "reference_scene_id",
+            "master_sequence_id",
+            "scene_id",
+            "sequence_id",
+            "order_id",
+        ):
+            _nonempty_string(row[field], name=f"{path}.{field}")
+        _validate_sha(row["prediction_digest"], name=f"{path}.prediction_digest", length=64)
+        key = (method, horizon)
+        counts[key] = counts.get(key, 0) + 1
+        units.setdefault(key, set()).add(
+            (
+                row["reference_scene_id"],
+                row["master_sequence_id"],
+                row["scene_id"],
+                row["sequence_id"],
+                row["order_id"],
+            )
+        )
+        if method not in ONLINE_METHOD_SET:
+            raise ValueError(f"{path} contains an unsupported method")
+        if row["order_id"] not in {"canonical", "reverse", "sha256_seed45"}:
+            raise ValueError(f"{path} contains an unsupported order variant")
+        for field in (
+            "id_switches",
+            "transition_opportunities",
+            "active_correct_matches",
+            "active_wrong_matches",
+            "births",
+            "false_births",
+            "rejected_births",
+            "fragmentation_count",
+            "merge_count",
+            "gap_opportunities",
+            "reactivation_attempts",
+            "predicted_reactivation_events",
+            "correct_reactivations",
+            "wrong_reactivations",
+            "no_attempts",
+        ):
+            _nonnegative_integer(row[field], name=f"{path}.{field}")
+        for field in (
+            "id_switch_rate",
+            "reactivation_accuracy",
+            "reactivation_precision",
+            "reactivation_recall",
+            "reactivation_coverage",
+        ):
+            _unit_or_none(row[field], name=f"{path}.{field}")
+        gap_opportunities = int(row["gap_opportunities"])
+        attempts = int(row["reactivation_attempts"])
+        correct = int(row["correct_reactivations"])
+        wrong = int(row["wrong_reactivations"])
+        if attempts > gap_opportunities or correct > attempts:
+            raise ValueError(f"{path} contains impossible reactivation counts")
+        if int(row["no_attempts"]) != gap_opportunities - attempts:
+            raise ValueError(f"{path}.no_attempts does not match gap opportunities")
+        predicted = int(row["predicted_reactivation_events"])
+        if predicted < correct or predicted != correct + wrong:
+            raise ValueError(f"{path}.predicted_reactivation_events is inconsistent")
+        _validate_ratio(
+            row["id_switch_rate"], int(row["id_switches"]),
+            int(row["transition_opportunities"]), name=f"{path}.id_switch_rate",
+        )
+        _validate_ratio(
+            row["reactivation_accuracy"], correct, attempts,
+            name=f"{path}.reactivation_accuracy",
+        )
+        _validate_ratio(
+            row["reactivation_precision"], correct, correct + wrong,
+            name=f"{path}.reactivation_precision",
+        )
+        _validate_ratio(
+            row["reactivation_recall"], correct, gap_opportunities,
+            name=f"{path}.reactivation_recall",
+        )
+        _validate_ratio(
+            row["reactivation_coverage"], attempts, gap_opportunities,
+            name=f"{path}.reactivation_coverage",
+        )
+    expected = {
+        (method, horizon): HORIZON_SEQUENCE_COUNTS[horizon]
+        for method in ONLINE_METHOD_SET
+        for horizon in HORIZON_IDS
+    }
+    if counts != expected:
+        raise ValueError(f"{path} must contain exactly 129 prefix units per method/horizon")
+    for key, unit_rows in units.items():
+        master_ids = {unit[1] for unit in unit_rows}
+        if len(master_ids) != 43:
+            raise ValueError(f"{path} must contain 43 masters for {key}")
+        if len({reference for reference, *_ in unit_rows}) != 6:
+            raise ValueError(f"{path} must contain six reference-scene clusters for {key}")
+        for master in master_ids:
+            master_orders = {
+                order
+                for _, current_master, _, _, order in unit_rows
+                if current_master == master
+            }
+            if master_orders != {"canonical", "reverse", "sha256_seed45"}:
+                raise ValueError(f"{path} must contain three orders per master for {key}")
+
+
+def _validate_error_rows(path: str, rows: Sequence[Mapping[str, object]]) -> None:
+    if path.startswith("error_breakdown_T"):
+        required_horizon = path[len("error_breakdown_") : -len(".csv")]
+        rows_horizons = {
+            _horizon_token(row["T"], name=f"{path}.T") for row in rows
+        }
+        if rows_horizons != {required_horizon}:
+            raise ValueError(f"{path} contains rows for the wrong horizon")
+    groups: dict[tuple[object, str], list[Mapping[str, object]]] = {}
+    for row in rows:
+        _nonempty_string(row["method"], name=f"{path}.method")
+        horizon = _horizon_token(row["T"], name=f"{path}.T")
+        category = row["category"]
+        if category not in FAILURE_CATEGORIES:
+            raise ValueError(f"{path} has an unknown failure category")
+        _nonnegative_integer(row["count"], name=f"{path}.count")
+        _unit(row["share"], name=f"{path}.share")
+        groups.setdefault((row["method"], horizon), []).append(row)
+    expected_groups = {
+        (method, horizon)
+        for method in ONLINE_METHOD_SET
+        for horizon in HORIZON_IDS
+        if not path.startswith("error_breakdown_T")
+        or horizon == path[len("error_breakdown_") : -len(".csv")]
+    }
+    if set(groups) != expected_groups:
+        raise ValueError(f"{path} must cover every method/horizon failure group")
+    for group, group_rows in groups.items():
+        if {row["category"] for row in group_rows} != set(FAILURE_CATEGORIES):
+            raise ValueError(f"{path} must contain F1 through F7 for {group}")
+        if not math.isclose(
+            sum(float(row["share"]) for row in group_rows), 1.0, abs_tol=1e-9
+        ):
+            raise ValueError(f"{path} failure shares must sum to one for {group}")
+        total_count = sum(int(row["count"]) for row in group_rows)
+        if total_count <= 0:
+            raise ValueError(f"{path} failure counts must have a positive total for {group}")
+        for row in group_rows:
+            if not math.isclose(
+                float(row["share"]), int(row["count"]) / total_count, abs_tol=1e-9
+            ):
+                raise ValueError(f"{path} share does not match count for {group}")
+
+
+def _validate_reactivation_audit(
+    path: str, rows: Sequence[Mapping[str, object]]
+) -> None:
+    expected = {
+        (method, horizon)
+        for method in REACTIVATION_METHOD_SET
+        for horizon in REACTIVATION_HORIZONS
+    }
+    actual = {
+        (
+            _nonempty_string(row["method"], name=f"{path}.method"),
+            _horizon_token(row["T"], name=f"{path}.T"),
+        )
+        for row in rows
+    }
+    if actual != expected:
+        raise ValueError(f"{path} must cover B1-B4 at T3-T5")
+    for row in rows:
+        _nonempty_string(row["method"], name=f"{path}.method")
+        for field in (
+            "gap_opportunities",
+            "reactivation_attempts",
+            "correct_reactivations",
+            "wrong_reactivations",
+            "no_attempts",
+        ):
+            _nonnegative_integer(row[field], name=f"{path}.{field}")
+        for field in (
+            "reactivation_accuracy",
+            "reactivation_precision",
+            "reactivation_recall",
+            "reactivation_coverage",
+        ):
+            _unit_or_none(row[field], name=f"{path}.{field}")
+        gap_opportunities = int(row["gap_opportunities"])
+        attempts = int(row["reactivation_attempts"])
+        correct = int(row["correct_reactivations"])
+        wrong = int(row["wrong_reactivations"])
+        no_attempts = int(row["no_attempts"])
+        if attempts > gap_opportunities or correct > attempts:
+            raise ValueError(f"{path} contains impossible reactivation counts")
+        if no_attempts != gap_opportunities - attempts:
+            raise ValueError(f"{path}.no_attempts does not match gap opportunities")
+        _validate_ratio(
+            row["reactivation_accuracy"], correct, attempts,
+            name=f"{path}.reactivation_accuracy",
+        )
+        _validate_ratio(
+            row["reactivation_precision"], correct, correct + wrong,
+            name=f"{path}.reactivation_precision",
+        )
+        _validate_ratio(
+            row["reactivation_recall"], correct, gap_opportunities,
+            name=f"{path}.reactivation_recall",
+        )
+        _validate_ratio(
+            row["reactivation_coverage"], attempts, gap_opportunities,
+            name=f"{path}.reactivation_coverage",
+        )
+
+
+def _validate_reactivation_distribution(
+    path: str, rows: Sequence[Mapping[str, object]]
+) -> None:
+    expected = {
+        (method, horizon)
+        for method in REACTIVATION_METHOD_SET
+        for horizon in REACTIVATION_HORIZONS
+    }
+    groups: dict[tuple[object, str, object], list[Mapping[str, object]]] = {}
+    for row in rows:
+        _nonempty_string(row["method"], name=f"{path}.method")
+        horizon = _horizon_token(row["T"], name=f"{path}.T")
+        if row["method"] not in REACTIVATION_METHOD_SET or horizon not in REACTIVATION_HORIZONS:
+            raise ValueError(f"{path} contains an unsupported method or horizon")
+        if row["outcome"] not in ("correct", "wrong"):
+            raise ValueError(f"{path} outcome must be correct or wrong")
+        _finite_number(row["bin_low"], name=f"{path}.bin_low")
+        _finite_number(row["bin_high"], name=f"{path}.bin_high")
+        if float(row["bin_high"]) <= float(row["bin_low"]):
+            raise ValueError(f"{path} bins must be increasing")
+        _nonnegative_integer(row["count"], name=f"{path}.count")
+        _unit(row["fraction"], name=f"{path}.fraction")
+        groups.setdefault((row["method"], horizon, row["outcome"]), []).append(row)
+    if {(method, horizon) for method, horizon, _ in groups} != expected:
+        raise ValueError(f"{path} must cover B1-B4 at T3-T5")
+    for group, group_rows in groups.items():
+        ordered = sorted(group_rows, key=lambda row: (row["bin_low"], row["bin_high"]))
+        if not math.isclose(
+            sum(float(row["fraction"]) for row in ordered), 1.0, abs_tol=1e-9
+        ):
+            raise ValueError(f"{path} fractions must sum to one for {group}")
+        for previous, current in pairwise(ordered):
+            if previous["bin_high"] != current["bin_low"]:
+                raise ValueError(f"{path} bins must be continuous")
+    if {key[:2] for key in groups} != expected:
+        raise ValueError(f"{path} must contain paired correct/wrong groups")
+    if any(
+        {outcome for method, horizon, outcome in groups if (method, horizon) == pair}
+        != {"correct", "wrong"}
+        for pair in expected
+    ):
+        raise ValueError(f"{path} must contain paired correct/wrong groups")
+
+
+def _validate_reactivation_by_gap(
+    path: str, rows: Sequence[Mapping[str, object]]
+) -> None:
+    expected = {
+        (method, horizon)
+        for method in REACTIVATION_METHOD_SET
+        for horizon in REACTIVATION_HORIZONS
+    }
+    groups: dict[tuple[object, str, object], list[Mapping[str, object]]] = {}
+    for row in rows:
+        _nonempty_string(row["method"], name=f"{path}.method")
+        horizon = _horizon_token(row["T"], name=f"{path}.T")
+        if row["method"] not in REACTIVATION_METHOD_SET or horizon not in REACTIVATION_HORIZONS:
+            raise ValueError(f"{path} contains an unsupported method or horizon")
+        _nonnegative_or_none(row["gap_length"], name=f"{path}.gap_length")
+        if row["outcome"] not in ("correct", "wrong"):
+            raise ValueError(f"{path} outcome must be correct or wrong")
+        _nonnegative_integer(row["count"], name=f"{path}.count")
+        _unit(row["fraction"], name=f"{path}.fraction")
+        groups.setdefault((row["method"], horizon, row["gap_length"]), []).append(row)
+    if {(method, horizon) for method, horizon, _ in groups} != expected:
+        raise ValueError(f"{path} must cover B1-B4 at T3-T5")
+    for group, group_rows in groups.items():
+        if {row["outcome"] for row in group_rows} != {"correct", "wrong"}:
+            raise ValueError(f"{path} must contain paired outcomes for {group}")
+        total_count = sum(int(row["count"]) for row in group_rows)
+        if total_count <= 0:
+            raise ValueError(f"{path} counts must have a positive total for {group}")
+        if not math.isclose(
+            sum(float(row["fraction"]) for row in group_rows), 1.0, abs_tol=1e-9
+        ) or any(
+            not math.isclose(
+                float(row["fraction"]), int(row["count"]) / total_count, abs_tol=1e-9
+            )
+            for row in group_rows
+        ):
+            raise ValueError(f"{path} fractions must sum to one for {group}")
+
+
+def _validate_capacity_rows(path: str, rows: Sequence[Mapping[str, object]]) -> None:
+    counts: dict[tuple[object, str], int] = {}
+    for row in rows:
+        _nonempty_string(row["method"], name=f"{path}.method")
+        if row["method"] != CAPACITY_METHOD:
+            raise ValueError(f"{path} only supports bounded state for {CAPACITY_METHOD}")
+        horizon = _horizon_token(row["T"], name=f"{path}.T")
+        stage = _integer(row["stage_id"], name=f"{path}.stage_id", minimum=0)
+        if stage > 4:
+            raise ValueError(f"{path}.stage_id must be between 0 and 4")
+        key = (row["method"], horizon)
+        counts[key] = counts.get(key, 0) + 1
+        capacity = _integer(row["capacity"], name=f"{path}.capacity", minimum=1)
+        occupied = _integer(row["occupied_count"], name=f"{path}.occupied_count", minimum=0)
+        active = _integer(row["active_count"], name=f"{path}.active_count", minimum=0)
+        dormant = _integer(row["dormant_count"], name=f"{path}.dormant_count", minimum=0)
+        if occupied > capacity or active > occupied or dormant != occupied - active:
+            raise ValueError(f"{path} has inconsistent capacity state counts")
+        for field in (
+            "birth_count",
+            "peak_occupied",
+            "peak_active",
+            "peak_dormant",
+            "rejected_births",
+            "persistent_state_bytes",
+        ):
+            _nonnegative_integer(row[field], name=f"{path}.{field}")
+        _unit(row["occupancy_ratio"], name=f"{path}.occupancy_ratio")
+        if row["occupancy_ratio"] is not None and not math.isclose(
+            float(row["occupancy_ratio"]), occupied / capacity, abs_tol=1e-9
+        ):
+            raise ValueError(f"{path}.occupancy_ratio does not match occupied/capacity")
+    expected = {(CAPACITY_METHOD, horizon): 5 for horizon in HORIZON_IDS}
+    if counts != expected:
+        raise ValueError(f"{path} must contain five stage snapshots per method/horizon")
+
+
+def _validate_efficiency_rows(path: str, rows: Sequence[Mapping[str, object]]) -> None:
+    row_types = {"bootstrap", "new_visit", "full_history"}
+    seen: set[tuple[object, object, object, object]] = set()
+    observed_types: set[object] = set()
+    for row in rows:
+        _nonempty_string(row["method"], name=f"{path}.method")
+        horizon = _horizon_token(row["T"], name=f"{path}.T")
+        stage_id = _integer(row["stage_id"], name=f"{path}.stage_id", minimum=0)
+        if stage_id > 4:
+            raise ValueError(f"{path}.stage_id must be between 0 and 4")
+        _nonempty_string(row["row_type"], name=f"{path}.row_type")
+        if row["row_type"] not in row_types:
+            raise ValueError(f"{path} has an unsupported row_type")
+        if row["method"] not in METHOD_IDS and row["method"] != "full_history_rescene":
+            raise ValueError(f"{path} contains an unsupported method")
+        key = (row["method"], horizon, row["stage_id"], row["row_type"])
+        if key in seen:
+            raise ValueError(f"{path} contains duplicate stage timing rows")
+        seen.add(key)
+        observed_types.add(row["row_type"])
+        _nonnegative_integer(row["count"], name=f"{path}.count")
+        for field in (
+            "bootstrap_latency_ms",
+            "new_visit_latency_ms",
+            "association_overhead_ms",
+            "memory_update_overhead_ms",
+            "full_history_latency_ms",
+        ):
+            _finite_number(row[field], name=f"{path}.{field}", allow_none=True)
+            if row[field] is not None and float(row[field]) < 0:
+                raise ValueError(f"{path}.{field} must be non-negative")
+        for field in ("gpu_peak_memory_bytes", "persistent_state_bytes"):
+            _nonnegative_or_none(row[field], name=f"{path}.{field}")
+        bootstrap = row["bootstrap_latency_ms"]
+        new_visit = row["new_visit_latency_ms"]
+        association = row["association_overhead_ms"]
+        memory_update = row["memory_update_overhead_ms"]
+        full_history = row["full_history_latency_ms"]
+        if row["row_type"] == "bootstrap":
+            if bootstrap is None or any(
+                value is not None
+                for value in (new_visit, association, memory_update, full_history)
+            ):
+                raise ValueError(f"{path} bootstrap rows cannot contain visit metrics")
+        elif row["row_type"] == "new_visit":
+            if new_visit is None or bootstrap is not None or full_history is not None:
+                raise ValueError(f"{path} new_visit rows cannot contain setup/full-history metrics")
+        elif full_history is None or any(
+            value is not None
+            for value in (bootstrap, new_visit, association, memory_update)
+        ):
+            raise ValueError(f"{path} full_history rows cannot contain setup/update metrics")
+    if observed_types != row_types:
+        raise ValueError(f"{path} must contain bootstrap, new_visit, and full_history rows")
+
+
+def _validate_association_event_rows(
+    path: str, rows: Sequence[Mapping[str, object]]
+) -> None:
+    for row in rows:
+        for field in (
+            "event_id",
+            "scene_id",
+            "sequence_id",
+            "reference_scene_id",
+            "master_sequence_id",
+            "order_id",
+            "method",
+            "event_kind",
+            "prediction_digest",
+            "cache_digest",
+        ):
+            _nonempty_string(row[field], name=f"{path}.{field}")
+        _integer(row["prefix"], name=f"{path}.prefix", minimum=0)
+        _integer(row["stage_id"], name=f"{path}.stage_id", minimum=0)
+        _validate_sha(row["prediction_digest"], name=f"{path}.prediction_digest", length=64)
+        _validate_sha(row["cache_digest"], name=f"{path}.cache_digest", length=64)
+        if row["prediction_digest"] != row["cache_digest"]:
+            raise ValueError(f"{path} prediction/cache digests must agree")
+        if not isinstance(row["is_failure"], bool):
+            raise ValueError(f"{path}.is_failure must be boolean")  # noqa: TRY004
+        for field in (
+            "association_correct",
+            "slot_active",
+            "slot_occupied",
+            "new_birth",
+            "reactivation",
+            "reactivation_correct",
+            "transition_opportunity",
+            "id_switch",
+            "gap_opportunity",
+            "reactivation_attempt",
+            "false_birth",
+            "wrong_reactivation",
+        ):
+            if row[field] is not None and not isinstance(row[field], bool):
+                raise ValueError(f"{path}.{field} must be boolean or null")
+        for field in (
+            "feature_similarity",
+            "class_similarity",
+            "total_score",
+            "best_score",
+            "second_best_score",
+            "score_margin",
+            "observation_confidence",
+            "mask_support",
+            "class_entropy",
+        ):
+            _finite_number(row[field], name=f"{path}.{field}", allow_none=True)
+        for field in ("slot_age", "last_seen_stage", "gap_length"):
+            _nonnegative_or_none(row[field], name=f"{path}.{field}")
+    try:
+        from scripts.p6a_analysis import validate_association_events
+
+        validate_association_events(rows)
+    except Exception as error:
+        raise ValueError(f"{path} failed association-event reconstruction validation") from error
+
+
+def _validate_registered_csv(path: str, columns: object, rows: object) -> None:
+    validated = _csv_rows_with_schema(path, columns, rows)
+    if path in {"baseline_results.csv", "strict_online_results.csv", "raw_local_results.csv"}:
+        _validate_metric_table(path, validated)
+    elif path == "per_sequence_results.csv":
+        _validate_per_sequence_rows(path, validated)
+    elif path == "association_events.csv":
+        _validate_association_event_rows(path, validated)
+    elif path == "error_breakdown.csv" or path.startswith("error_breakdown_T"):
+        _validate_error_rows(path, validated)
+    elif path == "reactivation_audit.csv":
+        _validate_reactivation_audit(path, validated)
+    elif path in {
+        "reactivation_score_distribution.csv",
+        "reactivation_margin_distribution.csv",
+    }:
+        _validate_reactivation_distribution(path, validated)
+    elif path == "reactivation_by_gap.csv":
+        _validate_reactivation_by_gap(path, validated)
+    elif path == "capacity_audit.csv":
+        _validate_capacity_rows(path, validated)
+    elif path == "efficiency_results.csv":
+        _validate_efficiency_rows(path, validated)
 
 
 def _validate_metric_record(value: object, *, name: str) -> None:
@@ -329,6 +1176,7 @@ def _validate_derived_artifacts(value: object) -> None:
         "json": REQUIRED_JSON_PATHS,
         "markdown": REQUIRED_MARKDOWN_PATHS,
         "svg": REQUIRED_SVG_PATHS,
+        "yaml": REQUIRED_YAML_PATHS,
     }
     for kind in DERIVED_KIND_IDS:
         records = derived[kind]
@@ -341,7 +1189,13 @@ def _validate_derived_artifacts(value: object) -> None:
                 f"missing={sorted(set(expected_paths[kind]) - actual_paths)}, "
                 f"extra={sorted(actual_paths - set(expected_paths[kind]))}"
             )
-        suffix = ".csv" if kind == "csv" else ".json" if kind == "json" else ".md" if kind == "markdown" else ".svg"
+        suffix = {
+            "csv": ".csv",
+            "json": ".json",
+            "markdown": ".md",
+            "svg": ".svg",
+            "yaml": ".yaml",
+        }[kind]
         for raw_path, record in records.items():
             path = _validate_relative_artifact_path(
                 raw_path, name=f"derived_artifacts.{kind} path"
@@ -351,31 +1205,37 @@ def _validate_derived_artifacts(value: object) -> None:
             expected_keys = DERIVED_RECORD_KEYS[kind]
             normalized = _exact_keys(record, expected_keys, name=f"derived_artifacts.{path}")
             if kind == "csv":
-                columns = normalized["columns"]
-                if (
-                    not isinstance(columns, list)
-                    or not columns
-                    or any(not isinstance(column, str) or not column for column in columns)
-                    or len(set(columns)) != len(columns)
-                ):
-                    raise ValueError(f"{path} columns must be a non-empty unique list")
-                rows = normalized["rows"]
-                if not isinstance(rows, list) or not rows:
-                    raise ValueError(f"{path} rows must not be empty")
-                for index, row in enumerate(rows):
-                    if not isinstance(row, Mapping) or set(row) != set(columns):
-                        raise ValueError(f"{path} row {index} has schema drift")
-                    _validate_scalar_tree(row, path=f"{path}.rows[{index}]")
-                render_csv(rows, columns=columns)
+                _validate_registered_csv(path, normalized["columns"], normalized["rows"])
             else:
                 text = _nonempty_string(normalized["text"], name=f"{path}.text")
                 if kind == "svg" and not text.lstrip().startswith("<svg"):
                     raise ValueError(f"{path} must contain an SVG root")
                 if kind == "json":
                     try:
-                        json.loads(text)
+                        parsed = json.loads(text)
                     except (TypeError, ValueError) as error:
                         raise ValueError(f"{path} must contain valid JSON") from error
+                    if path == "protocol_b_manifest.json":
+                        try:
+                            from scripts.p6a_protocol import (
+                                validate_protocol_b_manifest,
+                            )
+
+                            validate_protocol_b_manifest(parsed)
+                        except Exception as error:
+                            raise ValueError(
+                                f"{path} failed Protocol B manifest validation"
+                            ) from error
+                if kind == "yaml":
+                    try:
+                        import yaml
+
+                        parsed_yaml = yaml.safe_load(text)
+                    except Exception as error:
+                        raise ValueError(f"{path} must contain safe YAML") from error
+                    if not isinstance(parsed_yaml, Mapping):
+                        raise ValueError(f"{path} must contain a YAML mapping")
+                    _validate_scalar_tree(parsed_yaml, path=f"{path}.parsed")
 
 
 def _validate_manifest(value: object, *, derived: Mapping[str, object]) -> None:
@@ -421,11 +1281,17 @@ def validate_root_artifact(artifact: object) -> None:
         raise ValueError("source_tree_contract must bind the passing source commit")
 
     frozen = _exact_keys(root["p5_frozen_hashes"], P5_FROZEN_KEYS, name="p5_frozen_hashes")
-    if _validate_sha(frozen["git_commit"], name="p5_frozen_hashes.git_commit", length=40) != source_commit:
-        raise ValueError("p5_frozen_hashes.git_commit must equal source_commit")
-    frozen_checkpoint = _validate_sha(frozen["checkpoint_sha256"], name="p5_frozen_hashes.checkpoint_sha256", length=64)
-    frozen_config = _validate_sha(frozen["config_sha256"], name="p5_frozen_hashes.config_sha256", length=64)
-    frozen_dataset = _validate_sha(frozen["dataset_sha256"], name="p5_frozen_hashes.dataset_sha256", length=64)
+    for key, length in (
+        ("source_commit", 40),
+        ("artifact_commit", 40),
+        ("checkpoint_sha256", 64),
+        ("json_sha256", 64),
+        ("markdown_sha256", 64),
+    ):
+        _validate_sha(frozen[key], name=f"p5_frozen_hashes.{key}", length=length)
+    if dict(frozen) != P5_FROZEN_VALUES:
+        raise ValueError("p5_frozen_hashes does not match the frozen P5 contract")
+    frozen_checkpoint = frozen["checkpoint_sha256"]
 
     protocol = _exact_keys(root["protocol"], PROTOCOL_KEYS, name="protocol")
     if protocol["name"] != "exact_common_prefix_protocol_b":
@@ -446,13 +1312,9 @@ def validate_root_artifact(artifact: object) -> None:
         "checkpoint": "repo:checkpoints/",
         "config": "repo:conf/",
         "dataset": "repo:data/",
-        "prediction_cache": "repo:artifacts/P6A/",
+        "prediction_cache": "local_cache:",
     }
-    expected_digest = {
-        "checkpoint": frozen_checkpoint,
-        "config": frozen_config,
-        "dataset": frozen_dataset,
-    }
+    expected_digest = {"checkpoint": frozen_checkpoint}
     for key in sorted(PROVENANCE_KEYS):
         record = _exact_keys(provenance[key], PROVENANCE_RECORD_KEYS, name=f"provenance.{key}")
         _validate_reference(
@@ -509,11 +1371,25 @@ def validate_root_artifact(artifact: object) -> None:
     _validate_derived_artifacts(root["derived_artifacts"])
     _validate_manifest(root["artifact_manifest"], derived=root["derived_artifacts"])
 
+    analysis_artifacts = root["derived_artifacts"]
+    analysis_path_to_rows = {
+        path: len(spec["rows"])
+        for path, spec in analysis_artifacts["csv"].items()
+    }
+    analysis_path_to_rows.update(
+        {path: 1 for kind in ("json", "markdown", "svg", "yaml") for path in analysis_artifacts[kind]}
+    )
+    for group in ANALYSIS_GROUPS:
+        record = analysis[group]
+        expected_rows = analysis_path_to_rows.get(record["path"])
+        if expected_rows is None or record["rows"] != expected_rows:
+            raise ValueError(f"analysis.{group}.rows does not match its derived artifact")
+
     gates = _exact_keys(root["gate_results"], frozenset(GATE_IDS), name="gate_results")
     for gate_id in GATE_IDS:
         gate = _exact_keys(gates[gate_id], GATE_RECORD_KEYS, name=gate_id)
         if not isinstance(gate["passed"], bool):
-            raise ValueError(f"{gate_id}.passed must be boolean")
+            raise ValueError(f"{gate_id}.passed must be boolean")  # noqa: TRY004
         _nonempty_string(gate["evidence"], name=f"{gate_id}.evidence")
     _string_list(root["claims_supported"], name="claims_supported")
     _string_list(root["claims_not_supported"], name="claims_not_supported")
@@ -556,8 +1432,9 @@ def render_go_nogo_report(artifact: Mapping[str, object]) -> str:
             f"and {protocol['cache_entry_count']} cache entries at T=2/3/4/5."
         ),
         "Reproducibility binding": (
-            f"Source commit: `{artifact['source_commit']}`; P5 checkpoint SHA256: `{p5['checkpoint_sha256']}`; "
-            f"config SHA256: `{p5['config_sha256']}`; dataset SHA256: `{p5['dataset_sha256']}`."
+            f"P6-A source commit: `{artifact['source_commit']}`; P5 source commit: "
+            f"`{p5['source_commit']}`; P5 artifact commit: `{p5['artifact_commit']}`; "
+            f"P5 checkpoint SHA256: `{p5['checkpoint_sha256']}`."
         ),
         "Main results": gate_lines,
         "Statistical evidence": f"See `{analysis['statistical']['path']}`.",
@@ -601,10 +1478,13 @@ def render_artifact_bundle(artifact: Mapping[str, object]) -> dict[str, bytes]:
 
     validate_root_artifact(artifact)
     derived = artifact["derived_artifacts"]
-    rendered: dict[str, bytes] = {REPORT_PATH: render_go_nogo_report(artifact).encode("utf-8")}
+    rendered: dict[str, bytes] = {
+        ROOT_ARTIFACT_PATH: artifact_json_text(artifact).encode("utf-8"),
+        REPORT_PATH: render_go_nogo_report(artifact).encode("utf-8"),
+    }
     for path, spec in sorted(derived["csv"].items()):
         rendered[path] = render_csv(spec["rows"], columns=spec["columns"]).encode("utf-8")
-    for kind in ("json", "markdown", "svg"):
+    for kind in ("json", "markdown", "svg", "yaml"):
         for path, spec in sorted(derived[kind].items()):
             rendered[path] = spec["text"].encode("utf-8")
     return dict(sorted(rendered.items()))
@@ -617,7 +1497,7 @@ def _normalized_files(files: Mapping[str, str | bytes]) -> list[tuple[PurePosixP
     for raw_path, content in files.items():
         relative = PurePosixPath(_validate_relative_artifact_path(raw_path, name="artifact output path"))
         if not isinstance(content, (str, bytes)):
-            raise ValueError("artifact content must be text or bytes")
+            raise ValueError("artifact content must be text or bytes")  # noqa: TRY004
         payload = content.encode("utf-8") if isinstance(content, str) else content
         if not payload:
             raise ValueError(f"artifact {relative.as_posix()} must not be empty")
@@ -638,12 +1518,12 @@ def _check_existing_path_components(path: Path) -> None:
 
 def _validate_output_root(output_root: Path, targets: Sequence[Path]) -> None:
     if not isinstance(output_root, Path):
-        raise ValueError("output_root must be a Path")
+        raise ValueError("output_root must be a Path")  # noqa: TRY004
     _check_existing_path_components(output_root.parent)
     if output_root.is_symlink():
         raise ValueError("output_root must not be a symlink")
-    if output_root.exists() and not output_root.is_dir():
-        raise ValueError("output_root must be a directory")
+    if output_root.exists():
+        raise FileExistsError("output_root must not already exist for atomic publication")
     for target in targets:
         _check_existing_path_components(target.parent)
         if target.is_symlink():
@@ -669,6 +1549,10 @@ def verify_artifact_manifest(
         raise ValueError(f"rendered files differ: missing={missing}, extra={extra}")
     manifest = _manifest_map(artifact)
     for path, payload in sorted(actual.items()):
+        if path == ROOT_ARTIFACT_PATH:
+            if payload != artifact_json_text(artifact).encode("utf-8"):
+                raise ValueError("root JSON bytes differ from artifact_json_text")
+            continue
         record = manifest[path]
         expected_digest = hashlib.sha256(payload).hexdigest()
         if record["bytes"] != len(payload) or record["sha256"] != expected_digest:
@@ -682,12 +1566,7 @@ def publish_artifacts(
     *,
     artifact: Mapping[str, object] | None = None,
 ) -> list[Path]:
-    """Stage, verify, and atomically publish new P6-A files.
-
-    Existing paths are never replaced.  If any individual publication fails,
-    files already published by this call are removed and the staging directory
-    is cleaned in the ``finally`` block.
-    """
+    """Stage a complete bundle and expose it with one directory replacement."""
 
     if artifact is None and isinstance(files, Mapping) and "schema_version" in files and "artifact_manifest" in files:
         return publish_root_artifact(output_root, files)  # type: ignore[arg-type]
@@ -706,7 +1585,6 @@ def publish_artifacts(
     _check_existing_path_components(output_root.parent)
     stage_root = Path(tempfile.mkdtemp(prefix=".p6a-stage-", dir=output_root.parent))
     staged: list[tuple[Path, Path]] = []
-    published: list[Path] = []
     try:
         for relative, payload in normalized:
             stage_target = stage_root.joinpath(*relative.parts)
@@ -718,34 +1596,14 @@ def publish_artifacts(
                 raise ValueError("staged artifact is not a regular file")
             staged.append((stage_target, output_root.joinpath(*relative.parts)))
 
-        existing = []
-        for _, target in staged:
-            if target.is_symlink():
-                raise ValueError(f"artifact output must not be a symlink: {target}")
-            if target.exists():
-                existing.append(target)
-        if existing:
-            raise FileExistsError(f"refusing to overwrite existing artifact: {existing[0]}")
-
-        output_root.mkdir(parents=True, exist_ok=True)
-        _check_existing_path_components(output_root)
-        for stage_target, target in staged:
-            target.parent.mkdir(parents=True, exist_ok=True)
-            _check_existing_path_components(target.parent)
-            if target.is_symlink() or target.exists():
-                raise FileExistsError(f"refusing to overwrite existing artifact: {target}")
-            os.replace(stage_target, target)
-            if target.is_symlink() or not target.is_file():
-                raise ValueError(f"published artifact is not a regular file: {target}")
-            published.append(target)
+        if output_root.exists() or output_root.is_symlink():
+            raise FileExistsError("output_root appeared during atomic publication")
+        os.replace(stage_root, output_root)
+        stage_root = None
         return [target for _, target in staged]
-    except Exception:
-        for target in reversed(published):
-            if target.is_file() and not target.is_symlink():
-                target.unlink()
-        raise
     finally:
-        shutil.rmtree(stage_root, ignore_errors=True)
+        if stage_root is not None:
+            shutil.rmtree(stage_root, ignore_errors=True)
 
 
 def publish_root_artifact(output_root: Path, artifact: Mapping[str, object]) -> list[Path]:
