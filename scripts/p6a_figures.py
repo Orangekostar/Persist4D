@@ -234,11 +234,21 @@ def _c_records(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
             raise ValueError("correct and wrong reactivation groups must be paired")
     for group_records in groups.values():
         ordered = sorted(group_records, key=lambda record: (record["bin_low"], record["bin_high"]))
-        if sum(record["count"] for record in ordered) <= 0:
-            raise ValueError("reactivation count sum must be > 0")
+        total_count = sum(record["count"] for record in ordered)
         total = sum(record["fraction"] for record in group_records)
-        if not math.isclose(total, 1.0, abs_tol=TOLERANCE, rel_tol=0.0):
-            raise ValueError("reactivation fraction must close to 1")
+        expected_total = 1.0 if total_count else 0.0
+        if not math.isclose(
+            total, expected_total, abs_tol=TOLERANCE, rel_tol=0.0
+        ) or any(
+            not math.isclose(
+                record["fraction"],
+                record["count"] / total_count if total_count else 0.0,
+                abs_tol=TOLERANCE,
+                rel_tol=0.0,
+            )
+            for record in ordered
+        ):
+            raise ValueError("reactivation fractions must match counts")
         for previous, current in pairwise(ordered):
             if previous["bin_high"] != current["bin_low"]:
                 raise ValueError("reactivation bins must be continuous")

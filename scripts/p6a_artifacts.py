@@ -884,10 +884,21 @@ def _validate_reactivation_distribution(
         raise ValueError(f"{path} must cover B1-B4 at T3-T5")
     for group, group_rows in groups.items():
         ordered = sorted(group_rows, key=lambda row: (row["bin_low"], row["bin_high"]))
+        total_count = sum(int(row["count"]) for row in ordered)
+        expected_total = 1.0 if total_count else 0.0
         if not math.isclose(
-            sum(float(row["fraction"]) for row in ordered), 1.0, abs_tol=1e-9
+            sum(float(row["fraction"]) for row in ordered),
+            expected_total,
+            abs_tol=1e-9,
+        ) or any(
+            not math.isclose(
+                float(row["fraction"]),
+                int(row["count"]) / total_count if total_count else 0.0,
+                abs_tol=1e-9,
+            )
+            for row in ordered
         ):
-            raise ValueError(f"{path} fractions must sum to one for {group}")
+            raise ValueError(f"{path} fractions do not match counts for {group}")
         for previous, current in pairwise(ordered):
             if previous["bin_high"] != current["bin_low"]:
                 raise ValueError(f"{path} bins must be continuous")
@@ -927,17 +938,20 @@ def _validate_reactivation_by_gap(
         if {row["outcome"] for row in group_rows} != {"correct", "wrong"}:
             raise ValueError(f"{path} must contain paired outcomes for {group}")
         total_count = sum(int(row["count"]) for row in group_rows)
-        if total_count <= 0:
-            raise ValueError(f"{path} counts must have a positive total for {group}")
+        expected_total = 1.0 if total_count else 0.0
         if not math.isclose(
-            sum(float(row["fraction"]) for row in group_rows), 1.0, abs_tol=1e-9
+            sum(float(row["fraction"]) for row in group_rows),
+            expected_total,
+            abs_tol=1e-9,
         ) or any(
             not math.isclose(
-                float(row["fraction"]), int(row["count"]) / total_count, abs_tol=1e-9
+                float(row["fraction"]),
+                int(row["count"]) / total_count if total_count else 0.0,
+                abs_tol=1e-9,
             )
             for row in group_rows
         ):
-            raise ValueError(f"{path} fractions must sum to one for {group}")
+            raise ValueError(f"{path} fractions do not match counts for {group}")
 
 
 def _validate_capacity_rows(path: str, rows: Sequence[Mapping[str, object]]) -> None:

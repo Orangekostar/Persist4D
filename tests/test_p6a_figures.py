@@ -263,6 +263,18 @@ def test_reactivation_requires_paired_correct_and_wrong_groups() -> None:
         render_figure_c_reactivation(rows)
 
 
+def test_reactivation_figure_preserves_an_empty_outcome_group() -> None:
+    rows = _rows_c()
+    for row in rows:
+        if row["outcome"] == "wrong":
+            row["count"] = 0
+            row["fraction"] = 0.0
+
+    rendered = render_figure_c_reactivation(rows)
+
+    assert "wrong / best_score" in rendered
+
+
 @pytest.mark.parametrize("bad_low", (0.6, 0.4))
 def test_reactivation_bins_must_be_continuous_without_gap_or_overlap(bad_low: float) -> None:
     rows = _rows_c()

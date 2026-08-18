@@ -618,6 +618,25 @@ def test_error_breakdown_preserves_unclassified_failures() -> None:
         validate_root_artifact(artifact)
 
 
+def test_reactivation_distributions_preserve_empty_outcomes() -> None:
+    artifact = _artifact()
+    csv_artifacts = artifact["derived_artifacts"]["csv"]
+    for path in (
+        "reactivation_score_distribution.csv",
+        "reactivation_margin_distribution.csv",
+    ):
+        for row in csv_artifacts[path]["rows"]:
+            if row["outcome"] == "wrong":
+                row["count"] = 0
+                row["fraction"] = 0.0
+    for row in csv_artifacts["reactivation_by_gap.csv"]["rows"]:
+        if row["method"] == "B1" and row["T"] == 3:
+            row["count"] = 0
+            row["fraction"] = 0.0
+
+    validate_root_artifact(artifact)
+
+
 def test_capacity_audit_is_limited_to_b4_bounded_state() -> None:
     artifact = _artifact()
     artifact["derived_artifacts"]["csv"]["capacity_audit.csv"]["rows"][0][
