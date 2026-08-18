@@ -9,6 +9,7 @@ import torch
 from scripts.evaluate_persist4d_p6a import (
     atomic_manifest_payload,
     build_temporal_target,
+    cache_payload_from_inference,
     cache_payload_to_frozen_observation,
     expected_cache_keys,
     prefix_causality_coordinator,
@@ -26,7 +27,7 @@ def _payload(stage: int, *, gt_ids: tuple[int, ...] = (10, 20)) -> dict[str, obj
     masks[0, 0] = True
     masks[1, -1] = True
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "key": {
             "master_sequence_id": "master",
             "reference_scene_id": "ref",
@@ -65,6 +66,10 @@ def _payload(stage: int, *, gt_ids: tuple[int, ...] = (10, 20)) -> dict[str, obj
             ),
             "gt_masks": torch.zeros((len(gt_ids), point_count), dtype=torch.bool),
             "changes": torch.zeros(len(gt_ids), dtype=torch.long),
+            "change_labels_valid": False,
+            "change_label_semantics": (
+                "unavailable_for_protocol_b_order_stress_test_all_static_placeholder"
+            ),
         },
     }
 
@@ -132,6 +137,65 @@ def test_cache_payload_to_frozen_observation_detaches_all_cpu_tensors() -> None:
     assert frozen.features.data_ptr() != payload["observation"]["features"].data_ptr()
 
 
+def test_cache_payload_from_inference_freezes_latest_stage_without_change_gt() -> None:
+    class Observation:
+        def __init__(self) -> None:
+            self.features = torch.tensor(
+                [[[1.0, 0.0], [0.0, 1.0]]], requires_grad=True
+            )
+            self.class_prob = torch.tensor(
+                [[[0.8, 0.1, 0.1], [0.1, 0.7, 0.2]]]
+            )
+            self.confidence = torch.tensor([[0.8, 0.7]])
+            self.valid = torch.tensor([[True, False]])
+            self.latest_mask = [torch.ones((2, 3))]
+
+        def validate(self) -> None:
+            return None
+
+    key = _payload(1)["key"]
+    provenance = _payload(1)["provenance"]
+    full_masks = torch.tensor(
+        [[True, False, True], [False, True, False]], dtype=torch.bool
+    )
+    full_target = {
+        "ids": torch.tensor([10, 20, 30]),
+        "labels": torch.tensor([1, 2, 3]),
+        "masks": torch.tensor(
+            [
+                [True, False, False, False, False],
+                [False, True, False, True, False],
+                [False, False, True, False, True],
+            ],
+            dtype=torch.bool,
+        ),
+        "temporal_stages": torch.tensor([0, 0, 1, 1, 1]),
+    }
+
+    payload = cache_payload_from_inference(
+        key=key,
+        provenance=provenance,
+        observation=Observation(),
+        full_masks=full_masks,
+        full_target=full_target,
+        latest_local_stage=1,
+    )
+
+    assert payload["schema_version"] == 2
+    assert payload["observation"]["features"].requires_grad is False
+    assert payload["observation"]["features"].device.type == "cpu"
+    assert payload["observation"]["masks"].equal(full_masks)
+    assert payload["observation"]["mask_support"].tolist() == [2, 1]
+    assert payload["target"]["gt_ids"].tolist() == [20, 30]
+    assert payload["target"]["gt_classes"].tolist() == [2, 3]
+    assert payload["target"]["gt_masks"].shape == (2, 3)
+    assert payload["target"]["changes"].tolist() == [0, 0]
+    assert payload["target"]["change_labels_valid"] is False
+    assert payload["target"]["change_label_semantics"] == (
+        "unavailable_for_protocol_b_order_stress_test_all_static_placeholder"
+    )
+
+
 def test_build_temporal_target_unions_ids_and_marks_absent_stages_false() -> None:
     first = _payload(0, gt_ids=(10,))
     first["target"]["gt_masks"][0, 0] = True
@@ -167,7 +231,7 @@ def test_build_temporal_target_unions_ids_and_marks_absent_stages_false() -> Non
     assert all(value.device.type == "cpu" for value in target.values())
 
 
-def test_build_temporal_target_rejects_class_or_change_conflicts() -> None:
+def test_build_temporal_target_rejects_class_conflicts_or_nonzero_placeholders() -> None:
     first = _payload(0, gt_ids=(10,))
     second = _payload(1, gt_ids=(10,))
     second["target"]["gt_classes"][0] = 2

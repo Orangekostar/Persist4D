@@ -24,8 +24,10 @@ from torch import Tensor
 
 from scripts.p6a_association import FrozenObservation, freeze_observation
 from scripts.p6a_cache import (
+    CHANGE_LABEL_SEMANTICS,
     ENTRY_KEYS,
     KEY_KEYS,
+    SCHEMA_VERSION,
     build_cache_manifest,
     load_cache_entry,
     validate_cache_payload,
@@ -252,6 +254,108 @@ def cache_payload_to_frozen_observation(
     return frozen
 
 
+def cache_payload_from_inference(
+    *,
+    key: Mapping[str, object],
+    provenance: Mapping[str, object],
+    observation: object,
+    full_masks: Tensor,
+    full_target: Mapping[str, object],
+    latest_local_stage: int,
+) -> dict[str, object]:
+    """Freeze one real ReScene stage into the Protocol B cache contract."""
+
+    validate = getattr(observation, "validate", None)
+    if not callable(validate):
+        raise TypeError("observation must expose validate()")
+    validate()
+    if (
+        isinstance(latest_local_stage, bool)
+        or not isinstance(latest_local_stage, int)
+        or latest_local_stage < 0
+    ):
+        raise ValueError("latest_local_stage must be a non-negative integer")
+
+    features = _finite_tensor(
+        _field(observation, "features"), name="features", ndim=3
+    )
+    class_prob = _finite_tensor(
+        _field(observation, "class_prob"), name="class_prob", ndim=3
+    )
+    confidence = _finite_tensor(
+        _field(observation, "confidence"), name="confidence", ndim=2
+    )
+    valid = _clone_cpu(_field(observation, "valid"), name="valid")
+    if features.shape[0] != 1:
+        raise ValueError("Protocol B cache generation requires batch size one")
+    if (
+        class_prob.shape[:2] != features.shape[:2]
+        or confidence.shape != features.shape[:2]
+        or valid.shape != features.shape[:2]
+        or valid.dtype != torch.bool
+    ):
+        raise ValueError("observation batch and query dimensions must align")
+
+    masks = _clone_cpu(full_masks, name="full_masks")
+    if masks.dtype != torch.bool or masks.ndim != 2:
+        raise ValueError("full_masks must be a rank-2 bool tensor")
+    if masks.shape[0] != features.shape[1] or masks.shape[1] <= 0:
+        raise ValueError("full_masks must have shape [Q, P_latest]")
+
+    target = _require_mapping(full_target, name="full_target")
+    for name in ("ids", "labels", "masks", "temporal_stages"):
+        if name not in target:
+            raise ValueError(f"full_target is missing {name}")
+    gt_ids = _integer_tensor(target["ids"], name="full_target.ids", ndim=1)
+    gt_classes = _integer_tensor(
+        target["labels"], name="full_target.labels", ndim=1
+    )
+    gt_masks = _clone_cpu(target["masks"], name="full_target.masks")
+    temporal_stages = _integer_tensor(
+        target["temporal_stages"],
+        name="full_target.temporal_stages",
+        ndim=1,
+    )
+    if gt_masks.dtype != torch.bool or gt_masks.ndim != 2:
+        raise ValueError("full_target.masks must be a rank-2 bool tensor")
+    if (
+        gt_ids.shape != gt_classes.shape
+        or gt_masks.shape[0] != gt_ids.shape[0]
+        or gt_masks.shape[1] != temporal_stages.shape[0]
+    ):
+        raise ValueError("full_target tensors must align")
+    stage_selector = temporal_stages == latest_local_stage
+    if int(stage_selector.sum().item()) != masks.shape[1]:
+        raise ValueError("full masks and latest-stage target points must align")
+    latest_gt_masks = gt_masks[:, stage_selector]
+    present = latest_gt_masks.any(dim=1)
+
+    payload: dict[str, object] = {
+        "schema_version": SCHEMA_VERSION,
+        "key": dict(key),
+        "provenance": dict(provenance),
+        "observation": {
+            "features": features[0].clone(),
+            "class_prob": class_prob[0].clone(),
+            "confidence": confidence[0].clone(),
+            "valid": valid[0].clone(),
+            "masks": masks.clone(),
+            "mask_support": masks.sum(dim=1, dtype=torch.long),
+            "local_query_ids": torch.arange(masks.shape[0], dtype=torch.long),
+        },
+        "target": {
+            "gt_ids": gt_ids[present].clone(),
+            "gt_classes": gt_classes[present].clone(),
+            "gt_masks": latest_gt_masks[present].clone(),
+            "changes": torch.zeros(int(present.sum().item()), dtype=torch.long),
+            "change_labels_valid": False,
+            "change_label_semantics": CHANGE_LABEL_SEMANTICS,
+        },
+    }
+    validate_cache_payload(payload)
+    return payload
+
+
 def _stage_payloads(stage_payloads: object) -> tuple[Mapping[str, object], ...]:
     if isinstance(stage_payloads, Mapping):
         values = list(stage_payloads.values())
@@ -279,7 +383,14 @@ def _target_mapping(payload: Mapping[str, object]) -> Mapping[str, object]:
     target = payload.get("target", payload)
     if not isinstance(target, Mapping):
         raise ValueError("target must be a mapping")  # noqa: TRY004
-    for key in ("gt_ids", "gt_classes", "gt_masks"):
+    for key in (
+        "gt_ids",
+        "gt_classes",
+        "gt_masks",
+        "changes",
+        "change_labels_valid",
+        "change_label_semantics",
+    ):
         if key not in target:
             raise ValueError(f"target is missing {key}")
     return target
@@ -299,6 +410,10 @@ def build_temporal_target(
     change_values: dict[int, int] = {}
     for stage, payload in enumerate(payloads):
         target = _target_mapping(payload)
+        if target["change_labels_valid"] is not False:
+            raise ValueError("Protocol B change labels must be unavailable")
+        if target["change_label_semantics"] != CHANGE_LABEL_SEMANTICS:
+            raise ValueError("Protocol B change-label semantics differ")
         gt_ids = _integer_tensor(target["gt_ids"], name="gt_ids", ndim=1)
         gt_classes = _integer_tensor(target["gt_classes"], name="gt_classes", ndim=1)
         gt_masks = _clone_cpu(target["gt_masks"], name="gt_masks")
@@ -313,13 +428,9 @@ def build_temporal_target(
         ids = [int(value) for value in gt_ids.tolist()]
         if len(set(ids)) != len(ids):
             raise ValueError("gt_ids must be unique within a stage")
-        changes_value = target.get("changes")
-        if changes_value is None:
-            changes = torch.zeros_like(gt_ids)
-        else:
-            changes = _integer_tensor(changes_value, name="changes", ndim=1)
-            if changes.shape != gt_ids.shape:
-                raise ValueError("changes must align with gt_ids")
+        changes = _integer_tensor(target["changes"], name="changes", ndim=1)
+        if changes.shape != gt_ids.shape or torch.any(changes != 0).item():
+            raise ValueError("changes must be an aligned all-static placeholder")
         for index, gt_id in enumerate(ids):
             class_value = int(gt_classes[index].item())
             change_value = int(changes[index].item())
@@ -936,6 +1047,7 @@ __all__ = [
     "atomic_manifest_publish",
     "build_atomic_manifest_payload",
     "build_temporal_target",
+    "cache_payload_from_inference",
     "cache_payload_to_frozen_observation",
     "ensure_cache_entry",
     "expected_cache_keys",

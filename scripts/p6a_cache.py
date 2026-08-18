@@ -14,7 +14,10 @@ from typing import Any
 import torch
 from torch import Tensor
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
+CHANGE_LABEL_SEMANTICS = (
+    "unavailable_for_protocol_b_order_stress_test_all_static_placeholder"
+)
 ORDER_IDS = ("canonical", "reverse", "sha256_seed45")
 ROOT_KEYS = {"schema_version", "key", "provenance", "observation", "target"}
 KEY_KEYS = {
@@ -40,7 +43,14 @@ OBSERVATION_KEYS = {
     "mask_support",
     "local_query_ids",
 }
-TARGET_KEYS = {"gt_ids", "gt_classes", "gt_masks", "changes"}
+TARGET_KEYS = {
+    "gt_ids",
+    "gt_classes",
+    "gt_masks",
+    "changes",
+    "change_labels_valid",
+    "change_label_semantics",
+}
 ENTRY_KEYS = {"filename", "content_sha256", "file_sha256", "file_bytes", "key"}
 MANIFEST_ROOT_KEYS = {
     "schema_version",
@@ -221,6 +231,10 @@ def validate_cache_payload(payload: object) -> None:
     )
     gt_masks = _tensor(target["gt_masks"], name="gt_masks", ndim=2, kind="bool")
     changes = _tensor(target["changes"], name="changes", ndim=1, kind="integer")
+    if target["change_labels_valid"] is not False:
+        raise ValueError("Protocol B change labels must be marked unavailable")
+    if target["change_label_semantics"] != CHANGE_LABEL_SEMANTICS:
+        raise ValueError("unsupported Protocol B change-label semantics")
     gt_count = gt_ids.shape[0]
     if any(value.shape[0] != gt_count for value in (gt_classes, gt_masks, changes)):
         raise ValueError("target tensors must share GT dimension")
@@ -232,8 +246,8 @@ def validate_cache_payload(payload: object) -> None:
         raise ValueError("gt_ids must be non-negative")
     if torch.any(gt_classes < 0).item():
         raise ValueError("gt_classes must be non-negative")
-    if torch.any(changes < 0).item():
-        raise ValueError("changes must be non-negative")
+    if torch.any(changes != 0).item():
+        raise ValueError("unavailable change labels must use the all-static placeholder")
 
 
 def _update_digest(hasher: Any, value: object) -> None:

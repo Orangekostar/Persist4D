@@ -38,7 +38,7 @@ def _payload(*, stage_index: int = 1) -> dict[str, object]:
         dtype=torch.bool,
     )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "key": {
             "master_sequence_id": "scene0001_00-scene0001_01",
             "reference_scene_id": "uuid-1",
@@ -61,7 +61,11 @@ def _payload(*, stage_index: int = 1) -> dict[str, object]:
             "gt_ids": torch.tensor([10, 20], dtype=torch.long),
             "gt_classes": torch.tensor([0, 1], dtype=torch.long),
             "gt_masks": masks.clone(),
-            "changes": torch.tensor([0, 1], dtype=torch.long),
+            "changes": torch.tensor([0, 0], dtype=torch.long),
+            "change_labels_valid": False,
+            "change_label_semantics": (
+                "unavailable_for_protocol_b_order_stress_test_all_static_placeholder"
+            ),
         },
     }
 
@@ -87,6 +91,8 @@ def test_cache_digest_is_mapping_order_independent_and_tensor_sensitive():
         lambda value: value["observation"].update(valid=torch.tensor([True])),
         lambda value: value["observation"].update(local_query_ids=torch.tensor([1, 0])),
         lambda value: value["target"].update(gt_ids=torch.tensor([10, 10])),
+        lambda value: value["target"].update(change_labels_valid=True),
+        lambda value: value["target"].update(change_label_semantics="unknown"),
     ],
 )
 def test_cache_payload_fails_closed_on_shape_content_or_schema_drift(mutation):
@@ -103,7 +109,7 @@ def test_cache_payload_fails_closed_on_shape_content_or_schema_drift(mutation):
         lambda value: value["key"].update(stage_index=5),
         lambda value: value["key"].update(order_id="unregistered"),
         lambda value: value["target"].update(
-            changes=torch.tensor([0, -1], dtype=torch.long)
+            changes=torch.tensor([0, 1], dtype=torch.long)
         ),
         lambda value: value["target"].update(
             gt_classes=torch.tensor([0, -1], dtype=torch.long)
