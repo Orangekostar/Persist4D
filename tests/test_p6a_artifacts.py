@@ -359,7 +359,7 @@ def _derived_artifacts() -> dict[str, object]:
         }
         for method in ("B4",)
         for horizon in horizons
-        for stage in range(5)
+        for stage in range(horizon)
     ]
     efficiency_rows = [
         {
@@ -473,7 +473,7 @@ def _artifact() -> dict[str, object]:
             "association": {"path": "association_events.csv", "rows": 1, "status": "pass"},
             "error": {"path": "error_breakdown.csv", "rows": 192, "status": "pass"},
             "reactivation": {"path": "reactivation_audit.csv", "rows": 12, "status": "pass"},
-            "capacity": {"path": "capacity_audit.csv", "rows": 20, "status": "pass"},
+            "capacity": {"path": "capacity_audit.csv", "rows": 14, "status": "pass"},
             "efficiency": {"path": "efficiency_results.csv", "rows": 60, "status": "pass"},
             "statistical": {"path": "statistical_analysis.md", "rows": 1, "status": "pass"},
         },
@@ -625,6 +625,15 @@ def test_capacity_audit_is_limited_to_b4_bounded_state() -> None:
     ] = "B3"
 
     with pytest.raises(ValueError, match="capacity_audit|B4"):
+        validate_root_artifact(artifact)
+
+
+def test_capacity_audit_rejects_stages_outside_each_prefix() -> None:
+    artifact = _artifact()
+    row = artifact["derived_artifacts"]["csv"]["capacity_audit.csv"]["rows"][0]
+    row["stage_id"] = 2
+
+    with pytest.raises(ValueError, match="capacity_audit|prefix|stage"):
         validate_root_artifact(artifact)
 
 

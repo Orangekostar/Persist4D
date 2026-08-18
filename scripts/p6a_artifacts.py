@@ -941,7 +941,7 @@ def _validate_reactivation_by_gap(
 
 
 def _validate_capacity_rows(path: str, rows: Sequence[Mapping[str, object]]) -> None:
-    counts: dict[tuple[object, str], int] = {}
+    stages: dict[tuple[object, str], set[int]] = {}
     for row in rows:
         _nonempty_string(row["method"], name=f"{path}.method")
         if row["method"] != CAPACITY_METHOD:
@@ -950,8 +950,10 @@ def _validate_capacity_rows(path: str, rows: Sequence[Mapping[str, object]]) -> 
         stage = _integer(row["stage_id"], name=f"{path}.stage_id", minimum=0)
         if stage > 4:
             raise ValueError(f"{path}.stage_id must be between 0 and 4")
+        if stage >= int(horizon[1:]):
+            raise ValueError(f"{path}.stage_id must fall within its causal prefix")
         key = (row["method"], horizon)
-        counts[key] = counts.get(key, 0) + 1
+        stages.setdefault(key, set()).add(stage)
         capacity = _integer(row["capacity"], name=f"{path}.capacity", minimum=1)
         occupied = _integer(row["occupied_count"], name=f"{path}.occupied_count", minimum=0)
         active = _integer(row["active_count"], name=f"{path}.active_count", minimum=0)
@@ -972,9 +974,12 @@ def _validate_capacity_rows(path: str, rows: Sequence[Mapping[str, object]]) -> 
             float(row["occupancy_ratio"]), occupied / capacity, abs_tol=1e-9
         ):
             raise ValueError(f"{path}.occupancy_ratio does not match occupied/capacity")
-    expected = {(CAPACITY_METHOD, horizon): 5 for horizon in HORIZON_IDS}
-    if counts != expected:
-        raise ValueError(f"{path} must contain five stage snapshots per method/horizon")
+    expected = {
+        (CAPACITY_METHOD, horizon): set(range(int(horizon[1:])))
+        for horizon in HORIZON_IDS
+    }
+    if stages != expected:
+        raise ValueError(f"{path} must cover every stage in each causal prefix")
 
 
 def _validate_efficiency_rows(path: str, rows: Sequence[Mapping[str, object]]) -> None:
