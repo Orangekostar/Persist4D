@@ -39,7 +39,7 @@ def _payload(*, stage_index: int = 1) -> dict[str, object]:
         dtype=torch.bool,
     )
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "key": {
             "master_sequence_id": "scene0001_00-scene0001_01",
             "reference_scene_id": "uuid-1",
@@ -67,6 +67,7 @@ def _payload(*, stage_index: int = 1) -> dict[str, object]:
             "change_label_semantics": (
                 "unavailable_for_protocol_b_order_stress_test_all_static_placeholder"
             ),
+            "gt_class_semantics": "rescene_model_index_0_based",
         },
     }
 
@@ -94,6 +95,7 @@ def test_cache_digest_is_mapping_order_independent_and_tensor_sensitive():
         lambda value: value["target"].update(gt_ids=torch.tensor([10, 10])),
         lambda value: value["target"].update(change_labels_valid=True),
         lambda value: value["target"].update(change_label_semantics="unknown"),
+        lambda value: value["target"].update(gt_class_semantics="raw_dataset_id"),
     ],
 )
 def test_cache_payload_fails_closed_on_shape_content_or_schema_drift(mutation):

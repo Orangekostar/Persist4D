@@ -28,7 +28,7 @@ def _payload(stage: int, *, gt_ids: tuple[int, ...] = (10, 20)) -> dict[str, obj
     masks[0, 0] = True
     masks[1, -1] = True
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "key": {
             "master_sequence_id": "master",
             "reference_scene_id": "ref",
@@ -71,6 +71,7 @@ def _payload(stage: int, *, gt_ids: tuple[int, ...] = (10, 20)) -> dict[str, obj
             "change_label_semantics": (
                 "unavailable_for_protocol_b_order_stress_test_all_static_placeholder"
             ),
+            "gt_class_semantics": "rescene_model_index_0_based",
         },
     }
 
@@ -182,7 +183,7 @@ def test_cache_payload_from_inference_freezes_latest_stage_without_change_gt() -
         latest_local_stage=1,
     )
 
-    assert payload["schema_version"] == 2
+    assert payload["schema_version"] == 3
     assert payload["observation"]["features"].requires_grad is False
     assert payload["observation"]["features"].device.type == "cpu"
     assert payload["observation"]["masks"].equal(full_masks)
@@ -194,6 +195,9 @@ def test_cache_payload_from_inference_freezes_latest_stage_without_change_gt() -
     assert payload["target"]["change_labels_valid"] is False
     assert payload["target"]["change_label_semantics"] == (
         "unavailable_for_protocol_b_order_stress_test_all_static_placeholder"
+    )
+    assert payload["target"]["gt_class_semantics"] == (
+        "rescene_model_index_0_based"
     )
 
 

@@ -14,7 +14,7 @@ from typing import Any
 import torch
 from torch import Tensor
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 CHANGE_LABEL_SEMANTICS = (
     "unavailable_for_protocol_b_order_stress_test_all_static_placeholder"
 )
@@ -50,6 +50,7 @@ TARGET_KEYS = {
     "changes",
     "change_labels_valid",
     "change_label_semantics",
+    "gt_class_semantics",
 }
 ENTRY_KEYS = {"filename", "content_sha256", "file_sha256", "file_bytes", "key"}
 MANIFEST_ROOT_KEYS = {
@@ -235,6 +236,8 @@ def validate_cache_payload(payload: object) -> None:
         raise ValueError("Protocol B change labels must be marked unavailable")
     if target["change_label_semantics"] != CHANGE_LABEL_SEMANTICS:
         raise ValueError("unsupported Protocol B change-label semantics")
+    if target["gt_class_semantics"] != "rescene_model_index_0_based":
+        raise ValueError("unsupported GT class semantics")
     gt_count = gt_ids.shape[0]
     if any(value.shape[0] != gt_count for value in (gt_classes, gt_masks, changes)):
         raise ValueError("target tensors must share GT dimension")

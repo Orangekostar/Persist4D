@@ -402,6 +402,7 @@ def cache_payload_from_inference(
             "changes": torch.zeros(int(present.sum().item()), dtype=torch.long),
             "change_labels_valid": False,
             "change_label_semantics": CHANGE_LABEL_SEMANTICS,
+            "gt_class_semantics": "rescene_model_index_0_based",
         },
     }
     validate_cache_payload(payload)
@@ -442,6 +443,7 @@ def _target_mapping(payload: Mapping[str, object]) -> Mapping[str, object]:
         "changes",
         "change_labels_valid",
         "change_label_semantics",
+        "gt_class_semantics",
     ):
         if key not in target:
             raise ValueError(f"target is missing {key}")
@@ -466,6 +468,8 @@ def build_temporal_target(
             raise ValueError("Protocol B change labels must be unavailable")
         if target["change_label_semantics"] != CHANGE_LABEL_SEMANTICS:
             raise ValueError("Protocol B change-label semantics differ")
+        if target["gt_class_semantics"] != "rescene_model_index_0_based":
+            raise ValueError("Protocol B GT class semantics differ")
         gt_ids = _integer_tensor(target["gt_ids"], name="gt_ids", ndim=1)
         gt_classes = _integer_tensor(target["gt_classes"], name="gt_classes", ndim=1)
         gt_masks = _clone_cpu(target["gt_masks"], name="gt_masks")
