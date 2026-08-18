@@ -5,10 +5,15 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from html import escape
+from itertools import pairwise
 from numbers import Real
 from typing import Any
 
 METHOD_ORDER = ("b0", "b0_sanity", "b1", "b2", "b3", "b4", "oracle")
+BASELINE_METHOD_ORDER = ("b0", "b0_sanity", "b1", "b2", "b3", "b4")
+REACTIVATION_METHOD_ORDER = ("b1", "b2", "b3", "b4")
+REACTIVATION_HORIZONS = (3, 4, 5)
+LATENCY_METHOD_ORDER = ("b4", "full_history_rescene")
 HORIZONS = (2, 3, 4, 5)
 OUTCOMES = ("correct", "wrong")
 REACTIVATION_METRICS = ("best_score", "score_margin")
@@ -24,6 +29,7 @@ _PALETTE = {
     "b3": "#F0E442",
     "b4": "#0072B2",
     "oracle": "#D55E00",
+    "full_history_rescene": "#CC79A7",
 }
 _LINE_STYLES = {
     "b0": "",
@@ -33,6 +39,7 @@ _LINE_STYLES = {
     "b3": "1 3",
     "b4": "8 2",
     "oracle": "14 3 2 3",
+    "full_history_rescene": "4 4",
 }
 _MARKERS = {
     "b0": "circle",
@@ -42,6 +49,7 @@ _MARKERS = {
     "b3": "cross",
     "b4": "plus",
     "oracle": "star",
+    "full_history_rescene": "diamond",
 }
 _CATEGORY_FILLS = (
     "#1A1A1A",
@@ -97,15 +105,16 @@ def _finite(value: Any, *, name: str) -> float:
     return result
 
 
-def _horizon(value: Any) -> int:
-    if isinstance(value, bool) or not isinstance(value, int) or value not in HORIZONS:
-        raise ValueError("horizon must be one of 2, 3, 4, or 5")
+def _horizon(value: Any, *, horizons: Sequence[int] = HORIZONS) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value not in horizons:
+        choices = ", ".join(str(horizon) for horizon in horizons)
+        raise ValueError(f"horizon must be one of {choices}")
     return int(value)
 
 
-def _method(value: Any) -> str:
-    if not isinstance(value, str) or value not in METHOD_ORDER:
-        raise ValueError(f"method_id must be one of {', '.join(METHOD_ORDER)}")
+def _method(value: Any, *, methods: Sequence[str] = METHOD_ORDER) -> str:
+    if not isinstance(value, str) or value not in methods:
+        raise ValueError(f"method_id must be one of {', '.join(methods)}")
     return value
 
 
@@ -152,10 +161,18 @@ def _base_records(
                 value_name: value_validator(row[value_name], name=value_name),
             }
         )
-    expected = {(method, horizon) for method in METHOD_ORDER for horizon in HORIZONS}
+    expected = {
+        (method, horizon)
+        for method in BASELINE_METHOD_ORDER
+        for horizon in HORIZONS
+    }
     missing = expected - seen
     if missing:
         raise ValueError("missing method/horizon group")
+    oracle_seen = {key for key in seen if key[0] == "oracle"}
+    oracle_expected = {("oracle", horizon) for horizon in HORIZONS}
+    if oracle_seen and oracle_seen != oracle_expected:
+        raise ValueError("missing oracle method/horizon group")
     return sorted(records, key=lambda record: (METHOD_ORDER.index(record["method_id"]), record["horizon"]))
 
 
@@ -166,8 +183,8 @@ def _c_records(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     groups: dict[tuple[str, int, str, str], list[dict[str, Any]]] = {}
     for row in materialized:
         _check_columns(row, _SCHEMA_C)
-        method = _method(row["method_id"])
-        horizon = _horizon(row["horizon"])
+        method = _method(row["method_id"], methods=REACTIVATION_METHOD_ORDER)
+        horizon = _horizon(row["horizon"], horizons=REACTIVATION_HORIZONS)
         outcome = row["outcome"]
         metric = row["metric"]
         if outcome not in OUTCOMES:
@@ -195,20 +212,26 @@ def _c_records(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         }
         groups.setdefault(group_key, []).append(record)
         records.append(record)
-    expected_groups = {
-        (method, horizon, outcome, metric)
-        for method in METHOD_ORDER
-        for horizon in HORIZONS
-        for outcome in OUTCOMES
-        for metric in REACTIVATION_METRICS
-    }
-    missing = expected_groups - set(groups)
-    if missing:
-        raise ValueError("missing reactivation bin group")
+    group_keys = set(groups)
+    for method, horizon, outcome, metric in group_keys:
+        counterpart = (
+            method,
+            horizon,
+            "wrong" if outcome == "correct" else "correct",
+            metric,
+        )
+        if counterpart not in group_keys:
+            raise ValueError("correct and wrong reactivation groups must be paired")
     for group_records in groups.values():
+        ordered = sorted(group_records, key=lambda record: (record["bin_low"], record["bin_high"]))
+        if sum(record["count"] for record in ordered) <= 0:
+            raise ValueError("reactivation count sum must be > 0")
         total = sum(record["fraction"] for record in group_records)
         if not math.isclose(total, 1.0, abs_tol=TOLERANCE, rel_tol=0.0):
             raise ValueError("reactivation fraction must close to 1")
+        for previous, current in pairwise(ordered):
+            if previous["bin_high"] != current["bin_low"]:
+                raise ValueError("reactivation bins must be continuous")
     return sorted(
         records,
         key=lambda record: (
@@ -247,19 +270,16 @@ def _d_records(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         }
         groups.setdefault((method, horizon), []).append(record)
         records.append(record)
-    expected = {
-        (method, horizon, category)
-        for method in METHOD_ORDER
-        for horizon in HORIZONS
-        for category in FAILURE_CATEGORIES
-    }
-    missing = expected - seen
-    if missing:
-        raise ValueError("missing failure category group")
     for group_records in groups.values():
+        categories = {record["category"] for record in group_records}
+        if categories != set(FAILURE_CATEGORIES):
+            raise ValueError("missing failure category group")
         total = sum(record["share"] for record in group_records)
         if not math.isclose(total, 1.0, abs_tol=TOLERANCE, rel_tol=0.0):
             raise ValueError("failure share must close to 1")
+    b4_keys = {(method, horizon) for method, horizon, _ in seen if method == "b4"}
+    if b4_keys != {("b4", horizon) for horizon in HORIZONS}:
+        raise ValueError("missing b4 failure horizon group")
     return sorted(
         records,
         key=lambda record: (
@@ -276,11 +296,13 @@ def _e_records(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     seen: set[tuple[str, int, str]] = set()
     for row in materialized:
         _check_columns(row, _SCHEMA_E)
-        method = _method(row["method_id"])
+        method = _method(row["method_id"], methods=LATENCY_METHOD_ORDER)
         horizon = _horizon(row["horizon"])
         phase = row["phase"]
         if phase not in PHASES:
             raise ValueError("phase must be bootstrap or new_visit")
+        if method == "full_history_rescene" and phase == "bootstrap":
+            raise ValueError("full_history_rescene cannot have bootstrap latency")
         latency = _finite(row["latency_ms"], name="latency_ms")
         if latency < 0:
             raise ValueError("latency_ms must be >= 0")
@@ -297,18 +319,20 @@ def _e_records(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
             }
         )
     expected = {
-        (method, horizon, phase)
-        for method in METHOD_ORDER
+        ("b4", horizon, phase)
         for horizon in HORIZONS
         for phase in PHASES
     }
+    expected.update(
+        ("full_history_rescene", horizon, "new_visit") for horizon in HORIZONS
+    )
     missing = expected - seen
     if missing:
         raise ValueError("missing latency method/horizon phase group")
     return sorted(
         records,
         key=lambda record: (
-            METHOD_ORDER.index(record["method_id"]),
+            LATENCY_METHOD_ORDER.index(record["method_id"]),
             record["horizon"],
             PHASES.index(record["phase"]),
         ),
@@ -394,8 +418,15 @@ def _svg_end(parts: list[str]) -> str:
     return "".join(parts)
 
 
-def _legend(parts: list[str], *, x: float = 680, y: float = 82, phase: bool = False) -> None:
-    for method_index, method in enumerate(METHOD_ORDER):
+def _legend(
+    parts: list[str],
+    *,
+    x: float = 680,
+    y: float = 82,
+    phase: bool = False,
+    methods: Sequence[str] = METHOD_ORDER,
+) -> None:
+    for method_index, method in enumerate(methods):
         row_y = y + method_index * 25
         parts.append(
             _line(
@@ -418,10 +449,27 @@ def _legend(parts: list[str], *, x: float = 680, y: float = 82, phase: bool = Fa
         parts.append(_text(x + 38, phase_y + 27, "new_visit"))
 
 
-def _axes(parts: list[str], *, y_label: str, x_label: str = "Horizon (T)") -> None:
+def _x_positions(horizons: Sequence[int]) -> dict[int, float]:
+    if not horizons:
+        return {}
+    if len(horizons) == 1:
+        return {horizons[0]: 340.0}
+    return {
+        horizon: 80.0 + index * (590.0 - 80.0) / (len(horizons) - 1)
+        for index, horizon in enumerate(horizons)
+    }
+
+
+def _axes(
+    parts: list[str],
+    *,
+    y_label: str,
+    x_label: str = "Horizon (T)",
+    horizons: Sequence[int] = HORIZONS,
+) -> None:
     parts.append(_line(70, 500, 610, 500, stroke="#333333"))
     parts.append(_line(70, 70, 70, 500, stroke="#333333"))
-    for horizon, x in zip(HORIZONS, (80, 250, 420, 590), strict=True):
+    for horizon, x in _x_positions(horizons).items():
         parts.append(_line(x, 500, x, 506, stroke="#333333"))
         parts.append(_text(x, 527, horizon, anchor="middle"))
     parts.append(_text(340, 566, x_label, anchor="middle"))
@@ -461,9 +509,10 @@ def _render_line_figure(
     parts = _svg_start(letter, title, description)
     _axes(parts, y_label=y_label)
     grouped = _series_points(records, value_name)
+    methods = [method for method in METHOD_ORDER if grouped[method]]
     scale = _scale([value for values in grouped.values() for _, value in values])
-    x_by_horizon = dict(zip(HORIZONS, (80, 250, 420, 590), strict=True))
-    for method in METHOD_ORDER:
+    x_by_horizon = _x_positions(HORIZONS)
+    for method in methods:
         points = [(x_by_horizon[horizon], scale(value)) for horizon, value in grouped[method]]
         path = " ".join(
             ("M" if index == 0 else "L") + f" {_fmt(x)} {_fmt(y)}"
@@ -475,7 +524,7 @@ def _render_line_figure(
         )
         for x, y in points:
             parts.append(_marker(x, y, method))
-    _legend(parts)
+    _legend(parts, methods=methods)
     return _svg_end(parts)
 
 
@@ -510,31 +559,52 @@ def render_figure_c_reactivation(rows: Iterable[Mapping[str, Any]]) -> str:
         "Figure C: Reactivation & Score-Bin Distributions",
         "Reactivation outcome distributions over score bins.",
     )
-    _axes(parts, y_label="Fraction", x_label="Horizon (T)")
+    _axes(
+        parts,
+        y_label="Fraction",
+        x_label="Horizon (T)",
+        horizons=REACTIVATION_HORIZONS,
+    )
     panels = {
         ("correct", "best_score"): (80, 92),
         ("correct", "score_margin"): (370, 92),
         ("wrong", "best_score"): (80, 320),
         ("wrong", "score_margin"): (370, 320),
     }
+    group_keys = {
+        (
+            record["method_id"],
+            record["horizon"],
+            record["outcome"],
+            record["metric"],
+        )
+        for record in records
+    }
     for (outcome, metric), (panel_x, panel_y) in panels.items():
         parts.append(_text(panel_x, panel_y, f"{outcome} / {metric}", size=12))
-        panel_records = [
-            record
-            for record in records
-            if record["outcome"] == outcome and record["metric"] == metric
-        ]
-        for method_index, method in enumerate(METHOD_ORDER):
-            for horizon_index, horizon in enumerate(HORIZONS):
+        for method_index, method in enumerate(REACTIVATION_METHOD_ORDER):
+            present = any(
+                (method, horizon, outcome, metric) in group_keys
+                for horizon in REACTIVATION_HORIZONS
+            )
+            if not present:
+                continue
+            parts.append(_text(panel_x - 8, panel_y + 28 + method_index * 27, method, size=8, anchor="end"))
+            for horizon_index, horizon in enumerate(REACTIVATION_HORIZONS):
                 group = [
                     record
-                    for record in panel_records
-                    if record["method_id"] == method and record["horizon"] == horizon
+                    for record in records
+                    if record["method_id"] == method
+                    and record["horizon"] == horizon
+                    and record["outcome"] == outcome
+                    and record["metric"] == metric
                 ]
+                if not group:
+                    continue
                 group = sorted(group, key=lambda record: (record["bin_low"], record["bin_high"]))
                 cell_x = panel_x + horizon_index * 67
                 cell_y = panel_y + 18 + method_index * 27
-                width = 58 / max(len(group), 1)
+                width = 58 / len(group)
                 for bin_index, record in enumerate(group):
                     height = float(record["fraction"]) * 19
                     parts.append(
@@ -543,7 +613,7 @@ def render_figure_c_reactivation(rows: Iterable[Mapping[str, Any]]) -> str:
                         f'fill="{_PALETTE[method]}" stroke="#333333" stroke-width="0.4"/>'
                     )
                 parts.append(_text(cell_x - 3, cell_y + 11, horizon, size=8, anchor="end"))
-    _legend(parts, x=680, y=92)
+    _legend(parts, x=680, y=92, methods=REACTIVATION_METHOD_ORDER)
     return _svg_end(parts)
 
 
@@ -561,21 +631,24 @@ def render_figure_d_failures(rows: Iterable[Mapping[str, Any]]) -> str:
         (record["method_id"], record["horizon"], record["category"]): record
         for record in records
     }
-    for method_index, method in enumerate(METHOD_ORDER):
-        for horizon_index, horizon in enumerate(HORIZONS):
-            y = 70 + (method_index * len(HORIZONS) + horizon_index) * 15
-            parts.append(_text(70, y + 5, f"{method} / T{horizon}", size=9, anchor="end"))
-            x = 100.0
-            for category_index, category in enumerate(FAILURE_CATEGORIES):
-                record = group_map[(method, horizon, category)]
-                width = float(record["share"]) * 490
-                dash = _CATEGORY_DASHES[category_index]
-                dash_attr = f' stroke-dasharray="{dash}"' if dash else ""
-                parts.append(
-                    f'<rect x="{_fmt(x)}" y="{_fmt(y - 8)}" width="{_fmt(width)}" height="10" '
-                    f'fill="{_CATEGORY_FILLS[category_index]}" stroke="#222222" stroke-width="0.5"{dash_attr}/>'
-                )
-                x += width
+    group_keys = sorted(
+        {(record["method_id"], record["horizon"]) for record in records},
+        key=lambda key: (METHOD_ORDER.index(key[0]), key[1]),
+    )
+    for group_index, (method, horizon) in enumerate(group_keys):
+        y = 70 + group_index * 15
+        parts.append(_text(70, y + 5, f"{method} / T{horizon}", size=9, anchor="end"))
+        x = 100.0
+        for category_index, category in enumerate(FAILURE_CATEGORIES):
+            record = group_map[(method, horizon, category)]
+            width = float(record["share"]) * 490
+            dash = _CATEGORY_DASHES[category_index]
+            dash_attr = f' stroke-dasharray="{dash}"' if dash else ""
+            parts.append(
+                f'<rect x="{_fmt(x)}" y="{_fmt(y - 8)}" width="{_fmt(width)}" height="10" '
+                f'fill="{_CATEGORY_FILLS[category_index]}" stroke="#222222" stroke-width="0.5"{dash_attr}/>'
+            )
+            x += width
     for category_index, category in enumerate(FAILURE_CATEGORIES):
         x = 100 + category_index * 73
         parts.append(
@@ -595,20 +668,22 @@ def render_figure_e_latency(rows: Iterable[Mapping[str, Any]]) -> str:
     )
     _axes(parts, y_label="Latency (ms)")
     grouped: dict[tuple[str, str], list[tuple[int, float]]] = {
-        (method, phase): [] for method in METHOD_ORDER for phase in PHASES
+        (method, phase): [] for method in LATENCY_METHOD_ORDER for phase in PHASES
     }
     for record in records:
         grouped[(record["method_id"], record["phase"])].append(
             (record["horizon"], float(record["latency_ms"]))
         )
     scale = _scale([value for values in grouped.values() for _, value in values])
-    x_by_horizon = dict(zip(HORIZONS, (80, 250, 420, 590), strict=True))
-    for method in METHOD_ORDER:
+    x_by_horizon = _x_positions(HORIZONS)
+    for method in LATENCY_METHOD_ORDER:
         for phase in PHASES:
             points = [
                 (x_by_horizon[horizon], scale(value))
                 for horizon, value in sorted(grouped[(method, phase)])
             ]
+            if not points:
+                continue
             path = " ".join(
                 ("M" if index == 0 else "L") + f" {_fmt(x)} {_fmt(y)}"
                 for index, (x, y) in enumerate(points)
@@ -622,7 +697,7 @@ def render_figure_e_latency(rows: Iterable[Mapping[str, Any]]) -> str:
             )
             for x, y in points:
                 parts.append(_marker(x, y, method, size=3.5 if phase == "new_visit" else 2.8))
-    _legend(parts, phase=True)
+    _legend(parts, phase=True, methods=LATENCY_METHOD_ORDER)
     return _svg_end(parts)
 
 
