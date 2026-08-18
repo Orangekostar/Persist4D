@@ -8,6 +8,7 @@ import torch
 
 from scripts.evaluate_persist4d_p6a import (
     atomic_manifest_payload,
+    build_cache_provenance,
     build_temporal_target,
     cache_payload_from_inference,
     cache_payload_to_frozen_observation,
@@ -16,6 +17,7 @@ from scripts.evaluate_persist4d_p6a import (
     prefix_causality_coordinator,
     publish_manifest_atomic,
     resolve_cache_entry,
+    resolve_protocol_cache_request,
     stage_prediction_from_track_step,
 )
 from scripts.p6a_cache import load_cache_entry, write_cache_entry
@@ -80,11 +82,15 @@ def _payload(stage: int, *, gt_ids: tuple[int, ...] = (10, 20)) -> dict[str, obj
 class _Master:
     sequence_id: str
     reference_scene_id: str
+    scan_ids: tuple[str, ...]
+    scan_indices: tuple[int, ...]
+    validation_index: int
 
 
 @dataclass(frozen=True)
 class _Order:
     scan_ids: tuple[str, ...]
+    scan_indices: tuple[int, ...]
 
 
 @dataclass(frozen=True)
@@ -96,15 +102,29 @@ class _Protocol:
 
 def _protocol(count: int = 1) -> _Protocol:
     masters = tuple(
-        _Master(f"master-{index}", f"ref-{index}") for index in range(count)
+        _Master(
+            f"master-{index}",
+            f"ref-{index}",
+            tuple(f"scene{index:04d}_{stage:02d}" for stage in range(5)),
+            tuple(range(index * 5, index * 5 + 5)),
+            index,
+        )
+        for index in range(count)
     )
-    variants = {
-        master.sequence_id: {
-            order: _Order(tuple(f"scene{index:04d}_{stage:02d}" for stage in range(5)))
-            for order in ("canonical", "reverse", "sha256_seed45")
+    variants = {}
+    for master in masters:
+        permutations = {
+            "canonical": (0, 1, 2, 3, 4),
+            "reverse": (4, 3, 2, 1, 0),
+            "sha256_seed45": (2, 4, 1, 3, 0),
         }
-        for index, master in enumerate(masters)
-    }
+        variants[master.sequence_id] = {
+            order: _Order(
+                tuple(master.scan_ids[position] for position in positions),
+                tuple(master.scan_indices[position] for position in positions),
+            )
+            for order, positions in permutations.items()
+        }
     return _Protocol(masters, variants)
 
 
@@ -121,7 +141,61 @@ def test_expected_cache_keys_are_exact_prefix_windows() -> None:
         "scene0000_02",
     ]
     assert keys[2]["local_window_scan_ids"] == ["scene0000_01", "scene0000_02"]
-    assert len({tuple(key["history_scan_ids"]) for key in keys}) == 5
+    assert len({tuple(key["history_scan_ids"]) for key in keys}) == 15
+
+
+def test_protocol_cache_request_resolves_exact_global_scan_indices() -> None:
+    protocol = _protocol()
+    key = expected_cache_keys(protocol)[7]
+
+    request = resolve_protocol_cache_request(protocol, key)
+
+    assert request.context_index == 0
+    assert request.master_sequence_id == "master-0"
+    assert request.order_id == "reverse"
+    assert request.stage_index == 2
+    assert request.scan_indices == (3, 2)
+    changed = dict(key)
+    changed["history_scan_ids"] = [*key["history_scan_ids"][:-1], "scene9999_00"]
+    changed["local_window_scan_ids"] = changed["history_scan_ids"][-2:]
+    with pytest.raises(ValueError, match="Protocol B"):
+        resolve_protocol_cache_request(protocol, changed)
+
+
+def test_cache_provenance_binds_checkpoint_configs_and_protocol(
+    tmp_path: Path,
+) -> None:
+    checkpoint = tmp_path / "model.ckpt"
+    checkpoint.write_bytes(b"checkpoint")
+    protocol_manifest = {"schema_version": "protocol-b-v1", "masters": [1]}
+
+    first = build_cache_provenance(
+        source_commit="a" * 40,
+        checkpoint_path=checkpoint,
+        config_documents={"p6a": b"p6a", "runtime": b"runtime"},
+        protocol_manifest=protocol_manifest,
+    )
+    second = build_cache_provenance(
+        source_commit="a" * 40,
+        checkpoint_path=checkpoint,
+        config_documents={"runtime": b"runtime", "p6a": b"p6a"},
+        protocol_manifest=protocol_manifest,
+    )
+
+    assert first == second
+    assert set(first) == {
+        "source_commit",
+        "checkpoint_sha256",
+        "config_sha256",
+        "dataset_sha256",
+    }
+    changed = build_cache_provenance(
+        source_commit="a" * 40,
+        checkpoint_path=checkpoint,
+        config_documents={"p6a": b"changed", "runtime": b"runtime"},
+        protocol_manifest=protocol_manifest,
+    )
+    assert changed["config_sha256"] != first["config_sha256"]
 
 
 def test_cache_payload_to_frozen_observation_detaches_all_cpu_tensors() -> None:

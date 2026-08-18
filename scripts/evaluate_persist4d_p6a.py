@@ -211,6 +211,117 @@ def expected_cache_keys(protocol: object) -> list[dict[str, object]]:
     return keys
 
 
+@dataclass(frozen=True)
+class ProtocolCacheRequest:
+    context_index: int
+    master_sequence_id: str
+    reference_scene_id: str
+    order_id: str
+    stage_index: int
+    scan_indices: tuple[int, ...]
+
+
+def resolve_protocol_cache_request(
+    protocol: object,
+    logical_key: Mapping[str, object],
+) -> ProtocolCacheRequest:
+    """Resolve one exact cache key to dataset context and global scan indices."""
+
+    key = _normalize_key(logical_key)
+    masters = _protocol_masters(protocol)
+    matches = [
+        master
+        for master in masters
+        if _field(master, "sequence_id") == key["master_sequence_id"]
+    ]
+    if len(matches) != 1:
+        raise ValueError("cache key does not identify one Protocol B master")
+    master = matches[0]
+    reference = _field(master, "reference_scene_id")
+    if reference != key["reference_scene_id"]:
+        raise ValueError("cache key reference scene differs from Protocol B")
+    variant = _protocol_variant(protocol, master, str(key["order_id"]))
+    scan_ids = _as_scan_ids(
+        _field(variant, "scan_ids"), name="Protocol B variant scan_ids"
+    )
+    raw_indices = _field(variant, "scan_indices")
+    if isinstance(raw_indices, (str, bytes)) or not isinstance(raw_indices, Sequence):
+        raise TypeError("Protocol B variant scan_indices must be a sequence")
+    scan_indices = tuple(raw_indices)
+    if len(scan_indices) != len(scan_ids) or any(
+        isinstance(index, bool) or not isinstance(index, int) or index < 0
+        for index in scan_indices
+    ):
+        raise ValueError("Protocol B variant scan indices are invalid")
+    stage = int(key["stage_index"])
+    if key["history_scan_ids"] != scan_ids[: stage + 1]:
+        raise ValueError("cache history is not the exact Protocol B order prefix")
+    expected_local_ids = scan_ids[: stage + 1][-1 if stage == 0 else -2 :]
+    if key["local_window_scan_ids"] != expected_local_ids:
+        raise ValueError("cache local window differs from Protocol B")
+    context_index = _field(master, "validation_index")
+    if (
+        isinstance(context_index, bool)
+        or not isinstance(context_index, int)
+        or context_index < 0
+    ):
+        raise ValueError("Protocol B master validation_index is invalid")
+    id_to_index = dict(zip(scan_ids, scan_indices, strict=True))
+    return ProtocolCacheRequest(
+        context_index=context_index,
+        master_sequence_id=str(key["master_sequence_id"]),
+        reference_scene_id=str(reference),
+        order_id=str(key["order_id"]),
+        stage_index=stage,
+        scan_indices=tuple(
+            int(id_to_index[scan_id]) for scan_id in key["local_window_scan_ids"]
+        ),
+    )
+
+
+def build_cache_provenance(
+    *,
+    source_commit: str,
+    checkpoint_path: Path,
+    config_documents: Mapping[str, bytes],
+    protocol_manifest: Mapping[str, object],
+) -> dict[str, str]:
+    """Bind cache content to code, checkpoint, resolved configs, and dataset."""
+
+    if len(source_commit) != 40 or any(
+        character not in "0123456789abcdef" for character in source_commit
+    ):
+        raise ValueError("source_commit must be a lowercase SHA-1")
+    if checkpoint_path.is_symlink() or not checkpoint_path.is_file():
+        raise ValueError("checkpoint_path must be a regular non-symlink file")
+    if not isinstance(config_documents, Mapping) or not config_documents:
+        raise ValueError("config_documents must be a non-empty mapping")
+    config_hasher = hashlib.sha256()
+    for name, content in sorted(config_documents.items()):
+        if not isinstance(name, str) or not name or "/" in name or "\\" in name:
+            raise ValueError("config document names must be portable identifiers")
+        if not isinstance(content, bytes) or not content:
+            raise ValueError("config documents must contain non-empty bytes")
+        config_hasher.update(name.encode("utf-8") + b"\0")
+        config_hasher.update(len(content).to_bytes(8, "big") + content)
+    try:
+        protocol_bytes = json.dumps(
+            protocol_manifest,
+            allow_nan=False,
+            ensure_ascii=True,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+    except (TypeError, ValueError) as error:
+        raise ValueError("protocol_manifest must be canonical JSON data") from error
+    return {
+        "source_commit": source_commit,
+        "checkpoint_sha256": _file_sha256(checkpoint_path),
+        "config_sha256": config_hasher.hexdigest(),
+        "dataset_sha256": hashlib.sha256(protocol_bytes).hexdigest(),
+    }
+
+
 def materialize_prediction_cache(
     *,
     protocol: object,
@@ -1099,9 +1210,11 @@ build_atomic_manifest_payload = atomic_manifest_payload
 __all__ = [
     "CacheResolution",
     "PrefixCausalityResult",
+    "ProtocolCacheRequest",
     "atomic_manifest_payload",
     "atomic_manifest_publish",
     "build_atomic_manifest_payload",
+    "build_cache_provenance",
     "build_temporal_target",
     "cache_payload_from_inference",
     "cache_payload_to_frozen_observation",
@@ -1113,5 +1226,6 @@ __all__ = [
     "prefix_causality_coordinator",
     "publish_manifest_atomic",
     "resolve_cache_entry",
+    "resolve_protocol_cache_request",
     "stage_prediction_from_track_step",
 ]
