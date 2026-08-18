@@ -606,6 +606,22 @@ def _external_cache_directory(path: Path) -> Path:
     raise ValueError("prediction cache directory must be outside the repository")
 
 
+def _cache_artifact_path(
+    cache_root: Path,
+    requested: Path | None,
+    *,
+    filename: str,
+) -> Path:
+    root = cache_root.expanduser().resolve()
+    candidate = root / filename if requested is None else requested.expanduser()
+    if not candidate.is_absolute():
+        candidate = root / candidate
+    target = candidate.resolve()
+    if target.parent != root or target.name != filename:
+        raise ValueError(f"{filename} must remain inside prediction cache root")
+    return target
+
+
 def _frozen_protocol_bundle(
     *,
     metadata_path: Path,
@@ -673,8 +689,8 @@ def _frozen_protocol_bundle(
 def run_real_prediction_cache(
     *,
     cache_directory: Path,
-    protocol_manifest_path: Path,
-    cache_manifest_path: Path,
+    protocol_manifest_path: Path | None,
+    cache_manifest_path: Path | None,
     metadata_path: Path,
     checkpoint_path: Path,
     device_name: str,
@@ -682,8 +698,17 @@ def run_real_prediction_cache(
     """Materialize the complete frozen ReScene cache on one CUDA device."""
 
     external_cache = _external_cache_directory(cache_directory)
-    protocol_output = _repository_path(protocol_manifest_path)
-    cache_output = _repository_path(cache_manifest_path)
+    entry_cache = external_cache / "entries"
+    protocol_output = _cache_artifact_path(
+        external_cache,
+        protocol_manifest_path,
+        filename="protocol_b_manifest.json",
+    )
+    cache_output = _cache_artifact_path(
+        external_cache,
+        cache_manifest_path,
+        filename="cache_manifest.json",
+    )
     metadata = _repository_path(metadata_path)
 
     import hydra
@@ -773,7 +798,7 @@ def run_real_prediction_cache(
         torch.set_float32_matmul_precision("highest")
         manifest = materialize_prediction_cache(
             protocol=protocol,
-            cache_directory=external_cache,
+            cache_directory=entry_cache,
             manifest_path=cache_output,
             provenance=provenance,
             producer=producer,
@@ -801,12 +826,12 @@ def _argument_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--protocol-manifest",
         type=Path,
-        default=Path("artifacts/P6A/protocol_b_manifest.json"),
+        default=None,
     )
     parser.add_argument(
         "--cache-manifest",
         type=Path,
-        default=Path("artifacts/P6A/cache_manifest.json"),
+        default=None,
     )
     parser.add_argument(
         "--checkpoint",

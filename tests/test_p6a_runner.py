@@ -11,6 +11,8 @@ import torch
 from scripts.evaluate_persist4d_p6a import (
     CachedProtocolSequence,
     RealPredictionCacheProducer,
+    _argument_parser,
+    _cache_artifact_path,
     atomic_manifest_payload,
     build_association_events,
     build_cache_provenance,
@@ -316,6 +318,34 @@ def test_real_cache_run_rejects_repository_cache_before_runtime_setup() -> None:
             metadata_path=Path("external/3RScan.json"),
             checkpoint_path=Path("checkpoints/rescene4d_concerto_t2_repro.ckpt"),
             device_name="cuda:0",
+        )
+
+
+def test_cache_manifests_default_inside_the_external_cache(tmp_path: Path) -> None:
+    cache_dir = tmp_path / "cache"
+
+    assert _cache_artifact_path(
+        cache_dir, None, filename="protocol_b_manifest.json"
+    ) == cache_dir / "protocol_b_manifest.json"
+    assert _cache_artifact_path(
+        cache_dir, None, filename="cache_manifest.json"
+    ) == cache_dir / "cache_manifest.json"
+
+    args = _argument_parser().parse_args(
+        ["--cache-directory", str(cache_dir), "--metadata", "metadata.json"]
+    )
+    assert args.protocol_manifest is None
+    assert args.cache_manifest is None
+
+
+def test_cache_manifests_cannot_escape_the_external_cache(tmp_path: Path) -> None:
+    cache_dir = tmp_path / "cache"
+
+    with pytest.raises(ValueError, match="inside prediction cache"):
+        _cache_artifact_path(
+            cache_dir,
+            tmp_path / "elsewhere" / "cache_manifest.json",
+            filename="cache_manifest.json",
         )
 
 
