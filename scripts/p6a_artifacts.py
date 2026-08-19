@@ -559,7 +559,7 @@ def _csv_rows_with_schema(
         raise ValueError(f"{path} rows must not be empty")
     validated: list[Mapping[str, object]] = []
     for index, raw_row in enumerate(rows):
-        if not isinstance(raw_row, Mapping) or tuple(raw_row) != expected:
+        if not isinstance(raw_row, Mapping) or set(raw_row) != set(expected):
             raise ValueError(f"{path} row {index} has schema drift")
         _validate_scalar_tree(raw_row, path=f"{path}.rows[{index}]")
         validated.append(raw_row)
