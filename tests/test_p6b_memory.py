@@ -80,6 +80,12 @@ def test_default_p6b_memory_config_is_valid_and_immutable() -> None:
         config.active_threshold = 0.75  # type: ignore[misc]
 
 
+def test_reactivation_margin_can_be_disabled_explicitly() -> None:
+    config = P6BMemoryConfig(reactivation_margin=None)
+
+    assert config.reactivation_margin is None
+
+
 @pytest.mark.parametrize(
     ("overrides", "message"),
     [

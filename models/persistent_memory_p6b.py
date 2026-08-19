@@ -53,7 +53,7 @@ class P6BMemoryConfig:
     capacity: int = 100
     active_threshold: float = 0.50
     reactivation_threshold: float = 0.85
-    reactivation_margin: float = 0.10
+    reactivation_margin: float | None = 0.10
     class_weight: float = 0.25
     class_mode: str = "foreground_normalized"
     background_class: int = 18
@@ -84,8 +84,7 @@ class P6BMemoryConfig:
             raise ValueError(
                 "reactivation_threshold must be at least active_threshold"
             )
-        if _finite_number(self.reactivation_margin, "reactivation_margin") < 0.0:
-            raise ValueError("reactivation_margin must be nonnegative")
+        _optional_nonnegative(self.reactivation_margin, "reactivation_margin")
         _unit_interval(self.class_weight, "class_weight")
         if self.class_mode not in _CLASS_MODES:
             raise ValueError(
@@ -504,10 +503,11 @@ class P6BPersistentMemory(nn.Module):
             candidate_margin = _edge_margins(candidate_score)
             candidate_active = state.active[batch_index, occupied_slots].unsqueeze(1)
             active_allowed = candidate_score >= self.config.active_threshold
-            dormant_allowed = (
-                (candidate_score >= self.config.reactivation_threshold)
-                & (candidate_margin >= self.config.reactivation_margin)
-            )
+            dormant_allowed = candidate_score >= self.config.reactivation_threshold
+            if self.config.reactivation_margin is not None:
+                dormant_allowed &= (
+                    candidate_margin >= self.config.reactivation_margin
+                )
             allowed = torch.where(
                 candidate_active, active_allowed, dormant_allowed
             )
