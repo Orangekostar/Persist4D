@@ -500,4 +500,5 @@ def test_staged_sweep_preserves_candidates_and_selects_official_incumbents() -> 
     assert counts["joint_neighbors"] > 1
     assert result.finalist_rows
     assert all(row.official_metrics_complete for row in result.finalist_rows)
+    assert all(isinstance(row.eligibility_reasons, tuple) for row in result.candidate_rows)
     assert result.selected.official_metrics_complete

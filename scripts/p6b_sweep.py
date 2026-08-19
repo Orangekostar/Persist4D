@@ -181,14 +181,18 @@ def derive_prefix_events(
 
 def extract_official_metrics(
     evaluation: object,
+    *,
+    method: str = "P6B",
 ) -> Mapping[int, Mapping[str, float]]:
     metric_blocks = getattr(evaluation, "metric_blocks", None)
     if not isinstance(metric_blocks, Mapping):
         raise P6BSweepError("evaluation must expose metric_blocks")
     strict_block = metric_blocks.get("strict")
-    if not isinstance(strict_block, Mapping) or set(strict_block) != {"P6B"}:
-        raise P6BSweepError("strict metric block must contain exact P6B method")
-    method_block = strict_block["P6B"]
+    if not isinstance(method, str) or not method:
+        raise P6BSweepError("official metric method must be nonempty")
+    if not isinstance(strict_block, Mapping) or set(strict_block) != {method}:
+        raise P6BSweepError(f"strict metric block must contain exact {method} method")
+    method_block = strict_block[method]
     if not isinstance(method_block, Mapping) or set(method_block) != {
         f"T{horizon}" for horizon in _HORIZONS
     }:
@@ -660,7 +664,16 @@ def run_staged_sweep(
             if row.official_metrics_complete:
                 raise P6BSweepError("fast evaluator must not inject official metrics")
             stage_rows.append(row)
-        candidates.extend(stage_rows)
+        assessed_stage_rows = tuple(
+            assess_candidate(
+                row,
+                baseline=baseline,
+                eligibility=protocol.eligibility,
+                require_official_metrics=False,
+            )
+            for row in stage_rows
+        )
+        candidates.extend(assessed_stage_rows)
         frontier = pareto_finalists(
             stage_rows,
             baseline=baseline,
@@ -676,12 +689,12 @@ def run_staged_sweep(
             if not official.official_metrics_complete:
                 raise P6BSweepError("official evaluator omitted task metrics")
             official_rows.append(official)
-        finalists_with_metrics.extend(official_rows)
         selection = select_final_candidate(
             official_rows,
             baseline=baseline,
             eligibility=protocol.eligibility,
         )
+        finalists_with_metrics.extend(selection.assessed_rows)
         incumbent = selection.selected.config
         selected_by_stage[stage] = selection.selected
     return P6BStagedSweepResult(
