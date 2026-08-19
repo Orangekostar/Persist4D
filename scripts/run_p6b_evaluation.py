@@ -87,6 +87,10 @@ def _git(repo_root: Path, *arguments: str) -> str:
     return result.stdout.strip()
 
 
+def _log_event(event: str, **values: object) -> None:
+    print(json.dumps({"event": event, **values}, sort_keys=True), flush=True)
+
+
 def build_source_tree_contract(repo_root: Path = PROJECT_ROOT) -> dict[str, str]:
     root = Path(repo_root).resolve()
     commit = _git(root, "rev-parse", "HEAD")
@@ -648,6 +652,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 def run_sweep(
     *, cache_directory: Path, metadata_path: Path, output_root: Path, config_path: Path
 ) -> dict[str, object]:
+    _log_event("sweep_start")
     source_contract = build_source_tree_contract(PROJECT_ROOT)
     output = Path(output_root)
     if output.exists() or output.is_symlink():
@@ -657,12 +662,15 @@ def run_sweep(
         metadata_path=metadata_path,
         config_path=(PROJECT_ROOT / config_path if not config_path.is_absolute() else config_path),
     )
+    _log_event("cache_validated", tuning_orders=len(tuning), heldout_orders=33)
     split_mapping = split.to_mapping()
     tuning_references = tuple(split.tuning_reference_scene_ids)
     baseline, _baseline_evaluation = _baseline_candidate(tuning, protocol_config)
+    _log_event("baseline_complete")
     sweep_sequences = cached_sequences_to_sweep_sequences(tuning)
 
     def fast_evaluator(config: P6BMemoryConfig, stage: str) -> P6BCandidateRow:
+        _log_event("candidate_start", stage=stage, config_id=canonical_config_id(config))
         replay = replay_configuration(
             sweep_sequences,
             config,
@@ -673,14 +681,19 @@ def run_sweep(
             tuning,
             background_class=config.background_class,
         )
-        return build_candidate_row(
+        row = build_candidate_row(
             replay,
             stage=stage,
             events_by_horizon=events,
         )
+        _log_event("candidate_complete", stage=stage, config_id=row.config_id)
+        return row
 
     def official_evaluator(row: P6BCandidateRow) -> P6BCandidateRow:
-        return _official_candidate(row, tuning)
+        _log_event("official_finalist_start", stage=row.stage, config_id=row.config_id)
+        result = _official_candidate(row, tuning)
+        _log_event("official_finalist_complete", stage=row.stage, config_id=row.config_id)
+        return result
 
     result = run_staged_sweep(
         protocol_config,
@@ -717,6 +730,11 @@ def run_sweep(
         },
     )
     _publish_selection(output, document)
+    _log_event(
+        "sweep_complete",
+        selected_config_id=document["selected_config_id"],
+        output=str(output),
+    )
     return document
 
 
@@ -728,6 +746,7 @@ def run_final(
     output_root: Path,
     config_path: Path,
 ) -> dict[str, object]:
+    _log_event("final_start")
     source_contract = build_source_tree_contract(PROJECT_ROOT)
     selection_path = Path(selection_root) / "selection.json"
     selection = load_selection_document(selection_path)
@@ -761,6 +780,7 @@ def run_final(
         raise ValueError("frozen selection provenance differs from current inputs")
     config = _selection_config(selection)
     final_results, events = _evaluate_methods(heldout, config)
+    _log_event("heldout_evaluation_complete", heldout_orders=len(heldout))
     per_sequence = _per_sequence_rows(events)
     failures = _failure_rows(events)
     checkpoint = PROJECT_ROOT / "checkpoints/rescene4d_concerto_t2_repro.ckpt"
@@ -826,6 +846,7 @@ def run_final(
         }
     )
     publish_p6b_artifact(Path(output_root), root)
+    _log_event("final_complete", decision=decision, output=str(output_root))
     return root
 
 
