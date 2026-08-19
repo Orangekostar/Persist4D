@@ -1293,7 +1293,7 @@ def _validate_efficiency_aggregate_binding(
     if not isinstance(actual_rows, list) or len(actual_rows) != len(expected_rows):
         raise ValueError("efficiency_results.csv rows differ from raw manifest aggregation")
     for row_index, (actual, expected) in enumerate(zip(actual_rows, expected_rows)):
-        if not isinstance(actual, Mapping) or tuple(actual) != tuple(expected):
+        if not isinstance(actual, Mapping) or set(actual) != set(expected):
             raise ValueError(
                 f"efficiency_results.csv row {row_index} columns differ from raw manifest"
             )

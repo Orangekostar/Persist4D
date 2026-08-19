@@ -620,10 +620,10 @@ def test_complete_root_schema_and_manifest_are_bound() -> None:
     }
 
 
-def test_csv_row_schema_survives_canonical_json_key_sorting() -> None:
+def test_all_csv_row_schemas_survive_canonical_json_key_sorting() -> None:
     artifact = _artifact()
-    spec = artifact["derived_artifacts"]["csv"]["baseline_results.csv"]
-    spec["rows"] = [dict(sorted(row.items())) for row in spec["rows"]]
+    for spec in artifact["derived_artifacts"]["csv"].values():
+        spec["rows"] = [dict(sorted(row.items())) for row in spec["rows"]]
 
     validate_root_artifact(artifact)
 
