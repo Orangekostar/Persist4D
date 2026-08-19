@@ -308,7 +308,8 @@ def _foreground_entropy(class_prob: Tensor, background_class: int) -> Tensor:
         foreground * foreground.clamp_min(torch.finfo(foreground.dtype).tiny).log(),
         torch.zeros_like(foreground),
     )
-    return -terms.sum(dim=-1) / math.log(foreground.shape[-1])
+    entropy = -terms.sum(dim=-1) / math.log(foreground.shape[-1])
+    return entropy.clamp(min=0.0, max=1.0)
 
 
 def _edge_margins(score: Tensor) -> Tensor:
