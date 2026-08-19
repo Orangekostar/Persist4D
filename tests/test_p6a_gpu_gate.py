@@ -39,6 +39,23 @@ PRIVATE_MARKERS = (
     "CUDA_VISIBLE_DEVICES",
     "CONCERTO_CHECKPOINT",
 )
+UUID_PATTERN = re.compile(
+    r"\b[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\b"
+)
+
+
+def _assert_only_protocol_reference_uuids(
+    serialized: str, allowed: set[str]
+) -> None:
+    assert set(UUID_PATTERN.findall(serialized)) == allowed
+
+
+def test_uuid_privacy_allowlist_rejects_undeclared_identifiers() -> None:
+    allowed = {"10b17940-3938-2467-8a7a-958300ba83d3"}
+    serialized = " ".join((*allowed, "12345678-1234-1234-1234-123456789abc"))
+
+    with pytest.raises(AssertionError):
+        _assert_only_protocol_reference_uuids(serialized, allowed)
 
 
 def _required_external_path(name: str) -> Path:
@@ -187,9 +204,14 @@ def test_real_p6a_evidence_is_source_bound_private_and_keeps_p5_frozen() -> None
         if path.is_file()
     ).decode("ascii")
     assert not re.search(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", serialized)
-    assert not re.search(
-        r"\b[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\b",
-        serialized,
+    protocol_manifest = _canonical_json_mapping(
+        ARTIFACT_ROOT / "protocol_b_manifest.json",
+        name="Protocol B manifest",
     )
+    reference_ids = {
+        master["reference_scene_id"] for master in protocol_manifest["masters"]
+    }
+    assert len(reference_ids) == 6
+    _assert_only_protocol_reference_uuids(serialized, reference_ids)
     assert all(marker not in serialized for marker in PRIVATE_MARKERS)
     assert hashlib.sha256(root_path.read_bytes()).hexdigest()
