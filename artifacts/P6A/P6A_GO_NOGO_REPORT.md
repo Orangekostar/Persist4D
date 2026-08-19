@@ -14,7 +14,7 @@ Protocol B uses exactly 43 masters, 6 reference-scene clusters, 3 orders, and 64
 
 ## Reproducibility binding
 
-P6-A source commit: `f8cb3c957bd0cdf8adc57ceadd99f2cf7219291a`; P5 source commit: `92bab01e93bacbc939606ec7c7f58d3f9b334fe6`; P5 artifact commit: `1380c4b9f37bec7933126ccc9bd70067de166f6f`; P5 checkpoint SHA256: `85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e`.
+P6-A source commit: `cee151a9dfc1c9aa038227bc4e179b671e739575`; P5 source commit: `92bab01e93bacbc939606ec7c7f58d3f9b334fe6`; P5 artifact commit: `1380c4b9f37bec7933126ccc9bd70067de166f6f`; P5 checkpoint SHA256: `85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e`.
 
 ## Main results
 
