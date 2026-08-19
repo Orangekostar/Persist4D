@@ -1,0 +1,72 @@
+schema_version: 1
+seed: 45
+
+sources:
+  p6a_protocol_manifest:
+    reference: repo:artifacts/P6A/protocol_b_manifest.json
+    sha256: 246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe
+  p6a_cache_manifest:
+    reference: external:p6a_cache_cee151a/cache_manifest.json
+    sha256: 499fe6a8a84fc3c55fb19dcb6487af46d13e1947a4ec8dcdc748171580d1e844
+
+split:
+  algorithm: sha256
+  namespace: p6b
+  tuning_cluster_count: 4
+  heldout_cluster_count: 2
+  expected_master_count: 43
+  expected_reference_scene_clusters: 6
+  order_variants:
+    - canonical
+    - reverse
+    - sha256_seed45
+
+base_memory:
+  capacity: 100
+  active_threshold: 0.50
+  reactivation_threshold: 0.85
+  reactivation_margin: 0.10
+  class_weight: 0.25
+  class_mode: foreground_normalized
+  background_class: 18
+  update_rate: 0.20
+  max_update_rate: 0.20
+  consolidation_confidence: 0.90
+  consolidation_margin: 0.10
+  birth_confidence: 0.75
+  birth_minimum_mask_support: 128
+  birth_max_entropy: 0.50
+  mask_threshold: 0.50
+  assignment_mode: threshold_aware
+
+search:
+  assignment_modes:
+    - legacy_post_threshold
+    - threshold_aware
+  active_thresholds: [0.45, 0.50, 0.55]
+  reactivation_thresholds: [0.75, 0.85, 0.95, 1.05]
+  reactivation_margins: [0.00, 0.05, 0.10, 0.20]
+  class_modes:
+    - full
+    - foreground_normalized
+  class_weights: [0.15, 0.25, 0.35]
+  consolidation_confidences: [0.80, 0.90, 0.97]
+  consolidation_margins: [0.05, 0.10, 0.20]
+  birth_confidences: [0.50, 0.75, 0.90, 0.97]
+  birth_minimum_mask_supports: [1, 128, 512, 1024]
+  birth_max_entropies: [null, 0.75, 0.50, 0.25]
+
+selection:
+  eligibility:
+    minimum_reactivation_accuracy: 0.70
+    maximum_reactivation_recall_drop: 0.05
+    minimum_valid_observation_ratio: 0.90
+    maximum_t2_task_drop: 0.02
+  ranking:
+    - mean_t4_t5_identity_switches
+    - wrong_reactivations
+    - false_births
+    - negative_reactivation_recall
+    - negative_mean_t4_t5_task_score
+    - canonical_config_json
+  heldout_evaluation_count: 1
