@@ -125,6 +125,14 @@ def test_finalize_validates_exact_schema_and_manifest_binding() -> None:
     assert json.loads(files["p6b_eval.json"])["decision"] == "P6B_GO"
 
 
+def test_finalize_accepts_json_object_key_reordering() -> None:
+    root = json.loads(json.dumps(_root(), sort_keys=True))
+
+    finalized = finalize_p6b_artifact(root)
+
+    validate_p6b_artifact(finalized)
+
+
 def test_report_has_exact_eleven_sections_and_terminal_decision() -> None:
     report = render_p6b_bundle(finalize_p6b_artifact(_root()))[
         "P6B_GO_NOGO_REPORT.md"

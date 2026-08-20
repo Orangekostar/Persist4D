@@ -165,7 +165,7 @@ def _validate_rows(
     if nonempty and not rows:
         raise ValueError(f"{name} must not be empty")
     for index, row in enumerate(rows):
-        if not isinstance(row, Mapping) or tuple(row) != tuple(columns):
+        if not isinstance(row, Mapping) or set(row) != set(columns):
             raise ValueError(f"{name}[{index}] columns differ from the schema")
     return rows
 
