@@ -52,7 +52,9 @@ def test_real_protocol_is_split_by_reference_cluster_without_leakage() -> None:
     assert set(split.tuning_master_sequence_ids).isdisjoint(
         split.heldout_master_sequence_ids
     )
-    assert all(assignment.order_ids == EXPECTED_ORDERS for assignment in split.assignments)
+    assert all(
+        assignment.order_ids == EXPECTED_ORDERS for assignment in split.assignments
+    )
     assert all(
         assignment.partition
         == (
@@ -109,10 +111,20 @@ def test_default_config_locks_search_space_and_selection_contract() -> None:
         "paired_cluster_mean_t4_t5_identity_switch_rate",
         "paired_cluster_mean_t3_t5_wrong_reactivation_rate",
         "paired_cluster_mean_t2_t5_false_birth_rate",
-        "negative_reactivation_recall",
-        "negative_mean_t4_t5_task_score",
+        "negative_paired_cluster_mean_t3_t5_reactivation_recall",
+        "negative_paired_cluster_mean_t4_t5_strict_online_task_score",
         "canonical_config_json",
     )
+
+
+def test_config_loader_rejects_ranking_contract_drift(tmp_path: Path) -> None:
+    payload = yaml.safe_load(P6B_CONFIG.read_text(encoding="utf-8"))
+    payload["selection"]["ranking"] = list(reversed(payload["selection"]["ranking"]))
+    path = tmp_path / "p6b.yaml"
+    path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+
+    with pytest.raises(P6BProtocolError, match="ranking"):
+        load_p6b_config(path)
 
 
 def test_stage_expansion_is_exact_unique_and_deterministic() -> None:
@@ -135,11 +147,13 @@ def test_stage_expansion_is_exact_unique_and_deterministic() -> None:
     consolidation = expand_stage_configs(
         config.base, config.search, stage="consolidation"
     )
-    assert sum(
-        item.consolidation_confidence is None
-        and item.consolidation_margin is None
-        for item in consolidation
-    ) == 1
+    assert (
+        sum(
+            item.consolidation_confidence is None and item.consolidation_margin is None
+            for item in consolidation
+        )
+        == 1
+    )
 
 
 def test_canonical_config_serialization_is_portable_and_ordered() -> None:
@@ -170,7 +184,27 @@ def test_joint_neighbors_change_at_most_one_registered_field() -> None:
             for key, value in base_mapping.items()
             if candidate_mapping[key] != value
         }
-        assert len(changed) == 1
+        assert len(changed) == 1 or changed == {
+            "consolidation_confidence",
+            "consolidation_margin",
+        }
+
+
+def test_joint_neighbors_can_reenable_consolidation_after_off_wins() -> None:
+    config = load_p6b_config(P6B_CONFIG)
+    off = replace(
+        config.base,
+        consolidation_confidence=None,
+        consolidation_margin=None,
+    )
+
+    neighbors = joint_neighbor_configs(off, config.search)
+
+    assert any(
+        item.consolidation_confidence is not None
+        and item.consolidation_margin is not None
+        for item in neighbors
+    )
 
 
 @pytest.mark.parametrize("mutation", ["missing", "extra"])

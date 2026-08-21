@@ -13,6 +13,15 @@ import yaml
 
 from models.persistent_memory_p6b import P6BMemoryConfig
 
+_EXPECTED_RANKING = (
+    "paired_cluster_mean_t4_t5_identity_switch_rate",
+    "paired_cluster_mean_t3_t5_wrong_reactivation_rate",
+    "paired_cluster_mean_t2_t5_false_birth_rate",
+    "negative_paired_cluster_mean_t3_t5_reactivation_recall",
+    "negative_paired_cluster_mean_t4_t5_strict_online_task_score",
+    "canonical_config_json",
+)
+
 
 class P6BProtocolError(ValueError):
     pass
@@ -133,9 +142,7 @@ def _exact_fields(
 
 def _integer(value: object, context: str, *, minimum: int = 0) -> int:
     if not isinstance(value, int) or isinstance(value, bool) or value < minimum:
-        raise P6BProtocolError(
-            f"{context} must be an integer of at least {minimum}"
-        )
+        raise P6BProtocolError(f"{context} must be an integer of at least {minimum}")
     return value
 
 
@@ -322,12 +329,8 @@ def load_p6b_config(path: str | Path) -> P6BProtocolConfig:
         reactivation_margins=_tuple_floats(
             search_mapping["reactivation_margins"], "reactivation_margins"
         ),
-        class_modes=_tuple_strings(
-            search_mapping["class_modes"], "class_modes"
-        ),
-        class_weights=_tuple_floats(
-            search_mapping["class_weights"], "class_weights"
-        ),
+        class_modes=_tuple_strings(search_mapping["class_modes"], "class_modes"),
+        class_weights=_tuple_floats(search_mapping["class_weights"], "class_weights"),
         consolidation_confidences=_tuple_floats(
             search_mapping["consolidation_confidences"],
             "consolidation_confidences",
@@ -374,6 +377,8 @@ def load_p6b_config(path: str | Path) -> P6BProtocolConfig:
     ):
         raise P6BProtocolError("eligibility values are outside their valid ranges")
     ranking = _tuple_strings(selection["ranking"], "selection.ranking")
+    if ranking != _EXPECTED_RANKING:
+        raise P6BProtocolError("selection.ranking differs from protocol v2")
     heldout_count = _integer(
         selection["heldout_evaluation_count"],
         "selection.heldout_evaluation_count",
@@ -428,8 +433,7 @@ def expand_stage_configs(
     try:
         if stage == "assignment":
             configs = [
-                replace(base, assignment_mode=mode)
-                for mode in search.assignment_modes
+                replace(base, assignment_mode=mode) for mode in search.assignment_modes
             ]
         elif stage == "reactivation":
             configs = [
@@ -498,13 +502,39 @@ def joint_neighbor_configs(
         "reactivation_margin": search.reactivation_margins,
         "class_mode": search.class_modes,
         "class_weight": search.class_weights,
-        "consolidation_confidence": search.consolidation_confidences,
-        "consolidation_margin": search.consolidation_margins,
         "birth_confidence": search.birth_confidences,
         "birth_minimum_mask_support": search.birth_minimum_mask_supports,
         "birth_max_entropy": search.birth_max_entropies,
     }
     neighbors = [selected]
+    if selected.consolidation_confidence is None:
+        neighbors.append(
+            replace(
+                selected,
+                consolidation_confidence=search.consolidation_confidences[0],
+                consolidation_margin=search.consolidation_margins[0],
+            )
+        )
+    else:
+        neighbors.append(
+            replace(
+                selected,
+                consolidation_confidence=None,
+                consolidation_margin=None,
+            )
+        )
+        for field_name, values in (
+            ("consolidation_confidence", search.consolidation_confidences),
+            ("consolidation_margin", search.consolidation_margins),
+        ):
+            current = getattr(selected, field_name)
+            assert current is not None
+            index = values.index(current)
+            for neighbor_index in (index - 1, index + 1):
+                if 0 <= neighbor_index < len(values):
+                    neighbors.append(
+                        replace(selected, **{field_name: values[neighbor_index]})
+                    )
     for field_name, values in grids.items():
         current = getattr(selected, field_name)
         if current not in values:
@@ -529,12 +559,8 @@ def _split_payload(manifest: P6BSplitManifest) -> dict[str, object]:
         "seed": manifest.seed,
         "hash_algorithm": manifest.hash_algorithm,
         "hash_namespace": manifest.hash_namespace,
-        "tuning_reference_scene_ids": list(
-            manifest.tuning_reference_scene_ids
-        ),
-        "heldout_reference_scene_ids": list(
-            manifest.heldout_reference_scene_ids
-        ),
+        "tuning_reference_scene_ids": list(manifest.tuning_reference_scene_ids),
+        "heldout_reference_scene_ids": list(manifest.heldout_reference_scene_ids),
         "tuning_master_sequence_ids": list(manifest.tuning_master_sequence_ids),
         "heldout_master_sequence_ids": list(manifest.heldout_master_sequence_ids),
         "assignments": [assignment.to_mapping() for assignment in manifest.assignments],
@@ -597,9 +623,7 @@ def build_split_manifest(
         sorted(
             references,
             key=lambda reference: (
-                hashlib.sha256(
-                    f"p6b|{seed_value}|{reference}".encode()
-                ).hexdigest(),
+                hashlib.sha256(f"p6b|{seed_value}|{reference}".encode()).hexdigest(),
                 reference,
             ),
         )
@@ -611,9 +635,7 @@ def build_split_manifest(
             reference_scene_id=reference_id,
             master_sequence_id=master_id,
             order_ids=order_ids,
-            partition=(
-                "tuning" if reference_id in tuning_references else "heldout"
-            ),
+            partition=("tuning" if reference_id in tuning_references else "heldout"),
         )
         for master_id, reference_id in sorted(master_rows)
     )
@@ -628,7 +650,9 @@ def build_split_manifest(
         if assignment.partition == "heldout"
     )
     if len(tuning_masters) != 32 or len(heldout_masters) != 11:
-        raise P6BProtocolError("cluster split must contain 32 tuning and 11 heldout masters")
+        raise P6BProtocolError(
+            "cluster split must contain 32 tuning and 11 heldout masters"
+        )
     provisional = P6BSplitManifest(
         schema_version=1,
         seed=seed_value,

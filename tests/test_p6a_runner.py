@@ -9,6 +9,7 @@ import pytest
 import torch
 import yaml
 
+import scripts.evaluate_persist4d_p6a as p6a_evaluator
 from scripts.evaluate_persist4d_p6a import (
     CachedProtocolSequence,
     RealPredictionCacheProducer,
@@ -233,9 +234,7 @@ def test_cache_provenance_uses_portable_concerto_checkpoint_reference(
     protocol_manifest = {"schema_version": "protocol-b-v1", "masters": [1]}
     local_checkpoint = "/" + "home/user/.cache/concerto/concerto_base.pth"
     local_runtime = (
-        "backbone:\n"
-        "  model_lib: concerto\n"
-        f"  name: {local_checkpoint}\n"
+        f"backbone:\n  model_lib: concerto\n  name: {local_checkpoint}\n"
     ).encode()
     portable_runtime = (
         b"backbone:\n"
@@ -406,12 +405,14 @@ def test_real_cache_run_rejects_repository_cache_before_runtime_setup() -> None:
 def test_cache_manifests_default_inside_the_external_cache(tmp_path: Path) -> None:
     cache_dir = tmp_path / "cache"
 
-    assert _cache_artifact_path(
-        cache_dir, None, filename="protocol_b_manifest.json"
-    ) == cache_dir / "protocol_b_manifest.json"
-    assert _cache_artifact_path(
-        cache_dir, None, filename="cache_manifest.json"
-    ) == cache_dir / "cache_manifest.json"
+    assert (
+        _cache_artifact_path(cache_dir, None, filename="protocol_b_manifest.json")
+        == cache_dir / "protocol_b_manifest.json"
+    )
+    assert (
+        _cache_artifact_path(cache_dir, None, filename="cache_manifest.json")
+        == cache_dir / "cache_manifest.json"
+    )
 
     args = _argument_parser().parse_args(
         ["--cache-directory", str(cache_dir), "--metadata", "metadata.json"]
@@ -446,15 +447,22 @@ def test_cache_payload_to_frozen_observation_detaches_all_cpu_tensors() -> None:
     assert frozen.features.data_ptr() != payload["observation"]["features"].data_ptr()
 
 
+def test_cache_payload_to_frozen_observation_rejects_inconsistent_mask_support() -> (
+    None
+):
+    observation = _payload(1)["observation"]
+    observation["mask_support"] = observation["mask_support"].clone()
+    observation["mask_support"][0] += 1
+
+    with pytest.raises(ValueError, match="mask_support.*mask point count"):
+        cache_payload_to_frozen_observation(observation)
+
+
 def test_cache_payload_from_inference_freezes_latest_stage_without_change_gt() -> None:
     class Observation:
         def __init__(self) -> None:
-            self.features = torch.tensor(
-                [[[1.0, 0.0], [0.0, 1.0]]], requires_grad=True
-            )
-            self.class_prob = torch.tensor(
-                [[[0.8, 0.1, 0.1], [0.1, 0.7, 0.2]]]
-            )
+            self.features = torch.tensor([[[1.0, 0.0], [0.0, 1.0]]], requires_grad=True)
+            self.class_prob = torch.tensor([[[0.8, 0.1, 0.1], [0.1, 0.7, 0.2]]])
             self.confidence = torch.tensor([[0.8, 0.7]])
             self.valid = torch.tensor([[True, False]])
             self.latest_mask = [torch.ones((2, 3))]
@@ -504,9 +512,7 @@ def test_cache_payload_from_inference_freezes_latest_stage_without_change_gt() -
     assert payload["target"]["change_label_semantics"] == (
         "unavailable_for_protocol_b_order_stress_test_all_static_placeholder"
     )
-    assert payload["target"]["gt_class_semantics"] == (
-        "rescene_model_index_0_based"
-    )
+    assert payload["target"]["gt_class_semantics"] == ("rescene_model_index_0_based")
 
     full_target["temporal_stages"][0] = 0.5
     with pytest.raises(ValueError, match="integer stage indices"):
@@ -672,7 +678,9 @@ def test_prefix_coordinator_is_causal_and_separates_offline_reconstruction() -> 
     assert result.content_digest
 
 
-def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping() -> None:
+def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping() -> (
+    None
+):
     payloads = []
     for stage in range(5):
         payload = _payload(stage, gt_ids=(10,))
@@ -702,6 +710,9 @@ def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping(
                 "online_t-mAP": score,
                 "online_t-REC": score / 2.0,
             }
+
+        def export_evidence(self) -> dict[str, object]:
+            return {"metric_key": list(self.key)}
 
     factories = {
         "B0": lambda sequence_id: B0StageUniqueTracker(sequence_id=sequence_id),
@@ -740,13 +751,8 @@ def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping(
     assert len(result.capacity_snapshots) == 2 + 3 + 4 + 5
     assert len(aggregate_metrics_by_sequence(result.association_events)) == 6 * 4
     assert len(result.per_sequence_metrics) == len(factories) * 4
-    assert {
-        (row["method"], row["T"])
-        for row in result.per_sequence_metrics
-    } == {
-        (method, f"T{horizon}")
-        for method in factories
-        for horizon in range(2, 6)
+    assert {(row["method"], row["T"]) for row in result.per_sequence_metrics} == {
+        (method, f"T{horizon}") for method in factories for horizon in range(2, 6)
     }
     p6b_row = next(
         row
@@ -764,6 +770,21 @@ def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping(
         "prediction_digest": p6b_row["prediction_digest"],
     }
     assert len({row["prediction_digest"] for row in result.per_sequence_metrics}) == 1
+    assert len(result.per_sequence_metric_evidence) == len(factories) * 4
+    evidence = next(
+        row
+        for row in result.per_sequence_metric_evidence
+        if row["method"] == "B4" and row["T"] == "T5"
+    )
+    assert evidence == {
+        "method": "B4",
+        "reference_scene_id": "ref",
+        "master_sequence_id": "master",
+        "order_id": "canonical",
+        "T": "T5",
+        "prediction_digest": p6b_row["prediction_digest"],
+        "state": {"metric_key": ["strict_online", "B4", 5]},
+    }
 
 
 def test_tracker_factories_lock_the_preregistered_baseline_parameters() -> None:
@@ -796,9 +817,7 @@ def test_tracker_factories_lock_the_preregistered_baseline_parameters() -> None:
     factories = build_tracker_factories(config)
 
     assert tuple(factories) == ("B0", "B0_sanity", "B1", "B2", "B3", "B4")
-    trackers = {
-        method: factory("sequence") for method, factory in factories.items()
-    }
+    trackers = {method: factory("sequence") for method, factory in factories.items()}
     assert isinstance(trackers["B0"], B0StageUniqueTracker)
     assert isinstance(trackers["B0_sanity"], B0SanityTracker)
     assert trackers["B1"].feature_threshold == pytest.approx(0.5)
@@ -828,7 +847,9 @@ def test_rio_class_mapper_applies_label_offset_before_dataset_remap() -> None:
 
 
 def test_association_events_reconstruct_gap_reactivation_and_identity_history() -> None:
-    payloads = [_payload(stage, gt_ids=((10,) if stage != 1 else ())) for stage in range(3)]
+    payloads = [
+        _payload(stage, gt_ids=((10,) if stage != 1 else ())) for stage in range(3)
+    ]
     for stage in (0, 2):
         payloads[stage]["target"]["gt_masks"][0] = payloads[stage]["observation"][
             "masks"
@@ -909,7 +930,11 @@ def test_capacity_snapshots_are_derived_only_from_bounded_b4_state() -> None:
     payloads = [_payload(stage) for stage in range(2)]
     result = prefix_causality_coordinator(
         payloads,
-        {"B4": lambda sequence_id: B4PersistentTracker(sequence_id=sequence_id, capacity=3)},
+        {
+            "B4": lambda sequence_id: B4PersistentTracker(
+                sequence_id=sequence_id, capacity=3
+            )
+        },
         endpoints=(1,),
         background_class=2,
     )
@@ -923,13 +948,14 @@ def test_capacity_snapshots_are_derived_only_from_bounded_b4_state() -> None:
     assert all(snapshot.class_count == 3 for snapshot in snapshots)
     assert len({snapshot.persistent_state_bytes for snapshot in snapshots}) == 1
     assert all(
-        snapshot.dormant_count
-        == snapshot.occupied_count - snapshot.active_count
+        snapshot.dormant_count == snapshot.occupied_count - snapshot.active_count
         for snapshot in snapshots
     )
 
 
-def test_official_metric_blocks_are_normalized_without_mixing_raw_and_temporal() -> None:
+def test_official_metric_blocks_are_normalized_without_mixing_raw_and_temporal() -> (
+    None
+):
     blocks = {
         "raw": {
             "B4": {
@@ -1137,6 +1163,46 @@ def test_load_cached_protocol_sequences_reconstructs_exact_master_orders(
         "scene0000_04",
         "scene0000_03",
     ]
+
+
+def test_load_cached_protocol_sequences_does_not_read_disallowed_master_payloads(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    protocol = _protocol(2)
+    provenance = _payload(0)["provenance"]
+
+    def producer(key: dict[str, object]) -> dict[str, object]:
+        payload = _payload(int(key["stage_index"]))
+        payload["key"] = dict(key)
+        return payload
+
+    cache_directory = tmp_path / "entries"
+    manifest_path = tmp_path / "cache_manifest.json"
+    materialize_prediction_cache(
+        protocol=protocol,
+        cache_directory=cache_directory,
+        manifest_path=manifest_path,
+        provenance=provenance,
+        producer=producer,
+    )
+    original_validate = p6a_evaluator.validate_cache_entry
+    validated_masters = []
+
+    def record_validation(path, entry, *, expected_provenance):
+        validated_masters.append(entry["key"]["master_sequence_id"])
+        return original_validate(path, entry, expected_provenance=expected_provenance)
+
+    monkeypatch.setattr(p6a_evaluator, "validate_cache_entry", record_validation)
+    sequences = load_cached_protocol_sequences(
+        protocol=protocol,
+        cache_directory=cache_directory,
+        manifest_path=manifest_path,
+        allowed_master_sequence_ids=("master-0",),
+    )
+
+    assert len(sequences) == 3
+    assert set(validated_masters) == {"master-0"}
+    assert len(validated_masters) == 15
 
 
 def test_atomic_manifest_payload_and_publish_are_deterministic(tmp_path: Path) -> None:

@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+import base64
+import hashlib
+import json
+import zlib
 from copy import deepcopy
 
 import pytest
 import torch
 
+from scripts import p6a_metrics
 from scripts.p6a_metrics import (
     IdentityAccumulator,
     OfficialMetricAccumulator,
     adapt_raw_local_pair,
     assert_shared_raw_predictions,
+    build_official_metric_population_evidence,
     build_offline_reconstructed_prediction,
     build_online_endpoint_prediction,
     compute_endpoint_metrics,
@@ -19,6 +25,8 @@ from scripts.p6a_metrics import (
     global_hungarian_match,
     greedy_diagnostic_match,
     raw_observation_fingerprint,
+    recompute_official_metric_evidence,
+    recompute_official_metric_population_evidence,
     relative_retention,
 )
 
@@ -277,6 +285,180 @@ def test_official_temporal_accumulator_exposes_fixed_stmetrics_keys():
         "online_t-REC25": 1.0,
     }
     assert compute_official_temporal_metrics([prediction], [target]) == metric.compute()
+
+
+def test_official_metric_state_evidence_recomputes_exact_aggregate() -> None:
+    point_count = 120
+    mask = torch.ones(point_count, dtype=torch.bool)
+    prediction = {
+        "pred_masks": mask[:, None],
+        "pred_classes": torch.tensor([3]),
+        "pred_scores": torch.tensor([0.9]),
+    }
+    target = {
+        "masks": mask[None, :],
+        "labels": torch.tensor([3]),
+        "ids": torch.tensor([1]),
+        "changes": torch.tensor([0]),
+        "temporal_stages": torch.zeros(point_count, dtype=torch.long),
+    }
+    metric = OfficialMetricAccumulator(mode="strict_online")
+    metric.update(prediction, target)
+
+    evidence = metric.export_evidence()
+
+    assert recompute_official_metric_evidence(evidence) == metric.compute()
+    tampered = deepcopy(evidence)
+    tampered["states"][0]["data"] = tampered["states"][0]["data"] + "AA=="
+    with pytest.raises(ValueError, match="SHA-256|evidence"):
+        recompute_official_metric_evidence(tampered)
+
+
+def test_official_metric_population_evidence_merges_identity_keyed_states() -> None:
+    point_count = 120
+    mask = torch.ones(point_count, dtype=torch.bool)
+    prediction = {
+        "pred_masks": mask[:, None],
+        "pred_classes": torch.tensor([3]),
+        "pred_scores": torch.tensor([0.9]),
+    }
+    target = {
+        "masks": mask[None, :],
+        "labels": torch.tensor([3]),
+        "ids": torch.tensor([1]),
+        "changes": torch.tensor([0]),
+        "temporal_stages": torch.zeros(point_count, dtype=torch.long),
+    }
+    state = OfficialMetricAccumulator(mode="strict_online")
+    state.update(prediction, target)
+    records = [
+        {
+            "reference_scene_id": "ref-a",
+            "master_sequence_id": "master-a",
+            "order_id": "canonical",
+            "prediction_digest": "a" * 64,
+            "state": state.export_evidence(),
+        },
+        {
+            "reference_scene_id": "ref-b",
+            "master_sequence_id": "master-b",
+            "order_id": "reverse",
+            "prediction_digest": "b" * 64,
+            "state": state.export_evidence(),
+        },
+    ]
+
+    evidence = build_official_metric_population_evidence(records)
+    computed, restored, per_sequence = (
+        recompute_official_metric_population_evidence(evidence)
+    )
+
+    assert evidence["updates"] == 2
+    assert computed == state.compute()
+    assert per_sequence == (state.compute(), state.compute())
+    assert [
+        (row["reference_scene_id"], row["master_sequence_id"], row["order_id"])
+        for row in restored
+    ] == [("ref-a", "master-a", "canonical"), ("ref-b", "master-b", "reverse")]
+    tampered = deepcopy(evidence)
+    tampered["records_zlib_base64"] += "AA=="
+    with pytest.raises(ValueError, match="SHA-256|population evidence"):
+        recompute_official_metric_population_evidence(tampered)
+
+
+@pytest.mark.parametrize(
+    "limit_name",
+    (
+        "_MAX_OFFICIAL_METRIC_POPULATION_ENCODED_BYTES",
+        "_MAX_OFFICIAL_METRIC_POPULATION_COMPRESSED_BYTES",
+    ),
+)
+def test_official_metric_population_evidence_bounds_input_before_decode(
+    monkeypatch: pytest.MonkeyPatch, limit_name: str
+) -> None:
+    evidence = _small_official_metric_population_evidence()
+    monkeypatch.setattr(p6a_metrics, limit_name, 1, raising=False)
+
+    with pytest.raises(ValueError, match="payload exceeds"):
+        recompute_official_metric_population_evidence(evidence)
+
+
+def test_official_metric_population_encoded_limit_precedes_core_serialization(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    evidence = _small_official_metric_population_evidence()
+    monkeypatch.setattr(
+        p6a_metrics,
+        "_MAX_OFFICIAL_METRIC_POPULATION_ENCODED_BYTES",
+        1,
+    )
+    monkeypatch.setattr(
+        p6a_metrics.json,
+        "dumps",
+        lambda *args, **kwargs: pytest.fail("oversized payload must not be serialized"),
+    )
+
+    with pytest.raises(ValueError, match="payload exceeds"):
+        recompute_official_metric_population_evidence(evidence)
+
+
+def test_official_metric_population_evidence_rejects_zip_bomb_before_json(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    evidence = _small_official_metric_population_evidence()
+    oversized = b" " * 1024
+    evidence["records_zlib_base64"] = base64.b64encode(
+        zlib.compress(oversized, level=9)
+    ).decode("ascii")
+    evidence["records_sha256"] = hashlib.sha256(oversized).hexdigest()
+    _rebind_population_evidence(evidence)
+    monkeypatch.setattr(
+        p6a_metrics,
+        "_MAX_OFFICIAL_METRIC_POPULATION_RAW_BYTES",
+        128,
+        raising=False,
+    )
+
+    with pytest.raises(ValueError, match="payload exceeds"):
+        recompute_official_metric_population_evidence(evidence)
+
+
+def _small_official_metric_population_evidence() -> dict[str, object]:
+    point_count = 120
+    mask = torch.ones(point_count, dtype=torch.bool)
+    accumulator = OfficialMetricAccumulator(mode="strict_online")
+    accumulator.update(
+        {
+            "pred_masks": mask[:, None],
+            "pred_classes": torch.tensor([3]),
+            "pred_scores": torch.tensor([0.9]),
+        },
+        {
+            "masks": mask[None, :],
+            "labels": torch.tensor([3]),
+            "ids": torch.tensor([1]),
+            "changes": torch.tensor([0]),
+            "temporal_stages": torch.zeros(point_count, dtype=torch.long),
+        },
+    )
+    return build_official_metric_population_evidence(
+        [
+            {
+                "reference_scene_id": "ref-a",
+                "master_sequence_id": "master-a",
+                "order_id": "canonical",
+                "prediction_digest": "a" * 64,
+                "state": accumulator.export_evidence(),
+            }
+        ]
+    )
+
+
+def _rebind_population_evidence(evidence: dict[str, object]) -> None:
+    core = {key: evidence[key] for key in evidence if key != "sha256"}
+    evidence["sha256"] = hashlib.sha256(
+        (json.dumps(core, sort_keys=True, indent=2) + "\n").encode("utf-8")
+    ).hexdigest()
 
 
 def test_offline_prefix_uses_full_state_without_future_point_masks():

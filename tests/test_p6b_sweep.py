@@ -21,12 +21,16 @@ from scripts.p6b_sweep import (
     P6BCandidateRow,
     P6BClusterMetrics,
     P6BHorizonMetrics,
+    P6BSequenceAssociationMetrics,
     P6BSweepError,
     P6BSweepSequence,
+    _sequence_population_binding,
     assess_candidate,
+    attach_cluster_task_metrics,
     build_candidate_row,
     cached_sequences_to_sweep_sequences,
     candidate_ranking_key,
+    cluster_event_metrics,
     derive_prefix_events,
     extract_official_metrics,
     pareto_finalists,
@@ -161,6 +165,25 @@ def _horizon(
     gaps = correct * recall_fraction.denominator // recall_fraction.numerator
     predicted = correct + wrong
     births = max(10, false_births)
+    population = (("cluster-0", "cluster-0-master", "canonical"),)
+    population_count, population_sha = _sequence_population_binding(population)
+    sequence_metrics = (
+        P6BSequenceAssociationMetrics(
+            reference_scene_id="cluster-0",
+            master_sequence_id="cluster-0-master",
+            order_id="canonical",
+            identity_switches=switches,
+            transition_opportunities=transitions,
+            wrong_reactivations=wrong,
+            predicted_reactivation_events=predicted,
+            correct_reactivations=correct,
+            reactivation_attempts=attempts,
+            gap_opportunities=gaps,
+            false_births=false_births,
+            births=births,
+            rejected_births=2,
+        ),
+    )
     cluster = P6BClusterMetrics(
         reference_scene_id="cluster-0",
         identity_switches=switches,
@@ -173,6 +196,11 @@ def _horizon(
         false_births=false_births,
         births=births,
         rejected_births=2,
+        sequence_population_count=population_count,
+        sequence_population_sha256=population_sha,
+        sequence_metrics=sequence_metrics,
+        strict_online_tmap=tmap,
+        strict_online_trec=trec,
     )
     return P6BHorizonMetrics(
         horizon=horizon,
@@ -231,8 +259,7 @@ def test_one_t5_replay_exposes_identical_causal_prefix_steps() -> None:
     sequence_replay = replay.sequences[0]
     assert set(sequence_replay.prefix_steps) == {2, 3, 4, 5}
     assert all(
-        sequence_replay.prefix_steps[horizon]
-        == sequence_replay.steps[:horizon]
+        sequence_replay.prefix_steps[horizon] == sequence_replay.steps[:horizon]
         for horizon in (2, 3, 4, 5)
     )
     assert [step.track_ids for step in sequence_replay.steps] == [(0,)] * 5
@@ -320,7 +347,40 @@ def test_missing_official_task_metrics_cannot_be_frozen() -> None:
         )
 
 
+def test_official_metric_completeness_includes_cluster_task_fields() -> None:
+    complete = _candidate()
+    absent = _candidate(official=False)
+    partial_metric = absent.metric(4)
+    partial = replace(
+        absent,
+        horizons=tuple(
+            replace(
+                partial_metric,
+                cluster_metrics=tuple(
+                    replace(
+                        cluster,
+                        strict_online_tmap=0.2,
+                        strict_online_trec=0.3,
+                    )
+                    for cluster in partial_metric.cluster_metrics
+                ),
+            )
+            if metric.horizon == 4
+            else metric
+            for metric in absent.horizons
+        ),
+    )
+
+    assert complete.official_metrics_complete is True
+    assert complete.official_metrics_absent is False
+    assert absent.official_metrics_complete is False
+    assert absent.official_metrics_absent is True
+    assert partial.official_metrics_complete is False
+    assert partial.official_metrics_absent is False
+
+
 def test_ranking_key_uses_all_preregistered_criteria_in_order() -> None:
+    baseline = _candidate()
     row = _candidate(
         overrides={
             2: {"false_births": 8},
@@ -344,25 +404,298 @@ def test_ranking_key_uses_all_preregistered_criteria_in_order() -> None:
         }
     )
 
-    key = candidate_ranking_key(row)
+    key = candidate_ranking_key(row, baseline=baseline)
 
     assert key[:5] == pytest.approx(
         (
-            (0.12 + 0.14) / 2,
+            sum(
+                row.metric(horizon).cluster_mean_identity_switch_rate
+                - baseline.metric(horizon).cluster_mean_identity_switch_rate
+                for horizon in (4, 5)
+            )
+            / 2,
             sum(
                 row.metric(horizon).wrong_reactivation_rate
+                - baseline.metric(horizon).wrong_reactivation_rate
                 for horizon in (3, 4, 5)
             )
             / 3,
-            (8 / 12 + 3 / 12 + 5 / 12 + 4 / 12) / 4,
-            -0.30,
-            -0.40,
+            sum(
+                row.metric(horizon).false_birth_rate
+                - baseline.metric(horizon).false_birth_rate
+                for horizon in (2, 3, 4, 5)
+            )
+            / 4,
+            -sum(
+                row.metric(horizon).reactivation_recall
+                - baseline.metric(horizon).reactivation_recall
+                for horizon in (3, 4, 5)
+            )
+            / 3,
+            -sum(
+                candidate_value - baseline_value
+                for horizon in (4, 5)
+                for candidate_value, baseline_value in (
+                    (
+                        row.metric(horizon).strict_online_tmap,
+                        baseline.metric(horizon).strict_online_tmap,
+                    ),
+                    (
+                        row.metric(horizon).strict_online_trec,
+                        baseline.metric(horizon).strict_online_trec,
+                    ),
+                )
+            )
+            / 4,
         )
     )
     assert key[5] == row.config_json
 
 
+def test_ranking_key_records_paired_deltas_against_frozen_b4() -> None:
+    baseline = _candidate()
+    candidate = _candidate(
+        0.01,
+        overrides={
+            4: {"switches": 8, "transitions": 100},
+            5: {"switches": 9, "transitions": 100},
+        },
+    )
+
+    key = candidate_ranking_key(candidate, baseline=baseline)
+
+    expected = (
+        sum(
+            candidate.metric(horizon).cluster_mean_identity_switch_rate
+            - baseline.metric(horizon).cluster_mean_identity_switch_rate
+            for horizon in (4, 5)
+        )
+        / 2
+    )
+    assert key[0] == pytest.approx(expected)
+
+
+def _cluster(
+    reference: str,
+    *,
+    correct: int,
+    gaps: int,
+    tmap: float,
+    trec: float,
+    identities: tuple[tuple[str, str, str], ...] | None = None,
+) -> P6BClusterMetrics:
+    population = identities or ((reference, f"{reference}-0", "canonical"),)
+    population_count, population_sha = _sequence_population_binding(population)
+    sequence_metrics = tuple(
+        P6BSequenceAssociationMetrics(
+            reference_scene_id=identity[0],
+            master_sequence_id=identity[1],
+            order_id=identity[2],
+            identity_switches=1 if index == 0 else 0,
+            transition_opportunities=10 if index == 0 else 0,
+            wrong_reactivations=0,
+            predicted_reactivation_events=correct if index == 0 else 0,
+            correct_reactivations=correct if index == 0 else 0,
+            reactivation_attempts=correct if index == 0 else 0,
+            gap_opportunities=gaps if index == 0 else 0,
+            false_births=1 if index == 0 else 0,
+            births=10 if index == 0 else 0,
+            rejected_births=0,
+        )
+        for index, identity in enumerate(sorted(population))
+    )
+    return P6BClusterMetrics(
+        reference_scene_id=reference,
+        identity_switches=1,
+        transition_opportunities=10,
+        wrong_reactivations=0,
+        predicted_reactivation_events=correct,
+        correct_reactivations=correct,
+        reactivation_attempts=correct,
+        gap_opportunities=gaps,
+        false_births=1,
+        births=10,
+        rejected_births=0,
+        sequence_population_count=population_count,
+        sequence_population_sha256=population_sha,
+        sequence_metrics=sequence_metrics,
+        strict_online_tmap=tmap,
+        strict_online_trec=trec,
+    )
+
+
+def _with_clusters(
+    row: P6BCandidateRow,
+    horizon: int,
+    clusters: tuple[P6BClusterMetrics, ...],
+    *,
+    tmap: float,
+    trec: float,
+) -> P6BCandidateRow:
+    metric = row.metric(horizon)
+    correct = sum(item.correct_reactivations for item in clusters)
+    gaps = sum(item.gap_opportunities for item in clusters)
+    replacement = replace(
+        metric,
+        identity_switches=sum(item.identity_switches for item in clusters),
+        transition_opportunities=sum(
+            item.transition_opportunities for item in clusters
+        ),
+        wrong_reactivations=0,
+        predicted_reactivation_events=correct,
+        correct_reactivations=correct,
+        reactivation_attempts=correct,
+        gap_opportunities=gaps,
+        false_births=sum(item.false_births for item in clusters),
+        births=sum(item.births for item in clusters),
+        rejected_births=0,
+        reactivation_accuracy=1.0,
+        reactivation_recall=correct / gaps,
+        cluster_metrics=clusters,
+        strict_online_tmap=tmap,
+        strict_online_trec=trec,
+    )
+    return replace(
+        row,
+        horizons=tuple(
+            replacement if item.horizon == horizon else item for item in row.horizons
+        ),
+    )
+
+
+def test_ranking_uses_paired_reference_cluster_recall_and_task_score() -> None:
+    baseline = _candidate()
+    candidate = _candidate(0.01)
+    for horizon in (3, 4, 5):
+        baseline = _with_clusters(
+            baseline,
+            horizon,
+            (
+                _cluster("a", correct=1, gaps=10, tmap=0.2, trec=0.2),
+                _cluster("b", correct=9, gaps=10, tmap=0.8, trec=0.8),
+            ),
+            tmap=0.90,
+            trec=0.90,
+        )
+        candidate = _with_clusters(
+            candidate,
+            horizon,
+            (
+                _cluster("a", correct=4, gaps=5, tmap=0.4, trec=0.4),
+                _cluster("b", correct=6, gaps=15, tmap=0.8, trec=0.8),
+            ),
+            tmap=0.10,
+            trec=0.10,
+        )
+
+    key = candidate_ranking_key(candidate, baseline=baseline)
+
+    assert key[3] == pytest.approx(-0.1)
+    assert key[4] == pytest.approx(-0.1)
+
+
+def test_pareto_shortlist_uses_reference_cluster_recall() -> None:
+    protocol = load_p6b_config("conf/p6b/default.yaml")
+    baseline = _candidate()
+    candidate = _candidate(0.01)
+    for horizon in (3, 4, 5):
+        baseline = _with_clusters(
+            baseline,
+            horizon,
+            (
+                _cluster("a", correct=1, gaps=10, tmap=0.2, trec=0.2),
+                _cluster("b", correct=9, gaps=10, tmap=0.8, trec=0.8),
+            ),
+            tmap=0.5,
+            trec=0.5,
+        )
+        candidate = _with_clusters(
+            candidate,
+            horizon,
+            (
+                _cluster("a", correct=4, gaps=5, tmap=0.2, trec=0.2),
+                _cluster("b", correct=6, gaps=15, tmap=0.8, trec=0.8),
+            ),
+            tmap=0.5,
+            trec=0.5,
+        )
+
+    finalists = pareto_finalists(
+        (baseline, candidate), baseline=baseline, eligibility=protocol.eligibility
+    )
+
+    assert [row.config_id for row in finalists] == [candidate.config_id]
+
+
+def test_cluster_task_metrics_are_averaged_within_reference_scene() -> None:
+    clusters = (
+        _cluster(
+            "a",
+            correct=1,
+            gaps=2,
+            tmap=0.0,
+            trec=0.0,
+            identities=(("a", "a-0", "canonical"), ("a", "a-1", "reverse")),
+        ),
+        _cluster("b", correct=1, gaps=2, tmap=0.0, trec=0.0),
+    )
+    rows = (
+        {
+            "method": "P6B",
+            "reference_scene_id": "a",
+            "master_sequence_id": "a-0",
+            "order_id": "canonical",
+            "T": "T4",
+            "t_mAP": 0.2,
+            "t_REC": 0.4,
+            "prediction_digest": "1" * 64,
+        },
+        {
+            "method": "P6B",
+            "reference_scene_id": "a",
+            "master_sequence_id": "a-1",
+            "order_id": "reverse",
+            "T": "T4",
+            "t_mAP": 0.4,
+            "t_REC": 0.6,
+            "prediction_digest": "2" * 64,
+        },
+        {
+            "method": "P6B",
+            "reference_scene_id": "b",
+            "master_sequence_id": "b-0",
+            "order_id": "canonical",
+            "T": "T4",
+            "t_mAP": 0.8,
+            "t_REC": 1.0,
+            "prediction_digest": "3" * 64,
+        },
+    )
+
+    enriched = attach_cluster_task_metrics(
+        clusters,
+        rows,
+        method="P6B",
+        horizon=4,
+        expected_sequence_count=3,
+    )
+
+    assert enriched[0].strict_online_tmap == pytest.approx(0.3)
+    assert enriched[0].strict_online_trec == pytest.approx(0.5)
+    assert enriched[1].strict_online_tmap == pytest.approx(0.8)
+    assert enriched[1].strict_online_trec == pytest.approx(1.0)
+    with pytest.raises(P6BSweepError, match="population"):
+        attach_cluster_task_metrics(
+            clusters,
+            rows[:-1],
+            method="P6B",
+            horizon=4,
+            expected_sequence_count=3,
+        )
+
+
 def test_ranking_prefers_lower_normalized_rate_over_lower_raw_count() -> None:
+    baseline = _candidate()
     lower_rate = _candidate(
         0.01,
         overrides={
@@ -378,8 +711,8 @@ def test_ranking_prefers_lower_normalized_rate_over_lower_raw_count() -> None:
         },
     )
 
-    assert candidate_ranking_key(lower_rate) < candidate_ranking_key(
-        lower_count_but_worse_rate
+    assert candidate_ranking_key(lower_rate, baseline=baseline) < candidate_ranking_key(
+        lower_count_but_worse_rate, baseline=baseline
     )
 
 
@@ -398,6 +731,10 @@ def test_horizon_rates_are_recomputed_from_explicit_denominators() -> None:
     )
     assert metric.false_birth_rate == pytest.approx(4 / (metric.births + 2))
     assert metric.cluster_mean_identity_switch_rate == pytest.approx(3 / 12)
+    assert metric.true_births == metric.births - metric.false_births
+    assert metric.accepted_births == metric.births
+    assert metric.valid_birth_opportunities == metric.births + metric.rejected_births
+    assert metric.frozen_b4_valid_observations == metric.total_valid_observations
 
 
 def test_pareto_finalists_exclude_dominated_and_ineligible_rows() -> None:
@@ -497,8 +834,81 @@ def test_candidate_row_aggregates_event_and_acceptance_metrics() -> None:
     assert row.metric(5).reactivation_recall == 1.0
     assert row.metric(5).accepted_valid_observations == 5
     assert row.metric(5).total_valid_observations == 5
+    assert row.metric(5).frozen_b4_valid_observations == 5
+    assert row.metric(5).accepted_births == row.metric(5).births
+    assert row.metric(5).true_births == (
+        row.metric(5).births - row.metric(5).false_births
+    )
+    assert row.metric(5).valid_birth_opportunities == (
+        row.metric(5).births + row.metric(5).rejected_births
+    )
     assert row.metric(4).strict_online_tmap == pytest.approx(0.4)
     assert row.metric(4).strict_online_trec == pytest.approx(0.2)
+
+
+def test_cluster_metrics_include_explicit_zero_event_population_rows() -> None:
+    event = AssociationEvent(
+        event_id="P6B:tune:canonical:T2:1:0",
+        scene_id="master-a",
+        sequence_id="master-a:canonical",
+        reference_scene_id="tune",
+        master_sequence_id="master-a",
+        order_id="canonical",
+        prefix=2,
+        method="P6B",
+        stage_id=1,
+        query_id=0,
+        candidate_slot_id=0,
+        predicted_identity_id=0,
+        gt_entity_id=0,
+        association_correct=True,
+        association_result="active_correct",
+        gt_present=True,
+        prediction_present=True,
+        transition_opportunity=True,
+        id_switch=False,
+        gap_opportunity=False,
+        reactivation_attempt=False,
+        reactivation_correct=None,
+        new_birth=False,
+        false_birth=False,
+        reactivation=False,
+        wrong_reactivation=False,
+        is_failure=False,
+        prediction_digest="a" * 64,
+        cache_digest="a" * 64,
+    )
+
+    (cluster,) = cluster_event_metrics(
+        (event,),
+        population_identities=(
+            ("tune", "master-a", "canonical"),
+            ("tune", "master-b", "reverse"),
+        ),
+    )
+
+    assert [
+        (row.master_sequence_id, row.order_id) for row in cluster.sequence_metrics
+    ] == [("master-a", "canonical"), ("master-b", "reverse")]
+    zero = cluster.sequence_metrics[1]
+    assert (
+        sum(
+            getattr(zero, field)
+            for field in (
+                "identity_switches",
+                "transition_opportunities",
+                "wrong_reactivations",
+                "predicted_reactivation_events",
+                "correct_reactivations",
+                "reactivation_attempts",
+                "gap_opportunities",
+                "false_births",
+                "births",
+                "rejected_births",
+            )
+        )
+        == 0
+    )
 
 
 def test_cached_sequences_convert_and_derive_exact_prefix_events() -> None:
@@ -557,9 +967,9 @@ def test_official_metrics_are_extracted_only_from_exact_p6b_strict_blocks() -> N
 
     assert metrics[2] == {"t_mAP": pytest.approx(0.1), "t_REC": pytest.approx(0.2)}
     assert metrics[5] == {"t_mAP": pytest.approx(0.25), "t_REC": pytest.approx(0.5)}
-    evaluation.metric_blocks["strict"]["Other"] = evaluation.metric_blocks["strict"].pop(
-        "P6B"
-    )
+    evaluation.metric_blocks["strict"]["Other"] = evaluation.metric_blocks[
+        "strict"
+    ].pop("P6B")
     with pytest.raises(P6BSweepError, match="P6B"):
         extract_official_metrics(evaluation)
 
@@ -575,7 +985,19 @@ def test_staged_sweep_preserves_candidates_and_selects_official_incumbents() -> 
         return replace(
             row,
             horizons=tuple(
-                replace(item, strict_online_tmap=0.20, strict_online_trec=0.30)
+                replace(
+                    item,
+                    cluster_metrics=tuple(
+                        replace(
+                            cluster,
+                            strict_online_tmap=0.20,
+                            strict_online_trec=0.30,
+                        )
+                        for cluster in item.cluster_metrics
+                    ),
+                    strict_online_tmap=0.20,
+                    strict_online_trec=0.30,
+                )
                 for item in row.horizons
             ),
         )
@@ -607,7 +1029,9 @@ def test_staged_sweep_preserves_candidates_and_selects_official_incumbents() -> 
     assert counts["joint_neighbors"] > 1
     assert result.finalist_rows
     assert all(row.official_metrics_complete for row in result.finalist_rows)
-    assert all(isinstance(row.eligibility_reasons, tuple) for row in result.candidate_rows)
+    assert all(
+        isinstance(row.eligibility_reasons, tuple) for row in result.candidate_rows
+    )
     assert result.selected.official_metrics_complete
     validate_staged_sweep_evidence(
         protocol,
@@ -616,8 +1040,54 @@ def test_staged_sweep_preserves_candidates_and_selects_official_incumbents() -> 
         finalist_rows=result.finalist_rows,
         selected_by_stage=result.selected_by_stage,
         selected=result.selected,
-        ranking_key=candidate_ranking_key(result.selected),
+        ranking_key=candidate_ranking_key(result.selected, baseline=baseline),
     )
+
+    nonwinner = next(
+        row
+        for row in result.finalist_rows
+        if row != result.selected_by_stage[row.stage]
+    )
+    drifted_horizons = tuple(
+        replace(
+            metric,
+            identity_switches=metric.identity_switches + 1,
+            cluster_metrics=(
+                replace(
+                    metric.cluster_metrics[0],
+                    identity_switches=metric.cluster_metrics[0].identity_switches + 1,
+                    sequence_metrics=(
+                        replace(
+                            metric.cluster_metrics[0].sequence_metrics[0],
+                            identity_switches=metric.cluster_metrics[0]
+                            .sequence_metrics[0]
+                            .identity_switches
+                            + 1,
+                        ),
+                        *metric.cluster_metrics[0].sequence_metrics[1:],
+                    ),
+                ),
+                *metric.cluster_metrics[1:],
+            ),
+        )
+        if metric.horizon == 4
+        else metric
+        for metric in nonwinner.horizons
+    )
+    drifted = replace(nonwinner, horizons=drifted_horizons)
+    finalists = tuple(
+        drifted if row is nonwinner else row for row in result.finalist_rows
+    )
+    with pytest.raises(P6BSweepError, match="association evidence"):
+        validate_staged_sweep_evidence(
+            protocol,
+            baseline=baseline,
+            candidate_rows=result.candidate_rows,
+            finalist_rows=finalists,
+            selected_by_stage=result.selected_by_stage,
+            selected=result.selected,
+            ranking_key=candidate_ranking_key(result.selected, baseline=baseline),
+        )
 
     tampered = dict(result.selected_by_stage)
     tampered["assignment"] = replace(
@@ -632,5 +1102,5 @@ def test_staged_sweep_preserves_candidates_and_selects_official_incumbents() -> 
             finalist_rows=result.finalist_rows,
             selected_by_stage=tampered,
             selected=result.selected,
-            ranking_key=candidate_ranking_key(result.selected),
+            ranking_key=candidate_ranking_key(result.selected, baseline=baseline),
         )

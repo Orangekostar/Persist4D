@@ -356,7 +356,9 @@ class RealPredictionCacheProducer:
                 or len(target_full) != 1
                 or not isinstance(target_full[0], Mapping)
             ):
-                raise ValueError("collated data must contain one full-resolution target")
+                raise ValueError(
+                    "collated data must contain one full-resolution target"
+                )
             full_target = target_full[0]
             data = self.move_data(data, self.device)
             targets = self.move_targets(targets, self.device)
@@ -364,7 +366,11 @@ class RealPredictionCacheProducer:
             if not isinstance(target, Mapping) or "point2segment" not in target:
                 raise ValueError("collated target is missing point2segment")
             stages = self.segment_stages(target)
-            if not isinstance(stages, Tensor) or stages.ndim != 1 or stages.numel() == 0:
+            if (
+                not isinstance(stages, Tensor)
+                or stages.ndim != 1
+                or stages.numel() == 0
+            ):
                 raise ValueError("segment stages must be a non-empty rank-1 tensor")
             latest_local_stage = int(stages.max().item())
             raw_coordinates = self.system._process_raw_coordinates(data)
@@ -508,7 +514,9 @@ def materialize_prediction_cache(
         expected_provenance=provenance,
     )
     expected_identities = {_key_identity(key) for key in expected}
-    if any(_key_identity(entry["key"]) not in expected_identities for entry in existing):
+    if any(
+        _key_identity(entry["key"]) not in expected_identities for entry in existing
+    ):
         raise ValueError("cache_directory contains an unexpected logical key")
     partial_manifest: dict[str, object] = {
         "provenance": dict(provenance),
@@ -547,10 +555,37 @@ def load_cached_protocol_sequences(
     protocol: object,
     cache_directory: Path,
     manifest_path: Path,
+    allowed_master_sequence_ids: Sequence[str] | None = None,
 ) -> tuple[CachedProtocolSequence, ...]:
     """Load one validated five-stage sequence per Protocol B master and order."""
 
     expected = expected_cache_keys(protocol)
+    masters = tuple(_protocol_masters(protocol))
+    available_master_ids = tuple(
+        str(_field(master, "sequence_id")) for master in masters
+    )
+    if allowed_master_sequence_ids is None:
+        allowed_master_ids = available_master_ids
+        filtered = False
+    else:
+        if (
+            isinstance(allowed_master_sequence_ids, (str, bytes))
+            or not isinstance(allowed_master_sequence_ids, Sequence)
+            or not allowed_master_sequence_ids
+            or any(
+                not isinstance(value, str) or not value
+                for value in allowed_master_sequence_ids
+            )
+            or len(set(allowed_master_sequence_ids)) != len(allowed_master_sequence_ids)
+        ):
+            raise ValueError("allowed master sequence IDs must be nonempty and unique")
+        allowed_master_ids = tuple(allowed_master_sequence_ids)
+        if not set(allowed_master_ids) <= set(available_master_ids):
+            raise ValueError("allowed master sequence IDs are outside Protocol B")
+        filtered = set(allowed_master_ids) != set(available_master_ids)
+    selected_expected = tuple(
+        key for key in expected if key["master_sequence_id"] in set(allowed_master_ids)
+    )
     try:
         manifest_document = json.loads(manifest_path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
@@ -563,13 +598,13 @@ def load_cached_protocol_sequences(
         manifest_path,
         expected_keys=expected,
         expected_provenance=provenance,
-        cache_directory=cache_directory,
+        cache_directory=None if filtered else cache_directory,
     )
     entries_by_key = {
         _key_identity(entry["key"]): entry for entry in _manifest_entries(manifest)
     }
     payloads_by_key: dict[str, Mapping[str, object]] = {}
-    for key in expected:
+    for key in selected_expected:
         identity = _key_identity(key)
         entry = entries_by_key[identity]
         filename = entry["filename"]
@@ -582,15 +617,16 @@ def load_cached_protocol_sequences(
         )
 
     sequences = []
-    for master in _protocol_masters(protocol):
+    for master in masters:
         master_id = _field(master, "sequence_id")
+        if master_id not in allowed_master_ids:
+            continue
         reference_id = _field(master, "reference_scene_id")
         for order in _protocol_orders(protocol):
             keys = [
                 key
                 for key in expected
-                if key["master_sequence_id"] == master_id
-                and key["order_id"] == order
+                if key["master_sequence_id"] == master_id and key["order_id"] == order
             ]
             keys.sort(key=lambda key: int(key["stage_index"]))
             sequences.append(
@@ -905,6 +941,7 @@ def cache_payload_to_frozen_observation(
     if (
         class_prob.shape[0] != query_count
         or confidence.shape[0] != query_count
+        or mask_support.shape[0] != query_count
         or valid.shape[0] != query_count
         or masks.shape[0] != query_count
     ):
@@ -915,6 +952,8 @@ def cache_payload_to_frozen_observation(
         raise ValueError("class_prob must be non-negative")
     if torch.any((confidence < 0) | (confidence > 1)).item():
         raise ValueError("confidence must be within [0, 1]")
+    if not torch.equal(mask_support, masks.sum(dim=1, dtype=mask_support.dtype)):
+        raise ValueError("mask_support must equal the mask point count")
     frozen = FrozenObservation(
         features=features,
         class_prob=class_prob,
@@ -950,9 +989,7 @@ def cache_payload_from_inference(
     ):
         raise ValueError("latest_local_stage must be a non-negative integer")
 
-    features = _finite_tensor(
-        _field(observation, "features"), name="features", ndim=3
-    )
+    features = _finite_tensor(_field(observation, "features"), name="features", ndim=3)
     class_prob = _finite_tensor(
         _field(observation, "class_prob"), name="class_prob", ndim=3
     )
@@ -981,9 +1018,7 @@ def cache_payload_from_inference(
         if name not in target:
             raise ValueError(f"full_target is missing {name}")
     gt_ids = _integer_tensor(target["ids"], name="full_target.ids", ndim=1)
-    gt_classes = _integer_tensor(
-        target["labels"], name="full_target.labels", ndim=1
-    )
+    gt_classes = _integer_tensor(target["labels"], name="full_target.labels", ndim=1)
     gt_masks = _clone_cpu(target["masks"], name="full_target.masks")
     temporal_stages = _stage_index_tensor(
         target["temporal_stages"],
@@ -1437,6 +1472,7 @@ class TaskMetricEvaluation:
     association_events: tuple[AssociationEvent, ...]
     capacity_snapshots: tuple[CapacitySnapshot, ...]
     per_sequence_metrics: tuple[dict[str, object], ...] = ()
+    per_sequence_metric_evidence: tuple[dict[str, object], ...] = ()
 
 
 def prefix_causality_coordinator(
@@ -1617,9 +1653,7 @@ def build_tracker_factories(
     b4 = settings["b4"]
     return {
         "B0": lambda sequence_id: B0StageUniqueTracker(sequence_id=sequence_id),
-        "B0_sanity": lambda sequence_id: B0SanityTracker(
-            sequence_id=sequence_id
-        ),
+        "B0_sanity": lambda sequence_id: B0SanityTracker(sequence_id=sequence_id),
         "B1": lambda sequence_id: B1FeatureTracker(
             sequence_id=sequence_id,
             feature_threshold=float(b1["feature_threshold"]),
@@ -1773,9 +1807,7 @@ def build_association_events(
             raise ValueError("tracker decision fields must cover every query")
         target = _target_mapping(payload)
         gt_ids = _integer_tensor(target["gt_ids"], name="gt_ids", ndim=1)
-        gt_classes = _integer_tensor(
-            target["gt_classes"], name="gt_classes", ndim=1
-        )
+        gt_classes = _integer_tensor(target["gt_classes"], name="gt_classes", ndim=1)
         gt_masks = _clone_cpu(target["gt_masks"], name="gt_masks")
         pred_masks = prediction["pred_masks"]
         pred_classes = prediction["pred_classes"]
@@ -1814,9 +1846,7 @@ def build_association_events(
             merge = gt_id is not None and (
                 prior_identity_gt is not None and prior_identity_gt != gt_id
             )
-            switched = bool(
-                transition and predicted_identity != prior_gt[1]
-            )
+            switched = bool(transition and predicted_identity != prior_gt[1])
             fragmentation = switched and not merge
             tracker_reactivation = (
                 _diagnostic_value(step, "reactivation", query_index) is True
@@ -1894,9 +1924,7 @@ def build_association_events(
                 stage_id=stage,
                 query_id=query_index,
                 candidate_slot_id=_event_identity(
-                    _diagnostic_value(
-                        step, "selected_candidate_identity", query_index
-                    )
+                    _diagnostic_value(step, "selected_candidate_identity", query_index)
                 ),
                 predicted_identity_id=predicted_identity,
                 gt_entity_id=gt_id,
@@ -1907,9 +1935,7 @@ def build_association_events(
                 class_similarity=_diagnostic_value(
                     step, "chosen_class_similarity", query_index
                 ),
-                total_score=_diagnostic_value(
-                    step, "chosen_total_score", query_index
-                ),
+                total_score=_diagnostic_value(step, "chosen_total_score", query_index),
                 best_score=_diagnostic_value(step, "best_score", query_index),
                 second_best_score=_diagnostic_value(
                     step, "second_best_score", query_index
@@ -1920,14 +1946,10 @@ def build_association_events(
                 predicted_class=predicted_class,
                 class_entropy=entropy,
                 slot_age=_diagnostic_value(step, "slot_age", query_index),
-                last_seen_stage=_diagnostic_value(
-                    step, "last_seen_stage", query_index
-                ),
+                last_seen_stage=_diagnostic_value(step, "last_seen_stage", query_index),
                 gap_length=gap_length,
                 slot_active=_diagnostic_value(step, "slot_active", query_index),
-                slot_occupied=_diagnostic_value(
-                    step, "slot_occupied", query_index
-                ),
+                slot_occupied=_diagnostic_value(step, "slot_occupied", query_index),
                 association_result=result,
                 gt_present=gt_id is not None,
                 prediction_present=True,
@@ -2072,9 +2094,7 @@ def build_association_events(
                 prediction_digest=cache_digest,
                 cache_digest=cache_digest,
             )
-            events.append(
-                replace(event, failure_category=classify_failure(event))
-            )
+            events.append(replace(event, failure_category=classify_failure(event)))
 
         for gt_id, predicted_identity in current_matches:
             gt_history[gt_id] = (stage, predicted_identity)
@@ -2110,9 +2130,7 @@ def build_capacity_snapshots(
         class_count = int(state.class_count)
         occupied = int(state.occupied[0].sum().item())
         active = int(state.active[0].sum().item())
-        births = _sequence_values(
-            _field(step, "births", default=()), name="births"
-        )
+        births = _sequence_values(_field(step, "births", default=()), name="births")
         rejected = _sequence_values(
             _field(step, "rejected_births", default=()), name="rejected_births"
         )
@@ -2211,9 +2229,7 @@ def normalize_official_metric_blocks(
                     raise ValueError(
                         f"{block_name}.{method}.{horizon} metric keys differ"
                     )
-                normalized: dict[str, float | None] = {
-                    field: None for field in fields
-                }
+                normalized: dict[str, float | None] = {field: None for field in fields}
                 for source, destination in source_fields.items():
                     value = values[source]
                     if (
@@ -2222,7 +2238,9 @@ def normalize_official_metric_blocks(
                         or not math.isfinite(float(value))
                         or not 0.0 <= float(value) <= 1.0
                     ):
-                        raise ValueError("official metric values must be finite in [0, 1]")
+                        raise ValueError(
+                            "official metric values must be finite in [0, 1]"
+                        )
                     if destination in normalized:
                         normalized[destination] = float(value)
                 result[block_name][method][horizon] = normalized
@@ -2249,8 +2267,7 @@ def evaluate_cached_task_metrics(
     all_methods = (*methods, "Oracle")
     horizons = (2, 3, 4, 5)
     raw_metrics = {
-        horizon: metric_factory("raw_local", "shared", horizon)
-        for horizon in horizons
+        horizon: metric_factory("raw_local", "shared", horizon) for horizon in horizons
     }
     strict_metrics = {
         method: {
@@ -2271,14 +2288,13 @@ def evaluate_cached_task_metrics(
     association_events: list[AssociationEvent] = []
     capacity_snapshots: list[CapacitySnapshot] = []
     per_sequence_metrics: list[dict[str, object]] = []
+    per_sequence_metric_evidence: list[dict[str, object]] = []
 
     for sequence in sequences:
         if not isinstance(sequence, CachedProtocolSequence):
             raise TypeError("sequences must contain CachedProtocolSequence values")
         payloads = sequence.payloads
-        sequence_id = (
-            f"{sequence.master_sequence_id}:{sequence.order_id}"
-        )
+        sequence_id = f"{sequence.master_sequence_id}:{sequence.order_id}"
         coordinated = prefix_causality_coordinator(
             payloads,
             tracker_factories,
@@ -2303,9 +2319,7 @@ def evaluate_cached_task_metrics(
                         ndim=1,
                     ).tolist()
                 ),
-                masks=_clone_cpu(
-                    _target_mapping(payload)["gt_masks"], name="gt_masks"
-                ),
+                masks=_clone_cpu(_target_mapping(payload)["gt_masks"], name="gt_masks"),
             )
             for payload in payloads
         )
@@ -2372,23 +2386,29 @@ def evaluate_cached_task_metrics(
                     coordinated.online_predictions[method][endpoint], class_mapper
                 )
                 strict_metrics[method][horizon].update(strict_prediction, target)
-                sequence_metric = metric_factory(
-                    "strict_online", method, horizon
-                )
+                sequence_metric = metric_factory("strict_online", method, horizon)
                 sequence_metric.update(strict_prediction, target)
                 sequence_values = sequence_metric.compute()
+                identity = {
+                    "method": method,
+                    "reference_scene_id": sequence.reference_scene_id,
+                    "master_sequence_id": sequence.master_sequence_id,
+                    "order_id": sequence.order_id,
+                    "T": f"T{horizon}",
+                    "prediction_digest": coordinated.content_digest,
+                }
                 per_sequence_metrics.append(
                     {
-                        "method": method,
-                        "reference_scene_id": sequence.reference_scene_id,
-                        "master_sequence_id": sequence.master_sequence_id,
-                        "order_id": sequence.order_id,
-                        "T": f"T{horizon}",
+                        **identity,
                         "t_mAP": float(sequence_values["online_t-mAP"]),
                         "t_REC": float(sequence_values["online_t-REC"]),
-                        "prediction_digest": coordinated.content_digest,
                     }
                 )
+                export_evidence = getattr(sequence_metric, "export_evidence", None)
+                if callable(export_evidence):
+                    per_sequence_metric_evidence.append(
+                        {**identity, "state": export_evidence()}
+                    )
                 offline_prediction = _remap_metric_prediction(
                     build_offline_reconstructed_prediction(
                         coordinated.offline[method], endpoint=endpoint
@@ -2414,9 +2434,7 @@ def evaluate_cached_task_metrics(
     raw_result = {f"T{horizon}": raw_metrics[horizon].compute() for horizon in horizons}
     metric_blocks = {
         "raw": {
-            method: {
-                horizon: dict(values) for horizon, values in raw_result.items()
-            }
+            method: {horizon: dict(values) for horizon, values in raw_result.items()}
             for method in methods
         },
         "strict": {
@@ -2449,6 +2467,7 @@ def evaluate_cached_task_metrics(
         association_events=tuple(association_events),
         capacity_snapshots=tuple(capacity_snapshots),
         per_sequence_metrics=tuple(per_sequence_metrics),
+        per_sequence_metric_evidence=tuple(per_sequence_metric_evidence),
     )
 
 

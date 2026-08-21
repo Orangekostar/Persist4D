@@ -66,7 +66,7 @@ selection:
     - paired_cluster_mean_t4_t5_identity_switch_rate
     - paired_cluster_mean_t3_t5_wrong_reactivation_rate
     - paired_cluster_mean_t2_t5_false_birth_rate
-    - negative_reactivation_recall
-    - negative_mean_t4_t5_task_score
+    - negative_paired_cluster_mean_t3_t5_reactivation_recall
+    - negative_paired_cluster_mean_t4_t5_strict_online_task_score
     - canonical_config_json
   heldout_evaluation_count: 1

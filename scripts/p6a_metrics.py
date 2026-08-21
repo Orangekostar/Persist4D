@@ -13,6 +13,7 @@ import copy
 import hashlib
 import json
 import math
+import zlib
 from collections.abc import Hashable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -29,6 +30,9 @@ _TARGET_MASK_KEY = "masks"
 _OFFICIAL_IOU_THRESHOLDS = (0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9)
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 _DEFAULT_DATASET_SPEC = _PROJECT_ROOT / "data/processed/rio/rio.yaml"
+_MAX_OFFICIAL_METRIC_POPULATION_RAW_BYTES = 64 * 1024 * 1024
+_MAX_OFFICIAL_METRIC_POPULATION_COMPRESSED_BYTES = 16 * 1024 * 1024
+_MAX_OFFICIAL_METRIC_POPULATION_ENCODED_BYTES = 24 * 1024 * 1024
 
 
 def _clone_cpu(value: Any) -> Any:
@@ -1008,6 +1012,474 @@ class OfficialMetricAccumulator:
                 raise ValueError(f"stmetrics key {source_key} must be finite")
             result[output_key] = number
         return result
+
+    def export_evidence(self) -> dict[str, Any]:
+        """Serialize sufficient stmetrics state for an independent recomputation."""
+
+        if self._updates == 0:
+            raise ValueError("official metric accumulator has no observations")
+        head = self._metric.heads[0]
+        states = []
+        for name in sorted(head.metric_state):
+            value = getattr(head, name)
+            kind = "list" if isinstance(value, list) else "tensor"
+            if kind == "list":
+                if not value:
+                    raise ValueError("official metric list state is unexpectedly empty")
+                tensor = torch.cat(
+                    [item.detach().cpu().reshape(-1) for item in value], dim=0
+                )
+            elif isinstance(value, Tensor):
+                tensor = value.detach().cpu().contiguous()
+            else:
+                raise TypeError("official metric state must contain tensors")
+            states.append(
+                {
+                    "name": name,
+                    "kind": kind,
+                    "dtype": str(tensor.dtype),
+                    "shape": list(tensor.shape),
+                    "data": base64.b64encode(tensor.numpy().tobytes()).decode("ascii"),
+                }
+            )
+        core = {
+            "schema_version": 1,
+            "mode": self.mode,
+            "updates": self._updates,
+            "states": states,
+        }
+        digest = hashlib.sha256(
+            (json.dumps(core, sort_keys=True, indent=2, allow_nan=False) + "\n").encode(
+                "utf-8"
+            )
+        ).hexdigest()
+        return {**core, "sha256": digest}
+
+
+def _restore_official_metric_evidence(
+    evidence: Mapping[str, Any],
+) -> OfficialMetricAccumulator:
+    """Rebuild the frozen stmetrics accumulator from serialized sufficient state."""
+
+    if not isinstance(evidence, Mapping) or set(evidence) != {
+        "schema_version",
+        "mode",
+        "updates",
+        "states",
+        "sha256",
+    }:
+        raise ValueError("official metric evidence differs from the strict schema")
+    core = {key: evidence[key] for key in evidence if key != "sha256"}
+    expected_sha = hashlib.sha256(
+        (json.dumps(core, sort_keys=True, indent=2, allow_nan=False) + "\n").encode(
+            "utf-8"
+        )
+    ).hexdigest()
+    if evidence["sha256"] != expected_sha:
+        raise ValueError("official metric evidence SHA-256 differs")
+    if evidence["schema_version"] != 1 or evidence["mode"] not in {
+        "raw_local",
+        "strict_online",
+        "offline_reconstructed",
+    }:
+        raise ValueError("official metric evidence mode/schema is invalid")
+    updates = evidence["updates"]
+    if isinstance(updates, bool) or not isinstance(updates, int) or updates <= 0:
+        raise ValueError("official metric evidence updates must be positive")
+    records = evidence["states"]
+    if isinstance(records, (str, bytes)) or not isinstance(records, Sequence):
+        raise TypeError("official metric evidence states must be a sequence")
+    metric = OfficialMetricAccumulator(mode=str(evidence["mode"]))
+    head = metric._metric.heads[0]
+    expected_names = tuple(sorted(head.metric_state))
+    if (
+        tuple(record.get("name") for record in records if isinstance(record, Mapping))
+        != expected_names
+    ):
+        raise ValueError("official metric evidence state population differs")
+    dtype_by_name = {
+        "torch.float32": torch.float32,
+        "torch.float64": torch.float64,
+        "torch.int32": torch.int32,
+        "torch.int64": torch.int64,
+        "torch.bool": torch.bool,
+    }
+    for record in records:
+        if not isinstance(record, Mapping) or set(record) != {
+            "name",
+            "kind",
+            "dtype",
+            "shape",
+            "data",
+        }:
+            raise ValueError("official metric evidence state differs from schema")
+        name = str(record["name"])
+        dtype = dtype_by_name.get(record["dtype"])
+        shape = record["shape"]
+        if (
+            dtype is None
+            or not isinstance(shape, list)
+            or any(
+                isinstance(size, bool) or not isinstance(size, int) or size < 0
+                for size in shape
+            )
+        ):
+            raise ValueError("official metric evidence tensor metadata is invalid")
+        try:
+            raw = base64.b64decode(record["data"], validate=True)
+            tensor = (
+                torch.empty(shape, dtype=dtype)
+                if not raw and math.prod(shape) == 0
+                else torch.frombuffer(bytearray(raw), dtype=dtype)
+                .clone()
+                .reshape(shape)
+            )
+        except (TypeError, ValueError, RuntimeError) as error:
+            raise ValueError(
+                "official metric evidence tensor cannot be decoded"
+            ) from error
+        current = getattr(head, name)
+        if isinstance(current, list):
+            if record["kind"] != "list" or tensor.ndim != 1:
+                raise ValueError("official metric list state is invalid")
+            setattr(head, name, [tensor])
+        else:
+            if (
+                record["kind"] != "tensor"
+                or not isinstance(current, Tensor)
+                or tensor.shape != current.shape
+                or tensor.dtype != current.dtype
+            ):
+                raise ValueError("official metric tensor state is invalid")
+            setattr(head, name, tensor)
+    metric._updates = updates
+    metric._metric._update_count = updates
+    head._update_count = updates
+    return metric
+
+
+def recompute_official_metric_evidence(evidence: Mapping[str, Any]) -> dict[str, float]:
+    """Recompute official metrics from one serialized accumulator."""
+
+    return _restore_official_metric_evidence(evidence).compute()
+
+
+def _decode_official_metric_tensors(
+    evidence: Mapping[str, Any], head: object
+) -> dict[str, tuple[str, Tensor]]:
+    if not isinstance(evidence, Mapping) or set(evidence) != {
+        "schema_version",
+        "mode",
+        "updates",
+        "states",
+        "sha256",
+    }:
+        raise ValueError("official metric evidence differs from the strict schema")
+    core = {key: evidence[key] for key in evidence if key != "sha256"}
+    expected_sha = hashlib.sha256(
+        (json.dumps(core, sort_keys=True, indent=2, allow_nan=False) + "\n").encode(
+            "utf-8"
+        )
+    ).hexdigest()
+    if evidence["sha256"] != expected_sha:
+        raise ValueError("official metric evidence SHA-256 differs")
+    if (
+        evidence["schema_version"] != 1
+        or evidence["mode"] != "strict_online"
+        or evidence["updates"] != 1
+    ):
+        raise ValueError("official metric population state scope is invalid")
+    records = evidence["states"]
+    if isinstance(records, (str, bytes)) or not isinstance(records, Sequence):
+        raise TypeError("official metric evidence states must be a sequence")
+    expected_names = tuple(sorted(head.metric_state))
+    if (
+        tuple(record.get("name") for record in records if isinstance(record, Mapping))
+        != expected_names
+    ):
+        raise ValueError("official metric evidence state population differs")
+    dtype_by_name = {
+        "torch.float32": torch.float32,
+        "torch.float64": torch.float64,
+        "torch.int32": torch.int32,
+        "torch.int64": torch.int64,
+        "torch.bool": torch.bool,
+    }
+    decoded = {}
+    for record in records:
+        if not isinstance(record, Mapping) or set(record) != {
+            "name",
+            "kind",
+            "dtype",
+            "shape",
+            "data",
+        }:
+            raise ValueError("official metric evidence state differs from schema")
+        name = str(record["name"])
+        dtype = dtype_by_name.get(record["dtype"])
+        shape = record["shape"]
+        if (
+            dtype is None
+            or not isinstance(shape, list)
+            or any(
+                isinstance(size, bool) or not isinstance(size, int) or size < 0
+                for size in shape
+            )
+        ):
+            raise ValueError("official metric evidence tensor metadata is invalid")
+        try:
+            raw = base64.b64decode(record["data"], validate=True)
+            tensor = (
+                torch.empty(shape, dtype=dtype)
+                if not raw and math.prod(shape) == 0
+                else torch.frombuffer(bytearray(raw), dtype=dtype)
+                .clone()
+                .reshape(shape)
+            )
+        except (TypeError, ValueError, RuntimeError) as error:
+            raise ValueError(
+                "official metric evidence tensor cannot be decoded"
+            ) from error
+        current = getattr(head, name)
+        if isinstance(current, list):
+            if record["kind"] != "list" or tensor.ndim != 1:
+                raise ValueError("official metric list state is invalid")
+        elif (
+            record["kind"] != "tensor"
+            or not isinstance(current, Tensor)
+            or tensor.shape != current.shape
+            or tensor.dtype != current.dtype
+        ):
+            raise ValueError("official metric tensor state is invalid")
+        decoded[name] = (str(record["kind"]), tensor)
+    return decoded
+
+
+_POPULATION_RECORD_KEYS = frozenset(
+    {
+        "reference_scene_id",
+        "master_sequence_id",
+        "order_id",
+        "prediction_digest",
+        "state",
+    }
+)
+_POPULATION_IDENTITY_KEYS = (
+    "reference_scene_id",
+    "master_sequence_id",
+    "order_id",
+    "prediction_digest",
+)
+
+
+def _population_identity(record: Mapping[str, Any]) -> tuple[str, str, str, str]:
+    values = tuple(record.get(name) for name in _POPULATION_IDENTITY_KEYS)
+    if any(not isinstance(value, str) or not value for value in values):
+        raise ValueError("official metric population identity is invalid")
+    if len(values[3]) != 64 or any(
+        character not in "0123456789abcdef" for character in values[3]
+    ):
+        raise ValueError("official metric prediction digest is invalid")
+    return values
+
+
+def _population_digest(records: Sequence[Mapping[str, Any]]) -> str:
+    population = [
+        {
+            "reference_scene_id": record["reference_scene_id"],
+            "master_sequence_id": record["master_sequence_id"],
+            "order_id": record["order_id"],
+            "prediction_digest": record["prediction_digest"],
+        }
+        for record in records
+    ]
+    return hashlib.sha256(
+        (json.dumps(population, sort_keys=True, indent=2) + "\n").encode("utf-8")
+    ).hexdigest()
+
+
+def build_official_metric_population_evidence(
+    records: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Compress identity-keyed single-sequence sufficient states."""
+
+    if isinstance(records, (str, bytes)) or not isinstance(records, Sequence):
+        raise TypeError("official metric population records must be a sequence")
+    normalized = []
+    for record in records:
+        if not isinstance(record, Mapping) or set(record) != _POPULATION_RECORD_KEYS:
+            raise ValueError("official metric population record differs from schema")
+        identity = _population_identity(record)
+        state = record["state"]
+        if (
+            not isinstance(state, Mapping)
+            or state.get("mode") != "strict_online"
+            or state.get("updates") != 1
+        ):
+            raise ValueError("official metric population state scope is invalid")
+        normalized.append(
+            {
+                **dict(zip(_POPULATION_IDENTITY_KEYS, identity, strict=True)),
+                "state": dict(state),
+            }
+        )
+    normalized.sort(key=_population_identity)
+    identities = tuple(_population_identity(record) for record in normalized)
+    if not normalized or len(set(identities)) != len(identities):
+        raise ValueError("official metric population must be nonempty and unique")
+    raw = (
+        json.dumps(normalized, sort_keys=True, separators=(",", ":"), allow_nan=False)
+        + "\n"
+    ).encode("utf-8")
+    core = {
+        "schema_version": 1,
+        "mode": "strict_online",
+        "updates": len(normalized),
+        "population_sha256": _population_digest(normalized),
+        "records_sha256": hashlib.sha256(raw).hexdigest(),
+        "records_zlib_base64": base64.b64encode(zlib.compress(raw, level=9)).decode(
+            "ascii"
+        ),
+    }
+    digest = hashlib.sha256(
+        (json.dumps(core, sort_keys=True, indent=2) + "\n").encode("utf-8")
+    ).hexdigest()
+    return {**core, "sha256": digest}
+
+
+def recompute_official_metric_population_evidence(
+    evidence: Mapping[str, Any],
+) -> tuple[
+    dict[str, float],
+    tuple[dict[str, Any], ...],
+    tuple[dict[str, float], ...],
+]:
+    """Recompute the aggregate and every identity-keyed single update."""
+
+    expected_keys = {
+        "schema_version",
+        "mode",
+        "updates",
+        "population_sha256",
+        "records_sha256",
+        "records_zlib_base64",
+        "sha256",
+    }
+    if not isinstance(evidence, Mapping) or set(evidence) != expected_keys:
+        raise ValueError("official metric population evidence differs from schema")
+    if evidence["schema_version"] != 1 or evidence["mode"] != "strict_online":
+        raise ValueError("official metric population evidence mode/schema is invalid")
+    encoded = evidence["records_zlib_base64"]
+    if (
+        not isinstance(encoded, str)
+        or len(encoded) > _MAX_OFFICIAL_METRIC_POPULATION_ENCODED_BYTES
+    ):
+        raise ValueError("official metric population evidence payload exceeds limit")
+    for name in ("population_sha256", "records_sha256", "sha256"):
+        value = evidence[name]
+        if (
+            not isinstance(value, str)
+            or len(value) != 64
+            or any(character not in "0123456789abcdef" for character in value)
+        ):
+            raise ValueError("official metric population evidence SHA-256 is invalid")
+    core = {key: evidence[key] for key in evidence if key != "sha256"}
+    digest = hashlib.sha256(
+        (json.dumps(core, sort_keys=True, indent=2) + "\n").encode("utf-8")
+    ).hexdigest()
+    if evidence["sha256"] != digest:
+        raise ValueError("official metric population evidence SHA-256 differs")
+    try:
+        compressed = base64.b64decode(encoded, validate=True)
+    except (TypeError, ValueError) as error:
+        raise ValueError(
+            "official metric population evidence cannot be decoded"
+        ) from error
+    if len(compressed) > _MAX_OFFICIAL_METRIC_POPULATION_COMPRESSED_BYTES:
+        raise ValueError("official metric population evidence payload exceeds limit")
+    try:
+        decoder = zlib.decompressobj()
+        raw = decoder.decompress(
+            compressed, _MAX_OFFICIAL_METRIC_POPULATION_RAW_BYTES + 1
+        )
+    except zlib.error as error:
+        raise ValueError(
+            "official metric population evidence cannot be decoded"
+        ) from error
+    if (
+        len(raw) > _MAX_OFFICIAL_METRIC_POPULATION_RAW_BYTES
+        or decoder.unconsumed_tail
+    ):
+        raise ValueError("official metric population evidence payload exceeds limit")
+    if (
+        not decoder.eof
+        or decoder.unused_data
+        or hashlib.sha256(raw).hexdigest() != evidence["records_sha256"]
+    ):
+        raise ValueError("official metric population evidence payload differs")
+    try:
+        records = json.loads(raw)
+    except (UnicodeError, json.JSONDecodeError) as error:
+        raise ValueError(
+            "official metric population evidence JSON is invalid"
+        ) from error
+    if not isinstance(records, list) or len(records) != evidence["updates"]:
+        raise ValueError("official metric population evidence update count differs")
+    identities = []
+    per_sequence_metrics = []
+    combined = OfficialMetricAccumulator(mode="strict_online")
+    combined_head = combined._metric.heads[0]
+    individual = OfficialMetricAccumulator(mode="strict_online")
+    merged: dict[str, list[Tensor] | Tensor] = {
+        name: []
+        if isinstance(getattr(combined_head, name), list)
+        else torch.zeros_like(getattr(combined_head, name))
+        for name in sorted(combined_head.metric_state)
+    }
+    for record in records:
+        if not isinstance(record, Mapping) or set(record) != _POPULATION_RECORD_KEYS:
+            raise ValueError("official metric population record differs from schema")
+        identity = _population_identity(record)
+        identities.append(identity)
+        decoded = _decode_official_metric_tensors(record["state"], combined_head)
+        individual._metric.reset()
+        individual_head = individual._metric.heads[0]
+        for name, (kind, tensor) in decoded.items():
+            setattr(individual_head, name, [tensor] if kind == "list" else tensor)
+        individual._updates = 1
+        individual._metric._update_count = 1
+        individual_head._update_count = 1
+        per_sequence_metrics.append(individual.compute())
+        for name, (kind, tensor) in decoded.items():
+            if kind == "list":
+                value = merged[name]
+                assert isinstance(value, list)
+                value.append(tensor)
+            else:
+                value = merged[name]
+                assert isinstance(value, Tensor)
+                merged[name] = value + tensor
+    if (
+        not records
+        or identities != sorted(identities)
+        or len(set(identities)) != len(identities)
+        or _population_digest(records) != evidence["population_sha256"]
+    ):
+        raise ValueError("official metric population evidence identity differs")
+    for name in sorted(combined_head.metric_state):
+        value = merged[name]
+        if isinstance(value, list):
+            setattr(combined_head, name, [torch.cat(value)] if value else [])
+        else:
+            setattr(combined_head, name, value)
+    combined._updates = len(records)
+    combined._metric._update_count = len(records)
+    combined_head._update_count = len(records)
+    return (
+        combined.compute(),
+        tuple(dict(record) for record in records),
+        tuple(per_sequence_metrics),
+    )
 
 
 def compute_official_raw_local_metrics(
