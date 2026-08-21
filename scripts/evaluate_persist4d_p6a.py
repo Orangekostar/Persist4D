@@ -1436,6 +1436,7 @@ class TaskMetricEvaluation:
     sequence_count: int
     association_events: tuple[AssociationEvent, ...]
     capacity_snapshots: tuple[CapacitySnapshot, ...]
+    per_sequence_metrics: tuple[dict[str, object], ...] = ()
 
 
 def prefix_causality_coordinator(
@@ -2269,6 +2270,7 @@ def evaluate_cached_task_metrics(
     cache_hasher = hashlib.sha256()
     association_events: list[AssociationEvent] = []
     capacity_snapshots: list[CapacitySnapshot] = []
+    per_sequence_metrics: list[dict[str, object]] = []
 
     for sequence in sequences:
         if not isinstance(sequence, CachedProtocolSequence):
@@ -2370,6 +2372,23 @@ def evaluate_cached_task_metrics(
                     coordinated.online_predictions[method][endpoint], class_mapper
                 )
                 strict_metrics[method][horizon].update(strict_prediction, target)
+                sequence_metric = metric_factory(
+                    "strict_online", method, horizon
+                )
+                sequence_metric.update(strict_prediction, target)
+                sequence_values = sequence_metric.compute()
+                per_sequence_metrics.append(
+                    {
+                        "method": method,
+                        "reference_scene_id": sequence.reference_scene_id,
+                        "master_sequence_id": sequence.master_sequence_id,
+                        "order_id": sequence.order_id,
+                        "T": f"T{horizon}",
+                        "t_mAP": float(sequence_values["online_t-mAP"]),
+                        "t_REC": float(sequence_values["online_t-REC"]),
+                        "prediction_digest": coordinated.content_digest,
+                    }
+                )
                 offline_prediction = _remap_metric_prediction(
                     build_offline_reconstructed_prediction(
                         coordinated.offline[method], endpoint=endpoint
@@ -2429,6 +2448,7 @@ def evaluate_cached_task_metrics(
         sequence_count=len(sequences),
         association_events=tuple(association_events),
         capacity_snapshots=tuple(capacity_snapshots),
+        per_sequence_metrics=tuple(per_sequence_metrics),
     )
 
 

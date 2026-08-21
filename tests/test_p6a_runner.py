@@ -696,7 +696,12 @@ def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping(
             updates[self.key] = updates.get(self.key, 0) + 1
 
         def compute(self) -> dict[str, float]:
-            return {"score": float(self.key[2]) / 10.0}
+            score = float(self.key[2]) / 10.0
+            return {
+                "score": score,
+                "online_t-mAP": score,
+                "online_t-REC": score / 2.0,
+            }
 
     factories = {
         "B0": lambda sequence_id: B0StageUniqueTracker(sequence_id=sequence_id),
@@ -724,16 +729,41 @@ def test_cached_task_metrics_separate_raw_online_and_offline_with_class_mapping(
     assert set(result.metric_blocks["raw"]) == set(factories)
     assert set(result.metric_blocks["strict"]) == set(factories)
     assert set(result.metric_blocks["offline"]) == {*factories, "Oracle"}
-    assert result.metric_blocks["raw"]["B0"]["T2"] == {"score": 0.2}
-    assert result.metric_blocks["raw"]["B4"]["T5"] == {"score": 0.5}
+    assert result.metric_blocks["raw"]["B0"]["T2"]["score"] == 0.2
+    assert result.metric_blocks["raw"]["B4"]["T5"]["score"] == 0.5
     assert updates[("raw_local", "shared", 2)] == 1
-    assert updates[("strict_online", "B4", 5)] == 1
+    assert updates[("strict_online", "B4", 5)] == 2
     assert updates[("offline_reconstructed", "Oracle", 5)] == 1
     assert len(set(result.fingerprints["prediction"].values())) == 1
     assert len(set(result.fingerprints["cache"].values())) == 1
     assert result.association_events
     assert len(result.capacity_snapshots) == 2 + 3 + 4 + 5
     assert len(aggregate_metrics_by_sequence(result.association_events)) == 6 * 4
+    assert len(result.per_sequence_metrics) == len(factories) * 4
+    assert {
+        (row["method"], row["T"])
+        for row in result.per_sequence_metrics
+    } == {
+        (method, f"T{horizon}")
+        for method in factories
+        for horizon in range(2, 6)
+    }
+    p6b_row = next(
+        row
+        for row in result.per_sequence_metrics
+        if row["method"] == "B4" and row["T"] == "T5"
+    )
+    assert p6b_row == {
+        "method": "B4",
+        "reference_scene_id": "ref",
+        "master_sequence_id": "master",
+        "order_id": "canonical",
+        "T": "T5",
+        "t_mAP": 0.5,
+        "t_REC": 0.25,
+        "prediction_digest": p6b_row["prediction_digest"],
+    }
+    assert len({row["prediction_digest"] for row in result.per_sequence_metrics}) == 1
 
 
 def test_tracker_factories_lock_the_preregistered_baseline_parameters() -> None:

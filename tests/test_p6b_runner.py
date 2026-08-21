@@ -25,6 +25,8 @@ from scripts.run_p6b_evaluation import (
     _candidate_sweep_rows,
     _config_sha256,
     _expected_selection_provenance,
+    _join_per_sequence_rows,
+    _paired_statistics,
     build_selection_document,
     build_source_tree_contract,
     compute_final_gate_results,
@@ -109,6 +111,156 @@ def _sweep_candidate(
             _sweep_metric(horizon, official=official) for horizon in (2, 3, 4, 5)
         ),
     )
+
+
+def _association_row(
+    method: str,
+    reference: str,
+    master: str,
+    horizon: int,
+    *,
+    digest: str,
+    switches: int,
+) -> dict[str, object]:
+    return {
+        "method": method,
+        "reference_scene_id": reference,
+        "master_sequence_id": master,
+        "order_id": "canonical",
+        "prefix": horizon,
+        "prediction_digest": digest,
+        "id_switches": switches,
+        "transition_opportunities": 10,
+        "wrong_reactivations": 0 if horizon == 2 else switches,
+        "predicted_reactivation_events": 0 if horizon == 2 else 4,
+        "correct_reactivations": 0 if horizon == 2 else 4 - switches,
+        "reactivation_attempts": 0 if horizon == 2 else 4,
+        "gap_opportunities": 0 if horizon == 2 else 5,
+        "false_births": switches,
+        "births": 8,
+        "rejected_births": 2,
+        "reactivation_accuracy": None if horizon == 2 else (4 - switches) / 4,
+        "reactivation_recall": None if horizon == 2 else (4 - switches) / 5,
+    }
+
+
+def _task_row(
+    method: str,
+    reference: str,
+    master: str,
+    horizon: int,
+    *,
+    digest: str,
+) -> dict[str, object]:
+    return {
+        "method": method,
+        "reference_scene_id": reference,
+        "master_sequence_id": master,
+        "order_id": "canonical",
+        "T": f"T{horizon}",
+        "t_mAP": 0.20 if method == "B4" else 0.21,
+        "t_REC": 0.30 if method == "B4" else 0.31,
+        "prediction_digest": digest,
+    }
+
+
+def _paired_sequence_fixture() -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    association: list[dict[str, object]] = []
+    tasks: list[dict[str, object]] = []
+    for reference in ("heldout-a", "heldout-b"):
+        for sequence_index in range(2):
+            master = f"{reference}-master-{sequence_index}"
+            digest = f"digest-{reference}-{sequence_index}"
+            for horizon in (2, 3, 4, 5):
+                for method, switches in (("B4", 2), ("P6B", 1)):
+                    association.append(
+                        _association_row(
+                            method,
+                            reference,
+                            master,
+                            horizon,
+                            digest=digest,
+                            switches=switches,
+                        )
+                    )
+                    tasks.append(
+                        _task_row(
+                            method,
+                            reference,
+                            master,
+                            horizon,
+                            digest=digest,
+                        )
+                    )
+    return association, tasks
+
+
+def test_per_sequence_join_is_exact_and_recomputes_normalized_rates() -> None:
+    association, tasks = _paired_sequence_fixture()
+
+    rows = _join_per_sequence_rows(
+        association,
+        tasks,
+        expected_sequence_count=4,
+        expected_reference_scene_ids=("heldout-a", "heldout-b"),
+    )
+
+    assert len(rows) == 32
+    row = next(item for item in rows if item["method"] == "P6B" and item["T"] == "T5")
+    assert row["identity_switch_rate"] == pytest.approx(0.1)
+    assert row["wrong_reactivation_rate"] == pytest.approx(0.25)
+    assert row["false_birth_rate"] == pytest.approx(0.1)
+    assert row["reactivation_accuracy"] == pytest.approx(0.75)
+    assert row["reactivation_recall"] == pytest.approx(0.6)
+    assert row["t_mAP"] == pytest.approx(0.21)
+    assert row["prediction_digest"].startswith("digest-")
+
+
+@pytest.mark.parametrize("mutation", ["missing", "duplicate", "cross_digest"])
+def test_per_sequence_join_rejects_inexact_evidence(mutation: str) -> None:
+    association, tasks = _paired_sequence_fixture()
+    if mutation == "missing":
+        tasks.pop()
+    elif mutation == "duplicate":
+        tasks.append(dict(tasks[-1]))
+    else:
+        tasks[-1]["prediction_digest"] = "wrong-digest"
+
+    with pytest.raises(ValueError, match="missing|duplicate|digest|population"):
+        _join_per_sequence_rows(
+            association,
+            tasks,
+            expected_sequence_count=4,
+            expected_reference_scene_ids=("heldout-a", "heldout-b"),
+        )
+
+
+def test_paired_statistics_are_clustered_seeded_and_complete() -> None:
+    association, tasks = _paired_sequence_fixture()
+    rows = _join_per_sequence_rows(
+        association,
+        tasks,
+        expected_sequence_count=4,
+        expected_reference_scene_ids=("heldout-a", "heldout-b"),
+    )
+
+    first = _paired_statistics(rows, expected_sequence_count=4)
+    second = _paired_statistics(rows, expected_sequence_count=4)
+
+    assert first == second
+    assert len(first) == 25
+    idsw_t5 = next(
+        item
+        for item in first
+        if item["metric"] == "identity_switch_rate" and item["T"] == "T5"
+    )
+    assert idsw_t5["n_clusters"] == 2
+    assert idsw_t5["n_pairs"] == 4
+    assert idsw_t5["n_bootstrap"] == 10_000
+    assert idsw_t5["seed"] == 45
+    assert idsw_t5["mean_delta"] == pytest.approx(-0.1)
+    assert idsw_t5["std_delta"] == pytest.approx(0.0)
+    assert idsw_t5["excluded_null_pairs"] == 0
 
 
 def _valid_selection_document() -> dict[str, object]:

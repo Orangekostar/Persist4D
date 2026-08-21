@@ -13,7 +13,7 @@ from itertools import pairwise
 from math import isfinite
 from numbers import Integral, Real
 from random import Random
-from statistics import mean, pstdev
+from statistics import mean, pstdev, stdev
 
 FAILURE_CODES = ("F1", "F2", "F3", "F4", "F5", "F6", "F7")
 FAILURE_LABELS = {
@@ -1311,6 +1311,8 @@ def paired_cluster_bootstrap(
     confidence: float = 0.95,
     cluster_by: str = "reference_scene_id",
     cluster_key: str | None = None,
+    expected_cluster_count: int = 6,
+    sample_standard_deviation: bool = False,
 ) -> dict[str, object]:
     """Run deterministic paired bootstrap over reference-scene clusters.
 
@@ -1335,6 +1337,14 @@ def paired_cluster_bootstrap(
         raise ValueError("n_bootstrap must be a positive integer")
     if isinstance(seed, bool) or not isinstance(seed, Integral):
         raise ValueError("seed must be an integer")  # noqa: TRY004
+    if (
+        isinstance(expected_cluster_count, bool)
+        or not isinstance(expected_cluster_count, Integral)
+        or expected_cluster_count <= 0
+    ):
+        raise ValueError("expected_cluster_count must be a positive integer")
+    if not isinstance(sample_standard_deviation, bool):
+        raise ValueError("sample_standard_deviation must be boolean")  # noqa: TRY004
     confidence = _finite(confidence, name="confidence")
     if not 0.0 < confidence < 1.0:
         raise ValueError("confidence must be within (0, 1)")
@@ -1381,9 +1391,13 @@ def paired_cluster_bootstrap(
             )
         )
     clusters = sorted({item[0] for item in pair_deltas})
-    if len(clusters) != 6:
+    if len(clusters) != expected_cluster_count:
+        expected_label = (
+            "six" if expected_cluster_count == 6 else str(expected_cluster_count)
+        )
         raise ValueError(
-            "paired cluster bootstrap requires exactly six reference scenes"
+            "paired cluster bootstrap requires exactly "
+            f"{expected_label} reference scenes"
         )
     deltas_by_cluster: dict[str, list[float]] = {cluster: [] for cluster in clusters}
     method_by_cluster: dict[str, list[float]] = {cluster: [] for cluster in clusters}
@@ -1413,6 +1427,11 @@ def paired_cluster_bootstrap(
     )
     low = _percentile(bootstrap_means, alpha)
     high = _percentile(bootstrap_means, 1.0 - alpha)
+    deviation = (
+        stdev(cluster_means.values())
+        if sample_standard_deviation and len(cluster_means) > 1
+        else pstdev(cluster_means.values())
+    )
     return {
         "method": method,
         "baseline_method": baseline_method,
@@ -1426,8 +1445,8 @@ def paired_cluster_bootstrap(
         "method_mean": method_mean,
         "baseline_mean": baseline_mean,
         "mean_delta": mean_delta,
-        "std_delta": pstdev(cluster_means.values()),
-        "std": pstdev(cluster_means.values()),
+        "std_delta": deviation,
+        "std": deviation,
         "mean": mean_delta,
         "ci_low": low,
         "ci_high": high,

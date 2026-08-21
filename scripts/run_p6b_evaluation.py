@@ -25,9 +25,11 @@ from scripts.evaluate_persist4d_p6a import (
     load_cached_protocol_sequences,
 )
 from scripts.p6a_analysis import (
+    PairedMetricRecord,
     aggregate_event_metrics,
     aggregate_metrics_by_sequence,
     failure_breakdown,
+    paired_cluster_bootstrap,
 )
 from scripts.p6b_artifacts import finalize_p6b_artifact, publish_p6b_artifact
 from scripts.p6b_association import P6BTracker
@@ -822,7 +824,7 @@ def _official_candidate(
 
 def _evaluate_methods(
     sequences: Sequence[object], config: P6BMemoryConfig
-) -> tuple[list[dict[str, object]], tuple[object, ...]]:
+) -> tuple[list[dict[str, object]], object]:
     p6a_config = yaml.safe_load(
         (PROJECT_ROOT / "conf/p6a/default.yaml").read_text(encoding="utf-8")
     )
@@ -863,29 +865,293 @@ def _evaluate_methods(
                     "false_births": int(identity["false_births"]),
                 }
             )
-    return rows, evaluation.association_events
+    return rows, evaluation
 
 
-def _per_sequence_rows(events: Sequence[object]) -> list[dict[str, object]]:
-    rows = []
-    for aggregate in aggregate_metrics_by_sequence(events):
-        rows.append(
+def _per_sequence_key(
+    row: Mapping[str, object], *, horizon_field: str
+) -> tuple[str, str, str, str, int]:
+    method = row.get("method")
+    reference = row.get("reference_scene_id")
+    master = row.get("master_sequence_id")
+    order = row.get("order_id")
+    if method not in {"B4", "P6B"}:
+        raise ValueError("per-sequence method must be B4 or P6B")
+    if any(not isinstance(value, str) or not value for value in (reference, master, order)):
+        raise ValueError("per-sequence identity fields must be nonempty strings")
+    raw_horizon = row.get(horizon_field)
+    if horizon_field == "T":
+        if not isinstance(raw_horizon, str) or raw_horizon not in {
+            f"T{horizon}" for horizon in _HORIZONS
+        }:
+            raise ValueError("per-sequence T is invalid")
+        horizon = int(raw_horizon[1:])
+    else:
+        if isinstance(raw_horizon, bool) or raw_horizon not in _HORIZONS:
+            raise ValueError("per-sequence prefix is invalid")
+        horizon = int(raw_horizon)
+    return method, reference, master, order, horizon
+
+
+def _finite_number(value: object, *, name: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError(f"{name} must be numeric")
+    result = float(value)
+    if not math.isfinite(result):
+        raise ValueError(f"{name} must be finite")
+    return result
+
+
+def _nonnegative_count(value: object, *, name: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ValueError(f"{name} must be a nonnegative integer")
+    return value
+
+
+def _rate(numerator: int, denominator: int) -> float | None:
+    if numerator > denominator:
+        raise ValueError("metric numerator exceeds denominator")
+    return numerator / denominator if denominator else None
+
+
+def _index_per_sequence_rows(
+    rows: Sequence[Mapping[str, object]], *, horizon_field: str, name: str
+) -> dict[tuple[str, str, str, str, int], Mapping[str, object]]:
+    indexed: dict[tuple[str, str, str, str, int], Mapping[str, object]] = {}
+    for row in rows:
+        if not isinstance(row, Mapping):
+            raise TypeError(f"{name} rows must be mappings")
+        key = _per_sequence_key(row, horizon_field=horizon_field)
+        if key in indexed:
+            raise ValueError(f"{name} contains a duplicate per-sequence row")
+        indexed[key] = row
+    return indexed
+
+
+def _join_per_sequence_rows(
+    association_rows: Sequence[Mapping[str, object]],
+    task_rows: Sequence[Mapping[str, object]],
+    *,
+    expected_sequence_count: int = 33,
+    expected_reference_scene_ids: Sequence[str] | None = None,
+) -> list[dict[str, object]]:
+    association = _index_per_sequence_rows(
+        association_rows, horizon_field="prefix", name="association evidence"
+    )
+    tasks = _index_per_sequence_rows(
+        task_rows, horizon_field="T", name="task metric evidence"
+    )
+    if set(association) != set(tasks):
+        raise ValueError("per-sequence evidence has a missing association/task pair")
+    expected_rows = expected_sequence_count * 2 * len(_HORIZONS)
+    if len(association) != expected_rows:
+        raise ValueError("per-sequence evidence population differs from the protocol")
+    sequence_keys = {(key[1], key[2], key[3]) for key in association}
+    if len(sequence_keys) != expected_sequence_count:
+        raise ValueError("per-sequence sequence population differs from the protocol")
+    references = {key[1] for key in association}
+    if expected_reference_scene_ids is not None and references != set(
+        expected_reference_scene_ids
+    ):
+        raise ValueError("per-sequence reference population differs from held-out split")
+
+    result: list[dict[str, object]] = []
+    for key in sorted(association):
+        aggregate = association[key]
+        task = tasks[key]
+        association_digest = aggregate.get("prediction_digest")
+        task_digest = task.get("prediction_digest")
+        if (
+            not isinstance(association_digest, str)
+            or not association_digest
+            or association_digest != task_digest
+        ):
+            raise ValueError("per-sequence prediction digests differ")
+        switches = _nonnegative_count(
+            aggregate.get("id_switches"), name="identity_switches"
+        )
+        transitions = _nonnegative_count(
+            aggregate.get("transition_opportunities"),
+            name="transition_opportunities",
+        )
+        wrong = _nonnegative_count(
+            aggregate.get("wrong_reactivations"), name="wrong_reactivations"
+        )
+        predicted = _nonnegative_count(
+            aggregate.get("predicted_reactivation_events"),
+            name="predicted_reactivation_events",
+        )
+        correct = _nonnegative_count(
+            aggregate.get("correct_reactivations"), name="correct_reactivations"
+        )
+        attempts = _nonnegative_count(
+            aggregate.get("reactivation_attempts"), name="reactivation_attempts"
+        )
+        gaps = _nonnegative_count(
+            aggregate.get("gap_opportunities"), name="gap_opportunities"
+        )
+        false_births = _nonnegative_count(
+            aggregate.get("false_births"), name="false_births"
+        )
+        births = _nonnegative_count(aggregate.get("births"), name="births")
+        rejected = _nonnegative_count(
+            aggregate.get("rejected_births"), name="rejected_births"
+        )
+        identity_rate = _rate(switches, transitions)
+        wrong_rate = _rate(wrong, predicted)
+        reactivation_accuracy = _rate(correct, attempts)
+        reactivation_recall = _rate(correct, gaps)
+        false_birth_rate = _rate(false_births, births + rejected)
+        if aggregate.get("reactivation_accuracy") != reactivation_accuracy:
+            raise ValueError("reactivation accuracy differs from counts")
+        if aggregate.get("reactivation_recall") != reactivation_recall:
+            raise ValueError("reactivation recall differs from counts")
+        method, reference, master, order, horizon = key
+        result.append(
             {
-                "method": aggregate["method"],
-                "reference_scene_id": aggregate["reference_scene_id"],
-                "master_sequence_id": aggregate["master_sequence_id"],
-                "order_id": aggregate["order_id"],
-                "T": f"T{aggregate['prefix']}",
-                "identity_switches": aggregate["id_switches"],
-                "transition_opportunities": aggregate["transition_opportunities"],
-                "identity_switch_rate": aggregate["id_switch_rate"],
-                "wrong_reactivations": aggregate["wrong_reactivations"],
-                "false_births": aggregate["false_births"],
-                "reactivation_accuracy": aggregate["reactivation_accuracy"],
-                "reactivation_recall": aggregate["reactivation_recall"],
+                "method": method,
+                "reference_scene_id": reference,
+                "master_sequence_id": master,
+                "order_id": order,
+                "T": f"T{horizon}",
+                "prediction_digest": association_digest,
+                "t_mAP": _finite_number(task.get("t_mAP"), name="t_mAP"),
+                "t_REC": _finite_number(task.get("t_REC"), name="t_REC"),
+                "identity_switches": switches,
+                "transition_opportunities": transitions,
+                "identity_switch_rate": identity_rate,
+                "wrong_reactivations": wrong,
+                "predicted_reactivation_events": predicted,
+                "wrong_reactivation_rate": wrong_rate,
+                "correct_reactivations": correct,
+                "reactivation_attempts": attempts,
+                "gap_opportunities": gaps,
+                "reactivation_accuracy": reactivation_accuracy,
+                "reactivation_recall": reactivation_recall,
+                "false_births": false_births,
+                "births": births,
+                "rejected_births": rejected,
+                "false_birth_rate": false_birth_rate,
             }
         )
-    return rows
+
+    pair_groups: dict[tuple[str, str, str, int], dict[str, dict[str, object]]] = {}
+    for row in result:
+        pair_key = (
+            str(row["reference_scene_id"]),
+            str(row["master_sequence_id"]),
+            str(row["order_id"]),
+            int(str(row["T"])[1:]),
+        )
+        pair_groups.setdefault(pair_key, {})[str(row["method"])] = row
+    for pair in pair_groups.values():
+        if set(pair) != {"B4", "P6B"}:
+            raise ValueError("per-sequence method pair is incomplete")
+        if pair["B4"]["prediction_digest"] != pair["P6B"]["prediction_digest"]:
+            raise ValueError("paired methods use different frozen prediction digests")
+    return result
+
+
+_PAIRED_STATISTIC_HORIZONS = {
+    "identity_switch_rate": _HORIZONS,
+    "wrong_reactivation_rate": (3, 4, 5),
+    "false_birth_rate": _HORIZONS,
+    "reactivation_accuracy": (3, 4, 5),
+    "reactivation_recall": (3, 4, 5),
+    "t_mAP": _HORIZONS,
+    "t_REC": _HORIZONS,
+}
+
+
+def _paired_statistics(
+    rows: Sequence[Mapping[str, object]], *, expected_sequence_count: int = 33
+) -> list[dict[str, object]]:
+    indexed = _index_per_sequence_rows(rows, horizon_field="T", name="paired evidence")
+    if len(indexed) != expected_sequence_count * 2 * len(_HORIZONS):
+        raise ValueError("paired evidence population differs from the protocol")
+    pairs: dict[tuple[str, str, str, int], dict[str, Mapping[str, object]]] = {}
+    for key, row in indexed.items():
+        method, reference, master, order, horizon = key
+        pairs.setdefault((reference, master, order, horizon), {})[method] = row
+    if len(pairs) != expected_sequence_count * len(_HORIZONS):
+        raise ValueError("paired evidence sequence/horizon population differs")
+    for pair in pairs.values():
+        if set(pair) != {"B4", "P6B"}:
+            raise ValueError("paired evidence has a missing method pair")
+        if pair["B4"].get("prediction_digest") != pair["P6B"].get(
+            "prediction_digest"
+        ):
+            raise ValueError("paired evidence uses different prediction digests")
+
+    statistics: list[dict[str, object]] = []
+    for metric, horizons in _PAIRED_STATISTIC_HORIZONS.items():
+        for horizon in horizons:
+            records: list[PairedMetricRecord] = []
+            excluded = 0
+            for (reference, master, order, pair_horizon), pair in sorted(pairs.items()):
+                if pair_horizon != horizon:
+                    continue
+                left = pair["P6B"].get(metric)
+                right = pair["B4"].get(metric)
+                if left is None and right is None:
+                    excluded += 1
+                    continue
+                if left is None or right is None:
+                    raise ValueError("paired metric availability differs between methods")
+                digest = pair["P6B"].get("prediction_digest")
+                for method, value in (("P6B", left), ("B4", right)):
+                    records.append(
+                        PairedMetricRecord(
+                            reference_scene_id=reference,
+                            master_sequence_id=master,
+                            prefix=horizon,
+                            method=method,
+                            metric=metric,
+                            value=_finite_number(value, name=metric),
+                            order_id=order,
+                            prediction_digest=str(digest),
+                        )
+                    )
+            if not records:
+                raise ValueError(f"paired statistic {metric} T{horizon} has no pairs")
+            statistic = paired_cluster_bootstrap(
+                records,
+                method="P6B",
+                baseline_method="B4",
+                metric=metric,
+                n_bootstrap=10_000,
+                seed=45,
+                expected_cluster_count=2,
+                sample_standard_deviation=True,
+            )
+            statistics.append(
+                {
+                    **statistic,
+                    "T": f"T{horizon}",
+                    "population_pair_count": expected_sequence_count,
+                    "excluded_null_pairs": excluded,
+                    "standard_deviation_kind": "sample_across_reference_clusters",
+                    "uncertainty_caveat": (
+                        "Only two held-out reference-scene clusters; the interval is "
+                        "unstable and is not a significance claim."
+                    ),
+                }
+            )
+    return statistics
+
+
+def _per_sequence_rows(
+    events: Sequence[object],
+    task_rows: Sequence[Mapping[str, object]],
+    *,
+    expected_reference_scene_ids: Sequence[str],
+) -> list[dict[str, object]]:
+    return _join_per_sequence_rows(
+        aggregate_metrics_by_sequence(events),
+        task_rows,
+        expected_sequence_count=33,
+        expected_reference_scene_ids=expected_reference_scene_ids,
+    )
 
 
 def _failure_rows(events: Sequence[object]) -> list[dict[str, object]]:

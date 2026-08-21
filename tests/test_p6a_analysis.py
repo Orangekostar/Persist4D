@@ -678,6 +678,32 @@ def test_paired_bootstrap_requires_all_six_reference_clusters() -> None:
         )
 
 
+def test_paired_bootstrap_supports_two_clusters_and_sample_deviation() -> None:
+    rows = [
+        (
+            replace(row, value=row.value + 0.01)
+            if row.reference_scene_id == "ref-b" and row.method == "Persist4D"
+            else row
+        )
+        for row in _paired_rows()
+        if row.reference_scene_id in {"ref-a", "ref-b"}
+    ]
+
+    result = paired_cluster_bootstrap(
+        rows,
+        method="Persist4D",
+        baseline_method="EMA",
+        expected_cluster_count=2,
+        sample_standard_deviation=True,
+    )
+
+    assert result["n_clusters"] == 2
+    assert result["n_bootstrap"] == 10_000
+    assert result["seed"] == 45
+    assert result["std_delta"] == pytest.approx(math.sqrt(0.00005))
+    assert result["std"] == result["std_delta"]
+
+
 def test_compact_paired_rows_cannot_bypass_record_validation() -> None:
     row = {
         "reference_scene_id": "ref-a",
