@@ -133,6 +133,17 @@ def test_threshold_aware_assignment_preserves_allowed_cardinality() -> None:
     assert pairs == ((0, 1), (1, 0))
 
 
+def test_threshold_aware_assignment_maximizes_score_before_cardinality() -> None:
+    score = torch.tensor(
+        [[1.25, 0.50], [0.50, 0.49]],
+        dtype=torch.float64,
+    )
+
+    pairs = threshold_aware_assignment(score, score >= 0.50)
+
+    assert pairs == ((0, 0),)
+
+
 def test_threshold_aware_assignment_handles_rectangular_scores() -> None:
     score = torch.tensor(
         [[0.10, 0.80, 0.70], [0.90, 0.40, 0.20]],
@@ -241,6 +252,34 @@ def test_low_margin_dormant_edge_yields_to_allowed_active_edge() -> None:
     assert result.slot_ids.tolist() == [[1]]
     assert result.reactivations.tolist() == [[False]]
     assert result.association_margins[0, 0].item() == pytest.approx(-0.05, abs=1e-6)
+
+
+def test_dormant_margin_must_be_strictly_greater_than_threshold() -> None:
+    memory = P6BPersistentMemory(
+        P6BMemoryConfig(
+            capacity=2,
+            active_threshold=0.50,
+            reactivation_threshold=0.50,
+            reactivation_margin=1.0,
+            class_weight=0.0,
+            background_class=2,
+            birth_confidence=1.0,
+        )
+    )
+    state = _state(
+        [[1.0, 0.0], [0.0, 1.0]],
+        [[1.0, 0.0, 0.0], [1.0, 0.0, 0.0]],
+        active=[False, False],
+    )
+
+    result = memory.step(
+        _observation([[1.0, 0.0]], [[1.0, 0.0, 0.0]]),
+        state,
+        stage_index=1,
+    )
+
+    assert result.slot_ids.tolist() == [[-1]]
+    assert result.reactivations.tolist() == [[False]]
 
 
 def test_accepted_dormant_match_is_reported_as_reactivation() -> None:

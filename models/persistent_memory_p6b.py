@@ -215,7 +215,17 @@ def _maximum_weight_assignment(weights: list[list[int]]) -> list[int]:
 def threshold_aware_assignment(
     score: Tensor, allowed: Tensor
 ) -> tuple[tuple[int, int], ...]:
-    """Match only allowed edges, prioritizing cardinality before total score."""
+    """Match allowed edges and zero-score dummies by maximum total score."""
+
+    return _assignment_pairs(score, allowed, prioritize_cardinality=False)
+
+
+def _assignment_pairs(
+    score: Tensor,
+    allowed: Tensor,
+    *,
+    prioritize_cardinality: bool,
+) -> tuple[tuple[int, int], ...]:
 
     if not isinstance(score, Tensor) or score.ndim != 2:
         raise ValueError("score must have shape [N, M]")
@@ -234,7 +244,7 @@ def threshold_aware_assignment(
     score_units = _integer_score_units(score_cpu)
     maximum_dimension = row_count + column_count
     maximum_matching = min(row_count, column_count)
-    tie_span = maximum_dimension * maximum_dimension + 1
+    tie_span = maximum_dimension * maximum_matching + 1
     score_factor = tie_span + 1
     maximum_abs_score = max(
         abs(score_units[row][column])
@@ -242,11 +252,13 @@ def threshold_aware_assignment(
         for column in range(column_count)
         if bool(allowed_cpu[row, column])
     )
-    cardinality_bonus = (
-        (2 * maximum_abs_score * maximum_matching + 1) * score_factor
-        + 2 * tie_span * maximum_matching
-        + 1
-    )
+    cardinality_bonus = 0
+    if prioritize_cardinality:
+        cardinality_bonus = (
+            (2 * maximum_abs_score * maximum_matching + 1) * score_factor
+            + 2 * tie_span * maximum_matching
+            + 1
+        )
 
     dimension = row_count + column_count
     weights = [[0 for _ in range(dimension)] for _ in range(dimension)]
@@ -456,6 +468,8 @@ class P6BPersistentMemory(nn.Module):
         observation: LocalInstanceObservation,
         state: PersistentMemoryState,
         stage_index: int,
+        *,
+        mask_support: Tensor | None = None,
     ) -> P6BStepResult:
         self._validate_step(observation, state, stage_index)
         (
@@ -506,7 +520,7 @@ class P6BPersistentMemory(nn.Module):
             dormant_allowed = candidate_score >= self.config.reactivation_threshold
             if self.config.reactivation_margin is not None:
                 dormant_allowed &= (
-                    candidate_margin >= self.config.reactivation_margin
+                    candidate_margin > self.config.reactivation_margin
                 )
             allowed = torch.where(
                 candidate_active, active_allowed, dormant_allowed
@@ -518,8 +532,10 @@ class P6BPersistentMemory(nn.Module):
             else:
                 candidate_pairs = tuple(
                     pair
-                    for pair in threshold_aware_assignment(
-                        candidate_score, torch.ones_like(allowed)
+                    for pair in _assignment_pairs(
+                        candidate_score,
+                        torch.ones_like(allowed),
+                        prioritize_cardinality=True,
                     )
                     if bool(allowed[pair[0], pair[1]])
                 )
@@ -602,12 +618,32 @@ class P6BPersistentMemory(nn.Module):
                 ).to(dtype=state.confidence.dtype)
                 consolidated[batch_index, query] = True
 
-        birth_mask_support = torch.stack(
-            [
-                (mask.sigmoid() >= self.config.mask_threshold).sum(dim=1)
-                for mask in observation.latest_mask
-            ]
-        )
+        if mask_support is None:
+            birth_mask_support = torch.stack(
+                [
+                    (mask.sigmoid() >= self.config.mask_threshold).sum(dim=1)
+                    for mask in observation.latest_mask
+                ]
+            )
+        else:
+            if (
+                not isinstance(mask_support, Tensor)
+                or mask_support.shape != observation.valid.shape
+                or mask_support.device != observation.features.device
+                or mask_support.dtype == torch.bool
+            ):
+                raise ValueError(
+                    "mask_support must be an integer tensor with shape [B, Q]"
+                )
+            try:
+                torch.iinfo(mask_support.dtype)
+            except (TypeError, RuntimeError) as error:
+                raise ValueError(
+                    "mask_support must be an integer tensor with shape [B, Q]"
+                ) from error
+            if torch.any(mask_support < 0).item():
+                raise ValueError("mask_support must be nonnegative")
+            birth_mask_support = mask_support.clone()
         birth_entropy = _foreground_entropy(
             observation.class_prob.to(dtype=output_float),
             self.config.background_class,

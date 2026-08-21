@@ -892,6 +892,9 @@ def cache_payload_to_frozen_observation(
     features = _finite_tensor(observation["features"], name="features", ndim=2)
     class_prob = _finite_tensor(observation["class_prob"], name="class_prob", ndim=2)
     confidence = _finite_tensor(observation["confidence"], name="confidence", ndim=1)
+    mask_support = _integer_tensor(
+        observation["mask_support"], name="mask_support", ndim=1
+    )
     valid = _clone_cpu(observation["valid"], name="valid")
     masks = _clone_cpu(observation["masks"], name="masks")
     if valid.dtype != torch.bool:
@@ -919,6 +922,7 @@ def cache_payload_to_frozen_observation(
         valid=valid,
         # Trackers consume mask logits; cache masks are thresholded booleans.
         latest_mask=(masks.to(dtype=features.dtype),),
+        mask_support=mask_support,
     )
     frozen.validate()
     return frozen
@@ -1319,6 +1323,7 @@ def observation_content_digest(observations: Sequence[FrozenObservation]) -> str
             observation.class_prob,
             observation.confidence,
             observation.valid,
+            *(() if observation.mask_support is None else (observation.mask_support,)),
             *observation.latest_mask,
         ):
             _tensor_digest(tensor, hasher)

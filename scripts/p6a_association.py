@@ -36,6 +36,7 @@ class FrozenObservation:
     confidence: Tensor
     valid: Tensor
     latest_mask: tuple[Tensor, ...] = ()
+    mask_support: Tensor | None = None
 
     @property
     def query_count(self) -> int:
@@ -84,6 +85,21 @@ class FrozenObservation:
                     raise ValueError("latest_mask tensors must share a device")
                 if not mask.is_floating_point() or not torch.isfinite(mask).all().item():
                     raise ValueError("latest_mask must contain finite floats")
+        if self.mask_support is not None:
+            if not isinstance(self.mask_support, Tensor):
+                raise ValueError("mask_support must be a tensor")
+            if self.mask_support.shape != expected:
+                raise ValueError("mask_support must match batch/query axes")
+            if self.mask_support.device != device:
+                raise ValueError("mask_support must share the observation device")
+            if self.mask_support.dtype == torch.bool:
+                raise ValueError("mask_support must use an integer dtype")
+            try:
+                torch.iinfo(self.mask_support.dtype)
+            except (TypeError, RuntimeError) as error:
+                raise ValueError("mask_support must use an integer dtype") from error
+            if torch.any(self.mask_support < 0).item():
+                raise ValueError("mask_support must be nonnegative")
 
 
 # A descriptive alias makes the fan-out contract discoverable without
@@ -115,6 +131,7 @@ def freeze_observation(
             confidence=observation.confidence,
             valid=observation.valid,
             latest_mask=tuple(observation.latest_mask),
+            mask_support=None,
         )
     elif isinstance(observation, Mapping):
         required = ("features", "class_prob", "confidence", "valid")
@@ -134,6 +151,7 @@ def freeze_observation(
             confidence=observation["confidence"],
             valid=observation["valid"],
             latest_mask=latest_mask,
+            mask_support=observation.get("mask_support"),
         )
     else:
         raise ValueError(  # noqa: TRY004
@@ -149,6 +167,11 @@ def freeze_observation(
         confidence=_clone_tensor(source.confidence),
         valid=_clone_tensor(source.valid),
         latest_mask=tuple(_clone_tensor(mask) for mask in source.latest_mask),
+        mask_support=(
+            None
+            if source.mask_support is None
+            else _clone_tensor(source.mask_support)
+        ),
     )
     frozen.validate()
     return frozen
@@ -179,6 +202,9 @@ def _single_observation(observation: FrozenObservation) -> FrozenObservation:
         confidence=frozen.confidence[0],
         valid=frozen.valid[0],
         latest_mask=(frozen.latest_mask[0],) if frozen.latest_mask else (),
+        mask_support=(
+            None if frozen.mask_support is None else frozen.mask_support[0]
+        ),
     )
 
 

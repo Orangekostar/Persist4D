@@ -256,6 +256,11 @@ class P6BTracker:
             local_observation,
             state_before,
             stage_index=stage_id,
+            mask_support=(
+                None
+                if current.mask_support is None
+                else current.mask_support.unsqueeze(0)
+            ),
         )
         slot_values = result.slot_ids[0].detach().cpu().tolist()
         score_values = result.association_scores[0].detach().cpu().tolist()

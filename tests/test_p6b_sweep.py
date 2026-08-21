@@ -7,7 +7,10 @@ import pytest
 import torch
 
 from models.persistent_memory_p6b import P6BMemoryConfig
-from scripts.evaluate_persist4d_p6a import CachedProtocolSequence
+from scripts.evaluate_persist4d_p6a import (
+    CachedProtocolSequence,
+    cache_payload_to_frozen_observation,
+)
 from scripts.p6a_analysis import AssociationEvent
 from scripts.p6a_association import FrozenObservation
 from scripts.p6b_association import P6BTracker
@@ -114,6 +117,23 @@ def _memory_config() -> P6BMemoryConfig:
         birth_max_entropy=None,
         consolidation_margin=None,
     )
+
+
+def test_cached_mask_support_is_not_reinterpreted_as_zero_one_logits() -> None:
+    payload = _cached_payload(stage=0)
+    observation = cache_payload_to_frozen_observation(payload)
+    tracker = P6BTracker(
+        sequence_id="cached-support",
+        config=replace(_memory_config(), birth_minimum_mask_support=2),
+    )
+
+    tracker.step(observation, stage_id=0)
+
+    assert observation.mask_support is not None
+    assert observation.mask_support.tolist() == [1]
+    assert tracker.last_transition is not None
+    assert tracker.last_transition.birth_mask_support == (1,)
+    assert tracker.last_transition.rejected_birth_support == (True,)
 
 
 def _horizon(
