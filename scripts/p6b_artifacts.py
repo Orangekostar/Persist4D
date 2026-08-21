@@ -153,7 +153,8 @@ _SWEEP_COLUMNS = (
     "frozen_b4_valid_observations",
     "strict_online_tmap",
     "strict_online_trec",
-    "eligible",
+    "full_eligible",
+    "stage_eligible",
     "eligibility_reasons",
 )
 _FINAL_COLUMNS = (

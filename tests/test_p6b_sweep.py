@@ -336,6 +336,132 @@ def test_ineligible_candidate_cannot_win_even_with_better_switch_count() -> None
     assert len(selection.assessed_rows) == 2
 
 
+def test_selection_api_rejects_free_form_gate_deferrals() -> None:
+    protocol = load_p6b_config("conf/p6b/default.yaml")
+    baseline = _candidate(
+        overrides={
+            horizon: {"accepted": 100, "total": 100}
+            for horizon in (2, 3, 4, 5)
+        }
+    )
+    candidate = _candidate(
+        0.01,
+        overrides={
+            2: {"accepted": 80, "total": 100, "tmap": 0.10},
+            3: {"accepted": 80, "total": 100},
+            4: {"accepted": 80, "total": 100},
+            5: {"accepted": 80, "total": 100},
+        },
+    )
+
+    with pytest.raises(TypeError):
+        select_final_candidate(
+            (candidate,),
+            baseline=baseline,
+            eligibility=protocol.eligibility,
+            deferred_eligibility_reasons=frozenset(
+                {
+                    "valid_observation_ratio_below_minimum",
+                    "t2_task_drop_exceeded",
+                }
+            ),
+        )
+
+
+def test_stage_policy_never_defers_t2_or_final_stage_gates() -> None:
+    protocol = load_p6b_config("conf/p6b/default.yaml")
+    baseline = _candidate(
+        overrides={
+            horizon: {"accepted": 100, "total": 100}
+            for horizon in (2, 3, 4, 5)
+        }
+    )
+    observation_drop = _candidate(
+        0.01,
+        overrides={
+            horizon: {"accepted": 80, "total": 100}
+            for horizon in (2, 3, 4, 5)
+        },
+    )
+    task_drop = _candidate(
+        0.02,
+        overrides={2: {"accepted": 100, "total": 100, "tmap": 0.10}},
+    )
+
+    provisional = select_final_candidate(
+        (replace(observation_drop, stage="assignment"),),
+        baseline=baseline,
+        eligibility=protocol.eligibility,
+        stage="assignment",
+    )
+    assert provisional.selected.eligibility_reasons == (
+        "valid_observation_ratio_below_minimum",
+    )
+    for stage in ("birth_gate", "joint_neighbors"):
+        with pytest.raises(P6BSweepError, match="eligibility"):
+            select_final_candidate(
+                (replace(observation_drop, stage=stage),),
+                baseline=baseline,
+                eligibility=protocol.eligibility,
+                stage=stage,
+            )
+    for stage in ("assignment", "birth_gate", "joint_neighbors"):
+        with pytest.raises(P6BSweepError, match="eligibility"):
+            select_final_candidate(
+                (replace(task_drop, stage=stage),),
+                baseline=baseline,
+                eligibility=protocol.eligibility,
+                stage=stage,
+            )
+
+
+def test_stage_policy_rejects_rows_claiming_a_different_stage() -> None:
+    protocol = load_p6b_config("conf/p6b/default.yaml")
+    baseline = _candidate(
+        overrides={
+            horizon: {"accepted": 100, "total": 100}
+            for horizon in (2, 3, 4, 5)
+        }
+    )
+    mismatched = replace(
+        _candidate(
+            0.01,
+            overrides={
+                horizon: {"accepted": 80, "total": 100}
+                for horizon in (2, 3, 4, 5)
+            },
+        ),
+        stage="joint_neighbors",
+    )
+
+    with pytest.raises(P6BSweepError, match="stage"):
+        select_final_candidate(
+            (mismatched,),
+            baseline=baseline,
+            eligibility=protocol.eligibility,
+            stage="assignment",
+        )
+    with pytest.raises(P6BSweepError, match="stage"):
+        pareto_finalists(
+            (
+                replace(
+                    mismatched,
+                    horizons=tuple(
+                        replace(
+                            metric,
+                            strict_online_tmap=None,
+                            strict_online_trec=None,
+                        )
+                        for metric in mismatched.horizons
+                    ),
+                ),
+            ),
+            baseline=baseline,
+            eligibility=protocol.eligibility,
+            stage="assignment",
+        )
+
+
 def test_missing_official_task_metrics_cannot_be_frozen() -> None:
     protocol = load_p6b_config("conf/p6b/default.yaml")
 
@@ -972,6 +1098,70 @@ def test_official_metrics_are_extracted_only_from_exact_p6b_strict_blocks() -> N
     ].pop("P6B")
     with pytest.raises(P6BSweepError, match="P6B"):
         extract_official_metrics(evaluation)
+
+
+def test_staged_sweep_defers_future_component_gates_until_their_stage() -> None:
+    protocol = load_p6b_config("conf/p6b/default.yaml")
+    baseline = _candidate(
+        overrides={
+            horizon: {"accepted": 100, "total": 100}
+            for horizon in (2, 3, 4, 5)
+        }
+    )
+
+    def fast_evaluator(config: P6BMemoryConfig, stage: str) -> P6BCandidateRow:
+        accepted = 100 if stage in {"birth_gate", "joint_neighbors"} else 89
+        overrides = {
+            horizon: {"accepted": accepted, "total": 100}
+            for horizon in (2, 3, 4, 5)
+        }
+        if stage == "assignment":
+            for horizon in (3, 4, 5):
+                overrides[horizon].update(accuracy=0.60, recall=0.20)
+        return replace(
+            _candidate(overrides=overrides, official=False),
+            config=config,
+            stage=stage,
+        )
+
+    def official_evaluator(row: P6BCandidateRow) -> P6BCandidateRow:
+        return replace(
+            row,
+            horizons=tuple(
+                replace(
+                    metric,
+                    cluster_metrics=tuple(
+                        replace(
+                            cluster,
+                            strict_online_tmap=0.20,
+                            strict_online_trec=0.30,
+                        )
+                        for cluster in metric.cluster_metrics
+                    ),
+                    strict_online_tmap=0.20,
+                    strict_online_trec=0.30,
+                )
+                for metric in row.horizons
+            ),
+        )
+
+    result = run_staged_sweep(
+        protocol,
+        baseline=baseline,
+        fast_evaluator=fast_evaluator,
+        official_evaluator=official_evaluator,
+    )
+
+    assert set(result.selected_by_stage["assignment"].eligibility_reasons) == {
+        "reactivation_accuracy_below_minimum",
+        "reactivation_recall_drop_exceeded",
+        "valid_observation_ratio_below_minimum",
+    }
+    assert result.selected_by_stage["reactivation"].eligibility_reasons == (
+        "valid_observation_ratio_below_minimum",
+    )
+    assert result.selected_by_stage["birth_gate"].eligible
+    assert result.selected.eligible
 
 
 def test_staged_sweep_preserves_candidates_and_selects_official_incumbents() -> None:

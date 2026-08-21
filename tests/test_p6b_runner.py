@@ -702,6 +702,34 @@ def test_selection_document_deduplicates_cluster_sequence_evidence() -> None:
     assert len(registered) < len(document["candidate_rows"])
 
 
+def test_selection_document_records_exact_stage_eligibility_policy() -> None:
+    document = _valid_selection_document()
+    expected = {
+        "assignment": [
+            "reactivation_accuracy_below_minimum",
+            "reactivation_recall_drop_exceeded",
+            "valid_observation_ratio_below_minimum",
+        ],
+        "reactivation": ["valid_observation_ratio_below_minimum"],
+        "class_compatibility": ["valid_observation_ratio_below_minimum"],
+        "consolidation": ["valid_observation_ratio_below_minimum"],
+        "birth_gate": [],
+        "joint_neighbors": [],
+    }
+
+    assert document["stage_eligibility_policy"] == expected
+    for section in (
+        document["baseline"]["rows"],
+        document["candidate_rows"],
+        document["finalist_rows"],
+    ):
+        for row in section:
+            reasons = {item for item in row["eligibility_reasons"].split(";") if item}
+            assert row["full_eligible"] is (not reasons)
+            deferred = set(expected.get(row["stage"], ()))
+            assert row["stage_eligible"] is (reasons <= deferred)
+
+
 def test_selection_publication_enforces_source_sized_budget(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

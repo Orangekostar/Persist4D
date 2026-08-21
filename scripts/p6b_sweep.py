@@ -1322,7 +1322,9 @@ def pareto_finalists(
     *,
     baseline: P6BCandidateRow,
     eligibility: P6BEligibility,
+    stage: str | None = None,
 ) -> tuple[P6BCandidateRow, ...]:
+    deferred = _validate_candidate_stage_binding(rows, stage=stage)
     assessed = [
         assess_candidate(
             row,
@@ -1332,7 +1334,7 @@ def pareto_finalists(
         )
         for row in rows
     ]
-    eligible_rows = [row for row in assessed if row.eligible]
+    eligible_rows = [row for row in assessed if set(row.eligibility_reasons) <= deferred]
     frontier = []
     for candidate in eligible_rows:
         objective = _coarse_objectives(candidate, baseline=baseline)
@@ -1366,9 +1368,11 @@ def select_final_candidate(
     *,
     baseline: P6BCandidateRow,
     eligibility: P6BEligibility,
+    stage: str | None = None,
 ) -> P6BSelection:
     if not rows:
         raise P6BSweepError("candidate rows must not be empty")
+    deferred = _validate_candidate_stage_binding(rows, stage=stage)
     assessed = tuple(
         assess_candidate(
             row,
@@ -1378,7 +1382,7 @@ def select_final_candidate(
         )
         for row in rows
     )
-    eligible_rows = [row for row in assessed if row.eligible]
+    eligible_rows = [row for row in assessed if set(row.eligibility_reasons) <= deferred]
     if not eligible_rows:
         if any(
             "official_task_metrics_missing" in row.eligibility_reasons
@@ -1414,6 +1418,58 @@ _STAGES = (
     "birth_gate",
     "joint_neighbors",
 )
+
+_DEFERRED_ELIGIBILITY_REASONS = MappingProxyType(
+    {
+        "assignment": frozenset(
+            {
+                "reactivation_accuracy_below_minimum",
+                "reactivation_recall_drop_exceeded",
+                "valid_observation_ratio_below_minimum",
+            }
+        ),
+        "reactivation": frozenset({"valid_observation_ratio_below_minimum"}),
+        "class_compatibility": frozenset(
+            {"valid_observation_ratio_below_minimum"}
+        ),
+        "consolidation": frozenset({"valid_observation_ratio_below_minimum"}),
+        "birth_gate": frozenset(),
+        "joint_neighbors": frozenset(),
+    }
+)
+
+
+def _eligibility_reasons_deferred_at_stage(stage: str | None) -> frozenset[str]:
+    if stage is None or stage == "baseline":
+        return frozenset()
+    try:
+        return _DEFERRED_ELIGIBILITY_REASONS[stage]
+    except KeyError as error:
+        raise P6BSweepError("unknown staged eligibility policy") from error
+
+
+def _validate_candidate_stage_binding(
+    rows: Sequence[P6BCandidateRow], *, stage: str | None
+) -> frozenset[str]:
+    deferred = _eligibility_reasons_deferred_at_stage(stage)
+    if stage is not None and stage != "baseline" and any(
+        row.stage != stage for row in rows
+    ):
+        raise P6BSweepError("candidate row stage differs from requested stage policy")
+    return deferred
+
+
+def stage_eligibility_policy() -> dict[str, list[str]]:
+    return {
+        stage: sorted(_DEFERRED_ELIGIBILITY_REASONS[stage]) for stage in _STAGES
+    }
+
+
+def candidate_stage_eligible(candidate: P6BCandidateRow) -> bool:
+    if not isinstance(candidate, P6BCandidateRow):
+        raise P6BSweepError("stage eligibility requires a P6-B candidate")
+    deferred = _eligibility_reasons_deferred_at_stage(candidate.stage)
+    return set(candidate.eligibility_reasons) <= deferred
 
 
 def validate_staged_sweep_evidence(
@@ -1462,6 +1518,7 @@ def validate_staged_sweep_evidence(
             candidates,
             baseline=baseline,
             eligibility=protocol.eligibility,
+            stage=stage,
         )
         finalists = tuple(row for row in finalist_rows if row.stage == stage)
         if tuple(row.config for row in finalists) != tuple(
@@ -1495,6 +1552,7 @@ def validate_staged_sweep_evidence(
             finalists,
             baseline=baseline,
             eligibility=protocol.eligibility,
+            stage=stage,
         )
         if finalists != selection.assessed_rows:
             raise P6BSweepError(f"{stage} finalist eligibility was not recomputed")
@@ -1554,6 +1612,7 @@ def run_staged_sweep(
             stage_rows,
             baseline=baseline,
             eligibility=protocol.eligibility,
+            stage=stage,
         )
         if not frontier:
             raise P6BSweepError(f"{stage} produced no eligible Pareto finalist")
@@ -1569,6 +1628,7 @@ def run_staged_sweep(
             official_rows,
             baseline=baseline,
             eligibility=protocol.eligibility,
+            stage=stage,
         )
         finalists_with_metrics.extend(selection.assessed_rows)
         incumbent = selection.selected.config

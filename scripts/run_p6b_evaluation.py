@@ -54,6 +54,7 @@ from scripts.p6b_sweep import (
     build_candidate_row,
     cached_sequences_to_sweep_sequences,
     candidate_ranking_key,
+    candidate_stage_eligible,
     cluster_event_metrics,
     cluster_metrics_from_payload,
     cluster_metrics_to_payload,
@@ -61,6 +62,7 @@ from scripts.p6b_sweep import (
     extract_official_metrics,
     replay_configuration,
     run_staged_sweep,
+    stage_eligibility_policy,
     validate_staged_sweep_evidence,
 )
 
@@ -123,7 +125,8 @@ _SWEEP_ROW_KEYS = frozenset(
         "tuning_population_sha256",
         "strict_online_tmap",
         "strict_online_trec",
-        "eligible",
+        "full_eligible",
+        "stage_eligible",
         "eligibility_reasons",
     }
 )
@@ -156,6 +159,7 @@ _SELECTION_KEYS = frozenset(
         "heldout_evaluated",
         "tuning_population",
         "sequence_metric_evidence",
+        "stage_eligibility_policy",
         "verification_ledger",
     }
 )
@@ -1017,10 +1021,15 @@ def _parse_candidate_rows(
                 reasons = row_reasons
             elif reasons != row_reasons:
                 raise ValueError("candidate eligibility differs across horizons")
-            if not isinstance(row["eligible"], bool) or row["eligible"] != (
-                not row_reasons
-            ):
-                raise ValueError("candidate eligible flag differs from reasons")
+            if not isinstance(row["full_eligible"], bool) or row[
+                "full_eligible"
+            ] != (not row_reasons):
+                raise ValueError("candidate full eligibility differs from reasons")
+            deferred = set(stage_eligibility_policy().get(stage, ()))
+            if not isinstance(row["stage_eligible"], bool) or row[
+                "stage_eligible"
+            ] != (set(row_reasons) <= deferred):
+                raise ValueError("candidate stage eligibility differs from policy")
             metrics.append(metric)
         result.append(
             P6BCandidateRow(
@@ -1209,6 +1218,7 @@ def build_selection_document(
                 for digest in sorted(registry)
             ],
         },
+        "stage_eligibility_policy": stage_eligibility_policy(),
         "verification_ledger": dict(verification_ledger),
     }
     _validate_selection_document(document)
@@ -1253,6 +1263,8 @@ def _validate_selection_document(document: Mapping[str, object]) -> None:
     expected_population = _split_population_evidence(expected_split, partition="tuning")
     if document["tuning_population"] != expected_population:
         raise ValueError("selection tuning population differs from the frozen split")
+    if document["stage_eligibility_policy"] != stage_eligibility_policy():
+        raise ValueError("selection staged eligibility policy differs")
     _validate_verification_ledger(document["verification_ledger"])
     provenance = document["provenance"]
     if (
@@ -1728,7 +1740,8 @@ def _candidate_sweep_rows(
             "tuning_population_sha256": tuning_population["sha256"],
             "strict_online_tmap": metric.strict_online_tmap,
             "strict_online_trec": metric.strict_online_trec,
-            "eligible": candidate.eligible,
+            "full_eligible": candidate.eligible,
+            "stage_eligible": candidate_stage_eligible(candidate),
             "eligibility_reasons": ";".join(candidate.eligibility_reasons),
         }
         for metric in candidate.horizons
