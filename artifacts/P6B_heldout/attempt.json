@@ -1,0 +1,41 @@
+{
+  "attempt_id": "e196f96d06790e769da447a31cff2266e875bb263fbf1a0a67558645d8250b59",
+  "command": [
+    "final-evaluate",
+    "--protocol",
+    "P6B-v2",
+    "--cache",
+    "frozen-P6A"
+  ],
+  "ended_utc": "2026-08-21T21:53:32.997695Z",
+  "error_type": null,
+  "events": [
+    {
+      "event": "attempt_token_published",
+      "utc": "2026-08-21T21:42:41.948315Z"
+    },
+    {
+      "event": "heldout_raw_published",
+      "utc": "2026-08-21T21:53:32.997695Z"
+    }
+  ],
+  "exit_status": 0,
+  "input_sha256": "09d66375c02d96bb58fd0ccf5f820a7da6610372ec705b563d2e6e68d6ed2fb1",
+  "log_sha256": "5e78613a4de6e681306ac3a501d80d5f7f4e9671901353bcf9b062e0e0e2f40f",
+  "output": {
+    "bytes": 1866372,
+    "ref": "repo:artifacts/P6B_heldout/heldout_raw.json",
+    "sha256": "b68ee9716a9be5a9a5b0c35751e4c44dd1fa10b203883fe243abbff7fcf0b7ad"
+  },
+  "p6b_config_sha256": "974acd51648fa952b55e7bb45bac8799db673578782c127c848294b301156fae",
+  "protocol_version": 2,
+  "schema_version": 1,
+  "selection": {
+    "ref": "repo:artifacts/P6B_selection/selection.json",
+    "sha256": "4c20284649b99d9f4e7eddb69c24d87c308b9eb07496f646def914a7c8137628"
+  },
+  "source_commit": "2024009f60814d02fbe1fb2bcc48d4408ae70fe2",
+  "split_sha256": "80157a4f25d222d7a07757acbaa70e9a68b5d2e546ee4903bf755fda928689d6",
+  "started_utc": "2026-08-21T21:42:41.948315Z",
+  "status": "success"
+}
