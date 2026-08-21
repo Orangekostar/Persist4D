@@ -84,7 +84,7 @@ def test_default_config_locks_search_space_and_selection_contract() -> None:
     config = load_p6b_config(P6B_CONFIG)
     search = config.search
 
-    assert config.schema_version == 1
+    assert config.schema_version == 2
     assert config.seed == 45
     assert config.base == P6BMemoryConfig()
     assert search.assignment_modes == (
@@ -106,9 +106,9 @@ def test_default_config_locks_search_space_and_selection_contract() -> None:
     assert config.eligibility.minimum_valid_observation_ratio == 0.90
     assert config.eligibility.maximum_t2_task_drop == 0.02
     assert config.ranking == (
-        "mean_t4_t5_identity_switches",
-        "wrong_reactivations",
-        "false_births",
+        "paired_cluster_mean_t4_t5_identity_switch_rate",
+        "paired_cluster_mean_t3_t5_wrong_reactivation_rate",
+        "paired_cluster_mean_t2_t5_false_birth_rate",
         "negative_reactivation_recall",
         "negative_mean_t4_t5_task_score",
         "canonical_config_json",

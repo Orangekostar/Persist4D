@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from fractions import Fraction
+from math import lcm
 from types import SimpleNamespace
 
 import pytest
@@ -17,6 +19,7 @@ from scripts.p6b_association import P6BTracker
 from scripts.p6b_protocol import load_p6b_config
 from scripts.p6b_sweep import (
     P6BCandidateRow,
+    P6BClusterMetrics,
     P6BHorizonMetrics,
     P6BSweepError,
     P6BSweepSequence,
@@ -30,6 +33,7 @@ from scripts.p6b_sweep import (
     replay_configuration,
     run_staged_sweep,
     select_final_candidate,
+    validate_staged_sweep_evidence,
 )
 
 
@@ -140,6 +144,7 @@ def _horizon(
     horizon: int,
     *,
     switches: int = 10,
+    transitions: int = 100,
     wrong: int = 4,
     false_births: int = 3,
     accuracy: float = 0.75,
@@ -149,15 +154,43 @@ def _horizon(
     tmap: float | None = 0.20,
     trec: float | None = 0.30,
 ) -> P6BHorizonMetrics:
+    accuracy_fraction = Fraction(str(accuracy))
+    recall_fraction = Fraction(str(recall))
+    correct = lcm(accuracy_fraction.numerator, recall_fraction.numerator)
+    attempts = correct * accuracy_fraction.denominator // accuracy_fraction.numerator
+    gaps = correct * recall_fraction.denominator // recall_fraction.numerator
+    predicted = correct + wrong
+    births = max(10, false_births)
+    cluster = P6BClusterMetrics(
+        reference_scene_id="cluster-0",
+        identity_switches=switches,
+        transition_opportunities=transitions,
+        wrong_reactivations=wrong,
+        predicted_reactivation_events=predicted,
+        correct_reactivations=correct,
+        reactivation_attempts=attempts,
+        gap_opportunities=gaps,
+        false_births=false_births,
+        births=births,
+        rejected_births=2,
+    )
     return P6BHorizonMetrics(
         horizon=horizon,
         identity_switches=switches,
+        transition_opportunities=transitions,
         wrong_reactivations=wrong,
+        predicted_reactivation_events=predicted,
+        correct_reactivations=correct,
+        reactivation_attempts=attempts,
+        gap_opportunities=gaps,
         false_births=false_births,
+        births=births,
+        rejected_births=2,
         reactivation_accuracy=accuracy,
         reactivation_recall=recall,
         accepted_valid_observations=accepted,
         total_valid_observations=total,
+        cluster_metrics=(cluster,),
         strict_online_tmap=tmap,
         strict_online_trec=trec,
     )
@@ -260,9 +293,9 @@ def test_ineligible_candidate_cannot_win_even_with_better_switch_count() -> None
     ineligible = _candidate(
         0.02,
         overrides={
-            3: {"accuracy": 0.1},
-            4: {"accuracy": 0.1, "switches": 0},
-            5: {"accuracy": 0.1, "switches": 0},
+            3: {"accuracy": 0.1, "recall": 0.05},
+            4: {"accuracy": 0.1, "recall": 0.05, "switches": 0},
+            5: {"accuracy": 0.1, "recall": 0.05, "switches": 0},
         },
     )
 
@@ -313,8 +346,58 @@ def test_ranking_key_uses_all_preregistered_criteria_in_order() -> None:
 
     key = candidate_ranking_key(row)
 
-    assert key[:5] == pytest.approx((13.0, 18.0, 20.0, -0.30, -0.40))
+    assert key[:5] == pytest.approx(
+        (
+            (0.12 + 0.14) / 2,
+            sum(
+                row.metric(horizon).wrong_reactivation_rate
+                for horizon in (3, 4, 5)
+            )
+            / 3,
+            (8 / 12 + 3 / 12 + 5 / 12 + 4 / 12) / 4,
+            -0.30,
+            -0.40,
+        )
+    )
     assert key[5] == row.config_json
+
+
+def test_ranking_prefers_lower_normalized_rate_over_lower_raw_count() -> None:
+    lower_rate = _candidate(
+        0.01,
+        overrides={
+            4: {"switches": 10, "transitions": 100},
+            5: {"switches": 10, "transitions": 100},
+        },
+    )
+    lower_count_but_worse_rate = _candidate(
+        0.02,
+        overrides={
+            4: {"switches": 8, "transitions": 40},
+            5: {"switches": 8, "transitions": 40},
+        },
+    )
+
+    assert candidate_ranking_key(lower_rate) < candidate_ranking_key(
+        lower_count_but_worse_rate
+    )
+
+
+def test_horizon_rates_are_recomputed_from_explicit_denominators() -> None:
+    metric = _horizon(
+        5,
+        switches=3,
+        transitions=12,
+        wrong=2,
+        false_births=4,
+    )
+
+    assert metric.identity_switch_rate == pytest.approx(3 / 12)
+    assert metric.wrong_reactivation_rate == pytest.approx(
+        2 / metric.predicted_reactivation_events
+    )
+    assert metric.false_birth_rate == pytest.approx(4 / (metric.births + 2))
+    assert metric.cluster_mean_identity_switch_rate == pytest.approx(3 / 12)
 
 
 def test_pareto_finalists_exclude_dominated_and_ineligible_rows() -> None:
@@ -332,7 +415,11 @@ def test_pareto_finalists_exclude_dominated_and_ineligible_rows() -> None:
     )
     ineligible = _candidate(
         0.03,
-        overrides={3: {"accuracy": 0.1}, 4: {"accuracy": 0.1}, 5: {"accuracy": 0.1}},
+        overrides={
+            3: {"accuracy": 0.1, "recall": 0.05},
+            4: {"accuracy": 0.1, "recall": 0.05},
+            5: {"accuracy": 0.1, "recall": 0.05},
+        },
         official=False,
     )
 
@@ -522,3 +609,28 @@ def test_staged_sweep_preserves_candidates_and_selects_official_incumbents() -> 
     assert all(row.official_metrics_complete for row in result.finalist_rows)
     assert all(isinstance(row.eligibility_reasons, tuple) for row in result.candidate_rows)
     assert result.selected.official_metrics_complete
+    validate_staged_sweep_evidence(
+        protocol,
+        baseline=baseline,
+        candidate_rows=result.candidate_rows,
+        finalist_rows=result.finalist_rows,
+        selected_by_stage=result.selected_by_stage,
+        selected=result.selected,
+        ranking_key=candidate_ranking_key(result.selected),
+    )
+
+    tampered = dict(result.selected_by_stage)
+    tampered["assignment"] = replace(
+        tampered["assignment"],
+        config=replace(tampered["assignment"].config, active_threshold=0.123),
+    )
+    with pytest.raises(P6BSweepError, match="assignment.*winner|winner.*assignment"):
+        validate_staged_sweep_evidence(
+            protocol,
+            baseline=baseline,
+            candidate_rows=result.candidate_rows,
+            finalist_rows=result.finalist_rows,
+            selected_by_stage=tampered,
+            selected=result.selected,
+            ranking_key=candidate_ranking_key(result.selected),
+        )

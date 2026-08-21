@@ -217,8 +217,8 @@ def load_p6b_config(path: str | Path) -> P6BProtocolConfig:
         "config",
     )
     schema_version = _integer(root["schema_version"], "schema_version", minimum=1)
-    if schema_version != 1:
-        raise P6BProtocolError("schema_version must be 1")
+    if schema_version != 2:
+        raise P6BProtocolError("schema_version must be 2")
     seed = _integer(root["seed"], "seed")
 
     sources_mapping = _mapping(root["sources"], "sources")

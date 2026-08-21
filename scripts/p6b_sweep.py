@@ -13,7 +13,7 @@ from scripts.evaluate_persist4d_p6a import (
     cache_payload_to_frozen_observation,
     observation_content_digest,
 )
-from scripts.p6a_analysis import aggregate_event_metrics
+from scripts.p6a_analysis import aggregate_event_metrics, validate_association_events
 from scripts.p6a_association import FrozenObservation, TrackStep, freeze_observation
 from scripts.p6b_association import P6BTracker, P6BTransitionDetails
 from scripts.p6b_protocol import (
@@ -278,11 +278,122 @@ def _aggregate_events(events: Iterable[object]) -> dict[str, int | float | None]
         raise P6BSweepError(f"invalid association events: {error}") from error
     return {
         "identity_switches": int(identity["id_switches"]),
+        "transition_opportunities": int(identity["transition_opportunities"]),
         "wrong_reactivations": int(reactivation["wrong_reactivations"]),
+        "predicted_reactivation_events": int(
+            reactivation["predicted_reactivation_events"]
+        ),
+        "correct_reactivations": int(reactivation["correct_reactivations"]),
+        "reactivation_attempts": int(reactivation["reactivation_attempts"]),
+        "gap_opportunities": int(reactivation["gap_opportunities"]),
         "false_births": int(identity["false_births"]),
+        "births": int(identity["births"]),
+        "rejected_births": int(identity["rejected_births"]),
         "reactivation_accuracy": reactivation["reactivation_accuracy"],
         "reactivation_recall": reactivation["reactivation_recall"],
     }
+
+
+def _ratio(numerator: int, denominator: int) -> float | None:
+    return numerator / denominator if denominator else None
+
+
+@dataclass(frozen=True)
+class P6BClusterMetrics:
+    reference_scene_id: str
+    identity_switches: int
+    transition_opportunities: int
+    wrong_reactivations: int
+    predicted_reactivation_events: int
+    correct_reactivations: int
+    reactivation_attempts: int
+    gap_opportunities: int
+    false_births: int
+    births: int
+    rejected_births: int
+
+    def __post_init__(self) -> None:
+        _nonempty_string(self.reference_scene_id, "reference_scene_id")
+        for name in (
+            "identity_switches",
+            "transition_opportunities",
+            "wrong_reactivations",
+            "predicted_reactivation_events",
+            "correct_reactivations",
+            "reactivation_attempts",
+            "gap_opportunities",
+            "false_births",
+            "births",
+            "rejected_births",
+        ):
+            value = getattr(self, name)
+            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+                raise P6BSweepError(f"{name} must be a nonnegative integer")
+        if self.identity_switches > self.transition_opportunities:
+            raise P6BSweepError("identity switches exceed transition opportunities")
+        if not (
+            self.correct_reactivations
+            <= self.reactivation_attempts
+            <= self.gap_opportunities
+        ):
+            raise P6BSweepError("reactivation counts exceed their opportunities")
+        if self.correct_reactivations > self.predicted_reactivation_events:
+            raise P6BSweepError("correct reactivations exceed predicted events")
+        if (
+            self.wrong_reactivations
+            != self.predicted_reactivation_events - self.correct_reactivations
+        ):
+            raise P6BSweepError("wrong reactivations differ from predicted minus correct")
+        if self.false_births > self.births:
+            raise P6BSweepError("false births exceed accepted births")
+
+    @property
+    def identity_switch_rate(self) -> float | None:
+        return _ratio(self.identity_switches, self.transition_opportunities)
+
+    @property
+    def wrong_reactivation_rate(self) -> float | None:
+        return _ratio(self.wrong_reactivations, self.predicted_reactivation_events)
+
+    @property
+    def false_birth_rate(self) -> float | None:
+        return _ratio(self.false_births, self.births + self.rejected_births)
+
+
+def cluster_event_metrics(events: Iterable[object]) -> tuple[P6BClusterMetrics, ...]:
+    try:
+        validated = validate_association_events(events)
+    except (TypeError, ValueError) as error:
+        raise P6BSweepError(f"invalid association events: {error}") from error
+    grouped: dict[str, list[object]] = {}
+    for event in validated:
+        grouped.setdefault(event.reference_scene_id, []).append(event)
+    result = []
+    for reference_scene_id, cluster_events in sorted(grouped.items()):
+        aggregate = _aggregate_events(cluster_events)
+        result.append(
+            P6BClusterMetrics(
+                reference_scene_id=reference_scene_id,
+                **{
+                    name: int(aggregate[name])
+                    for name in (
+                        "identity_switches",
+                        "transition_opportunities",
+                        "wrong_reactivations",
+                        "predicted_reactivation_events",
+                        "correct_reactivations",
+                        "reactivation_attempts",
+                        "gap_opportunities",
+                        "false_births",
+                        "births",
+                        "rejected_births",
+                    )
+                },
+            )
+        )
+    if not result:
+        raise P6BSweepError("cluster metrics require association events")
+    return tuple(result)
 
 
 def _observation_counts(
@@ -311,7 +422,9 @@ def build_candidate_row(
         raise P6BSweepError("official_metrics must contain exact T2-T5 keys")
     horizons = []
     for horizon in _HORIZONS:
-        aggregate = _aggregate_events(events_by_horizon[horizon])
+        events = tuple(events_by_horizon[horizon])
+        aggregate = _aggregate_events(events)
+        clusters = cluster_event_metrics(events)
         accepted, total = _observation_counts(replay, horizon)
         if official_metrics is None:
             tmap = None
@@ -328,12 +441,24 @@ def build_candidate_row(
             P6BHorizonMetrics(
                 horizon=horizon,
                 identity_switches=int(aggregate["identity_switches"]),
+                transition_opportunities=int(
+                    aggregate["transition_opportunities"]
+                ),
                 wrong_reactivations=int(aggregate["wrong_reactivations"]),
+                predicted_reactivation_events=int(
+                    aggregate["predicted_reactivation_events"]
+                ),
+                correct_reactivations=int(aggregate["correct_reactivations"]),
+                reactivation_attempts=int(aggregate["reactivation_attempts"]),
+                gap_opportunities=int(aggregate["gap_opportunities"]),
                 false_births=int(aggregate["false_births"]),
+                births=int(aggregate["births"]),
+                rejected_births=int(aggregate["rejected_births"]),
                 reactivation_accuracy=aggregate["reactivation_accuracy"],
                 reactivation_recall=aggregate["reactivation_recall"],
                 accepted_valid_observations=accepted,
                 total_valid_observations=total,
+                cluster_metrics=clusters,
                 strict_online_tmap=tmap,
                 strict_online_trec=trec,
             )
@@ -349,12 +474,20 @@ def build_candidate_row(
 class P6BHorizonMetrics:
     horizon: int
     identity_switches: int
+    transition_opportunities: int
     wrong_reactivations: int
+    predicted_reactivation_events: int
+    correct_reactivations: int
+    reactivation_attempts: int
+    gap_opportunities: int
     false_births: int
+    births: int
+    rejected_births: int
     reactivation_accuracy: float | None
     reactivation_recall: float | None
     accepted_valid_observations: int
     total_valid_observations: int
+    cluster_metrics: tuple[P6BClusterMetrics, ...]
     strict_online_tmap: float | None = None
     strict_online_trec: float | None = None
 
@@ -363,8 +496,15 @@ class P6BHorizonMetrics:
             raise P6BSweepError("horizon must be one of T2-T5")
         for name in (
             "identity_switches",
+            "transition_opportunities",
             "wrong_reactivations",
+            "predicted_reactivation_events",
+            "correct_reactivations",
+            "reactivation_attempts",
+            "gap_opportunities",
             "false_births",
+            "births",
+            "rejected_births",
             "accepted_valid_observations",
             "total_valid_observations",
         ):
@@ -373,6 +513,46 @@ class P6BHorizonMetrics:
                 raise P6BSweepError(f"{name} must be a nonnegative integer")
         if self.accepted_valid_observations > self.total_valid_observations:
             raise P6BSweepError("accepted observations cannot exceed total observations")
+        if not isinstance(self.cluster_metrics, tuple) or not self.cluster_metrics:
+            raise P6BSweepError("cluster_metrics must be a nonempty tuple")
+        if any(
+            not isinstance(item, P6BClusterMetrics) for item in self.cluster_metrics
+        ):
+            raise P6BSweepError("cluster_metrics contain an invalid record")
+        references = tuple(item.reference_scene_id for item in self.cluster_metrics)
+        if references != tuple(sorted(set(references))):
+            raise P6BSweepError("cluster_metrics must be uniquely sorted by reference")
+        for name in (
+            "identity_switches",
+            "transition_opportunities",
+            "wrong_reactivations",
+            "predicted_reactivation_events",
+            "correct_reactivations",
+            "reactivation_attempts",
+            "gap_opportunities",
+            "false_births",
+            "births",
+            "rejected_births",
+        ):
+            if getattr(self, name) != sum(
+                getattr(item, name) for item in self.cluster_metrics
+            ):
+                raise P6BSweepError(f"{name} differs from cluster totals")
+        expected_accuracy = _ratio(
+            self.correct_reactivations, self.reactivation_attempts
+        )
+        expected_recall = _ratio(self.correct_reactivations, self.gap_opportunities)
+        for name, expected in (
+            ("reactivation_accuracy", expected_accuracy),
+            ("reactivation_recall", expected_recall),
+        ):
+            actual = getattr(self, name)
+            if (actual is None) != (expected is None) or (
+                actual is not None
+                and expected is not None
+                and not math.isclose(actual, expected, rel_tol=1e-12, abs_tol=1e-12)
+            ):
+                raise P6BSweepError(f"{name} differs from count-derived rate")
         for name in (
             "reactivation_accuracy",
             "reactivation_recall",
@@ -382,6 +562,38 @@ class P6BHorizonMetrics:
             value = _finite_optional(getattr(self, name), name)
             if value is not None and not 0.0 <= value <= 1.0:
                 raise P6BSweepError(f"{name} must be within [0, 1]")
+
+    @property
+    def identity_switch_rate(self) -> float | None:
+        return _ratio(self.identity_switches, self.transition_opportunities)
+
+    @property
+    def wrong_reactivation_rate(self) -> float | None:
+        return _ratio(self.wrong_reactivations, self.predicted_reactivation_events)
+
+    @property
+    def false_birth_rate(self) -> float | None:
+        return _ratio(self.false_births, self.births + self.rejected_births)
+
+    def _cluster_mean(self, name: str) -> float | None:
+        values = [
+            getattr(item, name)
+            for item in self.cluster_metrics
+            if getattr(item, name) is not None
+        ]
+        return sum(values) / len(values) if values else None
+
+    @property
+    def cluster_mean_identity_switch_rate(self) -> float | None:
+        return self._cluster_mean("identity_switch_rate")
+
+    @property
+    def cluster_mean_wrong_reactivation_rate(self) -> float | None:
+        return self._cluster_mean("wrong_reactivation_rate")
+
+    @property
+    def cluster_mean_false_birth_rate(self) -> float | None:
+        return self._cluster_mean("false_birth_rate")
 
 
 @dataclass(frozen=True)
@@ -434,6 +646,13 @@ class P6BCandidateRow:
 def _mean_present(values: Iterable[float | None]) -> float | None:
     present = [float(value) for value in values if value is not None]
     return sum(present) / len(present) if present else None
+
+
+def _mean_required(values: Iterable[float | None], name: str) -> float:
+    materialized = tuple(values)
+    if not materialized or any(value is None for value in materialized):
+        raise P6BSweepError(f"{name} requires a rate for every requested horizon")
+    return sum(float(value) for value in materialized) / len(materialized)
 
 
 def assess_candidate(
@@ -512,14 +731,27 @@ def candidate_ranking_key(row: P6BCandidateRow) -> tuple[float | str, ...]:
     if any(value is None for value in task_values):
         raise P6BSweepError("T4/T5 official task metrics are required")
     return (
-        (t4.identity_switches + t5.identity_switches) / 2.0,
-        float(
-            sum(
-                row.metric(horizon).wrong_reactivations
-                for horizon in (3, 4, 5)
-            )
+        _mean_required(
+            (
+                row.metric(horizon).cluster_mean_identity_switch_rate
+                for horizon in (4, 5)
+            ),
+            "identity-switch ranking",
         ),
-        float(sum(row.metric(horizon).false_births for horizon in _HORIZONS)),
+        _mean_required(
+            (
+                row.metric(horizon).cluster_mean_wrong_reactivation_rate
+                for horizon in (3, 4, 5)
+            ),
+            "wrong-reactivation ranking",
+        ),
+        _mean_required(
+            (
+                row.metric(horizon).cluster_mean_false_birth_rate
+                for horizon in _HORIZONS
+            ),
+            "false-birth ranking",
+        ),
         -reactivation_recall,
         -sum(float(value) for value in task_values if value is not None) / 4.0,
         row.config_json,
@@ -533,15 +765,27 @@ def _coarse_objectives(row: P6BCandidateRow) -> tuple[float, ...]:
     if recall is None:
         recall = -1.0
     return (
-        (row.metric(4).identity_switches + row.metric(5).identity_switches)
-        / 2.0,
-        float(
-            sum(
-                row.metric(horizon).wrong_reactivations
-                for horizon in (3, 4, 5)
-            )
+        _mean_required(
+            (
+                row.metric(horizon).cluster_mean_identity_switch_rate
+                for horizon in (4, 5)
+            ),
+            "identity-switch objective",
         ),
-        float(sum(row.metric(horizon).false_births for horizon in _HORIZONS)),
+        _mean_required(
+            (
+                row.metric(horizon).cluster_mean_wrong_reactivation_rate
+                for horizon in (3, 4, 5)
+            ),
+            "wrong-reactivation objective",
+        ),
+        _mean_required(
+            (
+                row.metric(horizon).cluster_mean_false_birth_rate
+                for horizon in _HORIZONS
+            ),
+            "false-birth objective",
+        ),
         -recall,
     )
 
@@ -627,6 +871,88 @@ class P6BStagedSweepResult:
     selected: P6BCandidateRow
 
 
+_STAGES = (
+    "assignment",
+    "reactivation",
+    "class_compatibility",
+    "consolidation",
+    "birth_gate",
+    "joint_neighbors",
+)
+
+
+def validate_staged_sweep_evidence(
+    protocol: P6BProtocolConfig,
+    *,
+    baseline: P6BCandidateRow,
+    candidate_rows: Sequence[P6BCandidateRow],
+    finalist_rows: Sequence[P6BCandidateRow],
+    selected_by_stage: Mapping[str, P6BCandidateRow],
+    selected: P6BCandidateRow,
+    ranking_key: Sequence[float | str],
+) -> None:
+    if not isinstance(protocol, P6BProtocolConfig):
+        raise P6BSweepError("protocol must be a P6BProtocolConfig")
+    if not baseline.official_metrics_complete:
+        raise P6BSweepError("baseline must contain official task metrics")
+    if tuple(selected_by_stage) != _STAGES:
+        raise P6BSweepError("selected_by_stage must contain the exact stage order")
+    if not candidate_rows or not finalist_rows:
+        raise P6BSweepError("sweep evidence must contain candidates and finalists")
+
+    incumbent = protocol.base
+    for stage in _STAGES:
+        expected_configs = (
+            joint_neighbor_configs(incumbent, protocol.search)
+            if stage == "joint_neighbors"
+            else expand_stage_configs(incumbent, protocol.search, stage=stage)
+        )
+        candidates = tuple(row for row in candidate_rows if row.stage == stage)
+        if tuple(row.config for row in candidates) != expected_configs:
+            raise P6BSweepError(f"{stage} candidate grid differs from preregistration")
+        if any(row.official_metrics_complete for row in candidates):
+            raise P6BSweepError("coarse candidate rows cannot contain official metrics")
+        reassessed = tuple(
+            assess_candidate(
+                row,
+                baseline=baseline,
+                eligibility=protocol.eligibility,
+                require_official_metrics=False,
+            )
+            for row in candidates
+        )
+        if candidates != reassessed:
+            raise P6BSweepError(f"{stage} candidate eligibility was not recomputed")
+        frontier = pareto_finalists(
+            candidates,
+            baseline=baseline,
+            eligibility=protocol.eligibility,
+        )
+        finalists = tuple(row for row in finalist_rows if row.stage == stage)
+        if tuple(row.config for row in finalists) != tuple(
+            row.config for row in frontier
+        ):
+            raise P6BSweepError(f"{stage} finalists differ from the Pareto frontier")
+        selection = select_final_candidate(
+            finalists,
+            baseline=baseline,
+            eligibility=protocol.eligibility,
+        )
+        if finalists != selection.assessed_rows:
+            raise P6BSweepError(f"{stage} finalist eligibility was not recomputed")
+        if selected_by_stage[stage] != selection.selected:
+            raise P6BSweepError(f"{stage} selected winner differs from ranking")
+        incumbent = selection.selected.config
+
+    if any(row.stage not in _STAGES for row in (*candidate_rows, *finalist_rows)):
+        raise P6BSweepError("sweep evidence contains an unknown stage")
+    final = selected_by_stage[_STAGES[-1]]
+    if selected != final:
+        raise P6BSweepError("final selected candidate differs from joint winner")
+    if tuple(ranking_key) != candidate_ranking_key(final):
+        raise P6BSweepError("final ranking key differs from recomputed ranking")
+
+
 def run_staged_sweep(
     protocol: P6BProtocolConfig,
     *,
@@ -642,15 +968,7 @@ def run_staged_sweep(
     candidates: list[P6BCandidateRow] = []
     finalists_with_metrics: list[P6BCandidateRow] = []
     selected_by_stage: dict[str, P6BCandidateRow] = {}
-    stages = (
-        "assignment",
-        "reactivation",
-        "class_compatibility",
-        "consolidation",
-        "birth_gate",
-        "joint_neighbors",
-    )
-    for stage in stages:
+    for stage in _STAGES:
         configs = (
             joint_neighbor_configs(incumbent, protocol.search)
             if stage == "joint_neighbors"
@@ -697,9 +1015,19 @@ def run_staged_sweep(
         finalists_with_metrics.extend(selection.assessed_rows)
         incumbent = selection.selected.config
         selected_by_stage[stage] = selection.selected
-    return P6BStagedSweepResult(
+    result = P6BStagedSweepResult(
         candidate_rows=tuple(candidates),
         finalist_rows=tuple(finalists_with_metrics),
         selected_by_stage=MappingProxyType(dict(selected_by_stage)),
-        selected=selected_by_stage[stages[-1]],
+        selected=selected_by_stage[_STAGES[-1]],
     )
+    validate_staged_sweep_evidence(
+        protocol,
+        baseline=baseline,
+        candidate_rows=result.candidate_rows,
+        finalist_rows=result.finalist_rows,
+        selected_by_stage=result.selected_by_stage,
+        selected=result.selected,
+        ranking_key=candidate_ranking_key(result.selected),
+    )
+    return result

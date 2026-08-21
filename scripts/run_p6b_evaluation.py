@@ -39,22 +39,73 @@ from scripts.p6b_protocol import (
 )
 from scripts.p6b_sweep import (
     P6BCandidateRow,
+    P6BClusterMetrics,
     P6BHorizonMetrics,
     build_candidate_row,
     cached_sequences_to_sweep_sequences,
     candidate_ranking_key,
+    cluster_event_metrics,
     derive_prefix_events,
     extract_official_metrics,
     replay_configuration,
     run_staged_sweep,
+    validate_staged_sweep_evidence,
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SELECTION_SCHEMA_VERSION = 1
+SELECTION_SCHEMA_VERSION = 2
 EXPECTED_CHECKPOINT_SHA256 = "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e"
 EXPECTED_P5_SHA256 = "7da68910b0c0b43b5f04d8ae7d56543a460231c0616c62b2fb9485b88fd781a1"
 EXPECTED_P6A_SHA256 = "bffc32fde402396258ed750943101bd8acb6318bc2526ea8f99a9ec42dbe9399"
 _HORIZONS = (2, 3, 4, 5)
+_STAGES = (
+    "assignment",
+    "reactivation",
+    "class_compatibility",
+    "consolidation",
+    "birth_gate",
+    "joint_neighbors",
+)
+_SWEEP_ROW_KEYS = frozenset(
+    {
+        "config_id",
+        "config_json",
+        "stage",
+        "T",
+        "identity_switches",
+        "transition_opportunities",
+        "identity_switch_rate",
+        "wrong_reactivations",
+        "predicted_reactivation_events",
+        "correct_reactivations",
+        "reactivation_attempts",
+        "gap_opportunities",
+        "wrong_reactivation_rate",
+        "false_births",
+        "births",
+        "rejected_births",
+        "false_birth_rate",
+        "cluster_metrics_json",
+        "reactivation_accuracy",
+        "reactivation_recall",
+        "accepted_valid_observations",
+        "total_valid_observations",
+        "strict_online_tmap",
+        "strict_online_trec",
+        "eligible",
+        "eligibility_reasons",
+    }
+)
+_SELECTION_PROVENANCE_KEYS = frozenset(
+    {
+        "p6a_protocol_manifest_sha256",
+        "cache_manifest_sha256",
+        "split_sha256",
+        "p6b_config_sha256",
+        "gt_free_inference_test_sha256",
+        "gt_free_inference_status",
+    }
+)
 _SELECTION_KEYS = frozenset(
     {
         "schema_version",
@@ -136,6 +187,171 @@ def _config_sha256(config: P6BMemoryConfig) -> str:
     return hashlib.sha256(canonical_config_json(config).encode("ascii")).hexdigest()
 
 
+def _selection_protocol() -> tuple[object, Mapping[str, object]]:
+    config_path = PROJECT_ROOT / "conf/p6b/default.yaml"
+    protocol = load_p6b_config(config_path)
+    manifest_path = PROJECT_ROOT / "artifacts/P6A/protocol_b_manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise ValueError("frozen P6-A protocol manifest cannot be decoded") from error
+    if not isinstance(manifest, Mapping):
+        raise TypeError("frozen P6-A protocol manifest must be a mapping")
+    split = build_split_manifest(manifest, seed=protocol.seed)
+    return protocol, split.to_mapping()
+
+
+def _expected_selection_provenance(
+    protocol: object, split_manifest: Mapping[str, object]
+) -> dict[str, object]:
+    sources = getattr(protocol, "sources", None)
+    if sources is None:
+        raise TypeError("protocol must expose frozen sources")
+    return {
+        "p6a_protocol_manifest_sha256": sources.p6a_protocol_manifest.sha256,
+        "cache_manifest_sha256": sources.p6a_cache_manifest.sha256,
+        "split_sha256": split_manifest["sha256"],
+        "p6b_config_sha256": _sha256_file(PROJECT_ROOT / "conf/p6b/default.yaml"),
+        "gt_free_inference_test_sha256": _sha256_file(
+            PROJECT_ROOT / "tests/test_p6b_association.py"
+        ),
+        "gt_free_inference_status": "pass",
+    }
+
+
+def _same_optional_rate(actual: object, expected: float | None, *, name: str) -> None:
+    if expected is None:
+        if actual is not None:
+            raise ValueError(f"{name} must be null when its denominator is zero")
+        return
+    if isinstance(actual, bool) or not isinstance(actual, (int, float)):
+        raise TypeError(f"{name} must be a finite numeric rate")
+    number = float(actual)
+    if not math.isfinite(number) or not math.isclose(
+        number, expected, rel_tol=1e-12, abs_tol=1e-12
+    ):
+        raise ValueError(f"{name} differs from its count-derived rate")
+
+
+def _parse_candidate_rows(
+    rows: object,
+    *,
+    official_metrics_required: bool,
+    allowed_stages: Sequence[str] = _STAGES,
+) -> tuple[P6BCandidateRow, ...]:
+    if isinstance(rows, (str, bytes)) or not isinstance(rows, Sequence) or not rows:
+        raise ValueError("candidate rows must be a nonempty sequence")
+    groups: dict[tuple[str, str], list[Mapping[str, object]]] = {}
+    order: list[tuple[str, str]] = []
+    for index, raw_row in enumerate(rows):
+        if not isinstance(raw_row, Mapping) or set(raw_row) != _SWEEP_ROW_KEYS:
+            raise ValueError(f"candidate row {index} differs from the strict schema")
+        stage = raw_row["stage"]
+        config_id = raw_row["config_id"]
+        if stage not in allowed_stages or not isinstance(config_id, str) or not config_id:
+            raise ValueError("candidate row stage/config identity is invalid")
+        key = (stage, config_id)
+        if key not in groups:
+            groups[key] = []
+            order.append(key)
+        groups[key].append(raw_row)
+
+    result = []
+    for stage, config_id in order:
+        horizon_rows = groups[(stage, config_id)]
+        if [row["T"] for row in horizon_rows] != [f"T{value}" for value in _HORIZONS]:
+            raise ValueError("candidate config must contain ordered exact T2-T5 rows")
+        config_json = horizon_rows[0]["config_json"]
+        if not isinstance(config_json, str) or any(
+            row["config_json"] != config_json for row in horizon_rows
+        ):
+            raise ValueError("candidate config JSON differs across horizons")
+        try:
+            config_mapping = json.loads(config_json)
+            config = P6BMemoryConfig(**config_mapping)
+        except (json.JSONDecodeError, TypeError, ValueError) as error:
+            raise ValueError("candidate config JSON is invalid") from error
+        if config_json != canonical_config_json(config):
+            raise ValueError("candidate config JSON is not canonical")
+        if config_id != canonical_config_id(config):
+            raise ValueError("candidate config ID differs from canonical config")
+
+        metrics = []
+        reasons: tuple[str, ...] | None = None
+        for horizon, row in zip(_HORIZONS, horizon_rows, strict=True):
+            try:
+                cluster_payload = json.loads(str(row["cluster_metrics_json"]))
+                if not isinstance(cluster_payload, list):
+                    raise TypeError
+                clusters = tuple(P6BClusterMetrics(**item) for item in cluster_payload)
+                metric = P6BHorizonMetrics(
+                    horizon=horizon,
+                    identity_switches=row["identity_switches"],
+                    transition_opportunities=row["transition_opportunities"],
+                    wrong_reactivations=row["wrong_reactivations"],
+                    predicted_reactivation_events=row[
+                        "predicted_reactivation_events"
+                    ],
+                    correct_reactivations=row["correct_reactivations"],
+                    reactivation_attempts=row["reactivation_attempts"],
+                    gap_opportunities=row["gap_opportunities"],
+                    false_births=row["false_births"],
+                    births=row["births"],
+                    rejected_births=row["rejected_births"],
+                    reactivation_accuracy=row["reactivation_accuracy"],
+                    reactivation_recall=row["reactivation_recall"],
+                    accepted_valid_observations=row[
+                        "accepted_valid_observations"
+                    ],
+                    total_valid_observations=row["total_valid_observations"],
+                    cluster_metrics=clusters,
+                    strict_online_tmap=row["strict_online_tmap"],
+                    strict_online_trec=row["strict_online_trec"],
+                )
+            except (TypeError, ValueError, KeyError) as error:
+                raise ValueError("candidate horizon metrics are invalid") from error
+            _same_optional_rate(
+                row["identity_switch_rate"],
+                metric.identity_switch_rate,
+                name="identity_switch_rate",
+            )
+            _same_optional_rate(
+                row["wrong_reactivation_rate"],
+                metric.wrong_reactivation_rate,
+                name="wrong_reactivation_rate",
+            )
+            _same_optional_rate(
+                row["false_birth_rate"],
+                metric.false_birth_rate,
+                name="false_birth_rate",
+            )
+            if official_metrics_required != (
+                metric.strict_online_tmap is not None
+                and metric.strict_online_trec is not None
+            ):
+                raise ValueError("candidate official metric completeness differs")
+            raw_reasons = row["eligibility_reasons"]
+            if not isinstance(raw_reasons, str):
+                raise TypeError("candidate eligibility reasons must be text")
+            row_reasons = tuple(item for item in raw_reasons.split(";") if item)
+            if reasons is None:
+                reasons = row_reasons
+            elif reasons != row_reasons:
+                raise ValueError("candidate eligibility differs across horizons")
+            if not isinstance(row["eligible"], bool) or row["eligible"] != (not row_reasons):
+                raise ValueError("candidate eligible flag differs from reasons")
+            metrics.append(metric)
+        result.append(
+            P6BCandidateRow(
+                config=config,
+                stage=stage,
+                horizons=tuple(metrics),
+                eligibility_reasons=() if reasons is None else reasons,
+            )
+        )
+    return tuple(result)
+
+
 def build_selection_document(
     *,
     source_commit: str,
@@ -200,10 +416,62 @@ def _validate_selection_document(document: Mapping[str, object]) -> None:
     split = document["split_manifest"]
     if not isinstance(split, Mapping):
         raise TypeError("selection split_manifest must be a mapping")
-    tuning = split.get("tuning_reference_scene_ids")
-    heldout = split.get("heldout_reference_scene_ids")
-    if not isinstance(tuning, list) or not isinstance(heldout, list) or set(tuning) & set(heldout):
-        raise ValueError("selection split contains overlap")
+    protocol, expected_split = _selection_protocol()
+    if dict(split) != dict(expected_split):
+        raise ValueError("selection split differs from the frozen Protocol-B split")
+    provenance = document["provenance"]
+    if not isinstance(provenance, Mapping) or set(provenance) != _SELECTION_PROVENANCE_KEYS:
+        raise ValueError("selection provenance differs from the strict schema")
+    if dict(provenance) != _expected_selection_provenance(protocol, expected_split):
+        raise ValueError("selection provenance differs from frozen inputs")
+
+    baseline_raw = document["baseline"]
+    if not isinstance(baseline_raw, Mapping) or set(baseline_raw) != {"rows"}:
+        raise ValueError("selection baseline differs from the strict schema")
+    baseline_rows = _parse_candidate_rows(
+        baseline_raw["rows"],
+        official_metrics_required=True,
+        allowed_stages=("baseline",),
+    )
+    if len(baseline_rows) != 1 or baseline_rows[0].stage != "baseline":
+        raise ValueError("selection must contain one frozen baseline candidate")
+    candidates = _parse_candidate_rows(
+        document["candidate_rows"], official_metrics_required=False
+    )
+    finalists = _parse_candidate_rows(
+        document["finalist_rows"], official_metrics_required=True
+    )
+    selected_ids = document["selected_by_stage"]
+    if not isinstance(selected_ids, Mapping) or tuple(selected_ids) != _STAGES:
+        raise ValueError("selected_by_stage differs from the strict stage order")
+    selected_rows: dict[str, P6BCandidateRow] = {}
+    for stage in _STAGES:
+        config_id = selected_ids[stage]
+        matches = [
+            row
+            for row in finalists
+            if row.stage == stage and row.config_id == config_id
+        ]
+        if len(matches) != 1:
+            raise ValueError(f"{stage} selected config does not identify one finalist")
+        selected_rows[stage] = matches[0]
+    final_selected = selected_rows[_STAGES[-1]]
+    if final_selected.config != config:
+        raise ValueError("selected config differs from the final stage winner")
+    ranking_key = document["ranking_key"]
+    if isinstance(ranking_key, (str, bytes)) or not isinstance(
+        ranking_key, Sequence
+    ):
+        raise TypeError("selection ranking_key must be a sequence")
+    validate_staged_sweep_evidence(
+        protocol,
+        baseline=baseline_rows[0],
+        candidate_rows=candidates,
+        finalist_rows=finalists,
+        selected_by_stage=selected_rows,
+        selected=final_selected,
+        ranking_key=ranking_key,
+    )
     serialized = json.dumps(document, allow_nan=False, sort_keys=True)
     if any(marker in serialized for marker in ("/home/", "/mnt/", "/Users/")):
         raise ValueError("selection document contains a private path")
@@ -406,17 +674,28 @@ def _baseline_candidate(
     accepted = _accepted_counts(sequences)
     horizon_rows = []
     for horizon in _HORIZONS:
-        identity, reactivation = aggregate_event_metrics(events[horizon])
+        horizon_events = events[horizon]
+        identity, reactivation = aggregate_event_metrics(horizon_events)
         horizon_rows.append(
             P6BHorizonMetrics(
                 horizon=horizon,
                 identity_switches=int(identity["id_switches"]),
+                transition_opportunities=int(identity["transition_opportunities"]),
                 wrong_reactivations=int(reactivation["wrong_reactivations"]),
+                predicted_reactivation_events=int(
+                    reactivation["predicted_reactivation_events"]
+                ),
+                correct_reactivations=int(reactivation["correct_reactivations"]),
+                reactivation_attempts=int(reactivation["reactivation_attempts"]),
+                gap_opportunities=int(reactivation["gap_opportunities"]),
                 false_births=int(identity["false_births"]),
+                births=int(identity["births"]),
+                rejected_births=int(identity["rejected_births"]),
                 reactivation_accuracy=reactivation["reactivation_accuracy"],
                 reactivation_recall=reactivation["reactivation_recall"],
                 accepted_valid_observations=accepted[horizon],
                 total_valid_observations=accepted[horizon],
+                cluster_metrics=cluster_event_metrics(horizon_events),
                 strict_online_tmap=official[horizon]["t_mAP"],
                 strict_online_trec=official[horizon]["t_REC"],
             )
@@ -439,8 +718,24 @@ def _candidate_sweep_rows(candidate: P6BCandidateRow) -> list[dict[str, object]]
             "stage": candidate.stage,
             "T": f"T{metric.horizon}",
             "identity_switches": metric.identity_switches,
+            "transition_opportunities": metric.transition_opportunities,
+            "identity_switch_rate": metric.identity_switch_rate,
             "wrong_reactivations": metric.wrong_reactivations,
+            "predicted_reactivation_events": metric.predicted_reactivation_events,
+            "correct_reactivations": metric.correct_reactivations,
+            "reactivation_attempts": metric.reactivation_attempts,
+            "gap_opportunities": metric.gap_opportunities,
+            "wrong_reactivation_rate": metric.wrong_reactivation_rate,
             "false_births": metric.false_births,
+            "births": metric.births,
+            "rejected_births": metric.rejected_births,
+            "false_birth_rate": metric.false_birth_rate,
+            "cluster_metrics_json": json.dumps(
+                [asdict(item) for item in metric.cluster_metrics],
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
+            ),
             "reactivation_accuracy": metric.reactivation_accuracy,
             "reactivation_recall": metric.reactivation_recall,
             "accepted_valid_observations": metric.accepted_valid_observations,
@@ -723,11 +1018,7 @@ def run_sweep(
             stage: candidate.config_id
             for stage, candidate in result.selected_by_stage.items()
         },
-        provenance={
-            "p6a_protocol_manifest_sha256": protocol_config.sources.p6a_protocol_manifest.sha256,
-            "cache_manifest_sha256": protocol_config.sources.p6a_cache_manifest.sha256,
-            "split_sha256": split.sha256,
-        },
+        provenance=_expected_selection_provenance(protocol_config, split_mapping),
     )
     _publish_selection(output, document)
     _log_event(
@@ -772,11 +1063,9 @@ def run_final(
     )
     if selection["split_manifest"] != split.to_mapping():
         raise ValueError("frozen selection split differs from current protocol")
-    if selection["provenance"] != {
-        "p6a_protocol_manifest_sha256": protocol_config.sources.p6a_protocol_manifest.sha256,
-        "cache_manifest_sha256": protocol_config.sources.p6a_cache_manifest.sha256,
-        "split_sha256": split.sha256,
-    }:
+    if selection["provenance"] != _expected_selection_provenance(
+        protocol_config, split.to_mapping()
+    ):
         raise ValueError("frozen selection provenance differs from current inputs")
     config = _selection_config(selection)
     final_results, events = _evaluate_methods(heldout, config)
