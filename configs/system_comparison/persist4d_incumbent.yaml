@@ -1,0 +1,86 @@
+schema_version: 1
+stage_name: full-history-vs-persistent-state-system-comparison
+
+method:
+  id: B4
+  name: Persist4D Persistent-State
+  implementation: frozen_p5_persist4d
+
+memory:
+  capacity: 100
+  association_threshold: 0.5
+  class_weight: 0.25
+  background_class: 18
+  update_rate: 0.2
+  max_update_rate: 0.2
+  confidence_threshold: 0.5
+  mask_threshold: 0.5
+  minimum_mask_support: 1
+
+source_commits:
+  p6a: cee151a9dfc1c9aa038227bc4e179b671e739575
+  implementation_base: 73b83ced10a59c4ba755e94fad5fbf43c35d90e8
+
+sources:
+  p6a_config:
+    reference: repo:artifacts/P6A/configs/p6a_default.yaml
+    sha256: dd7a9fccc098fc7e5faecc059d6202ca7f8a762aaee3e7182738a2d7f800aac2
+  checkpoint:
+    reference: repo:checkpoints/rescene4d_concerto_t2_repro.ckpt
+    sha256: 85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e
+  p6a_report:
+    reference: repo:artifacts/P6A/P6A_GO_NOGO_REPORT.md
+    sha256: a9c95655c25d0ca1a902d901dbefec013e136ff7e1f4b6f0b023ef90157de5c6
+  p6a_strict_results:
+    reference: repo:artifacts/P6A/strict_online_results.csv
+    sha256: 668465baaeffaebc9de34b3dcc2e6da58c83588bca805b0a8b1ba7f78c473205
+  p6a_protocol_manifest:
+    reference: repo:artifacts/P6A/protocol_b_manifest.json
+    sha256: 246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe
+
+reference_metrics:
+  T2:
+    t_mAP: 0.15863607823848724
+    t_mAP50: 0.2756635546684265
+    t_mAP25: 0.4781670868396759
+    t_REC: 0.2724342346191406
+    t_REC50: 0.382106751203537
+    t_REC25: 0.5550395846366882
+  T3:
+    t_mAP: 0.09889432787895203
+    t_mAP50: 0.19606494903564453
+    t_mAP25: 0.3549192547798157
+    t_REC: 0.19456875324249268
+    t_REC50: 0.30214545130729675
+    t_REC25: 0.44620054960250854
+  T4:
+    t_mAP: 0.05956951901316643
+    t_mAP50: 0.13553611934185028
+    t_mAP25: 0.22074103355407715
+    t_REC: 0.13616830110549927
+    t_REC50: 0.2372516244649887
+    t_REC25: 0.31662553548812866
+  T5:
+    t_mAP: 0.04449684917926788
+    t_mAP50: 0.10772459208965302
+    t_mAP25: 0.169673353433609
+    t_REC: 0.10665469616651535
+    t_REC50: 0.19998401403427124
+    t_REC25: 0.28682082891464233
+
+profile:
+  warmup_repeats: 5
+  measured_repeats: 10
+  subset_rule: first_master_per_reference_scene_canonical
+
+statistics:
+  cluster_unit: reference_scene_id
+  bootstrap_replicates: 10000
+  seed: 45
+
+decision:
+  system_lock_task_noninferiority_tolerance: 0.002
+  meaningful_full_history_tmap_advantage: 0.01
+  meaningful_advantage_requires_negative_ci: true
+  oracle_within_full_history_tmap: 0.01
+  oracle_deficit_closure_fraction: 0.8
