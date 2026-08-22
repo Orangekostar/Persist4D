@@ -1,0 +1,20 @@
+{
+  "aggregate_row_count": 8,
+  "coverage": {
+    "horizon_count": 4,
+    "master_count": 43,
+    "method_count": 2,
+    "order_count": 3,
+    "reference_scene_count": 6,
+    "row_count": 1032
+  },
+  "incumbent_regression": {
+    "absolute_tolerance": 1e-12,
+    "maximum_absolute_difference": 0.0,
+    "status": "pass"
+  },
+  "per_order_row_count": 24,
+  "schema_version": 1,
+  "source_commit": "575acc12fbd63f38fc3c16578914b25c2fed8584",
+  "status": "pass"
+}

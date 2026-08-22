@@ -1,0 +1,9 @@
+method_id,method,horizon,profile_cluster_count,scans_processed_per_update,cumulative_scans_processed,median_latency_ms,peak_allocated_mib,peak_reserved_mib,mean_update_point_count,mean_cumulative_point_count,historical_state_bytes,explicit_history_input_bytes
+FullHistory,ReScene4D Full-History (Frozen T2 Checkpoint),2,6,2.0,2.0,597.33935225,2595.02392578125,3940.0,143202.5,143202.5,,25091804
+FullHistory,ReScene4D Full-History (Frozen T2 Checkpoint),3,6,3.0,5.0,784.4320495,3467.77294921875,5548.0,207430.33333333334,350632.8333333333,,37909192
+FullHistory,ReScene4D Full-History (Frozen T2 Checkpoint),4,6,4.0,9.0,932.820695,3843.15478515625,6116.0,247847.0,598479.8333333334,,42864380
+FullHistory,ReScene4D Full-History (Frozen T2 Checkpoint),5,6,5.0,14.0,1067.63340025,4964.0537109375,8012.0,306661.1666666667,905141.0,,58989016
+Persist4D,Persist4D Persistent-State,2,6,2.0,2.0,610.6198075,2552.7373046875,3808.0,143202.5,143202.5,61008,
+Persist4D,Persist4D Persistent-State,3,6,2.0,4.0,539.3448495,2549.48828125,3912.0,127197.83333333333,270400.3333333333,61008,
+Persist4D,Persist4D Persistent-State,4,6,2.0,6.0,495.397782,2095.94384765625,3130.0,104644.5,375044.8333333333,61008,
+Persist4D,Persist4D Persistent-State,5,6,2.0,8.0,440.4286995,2472.8935546875,3764.0,99230.83333333333,474275.6666666667,61008,

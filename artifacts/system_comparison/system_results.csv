@@ -1,0 +1,13 @@
+method_id,method,history_strategy,horizon,causal_prefix_t_mAP,causal_prefix_t_REC,normalized_id_switch_rate,gap_recovery_accuracy,gap_recovery_recall
+FullHistory,ReScene4D Full-History (Frozen T2 Checkpoint),Reprocess exact observed prefix,2,0.19099636375904083,0.34165626764297485,0.9892008639308856,,
+FullHistory,ReScene4D Full-History (Frozen T2 Checkpoint),Reprocess exact observed prefix,3,0.10789728909730911,0.2476949393749237,0.98,0.0,0.0
+FullHistory,ReScene4D Full-History (Frozen T2 Checkpoint),Reprocess exact observed prefix,4,0.06899910420179367,0.18835905194282532,0.9816201497617427,0.03383458646616541,0.01276595744680851
+FullHistory,ReScene4D Full-History (Frozen T2 Checkpoint),Reprocess exact observed prefix,5,0.045340124517679214,0.1365537792444229,0.9806643529995042,0.0267639902676399,0.009990917347865577
+B3,EMA Temporal Association,Local pair + unbounded EMA IDs,2,0.15683315694332123,0.2677476704120636,0.1079913606911447,,
+B3,EMA Temporal Association,Local pair + unbounded EMA IDs,3,0.08059833198785782,0.18892471492290497,0.16998191681735986,,
+B3,EMA Temporal Association,Local pair + unbounded EMA IDs,4,0.03896726295351982,0.12621940672397614,0.2230563002680965,,
+B3,EMA Temporal Association,Local pair + unbounded EMA IDs,5,0.01660783216357231,0.07940219342708588,0.2558922558922559,,
+Persist4D,Persist4D Persistent-State,Local pair + bounded entity state,2,0.15863607823848724,0.2724342346191406,0.10151187904967603,,
+Persist4D,Persist4D Persistent-State,Local pair + bounded entity state,3,0.09889432787895203,0.19456875324249268,0.09968847352024922,0.898876404494382,0.29411764705882354
+Persist4D,Persist4D Persistent-State,Local pair + bounded entity state,4,0.05956951901316643,0.13616830110549927,0.10349462365591398,0.8414634146341463,0.2974137931034483
+Persist4D,Persist4D Persistent-State,Local pair + bounded entity state,5,0.04449684917926788,0.10665469616651535,0.11138491867915229,0.8632911392405064,0.3119853613906679
