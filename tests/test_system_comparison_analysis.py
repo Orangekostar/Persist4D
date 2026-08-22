@@ -204,3 +204,54 @@ def test_statistical_tables_include_task_identity_gap_and_latency() -> None:
         "gap_recovery_recall",
         "median_latency_ms",
     }
+
+
+def test_gap_statistics_preserve_loso_when_one_cluster_has_no_finite_pairs() -> None:
+    rows = _rows()
+    for row in rows:
+        if (
+            row["reference_scene_id"] == "reference-5"
+            and row["horizon"] == 3
+        ):
+            row["gap_recovery_recall"] = None
+    profile_rows = [
+        {
+            "method": method,
+            "reference_scene_id": f"reference-{index}",
+            "master_sequence_id": f"master-{index}",
+            "order_id": "canonical",
+            "horizon": horizon,
+            "median_latency_ms": float(index + horizon),
+        }
+        for index in range(6)
+        for horizon in HORIZONS
+        for method in METHODS
+    ]
+
+    tables = build_statistical_tables(
+        rows,
+        profile_rows,
+        expected_master_count=6,
+    )
+
+    bootstrap = next(
+        row
+        for row in tables["cluster_bootstrap"]
+        if row["metric"] == "gap_recovery_recall" and row["horizon"] == 3
+    )
+    assert bootstrap["cluster_count"] == 5
+    loso = [
+        row
+        for row in tables["leave_one_scene_out"]
+        if row["metric"] == "gap_recovery_recall" and row["horizon"] == 3
+    ]
+    assert len(loso) == 6
+    assert {row["remaining_cluster_count"] for row in loso} == {4, 5}
+
+    undefined_loso = [
+        row
+        for row in tables["leave_one_scene_out"]
+        if row["metric"] == "gap_recovery_recall" and row["horizon"] == 2
+    ]
+    assert len(undefined_loso) == 6
+    assert all(row["remaining_cluster_count"] == 0 for row in undefined_loso)

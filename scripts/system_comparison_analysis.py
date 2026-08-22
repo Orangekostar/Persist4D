@@ -148,6 +148,7 @@ def paired_cluster_values(
     *,
     metric: str,
     horizon: int,
+    expected_reference_scene_ids: Sequence[str] | None = None,
 ) -> list[dict[str, object]]:
     pairs = _paired_values(rows, metric=metric, horizon=horizon)
     by_reference: dict[str, list[dict[str, object]]] = defaultdict(list)
@@ -166,7 +167,24 @@ def paired_cluster_values(
                 "difference": persistent - full,
             }
         )
-    if len(clusters) != 6:
+    if expected_reference_scene_ids is None:
+        if len(clusters) != 6:
+            raise AnalysisError("paired cluster analysis requires six reference scenes")
+    else:
+        expected_references = tuple(
+            _string(value, name="expected reference scene")
+            for value in expected_reference_scene_ids
+        )
+        actual_references = {
+            str(row["reference_scene_id"]) for row in clusters
+        }
+        if (
+            len(expected_references) != 6
+            or len(set(expected_references)) != 6
+            or not actual_references <= set(expected_references)
+        ):
+            raise AnalysisError("paired cluster analysis reference scenes differ")
+    if not clusters:
         raise AnalysisError("paired cluster analysis requires six reference scenes")
     return clusters
 
@@ -178,6 +196,7 @@ def paired_cluster_bootstrap(
     horizons: Sequence[int] = HORIZONS,
     replicates: int = 10_000,
     seed: int = 45,
+    expected_reference_scene_ids: Sequence[str] | None = None,
 ) -> list[dict[str, object]]:
     horizon_values = tuple(_horizon(value) for value in horizons)
     if not horizon_values or tuple(sorted(set(horizon_values))) != horizon_values:
@@ -190,7 +209,12 @@ def paired_cluster_bootstrap(
     result = []
     for metric in metrics:
         for horizon in horizon_values:
-            clusters = paired_cluster_values(rows, metric=metric, horizon=horizon)
+            clusters = paired_cluster_values(
+                rows,
+                metric=metric,
+                horizon=horizon,
+                expected_reference_scene_ids=expected_reference_scene_ids,
+            )
             full = np.asarray(
                 [float(row["full_history_mean"]) for row in clusters], dtype=np.float64
             )
@@ -228,19 +252,34 @@ def leave_one_scene_out(
     *,
     metrics: Sequence[str],
     horizons: Sequence[int] = HORIZONS,
+    expected_reference_scene_ids: Sequence[str] | None = None,
 ) -> list[dict[str, object]]:
     if isinstance(metrics, (str, bytes)) or not isinstance(metrics, Sequence) or not metrics:
         raise AnalysisError("LOSO metrics must be a nonempty sequence")
     result = []
     for metric in metrics:
         for horizon in horizons:
-            clusters = paired_cluster_values(rows, metric=metric, horizon=horizon)
-            for dropped in clusters:
+            clusters = paired_cluster_values(
+                rows,
+                metric=metric,
+                horizon=horizon,
+                expected_reference_scene_ids=expected_reference_scene_ids,
+            )
+            dropped_references = (
+                tuple(sorted(expected_reference_scene_ids))
+                if expected_reference_scene_ids is not None
+                else tuple(
+                    str(row["reference_scene_id"]) for row in clusters
+                )
+            )
+            for dropped_reference in dropped_references:
                 kept = [
                     row
                     for row in clusters
-                    if row["reference_scene_id"] != dropped["reference_scene_id"]
+                    if row["reference_scene_id"] != dropped_reference
                 ]
+                if not kept:
+                    raise AnalysisError("LOSO has no finite clusters after dropping")
                 difference = float(
                     np.mean([float(row["difference"]) for row in kept])
                 )
@@ -248,9 +287,7 @@ def leave_one_scene_out(
                     {
                         "metric": metric,
                         "horizon": horizon,
-                        "dropped_reference_scene_id": dropped[
-                            "reference_scene_id"
-                        ],
+                        "dropped_reference_scene_id": dropped_reference,
                         "remaining_cluster_count": len(kept),
                         "difference": difference,
                     }
@@ -400,6 +437,9 @@ def build_statistical_tables(
     loso_rows: list[dict[str, object]] = []
     for metric, rows in sources:
         for horizon in HORIZONS:
+            expected_references = (
+                references if metric == "gap_recovery_recall" else None
+            )
             try:
                 bootstrap_rows.extend(
                     paired_cluster_bootstrap(
@@ -408,6 +448,7 @@ def build_statistical_tables(
                         horizons=(horizon,),
                         replicates=10_000,
                         seed=45,
+                        expected_reference_scene_ids=expected_references,
                     )
                 )
                 loso_rows.extend(
@@ -415,6 +456,7 @@ def build_statistical_tables(
                         rows,
                         metrics=(metric,),
                         horizons=(horizon,),
+                        expected_reference_scene_ids=expected_references,
                     )
                 )
             except AnalysisError as error:
@@ -440,7 +482,7 @@ def build_statistical_tables(
                         "metric": metric,
                         "horizon": horizon,
                         "dropped_reference_scene_id": reference,
-                        "remaining_cluster_count": 5,
+                        "remaining_cluster_count": 0,
                         "difference": None,
                     }
                     for reference in references

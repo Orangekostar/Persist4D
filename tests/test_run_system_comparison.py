@@ -18,6 +18,7 @@ from scripts.run_system_comparison import (
     select_disjoint_shard,
     select_pending_keys,
     select_smoke_keys,
+    validate_cache_execution,
     verify_determinism_repeats,
     verify_incumbent_regression,
     verify_t2_regression_pairs,
@@ -65,6 +66,18 @@ def test_disjoint_shards_have_exact_ordered_coverage() -> None:
     assert not (set(shards[1]) & set(shards[2]))
     with pytest.raises(ValueError, match="shard"):
         select_disjoint_shard(values, 3, 3)
+
+
+def test_cache_materialization_is_bound_to_one_cuda_zero_process() -> None:
+    validate_cache_execution("cuda:0", shard_index=0, shard_count=1)
+
+    for device, index, count in (
+        ("cuda:1", 0, 1),
+        ("cuda:0", 0, 3),
+        ("cuda:0", 1, 3),
+    ):
+        with pytest.raises(GateFailure, match="single-process cuda:0"):
+            validate_cache_execution(device, shard_index=index, shard_count=count)
 
 
 def test_stage_pipeline_resumes_completed_prefix_and_stops_on_failure() -> None:

@@ -136,6 +136,20 @@ def select_disjoint_shard(
     return tuple(values[shard_index::shard_count])
 
 
+def validate_cache_execution(
+    device_name: str,
+    *,
+    shard_index: int,
+    shard_count: int,
+) -> None:
+    """Prevent cross-device cache mixtures with different numeric outputs."""
+
+    if device_name != "cuda:0" or shard_index != 0 or shard_count != 1:
+        raise GateFailure(
+            "cache materialization requires single-process cuda:0 execution"
+        )
+
+
 def _logical_key_identity(value: Mapping[str, object]) -> str:
     return json.dumps(value, allow_nan=False, sort_keys=True, separators=(",", ":"))
 
@@ -529,7 +543,12 @@ def _build_frozen_setup(
             full_provenance=full_provenance,
         )
     device = _validate_cuda_device(device_name)
-    system = _load_system(runtime_config, checkpoint, device)
+    from scripts.system_comparison_inference import deterministic_inference_runtime
+
+    with deterministic_inference_runtime(
+        int(p6a_config["protocol_b"]["seed"]), device
+    ):
+        system = _load_system(runtime_config, checkpoint, device)
     return _FrozenSetup(
         protocol=protocol,
         protocol_manifest=dict(protocol_manifest),
@@ -618,6 +637,11 @@ def run_cache_local_shard(
     from scripts.p6a_cache import load_cache_entry, write_cache_entry
     from scripts.system_comparison_inference import deterministic_inference_runtime
 
+    validate_cache_execution(
+        device_name,
+        shard_index=shard_index,
+        shard_count=shard_count,
+    )
     _system_manifest, binding = _load_bound_inputs()
     setup = _build_frozen_setup(
         binding=binding,
@@ -673,6 +697,11 @@ def run_cache_full_shard(
         write_full_history_cache_entry,
     )
 
+    validate_cache_execution(
+        device_name,
+        shard_index=shard_index,
+        shard_count=shard_count,
+    )
     system_manifest, binding = _load_bound_inputs()
     setup = _build_frozen_setup(
         binding=binding,
