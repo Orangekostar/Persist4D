@@ -7,8 +7,10 @@ from pathlib import Path
 
 import pytest
 
+import scripts.run_system_comparison as runner
 from scripts.run_system_comparison import (
     GateFailure,
+    _argument_parser,
     build_reproducibility_binding,
     oracle_attribution_required,
     publish_exact_json,
@@ -238,3 +240,19 @@ def test_smoke_selection_and_oracle_trigger_follow_preregistration() -> None:
         paired_ci={"T4": (-0.02, 0.001), "T5": (-0.02, 0.0)},
         minimum_advantage=0.01,
     )
+
+
+def test_all_pipeline_ends_with_final_artifact_gate(monkeypatch, capsys) -> None:
+    captured: list[str] = []
+
+    def fake_pipeline(stages, *, completed=()):
+        del completed
+        captured.extend(name for name, _action in stages)
+        return tuple(captured)
+
+    monkeypatch.setattr(runner, "run_stage_pipeline", fake_pipeline)
+
+    assert runner.main(["all"]) == 0
+    assert captured[-2:] == ["profile", "artifacts"]
+    assert _argument_parser().parse_args(["artifacts"]).command == "artifacts"
+    assert '"status": "pass"' in capsys.readouterr().out

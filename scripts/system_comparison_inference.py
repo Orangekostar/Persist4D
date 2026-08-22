@@ -16,6 +16,9 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+
 import torch
 from torch import Tensor
 
@@ -93,6 +96,30 @@ def _integer_tensor(value: object, *, name: str, ndim: int = 1) -> Tensor:
     if tensor.dtype == torch.bool or tensor.is_floating_point() or tensor.is_complex():
         raise FullHistoryCacheError(f"{name} must use an integer dtype")
     return tensor.long()
+
+
+def normalize_temporal_stages(
+    value: object,
+    *,
+    name: str = "temporal stages",
+) -> Tensor:
+    tensor = _finite_tensor(value, name=name, ndim=1)
+    if tensor.is_complex() or tensor.dtype == torch.bool:
+        raise FullHistoryCacheError(f"{name} must contain integer stage indices")
+    if tensor.is_floating_point():
+        rounded = tensor.round()
+        if not torch.equal(tensor, rounded):
+            raise FullHistoryCacheError(f"{name} must contain integer stage indices")
+        tensor = rounded
+    try:
+        result = tensor.long()
+    except (TypeError, RuntimeError) as error:
+        raise FullHistoryCacheError(
+            f"{name} must contain integer stage indices"
+        ) from error
+    if torch.any(result < 0).item():
+        raise FullHistoryCacheError(f"{name} must contain non-negative stage indices")
+    return result
 
 
 def pack_bool_matrix(value: Tensor) -> dict[str, object]:
@@ -350,6 +377,9 @@ def postprocess_full_history_output(
 ) -> ProcessedFullHistory:
     """Separate official task output from raw-query deployment identities."""
 
+    from models.persistent_memory import build_local_observation
+    from scripts.evaluate_persist4d import _segment_stages
+
     if not 1 <= horizon <= 5:
         raise FullHistoryCacheError("horizon must be within T1-T5")
     outputs = _mapping(output, name="ReScene output")
@@ -467,7 +497,7 @@ def postprocess_full_history_output(
             full_point2segment,
         )
     ).bool().cpu().contiguous()
-    temporal_stages = _integer_tensor(
+    temporal_stages = normalize_temporal_stages(
         target_full_resolution.get("temporal_stages"),
         name="target_full.temporal_stages",
     )
@@ -478,14 +508,23 @@ def postprocess_full_history_output(
     latest_selector = temporal_stages == horizon - 1
     current_query_masks = all_query_masks[latest_selector]
 
-    class_prob = logits[0].softmax(dim=-1)
+    low_stages = _segment_stages(target_low_resolution)
+    local_observation = build_local_observation(
+        outputs,
+        [low_stages],
+        latest_stage=int(low_stages.max().item()),
+        background_class=background_class,
+        confidence_threshold=confidence_threshold,
+        mask_threshold=mask_threshold,
+        minimum_mask_support=minimum_mask_support,
+    )
+    class_prob = local_observation.class_prob[0].detach().cpu().contiguous()
+    confidence = local_observation.confidence[0].detach().cpu().contiguous()
+    valid = local_observation.valid[0].detach().cpu().contiguous()
     foreground = class_prob.clone()
     foreground[:, background_class] = -torch.inf
-    confidence, model_classes = foreground.max(dim=-1)
+    model_classes = foreground.argmax(dim=-1)
     mask_support = current_query_masks.sum(dim=0, dtype=torch.long)
-    valid = (confidence >= confidence_threshold) & (
-        mask_support >= minimum_mask_support
-    )
     issued_ids = torch.arange(query_count, dtype=torch.long)[valid]
     identity_prediction = {
         "pred_masks": current_query_masks[:, valid].contiguous(),
@@ -522,7 +561,7 @@ def postprocess_full_history_output(
         "temporal_stages": temporal_stages,
     }
     raw_observation = {
-        "features": query_features[0],
+        "features": local_observation.features[0].detach().cpu().contiguous(),
         "class_prob": class_prob,
         "confidence": confidence,
         "valid": valid.cpu(),
@@ -1129,6 +1168,37 @@ def _model_input_bytes(data: object) -> int:
     return total
 
 
+def model_input_storage_bytes(data: object) -> int:
+    """Return tensor bytes passed to the model, excluding evaluation-only fields."""
+
+    return _model_input_bytes(data)
+
+
+def validate_full_history_dataset_context(
+    dataset: object,
+    logical_key: Mapping[str, object],
+) -> None:
+    key = validate_full_history_cache_key(logical_key)
+    names = _field(dataset, "sequence_names")
+    indices = _field(dataset, "sequence_indices")
+    context_index = int(key["context_index"])
+    if (
+        isinstance(names, (str, bytes))
+        or not isinstance(names, Sequence)
+        or context_index >= len(names)
+        or names[context_index] != key["master_sequence_id"]
+        or isinstance(indices, (str, bytes))
+        or not hasattr(indices, "__getitem__")
+    ):
+        raise FullHistoryCacheError("dataset context differs from cache key")
+    try:
+        context_indices = tuple(int(item) for item in indices[context_index])
+    except (IndexError, TypeError, ValueError) as error:
+        raise FullHistoryCacheError("dataset context differs from cache key") from error
+    if context_indices != tuple(key["context_scan_indices"]):
+        raise FullHistoryCacheError("dataset context differs from cache key")
+
+
 @dataclass
 class FullHistoryPredictionProducer:
     dataset: object
@@ -1147,20 +1217,8 @@ class FullHistoryPredictionProducer:
 
     def __call__(self, logical_key: Mapping[str, object]) -> dict[str, object]:
         key = validate_full_history_cache_key(logical_key)
-        names = _field(self.dataset, "sequence_names")
-        indices = _field(self.dataset, "sequence_indices")
+        validate_full_history_dataset_context(self.dataset, key)
         context_index = int(key["context_index"])
-        if (
-            isinstance(names, (str, bytes))
-            or not isinstance(names, Sequence)
-            or context_index >= len(names)
-            or names[context_index] != key["master_sequence_id"]
-            or isinstance(indices, (str, bytes))
-            or not isinstance(indices, Sequence)
-            or tuple(int(item) for item in indices[context_index])
-            != tuple(key["context_scan_indices"])
-        ):
-            raise FullHistoryCacheError("dataset context differs from cache key")
         from scripts.evaluate_persist4d_p6a import _frozen_inference_seed
 
         with _frozen_inference_seed(self.seed, self.device):
@@ -1185,7 +1243,7 @@ class FullHistoryPredictionProducer:
             ):
                 raise FullHistoryCacheError("collated data lacks one full target")
             target_full = target_full_values[0]
-            full_stages = _integer_tensor(
+            full_stages = normalize_temporal_stages(
                 target_full.get("temporal_stages"), name="full temporal stages"
             )
             scan_counts = [
@@ -1255,10 +1313,13 @@ __all__ = [
     "full_history_cache_keys",
     "full_history_prediction_fingerprint",
     "load_full_history_cache_entry",
+    "model_input_storage_bytes",
+    "normalize_temporal_stages",
     "pack_bool_matrix",
     "postprocess_full_history_output",
     "unpack_bool_matrix",
     "validate_full_history_cache_key",
+    "validate_full_history_dataset_context",
     "validate_full_history_payload",
     "write_full_history_cache_entry",
     "write_full_history_cache_manifest",

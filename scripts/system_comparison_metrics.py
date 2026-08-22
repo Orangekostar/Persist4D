@@ -193,6 +193,59 @@ def _metric_factory(mode: str) -> OfficialMetricAccumulator:
     return OfficialMetricAccumulator(mode=mode)
 
 
+class CausalTaskAccumulator:
+    """Stream causal-prefix and current-stage official metrics at one horizon."""
+
+    def __init__(
+        self,
+        *,
+        metric_factory: Callable[[str], object] = _metric_factory,
+    ) -> None:
+        if not callable(metric_factory):
+            raise SystemMetricError("task metric factory must be callable")
+        self._prefix_metric = metric_factory("strict_online")
+        self._current_metric = metric_factory("raw_local")
+        self._horizon: int | None = None
+        self._count = 0
+
+    def update(self, pair: CausalPrefixPair) -> None:
+        if not isinstance(pair, CausalPrefixPair):
+            raise SystemMetricError("task metric value must be a causal prefix pair")
+        if self._horizon is None:
+            self._horizon = pair.horizon
+        elif pair.horizon != self._horizon:
+            raise SystemMetricError("task metric pairs must share one horizon")
+        self._prefix_metric.update(pair.prediction, pair.target)
+        current = current_stage_pair(pair)
+        self._current_metric.update(current.prediction, current.target)
+        self._count += 1
+
+    def compute(self) -> dict[str, float]:
+        if not self._count:
+            raise SystemMetricError("task metrics require causal prefix pairs")
+        prefix_values = self._prefix_metric.compute()
+        current_values = self._current_metric.compute()
+        mapping = {
+            "causal_prefix_t_mAP": prefix_values["online_t-mAP"],
+            "causal_prefix_t_mAP50": prefix_values["online_t-mAP50"],
+            "causal_prefix_t_mAP25": prefix_values["online_t-mAP25"],
+            "causal_prefix_t_REC": prefix_values["online_t-REC"],
+            "causal_prefix_t_REC50": prefix_values["online_t-REC50"],
+            "causal_prefix_t_REC25": prefix_values["online_t-REC25"],
+            "current_stage_AP": current_values["raw_local_AP"],
+            "current_stage_AP50": current_values["raw_local_AP50"],
+            "current_stage_AP25": current_values["raw_local_AP25"],
+            "current_stage_REC": current_values["raw_local_REC"],
+        }
+        result = {name: float(value) for name, value in mapping.items()}
+        if any(
+            not math.isfinite(value) or not 0.0 <= value <= 1.0
+            for value in result.values()
+        ):
+            raise SystemMetricError("task metrics must be finite rates")
+        return result
+
+
 def compute_causal_task_metrics(
     pairs: Sequence[CausalPrefixPair],
     *,
@@ -202,33 +255,10 @@ def compute_causal_task_metrics(
         raise SystemMetricError("task metrics require causal prefix pairs")
     if any(not isinstance(pair, CausalPrefixPair) for pair in pairs):
         raise SystemMetricError("task metric values must be causal prefix pairs")
-    horizons = {pair.horizon for pair in pairs}
-    if len(horizons) != 1:
-        raise SystemMetricError("task metric pairs must share one horizon")
-    prefix_metric = metric_factory("strict_online")
-    current_metric = metric_factory("raw_local")
+    accumulator = CausalTaskAccumulator(metric_factory=metric_factory)
     for pair in pairs:
-        prefix_metric.update(pair.prediction, pair.target)
-        current = current_stage_pair(pair)
-        current_metric.update(current.prediction, current.target)
-    prefix_values = prefix_metric.compute()
-    current_values = current_metric.compute()
-    mapping = {
-        "causal_prefix_t_mAP": prefix_values["online_t-mAP"],
-        "causal_prefix_t_mAP50": prefix_values["online_t-mAP50"],
-        "causal_prefix_t_mAP25": prefix_values["online_t-mAP25"],
-        "causal_prefix_t_REC": prefix_values["online_t-REC"],
-        "causal_prefix_t_REC50": prefix_values["online_t-REC50"],
-        "causal_prefix_t_REC25": prefix_values["online_t-REC25"],
-        "current_stage_AP": current_values["raw_local_AP"],
-        "current_stage_AP50": current_values["raw_local_AP50"],
-        "current_stage_AP25": current_values["raw_local_AP25"],
-        "current_stage_REC": current_values["raw_local_REC"],
-    }
-    result = {name: float(value) for name, value in mapping.items()}
-    if any(not math.isfinite(value) or not 0.0 <= value <= 1.0 for value in result.values()):
-        raise SystemMetricError("task metrics must be finite rates")
-    return result
+        accumulator.update(pair)
+    return accumulator.compute()
 
 
 def _identity_id(value: object, *, name: str) -> int:
@@ -489,6 +519,7 @@ def deployment_identity_metrics_by_horizon(
 
 __all__ = [
     "CausalPrefixPair",
+    "CausalTaskAccumulator",
     "IdentityAssignmentUpdate",
     "SystemMetricError",
     "causal_prefix_pair_from_payload",

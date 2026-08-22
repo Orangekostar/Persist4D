@@ -974,6 +974,15 @@ def run_profile(*, device_name: str, metadata_path: Path) -> dict[str, object]:
     )
 
 
+def run_artifacts(*, metadata_path: Path) -> dict[str, object]:
+    from scripts.build_system_comparison_artifacts import run_build_all_artifacts
+
+    return run_build_all_artifacts(
+        project_root=PROJECT_ROOT,
+        metadata_path=metadata_path,
+    )
+
+
 def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -986,6 +995,7 @@ def _argument_parser() -> argparse.ArgumentParser:
             "smoke",
             "evaluate",
             "profile",
+            "artifacts",
             "all",
         ),
     )
@@ -1028,6 +1038,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             device_name=arguments.device,
             metadata_path=arguments.metadata,
         )
+    elif arguments.command == "artifacts":
+        result = run_artifacts(metadata_path=arguments.metadata)
     else:
         stages = (
             ("bind", run_bind),
@@ -1049,6 +1061,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                     device_name=arguments.device,
                     metadata_path=arguments.metadata,
                 ),
+            ),
+            (
+                "artifacts",
+                lambda: run_artifacts(metadata_path=arguments.metadata),
             ),
         )
         completed = run_stage_pipeline(stages)

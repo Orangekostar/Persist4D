@@ -3,9 +3,11 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 from types import SimpleNamespace
 
+import numpy as np
 import pytest
 import torch
 
@@ -15,10 +17,12 @@ from scripts.system_comparison_inference import (
     build_full_history_payload,
     full_history_cache_keys,
     load_full_history_cache_entry,
+    normalize_temporal_stages,
     pack_bool_matrix,
     postprocess_full_history_output,
     unpack_bool_matrix,
     validate_full_history_cache_key,
+    validate_full_history_dataset_context,
     validate_full_history_payload,
     write_full_history_cache_entry,
 )
@@ -72,6 +76,31 @@ def test_cache_key_rejects_noncausal_history() -> None:
 
     with pytest.raises(FullHistoryCacheError, match="horizon|history"):
         validate_full_history_cache_key(tampered)
+
+
+def test_dataset_context_accepts_real_numpy_sequence_index_container() -> None:
+    key = full_history_cache_keys(_system_manifest())[1]
+    dataset = SimpleNamespace(
+        sequence_names=[key["master_sequence_id"]],
+        sequence_indices=np.asarray([key["context_scan_indices"]]),
+    )
+    adjusted = dict(key)
+    adjusted["context_index"] = 0
+
+    validate_full_history_dataset_context(dataset, adjusted)
+
+
+def test_temporal_stage_normalization_accepts_integer_valued_collator_float() -> None:
+    stages = normalize_temporal_stages(torch.tensor([0.0, 1.0, 1.0]))
+    assert stages.dtype == torch.long
+    assert stages.tolist() == [0, 1, 1]
+
+    with pytest.raises(FullHistoryCacheError, match="integer stage"):
+        normalize_temporal_stages(torch.tensor([0.0, 1.5]))
+
+
+def test_deterministic_runtime_sets_cublas_workspace_before_cuda() -> None:
+    assert os.environ["CUBLAS_WORKSPACE_CONFIG"] == ":4096:8"
 
 
 class _FakeSystem:
