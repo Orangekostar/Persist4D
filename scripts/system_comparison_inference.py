@@ -755,6 +755,20 @@ def validate_full_history_payload(
     return payload
 
 
+def full_history_prediction_fingerprint(
+    value: Mapping[str, object],
+) -> str:
+    """Hash only masks, classes, IDs, and scores used by the smoke gate."""
+
+    payload = validate_full_history_payload(value)
+    return _content_sha256(
+        {
+            "task_prediction": payload["task_prediction"],
+            "identity_prediction": payload["identity_prediction"],
+        }
+    )
+
+
 def assert_t2_observation_regression(
     full_history_payload: Mapping[str, object],
     local_payload: Mapping[str, object],
@@ -871,6 +885,182 @@ def load_full_history_cache_entry(
     if validated["content_sha256"] != record["content_sha256"]:
         raise FullHistoryCacheError("cache entry content digest differs")
     return validated
+
+
+def _validate_cache_entry_record(value: Mapping[str, object]) -> dict[str, object]:
+    record = _mapping(value, name="cache entry")
+    expected = {"key", "filename", "sha256", "byte_size", "content_sha256"}
+    if set(record) != expected:
+        raise FullHistoryCacheError("cache entry fields differ")
+    key = validate_full_history_cache_key(record["key"])
+    filename = _nonempty_string(record["filename"], name="cache entry filename")
+    if filename != _entry_filename(key):
+        raise FullHistoryCacheError("cache entry filename differs from logical key")
+    sha256 = _nonempty_string(record["sha256"], name="cache entry sha256")
+    content_sha256 = _nonempty_string(
+        record["content_sha256"], name="cache entry content_sha256"
+    )
+    if _HEX64.fullmatch(sha256) is None or _HEX64.fullmatch(content_sha256) is None:
+        raise FullHistoryCacheError("cache entry digest is invalid")
+    byte_size = _nonnegative_integer(record["byte_size"], name="cache entry byte_size")
+    return {
+        "key": key,
+        "filename": filename,
+        "sha256": sha256,
+        "byte_size": byte_size,
+        "content_sha256": content_sha256,
+    }
+
+
+def _normalized_cache_entries(
+    entries: Sequence[Mapping[str, object]],
+) -> list[dict[str, object]]:
+    if isinstance(entries, (str, bytes)) or not isinstance(entries, Sequence):
+        raise FullHistoryCacheError("cache entries must be a sequence")
+    normalized = [_validate_cache_entry_record(entry) for entry in entries]
+    identities = [_key_identity(entry["key"]) for entry in normalized]
+    if len(set(identities)) != len(identities):
+        raise FullHistoryCacheError("cache entries contain duplicate logical keys")
+    normalized.sort(key=lambda entry: _key_identity(entry["key"]))
+    return normalized
+
+
+def _canonical_json_bytes(value: Mapping[str, object]) -> bytes:
+    return (
+        json.dumps(
+            value,
+            allow_nan=False,
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    ).encode("utf-8")
+
+
+def build_full_history_cache_manifest(
+    entries: Sequence[Mapping[str, object]],
+    *,
+    expected_keys: Sequence[Mapping[str, object]],
+    expected_provenance: Mapping[str, object],
+    cache_directory: str | Path | None = None,
+) -> dict[str, object]:
+    """Build a fail-closed manifest for all 645 exact causal prefixes."""
+
+    normalized = _normalized_cache_entries(entries)
+    expected = [validate_full_history_cache_key(key) for key in expected_keys]
+    expected_identities = [_key_identity(key) for key in expected]
+    if len(set(expected_identities)) != len(expected_identities):
+        raise FullHistoryCacheError("expected cache coverage contains duplicates")
+    actual_identities = [_key_identity(entry["key"]) for entry in normalized]
+    if set(actual_identities) != set(expected_identities):
+        raise FullHistoryCacheError("cache manifest does not have exact coverage")
+    provenance = _validate_provenance(expected_provenance)
+    entries_sha256 = hashlib.sha256(
+        _canonical_json_bytes({"entries": normalized})
+    ).hexdigest()
+    manifest: dict[str, object] = {
+        "schema_version": FULL_HISTORY_MANIFEST_SCHEMA_VERSION,
+        "status": "pass",
+        "provenance": provenance,
+        "entry_count": len(normalized),
+        "entries_sha256": entries_sha256,
+        "entries": normalized,
+    }
+    manifest["content_sha256"] = hashlib.sha256(
+        _canonical_json_bytes(manifest)
+    ).hexdigest()
+    if cache_directory is not None:
+        directory = Path(cache_directory)
+        if directory.is_symlink() or not directory.is_dir():
+            raise FullHistoryCacheError("cache directory must be a regular directory")
+        expected_files = {entry["filename"] for entry in normalized}
+        actual_files = {path.name for path in directory.iterdir()}
+        if actual_files != expected_files:
+            raise FullHistoryCacheError("cache directory coverage differs from manifest")
+        for entry in normalized:
+            load_full_history_cache_entry(
+                directory,
+                entry,
+                expected_provenance=provenance,
+            )
+    return manifest
+
+
+def discover_full_history_cache_entries(
+    cache_directory: str | Path,
+    *,
+    expected_provenance: Mapping[str, object],
+) -> list[dict[str, object]]:
+    directory = Path(cache_directory)
+    if directory.is_symlink() or (directory.exists() and not directory.is_dir()):
+        raise FullHistoryCacheError("cache directory must be a regular directory")
+    directory.mkdir(parents=True, exist_ok=True)
+    provenance = _validate_provenance(expected_provenance)
+    entries: list[dict[str, object]] = []
+    for path in sorted(directory.iterdir(), key=lambda item: item.name):
+        if path.is_symlink() or not path.is_file() or path.suffix != ".pt":
+            raise FullHistoryCacheError(
+                f"cache directory contains unexpected path: {path.name}"
+            )
+        payload = torch.load(path, map_location="cpu", weights_only=False)
+        validated = validate_full_history_payload(
+            payload,
+            expected_provenance=provenance,
+        )
+        record = {
+            "key": validated["key"],
+            "filename": path.name,
+            "sha256": _file_sha256(path),
+            "byte_size": path.stat().st_size,
+            "content_sha256": validated["content_sha256"],
+        }
+        entries.append(_validate_cache_entry_record(record))
+    return _normalized_cache_entries(entries)
+
+
+def write_full_history_cache_manifest(
+    path: str | Path,
+    manifest: Mapping[str, object],
+    *,
+    expected_keys: Sequence[Mapping[str, object]],
+    expected_provenance: Mapping[str, object],
+    cache_directory: str | Path,
+) -> None:
+    expected = build_full_history_cache_manifest(
+        _mapping(manifest, name="full-history cache manifest").get("entries", []),
+        expected_keys=expected_keys,
+        expected_provenance=expected_provenance,
+        cache_directory=cache_directory,
+    )
+    if dict(manifest) != expected:
+        raise FullHistoryCacheError("full-history cache manifest fields differ")
+    output = Path(path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    payload = _canonical_json_bytes(expected)
+    if output.exists() or output.is_symlink():
+        if output.is_symlink() or not output.is_file():
+            raise FileExistsError("cache manifest is not a regular file")
+        if output.read_bytes() == payload:
+            return
+        raise FileExistsError("cache manifest already contains different content")
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="wb",
+            dir=output.parent,
+            prefix=f".{output.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+            temporary = Path(handle.name)
+        os.link(temporary, output)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 @contextmanager
@@ -1058,9 +1248,12 @@ __all__ = [
     "FullHistoryPredictionProducer",
     "ProcessedFullHistory",
     "assert_t2_observation_regression",
+    "build_full_history_cache_manifest",
     "build_full_history_payload",
     "deterministic_inference_runtime",
+    "discover_full_history_cache_entries",
     "full_history_cache_keys",
+    "full_history_prediction_fingerprint",
     "load_full_history_cache_entry",
     "pack_bool_matrix",
     "postprocess_full_history_output",
@@ -1068,4 +1261,5 @@ __all__ = [
     "validate_full_history_cache_key",
     "validate_full_history_payload",
     "write_full_history_cache_entry",
+    "write_full_history_cache_manifest",
 ]
