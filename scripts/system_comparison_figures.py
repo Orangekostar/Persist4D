@@ -292,7 +292,7 @@ def _line_svg(
     upper = max(values)
     span = upper - lower
     upper = upper + (0.12 * span if span else 1.0)
-    left, right, bottom = 78.0, 682.0, 350.0
+    left, right, bottom = 96.0, 682.0, 350.0
     top = 72.0 if len(series) <= 2 else 48.0 + (len(series) - 1) * 18.0 + 24.0
 
     def x_coord(horizon: int) -> float:
@@ -311,7 +311,7 @@ def _line_svg(
         ),
         '<rect width="720" height="420" fill="#FFFFFF"/>',
         '<g font-family="Arial, Helvetica, sans-serif" fill="#222222" font-size="12">',
-        f'<text x="78" y="30" font-size="16" font-weight="700">{escaped_title}</text>',
+        f'<text x="{left}" y="30" font-size="16" font-weight="700">{escaped_title}</text>',
         f'<line x1="{left}" y1="{bottom}" x2="{right}" y2="{bottom}" stroke="#222222"/>',
         f'<line x1="{left}" y1="{top}" x2="{left}" y2="{bottom}" stroke="#222222"/>',
     ]
@@ -321,7 +321,7 @@ def _line_svg(
         elements.extend(
             [
                 f'<line x1="{left}" y1="{y:.2f}" x2="{right}" y2="{y:.2f}" stroke="#D9D9D9"/>',
-                f'<text x="68" y="{y + 4:.2f}" text-anchor="end">{value:.3g}</text>',
+                f'<text x="86" y="{y + 4:.2f}" text-anchor="end">{value:.3g}</text>',
             ]
         )
     for horizon in HORIZONS:

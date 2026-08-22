@@ -132,7 +132,17 @@ def test_six_svg_figures_are_valid_traceable_and_accessible(tmp_path: Path) -> N
     vertical_axis = next(
         element
         for element in gap_root.iter("{http://www.w3.org/2000/svg}line")
-        if element.attrib.get("x1") == "78.0"
-        and element.attrib.get("x2") == "78.0"
+        if element.attrib.get("x1") == "96.0"
+        and element.attrib.get("x2") == "96.0"
     )
     assert float(vertical_axis.attrib["y1"]) > 102.0
+
+    vram_root = ET.parse(tmp_path / "figure_5_peak_vram.svg").getroot()
+    vram_text = list(vram_root.iter("{http://www.w3.org/2000/svg}text"))
+    y_ticks = [
+        element
+        for element in vram_text
+        if element.attrib.get("text-anchor") == "end"
+    ]
+    assert len(y_ticks) == 5
+    assert {element.attrib.get("x") for element in y_ticks} == {"86"}
