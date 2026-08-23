@@ -1,0 +1,51 @@
+schema_version: 1
+stage_name: persist4d-reviewer-closure-phase-ii-evaluation
+paper_name: ReScene4D T2-to-T3 Horizon-Adapted
+strongest_simple_tracker_method_id: B2
+evaluation_horizons: [2, 3, 4, 5]
+task_metrics:
+  - causal_prefix_t_mAP
+  - causal_prefix_t_mAP50
+  - causal_prefix_t_mAP25
+  - causal_prefix_t_REC
+  - current_stage_AP
+  - current_stage_REC
+identity_metrics:
+  - normalized_id_switch_rate
+  - fragmentation_rate
+  - merge_rate
+  - gap_recovery_accuracy
+  - gap_recovery_recall
+statistics:
+  cluster_unit: reference_scene_id
+  cluster_count: 6
+  bootstrap_replicates: 10000
+  seed: 45
+  confidence_level: 0.95
+gate_ii:
+  substantial_task_advantage:
+    compared_horizons: [4, 5]
+    required_metrics:
+      - causal_prefix_t_mAP
+      - causal_prefix_t_REC
+    minimum_pooled_absolute_difference: 0.01
+    require_cluster_ci_lower_above_zero: true
+    require_all_orders_positive: true
+    require_all_loso_positive: true
+  identity_gap_closed:
+    compared_horizons: [4, 5]
+    required_metrics:
+      - normalized_id_switch_rate
+      - gap_recovery_recall
+    rule: no_robust_persist4d_advantage_in_any_required_cell
+  compute_no_material_disadvantage:
+    compared_horizons: [4, 5]
+    required_ratios:
+      - latency_ratio
+      - peak_allocated_vram_ratio
+      - cumulative_scan_ratio
+    maximum_ratio: 1.10
+  classification_priority:
+    - FULL_HISTORY_DOMINANT
+    - ACCURACY_ADVANTAGE_BUT_COSTLY
+    - HORIZON_ROBUST
