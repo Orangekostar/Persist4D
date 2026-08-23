@@ -353,8 +353,11 @@ def _audit_rows() -> list[dict[str, str]]:
         {
             "field": "t3_sequence_database",
             "classification": "known",
-            "value": "RIO sliding T3; train/validation/test 858/123/113",
-            "evidence": "content-bound local YAML",
+            "value": (
+                "RIO sliding T3 raw train/validation/test 858/123/113; "
+                "active train 855 after 3 known-empty exclusions"
+            ),
+            "evidence": "content-bound local YAML and fail-closed loader",
         },
         {
             "field": "model_loss_taxonomy",

@@ -5,9 +5,11 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import torch
+import pytest
 
 import main_instance_segmentation as training_entrypoint
 from scripts import reviewer_closure_training as training
+from scripts import run_reviewer_closure_t3 as t3_runner
 from trainer import trainer as trainer_module
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -155,3 +157,74 @@ def test_reviewer_runtime_filters_frozen_optimizer_parameters() -> None:
 
     assert optimizers[0].param_groups[0]["params"] == [trainable]
     assert training_entrypoint._is_formal_p2_training(adapted_config) is False
+
+
+def test_t3_batch_semantics_require_three_stages_and_valid_segment_mapping() -> None:
+    data = SimpleNamespace(
+        temporal_stages=[torch.tensor([0, 0, 1, 1, 2, 2])],
+        features=torch.ones(6, 3),
+    )
+    targets = [
+        {
+            "labels": torch.tensor([1, 2]),
+            "point2segment": torch.tensor([0, 0, 1, 1, 2, 2]),
+            "segment_mask": torch.tensor([[True, False, False], [False, True, True]]),
+        }
+    ]
+
+    result = t3_runner.validate_t3_batch_semantics(data, targets, ["sample"])
+
+    assert result == {
+        "batch_size": 1,
+        "point_count": 6,
+        "supervised_instances": 2,
+        "temporal_stages": [0, 1, 2],
+        "segment_count": 3,
+    }
+
+
+def test_real_t3_loader_materializes_exact_three_stage_batch() -> None:
+    recipe = training.load_t3_adaptation_recipe(RECIPE_PATH)
+    _, config = training.compose_t3_adaptation_config(recipe)
+
+    mixed, _, _, names, sample = t3_runner._materialize_t3_smoke_batch(
+        config, torch.device("cpu")
+    )
+
+    assert sample["temporal_stages"] == [0, 1, 2]
+    assert sample["rio_raw_train_sequence_count"] == 858
+    assert sample["rio_active_train_sequence_count"] == 855
+    assert sample["rio_excluded_empty_supervision_windows"] == 3
+    assert sample["mixed_epoch_samples"] == 1536
+    assert [len(dataset) for dataset in mixed.datasets] == [855, 1199]
+    assert names == [sample["sample_name"]]
+
+
+def test_strict_adaptation_load_rejects_partial_state(tmp_path: Path) -> None:
+    source = torch.nn.Linear(2, 2)
+    checkpoint = tmp_path / "partial.ckpt"
+    torch.save({"state_dict": {"weight": source.weight.detach().clone()}}, checkpoint)
+
+    with pytest.raises(RuntimeError, match="strict weights-only"):
+        t3_runner.strict_load_adaptation_weights(source, checkpoint)
+
+
+def test_completed_training_runtime_requires_exact_frozen_budget() -> None:
+    recipe = training.load_t3_adaptation_recipe(RECIPE_PATH)
+    runtime = {
+        "status": "completed",
+        "world_size": 2,
+        "completed_epochs": 45,
+        "optimizer_updates": 2160,
+        "global_sample_exposures": 69120,
+        "global_scan_exposures": 138240,
+        "rio_t3_sample_exposures": 34560,
+        "scannet_t1_sample_exposures": 34560,
+        "wall_clock_seconds": 3600.0,
+        "gpu_hours": 2.0,
+        "peak_allocated_vram_mib": 12000.0,
+    }
+
+    validated = t3_runner.validate_completed_training_runtime(runtime, recipe)
+
+    assert validated["global_sample_exposures"] == 69120

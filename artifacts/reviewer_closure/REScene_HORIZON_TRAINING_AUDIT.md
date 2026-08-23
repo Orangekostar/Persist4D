@@ -9,7 +9,7 @@ The source is the exact epoch 404 checkpoint at global step 26730; optimizer and
 | Field | Classification | Value | Evidence |
 |---|---|---|---|
 | local_source_checkpoint | known | epoch 404, global step 26730, exact SHA256 | frozen full Lightning checkpoint |
-| t3_sequence_database | known | RIO sliding T3; train/validation/test 858/123/113 | content-bound local YAML |
+| t3_sequence_database | known | RIO sliding T3 raw train/validation/test 858/123/113; active train 855 after 3 known-empty exclusions | content-bound local YAML and fail-closed loader |
 | model_loss_taxonomy | known | Concerto, 100 queries, NYU40-18, weighted criterion | P2 config and executable code |
 | official_concerto_weight_identity | unknown | not reported | P2 provenance audit |
 | official_optimizer_precision_details | unknown | betas/eps/weight decay/precision not fully reported | P2 provenance audit |

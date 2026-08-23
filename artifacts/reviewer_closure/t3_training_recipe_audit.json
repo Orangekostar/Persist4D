@@ -118,9 +118,9 @@
     },
     {
       "classification": "known",
-      "evidence": "content-bound local YAML",
+      "evidence": "content-bound local YAML and fail-closed loader",
       "field": "t3_sequence_database",
-      "value": "RIO sliding T3; train/validation/test 858/123/113"
+      "value": "RIO sliding T3 raw train/validation/test 858/123/113; active train 855 after 3 known-empty exclusions"
     },
     {
       "classification": "known",
@@ -196,7 +196,7 @@
     "reconstructed": 2,
     "unknown": 3
   },
-  "content_sha256": "16d097d85a44184f831b9806930cacd28a868524e056096e33ec2ad004ef9c2d",
+  "content_sha256": "612c83094a7c5bf48e087ce52ae3a2adb7e1587487af84777fd62f397e8503bd",
   "level1_claimed": false,
   "level1_rejection_reason": "official recipe provenance is incomplete and the local T2 source is a documented reproduction with explicit choices",
   "paper_name": "ReScene4D T2-to-T3 Horizon-Adapted",
