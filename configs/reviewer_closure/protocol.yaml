@@ -1,0 +1,72 @@
+schema_version: 1
+stage_name: persist4d-reviewer-closure
+
+source_commits:
+  completed_branch_head: b2414e3b2e89a990ee42a368caf6784eb27f8f01
+  system_report_source: 575acc12fbd63f38fc3c16578914b25c2fed8584
+  official_rescene: fb2fe42eb8f1e926567c48eea9acb874e608ee10
+
+baseline:
+  artifact_tree: 398fe87e1d40d67e61399fd893f02dc5f5f6b7ad
+  classification: SYSTEM_PARETO_LOCK
+
+sources:
+  checkpoint:
+    reference: repo:checkpoints/rescene4d_concerto_t2_repro.ckpt
+    sha256: 85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e
+  protocol_b_manifest:
+    reference: repo:artifacts/P6A/protocol_b_manifest.json
+    sha256: 246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe
+  system_config:
+    reference: repo:configs/system_comparison/persist4d_incumbent.yaml
+    sha256: aadca1c1608bae4ad4e812a6261536d9e386a85c460bbd85f4c5d215c9a68717
+  system_manifest:
+    reference: repo:artifacts/system_comparison/system_comparison_manifest.json
+    sha256: a7186318d329f5907ff3c67d37671359d2a81d058d5dea817c0ca53af2e783e8
+  reproducibility_binding:
+    reference: repo:artifacts/system_comparison/reproducibility_binding.json
+    sha256: acb86339d9462144fbcc85bc169bbf37c34845dd272b77a7910e8298f00eb995
+  system_report:
+    reference: repo:artifacts/system_comparison/SYSTEM_COMPARISON_GO_NOGO_REPORT.md
+    sha256: 9b08bff64ee08f3dc38caf74ccde1222daa19f45f9be1d91e198d599a87a80d8
+  system_artifact_manifest:
+    reference: repo:artifacts/system_comparison/artifact_manifest.json
+    sha256: fe66e48e7806a74e434a04599ed00264e1bac251e340e547603dd811bd0b322f
+
+sidecar:
+  schema_version: full-history-observations-v2
+  horizons: [2, 3, 4, 5]
+  tensor_fields:
+    - features
+    - class_prob
+    - confidence
+    - valid
+    - current_stage_masks
+    - mask_support
+    - local_query_ids
+  identity_fields:
+    - reference_scene_id
+    - master_sequence_id
+    - order_id
+    - horizon
+    - scan_indices
+  provenance_fields:
+    - source_prediction_content_sha256
+    - checkpoint_sha256
+    - config_sha256
+    - source_commit
+
+statistics:
+  cluster_unit: reference_scene_id
+  cluster_count: 6
+  bootstrap_replicates: 10000
+  seed: 45
+  confidence_level: 0.95
+
+gate_i:
+  compared_horizons: [4, 5]
+  identity_metrics:
+    - normalized_deployment_id_switch_rate
+    - gap_identity_recovery
+  decision_rule: any_metric_any_horizon_persist4d_advantage_with_paired_ci
+  requires_ci_exclude_zero: true
