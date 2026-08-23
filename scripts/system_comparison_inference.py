@@ -342,6 +342,20 @@ def _observation_fingerprints(observation: Mapping[str, Tensor]) -> dict[str, st
     return fingerprints
 
 
+def full_history_content_sha256(value: Mapping[str, object]) -> str:
+    """Return the canonical tensor-aware digest used by Full-History caches."""
+
+    return _content_sha256(value)
+
+
+def full_history_observation_fingerprints(
+    observation: Mapping[str, Tensor],
+) -> dict[str, str]:
+    """Return the frozen raw-observation fingerprints used by cache provenance."""
+
+    return _observation_fingerprints(observation)
+
+
 @dataclass(frozen=True)
 class ProcessedFullHistory:
     task_prediction: dict[str, Tensor]
@@ -349,6 +363,12 @@ class ProcessedFullHistory:
     target: dict[str, Tensor]
     raw_observation: dict[str, Tensor]
     observation_fingerprints: dict[str, str]
+
+
+@dataclass(frozen=True)
+class ProducedFullHistory:
+    payload: dict[str, object]
+    processed: ProcessedFullHistory
 
 
 def _map_classes(classes: Tensor, mapper: Callable[[int], int]) -> Tensor:
@@ -1215,7 +1235,9 @@ class FullHistoryPredictionProducer:
     minimum_mask_support: int = 1
     seed: int = 45
 
-    def __call__(self, logical_key: Mapping[str, object]) -> dict[str, object]:
+    def produce_bundle(
+        self, logical_key: Mapping[str, object]
+    ) -> ProducedFullHistory:
         key = validate_full_history_cache_key(logical_key)
         validate_full_history_dataset_context(self.dataset, key)
         context_index = int(key["context_index"])
@@ -1293,24 +1315,33 @@ class FullHistoryPredictionProducer:
                 "model_input_bytes": model_bytes,
                 "scan_point_counts": scan_counts,
             }
-        return build_full_history_payload(
-            key=key,
-            provenance=self.provenance,
+        return ProducedFullHistory(
+            payload=build_full_history_payload(
+                key=key,
+                provenance=self.provenance,
+                processed=processed,
+                input_stats=input_stats,
+            ),
             processed=processed,
-            input_stats=input_stats,
         )
+
+    def __call__(self, logical_key: Mapping[str, object]) -> dict[str, object]:
+        return self.produce_bundle(logical_key).payload
 
 
 __all__ = [
     "FullHistoryCacheError",
     "FullHistoryPredictionProducer",
     "ProcessedFullHistory",
+    "ProducedFullHistory",
     "assert_t2_observation_regression",
     "build_full_history_cache_manifest",
     "build_full_history_payload",
     "deterministic_inference_runtime",
     "discover_full_history_cache_entries",
     "full_history_cache_keys",
+    "full_history_content_sha256",
+    "full_history_observation_fingerprints",
     "full_history_prediction_fingerprint",
     "load_full_history_cache_entry",
     "model_input_storage_bytes",
