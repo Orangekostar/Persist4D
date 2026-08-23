@@ -2,8 +2,13 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
+import torch
+
+import main_instance_segmentation as training_entrypoint
 from scripts import reviewer_closure_training as training
+from trainer import trainer as trainer_module
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 RECIPE_PATH = REPO_ROOT / "configs/reviewer_closure/rescene_t3_adapted.yaml"
@@ -44,6 +49,8 @@ def test_composed_t3_config_changes_only_frozen_adaptation_fields() -> None:
     assert adapted.trainer.max_epochs == 45
     assert adapted.optimizer.lr == 5.0e-5
     assert adapted.scheduler.scheduler.total_steps == -1
+    assert adapted.callbacks[2].filename == "rescene4d_t2_to_t3_horizon_adapted"
+    assert adapted.callbacks[2].every_n_epochs == 45
     assert adapted.general.checkpoint == str(CHECKPOINT_PATH)
     assert adapted.general.reviewer_closure_weighted_objective is True
     assert adapted.general.reviewer_closure_fail_closed_runtime is True
@@ -100,3 +107,51 @@ def test_training_audit_classifies_all_fields_without_level1_claim(
         (tmp_path / "t3_training_recipe_audit.json").read_text(encoding="utf-8")
     )
     assert manifest["content_sha256"] == result["content_sha256"]
+
+
+def test_reviewer_flags_enable_weighted_fail_closed_objective_without_p2_identity() -> (
+    None
+):
+    config = SimpleNamespace(
+        general=SimpleNamespace(
+            reviewer_closure_weighted_objective=True,
+            reviewer_closure_fail_closed_runtime=True,
+        )
+    )
+    owner = SimpleNamespace(
+        config=config,
+        criterion=SimpleNamespace(weight_dict={"loss_ce": 2.0}),
+    )
+    losses = {
+        "loss_ce": torch.tensor(1.0),
+        "loss_segment_contrastive_layer0": torch.tensor(100.0),
+    }
+
+    objective = trainer_module._configured_objective_loss(owner, losses)
+
+    assert objective.item() == 2.0
+    assert trainer_module._runtime_safety_enabled(config) is True
+    assert trainer_module._weighted_objective_enabled(config) is True
+    assert trainer_module._p2_general_flag(config, "p2_fail_closed_runtime") is False
+
+
+def test_reviewer_runtime_filters_frozen_optimizer_parameters() -> None:
+    recipe = training.load_t3_adaptation_recipe(RECIPE_PATH)
+    _, adapted_config = training.compose_t3_adaptation_config(recipe)
+    adapted_config.scheduler.scheduler.total_steps = 2
+    trainable = torch.nn.Parameter(torch.ones(1), requires_grad=True)
+    frozen = torch.nn.Parameter(torch.ones(1), requires_grad=False)
+
+    class OptimizerOwner:
+        config = adapted_config
+
+        @staticmethod
+        def parameters():
+            return iter((trainable, frozen))
+
+    optimizers, _ = trainer_module.InstanceSegmentation.configure_optimizers(
+        OptimizerOwner()
+    )
+
+    assert optimizers[0].param_groups[0]["params"] == [trainable]
+    assert training_entrypoint._is_formal_p2_training(adapted_config) is False

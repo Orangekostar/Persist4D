@@ -8,6 +8,14 @@
       "adapted": "checkpoints/reviewer_closure_rescene_t3_adapted",
       "t2": "checkpoints/rescene4d_concerto_t2_repro"
     },
+    "callbacks.2.every_n_epochs": {
+      "adapted": 45,
+      "t2": 450
+    },
+    "callbacks.2.filename": {
+      "adapted": "rescene4d_t2_to_t3_horizon_adapted",
+      "t2": "rescene4d_concerto_t2_repro"
+    },
     "data.batch_size": {
       "adapted": 1,
       "t2": 2
@@ -188,7 +196,7 @@
     "reconstructed": 2,
     "unknown": 3
   },
-  "content_sha256": "067d88e732f8bff6dad5f7fdcb570fe4b98576e069525210f01f63801313004c",
+  "content_sha256": "16d097d85a44184f831b9806930cacd28a868524e056096e33ec2ad004ef9c2d",
   "level1_claimed": false,
   "level1_rejection_reason": "official recipe provenance is incomplete and the local T2 source is a documented reproduction with explicit choices",
   "paper_name": "ReScene4D T2-to-T3 Horizon-Adapted",

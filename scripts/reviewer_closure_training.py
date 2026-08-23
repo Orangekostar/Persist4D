@@ -25,6 +25,8 @@ OUTPUT_ROOT = PROJECT_ROOT / "artifacts/reviewer_closure"
 ALLOWED_ADAPTATION_CONFIG_PATHS = (
     "callbacks.0.dirpath",
     "callbacks.1.dirpath",
+    "callbacks.2.every_n_epochs",
+    "callbacks.2.filename",
     "data.batch_size",
     "data.temporal_window",
     "data.test_dataset.temporal_window",
@@ -249,6 +251,8 @@ def compose_t3_adaptation_config(
     adapted.optimizer.lr = 5.0e-5
     adapted.trainer.max_epochs = 45
     adapted.trainer.accumulate_grad_batches = 16
+    adapted.callbacks[2].filename = "rescene4d_t2_to_t3_horizon_adapted"
+    adapted.callbacks[2].every_n_epochs = 45
     return t2, adapted
 
 

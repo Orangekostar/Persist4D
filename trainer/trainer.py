@@ -24,6 +24,18 @@ def _p2_general_flag(config, name):
     return bool(getattr(general, name, False))
 
 
+def _runtime_safety_enabled(config):
+    return _p2_general_flag(
+        config, "p2_fail_closed_runtime"
+    ) or _p2_general_flag(config, "reviewer_closure_fail_closed_runtime")
+
+
+def _weighted_objective_enabled(config):
+    return _p2_general_flag(
+        config, "p2_weighted_objective"
+    ) or _p2_general_flag(config, "reviewer_closure_weighted_objective")
+
+
 def _safe_length(value):
     if value is None:
         return 0
@@ -534,19 +546,16 @@ def aggregate_objective_loss(losses, weight_dict, validate_finite=True):
 
 
 def _configured_objective_loss(module, losses):
-    p2_fail_closed_runtime = _p2_general_flag(
-        module.config,
-        "p2_fail_closed_runtime",
-    )
-    if _p2_general_flag(module.config, "p2_weighted_objective"):
+    runtime_safety_enabled = _runtime_safety_enabled(module.config)
+    if _weighted_objective_enabled(module.config):
         return aggregate_objective_loss(
             losses,
             module.criterion.weight_dict,
-            validate_finite=p2_fail_closed_runtime,
+            validate_finite=runtime_safety_enabled,
         )
 
     total_loss = sum(losses.values())
-    if p2_fail_closed_runtime:
+    if runtime_safety_enabled:
         _validate_objective_finite(losses, total_loss, list(losses))
     return total_loss
 
@@ -812,15 +821,10 @@ class InstanceSegmentation(pl.LightningModule):
             matcher=matcher,
             weight_dict=weight_dict,
         )
-        p2_fail_closed_runtime = _p2_general_flag(
-            config,
-            "p2_fail_closed_runtime",
-        )
-        criterion.p2_fail_closed_runtime = p2_fail_closed_runtime
+        runtime_safety_enabled = _runtime_safety_enabled(config)
+        criterion.p2_fail_closed_runtime = runtime_safety_enabled
         if hasattr(criterion, "contrastive_loss"):
-            criterion.contrastive_loss.p2_fail_closed_runtime = (
-                p2_fail_closed_runtime
-            )
+            criterion.contrastive_loss.p2_fail_closed_runtime = runtime_safety_enabled
         return criterion
 
     def forward(self, x, point2segment=None, raw_coordinates=None, is_eval=False, targets=None):
@@ -838,11 +842,8 @@ class InstanceSegmentation(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         """Training step implementation"""
-        p2_fail_closed_runtime = _p2_general_flag(
-            self.config,
-            "p2_fail_closed_runtime",
-        )
-        if p2_fail_closed_runtime:
+        runtime_safety_enabled = _runtime_safety_enabled(self.config)
+        if runtime_safety_enabled:
             (
                 data,
                 target,
@@ -877,7 +878,7 @@ class InstanceSegmentation(pl.LightningModule):
                 return None
 
         # Forward pass
-        if p2_fail_closed_runtime:
+        if runtime_safety_enabled:
             forward_failure = None
             forward_cause = None
             try:
@@ -929,7 +930,7 @@ class InstanceSegmentation(pl.LightningModule):
                 raise run_err
 
         # Compute losses
-        if p2_fail_closed_runtime:
+        if runtime_safety_enabled:
             objective_failure = None
             objective_cause = None
             try:
@@ -1075,11 +1076,8 @@ class InstanceSegmentation(pl.LightningModule):
 
     def _eval_step(self, batch, stage, batch_idx=None):
         """Unified evaluation step for validation and testing"""
-        p2_fail_closed_runtime = _p2_general_flag(
-            self.config,
-            "p2_fail_closed_runtime",
-        )
-        if p2_fail_closed_runtime:
+        runtime_safety_enabled = _runtime_safety_enabled(self.config)
+        if runtime_safety_enabled:
             (
                 data,
                 target,
@@ -1142,7 +1140,7 @@ class InstanceSegmentation(pl.LightningModule):
 
         # Disable gradient computation during evaluation
         with torch.no_grad():
-            if p2_fail_closed_runtime:
+            if runtime_safety_enabled:
                 forward_failure = None
                 forward_cause = None
                 try:
@@ -1200,7 +1198,7 @@ class InstanceSegmentation(pl.LightningModule):
                     raise run_err
 
             # Process predictions for metrics
-            if p2_fail_closed_runtime:
+            if runtime_safety_enabled:
                 evaluation_failure = None
                 evaluation_cause = None
                 try:
@@ -1267,7 +1265,7 @@ class InstanceSegmentation(pl.LightningModule):
             # Calculate losses if not in test mode
             if stage == "test":
                 return 0.0
-            if p2_fail_closed_runtime:
+            if runtime_safety_enabled:
                 objective_failure = None
                 objective_cause = None
                 try:
@@ -1290,10 +1288,7 @@ class InstanceSegmentation(pl.LightningModule):
                             **{f"{stage}_{k}": v for k, v in losses.items()},
                             **self._get_mean_loss(losses, stage),
                         }
-                        if _p2_general_flag(
-                            self.config,
-                            "p2_weighted_objective",
-                        ):
+                        if _weighted_objective_enabled(self.config):
                             log_values[f"{stage}_loss"] = total_loss
                         log_batch_size = data.batch_size
                     except Exception as error:
@@ -1322,10 +1317,7 @@ class InstanceSegmentation(pl.LightningModule):
                     **{f"{stage}_{k}": v for k, v in losses.items()},
                     **self._get_mean_loss(losses, stage),
                 }
-                if _p2_general_flag(
-                    self.config,
-                    "p2_weighted_objective",
-                ):
+                if _weighted_objective_enabled(self.config):
                     log_values[f"{stage}_loss"] = total_loss
                 log_batch_size = data.batch_size
             self.log_dict(
@@ -1781,7 +1773,7 @@ class InstanceSegmentation(pl.LightningModule):
 
     def configure_optimizers(self):
         parameters = self.parameters()
-        if _p2_general_flag(self.config, "p2_fail_closed_runtime"):
+        if _runtime_safety_enabled(self.config):
             parameters = (
                 parameter for parameter in parameters if parameter.requires_grad
             )
@@ -1817,7 +1809,7 @@ class InstanceSegmentation(pl.LightningModule):
 
         generator = self._train_sampler_generator()
         enabled = (
-            _p2_general_flag(self.config, "p2_fail_closed_runtime")
+            _runtime_safety_enabled(self.config)
             or generator is not None
         )
         if not enabled:
@@ -1969,18 +1961,19 @@ class InstanceSegmentation(pl.LightningModule):
 
     def on_save_checkpoint(self, checkpoint):
         generator = self._train_sampler_generator()
-        p2_fail_closed_runtime = _p2_general_flag(
+        formal_p2_runtime = _p2_general_flag(
             self.config,
             "p2_fail_closed_runtime",
         )
+        runtime_safety_enabled = _runtime_safety_enabled(self.config)
         if generator is None:
-            if p2_fail_closed_runtime:
+            if runtime_safety_enabled:
                 raise RuntimeError(
                     "cannot checkpoint train sampler: sampler has no explicit "
                     "generator"
                 )
             return
-        if p2_fail_closed_runtime:
+        if formal_p2_runtime:
             normalize_formal_p2_epoch_boundary_checkpoint(
                 checkpoint,
                 self.config,
@@ -1993,7 +1986,7 @@ class InstanceSegmentation(pl.LightningModule):
             "dataloader_prefetch_state_checkpointed": False,
             "generator_state": generator.get_state().detach().cpu().clone(),
         }
-        if p2_fail_closed_runtime:
+        if formal_p2_runtime:
             checkpoint[self._OPTIMIZER_PARAMETER_CONTRACT_KEY] = (
                 self._optimizer_parameter_contract(checkpoint)
             )
@@ -2023,11 +2016,11 @@ class InstanceSegmentation(pl.LightningModule):
                 self.config.data.train_dataset
             )
             if (
-                _p2_general_flag(self.config, "p2_fail_closed_runtime")
+                _runtime_safety_enabled(self.config)
                 and self._train_sampler_generator() is None
             ):
                 raise RuntimeError(
-                    "cannot set up P2 train sampler: sampler has no explicit "
+                    "cannot set up fail-closed train sampler: sampler has no explicit "
                     "generator"
                 )
             self._restore_train_sampler_generator_state()
@@ -2149,7 +2142,7 @@ class InstanceSegmentation(pl.LightningModule):
                 print(f"⚠️  {unused} unused parameters detected")
 
     def on_before_optimizer_step(self, optimizer):
-        if _p2_general_flag(self.config, "p2_fail_closed_runtime"):
+        if _runtime_safety_enabled(self.config):
             collective_device = _fallback_collective_device(self)
             batch_idx = None
             file_names = "<unavailable>"
