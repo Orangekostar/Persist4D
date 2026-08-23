@@ -1,0 +1,17 @@
+method,horizon,category,count,total_failure_events,fraction,operational_definition
+Persist4D,4,local_observation_miss,621,5176,0.11997681607418856,no valid raw candidate has positive spatial overlap
+Persist4D,4,class_failure,1210,5176,0.23377125193199383,spatial candidate exists but no class-compatible candidate overlaps
+Persist4D,4,high_iou_mask_failure,1136,5176,0.21947449768160743,class-compatible candidate overlaps but remains below IoU 0.50
+Persist4D,4,identity_fragmentation,81,5176,0.01564914992272025,one GT entity is assigned multiple issued IDs
+Persist4D,4,identity_merge,229,5176,0.04424265842349304,one issued ID is assigned to multiple GT entities
+Persist4D,4,wrong_gap_recovery,99,5176,0.019126738794435858,a reactivation after absence recovers the wrong GT identity
+Persist4D,4,capacity_failure,830,5176,0.16035548686244205,a valid birth is rejected by bounded state capacity
+Persist4D,4,unknown_unresolved,970,5176,0.187403400309119,available evidence does not uniquely identify one registered cause
+Persist4D,5,local_observation_miss,755,6535,0.11553175210405509,no valid raw candidate has positive spatial overlap
+Persist4D,5,class_failure,1525,6535,0.23335883703136956,spatial candidate exists but no class-compatible candidate overlaps
+Persist4D,5,high_iou_mask_failure,1418,6535,0.21698546289211937,class-compatible candidate overlaps but remains below IoU 0.50
+Persist4D,5,identity_fragmentation,125,6535,0.019127773527161437,one GT entity is assigned multiple issued IDs
+Persist4D,5,identity_merge,293,6535,0.044835501147666414,one issued ID is assigned to multiple GT entities
+Persist4D,5,wrong_gap_recovery,169,6535,0.025860749808722265,a reactivation after absence recovers the wrong GT identity
+Persist4D,5,capacity_failure,908,6535,0.1389441469013007,a valid birth is rejected by bounded state capacity
+Persist4D,5,unknown_unresolved,1342,6535,0.2053557765876052,available evidence does not uniquely identify one registered cause

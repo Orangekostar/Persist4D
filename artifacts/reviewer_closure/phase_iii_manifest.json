@@ -1,0 +1,43 @@
+{
+  "cache_binding": {
+    "backup_source_commit": "7c21ea549c9250e19ec52126bfe584060d106ef8",
+    "frozen_per_sequence_results_sha256": "0071913ca5616d9bce61fa8c89f96b788d5e8cf81fe77e17ef97d7525cd4c209",
+    "frozen_source_commit": "575acc12fbd63f38fc3c16578914b25c2fed8584",
+    "full_history_manifest_file_sha256": "33463282cf87554b594add4e122755bd5c350e6da9cc02842d0d6b05266bef11",
+    "persistent_manifest_file_sha256": "82d7c54e9c8eab516271a4d908809bf3d9ce31b9df87bfb9acb12e0ea2d006fb"
+  },
+  "ceiling_classification": "PERCEPTION_CEILING",
+  "content_sha256": "cea75379392251053bfedbbd7ff335614c7cc5f701e4ba3b4c32ac84d6a8cdd5",
+  "coverage_row_count": 96,
+  "coverage_thresholds": [
+    0.25,
+    0.5,
+    0.75
+  ],
+  "failure_row_count": 16,
+  "iou_thresholds": [
+    0.25,
+    0.3,
+    0.35,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9
+  ],
+  "living_scenes_triggered": false,
+  "oracle_policy": "p6a_offline_gt_ids_unmatched_candidates_retained",
+  "oracle_row_count": 12,
+  "schema_version": 1,
+  "sequence_count": 129,
+  "sidecar_manifest_content_sha256": "451f8563731aa3ea7a3a4cbe47d3b27b99f111b5221b3025a87251021da97126",
+  "source_commit": "14ca4be199c278f27123473514aa355a0e1bdb6c",
+  "status": "pass",
+  "sweep_row_count": 56
+}
