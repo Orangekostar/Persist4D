@@ -1,0 +1,5 @@
+tracker_method_id,metric,horizon,canonical_difference,reverse_difference,sha256_seed45_difference,complete_cluster_population,expected_direction_consistent
+B2,normalized_id_switch_rate,4,-0.012574357781039906,-0.03550531037500695,0.05011303256461571,True,False
+B2,normalized_id_switch_rate,5,-0.028790815543214814,-0.04746632307841517,0.0812934485517106,True,False
+B2,gap_recovery_recall,4,0.24607573453001227,0.2157986609277857,0.20404291901668214,False,True
+B2,gap_recovery_recall,5,0.38464983448056705,0.38130484030794726,0.38335579497403627,True,True

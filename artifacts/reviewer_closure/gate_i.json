@@ -1,0 +1,52 @@
+{
+  "classification": "TRACKER_REJECTED",
+  "content_sha256": "d468525232ffc67e281d1a47ca5dc9c8467a715fbbf64662299165806a800b5d",
+  "decision_rule": "any_metric_any_horizon_persist4d_advantage_with_ci_order_and_loso",
+  "evidence": [
+    {
+      "ci_advantage": false,
+      "complete_cluster_population": true,
+      "horizon": 4,
+      "loso_consistent": false,
+      "metric": "normalized_id_switch_rate",
+      "order_consistent": false
+    },
+    {
+      "ci_advantage": false,
+      "complete_cluster_population": true,
+      "horizon": 5,
+      "loso_consistent": false,
+      "metric": "normalized_id_switch_rate",
+      "order_consistent": false
+    },
+    {
+      "ci_advantage": true,
+      "complete_cluster_population": false,
+      "horizon": 4,
+      "loso_consistent": false,
+      "metric": "gap_recovery_recall",
+      "order_consistent": false
+    },
+    {
+      "ci_advantage": true,
+      "complete_cluster_population": true,
+      "horizon": 5,
+      "loso_consistent": true,
+      "metric": "gap_recovery_recall",
+      "order_consistent": true
+    }
+  ],
+  "qualifying_advantages": [
+    {
+      "ci_advantage": true,
+      "complete_cluster_population": true,
+      "horizon": 5,
+      "loso_consistent": true,
+      "metric": "gap_recovery_recall",
+      "order_consistent": true
+    }
+  ],
+  "schema_version": 1,
+  "selected_tracker_method_id": "B2",
+  "status": "pass"
+}

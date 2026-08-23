@@ -1,0 +1,76 @@
+{
+  "content_sha256": "66ada583ac4c189e87c6d38e45e3ce5bdf4c49a7f98f15e511235e7974eb11a2",
+  "diagnostic_excluded_method_id": "B4",
+  "eligible_method_ids": [
+    "B1",
+    "B2",
+    "B3"
+  ],
+  "ranking": [
+    {
+      "correct_recoveries": 58,
+      "deployment_id_switches": 365,
+      "fragmentation_count": 692,
+      "fragmentation_opportunities": 3088,
+      "gap_opportunities": 963,
+      "gap_recovery_recall": 0.060228452751817235,
+      "horizons": [
+        4,
+        5
+      ],
+      "identity_transition_opportunities": 2551,
+      "merge_count": 333,
+      "merge_opportunities": 2729,
+      "method": "Pairwise Feature-Class Association",
+      "method_id": "B2",
+      "normalized_id_switch_rate": 0.1430811446491572,
+      "recovery_attempts": 319
+    },
+    {
+      "correct_recoveries": 50,
+      "deployment_id_switches": 382,
+      "fragmentation_count": 718,
+      "fragmentation_opportunities": 3088,
+      "gap_opportunities": 963,
+      "gap_recovery_recall": 0.05192107995846314,
+      "horizons": [
+        4,
+        5
+      ],
+      "identity_transition_opportunities": 2551,
+      "merge_count": 304,
+      "merge_opportunities": 2674,
+      "method": "Pairwise Feature Association",
+      "method_id": "B1",
+      "normalized_id_switch_rate": 0.1497451979615837,
+      "recovery_attempts": 319
+    },
+    {
+      "correct_recoveries": 88,
+      "deployment_id_switches": 423,
+      "fragmentation_count": 684,
+      "fragmentation_opportunities": 3088,
+      "gap_opportunities": 963,
+      "gap_recovery_recall": 0.09138110072689512,
+      "horizons": [
+        4,
+        5
+      ],
+      "identity_transition_opportunities": 2551,
+      "merge_count": 319,
+      "merge_opportunities": 2723,
+      "method": "EMA Temporal Association",
+      "method_id": "B3",
+      "normalized_id_switch_rate": 0.1658173265386123,
+      "recovery_attempts": 319
+    }
+  ],
+  "ranking_rule": [
+    "pooled_t4_t5_normalized_id_switch_rate_ascending",
+    "pooled_t4_t5_gap_recovery_recall_descending",
+    "method_id_ascending"
+  ],
+  "schema_version": 1,
+  "selected_method_id": "B2",
+  "status": "pass"
+}

@@ -1,0 +1,13 @@
+{
+  "bitwise_equal_prediction_count": 0,
+  "content_sha256": "a7c2aed11806b37a25068db66ba780b3c32fcecb9a345d2b1f2d56f97bc93b30",
+  "entry_count": 516,
+  "maximum_absolute_difference": 0.030033230781555176,
+  "metric_row_count": 40,
+  "policy": "frozen_reference_task_metrics_remain_primary",
+  "reference_manifest_content_sha256": "8cd2a01bcbfc581c83daceb7d92f33842dcdb7c0e46903aa66665aa2f2109453",
+  "replay_manifest_content_sha256": "1b4064d1c98bf76080c699c6d9d74358664017ec19e347b98ce712432ffb0ec8",
+  "schema_version": 1,
+  "sidecar_manifest_content_sha256": "451f8563731aa3ea7a3a4cbe47d3b27b99f111b5221b3025a87251021da97126",
+  "status": "quantified"
+}
