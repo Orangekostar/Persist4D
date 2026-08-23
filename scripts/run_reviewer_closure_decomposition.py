@@ -289,7 +289,7 @@ def run_decomposition(
     )
     from scripts.p6a_metrics import (
         OfficialMetricAccumulator,
-        build_online_endpoint_prediction,
+        build_offline_reconstructed_prediction,
     )
     from scripts.reviewer_closure_sidecar import (
         load_full_history_observation_sidecar_entry,
@@ -421,7 +421,9 @@ def run_decomposition(
             full_pair = causal_prefix_pair_from_payload(full_payloads[horizon])
             oracle_pair = _persistent_task_pair(
                 payloads=payloads,
-                prediction=build_online_endpoint_prediction(oracle, endpoint=horizon - 1),
+                prediction=build_offline_reconstructed_prediction(
+                    oracle, endpoint=horizon - 1
+                ),
                 horizon=horizon,
                 class_mapper=class_mapper,
             )
@@ -521,7 +523,10 @@ def run_decomposition(
                 "t_REC": values["online_t-REC"],
                 "t_REC50": values["online_t-REC50"],
                 "t_REC25": values["online_t-REC25"],
-                "diagnostic_semantics": "GT association post-hoc; masks/classes unchanged",
+                "diagnostic_semantics": (
+                    "P6-A offline GT-ID readout; unmatched candidates retained; "
+                    "masks/classes unchanged"
+                ),
             }
         )
     oracle_rows.sort(key=lambda row: (int(row["horizon"]), str(row["method"])))
@@ -642,6 +647,7 @@ def run_decomposition(
 - `observation_coverage.csv` is a micro-average over GT entity/stage instances. Categories are mutually exclusive at each threshold.
 - `failure_decomposition.csv` uses prefix-specific P6-A failure events. Each event receives exactly one primary category; insufficient evidence remains `unknown_unresolved`.
 - GT is used only after frozen inference for Oracle identity assignment. Masks, classes, scores, features, and model forward outputs are unchanged.
+- Oracle follows the existing P6-A offline diagnostic: unmatched valid candidates remain stage-unique births rather than being removed with GT.
 - Oracle ceiling gate: minimum absolute t-mAP gain `0.05` and at least `50%` closure of a positive Full-History gap at T4 or T5.
 - Phase III classification: `{ceiling}`.
 """
@@ -661,6 +667,7 @@ def run_decomposition(
         "coverage_row_count": len(coverage_rows),
         "oracle_row_count": len(oracle_rows),
         "failure_row_count": len(failure_rows),
+        "oracle_policy": "p6a_offline_gt_ids_unmatched_candidates_retained",
         "ceiling_classification": ceiling,
         "living_scenes_triggered": ceiling == "ASSOCIATION_CEILING",
     }
