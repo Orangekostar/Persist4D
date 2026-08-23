@@ -10,6 +10,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import tempfile
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path, PurePosixPath, PureWindowsPath
@@ -17,9 +18,12 @@ from typing import Any
 
 import yaml
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 from scripts import reviewer_closure_adaptation as adaptation
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT_ROOT = PROJECT_ROOT / "artifacts/reviewer_closure"
 PHASE_II_CONFIG = PROJECT_ROOT / "configs/reviewer_closure/phase_ii_evaluation.yaml"
 TRAINING_MANIFEST = ARTIFACT_ROOT / "rescene_horizon_training_manifest.json"

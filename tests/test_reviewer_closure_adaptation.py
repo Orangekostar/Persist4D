@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import copy
+import subprocess
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -11,6 +13,23 @@ from scripts import run_reviewer_closure_adaptation as runner
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = REPO_ROOT / "configs/reviewer_closure/phase_ii_evaluation.yaml"
+
+
+def test_adaptation_runner_supports_direct_script_entrypoint(tmp_path: Path) -> None:
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(REPO_ROOT / "scripts/run_reviewer_closure_adaptation.py"),
+            "--help",
+        ],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert "{smoke,cache,finalize,evaluate,profile,gate}" in completed.stdout
 
 
 def _full_key(index: int, horizon: int) -> dict[str, object]:
