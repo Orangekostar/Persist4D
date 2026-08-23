@@ -365,6 +365,7 @@ def run_t3_smoke(device: torch.device) -> dict[str, object]:
         config.general.gpus = 1
         config.data.num_workers = 0
     _seed_everything(int(config.general.seed))
+    torch.cuda.set_device(device)
     torch.cuda.reset_peak_memory_stats(device)
     started = time.perf_counter()
     system = InstanceSegmentation(config).to(device)
