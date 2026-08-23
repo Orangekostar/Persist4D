@@ -1,0 +1,9 @@
+challenger_method_id,baseline_method_id,metric,horizon,canonical_difference,reverse_difference,sha256_seed45_difference,complete_cluster_population,sign_consistent
+FullHistoryAdaptedB2,Persist4D,causal_prefix_t_mAP,4,-0.003474385508646566,0.017006672070258192,-0.00014277082971400393,True,False
+FullHistoryAdaptedB2,Persist4D,causal_prefix_t_mAP,5,-0.016089882473978728,0.002642567297961147,-0.02844556252886024,True,False
+FullHistoryAdaptedB2,Persist4D,causal_prefix_t_REC,4,-0.001982750081353723,0.025987044307920676,0.012934176204726108,True,False
+FullHistoryAdaptedB2,Persist4D,causal_prefix_t_REC,5,-0.012837669398221707,0.006970681726104689,-0.028948047410489786,True,False
+FullHistoryAdaptedB2,Persist4D,normalized_id_switch_rate,4,0.0033638205217287123,0.015694704308372474,-0.04138530384105276,True,False
+FullHistoryAdaptedB2,Persist4D,normalized_id_switch_rate,5,0.0071601612671087595,0.040793656929812155,-0.05877142930537673,True,False
+FullHistoryAdaptedB2,Persist4D,gap_recovery_recall,4,-0.18718234721557234,-0.2435764387055635,-0.2314238713976345,False,False
+FullHistoryAdaptedB2,Persist4D,gap_recovery_recall,5,-0.35769688294228824,-0.39737908609821737,-0.40153660841347044,True,True

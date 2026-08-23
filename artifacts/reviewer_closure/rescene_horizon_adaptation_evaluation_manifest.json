@@ -1,0 +1,59 @@
+{
+  "artifacts": {
+    "rescene_horizon_adaptation_cluster_bootstrap.csv": {
+      "row_count": 8,
+      "sha256": "126915b55af93b1d5bd92321e70c70b8339f453afdd72e9d300bdac0bb9c2b87"
+    },
+    "rescene_horizon_adaptation_loso.csv": {
+      "row_count": 48,
+      "sha256": "35e883ce027174827fe0aa66afe57f290ecc366870b286b0742060b5c5a49090"
+    },
+    "rescene_horizon_adaptation_order_robustness.csv": {
+      "row_count": 8,
+      "sha256": "13685e747bfad46cbb62280f57720a3627e5d695e5c5b27b615735d399cfebd2"
+    },
+    "rescene_horizon_adaptation_per_order.csv": {
+      "row_count": 60,
+      "sha256": "6e52ee5d92455f2734aaba9452406479136c13d5869906f4d7fb041a82b3d32c"
+    },
+    "rescene_horizon_adaptation_per_sequence.csv": {
+      "row_count": 2580,
+      "sha256": "81dc71810859c8d199769705e4bef84b810fada9ac92924545f399d6377b0117"
+    },
+    "rescene_horizon_adaptation_results.csv": {
+      "row_count": 20,
+      "sha256": "753c192424a169505d119284c7b916154020f6b7dd989f2d24863685190eb628"
+    }
+  },
+  "checkpoint_sha256": "ba4ad656510aa8f8f86e5ad2b5fc332eabb721254f242ecdafa97e04f69d27bb",
+  "content_sha256": "5b59cfcc62aec31c83e65b05c83f077af9c0ab286d510b4b8775fe5616efa3cd",
+  "coverage": {
+    "horizons": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "per_order_row_count": 60,
+    "per_sequence_row_count": 2580,
+    "reference_scene_count": 6,
+    "result_row_count": 20,
+    "sequence_count": 129
+  },
+  "inference_source_commit": "e3f2c5c384b0afbfb838204926323460cb05bada",
+  "paper_name": "ReScene4D T2-to-T3 Horizon-Adapted",
+  "prediction_manifest_content_sha256": "4e7aaa863a686bc4b281bb958d28e13c63b702b18f6dd1c301633d1dd68f0219",
+  "schema_version": 1,
+  "selected_level": 2,
+  "sidecar_manifest_content_sha256": "0efa89c9f6ce40b1a370735044991e2c89d6073af3d8d0c1de307f13b6c5afaf",
+  "source_commit": "8672802c6b40be77a15580c202679241ede2e22b",
+  "statistics": {
+    "bootstrap_replicates": 10000,
+    "cluster_count": 6,
+    "cluster_statistics": "cluster_macro_of_per_sequence_official_metrics",
+    "pooled_task_metrics": "official_accumulator_over_all_sequences",
+    "seed": 45
+  },
+  "status": "pass",
+  "training_manifest_content_sha256": "93f4d8293ee44b5a36aa17b65289b9793306a8a4eaed2dd47bcee6300e0dbf5c"
+}
