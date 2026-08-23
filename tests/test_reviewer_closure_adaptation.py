@@ -369,6 +369,30 @@ def test_prediction_manifest_supplies_inference_source_commit(tmp_path: Path) ->
         runner._prediction_inference_source_commit(manifest_path)
 
 
+def test_profile_csv_reader_preserves_integer_byte_fields(tmp_path: Path) -> None:
+    csv_path = tmp_path / "profile.csv"
+    csv_path.write_text(
+        "method,horizon,peak_allocated_bytes,peak_reserved_bytes,"
+        "model_input_bytes,cumulative_model_input_bytes,persistent_state_bytes,"
+        "explicit_history_input_bytes\n"
+        "FullHistoryAdapted,4,10,20,30,40,,50\n",
+        encoding="utf-8",
+    )
+
+    row = runner._read_typed_csv(csv_path)[0]
+
+    for field in (
+        "peak_allocated_bytes",
+        "peak_reserved_bytes",
+        "model_input_bytes",
+        "cumulative_model_input_bytes",
+        "explicit_history_input_bytes",
+    ):
+        assert row[field] == int(row[field])
+        assert isinstance(row[field], int)
+    assert row["persistent_state_bytes"] is None
+
+
 def test_adapted_batch_runs_one_forward_per_missing_sidecar() -> None:
     keys = [_full_key(0, 2), _full_key(1, 2)]
     commit = "a" * 40
