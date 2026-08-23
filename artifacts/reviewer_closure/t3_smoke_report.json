@@ -1,0 +1,107 @@
+{
+  "checkpoint_reload": {
+    "state_dict_entry_count": 798,
+    "strict": true
+  },
+  "content_sha256": "3d7d51ea7a9d5b5f9a7f5818dc6f93719ce995827a77338f4a55ae330283afee",
+  "elapsed_seconds": 35.22410705732182,
+  "formal_training_started": false,
+  "fresh_optimizer_state_before_step": true,
+  "fresh_scheduler_last_epoch_after_step": 1,
+  "gradients": {
+    "frozen_encoder": {
+      "finite": true,
+      "max_grad_norm": 0.0,
+      "missing_grad_tensors": 453,
+      "nonzero_grad_tensors": 0,
+      "parameter_tensors": 453
+    },
+    "trainable_parameters": {
+      "finite": true,
+      "max_grad_norm": 24.998554229736328,
+      "missing_grad_tensors": 0,
+      "nonzero_grad_tensors": 342,
+      "parameter_tensors": 342
+    }
+  },
+  "losses": {
+    "loss_aux_contrastive": 0.0,
+    "loss_ce": 0.00025495782028883696,
+    "loss_ce_0": 0.7621748447418213,
+    "loss_ce_1": 0.20685622096061707,
+    "loss_ce_10": 0.0008967778412625194,
+    "loss_ce_11": 0.0005068352911621332,
+    "loss_ce_2": 0.10354776680469513,
+    "loss_ce_3": 0.013362648896872997,
+    "loss_ce_4": 0.0006322222761809826,
+    "loss_ce_5": 0.0005414867773652077,
+    "loss_ce_6": 0.0010767454514279962,
+    "loss_ce_7": 0.0005348653648979962,
+    "loss_ce_8": 0.00026988735771737993,
+    "loss_ce_9": 0.0004386478685773909,
+    "loss_dice": 0.03322537988424301,
+    "loss_dice_0": 0.6205980777740479,
+    "loss_dice_1": 0.0731649249792099,
+    "loss_dice_10": 0.03763175010681152,
+    "loss_dice_11": 0.036272965371608734,
+    "loss_dice_2": 0.05186647176742554,
+    "loss_dice_3": 0.030772468075156212,
+    "loss_dice_4": 0.032562993466854095,
+    "loss_dice_5": 0.031011879444122314,
+    "loss_dice_6": 0.03725939989089966,
+    "loss_dice_7": 0.03571274131536484,
+    "loss_dice_8": 0.03310414403676987,
+    "loss_dice_9": 0.031902533024549484,
+    "loss_mask": 0.01716848835349083,
+    "loss_mask_0": 0.2913990020751953,
+    "loss_mask_1": 0.028658337891101837,
+    "loss_mask_10": 0.018020272254943848,
+    "loss_mask_11": 0.017180204391479492,
+    "loss_mask_2": 0.021380644291639328,
+    "loss_mask_3": 0.015160623006522655,
+    "loss_mask_4": 0.017353935167193413,
+    "loss_mask_5": 0.01654100976884365,
+    "loss_mask_6": 0.018537890166044235,
+    "loss_mask_7": 0.01702537201344967,
+    "loss_mask_8": 0.017066914588212967,
+    "loss_mask_9": 0.01644035428762436,
+    "loss_segment_contrastive": 0.05421527847647667
+  },
+  "mixed_dataset_sizes": [
+    855,
+    1199
+  ],
+  "paper_name": "ReScene4D T2-to-T3 Horizon-Adapted",
+  "peak_allocated_vram_mib": 1494.4814453125,
+  "recipe_changed": false,
+  "recipe_sha256": "a3ac6f159ff6e445b6d5e21f67efe5a09fa0afee45969db572fbdc3d3e679349",
+  "sample": {
+    "batch_size": 1,
+    "mixed_epoch_samples": 1536,
+    "point_count": 10763,
+    "raw_point_count": 14945,
+    "rio_active_train_sequence_count": 855,
+    "rio_excluded_empty_supervision_windows": 3,
+    "rio_raw_train_sequence_count": 858,
+    "sample_name": "scene0361_03-scene0361_04-scene0361_02",
+    "scannet_train_sample_count": 1199,
+    "segment_count": 344,
+    "supervised_instances": 3,
+    "temporal_stages": [
+      0,
+      1,
+      2
+    ]
+  },
+  "schema_version": 1,
+  "scope": "pretraining-smoke-only",
+  "source_checkpoint": {
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "optimizer_state_resumed": false,
+    "scheduler_state_resumed": false,
+    "state_dict_entry_count": 798
+  },
+  "source_commit": "449471866048acff30dc31a9948b61e14f64454b",
+  "status": "pass",
+  "weighted_objective": 6.966239929199219
+}
