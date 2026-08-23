@@ -39,6 +39,11 @@ FAILURE_CATEGORIES = (
     "unknown_unresolved",
 )
 TRACKER_METHODS = ("FullHistoryNative", "B2", "Persist4D")
+ADAPTATION_TASK_METHODS = (
+    "FullHistoryFrozenB2",
+    "FullHistoryAdaptedB2",
+    "Persist4D",
+)
 
 FULL_COLOR = "#0072B2"
 PERSIST_COLOR = "#D55E00"
@@ -66,6 +71,8 @@ DISPLAY = {
     "Oracle": "P6-A GT-ID diagnostic",
     "FullHistoryNative": "Full-History native",
     "B2": "B2 feature + class",
+    "FullHistoryFrozenB2": "Frozen ReScene + B2",
+    "FullHistoryAdaptedB2": "Horizon-adapted ReScene + B2",
     "no_candidate_observation": "No candidate",
     "wrong_class": "Wrong class",
     "insufficient_iou": "Insufficient IoU",
@@ -348,6 +355,51 @@ def _normalize_tracker_rows(
         ):
             raise FigureEvidenceError("T3-T5 ID-switch rate must lie in [0, 1]")
         result[cell] = value
+    return result
+
+
+def _normalize_adaptation_task_rows(
+    rows: Sequence[Mapping[str, object]],
+) -> dict[tuple[str, int], tuple[float, float]]:
+    selected = [
+        {
+            **row,
+            "method_id": str(row.get("method_id")),
+            "horizon": _integer(row.get("horizon"), name="adaptation horizon"),
+        }
+        for row in rows
+        if row.get("method_id") in ADAPTATION_TASK_METHODS
+        and row.get("order_id") == "all"
+    ]
+    cells = _unique_cells(
+        selected,
+        keys=("method_id", "horizon"),
+        label="Horizon-adaptation task scaling",
+    )
+    expected = {
+        (method, horizon)
+        for method in ADAPTATION_TASK_METHODS
+        for horizon in HORIZONS
+    }
+    if set(cells) != expected:
+        raise FigureEvidenceError(
+            "Horizon-adaptation task scaling lacks exact coverage"
+        )
+    result = {}
+    for cell, row in cells.items():
+        if _integer(row.get("sequence_count"), name="adaptation sequence count") != 129:
+            raise FigureEvidenceError(
+                "Horizon-adaptation evidence must contain 129 sequences"
+            )
+        task_values = (
+            _number(row.get("causal_prefix_t_mAP"), name="causal-prefix t-mAP"),
+            _number(row.get("causal_prefix_t_REC"), name="causal-prefix t-REC"),
+        )
+        if any(not 0 <= value <= 1 for value in task_values):
+            raise FigureEvidenceError(
+                "Horizon-adaptation task metrics must lie in [0, 1]"
+            )
+        result[cell] = task_values
     return result
 
 
@@ -873,6 +925,67 @@ def render_strong_baseline_identity_scaling(
         )
 
 
+def render_horizon_adaptation_task_scaling(
+    rows: Sequence[Mapping[str, object]], output_directory: Path
+) -> tuple[Path, ...]:
+    """Render pooled task scaling for the adapted strong alternative."""
+
+    data = _normalize_adaptation_task_rows(rows)
+    colors = {
+        "FullHistoryFrozenB2": FULL_COLOR,
+        "FullHistoryAdaptedB2": TRACKER_COLOR,
+        "Persist4D": PERSIST_COLOR,
+    }
+    markers = {
+        "FullHistoryFrozenB2": "o",
+        "FullHistoryAdaptedB2": "^",
+        "Persist4D": "s",
+    }
+    styles = {
+        "FullHistoryFrozenB2": ":",
+        "FullHistoryAdaptedB2": "-.",
+        "Persist4D": "-",
+    }
+    with plt.rc_context(_style()):
+        figure, axes = plt.subplots(
+            1,
+            2,
+            figsize=(7.2, 3.45),
+            constrained_layout=True,
+        )
+        for metric_index, (axis, label) in enumerate(
+            zip(axes, ("Causal-prefix t-mAP", "Causal-prefix t-REC"))
+        ):
+            for method in ADAPTATION_TASK_METHODS:
+                axis.plot(
+                    HORIZONS,
+                    [data[(method, horizon)][metric_index] for horizon in HORIZONS],
+                    color=colors[method],
+                    marker=markers[method],
+                    linestyle=styles[method],
+                    linewidth=1.9,
+                    markersize=5,
+                    label=DISPLAY[method],
+                    zorder=3,
+                )
+            axis.set_xticks(HORIZONS, [f"T{horizon}" for horizon in HORIZONS])
+            axis.set_xlim(1.85, 5.15)
+            axis.set_ylim(bottom=0)
+            axis.set_xlabel("Temporal horizon")
+            axis.set_ylabel(label)
+            _format_axis(axis)
+        axes[0].legend(frameon=False, loc="upper right")
+        return _publish_figure(
+            figure,
+            Path(output_directory),
+            "horizon_adaptation_task_scaling",
+            title="Task scaling under T2-to-T3 horizon adaptation",
+            description=_source_description(
+                "rescene_horizon_adaptation_results.csv"
+            ),
+        )
+
+
 def _read_csv(path: Path) -> list[dict[str, object]]:
     with path.open(newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
@@ -901,6 +1014,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         if row.get("method_id") in TRACKER_METHODS
     ]
     render_strong_baseline_identity_scaling(tracker_rows, output)
+    render_horizon_adaptation_task_scaling(
+        _read_csv(root / "rescene_horizon_adaptation_results.csv"),
+        output,
+    )
     return 0
 
 
@@ -910,6 +1027,7 @@ if __name__ == "__main__":
 
 __all__ = [
     "FigureEvidenceError",
+    "render_horizon_adaptation_task_scaling",
     "render_phase_iii_figures",
     "render_strong_baseline_identity_scaling",
 ]

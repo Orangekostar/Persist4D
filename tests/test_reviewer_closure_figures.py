@@ -7,6 +7,7 @@ import pytest
 
 from scripts.reviewer_closure_figures import (
     FigureEvidenceError,
+    render_horizon_adaptation_task_scaling,
     render_phase_iii_figures,
     render_strong_baseline_identity_scaling,
 )
@@ -134,6 +135,30 @@ def _tracker_rows() -> list[dict[str, object]]:
     ]
 
 
+def _adaptation_rows() -> list[dict[str, object]]:
+    offsets = {
+        "FullHistoryFrozenB2": 0.00,
+        "FullHistoryAdaptedB2": 0.01,
+        "Persist4D": -0.01,
+    }
+    return [
+        {
+            "method_id": method,
+            "order_id": "all",
+            "horizon": horizon,
+            "sequence_count": 129,
+            "causal_prefix_t_mAP": 0.25 - horizon * 0.03 + offsets[method],
+            "causal_prefix_t_REC": 0.40 - horizon * 0.04 + offsets[method],
+        }
+        for method in (
+            "FullHistoryFrozenB2",
+            "FullHistoryAdaptedB2",
+            "Persist4D",
+        )
+        for horizon in (2, 3, 4, 5)
+    ]
+
+
 def test_phase_iii_figures_are_traceable_accessible_and_multiformat(
     tmp_path: Path,
 ) -> None:
@@ -188,6 +213,29 @@ def test_identity_scaling_handles_t2_as_not_applicable(tmp_path: Path) -> None:
     assert "B2 feature + class" in svg
     assert "Persist4D" in svg
     assert "T2 initialization: no ID-transition rate for Full-History/B2" in svg
+
+
+def test_horizon_adaptation_task_scaling_is_traceable_and_multiformat(
+    tmp_path: Path,
+) -> None:
+    paths = render_horizon_adaptation_task_scaling(_adaptation_rows(), tmp_path)
+
+    assert [path.name for path in paths] == [
+        "horizon_adaptation_task_scaling.svg",
+        "horizon_adaptation_task_scaling.pdf",
+        "horizon_adaptation_task_scaling.png",
+    ]
+    svg = paths[0].read_text(encoding="utf-8")
+    assert "Frozen ReScene + B2" in svg
+    assert "Horizon-adapted ReScene + B2" in svg
+    assert "Persist4D" in svg
+    assert "Source: rescene_horizon_adaptation_results.csv" in svg
+    assert "#0072b2" in svg.lower()
+    assert "#009e73" in svg.lower()
+    assert "#d55e00" in svg.lower()
+
+    with pytest.raises(FigureEvidenceError, match="Horizon-adaptation"):
+        render_horizon_adaptation_task_scaling(_adaptation_rows()[:-1], tmp_path)
 
 
 def test_rendering_rejects_incomplete_or_inconsistent_evidence(tmp_path: Path) -> None:
