@@ -1,0 +1,65 @@
+schema_version: 1
+stage_name: persist4d-reviewer-closure-t3-horizon-adaptation
+comparison_level: 2
+paper_name: ReScene4D T2-to-T3 Horizon-Adapted
+
+source:
+  checkpoint_reference: repo:checkpoints/rescene4d_concerto_t2_repro.ckpt
+  checkpoint_sha256: 85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e
+  checkpoint_epoch: 404
+  checkpoint_global_step: 26730
+  initialization: weights_only_strict
+  p2_config_reference: repo:conf/config_p2_rescene4d_concerto_t2.yaml
+  p2_config_sha256: 3077e89b9bca60049e1551654d5b3df78178d5647d84f0037bcb7ab91807c443
+
+data:
+  split_policy: same_as_p2_reproduction
+  rio_temporal_window: 3
+  rio_sequence_database_reference: repo:data/processed/rio/sequence_database_sliding_3.yaml
+  rio_sequence_database_sha256: 20184ca27316bd668c084c39af72144d018e556b9562826b511a1413f4986893
+  rio_raw_sequence_counts:
+    train: 858
+    validation: 123
+    test: 113
+  scannet_temporal_window: 1
+  mix_weights: [1.0, 0.8]
+  epoch_sample_multiple: 32
+  mixed_epoch_samples: 1536
+
+model:
+  backbone: Concerto
+  freeze: backbone_encoder
+  num_queries: 100
+  query_initialization: fps_non_parametric
+  temporal_window: 3
+  label_space: nyu40_18_instance_classes
+  loss_definition: p2_weighted_set_criterion_with_contrastive
+
+optimization:
+  optimizer: AdamW
+  max_lr: 5.0e-5
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.01
+  amsgrad: false
+  scheduler: OneCycleLR
+  scheduler_reset: true
+  epochs: 45
+  devices: 2
+  per_device_batch_size: 1
+  gradient_accumulation: 16
+  effective_batch_size: 32
+  train_batches_per_rank: 768
+  optimizer_updates_per_epoch: 48
+  total_optimizer_updates: 2160
+  precision: 32-true
+  seed: 45
+  validation_every_n_epochs: 15
+
+evidence:
+  actual_scan_exposures_required: true
+  actual_optimizer_updates_required: true
+  wall_clock_and_gpu_hours_required: true
+  nonfinite_loss_policy: fail_closed
+  checkpoint_reload_required: true
+  recipe_changes_after_smoke: forbidden

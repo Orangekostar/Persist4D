@@ -1,0 +1,199 @@
+{
+  "allowed_config_differences": {
+    "callbacks.0.dirpath": {
+      "adapted": "checkpoints/reviewer_closure_rescene_t3_adapted",
+      "t2": "checkpoints/rescene4d_concerto_t2_repro"
+    },
+    "callbacks.1.dirpath": {
+      "adapted": "checkpoints/reviewer_closure_rescene_t3_adapted",
+      "t2": "checkpoints/rescene4d_concerto_t2_repro"
+    },
+    "data.batch_size": {
+      "adapted": 1,
+      "t2": 2
+    },
+    "data.temporal_window": {
+      "adapted": 3,
+      "t2": 2
+    },
+    "data.test_dataset.temporal_window": {
+      "adapted": 3,
+      "t2": 2
+    },
+    "data.train_dataloader.batch_size": {
+      "adapted": 1,
+      "t2": 2
+    },
+    "data.train_dataset.datasets.0.temporal_window": {
+      "adapted": 3,
+      "t2": 2
+    },
+    "data.validation_dataset.temporal_window": {
+      "adapted": 3,
+      "t2": 2
+    },
+    "general.checkpoint": {
+      "adapted": "/home/ww/paper5/.worktrees/persist4d-reviewer-closure/checkpoints/rescene4d_concerto_t2_repro.ckpt",
+      "t2": null
+    },
+    "general.experiment_name": {
+      "adapted": "rescene4d_t2_to_t3_horizon_adapted",
+      "t2": "rescene4d_concerto_t2_repro"
+    },
+    "general.p2_fail_closed_runtime": {
+      "adapted": null,
+      "t2": true
+    },
+    "general.p2_weighted_objective": {
+      "adapted": null,
+      "t2": true
+    },
+    "general.project_name": {
+      "adapted": "rescene4d_t2_to_t3_horizon_adapted",
+      "t2": "rescene4d_concerto_t2_repro"
+    },
+    "general.reviewer_closure_fail_closed_runtime": {
+      "adapted": true,
+      "t2": null
+    },
+    "general.reviewer_closure_weighted_objective": {
+      "adapted": true,
+      "t2": null
+    },
+    "general.save_dir": {
+      "adapted": "checkpoints/reviewer_closure_rescene_t3_adapted",
+      "t2": "checkpoints/rescene4d_concerto_t2_repro"
+    },
+    "logging.0.save_dir": {
+      "adapted": "checkpoints/reviewer_closure_rescene_t3_adapted",
+      "t2": "checkpoints/rescene4d_concerto_t2_repro"
+    },
+    "model.config.temporal_window": {
+      "adapted": 3,
+      "t2": 2
+    },
+    "optimizer.lr": {
+      "adapted": 5e-05,
+      "t2": 0.0005
+    },
+    "p2_preflight.artifact_path": {
+      "adapted": null,
+      "t2": "artifacts/P2/scannet_preflight.json"
+    },
+    "p2_preflight.target": {
+      "adapted": null,
+      "t2": "rescene4d_concerto_t2"
+    },
+    "scheduler.scheduler.epochs": {
+      "adapted": 45,
+      "t2": 450
+    },
+    "scheduler.scheduler.max_lr": {
+      "adapted": 5e-05,
+      "t2": 0.0005
+    },
+    "trainer.accumulate_grad_batches": {
+      "adapted": 16,
+      "t2": 8
+    },
+    "trainer.max_epochs": {
+      "adapted": 45,
+      "t2": 450
+    }
+  },
+  "audit_rows": [
+    {
+      "classification": "known",
+      "evidence": "frozen full Lightning checkpoint",
+      "field": "local_source_checkpoint",
+      "value": "epoch 404, global step 26730, exact SHA256"
+    },
+    {
+      "classification": "known",
+      "evidence": "content-bound local YAML",
+      "field": "t3_sequence_database",
+      "value": "RIO sliding T3; train/validation/test 858/123/113"
+    },
+    {
+      "classification": "known",
+      "evidence": "P2 config and executable code",
+      "field": "model_loss_taxonomy",
+      "value": "Concerto, 100 queries, NYU40-18, weighted criterion"
+    },
+    {
+      "classification": "unknown",
+      "evidence": "P2 provenance audit",
+      "field": "official_concerto_weight_identity",
+      "value": "not reported"
+    },
+    {
+      "classification": "unknown",
+      "evidence": "P2 provenance audit",
+      "field": "official_optimizer_precision_details",
+      "value": "betas/eps/weight decay/precision not fully reported"
+    },
+    {
+      "classification": "unknown",
+      "evidence": "P2 provenance audit",
+      "field": "official_augmentation_exactness",
+      "value": "exact transform list and versions not reported"
+    },
+    {
+      "classification": "reconstructed",
+      "evidence": "P2 config audit and reproduction target",
+      "field": "local_p2_recipe",
+      "value": "local paper-aligned reproduction with safety fixes"
+    },
+    {
+      "classification": "reconstructed",
+      "evidence": "checkpoint callback state and metadata",
+      "field": "checkpoint_selection",
+      "value": "best validation checkpoint at epoch 404"
+    },
+    {
+      "classification": "assumed",
+      "evidence": "single frozen reviewer-closure choice",
+      "field": "adaptation_duration",
+      "value": "45 epochs / 2160 optimizer updates"
+    },
+    {
+      "classification": "assumed",
+      "evidence": "10x lower than P2 max LR; no sweep",
+      "field": "adaptation_learning_rate",
+      "value": "fresh OneCycleLR with max LR 5e-5"
+    },
+    {
+      "classification": "assumed",
+      "evidence": "effective batch 32 preserved pending smoke",
+      "field": "adaptation_batch_topology",
+      "value": "2 A40, batch 1/GPU, accumulation 16"
+    }
+  ],
+  "checkpoint": {
+    "byte_size": 754917862,
+    "epoch": 404,
+    "global_step": 26730,
+    "optimizer_state_count": 1,
+    "pytorch_lightning_version": "2.6.5",
+    "reference": "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt",
+    "scheduler_last_epoch": 26730,
+    "scheduler_state_count": 1,
+    "sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "source_temporal_window": 2,
+    "state_dict_entry_count": 798
+  },
+  "classification_counts": {
+    "assumed": 3,
+    "known": 3,
+    "reconstructed": 2,
+    "unknown": 3
+  },
+  "content_sha256": "067d88e732f8bff6dad5f7fdcb570fe4b98576e069525210f01f63801313004c",
+  "level1_claimed": false,
+  "level1_rejection_reason": "official recipe provenance is incomplete and the local T2 source is a documented reproduction with explicit choices",
+  "paper_name": "ReScene4D T2-to-T3 Horizon-Adapted",
+  "recipe_sha256": "a3ac6f159ff6e445b6d5e21f67efe5a09fa0afee45969db572fbdc3d3e679349",
+  "schema_version": 1,
+  "selected_level": 2,
+  "status": "pass"
+}
