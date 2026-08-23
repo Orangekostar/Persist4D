@@ -17,6 +17,7 @@ from scripts.reviewer_closure_protocol import (
 )
 from scripts.system_comparison_inference import (
     FullHistoryPredictionProducer,
+    build_full_history_cache_manifest,
     unpack_bool_matrix,
 )
 
@@ -112,7 +113,16 @@ def _payload() -> dict[str, object]:
         key=_key(),
         raw_observation=_raw_observation(),
         source_prediction=_source_prediction(),
+        reference_prediction_content_sha256="7" * 64,
         sidecar_source_commit="6" * 40,
+    )
+
+
+def _replay_pair() -> dict[str, object]:
+    return _api("build_full_history_replay_pair")(
+        reference_prediction_content_sha256="7" * 64,
+        replay_prediction=_source_prediction(),
+        sidecar=_payload(),
     )
 
 
@@ -131,6 +141,7 @@ def test_sidecar_schema_binds_source_and_keeps_only_tracker_observation() -> Non
     assert payload["key"] == _key()
     assert payload["provenance"] == {
         "source_prediction_content_sha256": "1" * 64,
+        "reference_prediction_content_sha256": "7" * 64,
         "checkpoint_sha256": "2" * 64,
         "config_sha256": "3" * 64,
         "source_commit": "6" * 40,
@@ -190,6 +201,7 @@ def test_sidecar_rejects_feature_class_mask_query_misalignment(
             key=_key(),
             raw_observation=observation,
             source_prediction=_source_prediction(),
+            reference_prediction_content_sha256="7" * 64,
             sidecar_source_commit="6" * 40,
         )
 
@@ -205,6 +217,7 @@ def test_sidecar_rejects_future_or_different_source_prefix() -> None:
             key=_key(),
             raw_observation=_raw_observation(),
             source_prediction=source,
+            reference_prediction_content_sha256="7" * 64,
             sidecar_source_commit="6" * 40,
         )
 
@@ -219,6 +232,7 @@ def test_sidecar_rejects_observation_different_from_source_fingerprint() -> None
             key=_key(),
             raw_observation=observation,
             source_prediction=_source_prediction(),
+            reference_prediction_content_sha256="7" * 64,
             sidecar_source_commit="6" * 40,
         )
 
@@ -255,6 +269,40 @@ def test_sidecar_entry_is_atomic_reusable_and_refuses_conflict(
     with pytest.raises(FileExistsError, match="different content"):
         _api("write_full_history_observation_sidecar_entry")(tmp_path, changed)
     assert not list(tmp_path.glob(".*.tmp"))
+
+
+def test_replay_pair_stage_is_atomic_recoverable_and_exactly_removed(
+    tmp_path: Path,
+) -> None:
+    pair = _replay_pair()
+    first = _api("write_full_history_replay_pair_stage")(tmp_path, pair)
+    second = _api("write_full_history_replay_pair_stage")(tmp_path, pair)
+
+    assert first == second
+    loaded = _api("load_full_history_replay_pair_stage")(tmp_path, first)
+    assert loaded["content_sha256"] == pair["content_sha256"]
+    assert loaded["sidecar"]["content_sha256"] == pair["sidecar"]["content_sha256"]
+    assert _api("discover_full_history_replay_pair_stages")(tmp_path) == [first]
+
+    changed = copy.deepcopy(pair)
+    changed["sidecar"]["observation"]["confidence"][0] -= 0.1
+    changed["sidecar"]["source_observation_fingerprints"] = _api(
+        "observation_fingerprints"
+    )(
+        {
+            **_raw_observation(),
+            "confidence": changed["sidecar"]["observation"]["confidence"],
+        }
+    )
+    changed["sidecar"]["content_sha256"] = _api("sidecar_content_sha256")(
+        changed["sidecar"]
+    )
+    changed["content_sha256"] = _api("replay_pair_content_sha256")(changed)
+    with pytest.raises(FileExistsError, match="different content"):
+        _api("write_full_history_replay_pair_stage")(tmp_path, changed)
+
+    _api("remove_full_history_replay_pair_stage")(tmp_path, first)
+    assert not list(tmp_path.iterdir())
 
 
 def _reviewer_manifest() -> dict[str, object]:
@@ -313,6 +361,7 @@ def _record(
         "byte_size": index + 1,
         "content_sha256": f"{index + 11:064x}",
         "source_prediction_content_sha256": source_record["content_sha256"],
+        "reference_prediction_content_sha256": source_record["content_sha256"],
         "sidecar_source_commit": "a" * 40,
     }
 
@@ -331,10 +380,28 @@ def test_sidecar_manifest_requires_exact_coverage_and_source_content_binding() -
         )
         for index, key in enumerate(keys)
     ]
+    replay_records = []
+    for key, record in zip(keys, records, strict=True):
+        source_record = _api("source_prediction_entry_for_key")(source, key)
+        replay_records.append(
+            {
+                "key": source_record["key"],
+                "filename": source_record["filename"],
+                "sha256": record["sha256"],
+                "byte_size": record["byte_size"],
+                "content_sha256": record["source_prediction_content_sha256"],
+            }
+        )
+    replay_manifest = build_full_history_cache_manifest(
+        replay_records,
+        expected_keys=[record["key"] for record in replay_records],
+        expected_provenance=source["provenance"],
+    )
     manifest = _api("build_full_history_observation_sidecar_manifest")(
         records,
         expected_keys=keys,
         source_prediction_manifest=source,
+        replay_prediction_manifest=replay_manifest,
         system_manifest=_system_manifest(),
         reviewer_manifest=reviewer,
         sidecar_code_commit="a" * 40,
@@ -347,6 +414,10 @@ def test_sidecar_manifest_requires_exact_coverage_and_source_content_binding() -
         manifest["source_prediction_manifest"]["content_sha256"]
         == source["content_sha256"]
     )
+    assert (
+        manifest["replay_prediction_manifest"]["content_sha256"]
+        == replay_manifest["content_sha256"]
+    )
     assert manifest["reviewer_manifest_content_sha256"] == reviewer["content_sha256"]
     assert manifest["sidecar_code_commit"] == "a" * 40
 
@@ -356,17 +427,19 @@ def test_sidecar_manifest_requires_exact_coverage_and_source_content_binding() -
             records[:1],
             expected_keys=keys,
             source_prediction_manifest=source,
+            replay_prediction_manifest=replay_manifest,
             system_manifest=_system_manifest(),
             reviewer_manifest=reviewer,
             sidecar_code_commit="a" * 40,
         )
     changed = copy.deepcopy(records)
-    changed[0]["source_prediction_content_sha256"] = "f" * 64
-    with pytest.raises(error, match="source prediction"):
+    changed[0]["reference_prediction_content_sha256"] = "f" * 64
+    with pytest.raises(error, match="reference prediction"):
         _api("build_full_history_observation_sidecar_manifest")(
             changed,
             expected_keys=keys,
             source_prediction_manifest=source,
+            replay_prediction_manifest=replay_manifest,
             system_manifest=_system_manifest(),
             reviewer_manifest=reviewer,
             sidecar_code_commit="a" * 40,
@@ -378,49 +451,62 @@ def test_sidecar_manifest_requires_exact_coverage_and_source_content_binding() -
             wrong_code,
             expected_keys=keys,
             source_prediction_manifest=source,
+            replay_prediction_manifest=replay_manifest,
             system_manifest=_system_manifest(),
             reviewer_manifest=reviewer,
             sidecar_code_commit="a" * 40,
         )
 
 
-def test_bound_sidecar_production_uses_one_bundle_and_requires_source_parity() -> None:
-    source = _source_prediction()
+def test_bound_sidecar_production_uses_one_bundle_and_binds_replay_to_reference() -> (
+    None
+):
+    reference = {
+        **_source_prediction(),
+        "input_stats": {"scan_count": 3},
+        "target": {"ids": torch.tensor([11, 22], dtype=torch.long)},
+    }
+    replay = copy.deepcopy(reference)
+    replay["content_sha256"] = "8" * 64
 
     class Producer:
         calls = 0
 
         def produce_bundle(self, key):
             self.calls += 1
-            assert key == source["key"]
+            assert key == reference["key"]
             return SimpleNamespace(
-                payload={"content_sha256": source["content_sha256"]},
+                payload=copy.deepcopy(replay),
                 processed=SimpleNamespace(raw_observation=_raw_observation()),
             )
 
     producer = Producer()
-    payload = _api("produce_bound_full_history_observation_sidecar")(
+    pair = _api("produce_bound_full_history_observation_sidecar")(
         producer=producer,
-        source_prediction=source,
+        source_prediction=reference,
         sidecar_key=_key(),
         sidecar_source_commit="6" * 40,
     )
     assert producer.calls == 1
-    assert payload["provenance"]["source_prediction_content_sha256"] == (
-        source["content_sha256"]
+    assert pair["replay_prediction"]["content_sha256"] == "8" * 64
+    assert pair["sidecar"]["provenance"]["source_prediction_content_sha256"] == (
+        "8" * 64
+    )
+    assert pair["sidecar"]["provenance"]["reference_prediction_content_sha256"] == (
+        reference["content_sha256"]
     )
 
     class MismatchProducer(Producer):
         def produce_bundle(self, key):
             bundle = super().produce_bundle(key)
-            bundle.payload["content_sha256"] = "f" * 64
+            bundle.payload["target"]["ids"][0] = 999
             return bundle
 
     error = _api("FullHistoryObservationSidecarError")
-    with pytest.raises(error, match="source prediction parity"):
+    with pytest.raises(error, match="target|replay"):
         _api("produce_bound_full_history_observation_sidecar")(
             producer=MismatchProducer(),
-            source_prediction=source,
+            source_prediction=reference,
             sidecar_key=_key(),
             sidecar_source_commit="6" * 40,
         )

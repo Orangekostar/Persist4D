@@ -43,11 +43,17 @@ modify `.gitignore` only for new large entry directories.
 constructed raw observation without changing old payloads.
 
 1. Test schema, content hashes, atomic refusal, mask/query alignment, current-stage
-   restriction, and old-cache immutability.
-2. Implement `full_history_observations_v2` serialization and manifest finalizer.
-3. Test one real canonical prefix, then generate the required 516 O2-O5
-   master/order/horizon sidecars on one deterministic GPU process and finalize
-   exact coverage; do not generate T1 sidecars.
+   restriction, old-cache immutability, and recoverable replay/sidecar pairing.
+2. Implement `full_history_observations_v2` plus a separate ignored
+   `full_history_replay_v2` prediction cache. Bind each sidecar to both the replay
+   prediction SHA and immutable old reference prediction SHA.
+3. Require exact key/provenance/input-stat/GT-target parity. Because audited CUDA
+   sparse inference is deterministic within one process but not bitwise identical
+   across processes, quantify replay task-metric drift instead of claiming false
+   old-cache content parity.
+4. Test one real canonical prefix, then generate the required 516 O2-O5
+   master/order/horizon replay/sidecar pairs on one deterministic GPU process and
+   finalize exact coverage; do not generate T1 sidecars.
 
 ## Task 3: Evaluate Reused Trivial Trackers
 

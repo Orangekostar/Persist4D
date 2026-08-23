@@ -19,7 +19,6 @@ from scripts.system_comparison_protocol import (
     validate_system_comparison_manifest,
 )
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 _HEX40 = re.compile(r"[0-9a-f]{40}\Z")
 _HEX64 = re.compile(r"[0-9a-f]{64}\Z")
@@ -136,7 +135,9 @@ def load_reviewer_closure_config(path: str | Path) -> dict[str, Any]:
     try:
         payload = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     except (OSError, UnicodeError, yaml.YAMLError) as error:
-        raise ReviewerClosureProtocolError("cannot load reviewer-closure config") from error
+        raise ReviewerClosureProtocolError(
+            "cannot load reviewer-closure config"
+        ) from error
     config = _mapping(payload, name="reviewer-closure config")
     _exact_keys(
         config,
@@ -152,7 +153,10 @@ def load_reviewer_closure_config(path: str | Path) -> dict[str, Any]:
         },
         name="reviewer-closure config",
     )
-    if config["schema_version"] != 1 or config["stage_name"] != "persist4d-reviewer-closure":
+    if (
+        config["schema_version"] != 1
+        or config["stage_name"] != "persist4d-reviewer-closure"
+    ):
         raise ReviewerClosureProtocolError("reviewer-closure schema or stage differs")
 
     commits = _mapping(config["source_commits"], name="source_commits")
@@ -176,7 +180,9 @@ def load_reviewer_closure_config(path: str | Path) -> dict[str, Any]:
         "artifact_tree": "398fe87e1d40d67e61399fd893f02dc5f5f6b7ad",
         "classification": "SYSTEM_PARETO_LOCK",
     }:
-        raise ReviewerClosureProtocolError("immutable system-comparison baseline differs")
+        raise ReviewerClosureProtocolError(
+            "immutable system-comparison baseline differs"
+        )
 
     sources = _mapping(config["sources"], name="sources")
     _exact_keys(sources, _SOURCE_NAMES, name="sources")
@@ -229,6 +235,7 @@ def load_reviewer_closure_config(path: str | Path) -> dict[str, Any]:
         or sidecar["provenance_fields"]
         != [
             "source_prediction_content_sha256",
+            "reference_prediction_content_sha256",
             "checkpoint_sha256",
             "config_sha256",
             "source_commit",
@@ -291,7 +298,9 @@ def validate_reviewer_closure_binding(
         _git(repository, "cat-file", "-e", f"{commit}^{{commit}}")
     parent = _git(repository, "rev-parse", f"{completed}^")
     if parent != report_source:
-        raise ReviewerClosureProtocolError("completed branch parent differs from report source")
+        raise ReviewerClosureProtocolError(
+            "completed branch parent differs from report source"
+        )
     try:
         subprocess.run(
             ["git", "merge-base", "--is-ancestor", completed, "HEAD"],

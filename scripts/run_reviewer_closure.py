@@ -30,6 +30,10 @@ REVIEWER_MANIFEST_PATH = REVIEWER_ROOT / "reviewer_closure_manifest.json"
 SIDECAR_ROOT = REVIEWER_ROOT / "full_history_observations_v2"
 SIDECAR_ENTRY_ROOT = SIDECAR_ROOT / "entries"
 SIDECAR_MANIFEST_PATH = SIDECAR_ROOT / "manifest.json"
+REPLAY_ROOT = REVIEWER_ROOT / "full_history_replay_v2"
+REPLAY_ENTRY_ROOT = REPLAY_ROOT / "entries"
+REPLAY_STAGING_ROOT = REPLAY_ROOT / "staging"
+REPLAY_MANIFEST_PATH = REPLAY_ROOT / "manifest.json"
 SOURCE_PREDICTION_MANIFEST_PATH = (
     PROJECT_ROOT / "artifacts/system_comparison/full_history_predictions/manifest.json"
 )
@@ -255,6 +259,57 @@ def validate_sidecar_resume_commit(
             )
 
 
+def validate_completed_replay_pairs(
+    sidecar_entries: Sequence[Mapping[str, object]],
+    replay_entries: Sequence[Mapping[str, object]],
+) -> list[dict[str, object]]:
+    from scripts.reviewer_closure_sidecar import sidecar_key_for_source_prediction
+
+    if (
+        isinstance(sidecar_entries, (str, bytes))
+        or not isinstance(sidecar_entries, Sequence)
+        or isinstance(replay_entries, (str, bytes))
+        or not isinstance(replay_entries, Sequence)
+    ):
+        raise ReviewerClosureGateFailure("completed replay pair inputs are invalid")
+    sidecars: dict[str, dict[str, object]] = {}
+    for raw_record in sidecar_entries:
+        record = dict(raw_record)
+        key = record.get("key")
+        digest = record.get("source_prediction_content_sha256")
+        if not isinstance(key, Mapping) or not isinstance(digest, str):
+            raise ReviewerClosureGateFailure("completed sidecar pair is invalid")
+        identity = _key_identity(key)
+        if identity in sidecars:
+            raise ReviewerClosureGateFailure("completed sidecar pair coverage differs")
+        sidecars[identity] = record
+    replays: dict[str, dict[str, object]] = {}
+    for raw_record in replay_entries:
+        record = dict(raw_record)
+        key = record.get("key")
+        digest = record.get("content_sha256")
+        if not isinstance(key, Mapping) or not isinstance(digest, str):
+            raise ReviewerClosureGateFailure("completed replay pair is invalid")
+        try:
+            identity = _key_identity(sidecar_key_for_source_prediction(key))
+        except FullHistoryObservationSidecarError as error:
+            raise ReviewerClosureGateFailure(
+                "completed replay pair key is invalid"
+            ) from error
+        if identity in replays:
+            raise ReviewerClosureGateFailure("completed replay pair coverage differs")
+        replays[identity] = record
+    if set(sidecars) != set(replays):
+        raise ReviewerClosureGateFailure("completed replay pair coverage differs")
+    for identity, sidecar in sidecars.items():
+        if (
+            sidecar["source_prediction_content_sha256"]
+            != replays[identity]["content_sha256"]
+        ):
+            raise ReviewerClosureGateFailure("completed replay pair content differs")
+    return [dict(record) for record in sidecar_entries]
+
+
 def produce_sidecar_batch(
     *,
     expected_keys: Sequence[Mapping[str, object]],
@@ -263,7 +318,7 @@ def produce_sidecar_batch(
     source_loader: Callable[[Mapping[str, object]], Mapping[str, object]],
     producer: object,
     sidecar_builder: Callable[..., Mapping[str, object]],
-    sidecar_writer: Callable[[Mapping[str, object]], Mapping[str, object]],
+    pair_writer: Callable[[Mapping[str, object]], Mapping[str, object]],
     sidecar_source_commit: str,
     smoke_only: bool,
 ) -> dict[str, int]:
@@ -279,18 +334,70 @@ def produce_sidecar_batch(
     for key in selected:
         source_record = source_lookup(key)
         source_prediction = source_loader(source_record)
-        payload = sidecar_builder(
+        pair = sidecar_builder(
             producer=producer,
             source_prediction=source_prediction,
             sidecar_key=key,
             sidecar_source_commit=sidecar_source_commit,
         )
-        sidecar_writer(payload)
+        pair_writer(pair)
     return {
         "expected_count": expected_count,
         "reused_count": expected_count - len(selected),
         "produced_count": len(selected),
     }
+
+
+def publish_full_history_replay_pair(
+    pair: Mapping[str, object],
+    *,
+    staging_root: str | Path,
+    replay_writer: Callable[[Mapping[str, object]], Mapping[str, object]],
+    sidecar_writer: Callable[[Mapping[str, object]], Mapping[str, object]],
+) -> dict[str, object]:
+    from scripts.reviewer_closure_sidecar import (
+        remove_full_history_replay_pair_stage,
+        write_full_history_replay_pair_stage,
+    )
+
+    stage = write_full_history_replay_pair_stage(staging_root, pair)
+    replay_record = dict(replay_writer(pair["replay_prediction"]))
+    sidecar_record = dict(sidecar_writer(pair["sidecar"]))
+    if replay_record.get("content_sha256") != sidecar_record.get(
+        "source_prediction_content_sha256"
+    ) or stage["key"] != sidecar_record.get("key"):
+        raise ReviewerClosureGateFailure("published replay pair content differs")
+    remove_full_history_replay_pair_stage(staging_root, stage)
+    return sidecar_record
+
+
+def recover_full_history_replay_pairs(
+    *,
+    staging_root: str | Path,
+    replay_writer: Callable[[Mapping[str, object]], Mapping[str, object]],
+    sidecar_writer: Callable[[Mapping[str, object]], Mapping[str, object]],
+    sidecar_source_commit: str,
+) -> int:
+    from scripts.reviewer_closure_sidecar import (
+        discover_full_history_replay_pair_stages,
+        load_full_history_replay_pair_stage,
+    )
+
+    recovered = 0
+    for record in discover_full_history_replay_pair_stages(staging_root):
+        if record["sidecar_source_commit"] != sidecar_source_commit:
+            raise ReviewerClosureGateFailure(
+                "staged replay pair uses a different code commit"
+            )
+        pair = load_full_history_replay_pair_stage(staging_root, record)
+        publish_full_history_replay_pair(
+            pair,
+            staging_root=staging_root,
+            replay_writer=replay_writer,
+            sidecar_writer=sidecar_writer,
+        )
+        recovered += 1
+    return recovered
 
 
 def run_sidecar_cache(
@@ -299,6 +406,8 @@ def run_sidecar_cache(
     metadata_path: str | Path,
     source_entry_root: str | Path,
     sidecar_entry_root: str | Path = SIDECAR_ENTRY_ROOT,
+    replay_entry_root: str | Path = REPLAY_ENTRY_ROOT,
+    replay_staging_root: str | Path = REPLAY_STAGING_ROOT,
     reviewer_manifest_path: str | Path = REVIEWER_MANIFEST_PATH,
     smoke_only: bool,
 ) -> dict[str, object]:
@@ -322,13 +431,35 @@ def run_sidecar_cache(
         validate_source_prediction_manifest,
         write_full_history_observation_sidecar_entry,
     )
+    from scripts.system_comparison_inference import (
+        discover_full_history_cache_entries,
+        write_full_history_cache_entry,
+    )
 
     source_manifest = validate_source_prediction_manifest(
         source_manifest, system_manifest=system_manifest
     )
     expected_keys = full_history_observation_keys(reviewer_manifest)
-    existing = discover_full_history_observation_sidecar_entries(sidecar_entry_root)
     source_commit = _git_head()
+
+    def write_replay(payload: Mapping[str, object]) -> Mapping[str, object]:
+        return write_full_history_cache_entry(replay_entry_root, payload)
+
+    def write_sidecar(payload: Mapping[str, object]) -> Mapping[str, object]:
+        return write_full_history_observation_sidecar_entry(sidecar_entry_root, payload)
+
+    recovered_count = recover_full_history_replay_pairs(
+        staging_root=replay_staging_root,
+        replay_writer=write_replay,
+        sidecar_writer=write_sidecar,
+        sidecar_source_commit=source_commit,
+    )
+    existing = discover_full_history_observation_sidecar_entries(sidecar_entry_root)
+    replay_entries = discover_full_history_cache_entries(
+        replay_entry_root,
+        expected_provenance=source_manifest["provenance"],
+    )
+    validate_completed_replay_pairs(existing, replay_entries)
     validate_sidecar_resume_commit(existing, source_commit)
     _require_source_tree_clean()
     pending = select_pending_sidecar_keys(expected_keys, existing)
@@ -342,6 +473,7 @@ def run_sidecar_cache(
             "expected_count": 1 if smoke_only else len(expected_keys),
             "reused_count": 1 if smoke_only else len(expected_keys),
             "produced_count": 0,
+            "recovered_count": recovered_count,
             "sidecar_source_commit": source_commit,
         }
 
@@ -371,8 +503,13 @@ def run_sidecar_cache(
             expected_provenance=source_manifest["provenance"],
         )
 
-    def write(payload: Mapping[str, object]) -> Mapping[str, object]:
-        return write_full_history_observation_sidecar_entry(sidecar_entry_root, payload)
+    def write_pair(pair: Mapping[str, object]) -> Mapping[str, object]:
+        return publish_full_history_replay_pair(
+            pair,
+            staging_root=replay_staging_root,
+            replay_writer=write_replay,
+            sidecar_writer=write_sidecar,
+        )
 
     with deterministic_inference_runtime(45, setup.device):
         result = produce_sidecar_batch(
@@ -382,7 +519,7 @@ def run_sidecar_cache(
             source_loader=load,
             producer=producer,
             sidecar_builder=produce_bound_full_history_observation_sidecar,
-            sidecar_writer=write,
+            pair_writer=write_pair,
             sidecar_source_commit=source_commit,
             smoke_only=smoke_only,
         )
@@ -390,6 +527,7 @@ def run_sidecar_cache(
         "status": "pass",
         "mode": "smoke" if smoke_only else "full",
         **result,
+        "recovered_count": recovered_count,
         "sidecar_source_commit": source_commit,
     }
 
@@ -398,12 +536,20 @@ def run_finalize_sidecars(
     *,
     sidecar_entry_root: str | Path = SIDECAR_ENTRY_ROOT,
     output_path: str | Path = SIDECAR_MANIFEST_PATH,
+    replay_entry_root: str | Path = REPLAY_ENTRY_ROOT,
+    replay_output_path: str | Path = REPLAY_MANIFEST_PATH,
     reviewer_manifest_path: str | Path = REVIEWER_MANIFEST_PATH,
 ) -> dict[str, object]:
     from scripts.reviewer_closure_sidecar import (
         build_full_history_observation_sidecar_manifest,
         discover_full_history_observation_sidecar_entries,
+        source_prediction_entry_for_key,
         validate_source_prediction_manifest,
+    )
+    from scripts.system_comparison_inference import (
+        FullHistoryCacheError,
+        build_full_history_cache_manifest,
+        discover_full_history_cache_entries,
     )
 
     reviewer_manifest = _load_bound_reviewer_manifest(reviewer_manifest_path)
@@ -413,18 +559,43 @@ def run_finalize_sidecars(
         system_manifest=system_manifest,
     )
     entries = discover_full_history_observation_sidecar_entries(sidecar_entry_root)
+    expected_keys = full_history_observation_keys(reviewer_manifest)
+    replay_entries = discover_full_history_cache_entries(
+        replay_entry_root,
+        expected_provenance=source_manifest["provenance"],
+    )
+    try:
+        replay_manifest = build_full_history_cache_manifest(
+            replay_entries,
+            expected_keys=[
+                source_prediction_entry_for_key(source_manifest, key)["key"]
+                for key in expected_keys
+            ],
+            expected_provenance=source_manifest["provenance"],
+            cache_directory=replay_entry_root,
+        )
+    except FullHistoryCacheError as error:
+        raise FullHistoryObservationSidecarError(
+            "replay prediction manifest does not have exact coverage"
+        ) from error
     manifest = build_full_history_observation_sidecar_manifest(
         entries,
-        expected_keys=full_history_observation_keys(reviewer_manifest),
+        expected_keys=expected_keys,
         source_prediction_manifest=source_manifest,
+        replay_prediction_manifest=replay_manifest,
         system_manifest=system_manifest,
         reviewer_manifest=reviewer_manifest,
         sidecar_code_commit=_git_head(),
         cache_directory=sidecar_entry_root,
     )
     _require_source_tree_clean()
+    publish_exact_json(replay_output_path, replay_manifest)
     publish_exact_json(output_path, manifest)
-    return manifest
+    return {
+        "status": "pass",
+        "replay_prediction_manifest": replay_manifest,
+        "sidecar_manifest": manifest,
+    }
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -468,6 +639,8 @@ __all__ = [
     "build_parser",
     "publish_exact_json",
     "produce_sidecar_batch",
+    "publish_full_history_replay_pair",
+    "recover_full_history_replay_pairs",
     "run_bind",
     "run_finalize_sidecars",
     "run_sidecar_cache",
@@ -475,6 +648,7 @@ __all__ = [
     "select_sidecar_smoke_key",
     "validate_sidecar_execution",
     "validate_sidecar_resume_commit",
+    "validate_completed_replay_pairs",
 ]
 
 

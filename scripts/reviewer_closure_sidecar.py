@@ -50,6 +50,7 @@ _OBSERVATION_FIELDS = {
 _RAW_OBSERVATION_FIELDS = (_OBSERVATION_FIELDS - {"current_stage_masks"}) | {"masks"}
 _PROVENANCE_FIELDS = {
     "source_prediction_content_sha256",
+    "reference_prediction_content_sha256",
     "checkpoint_sha256",
     "config_sha256",
     "source_commit",
@@ -171,6 +172,10 @@ def _source_key(value: object) -> dict[str, object]:
             "scan_indices": full["scan_indices"],
         }
     )
+
+
+def sidecar_key_for_source_prediction(value: Mapping[str, object]) -> dict[str, object]:
+    return _source_key(value)
 
 
 def _normalize_fingerprints(value: object) -> dict[str, str]:
@@ -315,11 +320,71 @@ def sidecar_content_sha256(value: Mapping[str, object]) -> str:
         ) from error
 
 
+def _nested_content_sha256(value: object, *, name: str) -> str:
+    try:
+        return full_history_content_sha256({"value": value})
+    except FullHistoryCacheError as error:
+        raise FullHistoryObservationSidecarError(
+            f"{name} content digest cannot be computed"
+        ) from error
+
+
+def validate_replay_prediction_compatibility(
+    reference_prediction: Mapping[str, object],
+    replay_prediction: Mapping[str, object],
+) -> tuple[dict[str, object], dict[str, object]]:
+    reference_raw = _mapping(reference_prediction, name="reference prediction")
+    replay_raw = _mapping(replay_prediction, name="replay prediction")
+    if "task_prediction" in reference_raw or "task_prediction" in replay_raw:
+        if (
+            "task_prediction" not in reference_raw
+            or "task_prediction" not in replay_raw
+        ):
+            raise FullHistoryObservationSidecarError(
+                "reference and replay prediction schemas differ"
+            )
+        try:
+            reference_raw = validate_full_history_payload(reference_raw)
+            replay_raw = validate_full_history_payload(
+                replay_raw,
+                expected_key=reference_raw["key"],
+                expected_provenance=reference_raw["provenance"],
+            )
+        except FullHistoryCacheError as error:
+            raise FullHistoryObservationSidecarError(
+                "replay prediction payload is invalid"
+            ) from error
+    reference = _source_prediction_binding(reference_raw)
+    replay = _source_prediction_binding(replay_raw)
+    if reference["key"] != replay["key"]:
+        raise FullHistoryObservationSidecarError(
+            "replay prediction key differs from reference"
+        )
+    if reference["provenance"] != replay["provenance"]:
+        raise FullHistoryObservationSidecarError(
+            "replay prediction provenance differs from reference"
+        )
+    for field in ("input_stats", "target"):
+        if field in reference_raw or field in replay_raw:
+            if field not in reference_raw or field not in replay_raw:
+                raise FullHistoryObservationSidecarError(
+                    f"replay prediction {field} differs from reference"
+                )
+            if _nested_content_sha256(
+                reference_raw[field], name=f"reference {field}"
+            ) != _nested_content_sha256(replay_raw[field], name=f"replay {field}"):
+                raise FullHistoryObservationSidecarError(
+                    f"replay prediction {field} differs from reference"
+                )
+    return reference_raw, replay_raw
+
+
 def build_full_history_observation_sidecar(
     *,
     key: Mapping[str, object],
     raw_observation: Mapping[str, object],
     source_prediction: Mapping[str, object],
+    reference_prediction_content_sha256: str,
     sidecar_source_commit: str,
 ) -> dict[str, object]:
     normalized_key = _normalize_key(key)
@@ -338,11 +403,16 @@ def build_full_history_observation_sidecar(
     source_commit = _digest(
         sidecar_source_commit, name="sidecar source_commit", commit=True
     )
+    reference_digest = _digest(
+        reference_prediction_content_sha256,
+        name="reference prediction content_sha256",
+    )
     payload: dict[str, object] = {
         "schema_version": SIDECAR_SCHEMA_VERSION,
         "key": normalized_key,
         "provenance": {
             "source_prediction_content_sha256": source["content_sha256"],
+            "reference_prediction_content_sha256": reference_digest,
             "checkpoint_sha256": provenance["checkpoint_sha256"],
             "config_sha256": provenance["config_sha256"],
             "source_commit": source_commit,
@@ -390,6 +460,10 @@ def validate_full_history_observation_sidecar(
         "source_prediction_content_sha256": _digest(
             provenance["source_prediction_content_sha256"],
             name="source_prediction_content_sha256",
+        ),
+        "reference_prediction_content_sha256": _digest(
+            provenance["reference_prediction_content_sha256"],
+            name="reference_prediction_content_sha256",
         ),
         "checkpoint_sha256": _digest(
             provenance["checkpoint_sha256"], name="checkpoint_sha256"
@@ -445,6 +519,91 @@ def validate_full_history_observation_sidecar(
     }
 
 
+def replay_pair_content_sha256(value: Mapping[str, object]) -> str:
+    try:
+        return full_history_content_sha256(value)
+    except FullHistoryCacheError as error:
+        raise FullHistoryObservationSidecarError(
+            "replay pair content digest cannot be computed"
+        ) from error
+
+
+def build_full_history_replay_pair(
+    *,
+    reference_prediction_content_sha256: str,
+    replay_prediction: Mapping[str, object],
+    sidecar: Mapping[str, object],
+) -> dict[str, object]:
+    replay_raw = _mapping(replay_prediction, name="replay prediction")
+    if "task_prediction" in replay_raw:
+        try:
+            replay_raw = validate_full_history_payload(replay_raw)
+        except FullHistoryCacheError as error:
+            raise FullHistoryObservationSidecarError(
+                "replay prediction payload is invalid"
+            ) from error
+    replay = _source_prediction_binding(replay_raw)
+    validated_sidecar = validate_full_history_observation_sidecar(
+        sidecar,
+        expected_key=replay["key"],
+    )
+    reference_digest = _digest(
+        reference_prediction_content_sha256,
+        name="reference prediction content_sha256",
+    )
+    sidecar_provenance = validated_sidecar["provenance"]
+    replay_provenance = replay["provenance"]
+    if (
+        sidecar_provenance["source_prediction_content_sha256"]
+        != replay["content_sha256"]
+        or sidecar_provenance["reference_prediction_content_sha256"] != reference_digest
+        or sidecar_provenance["checkpoint_sha256"]
+        != replay_provenance["checkpoint_sha256"]
+        or sidecar_provenance["config_sha256"] != replay_provenance["config_sha256"]
+    ):
+        raise FullHistoryObservationSidecarError(
+            "replay prediction and sidecar provenance differ"
+        )
+    payload: dict[str, object] = {
+        "schema_version": "full-history-replay-pair-v1",
+        "reference_prediction_content_sha256": reference_digest,
+        "replay_prediction": replay_raw,
+        "sidecar": validated_sidecar,
+    }
+    payload["content_sha256"] = replay_pair_content_sha256(payload)
+    return payload
+
+
+def validate_full_history_replay_pair(
+    value: Mapping[str, object],
+) -> dict[str, object]:
+    payload = _mapping(value, name="replay pair")
+    expected = {
+        "schema_version",
+        "reference_prediction_content_sha256",
+        "replay_prediction",
+        "sidecar",
+        "content_sha256",
+    }
+    if set(payload) != expected:
+        raise FullHistoryObservationSidecarError("replay pair fields differ")
+    if payload["schema_version"] != "full-history-replay-pair-v1":
+        raise FullHistoryObservationSidecarError("replay pair schema differs")
+    rebuilt = build_full_history_replay_pair(
+        reference_prediction_content_sha256=payload[
+            "reference_prediction_content_sha256"
+        ],
+        replay_prediction=_mapping(
+            payload["replay_prediction"], name="replay prediction"
+        ),
+        sidecar=_mapping(payload["sidecar"], name="sidecar"),
+    )
+    supplied = _digest(payload["content_sha256"], name="replay pair content_sha256")
+    if supplied != rebuilt["content_sha256"]:
+        raise FullHistoryObservationSidecarError("replay pair content digest differs")
+    return rebuilt
+
+
 def _key_identity(key: Mapping[str, object]) -> str:
     return json.dumps(
         _normalize_key(key), ensure_ascii=True, separators=(",", ":"), sort_keys=True
@@ -461,6 +620,162 @@ def _file_sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _replay_pair_stage_record(
+    path: Path, pair: Mapping[str, object]
+) -> dict[str, object]:
+    validated = validate_full_history_replay_pair(pair)
+    sidecar = validated["sidecar"]
+    return {
+        "key": sidecar["key"],
+        "filename": path.name,
+        "sha256": _file_sha256(path),
+        "byte_size": path.stat().st_size,
+        "content_sha256": validated["content_sha256"],
+        "sidecar_source_commit": sidecar["provenance"]["source_commit"],
+    }
+
+
+def _normalize_replay_pair_stage_record(
+    value: Mapping[str, object],
+) -> dict[str, object]:
+    record = _mapping(value, name="replay pair stage record")
+    expected = {
+        "key",
+        "filename",
+        "sha256",
+        "byte_size",
+        "content_sha256",
+        "sidecar_source_commit",
+    }
+    if set(record) != expected:
+        raise FullHistoryObservationSidecarError(
+            "replay pair stage record fields differ"
+        )
+    key = _normalize_key(record["key"])
+    filename = record["filename"]
+    if filename != _entry_filename(key):
+        raise FullHistoryObservationSidecarError("replay pair stage filename differs")
+    size = record["byte_size"]
+    if isinstance(size, bool) or not isinstance(size, int) or size <= 0:
+        raise FullHistoryObservationSidecarError(
+            "replay pair stage byte_size is invalid"
+        )
+    return {
+        "key": key,
+        "filename": filename,
+        "sha256": _digest(record["sha256"], name="replay pair stage sha256"),
+        "byte_size": size,
+        "content_sha256": _digest(
+            record["content_sha256"], name="replay pair stage content_sha256"
+        ),
+        "sidecar_source_commit": _digest(
+            record["sidecar_source_commit"],
+            name="replay pair stage source commit",
+            commit=True,
+        ),
+    }
+
+
+def write_full_history_replay_pair_stage(
+    directory: str | Path,
+    value: Mapping[str, object],
+) -> dict[str, object]:
+    pair = validate_full_history_replay_pair(value)
+    root = Path(directory)
+    root.mkdir(parents=True, exist_ok=True)
+    output = root / _entry_filename(pair["sidecar"]["key"])
+    if output.exists() or output.is_symlink():
+        if output.is_symlink() or not output.is_file():
+            raise FileExistsError("replay pair stage path is not a regular file")
+        existing = validate_full_history_replay_pair(
+            torch.load(output, map_location="cpu", weights_only=False)
+        )
+        if existing["content_sha256"] != pair["content_sha256"]:
+            raise FileExistsError("replay pair stage contains different content")
+        return _normalize_replay_pair_stage_record(
+            _replay_pair_stage_record(output, existing)
+        )
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="wb",
+            dir=root,
+            prefix=f".{output.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
+            temporary = Path(handle.name)
+        torch.save(pair, temporary)
+        with temporary.open("rb") as handle:
+            os.fsync(handle.fileno())
+        os.link(temporary, output)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+    return _normalize_replay_pair_stage_record(_replay_pair_stage_record(output, pair))
+
+
+def load_full_history_replay_pair_stage(
+    directory: str | Path,
+    entry: Mapping[str, object],
+) -> dict[str, object]:
+    record = _normalize_replay_pair_stage_record(entry)
+    path = Path(directory) / record["filename"]
+    if path.is_symlink() or not path.is_file():
+        raise FullHistoryObservationSidecarError(
+            "replay pair stage file is unavailable"
+        )
+    if (
+        path.stat().st_size != record["byte_size"]
+        or _file_sha256(path) != record["sha256"]
+    ):
+        raise FullHistoryObservationSidecarError("replay pair stage file hash differs")
+    pair = validate_full_history_replay_pair(
+        torch.load(path, map_location="cpu", weights_only=False)
+    )
+    if (
+        pair["content_sha256"] != record["content_sha256"]
+        or pair["sidecar"]["provenance"]["source_commit"]
+        != record["sidecar_source_commit"]
+    ):
+        raise FullHistoryObservationSidecarError("replay pair stage content differs")
+    return pair
+
+
+def discover_full_history_replay_pair_stages(
+    directory: str | Path,
+) -> list[dict[str, object]]:
+    root = Path(directory)
+    if root.is_symlink() or (root.exists() and not root.is_dir()):
+        raise FullHistoryObservationSidecarError(
+            "replay pair stage directory must be regular"
+        )
+    root.mkdir(parents=True, exist_ok=True)
+    records: list[dict[str, object]] = []
+    for path in sorted(root.iterdir(), key=lambda item: item.name):
+        if path.is_symlink() or not path.is_file() or path.suffix != ".pt":
+            raise FullHistoryObservationSidecarError(
+                f"replay pair stage directory contains unexpected path: {path.name}"
+            )
+        pair = validate_full_history_replay_pair(
+            torch.load(path, map_location="cpu", weights_only=False)
+        )
+        records.append(
+            _normalize_replay_pair_stage_record(_replay_pair_stage_record(path, pair))
+        )
+    records.sort(key=lambda record: _key_identity(record["key"]))
+    return records
+
+
+def remove_full_history_replay_pair_stage(
+    directory: str | Path,
+    entry: Mapping[str, object],
+) -> None:
+    record = _normalize_replay_pair_stage_record(entry)
+    load_full_history_replay_pair_stage(directory, record)
+    (Path(directory) / record["filename"]).unlink()
 
 
 def write_full_history_observation_sidecar_entry(
@@ -488,6 +803,9 @@ def write_full_history_observation_sidecar_entry(
             "content_sha256": existing["content_sha256"],
             "source_prediction_content_sha256": existing["provenance"][
                 "source_prediction_content_sha256"
+            ],
+            "reference_prediction_content_sha256": existing["provenance"][
+                "reference_prediction_content_sha256"
             ],
             "sidecar_source_commit": existing["provenance"]["source_commit"],
         }
@@ -517,6 +835,9 @@ def write_full_history_observation_sidecar_entry(
         "source_prediction_content_sha256": payload["provenance"][
             "source_prediction_content_sha256"
         ],
+        "reference_prediction_content_sha256": payload["provenance"][
+            "reference_prediction_content_sha256"
+        ],
         "sidecar_source_commit": payload["provenance"]["source_commit"],
     }
 
@@ -533,6 +854,7 @@ def load_full_history_observation_sidecar_entry(
         "byte_size",
         "content_sha256",
         "source_prediction_content_sha256",
+        "reference_prediction_content_sha256",
         "sidecar_source_commit",
     }
     if set(record) != expected_fields:
@@ -568,6 +890,11 @@ def load_full_history_observation_sidecar_entry(
             record["sidecar_source_commit"],
             name="entry sidecar source commit",
             commit=True,
+        )
+        or payload["provenance"]["reference_prediction_content_sha256"]
+        != _digest(
+            record["reference_prediction_content_sha256"],
+            name="entry reference prediction content_sha256",
         )
     ):
         raise FullHistoryObservationSidecarError("sidecar entry content differs")
@@ -662,9 +989,9 @@ def produce_bound_full_history_observation_sidecar(
     sidecar_key: Mapping[str, object],
     sidecar_source_commit: str,
 ) -> dict[str, object]:
-    source = _source_prediction_binding(source_prediction)
+    reference = _source_prediction_binding(source_prediction)
     normalized_key = _normalize_key(sidecar_key)
-    if source["key"] != normalized_key:
+    if reference["key"] != normalized_key:
         raise FullHistoryObservationSidecarError(
             "source prediction key differs from sidecar prefix"
         )
@@ -685,27 +1012,21 @@ def produce_bound_full_history_observation_sidecar(
         raise FullHistoryObservationSidecarError(
             "Full-History bundle lacks payload or raw observation"
         )
-    produced_digest = produced_payload.get("content_sha256")
-    if produced_digest != source["content_sha256"]:
-        raise FullHistoryObservationSidecarError(
-            "rerun failed source prediction parity"
-        )
-    if "task_prediction" in source_prediction:
-        try:
-            validate_full_history_payload(
-                produced_payload,
-                expected_key=source_prediction["key"],
-                expected_provenance=source_prediction["provenance"],
-            )
-        except FullHistoryCacheError as error:
-            raise FullHistoryObservationSidecarError(
-                "rerun source prediction payload is invalid"
-            ) from error
-    return build_full_history_observation_sidecar(
+    reference_payload, replay_payload = validate_replay_prediction_compatibility(
+        source_prediction,
+        produced_payload,
+    )
+    sidecar = build_full_history_observation_sidecar(
         key=normalized_key,
         raw_observation=raw_observation,
-        source_prediction=source_prediction,
+        source_prediction=replay_payload,
+        reference_prediction_content_sha256=reference["content_sha256"],
         sidecar_source_commit=sidecar_source_commit,
+    )
+    return build_full_history_replay_pair(
+        reference_prediction_content_sha256=reference_payload["content_sha256"],
+        replay_prediction=replay_payload,
+        sidecar=sidecar,
     )
 
 
@@ -736,6 +1057,9 @@ def discover_full_history_observation_sidecar_entries(
             "source_prediction_content_sha256": payload["provenance"][
                 "source_prediction_content_sha256"
             ],
+            "reference_prediction_content_sha256": payload["provenance"][
+                "reference_prediction_content_sha256"
+            ],
             "sidecar_source_commit": payload["provenance"]["source_commit"],
         }
         records.append(_normalize_sidecar_entry_record(record))
@@ -754,6 +1078,7 @@ def _normalize_sidecar_entry_record(
         "byte_size",
         "content_sha256",
         "source_prediction_content_sha256",
+        "reference_prediction_content_sha256",
         "sidecar_source_commit",
     }
     if set(record) != expected:
@@ -776,6 +1101,10 @@ def _normalize_sidecar_entry_record(
         "source_prediction_content_sha256": _digest(
             record["source_prediction_content_sha256"],
             name="sidecar source prediction content_sha256",
+        ),
+        "reference_prediction_content_sha256": _digest(
+            record["reference_prediction_content_sha256"],
+            name="sidecar reference prediction content_sha256",
         ),
         "sidecar_source_commit": _digest(
             record["sidecar_source_commit"],
@@ -803,6 +1132,7 @@ def build_full_history_observation_sidecar_manifest(
     *,
     expected_keys: Sequence[Mapping[str, object]],
     source_prediction_manifest: Mapping[str, object],
+    replay_prediction_manifest: Mapping[str, object],
     system_manifest: Mapping[str, object],
     reviewer_manifest: Mapping[str, object],
     sidecar_code_commit: str,
@@ -832,6 +1162,37 @@ def build_full_history_observation_sidecar_manifest(
         raise FullHistoryObservationSidecarError(
             "expected sidecar coverage contains duplicates"
         )
+    replay_manifest = _mapping(
+        replay_prediction_manifest, name="replay prediction manifest"
+    )
+    replay_entries = replay_manifest.get("entries")
+    if isinstance(replay_entries, (str, bytes)) or not isinstance(
+        replay_entries, Sequence
+    ):
+        raise FullHistoryObservationSidecarError(
+            "replay prediction manifest entries are invalid"
+        )
+    replay_keys = [
+        source_prediction_entry_for_key(source, key)["key"] for key in expected
+    ]
+    try:
+        rebuilt_replay_manifest = build_full_history_cache_manifest(
+            replay_entries,
+            expected_keys=replay_keys,
+            expected_provenance=source["provenance"],
+        )
+    except FullHistoryCacheError as error:
+        raise FullHistoryObservationSidecarError(
+            "replay prediction manifest binding differs"
+        ) from error
+    if replay_manifest != rebuilt_replay_manifest:
+        raise FullHistoryObservationSidecarError(
+            "replay prediction manifest content differs"
+        )
+    replay_index = {
+        _key_identity(_source_key(record["key"])): record
+        for record in rebuilt_replay_manifest["entries"]
+    }
     normalized = [_normalize_sidecar_entry_record(record) for record in entries]
     actual_identities = [_key_identity(record["key"]) for record in normalized]
     if len(set(actual_identities)) != len(actual_identities) or set(
@@ -848,11 +1209,18 @@ def build_full_history_observation_sidecar_manifest(
             )
         source_record = source_prediction_entry_for_key(source, record["key"])
         if (
-            record["source_prediction_content_sha256"]
+            record["reference_prediction_content_sha256"]
             != source_record["content_sha256"]
         ):
             raise FullHistoryObservationSidecarError(
-                "sidecar source prediction content binding differs"
+                "sidecar reference prediction content binding differs"
+            )
+        if (
+            record["source_prediction_content_sha256"]
+            != replay_index[_key_identity(record["key"])]["content_sha256"]
+        ):
+            raise FullHistoryObservationSidecarError(
+                "sidecar replay prediction content binding differs"
             )
     if cache_directory is not None:
         directory = Path(cache_directory)
@@ -881,6 +1249,12 @@ def build_full_history_observation_sidecar_manifest(
             "entries_sha256": source["entries_sha256"],
             "entry_count": source["entry_count"],
         },
+        "replay_prediction_manifest": {
+            "reference": "repo:artifacts/reviewer_closure/full_history_replay_v2/manifest.json",
+            "content_sha256": rebuilt_replay_manifest["content_sha256"],
+            "entries_sha256": rebuilt_replay_manifest["entries_sha256"],
+            "entry_count": rebuilt_replay_manifest["entry_count"],
+        },
         "sidecar_code_commit": commit,
         "entry_count": len(normalized),
         "entries_sha256": entries_sha256,
@@ -895,15 +1269,24 @@ def build_full_history_observation_sidecar_manifest(
 __all__ = [
     "FullHistoryObservationSidecarError",
     "SIDECAR_SCHEMA_VERSION",
+    "build_full_history_replay_pair",
     "build_full_history_observation_sidecar",
     "build_full_history_observation_sidecar_manifest",
     "discover_full_history_observation_sidecar_entries",
+    "discover_full_history_replay_pair_stages",
     "load_full_history_observation_sidecar_entry",
+    "load_full_history_replay_pair_stage",
     "observation_fingerprints",
     "produce_bound_full_history_observation_sidecar",
+    "remove_full_history_replay_pair_stage",
+    "replay_pair_content_sha256",
+    "sidecar_key_for_source_prediction",
     "sidecar_content_sha256",
     "source_prediction_entry_for_key",
     "validate_source_prediction_manifest",
     "validate_full_history_observation_sidecar",
+    "validate_full_history_replay_pair",
+    "validate_replay_prediction_compatibility",
     "write_full_history_observation_sidecar_entry",
+    "write_full_history_replay_pair_stage",
 ]

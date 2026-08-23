@@ -31,8 +31,12 @@
 - Full-History 原 cache payload 只有 task/identity prediction、target、provenance 和
   observation fingerprints，不含 tracker 所需的 raw feature/class/mask observations。
 - `postprocess_full_history_output` 已在内存中构造 feature、class probability、confidence、
-  validity、当前 stage mask、mask support 和 local query ID，因此只需一次 sidecar inference，
-  不重复生成或覆盖旧 task prediction cache。
+  validity、当前 stage mask、mask support 和 local query ID，因此每个 prefix 只需一次 replay
+  inference；旧 task prediction cache 始终只读。
+- 真实 canonical T2 诊断确认：相同 checkpoint、配置和逐 tensor 输入在同一进程三次前向完全
+  一致，但跨进程的 CUDA sparse forward 与旧 cache 不具备 bitwise content parity。输入统计和
+  GT target 完全一致，task score 的观测最大绝对漂移约为 0.029。旧 determinism audit 只覆盖
+  同进程重复，不能证明跨进程 bitwise replay。
 - 官方 ReScene4D 的 non-parametric queries 从当前完整 forward input 通过 FPS 初始化；query
   index 是 per-forward namespace，不是失败的 tracker。
 - Persist4D 是 local perception 之上的 persistent identity/state maintenance，memory 不反馈到
@@ -50,15 +54,21 @@ reference-scene clusters、3 个 order 和 T2-T5 exact prefixes，不重新采�
 ### Full-History Observation Sidecar
 
 `scripts/reviewer_closure_sidecar.py` 复用既有 dataset、collator、checkpoint loader 和
-Full-History postprocess。schema `full_history_observations_v2` 每个 entry 包含：
+Full-History postprocess。每次 forward 同时产生只读 replay prediction 与 schema
+`full_history_observations_v2` sidecar。每个 sidecar entry 包含：
 
 - `features`, `class_prob`, `confidence`, `valid`；
 - `current_stage_masks`, `mask_support`, `local_query_ids`；
 - `reference_scene_id`, `master_sequence_id`, `order_id`, `horizon`, `scan_indices`；
-- source prediction content SHA256、checkpoint/config/source commit hashes。
+- replay source prediction content SHA256、旧正式 reference prediction content SHA256、
+  checkpoint/config/source commit hashes。
 
 mask 的 query 轴必须与 feature/class/local-query 轴严格对齐；point 轴只覆盖 current stage。
-写入使用内容寻址、临时文件加原子发布、拒绝覆盖不匹配条目。旧 Full-History cache 只读。
+replay 与 sidecar 必须保持 key、checkpoint/config、input stats 和 GT target 一致；模型输出允许
+因已审计的跨进程 CUDA 数值路径不同而拥有不同 content SHA，但不得继承旧 observation
+fingerprint。两者先写入可恢复 staging pair，再原子发布到各自 cache，拒绝覆盖不匹配条目。
+旧 Full-History cache 只读。replay task metrics 必须与旧正式指标单独做 drift audit；论文主表
+仍使用旧冻结 pooled task metrics，tracker deployment metrics 绑定 replay sidecar。
 
 ### Phase I: Reused Trivial Trackers
 

@@ -127,11 +127,11 @@ def test_sidecar_batch_processes_each_pending_key_once_and_smoke_is_bounded() ->
     def build(producer, source_prediction, sidecar_key, sidecar_source_commit):
         producer.produce_bundle(source_prediction["key"])
         assert sidecar_source_commit == "a" * 40
-        return {"key": sidecar_key}
+        return {"sidecar": {"key": sidecar_key}}
 
-    def write(payload):
-        written.append(identity(payload["key"]))
-        return {"key": payload["key"]}
+    def write(pair):
+        written.append(identity(pair["sidecar"]["key"]))
+        return {"key": pair["sidecar"]["key"]}
 
     result = _api("produce_sidecar_batch")(
         expected_keys=keys,
@@ -140,7 +140,7 @@ def test_sidecar_batch_processes_each_pending_key_once_and_smoke_is_bounded() ->
         source_loader=load,
         producer=Producer(),
         sidecar_builder=build,
-        sidecar_writer=write,
+        pair_writer=write,
         sidecar_source_commit="a" * 40,
         smoke_only=False,
     )
@@ -163,12 +163,61 @@ def test_sidecar_batch_processes_each_pending_key_once_and_smoke_is_bounded() ->
         source_loader=load,
         producer=Producer(),
         sidecar_builder=build,
-        sidecar_writer=write,
+        pair_writer=write,
         sidecar_source_commit="a" * 40,
         smoke_only=True,
     )
     assert result["produced_count"] == 1
     assert written == [identity(smoke)]
+
+
+def test_completed_replay_pairs_require_exact_keys_and_content_binding() -> None:
+    keys = full_history_observation_keys(_manifest())[:2]
+    source_entries = json.loads(
+        (
+            REPO_ROOT
+            / "artifacts/system_comparison/full_history_predictions/manifest.json"
+        ).read_text(encoding="utf-8")
+    )["entries"]
+
+    def full_key(key):
+        return next(
+            entry["key"]
+            for entry in source_entries
+            if all(
+                entry["key"][name] == key[name]
+                for name in (
+                    "reference_scene_id",
+                    "master_sequence_id",
+                    "order_id",
+                    "horizon",
+                )
+            )
+        )
+
+    sidecars = [
+        {
+            "key": key,
+            "source_prediction_content_sha256": f"{index + 1:064x}",
+        }
+        for index, key in enumerate(keys)
+    ]
+    replays = [
+        {
+            "key": full_key(key),
+            "content_sha256": f"{index + 1:064x}",
+        }
+        for index, key in enumerate(keys)
+    ]
+    assert _api("validate_completed_replay_pairs")(sidecars, replays) == sidecars
+
+    error = _api("ReviewerClosureGateFailure")
+    with pytest.raises(error, match="coverage|pair"):
+        _api("validate_completed_replay_pairs")(sidecars, replays[:1])
+    changed = copy.deepcopy(replays)
+    changed[0]["content_sha256"] = "f" * 64
+    with pytest.raises(error, match="content|pair"):
+        _api("validate_completed_replay_pairs")(sidecars, changed)
 
 
 def test_real_sidecar_command_fails_before_gpu_when_inputs_are_missing(

@@ -11,7 +11,6 @@ import yaml
 
 from scripts import reviewer_closure_protocol as protocol
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = REPO_ROOT / "configs/reviewer_closure/protocol.yaml"
 MODULE_PATH = REPO_ROOT / "scripts/reviewer_closure_protocol.py"
@@ -46,6 +45,13 @@ def test_config_freezes_lineage_tree_sidecar_and_statistics() -> None:
     }
     assert config["sidecar"]["schema_version"] == "full-history-observations-v2"
     assert config["sidecar"]["horizons"] == [2, 3, 4, 5]
+    assert config["sidecar"]["provenance_fields"] == [
+        "source_prediction_content_sha256",
+        "reference_prediction_content_sha256",
+        "checkpoint_sha256",
+        "config_sha256",
+        "source_commit",
+    ]
     assert config["statistics"] == {
         "cluster_unit": "reference_scene_id",
         "cluster_count": 6,
@@ -173,9 +179,9 @@ def test_sidecar_keys_cover_only_exact_o2_to_o5_prefixes() -> None:
 
 def test_manifest_rejects_master_prefix_mutation() -> None:
     tampered = copy.deepcopy(_manifest())
-    tampered["masters"][0]["orders"]["canonical"]["prefixes"]["4"][
-        "scan_ids"
-    ][-1] = "scene9999_99"
+    tampered["masters"][0]["orders"]["canonical"]["prefixes"]["4"]["scan_ids"][
+        -1
+    ] = "scene9999_99"
 
     error = _api("ReviewerClosureProtocolError")
     with pytest.raises(error, match="digest|masters|prefix"):
@@ -188,9 +194,9 @@ def test_manifest_rejects_master_prefix_mutation() -> None:
 
 def test_manifest_rejects_semantic_prefix_mutation_with_recomputed_digest() -> None:
     tampered = copy.deepcopy(_manifest())
-    tampered["masters"][0]["orders"]["canonical"]["prefixes"]["4"][
-        "scan_ids"
-    ][-1] = "scene9999_99"
+    tampered["masters"][0]["orders"]["canonical"]["prefixes"]["4"]["scan_ids"][
+        -1
+    ] = "scene9999_99"
     tampered.pop("content_sha256")
     canonical = (
         json.dumps(
@@ -225,3 +231,22 @@ def test_sidecar_entries_are_ignored_but_manifest_is_trackable() -> None:
     )
     assert ignored.returncode == 0
     assert trackable.returncode == 1
+
+    for local_path in (
+        "artifacts/reviewer_closure/full_history_replay_v2/entries/a.pt",
+        "artifacts/reviewer_closure/full_history_replay_v2/staging/a.pt",
+    ):
+        result = subprocess.run(
+            ["git", "check-ignore", "--quiet", local_path], cwd=REPO_ROOT
+        )
+        assert result.returncode == 0
+    replay_manifest = subprocess.run(
+        [
+            "git",
+            "check-ignore",
+            "--quiet",
+            "artifacts/reviewer_closure/full_history_replay_v2/manifest.json",
+        ],
+        cwd=REPO_ROOT,
+    )
+    assert replay_manifest.returncode == 1

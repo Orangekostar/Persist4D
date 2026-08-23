@@ -52,6 +52,7 @@ sidecar:
     - scan_indices
   provenance_fields:
     - source_prediction_content_sha256
+    - reference_prediction_content_sha256
     - checkpoint_sha256
     - config_sha256
     - source_commit
