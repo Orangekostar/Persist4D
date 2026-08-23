@@ -1,0 +1,71 @@
+{
+  "canonical_checkpoint_reload": {
+    "state_dict_entry_count": 798,
+    "strict": true
+  },
+  "checkpoints": {
+    "best_validation": {
+      "byte_size": 754814630,
+      "epoch": 14,
+      "global_step": 720,
+      "optimizer_state_count": 1,
+      "reference": "repo:checkpoints/reviewer_closure_rescene_t3_adapted/epoch=014-val_mean_t-AP=0.207.ckpt",
+      "scheduler_state_count": 1,
+      "sha256": "899a8c7b462c52a8c038bef961051bfc82df55444837e793494c0326e5320239",
+      "state_dict_entry_count": 798
+    },
+    "canonical_final": {
+      "byte_size": 754815014,
+      "epoch": 44,
+      "global_step": 2160,
+      "optimizer_state_count": 1,
+      "reference": "repo:checkpoints/rescene4d_t2_to_t3_horizon_adapted.ckpt",
+      "scheduler_state_count": 1,
+      "sha256": "ba4ad656510aa8f8f86e5ad2b5fc332eabb721254f242ecdafa97e04f69d27bb",
+      "state_dict_entry_count": 798
+    },
+    "last": {
+      "byte_size": 754814758,
+      "epoch": 14,
+      "global_step": 720,
+      "optimizer_state_count": 1,
+      "reference": "repo:checkpoints/reviewer_closure_rescene_t3_adapted/last.ckpt",
+      "scheduler_state_count": 1,
+      "sha256": "5dc6531f9896aeb0b044f10f1c725e27515a79013dcc70ff6d36485a957e5b35",
+      "state_dict_entry_count": 798
+    }
+  },
+  "content_sha256": "93f4d8293ee44b5a36aa17b65289b9793306a8a4eaed2dd47bcee6300e0dbf5c",
+  "initialization": {
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "fresh_optimizer_and_scheduler": true,
+    "mode": "weights_only_strict",
+    "optimizer_state_resumed": false,
+    "scheduler_state_resumed": false,
+    "state_dict_entry_count": 798
+  },
+  "paper_name": "ReScene4D T2-to-T3 Horizon-Adapted",
+  "recipe_changed_after_smoke": false,
+  "recipe_sha256": "a3ac6f159ff6e445b6d5e21f67efe5a09fa0afee45969db572fbdc3d3e679349",
+  "runtime": {
+    "completed_epochs": 45,
+    "final_global_step": 2160,
+    "global_sample_exposures": 69120,
+    "global_scan_exposures": 145932,
+    "gpu_hours": 21.692877252653965,
+    "initial_lr": 2.000000000000001e-06,
+    "initial_optimizer_state_count": 0,
+    "optimizer_updates": 2160,
+    "peak_allocated_vram_mib": 29269.265625,
+    "rio_t3_sample_exposures": 38406,
+    "scannet_t1_sample_exposures": 30714,
+    "status": "completed",
+    "wall_clock_seconds": 39047.17905477714,
+    "world_size": 2
+  },
+  "schema_version": 1,
+  "selected_level": 2,
+  "source_commit": "29a7d49258441887da25e1cc4ab4b4a5363bb62d",
+  "status": "pass",
+  "training_audit_content_sha256": "612c83094a7c5bf48e087ce52ae3a2adb7e1587487af84777fd62f397e8503bd"
+}
