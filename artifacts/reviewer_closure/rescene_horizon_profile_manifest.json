@@ -1,0 +1,20 @@
+{
+  "checkpoint_sha256": "ba4ad656510aa8f8f86e5ad2b5fc332eabb721254f242ecdafa97e04f69d27bb",
+  "compute_row_count": 12,
+  "compute_table_sha256": "e724a97b3c63e09a27c5821b569485bb417d62d0b75dc0912a9cb9bfd633bea0",
+  "content_sha256": "4445b55b331feb9d6fea63d2650e009d05576c95522f21c5d584a8e17464f6eb",
+  "horizons": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "measured_repeats": 10,
+  "profile_cluster_count": 6,
+  "raw_profile_row_count": 24,
+  "raw_profile_sha256": "3faf580140d39deed93969cbe1c6f1a631ad258bd6ea16bda4e67cc5d614afd9",
+  "schema_version": 1,
+  "source_commit": "a970f4efdf8b050ad44860bf0cbece93afbfa972",
+  "status": "pass",
+  "warmup_repeats": 5
+}
