@@ -1,0 +1,5 @@
+metric,horizon,difference,ci_lower,ci_upper,complete_cluster_population,order_consistent,loso_consistent
+normalized_id_switch_rate,4,-0.00452665160694507,-0.06699653946805394,0.05244149548359339,True,False,False
+normalized_id_switch_rate,5,-0.004793074972909761,-0.08697142313806726,0.06138176897795747,True,False,False
+gap_recovery_recall,4,-0.24356292932050883,-0.37344401728302656,-0.12166282537576686,False,False,False
+gap_recovery_recall,5,-0.37861199024238024,-0.6471933698162827,-0.18662752368885802,True,True,True
