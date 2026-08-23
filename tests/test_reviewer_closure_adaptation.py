@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -186,6 +187,37 @@ def test_paired_statistics_use_six_clusters_and_recompute_identity_rates() -> No
     assert len(evidence["leave_one_scene_out"]) == 4 * 2 * 6
 
 
+def test_paired_statistics_retain_missing_gap_cluster_and_fail_closed() -> None:
+    rows = _paired_rows()
+    for row in rows:
+        if row["reference_scene_id"] == "reference-0":
+            row["gap_opportunities"] = 0
+            row["recovery_attempts"] = 0
+            row["correct_recoveries"] = 0
+
+    evidence = adaptation.paired_phase_ii_statistics(
+        rows,
+        challenger_method_id="FullHistoryAdaptedB2",
+        baseline_method_id="Persist4D",
+    )
+
+    bootstrap = next(
+        row
+        for row in evidence["bootstrap"]
+        if row["metric"] == "gap_recovery_recall" and row["horizon"] == 4
+    )
+    order = next(
+        row
+        for row in evidence["order_robustness"]
+        if row["metric"] == "gap_recovery_recall" and row["horizon"] == 4
+    )
+    assert bootstrap["reference_scene_count"] == 6
+    assert bootstrap["cluster_count"] == 5
+    assert bootstrap["missing_cluster_count"] == 1
+    assert order["complete_cluster_population"] is False
+    assert order["sign_consistent"] is False
+
+
 def _task_evidence(qualifying_horizons: set[int]) -> list[dict[str, object]]:
     rows = []
     for metric in ("causal_prefix_t_mAP", "causal_prefix_t_REC"):
@@ -198,6 +230,7 @@ def _task_evidence(qualifying_horizons: set[int]) -> list[dict[str, object]]:
                     "pooled_difference": 0.02 if qualifying else 0.005,
                     "ci_lower": 0.01 if qualifying else -0.01,
                     "ci_upper": 0.03,
+                    "complete_cluster_population": True,
                     "order_consistent": qualifying,
                     "loso_consistent": qualifying,
                 }
@@ -219,6 +252,7 @@ def _identity_evidence(*, persist_advantage: bool) -> list[dict[str, object]]:
                     "difference": difference,
                     "ci_lower": difference - 0.01,
                     "ci_upper": difference + 0.01,
+                    "complete_cluster_population": True,
                     "order_consistent": True,
                     "loso_consistent": True,
                 }
@@ -266,6 +300,21 @@ def test_gate_ii_classification_is_conjunctive_and_fail_closed(
     assert len(gate["content_sha256"]) == 64
 
 
+def test_gate_ii_does_not_close_identity_gap_with_incomplete_clusters() -> None:
+    identity = _identity_evidence(persist_advantage=False)
+    identity[0]["complete_cluster_population"] = False
+
+    gate = adaptation.derive_gate_ii(
+        task_evidence=_task_evidence({4, 5}),
+        identity_evidence=identity,
+        compute_evidence=_compute_evidence(1.05),
+        config=adaptation.load_phase_ii_evaluation_config(CONFIG_PATH),
+    )
+
+    assert gate["identity_gap_closed"] is False
+    assert gate["classification"] == "ACCURACY_ADVANTAGE_BUT_COSTLY"
+
+
 def test_adapted_provenance_binds_checkpoint_config_protocol_and_commit(
     tmp_path: Path,
 ) -> None:
@@ -301,6 +350,23 @@ def test_adapted_provenance_binds_checkpoint_config_protocol_and_commit(
     )
     assert changed["checkpoint_sha256"] == first["checkpoint_sha256"]
     assert changed["config_sha256"] != first["config_sha256"]
+
+
+def test_prediction_manifest_supplies_inference_source_commit(tmp_path: Path) -> None:
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(
+        json.dumps({"provenance": {"source_commit": "a" * 40}}),
+        encoding="utf-8",
+    )
+
+    assert runner._prediction_inference_source_commit(manifest_path) == "a" * 40
+
+    manifest_path.write_text(
+        json.dumps({"provenance": {"source_commit": "not-a-commit"}}),
+        encoding="utf-8",
+    )
+    with pytest.raises(runner.AdaptationRunError, match="source commit"):
+        runner._prediction_inference_source_commit(manifest_path)
 
 
 def test_adapted_batch_runs_one_forward_per_missing_sidecar() -> None:
@@ -633,6 +699,9 @@ def test_gate_inputs_keep_pooled_task_and_directional_robustness_separate() -> N
                     "difference": difference,
                     "ci_lower": difference - 0.005,
                     "ci_upper": difference + 0.005,
+                    "reference_scene_count": 6,
+                    "cluster_count": 6,
+                    "missing_cluster_count": 0,
                 }
             )
             order.append(
@@ -642,6 +711,7 @@ def test_gate_inputs_keep_pooled_task_and_directional_robustness_separate() -> N
                     "canonical_difference": difference,
                     "reverse_difference": difference,
                     "sha256_seed45_difference": difference,
+                    "complete_cluster_population": True,
                 }
             )
             for reference in range(6):
@@ -652,6 +722,7 @@ def test_gate_inputs_keep_pooled_task_and_directional_robustness_separate() -> N
                         "dropped_reference_scene_id": f"reference-{reference}",
                         "difference": difference,
                         "identity": identity,
+                        "remaining_cluster_count": 5,
                     }
                 )
     compute = [
@@ -693,3 +764,19 @@ def test_gate_inputs_keep_pooled_task_and_directional_robustness_separate() -> N
     assert identity["order_consistent"] is True
     assert identity["loso_consistent"] is True
     assert evidence["compute"][0]["latency_ratio"] == pytest.approx(1.0)
+
+    order[0]["complete_cluster_population"] = False
+    incomplete = adaptation.build_gate_ii_evidence(
+        result_rows=result_rows,
+        bootstrap_rows=bootstrap,
+        order_rows=order,
+        loso_rows=loso,
+        compute_rows=compute,
+    )
+    incomplete_task = next(
+        row
+        for row in incomplete["task"]
+        if row["metric"] == order[0]["metric"]
+        and row["horizon"] == order[0]["horizon"]
+    )
+    assert incomplete_task["order_consistent"] is False

@@ -200,6 +200,23 @@ def _load_json(path: str | Path, *, name: str) -> dict[str, Any]:
     return dict(value)
 
 
+def _prediction_inference_source_commit(
+    path: str | Path = PREDICTION_MANIFEST,
+) -> str:
+    manifest = _load_json(path, name="adapted prediction manifest")
+    provenance = manifest.get("provenance")
+    source_commit = (
+        provenance.get("source_commit") if isinstance(provenance, Mapping) else None
+    )
+    if not isinstance(source_commit, str) or re.fullmatch(
+        r"[0-9a-f]{40}", source_commit
+    ) is None:
+        raise AdaptationRunError(
+            "adapted prediction manifest source commit is invalid"
+        )
+    return source_commit
+
+
 def _publish_exact(path: Path, payload: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists() or path.is_symlink():
@@ -496,7 +513,12 @@ def build_adapted_sidecar_manifest(
     return manifest
 
 
-def _build_adapted_setup(*, metadata_path: Path, device_name: str | None):
+def _build_adapted_setup(
+    *,
+    metadata_path: Path,
+    device_name: str | None,
+    source_commit: str | None = None,
+):
     from omegaconf import OmegaConf
 
     from scripts import reviewer_closure_training
@@ -532,10 +554,12 @@ def _build_adapted_setup(*, metadata_path: Path, device_name: str | None):
         "t3_adaptation_recipe": reviewer_closure_training.RECIPE_PATH.read_bytes(),
         "phase_ii_evaluation": PHASE_II_CONFIG.read_bytes(),
     }
-    source_commit = _git_head()
+    provenance_source_commit = (
+        source_commit if source_commit is not None else _git_head()
+    )
     setup.full_provenance = build_adapted_provenance(
         checkpoint_path=ADAPTED_CHECKPOINT,
-        source_commit=source_commit,
+        source_commit=provenance_source_commit,
         config_documents=documents,
         protocol_sha256=str(setup.full_provenance["protocol_sha256"]),
     )
@@ -642,9 +666,15 @@ def run_finalize(*, metadata_path: Path) -> dict[str, object]:
         write_full_history_cache_manifest,
     )
 
+    inference_source_commit = (
+        _prediction_inference_source_commit()
+        if PREDICTION_MANIFEST.is_file() and not PREDICTION_MANIFEST.is_symlink()
+        else _git_head()
+    )
     setup, system_manifest, training = _build_adapted_setup(
         metadata_path=metadata_path,
         device_name=None,
+        source_commit=inference_source_commit,
     )
     expected = _expected_keys(system_manifest)
     predictions = discover_full_history_cache_entries(
@@ -669,7 +699,7 @@ def run_finalize(*, metadata_path: Path) -> dict[str, object]:
         entries=sidecars,
         expected_keys=expected,
         prediction_manifest=prediction_manifest,
-        source_commit=_git_head(),
+        source_commit=inference_source_commit,
         cache_directory=SIDECAR_ENTRIES,
     )
     _publish_exact(SIDECAR_MANIFEST, _canonical_json_bytes(sidecar_manifest))
@@ -715,7 +745,7 @@ def _read_typed_csv(path: str | Path) -> list[dict[str, object]]:
         "error_type",
         "error_message",
     }
-    boolean_fields = {"sign_consistent"}
+    boolean_fields = {"complete_cluster_population", "sign_consistent"}
     integer_fields = {
         "horizon",
         "sequence_count",
@@ -732,6 +762,13 @@ def _read_typed_csv(path: str | Path) -> list[dict[str, object]]:
         "update_scan_count",
         "update_point_count",
         "cumulative_scan_count",
+        "reference_scene_count",
+        "cluster_count",
+        "missing_cluster_count",
+        "pair_count",
+        "bootstrap_replicates",
+        "seed",
+        "remaining_cluster_count",
     }
     try:
         with source.open("r", encoding="utf-8", newline="") as handle:
@@ -899,16 +936,18 @@ def run_evaluate(*, metadata_path: Path) -> dict[str, object]:
         compute_causal_task_metrics,
     )
 
+    inference_source_commit = _prediction_inference_source_commit()
     setup, system_manifest, training = _build_adapted_setup(
         metadata_path=metadata_path,
         device_name=None,
+        source_commit=inference_source_commit,
     )
     expected = _expected_keys(system_manifest)
     source_commit = _git_head()
     prediction_manifest, sidecar_manifest = _validate_adapted_manifests(
         expected_keys=expected,
         expected_provenance=setup.full_provenance,
-        source_commit=source_commit,
+        source_commit=inference_source_commit,
     )
     prediction_entries = {
         _manifest_identity(entry["key"]): entry
@@ -1021,6 +1060,7 @@ def run_evaluate(*, metadata_path: Path) -> dict[str, object]:
         "paper_name": "ReScene4D T2-to-T3 Horizon-Adapted",
         "selected_level": 2,
         "source_commit": source_commit,
+        "inference_source_commit": inference_source_commit,
         "checkpoint_sha256": training["checkpoint_sha256"],
         "training_manifest_content_sha256": training[
             "training_manifest_content_sha256"

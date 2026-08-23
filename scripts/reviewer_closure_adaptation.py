@@ -731,7 +731,16 @@ def build_gate_ii_evidence(
                 "ci_upper": _finite(
                     bootstrap_row.get("ci_upper"), name="cluster CI upper"
                 ),
+                "complete_cluster_population": (
+                    bootstrap_row.get("reference_scene_count") == 6
+                    and bootstrap_row.get("cluster_count") == 6
+                    and bootstrap_row.get("missing_cluster_count") == 0
+                ),
             }
+            order_complete = order[key].get("complete_cluster_population") is True
+            loso_complete = all(
+                row.get("remaining_cluster_count") == 5 for row in loso[key]
+            )
             if metric in TASK_STATISTICAL_METRICS:
                 challenger = result_index[("FullHistoryAdaptedB2", horizon)]
                 baseline = result_index[("Persist4D", horizon)]
@@ -742,8 +751,10 @@ def build_gate_ii_evidence(
                     {
                         **common,
                         "pooled_difference": pooled_difference,
-                        "order_consistent": all(value > 0 for value in order_differences),
-                        "loso_consistent": all(value > 0 for value in loso_differences),
+                        "order_consistent": order_complete
+                        and all(value > 0 for value in order_differences),
+                        "loso_consistent": loso_complete
+                        and all(value > 0 for value in loso_differences),
                     }
                 )
             else:
@@ -755,10 +766,12 @@ def build_gate_ii_evidence(
                 identity_evidence.append(
                     {
                         **common,
-                        "order_consistent": all(
+                        "order_consistent": order_complete
+                        and all(
                             persist_direction(value) for value in order_differences
                         ),
-                        "loso_consistent": all(
+                        "loso_consistent": loso_complete
+                        and all(
                             persist_direction(value) for value in loso_differences
                         ),
                     }
@@ -817,14 +830,14 @@ def _finite(value: object, *, name: str) -> float:
     return result
 
 
-def _metric_value(rows: Sequence[Mapping[str, object]], metric: str) -> float:
+def _metric_value(
+    rows: Sequence[Mapping[str, object]], metric: str
+) -> float | None:
     if metric in TASK_STATISTICAL_METRICS:
         return float(np.mean([_finite(row.get(metric), name=metric) for row in rows]))
     if metric in IDENTITY_STATISTICAL_METRICS:
         value = aggregate_identity_metrics(rows)[metric]
-        if value is None:
-            raise AdaptationEvidenceError(f"identity metric {metric} is missing")
-        return float(value)
+        return None if value is None else float(value)
     raise AdaptationEvidenceError(f"unsupported Phase II metric: {metric}")
 
 
@@ -872,28 +885,14 @@ def _paired_cluster_values(
                 "pair_count": len(cells[(reference, challenger)]),
                 "challenger_value": challenger_value,
                 "baseline_value": baseline_value,
-                "difference": challenger_value - baseline_value,
+                "difference": (
+                    None
+                    if challenger_value is None or baseline_value is None
+                    else challenger_value - baseline_value
+                ),
             }
         )
     return result
-
-
-def _selected_rows(
-    rows: Sequence[Mapping[str, object]],
-    *,
-    method: str,
-    horizon: int,
-    references: set[str] | None = None,
-    order: str | None = None,
-) -> list[Mapping[str, object]]:
-    return [
-        row
-        for row in rows
-        if row.get("method_id") == method
-        and row.get("horizon") == horizon
-        and (references is None or row.get("reference_scene_id") in references)
-        and (order is None or row.get("order_id") == order)
-    ]
 
 
 def paired_phase_ii_statistics(
@@ -921,16 +920,28 @@ def paired_phase_ii_statistics(
                 metric=metric,
                 horizon=horizon,
             )
+            finite_clusters = [row for row in clusters if row["difference"] is not None]
+            if not finite_clusters:
+                raise AdaptationEvidenceError(
+                    f"paired metric {metric} has no finite clusters"
+                )
             differences = np.asarray(
-                [float(row["difference"]) for row in clusters], dtype=np.float64
+                [float(row["difference"]) for row in finite_clusters],
+                dtype=np.float64,
             )
-            indices = rng.integers(0, 6, size=(replicates, 6))
+            indices = rng.integers(
+                0,
+                len(finite_clusters),
+                size=(replicates, len(finite_clusters)),
+            )
             samples = differences[indices].mean(axis=1)
             challenger_mean = float(
-                np.mean([float(row["challenger_value"]) for row in clusters])
+                np.mean(
+                    [float(row["challenger_value"]) for row in finite_clusters]
+                )
             )
             baseline_mean = float(
-                np.mean([float(row["baseline_value"]) for row in clusters])
+                np.mean([float(row["baseline_value"]) for row in finite_clusters])
             )
             difference = challenger_mean - baseline_mean
             bootstrap.append(
@@ -939,8 +950,12 @@ def paired_phase_ii_statistics(
                     "baseline_method_id": baseline_method_id,
                     "metric": metric,
                     "horizon": horizon,
-                    "cluster_count": 6,
-                    "pair_count": sum(int(row["pair_count"]) for row in clusters),
+                    "reference_scene_count": len(clusters),
+                    "cluster_count": len(finite_clusters),
+                    "missing_cluster_count": len(clusters) - len(finite_clusters),
+                    "pair_count": sum(
+                        int(row["pair_count"]) for row in finite_clusters
+                    ),
                     "bootstrap_replicates": replicates,
                     "seed": seed,
                     "challenger_mean": challenger_mean,
@@ -954,22 +969,31 @@ def paired_phase_ii_statistics(
                 }
             )
             per_order: dict[str, float] = {}
+            complete_by_order: dict[str, bool] = {}
             for order in ORDERS:
-                challenger_values = _selected_rows(
-                    rows,
-                    method=challenger_method_id,
+                order_clusters = _paired_cluster_values(
+                    [row for row in rows if row.get("order_id") == order],
+                    challenger=challenger_method_id,
+                    baseline=baseline_method_id,
+                    metric=metric,
                     horizon=horizon,
-                    order=order,
                 )
-                baseline_values = _selected_rows(
-                    rows,
-                    method=baseline_method_id,
-                    horizon=horizon,
-                    order=order,
+                finite_order_clusters = [
+                    row for row in order_clusters if row["difference"] is not None
+                ]
+                if not finite_order_clusters:
+                    raise AdaptationEvidenceError(
+                        f"order metric {metric} has no finite clusters"
+                    )
+                complete_by_order[order] = (
+                    len(order_clusters) == 6 and len(finite_order_clusters) == 6
                 )
-                per_order[order] = _metric_value(challenger_values, metric) - _metric_value(
-                    baseline_values, metric
+                per_order[order] = float(
+                    np.mean(
+                        [float(row["difference"]) for row in finite_order_clusters]
+                    )
                 )
+            complete_cluster_population = all(complete_by_order.values())
             order_rows.append(
                 {
                     "challenger_method_id": challenger_method_id,
@@ -979,29 +1003,26 @@ def paired_phase_ii_statistics(
                     "canonical_difference": per_order["canonical"],
                     "reverse_difference": per_order["reverse"],
                     "sha256_seed45_difference": per_order["sha256_seed45"],
-                    "sign_consistent": all(
-                        value * difference > 0 for value in per_order.values()
-                    ),
+                    "complete_cluster_population": complete_cluster_population,
+                    "sign_consistent": complete_cluster_population
+                    and all(value * difference > 0 for value in per_order.values()),
                 }
             )
             references = {str(row["reference_scene_id"]) for row in clusters}
             for dropped in sorted(references):
-                kept = references - {dropped}
-                challenger_values = _selected_rows(
-                    rows,
-                    method=challenger_method_id,
-                    horizon=horizon,
-                    references=kept,
+                kept = [
+                    row
+                    for row in clusters
+                    if row["reference_scene_id"] != dropped
+                    and row["difference"] is not None
+                ]
+                if not kept:
+                    raise AdaptationEvidenceError(
+                        f"LOSO metric {metric} has no finite clusters"
+                    )
+                loso_difference = float(
+                    np.mean([float(row["difference"]) for row in kept])
                 )
-                baseline_values = _selected_rows(
-                    rows,
-                    method=baseline_method_id,
-                    horizon=horizon,
-                    references=kept,
-                )
-                loso_difference = _metric_value(
-                    challenger_values, metric
-                ) - _metric_value(baseline_values, metric)
                 loso_rows.append(
                     {
                         "challenger_method_id": challenger_method_id,
@@ -1009,9 +1030,11 @@ def paired_phase_ii_statistics(
                         "metric": metric,
                         "horizon": horizon,
                         "dropped_reference_scene_id": dropped,
-                        "remaining_cluster_count": 5,
+                        "remaining_cluster_count": len(kept),
                         "difference": loso_difference,
-                        "sign_consistent": loso_difference * difference > 0,
+                        "sign_consistent": (
+                            len(kept) == 5 and loso_difference * difference > 0
+                        ),
                     }
                 )
     return {
@@ -1071,6 +1094,7 @@ def derive_gate_ii(
             _finite(row.get("pooled_difference"), name="pooled task difference")
             >= threshold
             and _finite(row.get("ci_lower"), name="task CI lower") > 0
+            and row.get("complete_cluster_population") is True
             and bool(row.get("order_consistent"))
             and bool(row.get("loso_consistent"))
         )
@@ -1091,13 +1115,18 @@ def derive_gate_ii(
         lower = _finite(row.get("ci_lower"), name="identity CI lower")
         upper = _finite(row.get("ci_upper"), name="identity CI upper")
         direction = lower > 0 if metric == "normalized_id_switch_rate" else upper < 0
-        if direction and bool(row.get("order_consistent")) and bool(
-            row.get("loso_consistent")
+        if (
+            direction
+            and row.get("complete_cluster_population") is True
+            and bool(row.get("order_consistent"))
+            and bool(row.get("loso_consistent"))
         ):
             robust_persist_advantages.append(
                 {"metric": metric, "horizon": horizon, "difference": difference}
             )
-    identity_gap_closed = not robust_persist_advantages
+    identity_gap_closed = all(
+        row.get("complete_cluster_population") is True for row in identity.values()
+    ) and not robust_persist_advantages
 
     compute_by_horizon: dict[int, Mapping[str, object]] = {}
     for row in compute_evidence:
