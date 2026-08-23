@@ -67,7 +67,9 @@ GATE_II_COMPUTE_EVIDENCE = (
     ARTIFACT_ROOT / "rescene_horizon_gate_ii_compute_evidence.csv"
 )
 GATE_II_PATH = ARTIFACT_ROOT / "rescene_horizon_gate_ii.json"
-ADAPTED_CHALLENGE_REPORT = ARTIFACT_ROOT / "FULL_HISTORY_ADAPTED_CHALLENGE.md"
+ADAPTED_CHALLENGE_REPORT = (
+    ARTIFACT_ROOT / "LONG_HORIZON_RESCENE_CHALLENGE_REPORT.md"
+)
 DEFAULT_METADATA = Path(os.environ.get("PERSIST4D_3RSCAN_METADATA", "3RScan.json"))
 _WINDOWS_ABSOLUTE_FRAGMENT = re.compile(
     r"(?i)(?<![A-Za-z0-9])(?:[A-Za-z]:[\\/]|\\\\[^\\/\s]+[\\/])"
