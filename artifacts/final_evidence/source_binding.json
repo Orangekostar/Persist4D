@@ -1,0 +1,45 @@
+{
+  "architecture_status": "FINAL_LOCK",
+  "baseline_source_commit": "3323cba186479b7dd4c005bebd468415b7d07a3b",
+  "baseline_source_tree": "473f356b0d42810e63b5bd55d9081c7e166bf90d",
+  "binding_commit": "301b2c6d91c42d96135650a636fe6555ced86b49",
+  "binding_tree": "3dc881dd353fd9ff66bd5b92c4e59c04783e0771",
+  "branch": "research/persist4d-final-evidence",
+  "environment": {
+    "cuda": "12.6",
+    "numpy": "2.2.6",
+    "pytest": "8.4.2",
+    "python": "3.10.20",
+    "pytorch_lightning": "2.6.5",
+    "scipy": "1.15.3",
+    "torch": "2.6.0+cu126"
+  },
+  "frozen_inputs": {
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "p6a_config_sha256": "dd7a9fccc098fc7e5faecc059d6202ca7f8a762aaee3e7182738a2d7f800aac2",
+    "protocol_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+    "system_config_sha256": "aadca1c1608bae4ad4e812a6261536d9e386a85c460bbd85f4c5d215c9a68717",
+    "system_manifest_file_sha256": "a7186318d329f5907ff3c67d37671359d2a81d058d5dea817c0ca53af2e783e8"
+  },
+  "hardware": {
+    "gpu_count": 3,
+    "gpu_model": "NVIDIA A40",
+    "gpu_memory_mib": 46068,
+    "shared_storage_available_bytes": 541556998144,
+    "workspace_storage_available_bytes": 129867083776
+  },
+  "remote": "git@github.com:Orangekostar/Persist4D.git",
+  "reviewer_closure": {
+    "artifact_tree": "e521be7b038b9bfb84d8461380cc9cd228f70568",
+    "final_evidence_manifest_sha256": "9ce610cb4a790cb18f9f366721c4a29db3c1c2a1330a3e6c6bc65dc8ffa552f5",
+    "manifest_sha256": "11cc6d10d529eac45e8d946fefc4e7fdda2aa18a6d1e46b25f5d249ee2053e15",
+    "system_comparison_artifact_tree": "398fe87e1d40d67e61399fd893f02dc5f5f6b7ad"
+  },
+  "schema_version": 1,
+  "scientific_trees": {
+    "datasets": "51de6a50ded506ef88b364318ff3b23d9d5aa12f",
+    "models": "2004021178165470d5ae8e6e9cc589e9e6700f58",
+    "scripts": "90a24ef23e57a12acb3d3cce1ada0cf682f50279"
+  },
+  "status": "pass"
+}
