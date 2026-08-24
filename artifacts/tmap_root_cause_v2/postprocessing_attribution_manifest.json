@@ -1,0 +1,34 @@
+{
+  "analysis_source_commit": "b55e158b42f6bd81b38290878cd85c3c57665cde",
+  "cache_manifest_sha256": "f525252cd306f29e7db80788e4d5c773d2a35c8767d5eaa63b189740ea212182",
+  "cache_source_commit": "1a06240453bceb018e00b08dd362e6829a13f2ce",
+  "full_history_manifest_sha256": "6af9dd7412c1dafa438b8b40f8fe694be73a69835e8922c938efdadb2e4d1063",
+  "interpretation": "pairwise_diagnostics_not_additive_causal_decomposition",
+  "methods": {
+    "F0": "FullHistory official task prediction",
+    "L0": "Local official candidates without persistent identity",
+    "L1": "Legacy raw-observation conversion without persistent identity",
+    "P0": "Legacy raw-observation conversion with B4 identity",
+    "P1": "V2 official candidates with B4 identity"
+  },
+  "outputs": {
+    "POSTPROCESSING_ATTRIBUTION.md": "44b69b62fdb93fd866674c0d453f42f3009111bd9133f80ad4154c95be7f2989",
+    "postprocessing_attribution.csv": "f55675e19a499dfa6cd09c7e1c9947a2fab3ba4a78068aeaa49967329ad646b0"
+  },
+  "population": {
+    "horizons": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "masters": 43,
+    "orders": [
+      "canonical",
+      "reverse",
+      "sha256_seed45"
+    ]
+  },
+  "schema_version": 1,
+  "status": "pass"
+}
