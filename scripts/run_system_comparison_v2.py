@@ -366,22 +366,37 @@ def run_v2_cache(
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run System Comparison V2.")
-    parser.add_argument("stage", choices=("cache",))
+    parser.add_argument("stage", choices=("cache", "analyze"))
     parser.add_argument("--metadata", type=Path, default=DEFAULT_METADATA)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)
     parser.add_argument("--artifact-root", type=Path, default=ARTIFACT_ROOT)
+    parser.add_argument(
+        "--cache-manifest",
+        type=Path,
+        default=ARTIFACT_ROOT / "cache_manifest.json",
+    )
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = _parser().parse_args(argv)
-    result = run_v2_cache(
-        metadata_path=arguments.metadata,
-        device_name=arguments.device,
-        cache_root=arguments.cache_root,
-        artifact_root=arguments.artifact_root,
-    )
+    if arguments.stage == "cache":
+        result = run_v2_cache(
+            metadata_path=arguments.metadata,
+            device_name=arguments.device,
+            cache_root=arguments.cache_root,
+            artifact_root=arguments.artifact_root,
+        )
+    else:
+        from scripts.system_comparison_v2_analysis import run_v2_analysis
+
+        result = run_v2_analysis(
+            metadata_path=arguments.metadata,
+            cache_root=arguments.cache_root,
+            cache_manifest_path=arguments.cache_manifest,
+            output_root=arguments.artifact_root,
+        )
     print(json.dumps(result, allow_nan=False, sort_keys=True))
     return 0
 
