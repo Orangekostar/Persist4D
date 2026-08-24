@@ -1,0 +1,823 @@
+{
+  "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+  "comparisons": {
+    "frozen_encoder_mode": {
+      "gradient": {
+        "cosine_similarity": 0.5571237802505493,
+        "element_count": 80915,
+        "left_norm": 19.436616897583008,
+        "max_abs_difference": 1.9342886209487915,
+        "norm_ratio_right_over_left": 1.0760412879395627,
+        "right_norm": 20.914602279663086
+      },
+      "only_changed_factor": "frozen_encoder_train_vs_eval"
+    },
+    "microbatch_normalization": {
+      "accumulated": {
+        "batch_point_counts": [
+          5285,
+          5285
+        ],
+        "checkpoint_load": {
+          "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+          "optimizer_state_resumed": false,
+          "scheduler_state_resumed": false,
+          "state_dict_entry_count": 798
+        },
+        "contrastive_candidate_counts": {
+          "aux_candidates_per_layer_after_cap": [],
+          "segment_candidates_per_layer": [
+            851
+          ]
+        },
+        "effective_objective": 9.69075632095337,
+        "elapsed_seconds": 11.468118777964264,
+        "gradient_summaries": {
+          "frozen_encoder": {
+            "finite": true,
+            "max_grad_norm": 0.0,
+            "missing_grad_tensors": 453,
+            "nonzero_grad_tensors": 0,
+            "parameter_tensors": 453
+          },
+          "trainable_concerto_decoder": {
+            "finite": true,
+            "max_grad_norm": 9.412036895751953,
+            "missing_grad_tensors": 24,
+            "nonzero_grad_tensors": 224,
+            "parameter_tensors": 248
+          },
+          "trainable_objective": {
+            "finite": true,
+            "max_grad_norm": 0.0,
+            "missing_grad_tensors": 0,
+            "nonzero_grad_tensors": 0,
+            "parameter_tensors": 0
+          },
+          "trainable_rescene_decoder": {
+            "finite": true,
+            "max_grad_norm": 15.631939888000488,
+            "missing_grad_tensors": 0,
+            "nonzero_grad_tensors": 82,
+            "parameter_tensors": 82
+          },
+          "trainable_rescene_heads": {
+            "finite": true,
+            "max_grad_norm": 26.53605842590332,
+            "missing_grad_tensors": 0,
+            "nonzero_grad_tensors": 12,
+            "parameter_tensors": 12
+          }
+        },
+        "hungarian_match_count": 4,
+        "lr_trace": [
+          0.00040587282697488147,
+          2e-09
+        ],
+        "microbatch_objectives": [
+          9.597294807434082,
+          9.784217834472656
+        ],
+        "mode": "two_microbatches_accumulated",
+        "optimizer_step_count": 1,
+        "peak_allocated_vram_mib": 1004.38818359375,
+        "sample_names": [
+          "scene0112_00-scene0112_01",
+          "scene0112_00-scene0112_01"
+        ],
+        "selected_gradient_parameter_names": [
+          "model.mask_features_head.weight",
+          "model.mask_features_head.bias",
+          "model.query_projection.layers.0.weight",
+          "model.query_projection.layers.0.bias",
+          "model.query_projection.layers.2.weight",
+          "model.query_projection.layers.2.bias",
+          "model.mask_embed_head.0.weight",
+          "model.mask_embed_head.0.bias",
+          "model.mask_embed_head.2.weight",
+          "model.mask_embed_head.2.bias",
+          "model.class_embed_head.weight",
+          "model.class_embed_head.bias"
+        ]
+      },
+      "gradient": {
+        "cosine_similarity": 0.8990346193313599,
+        "element_count": 80915,
+        "left_norm": 79.41938018798828,
+        "max_abs_difference": 4.064648628234863,
+        "norm_ratio_right_over_left": 0.5567070557656223,
+        "right_norm": 44.21332931518555
+      },
+      "paper_physical_global_32_status": "hardware_infeasible_not_executed",
+      "physical": {
+        "batch_point_counts": [
+          10570
+        ],
+        "checkpoint_load": {
+          "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+          "optimizer_state_resumed": false,
+          "scheduler_state_resumed": false,
+          "state_dict_entry_count": 798
+        },
+        "contrastive_candidate_counts": {
+          "aux_candidates_per_layer_after_cap": [],
+          "segment_candidates_per_layer": [
+            851
+          ]
+        },
+        "effective_objective": 17.345672607421875,
+        "elapsed_seconds": 8.506123890168965,
+        "gradient_summaries": {
+          "frozen_encoder": {
+            "finite": true,
+            "max_grad_norm": 0.0,
+            "missing_grad_tensors": 453,
+            "nonzero_grad_tensors": 0,
+            "parameter_tensors": 453
+          },
+          "trainable_concerto_decoder": {
+            "finite": true,
+            "max_grad_norm": 13.694351196289062,
+            "missing_grad_tensors": 24,
+            "nonzero_grad_tensors": 224,
+            "parameter_tensors": 248
+          },
+          "trainable_objective": {
+            "finite": true,
+            "max_grad_norm": 0.0,
+            "missing_grad_tensors": 0,
+            "nonzero_grad_tensors": 0,
+            "parameter_tensors": 0
+          },
+          "trainable_rescene_decoder": {
+            "finite": true,
+            "max_grad_norm": 5.524893760681152,
+            "missing_grad_tensors": 0,
+            "nonzero_grad_tensors": 82,
+            "parameter_tensors": 82
+          },
+          "trainable_rescene_heads": {
+            "finite": true,
+            "max_grad_norm": 53.386653900146484,
+            "missing_grad_tensors": 0,
+            "nonzero_grad_tensors": 12,
+            "parameter_tensors": 12
+          }
+        },
+        "hungarian_match_count": 4,
+        "lr_trace": [
+          0.00040587282697488147,
+          2e-09
+        ],
+        "microbatch_objectives": [
+          17.345672607421875
+        ],
+        "mode": "physical_batch_2",
+        "optimizer_step_count": 1,
+        "peak_allocated_vram_mib": 1373.1142578125,
+        "sample_names": [
+          "scene0112_00-scene0112_01",
+          "scene0112_00-scene0112_01"
+        ],
+        "selected_gradient_parameter_names": [
+          "model.mask_features_head.weight",
+          "model.mask_features_head.bias",
+          "model.query_projection.layers.0.weight",
+          "model.query_projection.layers.0.bias",
+          "model.query_projection.layers.2.weight",
+          "model.query_projection.layers.2.bias",
+          "model.mask_embed_head.0.weight",
+          "model.mask_embed_head.0.bias",
+          "model.mask_embed_head.2.weight",
+          "model.mask_embed_head.2.bias",
+          "model.class_embed_head.weight",
+          "model.class_embed_head.bias"
+        ]
+      }
+    },
+    "objective_semantics": {
+      "gradient": {
+        "cosine_similarity": 0.7653270363807678,
+        "element_count": 80915,
+        "left_norm": 19.436616897583008,
+        "max_abs_difference": 1.3064030408859253,
+        "norm_ratio_right_over_left": 0.31413445124987915,
+        "right_norm": 6.105710983276367
+      },
+      "only_changed_factor": "weighted_vs_public_raw_sum"
+    }
+  },
+  "paths": {
+    "P2R-0": {
+      "checkpoint_load": {
+        "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+        "optimizer_state_resumed": false,
+        "scheduler_state_resumed": false,
+        "state_dict_entry_count": 798
+      },
+      "contrastive_candidate_counts": {
+        "aux_candidates_per_layer_after_cap": [],
+        "segment_candidates_per_layer": [
+          426
+        ]
+      },
+      "decoder_training": true,
+      "elapsed_seconds": 23.184161795303226,
+      "embedding_training": true,
+      "encoder_training": true,
+      "frozen_encoder_eval": false,
+      "gradient_summaries": {
+        "frozen_encoder": {
+          "finite": true,
+          "max_grad_norm": 0.0,
+          "missing_grad_tensors": 453,
+          "nonzero_grad_tensors": 0,
+          "parameter_tensors": 453
+        },
+        "trainable_concerto_decoder": {
+          "finite": true,
+          "max_grad_norm": 11.08659839630127,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 248,
+          "parameter_tensors": 248
+        },
+        "trainable_objective": {
+          "finite": true,
+          "max_grad_norm": 0.0,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 0,
+          "parameter_tensors": 0
+        },
+        "trainable_rescene_decoder": {
+          "finite": true,
+          "max_grad_norm": 4.944634437561035,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 82,
+          "parameter_tensors": 82
+        },
+        "trainable_rescene_heads": {
+          "finite": true,
+          "max_grad_norm": 12.699265480041504,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 12,
+          "parameter_tensors": 12
+        }
+      },
+      "input_provenance": {
+        "change_ground_truth": {
+          "reference": "repo:data/processed/rio/change_gt/train/scene0112_00-scene0112_01.txt",
+          "sha256": "75baf0a2d41956bd7d8c27b2a4257f5b8e606ab7a43a3436cc1bce07cbe0003c"
+        },
+        "change_label_database": {
+          "reference": "repo:data/processed/rio/change_label_database.yaml",
+          "sha256": "593e8c5d18883b9bd97a926e786b000425320b6d746f055d1aab5e54439814f1"
+        },
+        "color_statistics": {
+          "reference": "repo:data/processed/rio/color_mean_std.yaml",
+          "sha256": "c1a388cf2fbfd60703ec06bc81864e103895120c37a477cc6ad51f393dd7eb78"
+        },
+        "dataset": "3RScan",
+        "instance_ground_truth": [
+          {
+            "reference": "repo:data/processed/rio/instance_gt/train/scene0112_00.txt",
+            "sha256": "f5f9df1505fc72d23ca6c70b5180e6dffe6588a72d474feae9f072673b37f7a3"
+          },
+          {
+            "reference": "repo:data/processed/rio/instance_gt/train/scene0112_01.txt",
+            "sha256": "1aa55e3012f1cfe6e19def7caa0af67383d8311710c98465b3f47b5feb921b5a"
+          }
+        ],
+        "processed_point_clouds": [
+          {
+            "reference": "repo:data/processed/rio/train/0112_00.npy",
+            "sha256": "ecbbbc3fbcd52a3f752c43b8c983d3fb204206bc22549219d294be240a27b362"
+          },
+          {
+            "reference": "repo:data/processed/rio/train/0112_01.npy",
+            "sha256": "213b69bffc52948f7934f0a21c3e6c48be7180ff68487cb79bf5b64ffd75cd78"
+          }
+        ],
+        "resolved_composed_config": {
+          "format": "canonical-json-sort-keys-v1",
+          "portable_references": true,
+          "serialized_bytes": 9448,
+          "sha256": "5bdd5ae62aab766900a51e5e18da97ab49ebf1bec9418f161edb502ae343d12f"
+        },
+        "sample_name": "scene0112_00-scene0112_01",
+        "semantic_label_database": {
+          "reference": "repo:data/processed/rio/label_database.yaml",
+          "sha256": "b03b15ecd0791a0ecd05912e9fe5617dd29a466d117cf5c2188f28638293a063"
+        },
+        "sequence_database": {
+          "reference": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
+          "sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416"
+        },
+        "split_database": {
+          "reference": "repo:data/processed/rio/train_database.yaml",
+          "sha256": "9bb033e9e1e81c5f89e6e9f170392f95e930c9362ac83ac04c549a8b9a9c0ab0"
+        },
+        "temporal_window": 2,
+        "train_augmentations": {
+          "image": {
+            "reference": "repo:conf/augmentation/albumentations_aug.yaml",
+            "sha256": "0ee794f06cfa1552423ea6e51cec64d905e32dd27e63cc48defba9b17753d587"
+          },
+          "volume": {
+            "reference": "repo:conf/augmentation/volumentations_aug.yaml",
+            "sha256": "1ff353485c25fb37cf89776a60921c40d257bf627d9f89f8665ef49cc1e85cd4"
+          }
+        }
+      },
+      "loss_components": {
+        "loss_aux_contrastive": 0.0,
+        "loss_ce": 0.0003053259861189872,
+        "loss_ce_0": 0.7471390962600708,
+        "loss_ce_1": 0.14362648129463196,
+        "loss_ce_10": 0.000958624470513314,
+        "loss_ce_11": 0.001413419609889388,
+        "loss_ce_2": 0.09318242222070694,
+        "loss_ce_3": 0.022248543798923492,
+        "loss_ce_4": 0.0004685244057327509,
+        "loss_ce_5": 0.0006209446582943201,
+        "loss_ce_6": 0.0008698911406099796,
+        "loss_ce_7": 0.001587835606187582,
+        "loss_ce_8": 0.0003090806712862104,
+        "loss_ce_9": 0.0004892359720543027,
+        "loss_dice": 0.030067801475524902,
+        "loss_dice_0": 0.5446355938911438,
+        "loss_dice_1": 0.04592981934547424,
+        "loss_dice_10": 0.030217081308364868,
+        "loss_dice_11": 0.03172317147254944,
+        "loss_dice_2": 0.03561586141586304,
+        "loss_dice_3": 0.030570894479751587,
+        "loss_dice_4": 0.030062228441238403,
+        "loss_dice_5": 0.029726505279541016,
+        "loss_dice_6": 0.03023618459701538,
+        "loss_dice_7": 0.03209999203681946,
+        "loss_dice_8": 0.03021278977394104,
+        "loss_dice_9": 0.029737889766693115,
+        "loss_mask": 0.04811403900384903,
+        "loss_mask_0": 0.6346836686134338,
+        "loss_mask_1": 0.05980785936117172,
+        "loss_mask_10": 0.04706776142120361,
+        "loss_mask_11": 0.05023576691746712,
+        "loss_mask_2": 0.04742978513240814,
+        "loss_mask_3": 0.050804268568754196,
+        "loss_mask_4": 0.04892238229513168,
+        "loss_mask_5": 0.04961033910512924,
+        "loss_mask_6": 0.047538742423057556,
+        "loss_mask_7": 0.051051583141088486,
+        "loss_mask_8": 0.04825279116630554,
+        "loss_mask_9": 0.04869067668914795,
+        "loss_segment_contrastive": 0.025334849953651428,
+        "loss_segment_contrastive_layer0": 0.025334849953651428
+      },
+      "lr_trace": [
+        0.00040587282697488147,
+        2e-09
+      ],
+      "matching": {
+        "classification_accuracy": 1.0,
+        "matched_instances": 2,
+        "mean_dice": 0.9698119759559631
+      },
+      "objective": 10.074492454528809,
+      "objective_mode": "weighted",
+      "optimizer_step_count": 1,
+      "peak_allocated_vram_mib": 970.1005859375,
+      "sample": {
+        "name": "scene0112_00-scene0112_01",
+        "raw_points": 8977,
+        "supervised_instances": 2,
+        "temporal_stages": [
+          0,
+          1
+        ],
+        "voxels": 5285
+      },
+      "selected_gradient_parameter_names": [
+        "model.mask_features_head.weight",
+        "model.mask_features_head.bias",
+        "model.query_projection.layers.0.weight",
+        "model.query_projection.layers.0.bias",
+        "model.query_projection.layers.2.weight",
+        "model.query_projection.layers.2.bias",
+        "model.mask_embed_head.0.weight",
+        "model.mask_embed_head.0.bias",
+        "model.mask_embed_head.2.weight",
+        "model.mask_embed_head.2.bias",
+        "model.class_embed_head.weight",
+        "model.class_embed_head.bias"
+      ]
+    },
+    "P2R-A": {
+      "checkpoint_load": {
+        "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+        "optimizer_state_resumed": false,
+        "scheduler_state_resumed": false,
+        "state_dict_entry_count": 798
+      },
+      "contrastive_candidate_counts": {
+        "aux_candidates_per_layer_after_cap": [],
+        "segment_candidates_per_layer": [
+          426
+        ]
+      },
+      "decoder_training": true,
+      "elapsed_seconds": 9.461976513732225,
+      "embedding_training": false,
+      "encoder_training": false,
+      "frozen_encoder_eval": true,
+      "gradient_summaries": {
+        "frozen_encoder": {
+          "finite": true,
+          "max_grad_norm": 0.0,
+          "missing_grad_tensors": 453,
+          "nonzero_grad_tensors": 0,
+          "parameter_tensors": 453
+        },
+        "trainable_concerto_decoder": {
+          "finite": true,
+          "max_grad_norm": 8.852167129516602,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 248,
+          "parameter_tensors": 248
+        },
+        "trainable_objective": {
+          "finite": true,
+          "max_grad_norm": 0.0,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 0,
+          "parameter_tensors": 0
+        },
+        "trainable_rescene_decoder": {
+          "finite": true,
+          "max_grad_norm": 7.628612518310547,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 82,
+          "parameter_tensors": 82
+        },
+        "trainable_rescene_heads": {
+          "finite": true,
+          "max_grad_norm": 14.181269645690918,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 12,
+          "parameter_tensors": 12
+        }
+      },
+      "input_provenance": {
+        "change_ground_truth": {
+          "reference": "repo:data/processed/rio/change_gt/train/scene0112_00-scene0112_01.txt",
+          "sha256": "75baf0a2d41956bd7d8c27b2a4257f5b8e606ab7a43a3436cc1bce07cbe0003c"
+        },
+        "change_label_database": {
+          "reference": "repo:data/processed/rio/change_label_database.yaml",
+          "sha256": "593e8c5d18883b9bd97a926e786b000425320b6d746f055d1aab5e54439814f1"
+        },
+        "color_statistics": {
+          "reference": "repo:data/processed/rio/color_mean_std.yaml",
+          "sha256": "c1a388cf2fbfd60703ec06bc81864e103895120c37a477cc6ad51f393dd7eb78"
+        },
+        "dataset": "3RScan",
+        "instance_ground_truth": [
+          {
+            "reference": "repo:data/processed/rio/instance_gt/train/scene0112_00.txt",
+            "sha256": "f5f9df1505fc72d23ca6c70b5180e6dffe6588a72d474feae9f072673b37f7a3"
+          },
+          {
+            "reference": "repo:data/processed/rio/instance_gt/train/scene0112_01.txt",
+            "sha256": "1aa55e3012f1cfe6e19def7caa0af67383d8311710c98465b3f47b5feb921b5a"
+          }
+        ],
+        "processed_point_clouds": [
+          {
+            "reference": "repo:data/processed/rio/train/0112_00.npy",
+            "sha256": "ecbbbc3fbcd52a3f752c43b8c983d3fb204206bc22549219d294be240a27b362"
+          },
+          {
+            "reference": "repo:data/processed/rio/train/0112_01.npy",
+            "sha256": "213b69bffc52948f7934f0a21c3e6c48be7180ff68487cb79bf5b64ffd75cd78"
+          }
+        ],
+        "resolved_composed_config": {
+          "format": "canonical-json-sort-keys-v1",
+          "portable_references": true,
+          "serialized_bytes": 9447,
+          "sha256": "95b170eb792794a91607d6717835f42a062f21d7525364588a8c8088882254ad"
+        },
+        "sample_name": "scene0112_00-scene0112_01",
+        "semantic_label_database": {
+          "reference": "repo:data/processed/rio/label_database.yaml",
+          "sha256": "b03b15ecd0791a0ecd05912e9fe5617dd29a466d117cf5c2188f28638293a063"
+        },
+        "sequence_database": {
+          "reference": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
+          "sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416"
+        },
+        "split_database": {
+          "reference": "repo:data/processed/rio/train_database.yaml",
+          "sha256": "9bb033e9e1e81c5f89e6e9f170392f95e930c9362ac83ac04c549a8b9a9c0ab0"
+        },
+        "temporal_window": 2,
+        "train_augmentations": {
+          "image": {
+            "reference": "repo:conf/augmentation/albumentations_aug.yaml",
+            "sha256": "0ee794f06cfa1552423ea6e51cec64d905e32dd27e63cc48defba9b17753d587"
+          },
+          "volume": {
+            "reference": "repo:conf/augmentation/volumentations_aug.yaml",
+            "sha256": "1ff353485c25fb37cf89776a60921c40d257bf627d9f89f8665ef49cc1e85cd4"
+          }
+        }
+      },
+      "loss_components": {
+        "loss_aux_contrastive": 0.0,
+        "loss_ce": 0.0002437671646475792,
+        "loss_ce_0": 0.7471390962600708,
+        "loss_ce_1": 0.13764862716197968,
+        "loss_ce_10": 0.0009889556095004082,
+        "loss_ce_11": 0.001049533486366272,
+        "loss_ce_2": 0.10388530790805817,
+        "loss_ce_3": 0.005832256283611059,
+        "loss_ce_4": 0.0003772831696551293,
+        "loss_ce_5": 0.00043174816528335214,
+        "loss_ce_6": 0.0007687690085731447,
+        "loss_ce_7": 0.0011321596102789044,
+        "loss_ce_8": 0.00025858133449219167,
+        "loss_ce_9": 0.00040930823888629675,
+        "loss_dice": 0.028615117073059082,
+        "loss_dice_0": 0.5158007144927979,
+        "loss_dice_1": 0.027592062950134277,
+        "loss_dice_10": 0.029451072216033936,
+        "loss_dice_11": 0.02799287438392639,
+        "loss_dice_2": 0.027597397565841675,
+        "loss_dice_3": 0.027263551950454712,
+        "loss_dice_4": 0.028421789407730103,
+        "loss_dice_5": 0.028008580207824707,
+        "loss_dice_6": 0.02873167395591736,
+        "loss_dice_7": 0.028088867664337158,
+        "loss_dice_8": 0.028724104166030884,
+        "loss_dice_9": 0.028377264738082886,
+        "loss_mask": 0.038544610142707825,
+        "loss_mask_0": 0.6373252868652344,
+        "loss_mask_1": 0.03968605399131775,
+        "loss_mask_10": 0.03981608524918556,
+        "loss_mask_11": 0.041953593492507935,
+        "loss_mask_2": 0.04861772060394287,
+        "loss_mask_3": 0.043433599174022675,
+        "loss_mask_4": 0.03922206535935402,
+        "loss_mask_5": 0.03950962424278259,
+        "loss_mask_6": 0.041351187974214554,
+        "loss_mask_7": 0.04186621680855751,
+        "loss_mask_8": 0.038451842963695526,
+        "loss_mask_9": 0.03894338384270668,
+        "loss_segment_contrastive": 0.02256385050714016,
+        "loss_segment_contrastive_layer0": 0.02256385050714016
+      },
+      "lr_trace": [
+        0.00040587282697488147,
+        2e-09
+      ],
+      "matching": {
+        "classification_accuracy": 1.0,
+        "matched_instances": 2,
+        "mean_dice": 0.9712643325328827
+      },
+      "objective": 9.375829696655273,
+      "objective_mode": "weighted",
+      "optimizer_step_count": 1,
+      "peak_allocated_vram_mib": 975.33837890625,
+      "sample": {
+        "name": "scene0112_00-scene0112_01",
+        "raw_points": 8977,
+        "supervised_instances": 2,
+        "temporal_stages": [
+          0,
+          1
+        ],
+        "voxels": 5285
+      },
+      "selected_gradient_parameter_names": [
+        "model.mask_features_head.weight",
+        "model.mask_features_head.bias",
+        "model.query_projection.layers.0.weight",
+        "model.query_projection.layers.0.bias",
+        "model.query_projection.layers.2.weight",
+        "model.query_projection.layers.2.bias",
+        "model.mask_embed_head.0.weight",
+        "model.mask_embed_head.0.bias",
+        "model.mask_embed_head.2.weight",
+        "model.mask_embed_head.2.bias",
+        "model.class_embed_head.weight",
+        "model.class_embed_head.bias"
+      ]
+    },
+    "P2R-B": {
+      "checkpoint_load": {
+        "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+        "optimizer_state_resumed": false,
+        "scheduler_state_resumed": false,
+        "state_dict_entry_count": 798
+      },
+      "contrastive_candidate_counts": {
+        "aux_candidates_per_layer_after_cap": [],
+        "segment_candidates_per_layer": [
+          426
+        ]
+      },
+      "decoder_training": true,
+      "elapsed_seconds": 10.039747955277562,
+      "embedding_training": true,
+      "encoder_training": true,
+      "frozen_encoder_eval": false,
+      "gradient_summaries": {
+        "frozen_encoder": {
+          "finite": true,
+          "max_grad_norm": 0.0,
+          "missing_grad_tensors": 453,
+          "nonzero_grad_tensors": 0,
+          "parameter_tensors": 453
+        },
+        "trainable_concerto_decoder": {
+          "finite": true,
+          "max_grad_norm": 3.2975854873657227,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 248,
+          "parameter_tensors": 248
+        },
+        "trainable_objective": {
+          "finite": true,
+          "max_grad_norm": 0.0,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 0,
+          "parameter_tensors": 0
+        },
+        "trainable_rescene_decoder": {
+          "finite": true,
+          "max_grad_norm": 1.62870192527771,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 82,
+          "parameter_tensors": 82
+        },
+        "trainable_rescene_heads": {
+          "finite": true,
+          "max_grad_norm": 3.587409257888794,
+          "missing_grad_tensors": 0,
+          "nonzero_grad_tensors": 12,
+          "parameter_tensors": 12
+        }
+      },
+      "input_provenance": {
+        "change_ground_truth": {
+          "reference": "repo:data/processed/rio/change_gt/train/scene0112_00-scene0112_01.txt",
+          "sha256": "75baf0a2d41956bd7d8c27b2a4257f5b8e606ab7a43a3436cc1bce07cbe0003c"
+        },
+        "change_label_database": {
+          "reference": "repo:data/processed/rio/change_label_database.yaml",
+          "sha256": "593e8c5d18883b9bd97a926e786b000425320b6d746f055d1aab5e54439814f1"
+        },
+        "color_statistics": {
+          "reference": "repo:data/processed/rio/color_mean_std.yaml",
+          "sha256": "c1a388cf2fbfd60703ec06bc81864e103895120c37a477cc6ad51f393dd7eb78"
+        },
+        "dataset": "3RScan",
+        "instance_ground_truth": [
+          {
+            "reference": "repo:data/processed/rio/instance_gt/train/scene0112_00.txt",
+            "sha256": "f5f9df1505fc72d23ca6c70b5180e6dffe6588a72d474feae9f072673b37f7a3"
+          },
+          {
+            "reference": "repo:data/processed/rio/instance_gt/train/scene0112_01.txt",
+            "sha256": "1aa55e3012f1cfe6e19def7caa0af67383d8311710c98465b3f47b5feb921b5a"
+          }
+        ],
+        "processed_point_clouds": [
+          {
+            "reference": "repo:data/processed/rio/train/0112_00.npy",
+            "sha256": "ecbbbc3fbcd52a3f752c43b8c983d3fb204206bc22549219d294be240a27b362"
+          },
+          {
+            "reference": "repo:data/processed/rio/train/0112_01.npy",
+            "sha256": "213b69bffc52948f7934f0a21c3e6c48be7180ff68487cb79bf5b64ffd75cd78"
+          }
+        ],
+        "resolved_composed_config": {
+          "format": "canonical-json-sort-keys-v1",
+          "portable_references": true,
+          "serialized_bytes": 9448,
+          "sha256": "5bdd5ae62aab766900a51e5e18da97ab49ebf1bec9418f161edb502ae343d12f"
+        },
+        "sample_name": "scene0112_00-scene0112_01",
+        "semantic_label_database": {
+          "reference": "repo:data/processed/rio/label_database.yaml",
+          "sha256": "b03b15ecd0791a0ecd05912e9fe5617dd29a466d117cf5c2188f28638293a063"
+        },
+        "sequence_database": {
+          "reference": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
+          "sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416"
+        },
+        "split_database": {
+          "reference": "repo:data/processed/rio/train_database.yaml",
+          "sha256": "9bb033e9e1e81c5f89e6e9f170392f95e930c9362ac83ac04c549a8b9a9c0ab0"
+        },
+        "temporal_window": 2,
+        "train_augmentations": {
+          "image": {
+            "reference": "repo:conf/augmentation/albumentations_aug.yaml",
+            "sha256": "0ee794f06cfa1552423ea6e51cec64d905e32dd27e63cc48defba9b17753d587"
+          },
+          "volume": {
+            "reference": "repo:conf/augmentation/volumentations_aug.yaml",
+            "sha256": "1ff353485c25fb37cf89776a60921c40d257bf627d9f89f8665ef49cc1e85cd4"
+          }
+        }
+      },
+      "loss_components": {
+        "loss_aux_contrastive": 0.0,
+        "loss_ce": 0.0003053259861189872,
+        "loss_ce_0": 0.7471390962600708,
+        "loss_ce_1": 0.14362648129463196,
+        "loss_ce_10": 0.000958624470513314,
+        "loss_ce_11": 0.001413419609889388,
+        "loss_ce_2": 0.09318242222070694,
+        "loss_ce_3": 0.022248543798923492,
+        "loss_ce_4": 0.0004685244057327509,
+        "loss_ce_5": 0.0006209446582943201,
+        "loss_ce_6": 0.0008698911406099796,
+        "loss_ce_7": 0.001587835606187582,
+        "loss_ce_8": 0.0003090806712862104,
+        "loss_ce_9": 0.0004892359720543027,
+        "loss_dice": 0.030067801475524902,
+        "loss_dice_0": 0.5446355938911438,
+        "loss_dice_1": 0.04592981934547424,
+        "loss_dice_10": 0.030217081308364868,
+        "loss_dice_11": 0.03172317147254944,
+        "loss_dice_2": 0.03561586141586304,
+        "loss_dice_3": 0.030570894479751587,
+        "loss_dice_4": 0.030062228441238403,
+        "loss_dice_5": 0.029726505279541016,
+        "loss_dice_6": 0.03023618459701538,
+        "loss_dice_7": 0.03209999203681946,
+        "loss_dice_8": 0.03021278977394104,
+        "loss_dice_9": 0.029737889766693115,
+        "loss_mask": 0.04811403900384903,
+        "loss_mask_0": 0.6346836686134338,
+        "loss_mask_1": 0.05980785936117172,
+        "loss_mask_10": 0.04706776142120361,
+        "loss_mask_11": 0.05023576319217682,
+        "loss_mask_2": 0.04742978513240814,
+        "loss_mask_3": 0.0508042648434639,
+        "loss_mask_4": 0.04892238229513168,
+        "loss_mask_5": 0.04961033910512924,
+        "loss_mask_6": 0.047538742423057556,
+        "loss_mask_7": 0.05105157941579819,
+        "loss_mask_8": 0.04825279116630554,
+        "loss_mask_9": 0.04869067668914795,
+        "loss_segment_contrastive": 0.025334734469652176,
+        "loss_segment_contrastive_layer0": 0.025334734469652176
+      },
+      "lr_trace": [
+        0.00040587282697488147,
+        2e-09
+      ],
+      "matching": {
+        "classification_accuracy": 1.0,
+        "matched_instances": 2,
+        "mean_dice": 0.9698119759559631
+      },
+      "objective": 3.2269346714019775,
+      "objective_mode": "raw_sum",
+      "optimizer_step_count": 1,
+      "peak_allocated_vram_mib": 979.33837890625,
+      "sample": {
+        "name": "scene0112_00-scene0112_01",
+        "raw_points": 8977,
+        "supervised_instances": 2,
+        "temporal_stages": [
+          0,
+          1
+        ],
+        "voxels": 5285
+      },
+      "selected_gradient_parameter_names": [
+        "model.mask_features_head.weight",
+        "model.mask_features_head.bias",
+        "model.query_projection.layers.0.weight",
+        "model.query_projection.layers.0.bias",
+        "model.query_projection.layers.2.weight",
+        "model.query_projection.layers.2.bias",
+        "model.mask_embed_head.0.weight",
+        "model.mask_embed_head.0.bias",
+        "model.mask_embed_head.2.weight",
+        "model.mask_embed_head.2.bias",
+        "model.class_embed_head.weight",
+        "model.class_embed_head.bias"
+      ]
+    }
+  },
+  "schema_version": 1,
+  "scope": "single_real_t2_controlled_diagnostic_not_g2_evidence",
+  "seed": 45,
+  "source_commit": "8985d56dab11b5a3bfdd86fdbbf42192eb030875",
+  "status": "pass"
+}
