@@ -1,0 +1,7 @@
+record_id,source,population,order_scope,sequence_count,t_mAP,t_mAP50,t_mAP25,current_stage_AP,direct_comparison_group,notes
+R0,ReScene4D paper reported,official T2 benchmark,paper_reported,,0.348,0.525,0.668,,official_like_t2,reference only; paper-reported result
+R1,P2_G2_REPRODUCTION_REPORT.md,official-like supervised T2 validation,P2 sliding-T2,154,0.27939,0.46565,0.60945,,official_like_t2,authoritative single-GPU P2 reproduction
+R2,System Comparison V1 frozen CSV,Protocol B common-T5 masters,canonical,43,0.20722658932209015,0.3289628326892853,0.5393747687339783,0.36980727314949036,protocol_b_t2,official stmetrics; Protocol-B causal-prefix construction
+R3,System Comparison V1 frozen CSV,Protocol B common-T5 masters,reverse,43,0.21109874546527863,0.3429367244243622,0.5463166832923889,0.3819788098335266,protocol_b_t2,official stmetrics; Protocol-B causal-prefix construction
+R4,System Comparison V1 frozen CSV,Protocol B common-T5 masters,sha256_seed45,43,0.1711808741092682,0.24638503789901733,0.4208407700061798,0.407415509223938,protocol_b_t2,official stmetrics; Protocol-B causal-prefix construction
+R5,System Comparison V1 frozen CSV,Protocol B common-T5 masters,three_order_pooled,129,0.19099636375904083,0.2987154722213745,0.4959089159965515,0.37085068225860596,protocol_b_t2,official stmetrics; Protocol-B causal-prefix construction
