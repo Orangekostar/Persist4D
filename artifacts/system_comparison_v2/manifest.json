@@ -1,0 +1,56 @@
+{
+  "analysis_source_commit": "0503b0722489cb0c4b578f439453f45bfbf4c1d7",
+  "cache_manifest_sha256": "f525252cd306f29e7db80788e4d5c773d2a35c8767d5eaa63b189740ea212182",
+  "cache_source_commit": "1a06240453bceb018e00b08dd362e6829a13f2ce",
+  "causal_commitment": "latest_stage_only_no_future_rewrite",
+  "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+  "coverage": {
+    "aggregate_row_count": 8,
+    "horizons": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "methods": [
+      "FullHistory",
+      "Persist4D-V2"
+    ],
+    "per_order_row_count": 24,
+    "per_sequence_row_count": 1032,
+    "sequence_count": 129
+  },
+  "frozen_v1_inputs": {
+    "aggregate_results_sha256": "c70000d35e9d661c9929d25a465d287f778fc594b49fb596aa36d956e68f73a0",
+    "per_order_results_sha256": "6d950fa97da08892f5e86c08a6ff24e7710ff5090e46a664e4cb8394d8a64705",
+    "per_sequence_results_sha256": "0071913ca5616d9bce61fa8c89f96b788d5e8cf81fe77e17ef97d7525cd4c209"
+  },
+  "full_history_task_regression_max_abs_diff": 0.0,
+  "identity_metric_source": "frozen_v1_raw_query_b4_path",
+  "identity_regression_status": "pass_exact",
+  "outputs": {
+    "OLD_VS_V2_ATTRIBUTION.md": {
+      "bytes": 1190,
+      "sha256": "88a7283e1d7fac4ea86ea7786cdcd8dcd44313a87b71a2b8e2d33959cc93ab3a"
+    },
+    "aggregate_results.csv": {
+      "bytes": 3203,
+      "sha256": "20875d32712062660d8ff9b441b2ecc1f41919b924a64cb2b66f7dbe08a34ab0"
+    },
+    "per_order_results.csv": {
+      "bytes": 8560,
+      "sha256": "a520fdccc6e31d4075c0ef2f122151a4881758a648bec8d22cad0d9f6c3d7a8f"
+    },
+    "per_sequence_results.csv": {
+      "bytes": 377794,
+      "sha256": "f8d7b325c3075edfd7ca45cc22b5fbaa65dd10773f31a426e52eac0dde3837b0"
+    }
+  },
+  "persistent_key_semantics": "track_id_plus_official_class_id",
+  "protocol_manifest_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "schema_version": 2,
+  "score_reducer": "mean",
+  "status": "pass",
+  "task_candidate_semantics": "official_local_candidates",
+  "unmatched_candidate_semantics": "stage_local_ephemeral_retained"
+}
