@@ -1,0 +1,25 @@
+{
+  "checkpoint": {
+    "bytes": 754917862,
+    "path": "checkpoints/rescene4d_concerto_t2_repro.ckpt",
+    "sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e"
+  },
+  "frozen_inputs": {
+    "artifacts/P2/config_audit.md": "1d76568fb060d959a7ba3a5d660d2ca45ece19108615e6df2249e09912f17b08",
+    "artifacts/P2/environment_manifest.json": "cb700278ee69ad1800b47af8bfb9f21e621b320abc2843ba2947528964290cda",
+    "artifacts/P2_G2_REPRODUCTION_REPORT.md": "d891fb7fd53306d8ab65db81b9bb85f08664a9689de850ac7836143b238816bc",
+    "conf/config_p2_rescene4d_concerto_t2.yaml": "3077e89b9bca60049e1551654d5b3df78178d5647d84f0037bcb7ab91807c443"
+  },
+  "metrics_percent": {
+    "overall_mAP": 36.314,
+    "stage1_mAP": 41.398,
+    "stage2_mAP": 42.649,
+    "t_mAP": 27.939,
+    "t_mAP25": 60.945,
+    "t_mAP50": 46.565
+  },
+  "schema_version": 1,
+  "source_branch_start": "487080cf31266f1572257e2aca36767e074b68b6",
+  "status": "pass",
+  "validation_population": "154 supervised T=2 sequences"
+}
