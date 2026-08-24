@@ -743,6 +743,12 @@ class InstanceSegmentation(pl.LightningModule):
         self._setup_training()
         self.save_hyperparameters(config)
 
+    def train(self, mode=True):
+        result = super().train(mode)
+        if mode and _p2_general_flag(self.config, "frozen_encoder_eval"):
+            self._set_frozen_modules_eval(self.config.general.freeze)
+        return result
+
 
     def _initialize_model(self):
         """Initialize model components and settings"""
@@ -2133,6 +2139,34 @@ class InstanceSegmentation(pl.LightningModule):
         - Sonata: backbone.model.enc.*, backbone.model.embedding.*, etc.
         """
         for name, module in self.model.named_modules():
+            if freeze_mode == "backbone_encoder" and _p2_general_flag(
+                self.config, "frozen_encoder_eval"
+            ):
+                concerto_encoder = name in {
+                    "backbone.model.embedding",
+                    "backbone.model.enc",
+                }
+                minkowski_encoder = any(
+                    name == prefix or name.startswith(f"{prefix}.")
+                    for prefix in (
+                        "backbone.conv0",
+                        "backbone.bn0",
+                        "backbone.conv1p1",
+                        "backbone.bn1",
+                        "backbone.block1",
+                        "backbone.conv2p2",
+                        "backbone.bn2",
+                        "backbone.block2",
+                        "backbone.conv3p4",
+                        "backbone.bn3",
+                        "backbone.block3",
+                        "backbone.conv4p8",
+                        "backbone.bn4",
+                        "backbone.block4",
+                    )
+                )
+                if concerto_encoder or minkowski_encoder:
+                    module.eval()
             # only set to eval more if the entire backbone is frozen 
             if freeze_mode == "backbone" and name.startswith("backbone"):
                 # For Minkowski, don't freeze final layer

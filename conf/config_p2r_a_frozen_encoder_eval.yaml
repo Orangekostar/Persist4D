@@ -1,0 +1,9 @@
+defaults:
+  - config_p2_rescene4d_concerto_t2
+  - _self_
+
+general:
+  frozen_encoder_eval: true
+  project_name: p2r_a_frozen_encoder_eval
+  experiment_name: p2r_a_frozen_encoder_eval
+  save_dir: checkpoints/p2r_a_frozen_encoder_eval
