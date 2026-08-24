@@ -190,6 +190,19 @@ def compare_t2_task_predictions(
     }
 
 
+def t2_cache_identities(
+    local_key: Mapping[str, object],
+) -> tuple[tuple[str, str, int], tuple[str, str, int]]:
+    key = _mapping(local_key, name="local T2 key")
+    if key.get("stage_index") != 1:
+        raise T2ParityError("local T2 key must use stage_index 1")
+    master = key.get("master_sequence_id")
+    order = key.get("order_id")
+    if not isinstance(master, str) or not master or not isinstance(order, str):
+        raise T2ParityError("local T2 key identity fields are invalid")
+    return (master, order, 1), (master, order, 2)
+
+
 def summarize_t2_rows(
     rows: Sequence[Mapping[str, object]], *, expected_unit_count: int = 129
 ) -> dict[str, object]:
@@ -230,4 +243,5 @@ __all__ = [
     "T2ParityError",
     "compare_t2_task_predictions",
     "summarize_t2_rows",
+    "t2_cache_identities",
 ]

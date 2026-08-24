@@ -15,6 +15,7 @@ from scripts.system_comparison_v2_parity import (
     T2ParityError,
     compare_t2_task_predictions,
     summarize_t2_rows,
+    t2_cache_identities,
 )
 
 
@@ -205,3 +206,11 @@ def test_summary_requires_exact_unique_coverage_and_all_pass() -> None:
     failed = dict(row, parity_pass=False)
     summary = summarize_t2_rows([failed], expected_unit_count=1)
     assert summary["status"] == "fail"
+
+
+def test_t2_local_stage_one_maps_to_full_history_horizon_two() -> None:
+    local_identity, full_identity = t2_cache_identities(_sidecar()["key"])
+
+    assert local_identity[-1] == 1
+    assert full_identity[-1] == 2
+    assert local_identity[:2] == full_identity[:2]

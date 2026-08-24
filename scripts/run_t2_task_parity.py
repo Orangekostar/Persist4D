@@ -49,6 +49,7 @@ from scripts.system_comparison_v2_parity import (
     T2ParityError,
     compare_t2_task_predictions,
     summarize_t2_rows,
+    t2_cache_identities,
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -271,15 +272,16 @@ def run_t2_task_parity(
 
     with deterministic_inference_runtime(seed, setup.device):
         for key in t2_keys:
-            identity = (
-                str(key["master_sequence_id"]),
-                str(key["order_id"]),
-                1,
-            )
-            if identity not in local_entries or identity not in full_entries:
-                raise T2ParityError(f"frozen cache lacks T2 cell {identity}")
-            local_entry = local_entries[identity]
-            full_entry = full_entries[identity]
+            local_identity, full_identity = t2_cache_identities(key)
+            if (
+                local_identity not in local_entries
+                or full_identity not in full_entries
+            ):
+                raise T2ParityError(
+                    f"frozen cache lacks T2 cell {local_identity[:2]}"
+                )
+            local_entry = local_entries[local_identity]
+            full_entry = full_entries[full_identity]
             produced = producer.produce_bundle(
                 key,
                 task_prediction_builder=extract_official_task_prediction,
@@ -293,7 +295,8 @@ def run_t2_task_parity(
                 assert_t2_observation_regression(full_payload, produced.payload)
             except Exception as error:
                 raise T2ParityError(
-                    f"fresh local/full observation differs for T2 cell {identity}"
+                    "fresh local/full observation differs for T2 cell "
+                    f"{local_identity[:2]}"
                 ) from error
 
             sidecar = build_task_sidecar(
