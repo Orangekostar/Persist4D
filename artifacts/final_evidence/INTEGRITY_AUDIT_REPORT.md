@@ -15,6 +15,7 @@ boundary, and immutable reviewer-closure source tables.
 | T5 gap recall is 0.3120 versus 0.0581 for adapted Full-History + Feature-Class. | `rescene_horizon_adaptation_results.csv` | Supported |
 | T5 measured latency/VRAM are 440.4 ms/2473 MiB versus 1068.2 ms/4770 MiB. | `rescene_horizon_compute.csv` | Supported with scope qualifier |
 | ReScan transfer is inconclusive and cannot support generalization. | `external_gate.json`, `rescan_raw.json`, `EXTERNAL_VALIDATION_REPORT.md` | Supported |
+| Executed Full-History external baseline is also inconclusive. | `rescan_full_history_raw.json`, cache manifest, `EXTERNAL_FULL_HISTORY_BASELINE_AUDIT.md` | Supported |
 | LivingScenes should remain Related Work rather than a quantitative baseline. | pinned source/weights manifest and official evaluator/config audit | Supported |
 | Persist4D is the first persistent scene model or first sparse-revisit memory. | No supporting evidence; contradicted by positioning sources | Prohibited |
 
@@ -27,6 +28,9 @@ boundary, and immutable reviewer-closure source tables.
 - ReScan reports, dataset manifest, and gate agree on 13 scenes, 45 captures,
   333 Level-B object identities, 8 gaps, 2 gap scenes, and 0.055738 scene-macro
   coverage.
+- The Full-History report/raw/cache manifest agree on 13 scenes, 45 captures,
+  45 expanding-history entries, 2,247,570,182 cache bytes, 0.071881 coverage,
+  and zero recovery attempts.
 - Published Table 1 values remain percentages and are labeled reported/not
   rerun; common-prefix tables remain fractions from local evaluation.
 - Figure 1/2 captions state that Full-History compute excludes tracker overhead.

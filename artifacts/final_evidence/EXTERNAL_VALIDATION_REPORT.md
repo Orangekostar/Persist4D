@@ -45,6 +45,24 @@ merges change by +0.07692, CI [0, 0.23077]. These boundary-touching intervals,
 the worse merge direction, low coverage, and absent recovery attempts do not
 support an external advantage claim.
 
+`external/rescan_per_scene_effects.csv` records all 104 fixed B4-minus-B2
+scene/metric rows, including absolute and relative effects. Its scene means
+exactly reproduce the committed paired scene-bootstrap effects.
+
+## Executed Full-History Baseline
+
+The conditional Full-History comparison was executable and was therefore run
+with the same checkpoint, dataset order, and `[S1,...,St]` input at stage `t`.
+Full-History + Feature-Class has scene-macro Level-A online t-mAP/t-REC
+0.001682/0.007977 and Level-B coverage 0.071881, IDSW rate 0.173077,
+fragmentation 0.230769, and merge 0.230769. It sees the same eight gaps and
+makes zero recovery attempts. Its coverage also fails the 0.10 threshold, so it
+does not alter the gate or support a method comparison.
+
+The 45-entry, 2,247,570,182-byte cache remains outside Git and is bound by
+`external/rescan_full_history_cache_manifest.json`. Full provenance and the
+descriptive comparison are in `EXTERNAL_FULL_HISTORY_BASELINE_AUDIT.md`.
+
 ## Claim Boundary
 
 This experiment does not contradict the internal persistent-state result, but
@@ -55,4 +73,5 @@ generality claim from this evidence.
 
 Machine-readable sources: `external/rescan_raw.json`,
 `external/rescan_results.csv`, `external/rescan_per_scene.csv`,
-`external/rescan_scene_bootstrap.csv`, and `external_gate.json`.
+`external/rescan_per_scene_effects.csv`, `external/rescan_scene_bootstrap.csv`,
+the `external/rescan_full_history_*` artifacts, and `external_gate.json`.

@@ -18,6 +18,7 @@ generalization claims.
 | Remaining ceiling | `PERCEPTION_CEILING` | Local observation/class/mask limits, capacity taxonomy, and unresolved evidence dominate registered identity failures. |
 | Official ReScan method | `RESCAN_METHOD_NOT_REPRODUCED` | Discuss as historical context; do not place native numbers in the common-prefix table. |
 | Independent ReScan transfer | `EXTERNAL_INCONCLUSIVE` | Do not claim generalization or produce an external main table/figure. |
+| External Full-History baseline | `FULL_HISTORY_BASELINE_RUN_EXTERNAL_INCONCLUSIVE` | Conditional baseline executed; low coverage and zero recovery attempts prevent interpretation. |
 | LivingScenes baseline | `NOT_RUN` | Related Work only; no GT-mask or restricted-subset comparison. |
 
 ## Frozen Internal Conclusion
@@ -41,6 +42,11 @@ coverage is 0.055738 and no method makes a valid recovery attempt. The transfer
 therefore tests neither the primary gap-recovery mechanism nor full-system
 generality.
 
+The executed Full-History + Feature-Class baseline raises scene-macro coverage
+to 0.071881 but still makes zero recovery attempts and fails the same external
+gate. Expanding the local perception horizon therefore does not make this
+dataset sufficient for the registered identity claim.
+
 The manuscript may state that an audited independent transfer attempt was
 inconclusive under severe local-perception domain shift. It must not state that
 Persist4D generalizes beyond the evaluated six internal 3RScan environments.
@@ -52,7 +58,8 @@ Persist4D generalizes beyond the evaluated six internal 3RScan environments.
 - Main and supplementary visuals: `PAPER_FIGURE_TABLE_INDEX.md`.
 - Claim boundary: `NOVELTY_BOUNDARY.md`.
 - External protocol and outputs: `EXTERNAL_VALIDATION_REPORT.md` and
-  `external/` machine-readable artifacts.
+  `EXTERNAL_FULL_HISTORY_BASELINE_AUDIT.md` plus `external/` machine-readable
+  artifacts.
 - Reproducibility binding: `final_evidence_manifest.json`, verified by
   `python -m scripts.verify_final_evidence`.
 

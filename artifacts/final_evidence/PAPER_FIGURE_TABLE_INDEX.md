@@ -31,7 +31,10 @@
 - Bounded-State Capacity Sensitivity:
   `capacity/capacity_aggregate.csv` and `CAPACITY_SENSITIVITY_REPORT.md`.
 - Full per-scene ReScan descriptive output:
-  `external/rescan_per_scene.csv`.
+  `external/rescan_per_scene.csv` and `external/rescan_per_scene_effects.csv`.
+- Executed conditional Full-History baseline: machine-readable
+  `external/rescan_full_history_*` artifacts and
+  `EXTERNAL_FULL_HISTORY_BASELINE_AUDIT.md`.
 
 All SVG/PDF/PNG variants are generated from repository scripts. Captions and
 measurement-scope qualifiers are in `FIGURE_CAPTIONS.md` and

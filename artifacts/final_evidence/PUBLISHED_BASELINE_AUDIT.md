@@ -45,4 +45,7 @@ Persist4D at T4/T5. It preserves the same protocol and runtime-scope qualifier.
 External Table C/Table 4 is omitted. ReScan is `EXTERNAL_INCONCLUSIVE` because
 coverage, natural gaps, and gap-scene count all fail their preregistered minima.
 The official ReScan method is `RESCAN_METHOD_NOT_REPRODUCED`; LivingScenes is
-`NOT_RUN`. Neither is inserted into the common-prefix table.
+`NOT_RUN`. The executable external Full-History + Feature-Class baseline was
+run, but its 0.071881 coverage also fails the gate and it makes zero gap
+recovery attempts. None is inserted into the common-prefix or external main
+table.
