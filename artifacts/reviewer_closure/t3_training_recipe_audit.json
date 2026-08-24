@@ -41,7 +41,7 @@
       "t2": 2
     },
     "general.checkpoint": {
-      "adapted": "/home/ww/paper5/.worktrees/persist4d-reviewer-closure/checkpoints/rescene4d_concerto_t2_repro.ckpt",
+      "adapted": "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt",
       "t2": null
     },
     "general.experiment_name": {
@@ -196,7 +196,7 @@
     "reconstructed": 2,
     "unknown": 3
   },
-  "content_sha256": "612c83094a7c5bf48e087ce52ae3a2adb7e1587487af84777fd62f397e8503bd",
+  "content_sha256": "d05ca854dde6b40fdf580505213fc3f38f4c55275e77f73aab7d55f45d8038a6",
   "level1_claimed": false,
   "level1_rejection_reason": "official recipe provenance is incomplete and the local T2 source is a documented reproduction with explicit choices",
   "paper_name": "ReScene4D T2-to-T3 Horizon-Adapted",

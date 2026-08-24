@@ -4,8 +4,8 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
-import torch
 import pytest
+import torch
 
 import main_instance_segmentation as training_entrypoint
 from scripts import reviewer_closure_training as training
@@ -109,6 +109,11 @@ def test_training_audit_classifies_all_fields_without_level1_claim(
         (tmp_path / "t3_training_recipe_audit.json").read_text(encoding="utf-8")
     )
     assert manifest["content_sha256"] == result["content_sha256"]
+    assert (
+        manifest["allowed_config_differences"]["general.checkpoint"]["adapted"]
+        == "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt"
+    )
+    assert "/home/" not in json.dumps(manifest, sort_keys=True)
 
 
 def test_reviewer_flags_enable_weighted_fail_closed_objective_without_p2_identity() -> (

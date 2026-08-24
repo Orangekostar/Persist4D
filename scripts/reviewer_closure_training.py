@@ -472,6 +472,15 @@ def build_t3_training_audit(
     differences = adaptation_config_differences(t2, adapted)
     if set(differences) != set(ALLOWED_ADAPTATION_CONFIG_PATHS):
         raise ReviewerClosureTrainingError("T3 adaptation config differences differ")
+    checkpoint_difference = differences.get("general.checkpoint")
+    if not isinstance(checkpoint_difference, Mapping) or checkpoint_difference.get(
+        "adapted"
+    ) != str(CHECKPOINT_PATH):
+        raise ReviewerClosureTrainingError("T3 checkpoint config difference differs")
+    published_differences = {path: dict(values) for path, values in differences.items()}
+    published_differences["general.checkpoint"]["adapted"] = (
+        "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt"
+    )
     rows = _audit_rows()
     counts = dict(sorted(Counter(row["classification"] for row in rows).items()))
     artifact: dict[str, object] = {
@@ -488,7 +497,7 @@ def build_t3_training_audit(
         "checkpoint": checkpoint,
         "classification_counts": counts,
         "audit_rows": rows,
-        "allowed_config_differences": differences,
+        "allowed_config_differences": published_differences,
     }
     artifact["content_sha256"] = _content_sha256(artifact)
     report = [
