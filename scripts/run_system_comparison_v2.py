@@ -38,6 +38,7 @@ from scripts.system_comparison_v2_cache import (
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT_ROOT = PROJECT_ROOT / "artifacts/system_comparison_v2"
+ATTRIBUTION_ROOT = PROJECT_ROOT / "artifacts/tmap_root_cause_v2"
 DEFAULT_METADATA = Path("/home/ww/3RScan.json")
 DEFAULT_CACHE_ROOT = Path(
     "/mnt/shared/ww/persist4d-tmap-root-cause-v2/system_comparison_v2_full"
@@ -366,11 +367,12 @@ def run_v2_cache(
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run System Comparison V2.")
-    parser.add_argument("stage", choices=("cache", "analyze"))
+    parser.add_argument("stage", choices=("cache", "analyze", "attribute"))
     parser.add_argument("--metadata", type=Path, default=DEFAULT_METADATA)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)
     parser.add_argument("--artifact-root", type=Path, default=ARTIFACT_ROOT)
+    parser.add_argument("--attribution-root", type=Path, default=ATTRIBUTION_ROOT)
     parser.add_argument(
         "--cache-manifest",
         type=Path,
@@ -388,7 +390,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             cache_root=arguments.cache_root,
             artifact_root=arguments.artifact_root,
         )
-    else:
+    elif arguments.stage == "analyze":
         from scripts.system_comparison_v2_analysis import run_v2_analysis
 
         result = run_v2_analysis(
@@ -396,6 +398,17 @@ def main(argv: Sequence[str] | None = None) -> int:
             cache_root=arguments.cache_root,
             cache_manifest_path=arguments.cache_manifest,
             output_root=arguments.artifact_root,
+        )
+    else:
+        from scripts.system_comparison_v2_attribution import (
+            run_postprocessing_attribution,
+        )
+
+        result = run_postprocessing_attribution(
+            metadata_path=arguments.metadata,
+            cache_root=arguments.cache_root,
+            cache_manifest_path=arguments.cache_manifest,
+            output_root=arguments.attribution_root,
         )
     print(json.dumps(result, allow_nan=False, sort_keys=True))
     return 0
