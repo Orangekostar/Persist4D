@@ -3,21 +3,25 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import subprocess
+from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from datasets.multiscan_adapter import (
     MultiScanAdapterError,
     build_multiscan_inventory,
+    parse_multiscan_scan_id,
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FROZEN_COMMIT = "487080cf31266f1572257e2aca36767e074b68b6"
 MULTISCAN_COMMIT = "697bc9ec86fb7d34d47cb4cdbddcfc3c7f18c605"
 DATA_REPOSITORY_REVISION = "c62c9aad850a8638ac3e42605926a65707600125"
+_MAPPING_STATUSES = ("exact", "defensible", "ambiguous", "unsupported")
 
 
 def _json_bytes(value: Mapping[str, object]) -> bytes:
@@ -57,6 +61,194 @@ def _git(root: Path, *arguments: str) -> str:
         text=True,
         stderr=subprocess.DEVNULL,
     ).strip()
+
+
+def build_chronology_audit(inventory: Mapping[str, object]) -> dict[str, object]:
+    """Freeze official scan-index order without claiming acquisition chronology."""
+    if inventory.get("status") != "pass":
+        raise MultiScanAdapterError("chronology audit requires a passing inventory")
+    digest = inventory.get("selected_scene_list_sha256")
+    if not isinstance(digest, str) or len(digest) != 64:
+        raise MultiScanAdapterError("chronology audit requires the selected-list hash")
+    raw_scenes = inventory.get("scenes")
+    if not isinstance(raw_scenes, list) or not raw_scenes:
+        raise MultiScanAdapterError("chronology audit requires inventory scenes")
+    scene_orders = []
+    for raw_scene in raw_scenes:
+        if not isinstance(raw_scene, Mapping):
+            raise MultiScanAdapterError("chronology inventory scene must be a mapping")
+        scene_id = raw_scene.get("scene_id")
+        raw_scan_ids = raw_scene.get("scan_ids")
+        if not isinstance(scene_id, str) or not isinstance(raw_scan_ids, list):
+            raise MultiScanAdapterError("chronology inventory scene is malformed")
+        ordered_scan_ids = []
+        prior_index = -1
+        for scan_id in raw_scan_ids:
+            observed_scene, scan_index = parse_multiscan_scan_id(scan_id)
+            if observed_scene != scene_id or scan_index <= prior_index:
+                raise MultiScanAdapterError("inventory scan order is inconsistent")
+            ordered_scan_ids.append(scan_id)
+            prior_index = scan_index
+        scene_orders.append(
+            {"scene_id": scene_id, "ordered_scan_ids": ordered_scan_ids}
+        )
+    return {
+        "schema_version": 1,
+        "status": "DATASET_ORDER_ONLY",
+        "selected_scene_list_sha256": digest,
+        "ordering_rule": "numeric scan suffix within each physical scene",
+        "physical_chronology_proven": False,
+        "ordered_revisit_protocol_allowed": True,
+        "claim_boundary": (
+            "this is not proven physical chronology; causal claims are limited "
+            "to the frozen dataset-index order"
+        ),
+        "evidence": [
+            {
+                "source": "official scans_split.csv and dataset naming documentation",
+                "finding": "the final two digits are defined as the scan index",
+            },
+            {
+                "source": "official acquired-data schema",
+                "finding": (
+                    "scan metadata has no cross-capture acquisition timestamp; "
+                    "JSONL timestamps are frame-level ARKit session timestamps"
+                ),
+            },
+            {
+                "source": "official alignment schema",
+                "finding": (
+                    "reference_scan_alignment identifies a geometric reference, "
+                    "not capture chronology"
+                ),
+            },
+        ],
+        "scene_orders": scene_orders,
+    }
+
+
+def _frozen_rescene_classes(path: Path) -> dict[str, int]:
+    source = Path(path)
+    if source.is_symlink() or not source.is_file():
+        raise MultiScanAdapterError("frozen ReScene label map must be a regular file")
+    try:
+        document = json.loads(source.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise MultiScanAdapterError("cannot parse frozen ReScene label map") from error
+    mappings = document.get("mappings") if isinstance(document, dict) else None
+    if not isinstance(mappings, list):
+        raise MultiScanAdapterError("frozen ReScene label map lacks mappings")
+    target_classes: dict[str, int] = {}
+    target_ids: set[int] = set()
+    for raw_mapping in mappings:
+        if not isinstance(raw_mapping, dict) or raw_mapping.get("status") != "exact":
+            continue
+        name = raw_mapping.get("target_class_name")
+        target_id = raw_mapping.get("target_class_id")
+        if (
+            not isinstance(name, str)
+            or isinstance(target_id, bool)
+            or not isinstance(target_id, int)
+            or name in target_classes
+            or target_id in target_ids
+        ):
+            raise MultiScanAdapterError("frozen ReScene exact class rows are invalid")
+        target_classes[name] = target_id
+        target_ids.add(target_id)
+    if len(target_classes) != 18 or target_ids != set(range(18)):
+        raise MultiScanAdapterError("frozen ReScene taxonomy must contain 18 classes")
+    return target_classes
+
+
+def build_multiscan_label_map(
+    semantic_map_path: str | Path,
+    *,
+    frozen_rescene_map_path: str | Path = (
+        PROJECT_ROOT / "artifacts/final_evidence/rescan_to_rescene_label_map.json"
+    ),
+) -> dict[str, object]:
+    """Map official MultiScan semantic classes conservatively to ReScene18."""
+    source = Path(semantic_map_path)
+    if source.is_symlink() or not source.is_file():
+        raise MultiScanAdapterError("MultiScan semantic map must be a regular file")
+    with source.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        expected = {"objectName", "objectSemanticName", "objectSemanticId"}
+        if reader.fieldnames is None or set(reader.fieldnames) != expected:
+            raise MultiScanAdapterError("MultiScan semantic map columns differ")
+        raw_rows = list(reader)
+    if not raw_rows:
+        raise MultiScanAdapterError("MultiScan semantic map must not be empty")
+
+    names_by_id: dict[int, set[str]] = defaultdict(set)
+    object_names_by_id: dict[int, set[str]] = defaultdict(set)
+    seen_object_names: set[str] = set()
+    for row in raw_rows:
+        object_name = row.get("objectName")
+        semantic_name = row.get("objectSemanticName")
+        raw_id = row.get("objectSemanticId")
+        if not object_name or not semantic_name or not raw_id:
+            raise MultiScanAdapterError("MultiScan semantic map contains empty fields")
+        try:
+            semantic_id = int(raw_id)
+        except ValueError as error:
+            raise MultiScanAdapterError(
+                "MultiScan semantic ID must be an integer"
+            ) from error
+        if semantic_id <= 0 or object_name in seen_object_names:
+            raise MultiScanAdapterError("MultiScan semantic map contains duplicate IDs")
+        seen_object_names.add(object_name)
+        names_by_id[semantic_id].add(semantic_name)
+        object_names_by_id[semantic_id].add(object_name)
+    if any(len(names) != 1 for names in names_by_id.values()):
+        raise MultiScanAdapterError("one MultiScan semantic ID has conflicting names")
+
+    target_path = Path(frozen_rescene_map_path)
+    target_classes = _frozen_rescene_classes(target_path)
+    mappings = []
+    for semantic_id in sorted(names_by_id):
+        semantic_name = next(iter(names_by_id[semantic_id]))
+        target_id = target_classes.get(semantic_name)
+        status = "exact" if target_id is not None else "unsupported"
+        evidence = (
+            "exact_official_semantic_name_and_frozen_target_name"
+            if status == "exact"
+            else (
+                "excluded_structural_class"
+                if semantic_name in {"wall", "floor", "ceiling"}
+                else "absent_from_frozen_foreground_taxonomy"
+            )
+        )
+        mappings.append(
+            {
+                "source_class_id": semantic_id,
+                "source_class_name": semantic_name,
+                "source_object_names": sorted(object_names_by_id[semantic_id]),
+                "status": status,
+                "target_class_id": target_id,
+                "target_class_name": semantic_name if target_id is not None else None,
+                "mapping_evidence": evidence,
+            }
+        )
+    status_counts = Counter(row["status"] for row in mappings)
+    return {
+        "schema_version": 1,
+        "source_taxonomy": "official MultiScan objectSemanticId",
+        "target_taxonomy": "frozen ReScene ScanNet18 foreground output",
+        "source_class_count": len(mappings),
+        "status_counts": {
+            status: status_counts[status] for status in _MAPPING_STATUSES
+        },
+        "primary_class_aware_status": "exact_only",
+        "provenance": {
+            "source_semantic_map_sha256": _sha256_file(source),
+            "target_label_map_reference": (
+                "repo:artifacts/final_evidence/rescan_to_rescene_label_map.json"
+            ),
+            "target_label_map_sha256": _sha256_file(target_path),
+        },
+        "mappings": mappings,
+    }
 
 
 def build_inventory_artifacts(
