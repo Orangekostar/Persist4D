@@ -324,6 +324,7 @@ def _task_accumulators() -> dict[tuple[str, str, int], CausalTaskAccumulator]:
 def _old_row_maps() -> tuple[dict[tuple[str, str, str, int], dict[str, str]], dict[tuple[str, str, int], dict[str, str]]]:
     per_sequence = _read_csv(SYSTEM_ROOT / "per_sequence_results.csv")
     aggregate = _read_csv(SYSTEM_ROOT / "aggregate_results.csv")
+    aggregate.extend(_read_csv(SYSTEM_ROOT / "per_order_results.csv"))
     sequence_map = {
         (
             row["method"],
@@ -340,6 +341,9 @@ def _old_row_maps() -> tuple[dict[tuple[str, str, str, int], dict[str, str]], di
     expected_sequence = len(METHODS) * 129 * len(HORIZONS)
     if len(sequence_map) != expected_sequence:
         raise V2AnalysisError("frozen per-sequence coverage differs")
+    expected_aggregate = len(METHODS) * (len(ORDERS) + 1) * len(HORIZONS)
+    if len(aggregate_map) != expected_aggregate:
+        raise V2AnalysisError("frozen aggregate coverage differs")
     return sequence_map, aggregate_map
 
 
