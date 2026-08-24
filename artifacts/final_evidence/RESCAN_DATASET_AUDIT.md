@@ -42,7 +42,7 @@ identity evaluation.
 - 365 distinct valid scene identities in `[0,255]`
 - 333 distinct non-structural object identities after excluding wall, floor,
   and ceiling source classes `1`, `2`, and `22`
-- 8 natural visible-absent-visible gap opportunities across 3 scene clusters
+- 8 natural visible-absent-visible gap opportunities across 2 scene clusters
 - encountered source class IDs: `0,1,2,5,6,7,9,14,15,22,39`
 
 The dataset contains one semantic inconsistency: `scene_e` identity `27` is

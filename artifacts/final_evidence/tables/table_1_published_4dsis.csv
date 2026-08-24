@@ -1,0 +1,6 @@
+method,t_mAP,t_mAP50,t_mAP25,mAP,mAP50,mAP25,unit,result_status,protocol,source
+Mask4D,1.3,2.9,8.7,2.1,5.5,21.2,percent,reported_result_not_rerun,ReScene4D standard published protocol,https://arxiv.org/abs/2601.11508
+Mask4Former,17.0,38.9,59.1,21.7,45.6,66.3,percent,reported_result_not_rerun,ReScene4D standard published protocol,https://arxiv.org/abs/2601.11508
+Mask3D + Semantic Matching,20.1,32.9,38.6,25.9,42.3,73.9,percent,reported_result_not_rerun,ReScene4D standard published protocol,https://arxiv.org/abs/2601.11508
+Mask3D + Geometric Matching,20.7,43.1,62.4,29.7,54.1,70.9,percent,reported_result_not_rerun,ReScene4D standard published protocol,https://arxiv.org/abs/2601.11508
+ReScene4D (C),34.8,52.5,66.8,43.3,64.3,81.9,percent,reported_result_not_rerun,ReScene4D standard published protocol,https://arxiv.org/abs/2601.11508

@@ -1,0 +1,26 @@
+{
+  "checks": {
+    "cache_entries_hashed": true,
+    "no_gt_leakage_contract": true
+  },
+  "entry_count": 8,
+  "provenance": {
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "dataset_content_sha256": "612810f1f8ec8ff8e4a1693b4b451da34ea0501cee46e1b34fedf3ed1910a420",
+    "evaluator_sha256": "295f357dc67084f49cb20fbba5d3dd82df33f602c2a53822951f704773212289",
+    "external_config_sha256": "b7898eca6a912955b0cb03f749456090d86a29caf8885842e94d3a497aa8b4de",
+    "geometry_segment_size_m": 0.1,
+    "model_voxel_size_m": 0.02,
+    "seed": 45,
+    "source_commit": "c0587c831f6a60dbc49ce8240be3d5e459e00d58"
+  },
+  "runtime": {
+    "maximum_peak_gpu_memory_mib": 6500.50830078125,
+    "mean_forward_seconds": 1.1157201360329054,
+    "total_forward_seconds": 8.925761088263243,
+    "total_valid_observations": 28
+  },
+  "scene_count": 2,
+  "schema_version": 1,
+  "status": "pass"
+}

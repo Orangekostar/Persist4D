@@ -1,0 +1,27 @@
+{
+  "decision": "NOT_RUN",
+  "decision_reasons": [
+    "official_3rscan_config_uses_gt_masks",
+    "fair_predicted_object_inputs_not_provisioned",
+    "restricted_shape_prior_category_subset",
+    "native_reference_rescan_matching_protocol_not_common_prefix_tracking"
+  ],
+  "official_url": "https://github.com/GradientSpaces/LivingScenes",
+  "repository": {
+    "commit": "f290146d3a70ee8d7648ec3d841a58352331c27a",
+    "commit_tree": "ac707f3ddadde2b3b307069387aba3bef906f152"
+  },
+  "schema_version": 1,
+  "selected_source_files": {
+    "README.md": "670df589c3a6bc7de3b3df5269a22566809e6f489a9b202f0f9cbd773d8cfa7c",
+    "cate_to_use.txt": "1c4e778307b3ef70b87ca7e1c96c633dfcf87e5d9e74d64aa5546b0d9b99b9e9",
+    "configs/3rscan.yaml": "a51c711e2413eecb8e6fd8729ab6a8be8b2b2dee70604b5f91a08e011c3fe74b",
+    "eval_3rscan.py": "d01e3381fdd03267b42647a5009268ae26e5d295c0e33c838bc9c7f54284b2ed"
+  },
+  "status": "source_pinned_not_executed",
+  "weights": {
+    "external_reference": "external:livingscenes/official-code/weights/checkpoint/LivingScenes_latest.pt",
+    "sha256": "48b86e3cda90a066287aa6ae2acf3b0c92416afc6288b1da6d25f0a370013231",
+    "size_bytes": 88831661
+  }
+}

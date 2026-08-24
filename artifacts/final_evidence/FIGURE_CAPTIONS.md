@@ -1,5 +1,36 @@
 # Final-Evidence Figure Captions
 
+## Main Figure 1: Finite Temporal Context Is Not Persistent Entity State
+
+Full-History perception repeatedly expands the observation set, while Persist4D
+uses a bounded local pair and retains dormant entity identity in bounded state.
+The inset reports measured median update latency over six profile clusters for
+the T2-to-T3 horizon-adapted Full-History model and Persist4D. Full-History
+latency excludes lightweight tracker overhead. Source:
+`artifacts/reviewer_closure/rescene_horizon_compute.csv`.
+
+## Main Figure 2: Long-Horizon Accuracy-Identity-Compute Scaling
+
+Causal-prefix t-mAP, gap-recovery recall, median update latency, and peak
+allocated VRAM across T2-T5. Task and identity metrics use 129 common-prefix
+sequence/order scopes grouped into six independent scene clusters. Full-History
+and horizon-adapted alternatives use Feature-Class tracking for identity panels;
+their compute panels profile local perception and exclude tracker overhead.
+Sources: `full_history_tracker_aggregate.csv`,
+`rescene_horizon_adaptation_results.csv`, and `rescene_horizon_compute.csv` in
+the immutable reviewer-closure package.
+
+## Main Figure 3: Why Long-Horizon t-mAP Remains Similar
+
+IoU-threshold sensitivity, observation coverage, and registered failure
+decomposition show that local observation, class, mask, capacity, and unresolved
+errors dominate the remaining task ceiling more than registered identity
+failures. Source: immutable
+`artifacts/reviewer_closure/figures/performance_decomposition.*`.
+
+Main Figure 4 is intentionally omitted because external validation is
+`EXTERNAL_INCONCLUSIVE`.
+
 ## Figure C1: Occupancy vs Temporal Horizon
 
 Peak occupied persistent slots under the frozen common-prefix replay. The line

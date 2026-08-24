@@ -1,0 +1,17 @@
+{
+  "classification": "EXTERNAL_INCONCLUSIVE",
+  "failed_thresholds": [
+    "insufficient_gap_opportunities",
+    "insufficient_gap_scene_clusters",
+    "insufficient_observation_coverage"
+  ],
+  "observed_gap_opportunities": 8,
+  "observed_gap_scene_clusters": 2,
+  "persist4d_observation_coverage": 0.055737844551532426,
+  "schema_version": 1,
+  "thresholds": {
+    "minimum_gap_opportunities": 10,
+    "minimum_gap_scene_clusters": 3,
+    "minimum_observation_coverage": 0.1
+  }
+}
