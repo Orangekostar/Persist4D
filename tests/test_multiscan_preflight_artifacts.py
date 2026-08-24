@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import subprocess
 from pathlib import Path
 
 from scripts.audit_multiscan_dataset import build_release_blocked_artifacts
@@ -98,6 +99,20 @@ def test_blocked_release_builds_complete_fail_closed_evidence(tmp_path: Path) ->
 
     manifest = json.loads(paths["evidence_manifest.json"].read_text())
     assert manifest["decision"] == "MULTISCAN_PROTOCOL_FAIL"
+    assert (
+        manifest["implementation"]["commit"]
+        == subprocess.check_output(
+            ("git", "rev-parse", "HEAD"),
+            cwd=Path(__file__).resolve().parents[1],
+            text=True,
+        ).strip()
+    )
+    assert len(manifest["implementation"]["files"]) == 12
+    for row in manifest["implementation"]["files"]:
+        content = (
+            Path(__file__).resolve().parents[1] / row["relative_path"]
+        ).read_bytes()
+        assert hashlib.sha256(content).hexdigest() == row["sha256"]
     assert {row["relative_path"] for row in manifest["files"]} == (
         set(REQUIRED_BASE) | (expected_new - {"evidence_manifest.json"})
     )

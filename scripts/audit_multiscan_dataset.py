@@ -587,12 +587,44 @@ inference or MultiScan tuning was performed.
         _publish_exact(paths[name], payload)
 
     evidence_names = sorted((*base_names, *payloads))
+    implementation_names = (
+        "datasets/multiscan_adapter.py",
+        "scripts/audit_multiscan_dataset.py",
+        "tests/test_multiscan_inventory.py",
+        "tests/test_multiscan_identity_mapping.py",
+        "tests/test_multiscan_gap_detection.py",
+        "tests/test_multiscan_chronology.py",
+        "tests/test_multiscan_semantic_mapping.py",
+        "tests/test_multiscan_no_gt_leakage.py",
+        "tests/test_multiscan_external_gate.py",
+        "tests/test_multiscan_preflight_artifacts.py",
+        "docs/superpowers/specs/2026-08-24-persist4d-multiscan-preflight-design.md",
+        "docs/superpowers/plans/2026-08-24-persist4d-multiscan-preflight.md",
+    )
+    implementation_files = []
+    for name in implementation_names:
+        path = PROJECT_ROOT / name
+        if path.is_symlink() or not path.is_file():
+            raise MultiScanAdapterError(f"implementation evidence is absent: {name}")
+        implementation_files.append(
+            {
+                "relative_path": name,
+                "bytes": path.stat().st_size,
+                "sha256": _sha256_file(path),
+            }
+        )
     evidence_manifest = {
         "schema_version": 1,
         "status": "complete_fail_closed",
         "decision": decision["decision"],
         "decision_failures": decision["failures"],
         "official_source_evidence": source_evidence,
+        "implementation": {
+            "branch": "research/persist4d-multiscan-preflight",
+            "commit": _git(PROJECT_ROOT, "rev-parse", "HEAD"),
+            "tree": _git(PROJECT_ROOT, "rev-parse", "HEAD^{tree}"),
+            "files": implementation_files,
+        },
         "frozen_evidence_modified": False,
         "gpu_inference_executed": False,
         "files": [
