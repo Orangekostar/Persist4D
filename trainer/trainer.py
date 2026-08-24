@@ -1597,7 +1597,13 @@ class InstanceSegmentation(pl.LightningModule):
         return new_preds
     
     def _get_mask_and_scores(
-        self, mask_cls, mask_pred, num_queries=100, num_classes=18, device=None
+        self,
+        mask_cls,
+        mask_pred,
+        num_queries=100,
+        num_classes=18,
+        device=None,
+        return_lineage=False,
     ):
         if device is None:
             device = self.device
@@ -1619,8 +1625,8 @@ class InstanceSegmentation(pl.LightningModule):
             )
 
         labels_per_query = labels[topk_indices]
-        topk_indices = topk_indices // num_classes
-        mask_pred = mask_pred[:, topk_indices]
+        source_query_ids = topk_indices // num_classes
+        mask_pred = mask_pred[:, source_query_ids]
 
         result_pred_mask = (mask_pred > 0).float()
         heatmap = mask_pred.float().sigmoid()
@@ -1631,7 +1637,10 @@ class InstanceSegmentation(pl.LightningModule):
         score = scores_per_query * mask_scores_per_image
         classes = labels_per_query
 
-        return score, result_pred_mask, classes, heatmap
+        result = (score, result_pred_mask, classes, heatmap)
+        if return_lineage:
+            return (*result, source_query_ids, labels_per_query)
+        return result
     
     
     def _filter_and_sort_predictions(self, masks, scores, classes, heatmap):

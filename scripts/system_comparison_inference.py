@@ -399,6 +399,7 @@ def postprocess_full_history_output(
 
     from models.persistent_memory import build_local_observation
     from scripts.evaluate_persist4d import _segment_stages
+    from scripts.rescene_task_postprocess import extract_official_task_prediction
 
     if not 1 <= horizon <= 5:
         raise FullHistoryCacheError("horizon must be within T1-T5")
@@ -430,35 +431,23 @@ def postprocess_full_history_output(
     ):
         raise FullHistoryCacheError("identity observation thresholds are invalid")
 
-    get_predictions = getattr(system, "_get_predictions", None)
-    get_batch_masks = getattr(system, "_get_batch_masks", None)
-    get_mask_and_scores = getattr(system, "_get_mask_and_scores", None)
     get_full_res_mask = getattr(system, "_get_full_res_mask", None)
-    filter_predictions = getattr(system, "_filter_and_sort_predictions", None)
-    if not all(
-        callable(value)
-        for value in (
-            get_predictions,
-            get_batch_masks,
-            get_mask_and_scores,
-            get_full_res_mask,
-            filter_predictions,
-        )
-    ):
+    if not callable(get_full_res_mask):
         raise FullHistoryCacheError("system lacks official ReScene postprocessing")
 
-    prediction = get_predictions(outputs)
-    decoder_id = int(getattr(system, "decoder_id", -1))
-    selected = prediction[decoder_id]
-    low_masks = get_batch_masks(prediction, 0, [target_low_resolution])
-    official_scores, official_low_masks, official_classes, official_heatmap = (
-        get_mask_and_scores(
-            selected["pred_logits"][0].detach().cpu(),
-            low_masks,
-            selected["pred_logits"][0].shape[0],
-            logits.shape[2] - 1,
-        )
+    official_task = extract_official_task_prediction(
+        system=system,
+        output=outputs,
+        target_low_resolution=target_low_resolution,
+        target_full_resolution=target_full_resolution,
+        data=data,
+        class_mapper=class_mapper,
+        latest_stage_index=horizon - 1,
     )
+    task_masks = official_task.pred_masks
+    task_scores = official_task.pred_scores
+    task_classes = official_task.pred_classes
+
     inverse_maps = getattr(data, "inverse_maps", None)
     if not isinstance(inverse_maps, Sequence) or len(inverse_maps) != 1:
         raise FullHistoryCacheError("collated data must contain one inverse map")
@@ -466,34 +455,6 @@ def postprocess_full_history_output(
         target_full_resolution.get("point2segment"),
         name="target_full.point2segment",
     )
-    official_masks = get_full_res_mask(
-        official_low_masks,
-        inverse_maps[0],
-        full_point2segment,
-    )
-    official_heatmap = get_full_res_mask(
-        official_heatmap,
-        inverse_maps[0],
-        full_point2segment,
-        is_heatmap=True,
-    )
-    sorted_classes, sorted_masks, sorted_scores, _ = filter_predictions(
-        np.asarray(official_masks),
-        official_scores,
-        official_classes,
-        np.asarray(official_heatmap),
-    )
-    task_masks = torch.as_tensor(sorted_masks).bool().cpu().contiguous()
-    task_scores = torch.as_tensor(sorted_scores).float().cpu().contiguous()
-    task_classes = _map_classes(torch.as_tensor(sorted_classes), class_mapper)
-    if (
-        task_masks.ndim != 2
-        or task_scores.ndim != 1
-        or task_classes.ndim != 1
-        or task_masks.shape[1] != task_scores.shape[0]
-        or task_scores.shape != task_classes.shape
-    ):
-        raise FullHistoryCacheError("official task prediction tensors do not align")
 
     low_point2segment = _integer_tensor(
         target_low_resolution.get("point2segment"),

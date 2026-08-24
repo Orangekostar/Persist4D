@@ -291,6 +291,12 @@ def _frozen_inference_seed(seed: int, device: torch.device):
 
 
 @dataclass
+class ProducedLocalPrediction:
+    payload: dict[str, object]
+    task_prediction: object | None
+
+
+@dataclass
 class RealPredictionCacheProducer:
     """Run one frozen ReScene local window for one exact Protocol B key."""
 
@@ -308,7 +314,17 @@ class RealPredictionCacheProducer:
     observation_builder: Callable[..., object]
     seed: int = 45
 
-    def __call__(self, logical_key: Mapping[str, object]) -> dict[str, object]:
+    def produce_bundle(
+        self,
+        logical_key: Mapping[str, object],
+        *,
+        task_prediction_builder: Callable[..., object] | None = None,
+        class_mapper: Callable[[int], int] | None = None,
+    ) -> ProducedLocalPrediction:
+        if (task_prediction_builder is None) != (class_mapper is None):
+            raise ValueError(
+                "task_prediction_builder and class_mapper must be provided together"
+            )
         request = resolve_protocol_cache_request(self.protocol, logical_key)
         master = next(
             master
@@ -396,7 +412,20 @@ class RealPredictionCacheProducer:
                 data,
                 latest_local_stage=latest_local_stage,
             )
-        return cache_payload_from_inference(
+            task_prediction = (
+                task_prediction_builder(
+                    system=self.system,
+                    output=output,
+                    target_low_resolution=target,
+                    target_full_resolution=full_target,
+                    data=data,
+                    class_mapper=class_mapper,
+                    latest_stage_index=latest_local_stage,
+                )
+                if task_prediction_builder is not None
+                else None
+            )
+        payload = cache_payload_from_inference(
             key=logical_key,
             provenance=self.provenance,
             observation=observation,
@@ -404,6 +433,13 @@ class RealPredictionCacheProducer:
             full_target=full_target,
             latest_local_stage=latest_local_stage,
         )
+        return ProducedLocalPrediction(
+            payload=payload,
+            task_prediction=task_prediction,
+        )
+
+    def __call__(self, logical_key: Mapping[str, object]) -> dict[str, object]:
+        return self.produce_bundle(logical_key).payload
 
 
 def resolve_protocol_cache_request(
@@ -2707,6 +2743,7 @@ __all__ = [
     "CacheResolution",
     "CachedProtocolSequence",
     "PrefixCausalityResult",
+    "ProducedLocalPrediction",
     "ProtocolCacheRequest",
     "RealPredictionCacheProducer",
     "TaskMetricEvaluation",

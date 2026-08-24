@@ -118,16 +118,29 @@ class _FakeSystem:
         return prediction[0]["pred_masks"][bid][target_low_res[bid]["point2segment"]]
 
     def _get_mask_and_scores(
-        self, mask_cls, mask_pred, num_queries=100, num_classes=18, device=None
+        self,
+        mask_cls,
+        mask_pred,
+        num_queries=100,
+        num_classes=18,
+        device=None,
+        return_lineage=False,
     ):
         del mask_cls, num_queries, num_classes, device
         masks = (mask_pred > 0).float()
-        return (
+        result = (
             torch.tensor([0.9, 0.8]),
             masks,
             torch.tensor([0, 1]),
             mask_pred.sigmoid(),
         )
+        if return_lineage:
+            return (
+                *result,
+                torch.tensor([0, 1]),
+                torch.tensor([0, 1]),
+            )
+        return result
 
     def _get_full_res_mask(
         self, mask, inverse_map, point2segment_full, is_heatmap=False

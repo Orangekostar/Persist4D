@@ -378,7 +378,18 @@ def test_real_prediction_cache_producer_runs_one_exact_local_forward() -> None:
         observation_builder=lambda *_args, **_kwargs: Observation(),
     )
 
-    payload = producer(key)
+    task_calls: list[dict[str, object]] = []
+
+    def build_task(**kwargs: object) -> int:
+        task_calls.append(kwargs)
+        return int(kwargs["latest_stage_index"])
+
+    bundle = producer.produce_bundle(
+        key,
+        task_prediction_builder=build_task,
+        class_mapper=lambda value: value,
+    )
+    payload = bundle.payload
 
     assert calls[0] == ("load", 0, (4, 3), None)
     assert calls[1] == ("collate", ("sample",))
@@ -388,6 +399,13 @@ def test_real_prediction_cache_producer_runs_one_exact_local_forward() -> None:
     assert forward_kwargs["is_eval"] is True
     assert payload["key"] == key
     assert payload["target"]["gt_ids"].tolist() == [10]
+    assert bundle.task_prediction == 1
+    assert len(task_calls) == 1
+    assert task_calls[0]["output"] == {"output": True}
+
+    calls.clear()
+    assert producer(key)["key"] == key
+    assert [call[0] for call in calls].count("forward") == 1
 
 
 def test_real_cache_run_rejects_repository_cache_before_runtime_setup() -> None:
