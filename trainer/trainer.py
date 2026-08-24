@@ -2176,6 +2176,20 @@ class InstanceSegmentation(pl.LightningModule):
                 elif name.startswith("backbone.model"):
                     module.eval()
 
+        if freeze_mode == "backbone_encoder" and _p2_general_flag(
+            self.config, "frozen_encoder_eval"
+        ):
+            for name, module in self.model.named_modules():
+                in_concerto_encoder = name.startswith(
+                    ("backbone.model.embedding.", "backbone.model.enc.")
+                )
+                if in_concerto_encoder and module.__class__.__module__.startswith(
+                    "spconv."
+                ):
+                    # spconv eval kernels do not retain the indice state needed by
+                    # the trainable Concerto decoder backward pass.
+                    module.train()
+
 
     def on_train_batch_end(self, outputs, batch, batch_idx):
         """Quick check for unused parameters at the end of each training step"""

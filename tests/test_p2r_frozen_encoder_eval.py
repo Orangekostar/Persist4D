@@ -7,6 +7,13 @@ import torch
 from trainer.trainer import InstanceSegmentation
 
 
+class _SparseExecution(torch.nn.Module):
+    __module__ = "spconv.pytorch.conv"
+
+    def forward(self, value):
+        return value
+
+
 class _ConcertoTree(torch.nn.Module):
     def __init__(self) -> None:
         super().__init__()
@@ -16,7 +23,7 @@ class _ConcertoTree(torch.nn.Module):
             torch.nn.Linear(2, 2), torch.nn.Dropout(0.5)
         )
         self.backbone.model.enc = torch.nn.Sequential(
-            torch.nn.Linear(2, 2), torch.nn.Dropout(0.5)
+            torch.nn.Linear(2, 2), torch.nn.Dropout(0.5), _SparseExecution()
         )
         self.backbone.model.dec = torch.nn.Sequential(
             torch.nn.Linear(2, 2), torch.nn.Dropout(0.5)
@@ -47,6 +54,7 @@ def test_frozen_encoder_eval_flag_preserves_decoder_train_mode() -> None:
     assert system.training is True
     assert system.model.backbone.model.embedding.training is False
     assert system.model.backbone.model.enc.training is False
+    assert system.model.backbone.model.enc[-1].training is True
     assert system.model.backbone.model.dec.training is True
     assert system.model.class_embed_head.training is True
     assert all(
