@@ -6,6 +6,7 @@ import argparse
 import csv
 import hashlib
 import json
+import math
 import subprocess
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
@@ -249,6 +250,86 @@ def build_multiscan_label_map(
         },
         "mappings": mappings,
     }
+
+
+def derive_multiscan_preflight_decision(
+    *,
+    stable_identity_verified: bool,
+    gap_events: int | None,
+    gap_scenes: int | None,
+    chronology_status: str,
+    ordered_revisit_protocol_allowed: bool,
+    alignment_verified: bool | None,
+    gt_leakage_impossible: bool,
+    observation_coverage: float | None,
+) -> dict[str, object]:
+    """Apply the preregistered sequential MultiScan hard gates."""
+    protocol_failures = []
+    if stable_identity_verified is not True:
+        protocol_failures.append("stable_identity_not_verified")
+    if gap_events is None or gap_scenes is None:
+        protocol_failures.append("gap_audit_not_completed")
+    if chronology_status not in {"TRUE_CHRONOLOGY", "DATASET_ORDER_ONLY"}:
+        protocol_failures.append("ordered_revisit_policy_unresolved")
+    if ordered_revisit_protocol_allowed is not True:
+        protocol_failures.append("ordered_revisit_protocol_not_allowed")
+    if gt_leakage_impossible is not True:
+        protocol_failures.append("gt_leakage_contract_not_verified")
+    if protocol_failures:
+        return {
+            "decision": "MULTISCAN_PROTOCOL_FAIL",
+            "failures": protocol_failures,
+        }
+
+    if (
+        isinstance(gap_events, bool)
+        or not isinstance(gap_events, int)
+        or isinstance(gap_scenes, bool)
+        or not isinstance(gap_scenes, int)
+        or gap_events < 0
+        or gap_scenes < 0
+    ):
+        raise MultiScanAdapterError("gap gate counts must be non-negative integers")
+    if gap_events < 10 or gap_scenes < 3:
+        return {
+            "decision": "MULTISCAN_GAP_FAIL",
+            "failures": [
+                reason
+                for failed, reason in (
+                    (gap_events < 10, "natural_gap_events_below_10"),
+                    (gap_scenes < 3, "gap_scene_clusters_below_3"),
+                )
+                if failed
+            ],
+        }
+    if alignment_verified is None:
+        return {
+            "decision": "MULTISCAN_PROTOCOL_FAIL",
+            "failures": ["alignment_audit_not_completed"],
+        }
+    if alignment_verified is not True:
+        return {
+            "decision": "MULTISCAN_ALIGNMENT_FAIL",
+            "failures": ["official_alignment_not_verified"],
+        }
+    if observation_coverage is None:
+        return {
+            "decision": "MULTISCAN_PROTOCOL_FAIL",
+            "failures": ["frozen_rescene_smoke_not_completed"],
+        }
+    if (
+        isinstance(observation_coverage, bool)
+        or not isinstance(observation_coverage, (int, float))
+        or not math.isfinite(observation_coverage)
+        or not 0 <= observation_coverage <= 1
+    ):
+        raise MultiScanAdapterError("observation coverage must be within [0, 1]")
+    if observation_coverage < 0.10:
+        return {
+            "decision": "MULTISCAN_COVERAGE_FAIL",
+            "failures": ["frozen_rescene_coverage_below_0.10"],
+        }
+    return {"decision": "MULTISCAN_FULL_EVAL_GO", "failures": []}
 
 
 def build_inventory_artifacts(

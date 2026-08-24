@@ -14,11 +14,30 @@ from numbers import Integral
 from pathlib import Path
 from types import MappingProxyType
 
+import numpy as np
+
 _SCAN_ID = re.compile(r"(scene_\d{5})_(\d{2})\Z")
 _OFFICIAL_SPLITS = frozenset({"train", "val", "test", "unassigned"})
 _SELECTED_RULE = "all physical scenes with >= 3 scans"
 _STRUCTURAL_CLASSES = frozenset({"wall", "floor", "ceiling"})
 _OBJECT_LABEL = re.compile(r"(.+)\.(\d+)\Z")
+_FORBIDDEN_INFERENCE_KEYS = frozenset(
+    {
+        "class_ids",
+        "gt_correspondence",
+        "gt_obb",
+        "instance_gt",
+        "instance_ids",
+        "mobilityType",
+        "mobility_label",
+        "objectId",
+        "object_id",
+        "partId",
+        "part_id",
+        "semantic_gt",
+        "stable_object_ids",
+    }
+)
 
 
 class MultiScanAdapterError(ValueError):
@@ -61,6 +80,114 @@ class MultiScanIdentityRecord:
     @property
     def identity_key(self) -> tuple[str, int]:
         return self.scene_id, self.object_id
+
+
+def _readonly_array(value: object, *, dtype: np.dtype, name: str) -> np.ndarray:
+    try:
+        result = np.ascontiguousarray(np.asarray(value, dtype=dtype)).copy()
+    except (TypeError, ValueError) as error:
+        raise MultiScanAdapterError(f"{name} cannot be converted to {dtype}") from error
+    if np.issubdtype(result.dtype, np.floating) and not np.isfinite(result).all():
+        raise MultiScanAdapterError(f"{name} contains non-finite values")
+    result.setflags(write=False)
+    return result
+
+
+@dataclass(frozen=True)
+class MultiScanInferenceInput:
+    xyz: np.ndarray
+    normals: np.ndarray
+    rgb: np.ndarray
+    geometric_segment_ids: np.ndarray
+
+    def __post_init__(self) -> None:
+        arrays = {
+            "xyz": _readonly_array(self.xyz, dtype=np.float32, name="xyz"),
+            "normals": _readonly_array(self.normals, dtype=np.float32, name="normals"),
+            "rgb": _readonly_array(self.rgb, dtype=np.uint8, name="rgb"),
+            "geometric_segment_ids": _readonly_array(
+                self.geometric_segment_ids,
+                dtype=np.int64,
+                name="geometric_segment_ids",
+            ),
+        }
+        point_count = arrays["xyz"].shape[0]
+        expected_shapes = {
+            "xyz": (point_count, 3),
+            "normals": (point_count, 3),
+            "rgb": (point_count, 3),
+            "geometric_segment_ids": (point_count,),
+        }
+        if point_count <= 0:
+            raise MultiScanAdapterError("MultiScan inference input must not be empty")
+        for name, expected_shape in expected_shapes.items():
+            if arrays[name].shape != expected_shape:
+                raise MultiScanAdapterError(
+                    f"{name} must have shape {expected_shape}, got {arrays[name].shape}"
+                )
+            object.__setattr__(self, name, arrays[name])
+
+    def as_mapping(self) -> Mapping[str, np.ndarray]:
+        payload = {
+            "xyz": self.xyz,
+            "normals": self.normals,
+            "rgb": self.rgb,
+            "geometric_segment_ids": self.geometric_segment_ids,
+        }
+        assert_no_gt_leakage(payload)
+        return MappingProxyType(payload)
+
+
+@dataclass(frozen=True)
+class MultiScanEvaluatorTarget:
+    scene_id: str
+    scan_id: str
+    class_ids: np.ndarray
+    instance_ids: np.ndarray
+    stable_object_ids: np.ndarray
+
+    def __post_init__(self) -> None:
+        observed_scene, _ = parse_multiscan_scan_id(self.scan_id)
+        if observed_scene != self.scene_id:
+            raise MultiScanAdapterError("evaluator target cannot mix physical scenes")
+        arrays = {
+            "class_ids": _readonly_array(
+                self.class_ids, dtype=np.int32, name="class_ids"
+            ),
+            "instance_ids": _readonly_array(
+                self.instance_ids, dtype=np.int32, name="instance_ids"
+            ),
+            "stable_object_ids": _readonly_array(
+                self.stable_object_ids, dtype=np.int32, name="stable_object_ids"
+            ),
+        }
+        lengths = {array.shape for array in arrays.values()}
+        if len(lengths) != 1 or not lengths or next(iter(lengths)) == (0,):
+            raise MultiScanAdapterError(
+                "evaluator target arrays must have equal length"
+            )
+        if any(array.ndim != 1 for array in arrays.values()):
+            raise MultiScanAdapterError(
+                "evaluator target arrays must be one-dimensional"
+            )
+        for name, array in arrays.items():
+            object.__setattr__(self, name, array)
+
+
+def assert_no_gt_leakage(value: object) -> None:
+    """Reject evaluator-only MultiScan ground truth in model inputs."""
+    if isinstance(value, Mapping):
+        forbidden = _FORBIDDEN_INFERENCE_KEYS.intersection(value)
+        if forbidden:
+            raise MultiScanAdapterError(
+                "ground-truth leakage in inference payload: "
+                + ", ".join(sorted(forbidden))
+            )
+        for child in value.values():
+            assert_no_gt_leakage(child)
+    elif isinstance(value, (list, tuple)):
+        for child in value:
+            assert_no_gt_leakage(child)
 
 
 def parse_multiscan_scan_id(value: object) -> tuple[str, int]:
@@ -455,9 +582,12 @@ def build_multiscan_inventory(path: str | Path) -> dict[str, object]:
 __all__ = [
     "MultiScanAdapterError",
     "MultiScanAnnotation",
+    "MultiScanEvaluatorTarget",
     "MultiScanIdentityRecord",
+    "MultiScanInferenceInput",
     "MultiScanInstancePayload",
     "MultiScanObjectAnnotation",
+    "assert_no_gt_leakage",
     "build_multiscan_identity_records",
     "build_multiscan_inventory",
     "detect_natural_gaps",
