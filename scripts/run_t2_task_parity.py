@@ -17,7 +17,7 @@ from scripts.evaluate_persist4d_p6a import (
     build_rio_class_mapper,
     expected_cache_keys,
 )
-from scripts.p6a_cache import cache_payload_digest, validate_cache_entry
+from scripts.p6a_cache import cache_payload_digest, write_cache_entry
 from scripts.p6a_metrics import OfficialMetricAccumulator
 from scripts.rescene_task_postprocess import (
     OfficialTaskPrediction,
@@ -25,18 +25,17 @@ from scripts.rescene_task_postprocess import (
 )
 from scripts.run_system_comparison import (
     FULL_CACHE_MANIFEST,
-    FULL_ENTRY_CACHE,
     LOCAL_CACHE_MANIFEST,
-    LOCAL_ENTRY_CACHE,
     REPRODUCIBILITY_BINDING,
     SOURCE_PROTOCOL,
     _build_frozen_setup,
+    _full_producer,
     _local_producer,
     _publish_exact_bytes,
 )
 from scripts.system_comparison_inference import (
+    assert_t2_observation_regression,
     deterministic_inference_runtime,
-    load_full_history_cache_entry,
 )
 from scripts.system_comparison_metrics import (
     causal_prefix_pair_from_payload,
@@ -44,7 +43,6 @@ from scripts.system_comparison_metrics import (
 )
 from scripts.system_comparison_v2_cache import (
     build_task_sidecar,
-    observation_fingerprint,
     write_task_sidecar,
 )
 from scripts.system_comparison_v2_parity import (
@@ -59,6 +57,10 @@ DEFAULT_METADATA = Path("/home/ww/3RScan.json")
 DEFAULT_SIDECAR_ENTRIES = Path(
     "/mnt/shared/ww/persist4d-tmap-root-cause-v2/"
     "system_comparison_v2/task_sidecars/entries"
+)
+DEFAULT_RAW_ENTRIES = Path(
+    "/mnt/shared/ww/persist4d-tmap-root-cause-v2/"
+    "system_comparison_v2/raw_predictions/entries"
 )
 EXPECTED_T2_UNITS = 43 * 3
 CSV_FIELDS = (
@@ -79,6 +81,11 @@ CSV_FIELDS = (
     "raw_observation_fingerprint",
     "sidecar_content_sha256",
     "full_history_content_sha256",
+    "fresh_raw_content_sha256",
+    "frozen_v1_raw_content_sha256",
+    "frozen_v1_raw_reproduced",
+    "frozen_v1_full_history_content_sha256",
+    "frozen_v1_full_history_reproduced",
 )
 
 
@@ -183,17 +190,23 @@ def _report_bytes(
         f"- Per-unit rows SHA256: `{rows_sha256}`",
         f"- Sidecar manifest SHA256: `{sidecar_manifest_sha256}`",
         "- Sidecar storage: `external:system_comparison_v2/task_sidecars/entries`",
+        "- Matched raw storage: `external:system_comparison_v2/raw_predictions/entries`",
+        f"- Frozen V1 local raw bytewise replays: `{summary['frozen_v1_raw_reproduced_count']}/{summary['unit_count']}`",
+        f"- Frozen V1 FullHistory bytewise replays: `{summary['frozen_v1_full_history_reproduced_count']}/{summary['unit_count']}`",
         "",
         "## Gate Semantics",
         "",
-        "Each local task prediction is produced from the same forward pass as its raw ",
-        "observation. The raw payload must reproduce the frozen V1 cache content hash ",
-        "before the official-task sidecar is accepted. The gate then requires exact ",
+        "Each local task prediction is produced from the same forward pass as its ",
+        "content-addressed V2 raw observation. FullHistory and Local are replayed in ",
+        "the same deterministic process, and the existing T2 observation fingerprint ",
+        "regression must pass before task comparison. The gate then requires exact ",
         "candidate count, masks, and classes; scores use `rtol=0, atol=1e-7`; official ",
         "raw-local AP uses the same current-stage target on both sides.",
         "",
-        "This gate tests evaluator/input parity only. It does not establish causal ",
-        "t-mAP parity and it does not tune task post-processing or memory behavior.",
+        "Frozen V1 content hashes are retained as diagnostics rather than replay gates: ",
+        "the original audit established same-process repeatability, not cross-process ",
+        "bitwise replay. This gate tests evaluator/input parity only. It does not ",
+        "establish causal t-mAP parity or tune task post-processing/memory behavior.",
         "",
     ]
     return "\n".join(lines).encode("utf-8")
@@ -204,8 +217,16 @@ def run_t2_task_parity(
     metadata_path: Path,
     device_name: str,
     sidecar_entry_directory: Path,
+    raw_entry_directory: Path,
     artifact_root: Path = ARTIFACT_ROOT,
 ) -> Mapping[str, object]:
+    source_commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=PROJECT_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
     binding = _json(REPRODUCIBILITY_BINDING)
     local_manifest = _json(LOCAL_CACHE_MANIFEST)
     full_manifest = _json(FULL_CACHE_MANIFEST)
@@ -234,6 +255,11 @@ def run_t2_task_parity(
         raise T2ParityError("Protocol B does not contain 129 T2 units")
 
     producer = _local_producer(setup)
+    producer.provenance = {
+        **setup.local_provenance,
+        "source_commit": source_commit,
+    }
+    full_producer = _full_producer(setup)
     class_mapper = build_rio_class_mapper(setup.dataset)
     full_accumulator = OfficialMetricAccumulator(mode="raw_local")
     local_accumulator = OfficialMetricAccumulator(mode="raw_local")
@@ -254,16 +280,6 @@ def run_t2_task_parity(
                 raise T2ParityError(f"frozen cache lacks T2 cell {identity}")
             local_entry = local_entries[identity]
             full_entry = full_entries[identity]
-            frozen_raw = validate_cache_entry(
-                LOCAL_ENTRY_CACHE / str(local_entry["filename"]),
-                local_entry,
-                expected_provenance=setup.local_provenance,
-            )
-            full_payload = load_full_history_cache_entry(
-                FULL_ENTRY_CACHE,
-                full_entry,
-                expected_provenance=setup.full_provenance,
-            )
             produced = producer.produce_bundle(
                 key,
                 task_prediction_builder=extract_official_task_prediction,
@@ -271,31 +287,54 @@ def run_t2_task_parity(
             )
             if not isinstance(produced.task_prediction, OfficialTaskPrediction):
                 raise T2ParityError("local forward did not produce official task output")
-            if cache_payload_digest(produced.payload) != local_entry["content_sha256"]:
-                raise T2ParityError(f"fresh raw payload differs for T2 cell {identity}")
-            if observation_fingerprint(produced.payload) != observation_fingerprint(
-                frozen_raw
-            ):
+            full_produced = full_producer.produce_bundle(full_entry["key"])
+            full_payload = full_produced.payload
+            try:
+                assert_t2_observation_regression(full_payload, produced.payload)
+            except Exception as error:
                 raise T2ParityError(
-                    f"fresh raw observation differs for T2 cell {identity}"
-                )
+                    f"fresh local/full observation differs for T2 cell {identity}"
+                ) from error
 
             sidecar = build_task_sidecar(
-                raw_cache_payload=frozen_raw,
+                raw_cache_payload=produced.payload,
                 official_prediction=produced.task_prediction,
                 protocol_manifest_sha256=protocol_sha256,
             )
+            raw_entry = write_cache_entry(raw_entry_directory, produced.payload)
             sidecar_entry = write_task_sidecar(sidecar_entry_directory, sidecar)
             row = compare_t2_task_predictions(
                 full_payload=full_payload,
                 local_sidecar=sidecar,
-                full_history_content_sha256=str(full_entry["content_sha256"]),
+                full_history_content_sha256=str(full_payload["content_sha256"]),
                 sidecar_content_sha256=str(sidecar_entry["content_sha256"]),
+            )
+            row.update(
+                {
+                    "fresh_raw_content_sha256": cache_payload_digest(
+                        produced.payload
+                    ),
+                    "frozen_v1_raw_content_sha256": local_entry[
+                        "content_sha256"
+                    ],
+                    "frozen_v1_raw_reproduced": (
+                        cache_payload_digest(produced.payload)
+                        == local_entry["content_sha256"]
+                    ),
+                    "frozen_v1_full_history_content_sha256": full_entry[
+                        "content_sha256"
+                    ],
+                    "frozen_v1_full_history_reproduced": (
+                        full_payload["content_sha256"]
+                        == full_entry["content_sha256"]
+                    ),
+                }
             )
             rows.append(row)
             sidecar_entries.append(
                 {
                     **sidecar_entry,
+                    "matched_raw_entry": raw_entry,
                     "source_raw_observation_fingerprint": row[
                         "raw_observation_fingerprint"
                     ],
@@ -314,14 +353,15 @@ def run_t2_task_parity(
     aggregate_difference = abs(aggregate_full_ap - aggregate_local_ap)
     if aggregate_difference > 1e-12:
         summary = {**summary, "status": "fail"}
-
-    source_commit = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=PROJECT_ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
+    summary = {
+        **summary,
+        "frozen_v1_raw_reproduced_count": sum(
+            row["frozen_v1_raw_reproduced"] is True for row in rows
+        ),
+        "frozen_v1_full_history_reproduced_count": sum(
+            row["frozen_v1_full_history_reproduced"] is True for row in rows
+        ),
+    }
     rows_sha256 = _canonical_digest(rows)
     sidecar_manifest = {
         "schema_version": 1,
@@ -329,8 +369,10 @@ def run_t2_task_parity(
         "source_commit": source_commit,
         "protocol_manifest_sha256": protocol_sha256,
         "checkpoint_sha256": binding["checkpoint_sha256"],
-        "raw_cache_entries_sha256": local_manifest["entries_sha256"],
-        "full_history_entries_sha256": full_manifest["entries_sha256"],
+        "frozen_v1_raw_cache_entries_sha256": local_manifest["entries_sha256"],
+        "frozen_v1_full_history_entries_sha256": full_manifest[
+            "entries_sha256"
+        ],
         "entry_count": len(sidecar_entries),
         "entries_sha256": _canonical_digest(sidecar_entries),
         "entries": sidecar_entries,
@@ -386,6 +428,11 @@ def _parser() -> argparse.ArgumentParser:
         type=Path,
         default=DEFAULT_SIDECAR_ENTRIES,
     )
+    parser.add_argument(
+        "--raw-entry-directory",
+        type=Path,
+        default=DEFAULT_RAW_ENTRIES,
+    )
     parser.add_argument("--artifact-root", type=Path, default=ARTIFACT_ROOT)
     return parser
 
@@ -396,6 +443,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         metadata_path=arguments.metadata,
         device_name=arguments.device,
         sidecar_entry_directory=arguments.sidecar_entry_directory,
+        raw_entry_directory=arguments.raw_entry_directory,
         artifact_root=arguments.artifact_root,
     )
     print(json.dumps(result, allow_nan=False, sort_keys=True))
