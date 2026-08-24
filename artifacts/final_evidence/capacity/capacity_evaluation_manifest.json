@@ -1,0 +1,72 @@
+{
+  "artifacts": {
+    "capacity_aggregate.csv": {
+      "bytes": 15619,
+      "sha256": "6df796af15e9a1d6954cc1d0c317aa16b8a91e567e11073231ae24689f5c36a2"
+    },
+    "capacity_cluster_bootstrap.csv": {
+      "bytes": 4813,
+      "sha256": "4e6f1c61b51031115fcc564ee7c16e64029dae8efe0c074cfe51b414c6c6b7df"
+    },
+    "capacity_gate.json": {
+      "bytes": 101,
+      "sha256": "dea57d2a9b8af5ab6e80075e76b9e5926df7a6913726b28b3989866803dcf382"
+    },
+    "capacity_per_scene_effects.csv": {
+      "bytes": 31082,
+      "sha256": "f931b0177d8bcd39e8641ffce1384da9ae683ca3cb52e7da8b8c6b9d5bf5269c"
+    },
+    "capacity_per_sequence.csv": {
+      "bytes": 1313508,
+      "sha256": "9fe0501784c5f5959f5274412cd0739e1aba524efbcd2aa9c9a5df4e50c5bb51"
+    },
+    "capacity_raw.json": {
+      "bytes": 5215705,
+      "sha256": "152a5b944fc9603187de0831ec220733e0d3898e3f52f70182ace629bbea9e8f"
+    },
+    "capacity_robustness.json": {
+      "bytes": 788,
+      "sha256": "3ecb269f8cdda55026bb6660b215e1f5e238546054443138fb4153de988aee20"
+    }
+  },
+  "classification": "CAPACITY_100_OK",
+  "provenance": {
+    "architecture_status": "FINAL_LOCK",
+    "baseline_source_commit": "3323cba186479b7dd4c005bebd468415b7d07a3b",
+    "cache_entry_file_sha256_list_digest": "f03a6a99dd03c7995183ae23ae14a85e14d59e30b17a99cfa40336a4cdf4345d",
+    "cache_manifest_sha256": "44a089ae079b864a8417954fb0cc9b3e17f1650400e747c6d3c73c1ac71aaa0f",
+    "capacities": [
+      64,
+      100,
+      128,
+      160,
+      200
+    ],
+    "capacity_code_sha256": "d9497856b55e0ef5e4f5cf15981360d2e04ae626615d857ea9a9ad3b4e829dab",
+    "config_sha256": "b4fc1fb8719e06890ab18ecaebe10fada7b0ca39c216f98c15c06186a7a9820c",
+    "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+    "environment": {
+      "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.39",
+      "python": "3.10.20",
+      "torch": "2.6.0+cu126",
+      "torch_threads": 32
+    },
+    "horizons": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "label_database_sha256": "b03b15ecd0791a0ecd05912e9fe5617dd29a466d117cf5c2188f28638293a063",
+    "observation_manifest_sha256": "51b6784359c94d4ae7a2eb286ea5656968403d20567f8cd4941ea06651337c02",
+    "reference_scene_count": 6,
+    "reviewer_manifest_sha256": "11cc6d10d529eac45e8d946fefc4e7fdda2aa18a6d1e46b25f5d249ee2053e15",
+    "runner_sha256": "4e461335c8fb9f3f2999be540fce9412003b86ca54959b7763ac7fdda93b94c6",
+    "schema_version": 1,
+    "sequence_count": 129,
+    "source_binding_sha256": "ded8d39dfa1467693769fd601b5237eaf55bddeb2a534506b69e9bc538067381",
+    "timing_device": "cpu"
+  },
+  "schema_version": 1,
+  "status": "pass"
+}

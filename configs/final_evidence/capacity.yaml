@@ -1,0 +1,43 @@
+schema_version: 1
+architecture_status: FINAL_LOCK
+protocol: exact_frozen_common_prefix
+horizons: [2, 3, 4, 5]
+capacity_grid: [64, 100, 128, 160, 200]
+main_capacity: 100
+selection:
+  preexisting_development_split: false
+  selected_without_final_tuning: false
+  final_evaluation_may_select_capacity: false
+tracker:
+  association_threshold: 0.5
+  class_weight: 0.25
+  background_class: 18
+  update_rate: 0.2
+  max_update_rate: 0.2
+observation_control:
+  source: external:frozen-system-comparison/persistent_predictions
+  require_identical_content_digest_across_capacity: true
+  rerun_rescene: false
+statistics:
+  cluster_unit: reference_scene_id
+  expected_clusters: 6
+  bootstrap_replicates: 10000
+  confidence_level: 0.95
+  seed: 45
+robust_improvement:
+  reference_capacity: 100
+  candidate_capacities: [128, 160, 200]
+  primary_metrics: [causal_prefix_t_REC, gap_recovery_recall]
+  minimum_absolute_improvement: 0.01
+  require_paired_cluster_ci_lower_above_zero: true
+  candidate_rule: any_primary_metric_at_any_T2_T5_and_all_non_degradation_cells
+  non_degradation_metrics:
+    causal_prefix_t_mAP:
+      maximum_absolute_drop: 0.005
+    normalized_id_switch_rate:
+      maximum_absolute_increase: 0.005
+timing:
+  device: cpu
+  memory_latency: association_plus_memory_update
+  total_update_latency: complete_B4PersistentTracker_step
+  excluded: [network_forward, dataset_load, metric_postprocess]

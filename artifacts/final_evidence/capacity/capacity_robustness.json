@@ -1,0 +1,32 @@
+{
+  "candidates": [
+    {
+      "capacity": 128,
+      "id_switch_non_degradation": true,
+      "primary_evidence_cell_count": 0,
+      "robust": false,
+      "t_mAP_non_degradation": true,
+      "worst_id_switch_delta": 0.0,
+      "worst_t_mAP_delta": 0.0
+    },
+    {
+      "capacity": 160,
+      "id_switch_non_degradation": true,
+      "primary_evidence_cell_count": 0,
+      "robust": false,
+      "t_mAP_non_degradation": true,
+      "worst_id_switch_delta": 0.0,
+      "worst_t_mAP_delta": 0.0
+    },
+    {
+      "capacity": 200,
+      "id_switch_non_degradation": true,
+      "primary_evidence_cell_count": 0,
+      "robust": false,
+      "t_mAP_non_degradation": true,
+      "worst_id_switch_delta": 0.0,
+      "worst_t_mAP_delta": 0.0
+    }
+  ],
+  "robust_improvement": false
+}

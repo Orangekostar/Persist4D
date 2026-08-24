@@ -1,0 +1,61 @@
+{
+  "cache_manifest_sha256": "44a089ae079b864a8417954fb0cc9b3e17f1650400e747c6d3c73c1ac71aaa0f",
+  "cache_provenance": {
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "config_sha256": "34d10651643d1d01993a0b735f590fc555489462beda85b9dd215fc20823213d",
+    "dataset_sha256": "656dd934ed845e66e431cd223bf31e291681b8a59832db0f2c12d93af4ad450e",
+    "source_commit": "575acc12fbd63f38fc3c16578914b25c2fed8584"
+  },
+  "coverage": {
+    "entry_count": 645,
+    "horizons": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "master_sequence_count": 43,
+    "order_entry_counts": {
+      "canonical": 215,
+      "reverse": 215,
+      "sha256_seed45": 215
+    },
+    "reference_scene_cluster_count": 6,
+    "stage_count_per_master_order": 5,
+    "total_entry_bytes": 4062534570
+  },
+  "entry_file_sha256_list_digest": "f03a6a99dd03c7995183ae23ae14a85e14d59e30b17a99cfa40336a4cdf4345d",
+  "entry_validation": {
+    "regular_file_count": 645,
+    "sha256_verified_count": 645,
+    "size_verified_count": 645,
+    "status": "pass"
+  },
+  "observation_fields": [
+    "features",
+    "class_prob",
+    "confidence",
+    "valid",
+    "masks",
+    "mask_support",
+    "local_query_ids"
+  ],
+  "observation_shape": {
+    "class_count": 19,
+    "feature_dimension": 128,
+    "query_count": 100
+  },
+  "schema_version": 1,
+  "sidecar_created": false,
+  "source_reference": "external:frozen-system-comparison/persistent_predictions",
+  "status": "pass",
+  "target_fields": [
+    "gt_ids",
+    "gt_classes",
+    "gt_masks",
+    "changes",
+    "change_labels_valid",
+    "change_label_semantics",
+    "gt_class_semantics"
+  ]
+}

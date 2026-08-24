@@ -1,0 +1,46 @@
+{
+  "architecture_status": "FINAL_LOCK",
+  "classification": "CAPACITY_100_OK",
+  "configuration_reopened": false,
+  "coverage": {
+    "capacity_grid": [64, 100, 128, 160, 200],
+    "horizons": [2, 3, 4, 5],
+    "reference_scene_clusters": 6,
+    "sequences": 129
+  },
+  "legacy_f7_reconciliation": {
+    "legacy_t4_count": 830,
+    "legacy_t5_count": 908,
+    "status": "taxonomy_conflates_false_birth_with_true_capacity_rejection",
+    "true_rejected_births_in_direct_replay": 0
+  },
+  "main_capacity": 100,
+  "q1": {
+    "maximum_peak_occupied_slots": 30,
+    "saturated_sequence_count_at_t5": 0,
+    "sequence_count_at_t5": 129
+  },
+  "q2": {
+    "classes_with_rejected_births": [],
+    "orders_with_rejected_births": [],
+    "scenes_with_rejected_births": [],
+    "total_t5_birth_opportunities": 2214,
+    "total_t5_rejected_births": 0
+  },
+  "q3": {
+    "candidate_capacities": [128, 160, 200],
+    "maximum_defined_absolute_metric_effect": 0.0,
+    "robust_improvement": false
+  },
+  "q4": {
+    "additional_accepted_tracks_above_k100": 0,
+    "metric_change_above_k100": 0.0
+  },
+  "q5": {
+    "k100_state_bytes": 61008,
+    "measured_formula": "610*K + 8 bytes",
+    "tested_maximum_state_bytes": 122008,
+    "tested_minimum_state_bytes": 39048
+  },
+  "schema_version": 1
+}

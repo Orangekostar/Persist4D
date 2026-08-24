@@ -11,11 +11,11 @@
 ## Environment Diagnosis
 
 The unqualified `pytest` command is not a valid project runner on this host. It
-resolves to `/home/ww/.local/bin/pytest`, whose shebang uses system Python 3.12
+resolves to `$HOME/.local/bin/pytest`, whose shebang uses system Python 3.12
 and a broken user-level PyTorch installation. The project runner is:
 
 ```text
-/home/ww/miniconda3/envs/persist4d/bin/python -m pytest
+conda run -n persist4d python -m pytest
 ```
 
 That environment has Python 3.10.20, PyTorch 2.6.0+cu126, pytest 8.4.2, and
@@ -26,7 +26,7 @@ PyTorch Lightning 2.6.5.
 Command:
 
 ```text
-/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q -m 'not gpu'
+conda run -n persist4d python -m pytest -q -m 'not gpu'
 ```
 
 Result: 1651 passed, 8 skipped, 2 deselected, and 111 failed in 825.77 seconds.
