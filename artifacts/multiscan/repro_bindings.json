@@ -1,0 +1,40 @@
+{
+  "environment": {
+    "cuda": "12.6",
+    "numpy": "2.2.6",
+    "pytest": "8.4.2",
+    "python": "3.10.20",
+    "pytorch_lightning": "2.6.5",
+    "scipy": "1.15.3",
+    "torch": "2.6.0+cu126"
+  },
+  "frozen_runtime": {
+    "checkpoint_reference": "repo-ignored:checkpoints/rescene4d_concerto_t2_repro.ckpt",
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "external_config_reference": "repo:configs/final_evidence/rescan.yaml",
+    "external_config_sha256": "b7898eca6a912955b0cb03f749456090d86a29caf8885842e94d3a497aa8b4de",
+    "rescene_config_reference": "repo:configs/system_comparison/persist4d_incumbent.yaml",
+    "rescene_config_sha256": "aadca1c1608bae4ad4e812a6261536d9e386a85c460bbd85f4c5d215c9a68717"
+  },
+  "multiscan": {
+    "commit": "697bc9ec86fb7d34d47cb4cdbddcfc3c7f18c605",
+    "data_license": "CC-BY-NC-4.0",
+    "data_repository": "https://huggingface.co/datasets/3dlg-hcvc/MultiScan",
+    "data_repository_revision": "c62c9aad850a8638ac3e42605926a65707600125",
+    "release_file_access": "gated_unauthenticated",
+    "repository": "https://github.com/smartscenes/multiscan",
+    "scans_split_sha256": "6f502ee306bfd14cd96fc8368ad9ff5fe38af0f1504896884715818f8a2e3624",
+    "semantic_map_sha256": "6a9a5bcf44c628b7431d23b7a95be5479313c6fac8ddb49d5e2e499998c4f5bb",
+    "tree": "cbeec22d43dfd9def6055cf13c96ec40091d70be"
+  },
+  "persist4d": {
+    "branch": "research/persist4d-multiscan-preflight",
+    "final_evidence_tree": "0c28167e9eb347b78c431d84d94d0f79f3bddae2",
+    "frozen_commit": "487080cf31266f1572257e2aca36767e074b68b6",
+    "frozen_tree": "a8fdf03eac3254e463e1b14421be0deca8f234cc",
+    "generation_commit": "cf1df36190005fe5b7ee9e27d561f4b13110596c",
+    "reviewer_closure_tree": "e521be7b038b9bfb84d8461380cc9cd228f70568"
+  },
+  "schema_version": 1,
+  "status": "pass"
+}

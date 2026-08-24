@@ -1,0 +1,273 @@
+{
+  "collection_name": "MultiScan Longitudinal Zero-Shot Collection",
+  "scan_count": 101,
+  "scene_count": 23,
+  "scenes": [
+    {
+      "number_of_scans": 3,
+      "official_split": "val",
+      "scan_ids": [
+        "scene_00069_00",
+        "scene_00069_01",
+        "scene_00069_02"
+      ],
+      "scene_id": "scene_00069"
+    },
+    {
+      "number_of_scans": 3,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00088_00",
+        "scene_00088_01",
+        "scene_00088_02"
+      ],
+      "scene_id": "scene_00088"
+    },
+    {
+      "number_of_scans": 3,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00092_00",
+        "scene_00092_01",
+        "scene_00092_02"
+      ],
+      "scene_id": "scene_00092"
+    },
+    {
+      "number_of_scans": 3,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00094_00",
+        "scene_00094_01",
+        "scene_00094_02"
+      ],
+      "scene_id": "scene_00094"
+    },
+    {
+      "number_of_scans": 3,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00095_00",
+        "scene_00095_01",
+        "scene_00095_02"
+      ],
+      "scene_id": "scene_00095"
+    },
+    {
+      "number_of_scans": 3,
+      "official_split": "val",
+      "scan_ids": [
+        "scene_00097_00",
+        "scene_00097_01",
+        "scene_00097_02"
+      ],
+      "scene_id": "scene_00097"
+    },
+    {
+      "number_of_scans": 3,
+      "official_split": "test",
+      "scan_ids": [
+        "scene_00098_00",
+        "scene_00098_01",
+        "scene_00098_02"
+      ],
+      "scene_id": "scene_00098"
+    },
+    {
+      "number_of_scans": 3,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00100_00",
+        "scene_00100_01",
+        "scene_00100_02"
+      ],
+      "scene_id": "scene_00100"
+    },
+    {
+      "number_of_scans": 4,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00101_00",
+        "scene_00101_01",
+        "scene_00101_02",
+        "scene_00101_03"
+      ],
+      "scene_id": "scene_00101"
+    },
+    {
+      "number_of_scans": 5,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00102_00",
+        "scene_00102_01",
+        "scene_00102_02",
+        "scene_00102_03",
+        "scene_00102_04"
+      ],
+      "scene_id": "scene_00102"
+    },
+    {
+      "number_of_scans": 9,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00104_00",
+        "scene_00104_01",
+        "scene_00104_02",
+        "scene_00104_03",
+        "scene_00104_04",
+        "scene_00104_05",
+        "scene_00104_06",
+        "scene_00104_07",
+        "scene_00104_08"
+      ],
+      "scene_id": "scene_00104"
+    },
+    {
+      "number_of_scans": 9,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00105_00",
+        "scene_00105_01",
+        "scene_00105_02",
+        "scene_00105_03",
+        "scene_00105_04",
+        "scene_00105_05",
+        "scene_00105_06",
+        "scene_00105_07",
+        "scene_00105_08"
+      ],
+      "scene_id": "scene_00105"
+    },
+    {
+      "number_of_scans": 6,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00106_00",
+        "scene_00106_01",
+        "scene_00106_02",
+        "scene_00106_03",
+        "scene_00106_04",
+        "scene_00106_05"
+      ],
+      "scene_id": "scene_00106"
+    },
+    {
+      "number_of_scans": 4,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00107_00",
+        "scene_00107_01",
+        "scene_00107_02",
+        "scene_00107_03"
+      ],
+      "scene_id": "scene_00107"
+    },
+    {
+      "number_of_scans": 4,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00108_00",
+        "scene_00108_01",
+        "scene_00108_02",
+        "scene_00108_03"
+      ],
+      "scene_id": "scene_00108"
+    },
+    {
+      "number_of_scans": 5,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00109_00",
+        "scene_00109_01",
+        "scene_00109_02",
+        "scene_00109_03",
+        "scene_00109_04"
+      ],
+      "scene_id": "scene_00109"
+    },
+    {
+      "number_of_scans": 5,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00110_00",
+        "scene_00110_01",
+        "scene_00110_02",
+        "scene_00110_03",
+        "scene_00110_04"
+      ],
+      "scene_id": "scene_00110"
+    },
+    {
+      "number_of_scans": 3,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00111_00",
+        "scene_00111_01",
+        "scene_00111_02"
+      ],
+      "scene_id": "scene_00111"
+    },
+    {
+      "number_of_scans": 4,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00112_00",
+        "scene_00112_01",
+        "scene_00112_02",
+        "scene_00112_03"
+      ],
+      "scene_id": "scene_00112"
+    },
+    {
+      "number_of_scans": 4,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00113_00",
+        "scene_00113_01",
+        "scene_00113_02",
+        "scene_00113_03"
+      ],
+      "scene_id": "scene_00113"
+    },
+    {
+      "number_of_scans": 5,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00114_00",
+        "scene_00114_01",
+        "scene_00114_02",
+        "scene_00114_03",
+        "scene_00114_04"
+      ],
+      "scene_id": "scene_00114"
+    },
+    {
+      "number_of_scans": 5,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00115_00",
+        "scene_00115_01",
+        "scene_00115_02",
+        "scene_00115_03",
+        "scene_00115_04"
+      ],
+      "scene_id": "scene_00115"
+    },
+    {
+      "number_of_scans": 5,
+      "official_split": "train",
+      "scan_ids": [
+        "scene_00116_00",
+        "scene_00116_01",
+        "scene_00116_02",
+        "scene_00116_03",
+        "scene_00116_04"
+      ],
+      "scene_id": "scene_00116"
+    }
+  ],
+  "schema_version": 1,
+  "selected_rule": "all physical scenes with >= 3 scans",
+  "selected_scene_list_sha256": "ac84a044f24038de404715fc0dcb6bc62aff2e13992735e31877986122e00d36",
+  "status": "pass"
+}
