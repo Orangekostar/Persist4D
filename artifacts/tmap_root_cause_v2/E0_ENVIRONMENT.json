@@ -1,0 +1,38 @@
+{
+  "checkpoint": {
+    "byte_size": 754917862,
+    "epoch": 404,
+    "global_step": 26730,
+    "path": "checkpoints/rescene4d_concerto_t2_repro.ckpt",
+    "sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e"
+  },
+  "filesystem": {
+    "shared_available_bytes": 266033168384,
+    "workspace_available_bytes": 107363418112
+  },
+  "generated_at_utc": "2026-08-24T14:28:36Z",
+  "hardware": {
+    "cuda_available": true,
+    "cuda_runtime": "12.6",
+    "driver": "595.71.05",
+    "gpu_count": 3,
+    "gpu_memory_mib": 46068,
+    "gpu_model": "NVIDIA A40"
+  },
+  "repository": {
+    "branch": "research/persist4d-tmap-root-cause-v2",
+    "start_commit": "487080cf31266f1572257e2aca36767e074b68b6",
+    "worktree": "/home/ww/paper5/.worktrees/persist4d-final-evidence"
+  },
+  "runtime": {
+    "numpy": "2.2.6",
+    "pytest": "8.4.2",
+    "python": "3.10.20",
+    "pytorch_lightning": "2.6.5",
+    "scipy": "1.15.3",
+    "stmetrics": "0.1.0",
+    "torch": "2.6.0+cu126"
+  },
+  "schema_version": 1,
+  "test_runner": "conda run -n persist4d python -m pytest"
+}
