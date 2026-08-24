@@ -74,6 +74,7 @@ def build_chronology_audit(inventory: Mapping[str, object]) -> dict[str, object]
     raw_scenes = inventory.get("scenes")
     if not isinstance(raw_scenes, list) or not raw_scenes:
         raise MultiScanAdapterError("chronology audit requires inventory scenes")
+    selected_scene_ids = set(inventory.get("selected_scene_ids", []))
     scene_orders = []
     for raw_scene in raw_scenes:
         if not isinstance(raw_scene, Mapping):
@@ -82,6 +83,11 @@ def build_chronology_audit(inventory: Mapping[str, object]) -> dict[str, object]
         raw_scan_ids = raw_scene.get("scan_ids")
         if not isinstance(scene_id, str) or not isinstance(raw_scan_ids, list):
             raise MultiScanAdapterError("chronology inventory scene is malformed")
+        if selected_scene_ids:
+            if scene_id not in selected_scene_ids:
+                continue
+        elif raw_scene.get("number_of_scans", 0) < 3:
+            continue
         ordered_scan_ids = []
         prior_index = -1
         for scan_id in raw_scan_ids:
@@ -332,6 +338,278 @@ def derive_multiscan_preflight_decision(
     return {"decision": "MULTISCAN_FULL_EVAL_GO", "failures": []}
 
 
+def build_release_blocked_artifacts(
+    *,
+    output_directory: str | Path,
+    inventory: Mapping[str, object],
+    semantic_map_path: str | Path,
+    official_repository: str | Path,
+) -> dict[str, Path]:
+    """Publish complete fail-closed evidence when licensed files are inaccessible."""
+    output = Path(output_directory)
+    official = Path(official_repository)
+    if _git(official, "rev-parse", "HEAD") != MULTISCAN_COMMIT:
+        raise MultiScanAdapterError("official MultiScan checkout commit differs")
+    base_names = (
+        "repro_bindings.json",
+        "reproducibility_binding.json",
+        "multiscan_inventory.json",
+        "longitudinal_subset_manifest.json",
+    )
+    for name in base_names:
+        path = output / name
+        if path.is_symlink() or not path.is_file():
+            raise MultiScanAdapterError(f"required base artifact is absent: {name}")
+
+    chronology = build_chronology_audit(inventory)
+    label_map = build_multiscan_label_map(semantic_map_path)
+    decision = derive_multiscan_preflight_decision(
+        stable_identity_verified=False,
+        gap_events=None,
+        gap_scenes=None,
+        chronology_status=str(chronology["status"]),
+        ordered_revisit_protocol_allowed=bool(
+            chronology["ordered_revisit_protocol_allowed"]
+        ),
+        alignment_verified=None,
+        gt_leakage_impossible=True,
+        observation_coverage=None,
+    )
+    if decision["decision"] != "MULTISCAN_PROTOCOL_FAIL":
+        raise MultiScanAdapterError("blocked release must fail the protocol gate")
+
+    documentation = official / "docs/read-the-docs/dataset"
+    source_evidence = {
+        "annotation_schema_sha256": _sha256_file(
+            documentation / "files/annotation.rst"
+        ),
+        "acquired_schema_sha256": _sha256_file(documentation / "files/acquired.rst"),
+        "alignment_schema_sha256": _sha256_file(documentation / "files/output.rst"),
+        "dataset_index_sha256": _sha256_file(documentation / "index.rst"),
+        "instance_generator_sha256": _sha256_file(
+            official / "dataset/gen_instsegm_dataset.py"
+        ),
+    }
+    access_audit = {
+        "schema_version": 1,
+        "status": "blocked_gated_unauthenticated",
+        "repository": "https://huggingface.co/datasets/3dlg-hcvc/MultiScan",
+        "revision": DATA_REPOSITORY_REVISION,
+        "license": "CC-BY-NC-4.0",
+        "authenticated_session_present": False,
+        "resolver_http_status": 401,
+        "resolver_error_code": "GatedRepo",
+        "blocked_assets": [
+            "real released scan archives containing annotations/geometry/metadata",
+            "real released benchmark PTH files",
+        ],
+        "license_acceptance_performed_by_automation": False,
+        "scientific_effect": (
+            "release-level stable identity and natural gaps cannot be verified"
+        ),
+    }
+    gap_audit = {
+        "schema_version": 1,
+        "status": "not_run_release_access_blocked",
+        "selected_scene_list_sha256": inventory["selected_scene_list_sha256"],
+        "gap_definition": "maximal visible-absent-positive-visible intervals",
+        "gap_event_count": None,
+        "gap_scene_count": None,
+        "gap_length_distribution": None,
+        "class_distribution": None,
+        "opportunities": [],
+        "gate_evaluable": False,
+        "reason": "real released annotations are inaccessible",
+    }
+    frozen_protocol = {
+        "schema_version": 1,
+        "status": "not_authorized_by_preflight",
+        "full_evaluation_authorized": False,
+        "selected_scene_list_sha256": inventory["selected_scene_list_sha256"],
+        "ordering": {
+            "status": chronology["status"],
+            "rule": chronology["ordering_rule"],
+            "physical_chronology_proven": False,
+        },
+        "future_deployment_if_authorized": {
+            "stage_1": ["S1"],
+            "stage_t_ge_2": ["S[t-1]", "S[t]"],
+            "local_perception_window": 2,
+            "persistent_state_update": "M_t=P(M_[t-1],O_t)",
+            "full_history_input": False,
+        },
+        "inference_fields": [
+            "xyz",
+            "normals",
+            "rgb",
+            "geometric_segment_ids",
+        ],
+        "evaluator_only_fields": [
+            "class_ids",
+            "instance_ids",
+            "stable_object_ids",
+        ],
+        "frozen_gate_thresholds": {
+            "minimum_gap_events": 10,
+            "minimum_gap_scenes": 3,
+            "minimum_observation_coverage": 0.1,
+        },
+    }
+    coverage = {
+        "schema_version": 1,
+        "status": "not_run_not_authorized",
+        "model_inference_executed": False,
+        "candidate_coverage_iou_0_25": None,
+        "candidate_coverage_iou_0_50": None,
+        "class_compatible_coverage_exact": None,
+        "raw_local_ap": None,
+        "raw_local_recall": None,
+        "reason": "stable-identity and gap gates were not evaluable",
+    }
+
+    selected_scene_count = int(inventory["selected_scene_count"])
+    selected_scan_count = int(inventory["selected_scan_count"])
+    thresholds = inventory["threshold_scene_counts"]
+    status_counts = label_map["status_counts"]
+    dataset_audit = f"""# MultiScan Dataset Audit
+
+Status: `METADATA_COMPLETE_RELEASE_BLOCKED`
+
+- Official code commit: `{MULTISCAN_COMMIT}`
+- Official data revision: `{DATA_REPOSITORY_REVISION}`
+- Official inventory: {inventory["scan_count"]} scans / {inventory["scene_count"]} physical scenes
+- Frozen collection: {selected_scene_count} scenes / {selected_scan_count} scans, all scenes with T>=3
+- Release access: HTTP 401 `GatedRepo`; no authenticated Hugging Face session is present
+- Raw geometry, annotations, alignment, scan metadata, and benchmark PTH were not downloaded
+
+The official CSV inventory and taxonomy are auditable. Release-level identity,
+gap, alignment, and model-coverage evidence are not auditable without licensed
+file access. No GPU inference was run.
+"""
+    identity_audit = f"""# MultiScan Identity Audit
+
+Status: `NOT_VERIFIED_RELEASE_ACCESS_BLOCKED`
+
+Official source code at `{MULTISCAN_COMMIT}` writes `inst2obj_id` into generated
+instance-segmentation PTH payloads. Official annotation documentation defines
+`objectId` as an object's per-scan list index plus one. Those two source facts do
+not by themselves prove that a repeated numeric ID denotes the same physical
+object across scans.
+
+The real released PTH and annotations could not be opened because both official
+release paths require an authenticated, license-accepted session. Therefore no
+manual cross-scan example is reported and stable identity is not marked verified.
+Synthetic tests enforce local-instance remapping and fail on ID/label conflicts,
+but synthetic evidence is not substituted for release evidence.
+"""
+    alignment_audit = """# MultiScan Alignment Audit
+
+Status: `NOT_RUN_NOT_AUTHORIZED`
+
+The sequential protocol did not pass the stable-identity/gap preflight. Raw PLY
+and align.json files were not downloaded, no coordinate transform was applied,
+and no before/after geometry was generated. This is not an alignment failure;
+the alignment gate was not reached.
+"""
+    preflight_report = f"""# MultiScan Preflight Report
+
+## 1. Dataset provenance
+
+Official code commit `{MULTISCAN_COMMIT}` and data repository revision
+`{DATA_REPOSITORY_REVISION}` were bound. CSV, taxonomy, source, checkpoint, and
+frozen configuration hashes are recorded in the reproducibility artifacts.
+Release-file resolution returned HTTP 401 `GatedRepo` without an authenticated
+license-accepted session.
+
+## 2. Longitudinal inventory
+
+The official release contains {inventory["scan_count"]} scans and
+{inventory["scene_count"]} physical scenes. The frozen T>=3 collection contains
+{selected_scene_count} scenes and {selected_scan_count} scans. Counts are
+T>=3: {thresholds["3"]}, T>=4: {thresholds["4"]}, T>=5: {thresholds["5"]}.
+
+## 3. Stable identity evidence
+
+Not verified. Source code intends `local instance -> inst2obj_id -> objectId`,
+but real released PTH/annotations could not be opened. Documentation alone is
+insufficient because it defines `objectId` as a per-scan object-list index.
+
+## 4. Gap opportunities
+
+Not computed. Gap event count and gap-bearing scene count remain `null`; they
+are not reported as zero and the >=10 / >=3 gate is not evaluable.
+
+## 5. Chronology
+
+`DATASET_ORDER_ONLY`. Numeric scan suffix order is frozen for a possible ordered
+revisit protocol; this is not proven physical chronology.
+
+## 6. Alignment
+
+Not run and not authorized because the preceding identity/gap gate is not
+evaluable. This is not classified as an alignment failure.
+
+## 7. Semantic compatibility
+
+Of 20 official MultiScan semantic classes, {status_counts["exact"]} map exactly
+to frozen ReScene18 and {status_counts["unsupported"]} are unsupported. Main
+class-aware evaluation is frozen to exact mappings only.
+
+## 8. GT leakage audit
+
+The interface separates four geometry-only inference fields from evaluator-only
+class, instance, and stable-object IDs. Recursive leakage guards and tests pass.
+
+## 9. Frozen ReScene smoke coverage
+
+Not run and not authorized. Coverage, AP, and recall remain `null`; no GPU
+inference or MultiScan tuning was performed.
+
+## 10. Final decision
+
+`MULTISCAN_PROTOCOL_FAIL`
+"""
+
+    payloads = {
+        "release_access_audit.json": _json_bytes(access_audit),
+        "MULTISCAN_DATASET_AUDIT.md": dataset_audit.encode("ascii"),
+        "MULTISCAN_IDENTITY_AUDIT.md": identity_audit.encode("ascii"),
+        "chronology_audit.json": _json_bytes(chronology),
+        "gap_opportunities.json": _json_bytes(gap_audit),
+        "multiscan_to_rescene_label_map.json": _json_bytes(label_map),
+        "MULTISCAN_ALIGNMENT_AUDIT.md": alignment_audit.encode("ascii"),
+        "frozen_protocol.json": _json_bytes(frozen_protocol),
+        "observation_coverage_smoke.json": _json_bytes(coverage),
+        "MULTISCAN_PREFLIGHT_REPORT.md": preflight_report.encode("ascii"),
+    }
+    paths = {name: output / name for name in payloads}
+    for name, payload in payloads.items():
+        _publish_exact(paths[name], payload)
+
+    evidence_names = sorted((*base_names, *payloads))
+    evidence_manifest = {
+        "schema_version": 1,
+        "status": "complete_fail_closed",
+        "decision": decision["decision"],
+        "decision_failures": decision["failures"],
+        "official_source_evidence": source_evidence,
+        "frozen_evidence_modified": False,
+        "gpu_inference_executed": False,
+        "files": [
+            {
+                "relative_path": name,
+                "bytes": (output / name).stat().st_size,
+                "sha256": _sha256_file(output / name),
+            }
+            for name in evidence_names
+        ],
+    }
+    manifest_path = output / "evidence_manifest.json"
+    _publish_exact(manifest_path, _json_bytes(evidence_manifest))
+    paths["evidence_manifest.json"] = manifest_path
+    return paths
+
+
 def build_inventory_artifacts(
     *,
     scans_split_path: Path,
@@ -471,7 +749,8 @@ def _parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = _parser().parse_args(argv)
-    binding = _reproducibility_binding(
+    binding_path = arguments.output_directory.resolve() / "repro_bindings.json"
+    current_binding = _reproducibility_binding(
         root=arguments.root.resolve(),
         multiscan_repository=arguments.multiscan_repository.resolve(),
         scans_split_path=arguments.scans_split.resolve(),
@@ -479,17 +758,40 @@ def main(argv: Sequence[str] | None = None) -> int:
         checkpoint_path=arguments.checkpoint.resolve(),
         data_repository_revision=arguments.data_repository_revision,
     )
+    if binding_path.is_file() and not binding_path.is_symlink():
+        binding = json.loads(binding_path.read_text(encoding="utf-8"))
+        try:
+            current_binding["persist4d"]["generation_commit"] = binding["persist4d"][
+                "generation_commit"
+            ]
+        except (KeyError, TypeError) as error:
+            raise MultiScanAdapterError(
+                "existing reproducibility binding is malformed"
+            ) from error
+        if current_binding != binding:
+            raise MultiScanAdapterError(
+                "existing reproducibility binding differs from current inputs"
+            )
+    else:
+        binding = current_binding
     paths = build_inventory_artifacts(
         scans_split_path=arguments.scans_split.resolve(),
         output_directory=arguments.output_directory.resolve(),
         reproducibility_binding=binding,
     )
     inventory = json.loads(paths["multiscan_inventory.json"].read_text())
+    build_release_blocked_artifacts(
+        output_directory=arguments.output_directory.resolve(),
+        inventory=inventory,
+        semantic_map_path=arguments.semantic_map.resolve(),
+        official_repository=arguments.multiscan_repository.resolve(),
+    )
     print(
-        "MULTISCAN_INVENTORY_OK "
+        "MULTISCAN_PROTOCOL_FAIL "
         f"scans={inventory['scan_count']} scenes={inventory['scene_count']} "
         f"selected_scenes={inventory['selected_scene_count']} "
-        f"selected_scans={inventory['selected_scan_count']}"
+        f"selected_scans={inventory['selected_scan_count']} "
+        "reason=gated_release_access"
     )
     return 0
 
@@ -498,4 +800,10 @@ if __name__ == "__main__":
     raise SystemExit(main())
 
 
-__all__ = ["build_inventory_artifacts"]
+__all__ = [
+    "build_chronology_audit",
+    "build_inventory_artifacts",
+    "build_multiscan_label_map",
+    "build_release_blocked_artifacts",
+    "derive_multiscan_preflight_decision",
+]
