@@ -1,0 +1,48 @@
+{
+  "dataset_download": {
+    "content_length_bytes": 26239218080,
+    "content_type": "application/zip",
+    "etag": "61bfab1a0-63777e85ea017",
+    "external_reference": "external:rescan/rescan_dataset.zip",
+    "last_modified": "Fri, 13 Jun 2025 18:06:39 GMT",
+    "official_url": "https://rescan.cs.princeton.edu/assets/rescan_dataset.zip"
+  },
+  "official_method_dependencies": {
+    "compiler": "C++11",
+    "gco_v3": {
+      "distributed_in_repository": false,
+      "required_for": "segment_transfer"
+    },
+    "opengl_glfw3": {
+      "required_for": "rsdb_viewer"
+    },
+    "poisson_reconstruction": {
+      "distributed_in_repository": false,
+      "required_for": "full segmentation pipeline"
+    },
+    "python": "Python 3 evaluation scripts"
+  },
+  "repository": {
+    "branch": "master",
+    "commit": "f45283be31119e9bd955d40bc159b1774dfed092",
+    "commit_tree": "8825baa0b87135986160e1f820a8ed80d2d39930",
+    "external_reference": "external:rescan/official-code",
+    "license": "MIT",
+    "official_url": "https://github.com/mhalber/Rescan",
+    "source_archive_sha256": "24f30a6697dc8bf04540fe38b01f050295e6cf9dddc0e29858f0062bd7cdc529",
+    "tracked_file_list_and_content_sha256": "7b90106f714a5cc650ec1e04edc291063d50071cd545a261611791d6025cc116"
+  },
+  "retrieved_at_utc": "2026-08-24T04:08:41Z",
+  "schema_version": 1,
+  "selected_source_files": {
+    "LICENSE": "5f7fedcdaa29a21570a01a0114bf101d44325a1cce34171b8025f86552ed61e0",
+    "README.md": "db6280229a1675d64c6038e2db0e17473390520ebfa7701cb4679bb52ef37e0c",
+    "apps/CMakeLists.txt": "61cb1102a640739c011b62f38b13b121a73604d5c9a580012300806e76124550",
+    "scripts/common.py": "fc6602286c8985d52c1b26d44b3a1e67f636eb53b0bcdffb55d48458ca2288ad",
+    "scripts/evaluate_instance_transfer.py": "fa9c5eda339c284e7e038ab4f5883b4d713f7fec9f519231e3c77c138d73a42e",
+    "scripts/evaluate_semantic_instance.py": "895e2b2f55dce22e74739bfa351c86c988b5db8afbd99f3b76f290019f0bf66f",
+    "scripts/evaluate_semantic_label.py": "ef27b23dca24108aa2d2a13d97b57ceda55c228c1a29807a9793791cf3fccc32",
+    "scripts/run_segmentation_pipeline.py": "419ed121b1530d3c21402113c2bd39f7feef0457d8421494a2201b7e28bba446"
+  },
+  "status": "source_pinned"
+}
