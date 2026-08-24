@@ -1,0 +1,39 @@
+{
+  "evaluator_only_fields": [
+    "class_ids",
+    "instance_ids",
+    "stable_object_ids"
+  ],
+  "frozen_gate_thresholds": {
+    "minimum_gap_events": 10,
+    "minimum_gap_scenes": 3,
+    "minimum_observation_coverage": 0.1
+  },
+  "full_evaluation_authorized": false,
+  "future_deployment_if_authorized": {
+    "full_history_input": false,
+    "local_perception_window": 2,
+    "persistent_state_update": "M_t=P(M_[t-1],O_t)",
+    "stage_1": [
+      "S1"
+    ],
+    "stage_t_ge_2": [
+      "S[t-1]",
+      "S[t]"
+    ]
+  },
+  "inference_fields": [
+    "xyz",
+    "normals",
+    "rgb",
+    "geometric_segment_ids"
+  ],
+  "ordering": {
+    "physical_chronology_proven": false,
+    "rule": "numeric scan suffix within each physical scene",
+    "status": "DATASET_ORDER_ONLY"
+  },
+  "schema_version": 1,
+  "selected_scene_list_sha256": "ac84a044f24038de404715fc0dcb6bc62aff2e13992735e31877986122e00d36",
+  "status": "not_authorized_by_preflight"
+}

@@ -1,0 +1,276 @@
+{
+  "mappings": [
+    {
+      "mapping_evidence": "excluded_structural_class",
+      "source_class_id": 1,
+      "source_class_name": "floor",
+      "source_object_names": [
+        "floor",
+        "shower_floor"
+      ],
+      "status": "unsupported",
+      "target_class_id": null,
+      "target_class_name": null
+    },
+    {
+      "mapping_evidence": "excluded_structural_class",
+      "source_class_id": 2,
+      "source_class_name": "ceiling",
+      "source_object_names": [
+        "ceiling",
+        "suspended_ceiling"
+      ],
+      "status": "unsupported",
+      "target_class_id": null,
+      "target_class_name": null
+    },
+    {
+      "mapping_evidence": "excluded_structural_class",
+      "source_class_id": 3,
+      "source_class_name": "wall",
+      "source_object_names": [
+        "low_wall",
+        "short_wall",
+        "shower_wall",
+        "stall_wall",
+        "wall"
+      ],
+      "status": "unsupported",
+      "target_class_id": null,
+      "target_class_name": null
+    },
+    {
+      "mapping_evidence": "exact_official_semantic_name_and_frozen_target_name",
+      "source_class_id": 4,
+      "source_class_name": "door",
+      "source_object_names": [
+        "bifold_door",
+        "door",
+        "glass_door",
+        "sliding_door"
+      ],
+      "status": "exact",
+      "target_class_id": 5,
+      "target_class_name": "door"
+    },
+    {
+      "mapping_evidence": "exact_official_semantic_name_and_frozen_target_name",
+      "source_class_id": 5,
+      "source_class_name": "table",
+      "source_object_names": [
+        "adjustable_desk",
+        "bar_table",
+        "computer_desk",
+        "computer_table",
+        "desk",
+        "table"
+      ],
+      "status": "exact",
+      "target_class_id": 4,
+      "target_class_name": "table"
+    },
+    {
+      "mapping_evidence": "exact_official_semantic_name_and_frozen_target_name",
+      "source_class_id": 6,
+      "source_class_name": "chair",
+      "source_object_names": [
+        "chair",
+        "stacked_chairs"
+      ],
+      "status": "exact",
+      "target_class_id": 2,
+      "target_class_name": "chair"
+    },
+    {
+      "mapping_evidence": "exact_official_semantic_name_and_frozen_target_name",
+      "source_class_id": 7,
+      "source_class_name": "cabinet",
+      "source_object_names": [
+        "cabinet",
+        "cabinet_otherroom",
+        "drawer_unit",
+        "nightstand",
+        "shoe_cabinet",
+        "sink_cabinet",
+        "tv_cabinet",
+        "wall_cabinet",
+        "wardrobe",
+        "wine_cabinet"
+      ],
+      "status": "exact",
+      "target_class_id": 0,
+      "target_class_name": "cabinet"
+    },
+    {
+      "mapping_evidence": "exact_official_semantic_name_and_frozen_target_name",
+      "source_class_id": 8,
+      "source_class_name": "window",
+      "source_object_names": [
+        "window"
+      ],
+      "status": "exact",
+      "target_class_id": 6,
+      "target_class_name": "window"
+    },
+    {
+      "mapping_evidence": "exact_official_semantic_name_and_frozen_target_name",
+      "source_class_id": 9,
+      "source_class_name": "sofa",
+      "source_object_names": [
+        "sofa"
+      ],
+      "status": "exact",
+      "target_class_id": 3,
+      "target_class_name": "sofa"
+    },
+    {
+      "mapping_evidence": "absent_from_frozen_foreground_taxonomy",
+      "source_class_id": 10,
+      "source_class_name": "microwave",
+      "source_object_names": [
+        "microwave"
+      ],
+      "status": "unsupported",
+      "target_class_id": null,
+      "target_class_name": null
+    },
+    {
+      "mapping_evidence": "absent_from_frozen_foreground_taxonomy",
+      "source_class_id": 11,
+      "source_class_name": "pillow",
+      "source_object_names": [
+        "back_cushion",
+        "chair_cushion",
+        "cushion",
+        "pillow",
+        "sofa_cushion",
+        "thow_pillow"
+      ],
+      "status": "unsupported",
+      "target_class_id": null,
+      "target_class_name": null
+    },
+    {
+      "mapping_evidence": "absent_from_frozen_foreground_taxonomy",
+      "source_class_id": 12,
+      "source_class_name": "tv_monitor",
+      "source_object_names": [
+        "monitor",
+        "tv"
+      ],
+      "status": "unsupported",
+      "target_class_id": null,
+      "target_class_name": null
+    },
+    {
+      "mapping_evidence": "exact_official_semantic_name_and_frozen_target_name",
+      "source_class_id": 13,
+      "source_class_name": "curtain",
+      "source_object_names": [
+        "curtain",
+        "door_curtain",
+        "shower_curtain"
+      ],
+      "status": "exact",
+      "target_class_id": 11,
+      "target_class_name": "curtain"
+    },
+    {
+      "mapping_evidence": "absent_from_frozen_foreground_taxonomy",
+      "source_class_id": 14,
+      "source_class_name": "trash_can",
+      "source_object_names": [
+        "trash_bin",
+        "trashbin",
+        "waste_container"
+      ],
+      "status": "unsupported",
+      "target_class_id": null,
+      "target_class_name": null
+    },
+    {
+      "mapping_evidence": "absent_from_frozen_foreground_taxonomy",
+      "source_class_id": 15,
+      "source_class_name": "suitcase",
+      "source_object_names": [
+        "suitcase"
+      ],
+      "status": "unsupported",
+      "target_class_id": null,
+      "target_class_name": null
+    },
+    {
+      "mapping_evidence": "exact_official_semantic_name_and_frozen_target_name",
+      "source_class_id": 16,
+      "source_class_name": "sink",
+      "source_object_names": [
+        "sink"
+      ],
+      "status": "exact",
+      "target_class_id": 15,
+      "target_class_name": "sink"
+    },
+    {
+      "mapping_evidence": "absent_from_frozen_foreground_taxonomy",
+      "source_class_id": 17,
+      "source_class_name": "backpack",
+      "source_object_names": [
+        "backpack"
+      ],
+      "status": "unsupported",
+      "target_class_id": null,
+      "target_class_name": null
+    },
+    {
+      "mapping_evidence": "exact_official_semantic_name_and_frozen_target_name",
+      "source_class_id": 18,
+      "source_class_name": "bed",
+      "source_object_names": [
+        "bed"
+      ],
+      "status": "exact",
+      "target_class_id": 1,
+      "target_class_name": "bed"
+    },
+    {
+      "mapping_evidence": "exact_official_semantic_name_and_frozen_target_name",
+      "source_class_id": 19,
+      "source_class_name": "refrigerator",
+      "source_object_names": [
+        "fridge",
+        "refrigerator"
+      ],
+      "status": "exact",
+      "target_class_id": 12,
+      "target_class_name": "refrigerator"
+    },
+    {
+      "mapping_evidence": "exact_official_semantic_name_and_frozen_target_name",
+      "source_class_id": 20,
+      "source_class_name": "toilet",
+      "source_object_names": [
+        "pit_toilet",
+        "toilet"
+      ],
+      "status": "exact",
+      "target_class_id": 14,
+      "target_class_name": "toilet"
+    }
+  ],
+  "primary_class_aware_status": "exact_only",
+  "provenance": {
+    "source_semantic_map_sha256": "6a9a5bcf44c628b7431d23b7a95be5479313c6fac8ddb49d5e2e499998c4f5bb",
+    "target_label_map_reference": "repo:artifacts/final_evidence/rescan_to_rescene_label_map.json",
+    "target_label_map_sha256": "e30e1cbdcee73d11f9d58fb43bdd526ab411f49a2122cc061392fd8b996d0cb0"
+  },
+  "schema_version": 1,
+  "source_class_count": 20,
+  "source_taxonomy": "official MultiScan objectSemanticId",
+  "status_counts": {
+    "ambiguous": 0,
+    "defensible": 0,
+    "exact": 11,
+    "unsupported": 9
+  },
+  "target_taxonomy": "frozen ReScene ScanNet18 foreground output"
+}

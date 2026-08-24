@@ -1,0 +1,16 @@
+{
+  "authenticated_session_present": false,
+  "blocked_assets": [
+    "real released scan archives containing annotations/geometry/metadata",
+    "real released benchmark PTH files"
+  ],
+  "license": "CC-BY-NC-4.0",
+  "license_acceptance_performed_by_automation": false,
+  "repository": "https://huggingface.co/datasets/3dlg-hcvc/MultiScan",
+  "resolver_error_code": "GatedRepo",
+  "resolver_http_status": 401,
+  "revision": "c62c9aad850a8638ac3e42605926a65707600125",
+  "schema_version": 1,
+  "scientific_effect": "release-level stable identity and natural gaps cannot be verified",
+  "status": "blocked_gated_unauthenticated"
+}

@@ -1,0 +1,241 @@
+{
+  "claim_boundary": "this is not proven physical chronology; causal claims are limited to the frozen dataset-index order",
+  "evidence": [
+    {
+      "finding": "the final two digits are defined as the scan index",
+      "source": "official scans_split.csv and dataset naming documentation"
+    },
+    {
+      "finding": "scan metadata has no cross-capture acquisition timestamp; JSONL timestamps are frame-level ARKit session timestamps",
+      "source": "official acquired-data schema"
+    },
+    {
+      "finding": "reference_scan_alignment identifies a geometric reference, not capture chronology",
+      "source": "official alignment schema"
+    }
+  ],
+  "ordered_revisit_protocol_allowed": true,
+  "ordering_rule": "numeric scan suffix within each physical scene",
+  "physical_chronology_proven": false,
+  "scene_orders": [
+    {
+      "ordered_scan_ids": [
+        "scene_00069_00",
+        "scene_00069_01",
+        "scene_00069_02"
+      ],
+      "scene_id": "scene_00069"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00088_00",
+        "scene_00088_01",
+        "scene_00088_02"
+      ],
+      "scene_id": "scene_00088"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00092_00",
+        "scene_00092_01",
+        "scene_00092_02"
+      ],
+      "scene_id": "scene_00092"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00094_00",
+        "scene_00094_01",
+        "scene_00094_02"
+      ],
+      "scene_id": "scene_00094"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00095_00",
+        "scene_00095_01",
+        "scene_00095_02"
+      ],
+      "scene_id": "scene_00095"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00097_00",
+        "scene_00097_01",
+        "scene_00097_02"
+      ],
+      "scene_id": "scene_00097"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00098_00",
+        "scene_00098_01",
+        "scene_00098_02"
+      ],
+      "scene_id": "scene_00098"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00100_00",
+        "scene_00100_01",
+        "scene_00100_02"
+      ],
+      "scene_id": "scene_00100"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00101_00",
+        "scene_00101_01",
+        "scene_00101_02",
+        "scene_00101_03"
+      ],
+      "scene_id": "scene_00101"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00102_00",
+        "scene_00102_01",
+        "scene_00102_02",
+        "scene_00102_03",
+        "scene_00102_04"
+      ],
+      "scene_id": "scene_00102"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00104_00",
+        "scene_00104_01",
+        "scene_00104_02",
+        "scene_00104_03",
+        "scene_00104_04",
+        "scene_00104_05",
+        "scene_00104_06",
+        "scene_00104_07",
+        "scene_00104_08"
+      ],
+      "scene_id": "scene_00104"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00105_00",
+        "scene_00105_01",
+        "scene_00105_02",
+        "scene_00105_03",
+        "scene_00105_04",
+        "scene_00105_05",
+        "scene_00105_06",
+        "scene_00105_07",
+        "scene_00105_08"
+      ],
+      "scene_id": "scene_00105"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00106_00",
+        "scene_00106_01",
+        "scene_00106_02",
+        "scene_00106_03",
+        "scene_00106_04",
+        "scene_00106_05"
+      ],
+      "scene_id": "scene_00106"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00107_00",
+        "scene_00107_01",
+        "scene_00107_02",
+        "scene_00107_03"
+      ],
+      "scene_id": "scene_00107"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00108_00",
+        "scene_00108_01",
+        "scene_00108_02",
+        "scene_00108_03"
+      ],
+      "scene_id": "scene_00108"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00109_00",
+        "scene_00109_01",
+        "scene_00109_02",
+        "scene_00109_03",
+        "scene_00109_04"
+      ],
+      "scene_id": "scene_00109"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00110_00",
+        "scene_00110_01",
+        "scene_00110_02",
+        "scene_00110_03",
+        "scene_00110_04"
+      ],
+      "scene_id": "scene_00110"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00111_00",
+        "scene_00111_01",
+        "scene_00111_02"
+      ],
+      "scene_id": "scene_00111"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00112_00",
+        "scene_00112_01",
+        "scene_00112_02",
+        "scene_00112_03"
+      ],
+      "scene_id": "scene_00112"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00113_00",
+        "scene_00113_01",
+        "scene_00113_02",
+        "scene_00113_03"
+      ],
+      "scene_id": "scene_00113"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00114_00",
+        "scene_00114_01",
+        "scene_00114_02",
+        "scene_00114_03",
+        "scene_00114_04"
+      ],
+      "scene_id": "scene_00114"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00115_00",
+        "scene_00115_01",
+        "scene_00115_02",
+        "scene_00115_03",
+        "scene_00115_04"
+      ],
+      "scene_id": "scene_00115"
+    },
+    {
+      "ordered_scan_ids": [
+        "scene_00116_00",
+        "scene_00116_01",
+        "scene_00116_02",
+        "scene_00116_03",
+        "scene_00116_04"
+      ],
+      "scene_id": "scene_00116"
+    }
+  ],
+  "schema_version": 1,
+  "selected_scene_list_sha256": "ac84a044f24038de404715fc0dcb6bc62aff2e13992735e31877986122e00d36",
+  "status": "DATASET_ORDER_ONLY"
+}

@@ -1,0 +1,157 @@
+{
+  "decision": "MULTISCAN_PROTOCOL_FAIL",
+  "decision_failures": [
+    "stable_identity_not_verified",
+    "gap_audit_not_completed"
+  ],
+  "files": [
+    {
+      "bytes": 336,
+      "relative_path": "MULTISCAN_ALIGNMENT_AUDIT.md",
+      "sha256": "cb73b7bfd681c4fb5bb01b9a3418792758ae0842fa9c26ea23bf60c628d12a89"
+    },
+    {
+      "bytes": 707,
+      "relative_path": "MULTISCAN_DATASET_AUDIT.md",
+      "sha256": "538bbee75508db624c9b8f4b314236cf8b851a82d2231cbdc6fb36856852c265"
+    },
+    {
+      "bytes": 823,
+      "relative_path": "MULTISCAN_IDENTITY_AUDIT.md",
+      "sha256": "35f222c408ef2c4660a72981b9dca6853f2012e918577026d156556905a4862e"
+    },
+    {
+      "bytes": 1954,
+      "relative_path": "MULTISCAN_PREFLIGHT_REPORT.md",
+      "sha256": "7bae58bd4298527e8393e79aa250c97ebc40132718765eadd13228e6e12df47a"
+    },
+    {
+      "bytes": 5484,
+      "relative_path": "chronology_audit.json",
+      "sha256": "3d6a9be64ba10a3c75e712d8347366843e5655b3e9800d9a5aa01c3a52384cc8"
+    },
+    {
+      "bytes": 946,
+      "relative_path": "frozen_protocol.json",
+      "sha256": "1c2018b33d4cd9b1d730b0683258ea7f6f9427cf5af56536b669141c51b69414"
+    },
+    {
+      "bytes": 472,
+      "relative_path": "gap_opportunities.json",
+      "sha256": "2e09da6d5dfc3609ee1c2511561e2a09df6f6da8fe68c4035388daaa589db018"
+    },
+    {
+      "bytes": 6035,
+      "relative_path": "longitudinal_subset_manifest.json",
+      "sha256": "1b7d1e99ea4e5bd6325b02b381494f2903e2c236423502dc450c79ac3c4ab168"
+    },
+    {
+      "bytes": 26137,
+      "relative_path": "multiscan_inventory.json",
+      "sha256": "475e79d50e9e07c3b805be426856d952470e0e08b7585487916baadea7b8e013"
+    },
+    {
+      "bytes": 7519,
+      "relative_path": "multiscan_to_rescene_label_map.json",
+      "sha256": "00fb1e7b729134c6b6433eb3c9660f226b5accf39e948648753025a464bfdffb"
+    },
+    {
+      "bytes": 338,
+      "relative_path": "observation_coverage_smoke.json",
+      "sha256": "9729a2f541482db68847aa886e0be5b904377b631ae67b662d88044ffd7c3dbe"
+    },
+    {
+      "bytes": 630,
+      "relative_path": "release_access_audit.json",
+      "sha256": "31820327b609efb32b20a94e42c0155c796de02811b820000d92681bb6e1f2ea"
+    },
+    {
+      "bytes": 1860,
+      "relative_path": "repro_bindings.json",
+      "sha256": "299f91b2db8608a24a73cbfa33ea563e69d4865f4b9e084bf4787a86643be7f1"
+    },
+    {
+      "bytes": 1860,
+      "relative_path": "reproducibility_binding.json",
+      "sha256": "299f91b2db8608a24a73cbfa33ea563e69d4865f4b9e084bf4787a86643be7f1"
+    }
+  ],
+  "frozen_evidence_modified": false,
+  "gpu_inference_executed": false,
+  "implementation": {
+    "branch": "research/persist4d-multiscan-preflight",
+    "commit": "dfd7ba9ba2cb366933a9a13e8d2719770a03c648",
+    "files": [
+      {
+        "bytes": 23151,
+        "relative_path": "datasets/multiscan_adapter.py",
+        "sha256": "a45f8ee1015340b2d12bd6af3493963e0143993446f670e61b790e23e981f728"
+      },
+      {
+        "bytes": 33728,
+        "relative_path": "scripts/audit_multiscan_dataset.py",
+        "sha256": "32d0af1ec7eea5f92d83412f23a2538911eb35a5879ae251530b504209b7d6df"
+      },
+      {
+        "bytes": 8803,
+        "relative_path": "tests/test_multiscan_inventory.py",
+        "sha256": "4a6fcb50e499247c02ee14aad7fc82e08a3092cb35aefa108a74d48ee5e603b3"
+      },
+      {
+        "bytes": 5387,
+        "relative_path": "tests/test_multiscan_identity_mapping.py",
+        "sha256": "b6c56c43cff6c853539531e3f0731a8c94fd3379ec5e87631fa2fc81c90cd7eb"
+      },
+      {
+        "bytes": 2261,
+        "relative_path": "tests/test_multiscan_gap_detection.py",
+        "sha256": "0b541cc9f00cdda2b0c4d9772702b510a54e470c86e9bdfaca88fc122e115866"
+      },
+      {
+        "bytes": 1316,
+        "relative_path": "tests/test_multiscan_chronology.py",
+        "sha256": "d12d6ecb26d59b2f66e263c7addaa763f71537a19d276b762d4f747c1622602e"
+      },
+      {
+        "bytes": 2087,
+        "relative_path": "tests/test_multiscan_semantic_mapping.py",
+        "sha256": "2181482f1d04b9ba553f16b2736d046a7117aff94c9180fa2c4a10e9e6dd7e8e"
+      },
+      {
+        "bytes": 1765,
+        "relative_path": "tests/test_multiscan_no_gt_leakage.py",
+        "sha256": "e03a05f96ad5811b211896df7f5f070d57f500ecbb5ea4b239c35fb280581ff4"
+      },
+      {
+        "bytes": 1505,
+        "relative_path": "tests/test_multiscan_external_gate.py",
+        "sha256": "f5a6851ce1555a0aadd2a9106eff5e141e5a6be34640dabea01fbf4a218fda34"
+      },
+      {
+        "bytes": 4541,
+        "relative_path": "tests/test_multiscan_preflight_artifacts.py",
+        "sha256": "84c8c22ad9c742c50879b843698e2aefcdc0f84c57a6e6bfd62c6ff2065fa1d9"
+      },
+      {
+        "bytes": 5200,
+        "relative_path": "docs/superpowers/specs/2026-08-24-persist4d-multiscan-preflight-design.md",
+        "sha256": "677d608384d4b080f406cfc1405cc8a5be6119b8b44d547d1b232e341c557cf2"
+      },
+      {
+        "bytes": 11671,
+        "relative_path": "docs/superpowers/plans/2026-08-24-persist4d-multiscan-preflight.md",
+        "sha256": "5974f659e8c96413af91d190b59c27f996ec29bee038d27a79a568b98ae67bb7"
+      }
+    ],
+    "tree": "93ef7f2a6f051be547c411765f1f5f30ba282412"
+  },
+  "official_source_evidence": {
+    "acquired_schema_sha256": "0e319744954722deab4959b85e1b1b7410112e3fc158745e849775f8f3068b7c",
+    "alignment_schema_sha256": "8e43bce4683c211d4e8021fdd01e396dbcaae35e0567a6fbeabbc647a1f03e60",
+    "annotation_schema_sha256": "c1114b730ea2e3d589091283a3f984426346e55ab08d5636e28c2b2dde9ec927",
+    "dataset_index_sha256": "84768e0f4f3d561efc68ff729218c4d288dc768c6e1fc974a2eb26273a6a9433",
+    "instance_generator_sha256": "299efb13a64834c7f993b28ebad82676627bf597750df0bcd5fb2211cbe0de83"
+  },
+  "schema_version": 1,
+  "status": "complete_fail_closed"
+}
