@@ -1,0 +1,468 @@
+{
+  "audit_scope": "raw_xyz_geometry_only_no_transform_fitting",
+  "ground_truth_identity_or_object_pose_used": false,
+  "interpretation_rule": "raw frames are usable when every adjacent pair has geometric overlap; metrics are descriptive and no alignment is estimated",
+  "model_input_transform_applied": false,
+  "scenes": [
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_a_0",
+          "first_to_second_median_nn_m": 0.07994002559363139,
+          "first_voxel_point_count": 31377,
+          "second_capture_id": "scene_a_1",
+          "second_to_first_median_nn_m": 0.13106276627287494,
+          "second_voxel_point_count": 38655,
+          "symmetric_median_nn_m": 0.10674247501767545,
+          "symmetric_overlap_fraction_at_10cm": 0.487505711674663,
+          "symmetric_overlap_fraction_at_20cm": 0.6433915924148961,
+          "symmetric_p90_nn_m": 0.5587965115308215
+        },
+        {
+          "first_capture_id": "scene_a_1",
+          "first_to_second_median_nn_m": 0.04454781665889191,
+          "first_voxel_point_count": 38655,
+          "second_capture_id": "scene_a_2",
+          "second_to_first_median_nn_m": 0.04132452432491859,
+          "second_voxel_point_count": 37348,
+          "symmetric_median_nn_m": 0.04284103768086653,
+          "symmetric_overlap_fraction_at_10cm": 0.6456850387484705,
+          "symmetric_overlap_fraction_at_20cm": 0.7943896951436128,
+          "symmetric_p90_nn_m": 0.3849420766723862
+        },
+        {
+          "first_capture_id": "scene_a_2",
+          "first_to_second_median_nn_m": 0.04841533333853352,
+          "first_voxel_point_count": 37348,
+          "second_capture_id": "scene_a_3",
+          "second_to_first_median_nn_m": 0.040363977797015005,
+          "second_voxel_point_count": 33996,
+          "symmetric_median_nn_m": 0.04363918070683129,
+          "symmetric_overlap_fraction_at_10cm": 0.646417358152052,
+          "symmetric_overlap_fraction_at_20cm": 0.7776547432159677,
+          "symmetric_p90_nn_m": 0.4199626289958981
+        }
+      ],
+      "scene_id": "scene_a"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_b_0",
+          "first_to_second_median_nn_m": 0.09281628351020091,
+          "first_voxel_point_count": 60350,
+          "second_capture_id": "scene_b_1",
+          "second_to_first_median_nn_m": 0.03806463516326035,
+          "second_voxel_point_count": 40422,
+          "symmetric_median_nn_m": 0.05979327132824763,
+          "symmetric_overlap_fraction_at_10cm": 0.6078970348906442,
+          "symmetric_overlap_fraction_at_20cm": 0.7169650299686421,
+          "symmetric_p90_nn_m": 0.7364511552117742
+        },
+        {
+          "first_capture_id": "scene_b_1",
+          "first_to_second_median_nn_m": 0.0362299715870332,
+          "first_voxel_point_count": 40422,
+          "second_capture_id": "scene_b_2",
+          "second_to_first_median_nn_m": 0.11505989384996007,
+          "second_voxel_point_count": 58480,
+          "symmetric_median_nn_m": 0.05693231569165683,
+          "symmetric_overlap_fraction_at_10cm": 0.5666012820772077,
+          "symmetric_overlap_fraction_at_20cm": 0.6553254737012396,
+          "symmetric_p90_nn_m": 1.2809864503856199
+        },
+        {
+          "first_capture_id": "scene_b_2",
+          "first_to_second_median_nn_m": 0.07034296970185622,
+          "first_voxel_point_count": 58480,
+          "second_capture_id": "scene_b_3",
+          "second_to_first_median_nn_m": 0.030469766242942602,
+          "second_voxel_point_count": 39696,
+          "symmetric_median_nn_m": 0.038925924321647494,
+          "symmetric_overlap_fraction_at_10cm": 0.6364895697522817,
+          "symmetric_overlap_fraction_at_20cm": 0.7029212842242504,
+          "symmetric_p90_nn_m": 0.9481387675065555
+        }
+      ],
+      "scene_id": "scene_b"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_c_0",
+          "first_to_second_median_nn_m": 0.05226923602335836,
+          "first_voxel_point_count": 36105,
+          "second_capture_id": "scene_c_1",
+          "second_to_first_median_nn_m": 0.0450863613272951,
+          "second_voxel_point_count": 33352,
+          "symmetric_median_nn_m": 0.04848087344515369,
+          "symmetric_overlap_fraction_at_10cm": 0.6902112098132658,
+          "symmetric_overlap_fraction_at_20cm": 0.822782440934679,
+          "symmetric_p90_nn_m": 0.3779581110436832
+        },
+        {
+          "first_capture_id": "scene_c_1",
+          "first_to_second_median_nn_m": 0.058503797559183175,
+          "first_voxel_point_count": 33352,
+          "second_capture_id": "scene_c_2",
+          "second_to_first_median_nn_m": 0.03941006242369461,
+          "second_voxel_point_count": 27607,
+          "symmetric_median_nn_m": 0.04627041066466031,
+          "symmetric_overlap_fraction_at_10cm": 0.6363293361111567,
+          "symmetric_overlap_fraction_at_20cm": 0.7569677980281829,
+          "symmetric_p90_nn_m": 0.5668080493527217
+        },
+        {
+          "first_capture_id": "scene_c_2",
+          "first_to_second_median_nn_m": 0.056264910728735656,
+          "first_voxel_point_count": 27607,
+          "second_capture_id": "scene_c_3",
+          "second_to_first_median_nn_m": 0.06620141183734612,
+          "second_voxel_point_count": 30032,
+          "symmetric_median_nn_m": 0.060842884635432117,
+          "symmetric_overlap_fraction_at_10cm": 0.6195631430108086,
+          "symmetric_overlap_fraction_at_20cm": 0.7652284043789795,
+          "symmetric_p90_nn_m": 0.5228225631599551
+        },
+        {
+          "first_capture_id": "scene_c_3",
+          "first_to_second_median_nn_m": 0.03554067945954764,
+          "first_voxel_point_count": 30032,
+          "second_capture_id": "scene_c_4",
+          "second_to_first_median_nn_m": 0.04173326794555117,
+          "second_voxel_point_count": 35828,
+          "symmetric_median_nn_m": 0.03837431800028375,
+          "symmetric_overlap_fraction_at_10cm": 0.7544640145763741,
+          "symmetric_overlap_fraction_at_20cm": 0.8590343152140905,
+          "symmetric_p90_nn_m": 0.29266779946593696
+        }
+      ],
+      "scene_id": "scene_c"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_d_0",
+          "first_to_second_median_nn_m": 0.03797959520243303,
+          "first_voxel_point_count": 38883,
+          "second_capture_id": "scene_d_1",
+          "second_to_first_median_nn_m": 0.037912916769943045,
+          "second_voxel_point_count": 38789,
+          "symmetric_median_nn_m": 0.037947783155814416,
+          "symmetric_overlap_fraction_at_10cm": 0.6663276341538779,
+          "symmetric_overlap_fraction_at_20cm": 0.7388376763827377,
+          "symmetric_p90_nn_m": 0.6920278481958805
+        },
+        {
+          "first_capture_id": "scene_d_1",
+          "first_to_second_median_nn_m": 0.03588331113336304,
+          "first_voxel_point_count": 38789,
+          "second_capture_id": "scene_d_2",
+          "second_to_first_median_nn_m": 0.042772225344761876,
+          "second_voxel_point_count": 44106,
+          "symmetric_median_nn_m": 0.038692816020705,
+          "symmetric_overlap_fraction_at_10cm": 0.6921165329633874,
+          "symmetric_overlap_fraction_at_20cm": 0.8022679293081609,
+          "symmetric_p90_nn_m": 0.4522697665124775
+        },
+        {
+          "first_capture_id": "scene_d_2",
+          "first_to_second_median_nn_m": 0.032051358412161016,
+          "first_voxel_point_count": 44106,
+          "second_capture_id": "scene_d_3",
+          "second_to_first_median_nn_m": 0.03540849218995444,
+          "second_voxel_point_count": 49600,
+          "symmetric_median_nn_m": 0.0335716275162415,
+          "symmetric_overlap_fraction_at_10cm": 0.7990416835634858,
+          "symmetric_overlap_fraction_at_20cm": 0.8837747849657439,
+          "symmetric_p90_nn_m": 0.23133659153848624
+        }
+      ],
+      "scene_id": "scene_d"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_e_0",
+          "first_to_second_median_nn_m": 0.05566980702131625,
+          "first_voxel_point_count": 40445,
+          "second_capture_id": "scene_e_1",
+          "second_to_first_median_nn_m": 0.04745971452346495,
+          "second_voxel_point_count": 38107,
+          "symmetric_median_nn_m": 0.051355532228440234,
+          "symmetric_overlap_fraction_at_10cm": 0.6241216009776963,
+          "symmetric_overlap_fraction_at_20cm": 0.8092219166921275,
+          "symmetric_p90_nn_m": 0.31534748221462916
+        },
+        {
+          "first_capture_id": "scene_e_1",
+          "first_to_second_median_nn_m": 0.11644319024072008,
+          "first_voxel_point_count": 38107,
+          "second_capture_id": "scene_e_2",
+          "second_to_first_median_nn_m": 0.05195852572029061,
+          "second_voxel_point_count": 23997,
+          "symmetric_median_nn_m": 0.07975944135728663,
+          "symmetric_overlap_fraction_at_10cm": 0.56352247842329,
+          "symmetric_overlap_fraction_at_20cm": 0.7111297178925673,
+          "symmetric_p90_nn_m": 0.7452363197961939
+        }
+      ],
+      "scene_id": "scene_e"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_f_0",
+          "first_to_second_median_nn_m": 0.05171939068743484,
+          "first_voxel_point_count": 65409,
+          "second_capture_id": "scene_f_1",
+          "second_to_first_median_nn_m": 0.052389663640246525,
+          "second_voxel_point_count": 66099,
+          "symmetric_median_nn_m": 0.05204641247088077,
+          "symmetric_overlap_fraction_at_10cm": 0.638881284788758,
+          "symmetric_overlap_fraction_at_20cm": 0.7559083858016242,
+          "symmetric_p90_nn_m": 0.6542056922877555
+        },
+        {
+          "first_capture_id": "scene_f_1",
+          "first_to_second_median_nn_m": 0.0477592478910812,
+          "first_voxel_point_count": 66099,
+          "second_capture_id": "scene_f_2",
+          "second_to_first_median_nn_m": 0.05021060232842854,
+          "second_voxel_point_count": 68428,
+          "symmetric_median_nn_m": 0.04889739229281712,
+          "symmetric_overlap_fraction_at_10cm": 0.6817144513740736,
+          "symmetric_overlap_fraction_at_20cm": 0.8052063897953571,
+          "symmetric_p90_nn_m": 0.5888066405083218
+        }
+      ],
+      "scene_id": "scene_f"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_g_0",
+          "first_to_second_median_nn_m": 0.03338767528363589,
+          "first_voxel_point_count": 71799,
+          "second_capture_id": "scene_g_1",
+          "second_to_first_median_nn_m": 0.03561860325386005,
+          "second_voxel_point_count": 76825,
+          "symmetric_median_nn_m": 0.034494114672974786,
+          "symmetric_overlap_fraction_at_10cm": 0.7714299171062547,
+          "symmetric_overlap_fraction_at_20cm": 0.8470570029066637,
+          "symmetric_p90_nn_m": 0.3537343350799584
+        },
+        {
+          "first_capture_id": "scene_g_1",
+          "first_to_second_median_nn_m": 0.034946182077546364,
+          "first_voxel_point_count": 76825,
+          "second_capture_id": "scene_g_2",
+          "second_to_first_median_nn_m": 0.036807312306168516,
+          "second_voxel_point_count": 80535,
+          "symmetric_median_nn_m": 0.03585212589553463,
+          "symmetric_overlap_fraction_at_10cm": 0.7337188612099644,
+          "symmetric_overlap_fraction_at_20cm": 0.8248157092018302,
+          "symmetric_p90_nn_m": 0.44284443821530145
+        }
+      ],
+      "scene_id": "scene_g"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_h_0",
+          "first_to_second_median_nn_m": 0.030127111579451363,
+          "first_voxel_point_count": 46784,
+          "second_capture_id": "scene_h_1",
+          "second_to_first_median_nn_m": 0.0313136640866681,
+          "second_voxel_point_count": 48806,
+          "symmetric_median_nn_m": 0.030703067246699738,
+          "symmetric_overlap_fraction_at_10cm": 0.8210900721832828,
+          "symmetric_overlap_fraction_at_20cm": 0.9019039648498797,
+          "symmetric_p90_nn_m": 0.19590007816329866
+        },
+        {
+          "first_capture_id": "scene_h_1",
+          "first_to_second_median_nn_m": 0.03185414465777214,
+          "first_voxel_point_count": 48806,
+          "second_capture_id": "scene_h_2",
+          "second_to_first_median_nn_m": 0.029419557427349412,
+          "second_voxel_point_count": 44218,
+          "symmetric_median_nn_m": 0.030613795068889865,
+          "symmetric_overlap_fraction_at_10cm": 0.8005245958032335,
+          "symmetric_overlap_fraction_at_20cm": 0.8675718094255246,
+          "symmetric_p90_nn_m": 0.3019276654655416
+        }
+      ],
+      "scene_id": "scene_h"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_i_0",
+          "first_to_second_median_nn_m": 0.033397187746029025,
+          "first_voxel_point_count": 19938,
+          "second_capture_id": "scene_i_1",
+          "second_to_first_median_nn_m": 0.032930803466328415,
+          "second_voxel_point_count": 19834,
+          "symmetric_median_nn_m": 0.033154759044131434,
+          "symmetric_overlap_fraction_at_10cm": 0.8110982600824701,
+          "symmetric_overlap_fraction_at_20cm": 0.9263803680981595,
+          "symmetric_p90_nn_m": 0.1655634715474919
+        },
+        {
+          "first_capture_id": "scene_i_1",
+          "first_to_second_median_nn_m": 0.031616970307817,
+          "first_voxel_point_count": 19834,
+          "second_capture_id": "scene_i_2",
+          "second_to_first_median_nn_m": 0.029421977058998208,
+          "second_voxel_point_count": 17903,
+          "symmetric_median_nn_m": 0.030462675706897865,
+          "symmetric_overlap_fraction_at_10cm": 0.8373214616954183,
+          "symmetric_overlap_fraction_at_20cm": 0.9198399448816811,
+          "symmetric_p90_nn_m": 0.16147382645276018
+        }
+      ],
+      "scene_id": "scene_i"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_j_0",
+          "first_to_second_median_nn_m": 0.03662042485709242,
+          "first_voxel_point_count": 99794,
+          "second_capture_id": "scene_j_1",
+          "second_to_first_median_nn_m": 0.03771979372810001,
+          "second_voxel_point_count": 102421,
+          "symmetric_median_nn_m": 0.03716229981544694,
+          "symmetric_overlap_fraction_at_10cm": 0.7621689785624212,
+          "symmetric_overlap_fraction_at_20cm": 0.8774126548475633,
+          "symmetric_p90_nn_m": 0.2428532509549064
+        },
+        {
+          "first_capture_id": "scene_j_1",
+          "first_to_second_median_nn_m": 0.03408567892314861,
+          "first_voxel_point_count": 102421,
+          "second_capture_id": "scene_j_2",
+          "second_to_first_median_nn_m": 0.03178543144643321,
+          "second_voxel_point_count": 95182,
+          "symmetric_median_nn_m": 0.032891414708002276,
+          "symmetric_overlap_fraction_at_10cm": 0.801075894596742,
+          "symmetric_overlap_fraction_at_20cm": 0.9017626250613604,
+          "symmetric_p90_nn_m": 0.1965711737142702
+        }
+      ],
+      "scene_id": "scene_j"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_k_0",
+          "first_to_second_median_nn_m": 0.0313081449220657,
+          "first_voxel_point_count": 115798,
+          "second_capture_id": "scene_k_1",
+          "second_to_first_median_nn_m": 0.033547980606858555,
+          "second_voxel_point_count": 126050,
+          "symmetric_median_nn_m": 0.032397983843627645,
+          "symmetric_overlap_fraction_at_10cm": 0.7601634084218186,
+          "symmetric_overlap_fraction_at_20cm": 0.8286527074856935,
+          "symmetric_p90_nn_m": 0.46538045723888594
+        },
+        {
+          "first_capture_id": "scene_k_1",
+          "first_to_second_median_nn_m": 0.03292123451340012,
+          "first_voxel_point_count": 126050,
+          "second_capture_id": "scene_k_2",
+          "second_to_first_median_nn_m": 0.03122508035108713,
+          "second_voxel_point_count": 118139,
+          "symmetric_median_nn_m": 0.03206205604439934,
+          "symmetric_overlap_fraction_at_10cm": 0.7801375164319441,
+          "symmetric_overlap_fraction_at_20cm": 0.8540884315018284,
+          "symmetric_p90_nn_m": 0.33056375878455113
+        }
+      ],
+      "scene_id": "scene_k"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_l_0",
+          "first_to_second_median_nn_m": 0.03268307368979203,
+          "first_voxel_point_count": 29805,
+          "second_capture_id": "scene_l_1",
+          "second_to_first_median_nn_m": 0.03431779421558463,
+          "second_voxel_point_count": 31486,
+          "symmetric_median_nn_m": 0.03349861195273596,
+          "symmetric_overlap_fraction_at_10cm": 0.7453949193193128,
+          "symmetric_overlap_fraction_at_20cm": 0.8254229821670392,
+          "symmetric_p90_nn_m": 0.40009602317150966
+        },
+        {
+          "first_capture_id": "scene_l_1",
+          "first_to_second_median_nn_m": 0.03439539218612846,
+          "first_voxel_point_count": 31486,
+          "second_capture_id": "scene_l_2",
+          "second_to_first_median_nn_m": 0.030997632230965192,
+          "second_voxel_point_count": 27646,
+          "symmetric_median_nn_m": 0.03262979196193637,
+          "symmetric_overlap_fraction_at_10cm": 0.8373300412636137,
+          "symmetric_overlap_fraction_at_20cm": 0.9084421294730434,
+          "symmetric_p90_nn_m": 0.1812363382219497
+        },
+        {
+          "first_capture_id": "scene_l_2",
+          "first_to_second_median_nn_m": 0.039424969698709574,
+          "first_voxel_point_count": 27646,
+          "second_capture_id": "scene_l_3",
+          "second_to_first_median_nn_m": 0.048942590361747834,
+          "second_voxel_point_count": 31319,
+          "symmetric_median_nn_m": 0.043280778590131345,
+          "symmetric_overlap_fraction_at_10cm": 0.7202408208259137,
+          "symmetric_overlap_fraction_at_20cm": 0.8260154328839142,
+          "symmetric_p90_nn_m": 0.36480951682070006
+        }
+      ],
+      "scene_id": "scene_l"
+    },
+    {
+      "adjacent_pairs": [
+        {
+          "first_capture_id": "scene_m_0",
+          "first_to_second_median_nn_m": 0.03687428168282779,
+          "first_voxel_point_count": 111786,
+          "second_capture_id": "scene_m_1",
+          "second_to_first_median_nn_m": 0.03363964384962436,
+          "second_voxel_point_count": 100878,
+          "symmetric_median_nn_m": 0.03515453430464071,
+          "symmetric_overlap_fraction_at_10cm": 0.7703560546213746,
+          "symmetric_overlap_fraction_at_20cm": 0.8641989241244404,
+          "symmetric_p90_nn_m": 0.30516793499902595
+        },
+        {
+          "first_capture_id": "scene_m_1",
+          "first_to_second_median_nn_m": 0.035114407226597526,
+          "first_voxel_point_count": 100878,
+          "second_capture_id": "scene_m_2",
+          "second_to_first_median_nn_m": 0.03415397835135644,
+          "second_voxel_point_count": 98303,
+          "symmetric_median_nn_m": 0.03458829856940036,
+          "symmetric_overlap_fraction_at_10cm": 0.7741551654023225,
+          "symmetric_overlap_fraction_at_20cm": 0.8646356831223861,
+          "symmetric_p90_nn_m": 0.29077252640816914
+        }
+      ],
+      "scene_id": "scene_m"
+    }
+  ],
+  "schema_version": 1,
+  "status": "pass",
+  "summary": {
+    "adjacent_pair_count": 32,
+    "maximum_pair_symmetric_median_nn_m": 0.10674247501767545,
+    "median_of_pair_symmetric_median_nn_m": 0.03816105057804908,
+    "median_pair_overlap_fraction_at_10cm": 0.7269798410179391,
+    "minimum_pair_overlap_fraction_at_10cm": 0.487505711674663,
+    "scene_count": 13
+  },
+  "voxel_size_m": 0.05
+}

@@ -1,0 +1,1298 @@
+{
+  "baselines": [
+    "Pairwise Feature Association",
+    "Pairwise Feature-Class Association",
+    "EMA Temporal Association",
+    "Persist4D"
+  ],
+  "content_sha256": "a7cddae5fa4b0cd61d0391aa8974e566df616f44e9f4dd0ebc54f3c03d3759bf",
+  "external_gate_thresholds": {
+    "contradiction_requires_negative_upper_ci": true,
+    "minimum_gap_opportunities": 10,
+    "minimum_gap_scene_clusters": 3,
+    "minimum_observation_coverage": 0.1
+  },
+  "frozen_inference": {
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "config_sha256": "b7898eca6a912955b0cb03f749456090d86a29caf8885842e94d3a497aa8b4de",
+    "first_capture_initialization_window": 1,
+    "local_perception_window": 2,
+    "persistent_memory": {
+      "association_threshold": 0.5,
+      "capacity": 100,
+      "class_weight": 0.25,
+      "max_update_rate": 0.2,
+      "update_rate": 0.2
+    }
+  },
+  "ground_truth_boundary": {
+    "inference_fields": [
+      "xyz",
+      "normals",
+      "rgb",
+      "geometric_segment_ids"
+    ],
+    "object_ground_truth_used_for_association": false,
+    "post_inference_only_fields": [
+      "class_idx",
+      "instance_idx",
+      "ambiguity_alternatives"
+    ]
+  },
+  "level_a": {
+    "eligible_source_class_ids": [
+      5,
+      6,
+      7,
+      9,
+      14,
+      39
+    ],
+    "excluded_source_class_ids": [
+      0,
+      1,
+      2,
+      15,
+      22
+    ],
+    "metrics": [
+      "t_mAP",
+      "t_mAP50",
+      "t_mAP25",
+      "t_REC",
+      "normalized_id_switch_rate",
+      "gap_recovery_accuracy",
+      "gap_recovery_recall",
+      "fragmentation_count",
+      "merge_count"
+    ],
+    "status": "enabled"
+  },
+  "level_b": {
+    "eligible_rule": "official stable instance_idx in [0,255], excluding wall/floor/ceiling",
+    "metrics": [
+      "observation_coverage",
+      "normalized_id_switch_rate",
+      "fragmentation_count",
+      "merge_count",
+      "gap_recovery_accuracy",
+      "gap_recovery_recall"
+    ],
+    "stable_identity_count": 333,
+    "status": "enabled"
+  },
+  "order_policy": {
+    "artificial_permutations": false,
+    "chronology": "official_index_order"
+  },
+  "population": {
+    "capture_count": 45,
+    "gap_opportunity_count": 8,
+    "independent_scene_cluster_count": 13,
+    "temporal_sequence_count": 13,
+    "transition_count": 32
+  },
+  "protocol_id": "rescan-official-order-frozen-local-pair-v1",
+  "provenance": {
+    "dataset_content_sha256": "612810f1f8ec8ff8e4a1693b4b451da34ea0501cee46e1b34fedf3ed1910a420",
+    "label_map_sha256": "b9c53ae4cc51bff5b01ad94114dee474bec41a57eaad98eb3717c2748e86dacd",
+    "official_code_commit": "f45283be31119e9bd955d40bc159b1774dfed092"
+  },
+  "scenes": [
+    {
+      "capture_ids": [
+        "scene_a_0",
+        "scene_a_1",
+        "scene_a_2",
+        "scene_a_3"
+      ],
+      "gap_opportunities": [
+        {
+          "absent_capture_ids": [
+            "scene_a_1"
+          ],
+          "identity": 19,
+          "left_capture_id": "scene_a_0",
+          "right_capture_id": "scene_a_2"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_a_1"
+          ],
+          "identity": 31,
+          "left_capture_id": "scene_a_0",
+          "right_capture_id": "scene_a_2"
+        }
+      ],
+      "global_capture_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "scene_cluster_index": 0,
+      "scene_id": "scene_a",
+      "stages": [
+        {
+          "global_capture_indices": [
+            0
+          ],
+          "local_input_capture_ids": [
+            "scene_a_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_a_0"
+        },
+        {
+          "global_capture_indices": [
+            0,
+            1
+          ],
+          "local_input_capture_ids": [
+            "scene_a_0",
+            "scene_a_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_a_1"
+        },
+        {
+          "global_capture_indices": [
+            1,
+            2
+          ],
+          "local_input_capture_ids": [
+            "scene_a_1",
+            "scene_a_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_a_2"
+        },
+        {
+          "global_capture_indices": [
+            2,
+            3
+          ],
+          "local_input_capture_ids": [
+            "scene_a_2",
+            "scene_a_3"
+          ],
+          "stage_index": 3,
+          "target_capture_id": "scene_a_3"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_b_0",
+        "scene_b_1",
+        "scene_b_2",
+        "scene_b_3"
+      ],
+      "gap_opportunities": [
+        {
+          "absent_capture_ids": [
+            "scene_b_2"
+          ],
+          "identity": 8,
+          "left_capture_id": "scene_b_1",
+          "right_capture_id": "scene_b_3"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_b_2"
+          ],
+          "identity": 9,
+          "left_capture_id": "scene_b_1",
+          "right_capture_id": "scene_b_3"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_b_1"
+          ],
+          "identity": 12,
+          "left_capture_id": "scene_b_0",
+          "right_capture_id": "scene_b_2"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_b_1"
+          ],
+          "identity": 24,
+          "left_capture_id": "scene_b_0",
+          "right_capture_id": "scene_b_2"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_b_1"
+          ],
+          "identity": 25,
+          "left_capture_id": "scene_b_0",
+          "right_capture_id": "scene_b_2"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_b_1"
+          ],
+          "identity": 28,
+          "left_capture_id": "scene_b_0",
+          "right_capture_id": "scene_b_2"
+        }
+      ],
+      "global_capture_indices": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "scene_cluster_index": 1,
+      "scene_id": "scene_b",
+      "stages": [
+        {
+          "global_capture_indices": [
+            4
+          ],
+          "local_input_capture_ids": [
+            "scene_b_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_b_0"
+        },
+        {
+          "global_capture_indices": [
+            4,
+            5
+          ],
+          "local_input_capture_ids": [
+            "scene_b_0",
+            "scene_b_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_b_1"
+        },
+        {
+          "global_capture_indices": [
+            5,
+            6
+          ],
+          "local_input_capture_ids": [
+            "scene_b_1",
+            "scene_b_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_b_2"
+        },
+        {
+          "global_capture_indices": [
+            6,
+            7
+          ],
+          "local_input_capture_ids": [
+            "scene_b_2",
+            "scene_b_3"
+          ],
+          "stage_index": 3,
+          "target_capture_id": "scene_b_3"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_c_0",
+        "scene_c_1",
+        "scene_c_2",
+        "scene_c_3",
+        "scene_c_4"
+      ],
+      "gap_opportunities": [],
+      "global_capture_indices": [
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        4,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "scene_cluster_index": 2,
+      "scene_id": "scene_c",
+      "stages": [
+        {
+          "global_capture_indices": [
+            8
+          ],
+          "local_input_capture_ids": [
+            "scene_c_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_c_0"
+        },
+        {
+          "global_capture_indices": [
+            8,
+            9
+          ],
+          "local_input_capture_ids": [
+            "scene_c_0",
+            "scene_c_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_c_1"
+        },
+        {
+          "global_capture_indices": [
+            9,
+            10
+          ],
+          "local_input_capture_ids": [
+            "scene_c_1",
+            "scene_c_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_c_2"
+        },
+        {
+          "global_capture_indices": [
+            10,
+            11
+          ],
+          "local_input_capture_ids": [
+            "scene_c_2",
+            "scene_c_3"
+          ],
+          "stage_index": 3,
+          "target_capture_id": "scene_c_3"
+        },
+        {
+          "global_capture_indices": [
+            11,
+            12
+          ],
+          "local_input_capture_ids": [
+            "scene_c_3",
+            "scene_c_4"
+          ],
+          "stage_index": 4,
+          "target_capture_id": "scene_c_4"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_d_0",
+        "scene_d_1",
+        "scene_d_2",
+        "scene_d_3"
+      ],
+      "gap_opportunities": [],
+      "global_capture_indices": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "scene_cluster_index": 3,
+      "scene_id": "scene_d",
+      "stages": [
+        {
+          "global_capture_indices": [
+            13
+          ],
+          "local_input_capture_ids": [
+            "scene_d_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_d_0"
+        },
+        {
+          "global_capture_indices": [
+            13,
+            14
+          ],
+          "local_input_capture_ids": [
+            "scene_d_0",
+            "scene_d_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_d_1"
+        },
+        {
+          "global_capture_indices": [
+            14,
+            15
+          ],
+          "local_input_capture_ids": [
+            "scene_d_1",
+            "scene_d_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_d_2"
+        },
+        {
+          "global_capture_indices": [
+            15,
+            16
+          ],
+          "local_input_capture_ids": [
+            "scene_d_2",
+            "scene_d_3"
+          ],
+          "stage_index": 3,
+          "target_capture_id": "scene_d_3"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_e_0",
+        "scene_e_1",
+        "scene_e_2"
+      ],
+      "gap_opportunities": [],
+      "global_capture_indices": [
+        17,
+        18,
+        19
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [
+        27
+      ],
+      "level_b_identity_ids": [
+        6,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "scene_cluster_index": 4,
+      "scene_id": "scene_e",
+      "stages": [
+        {
+          "global_capture_indices": [
+            17
+          ],
+          "local_input_capture_ids": [
+            "scene_e_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_e_0"
+        },
+        {
+          "global_capture_indices": [
+            17,
+            18
+          ],
+          "local_input_capture_ids": [
+            "scene_e_0",
+            "scene_e_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_e_1"
+        },
+        {
+          "global_capture_indices": [
+            18,
+            19
+          ],
+          "local_input_capture_ids": [
+            "scene_e_1",
+            "scene_e_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_e_2"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_f_0",
+        "scene_f_1",
+        "scene_f_2"
+      ],
+      "gap_opportunities": [],
+      "global_capture_indices": [
+        20,
+        21,
+        22
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "scene_cluster_index": 5,
+      "scene_id": "scene_f",
+      "stages": [
+        {
+          "global_capture_indices": [
+            20
+          ],
+          "local_input_capture_ids": [
+            "scene_f_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_f_0"
+        },
+        {
+          "global_capture_indices": [
+            20,
+            21
+          ],
+          "local_input_capture_ids": [
+            "scene_f_0",
+            "scene_f_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_f_1"
+        },
+        {
+          "global_capture_indices": [
+            21,
+            22
+          ],
+          "local_input_capture_ids": [
+            "scene_f_1",
+            "scene_f_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_f_2"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_g_0",
+        "scene_g_1",
+        "scene_g_2"
+      ],
+      "gap_opportunities": [],
+      "global_capture_indices": [
+        23,
+        24,
+        25
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50
+      ],
+      "scene_cluster_index": 6,
+      "scene_id": "scene_g",
+      "stages": [
+        {
+          "global_capture_indices": [
+            23
+          ],
+          "local_input_capture_ids": [
+            "scene_g_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_g_0"
+        },
+        {
+          "global_capture_indices": [
+            23,
+            24
+          ],
+          "local_input_capture_ids": [
+            "scene_g_0",
+            "scene_g_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_g_1"
+        },
+        {
+          "global_capture_indices": [
+            24,
+            25
+          ],
+          "local_input_capture_ids": [
+            "scene_g_1",
+            "scene_g_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_g_2"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_h_0",
+        "scene_h_1",
+        "scene_h_2"
+      ],
+      "gap_opportunities": [],
+      "global_capture_indices": [
+        26,
+        27,
+        28
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "scene_cluster_index": 7,
+      "scene_id": "scene_h",
+      "stages": [
+        {
+          "global_capture_indices": [
+            26
+          ],
+          "local_input_capture_ids": [
+            "scene_h_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_h_0"
+        },
+        {
+          "global_capture_indices": [
+            26,
+            27
+          ],
+          "local_input_capture_ids": [
+            "scene_h_0",
+            "scene_h_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_h_1"
+        },
+        {
+          "global_capture_indices": [
+            27,
+            28
+          ],
+          "local_input_capture_ids": [
+            "scene_h_1",
+            "scene_h_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_h_2"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_i_0",
+        "scene_i_1",
+        "scene_i_2"
+      ],
+      "gap_opportunities": [],
+      "global_capture_indices": [
+        29,
+        30,
+        31
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "scene_cluster_index": 8,
+      "scene_id": "scene_i",
+      "stages": [
+        {
+          "global_capture_indices": [
+            29
+          ],
+          "local_input_capture_ids": [
+            "scene_i_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_i_0"
+        },
+        {
+          "global_capture_indices": [
+            29,
+            30
+          ],
+          "local_input_capture_ids": [
+            "scene_i_0",
+            "scene_i_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_i_1"
+        },
+        {
+          "global_capture_indices": [
+            30,
+            31
+          ],
+          "local_input_capture_ids": [
+            "scene_i_1",
+            "scene_i_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_i_2"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_j_0",
+        "scene_j_1",
+        "scene_j_2"
+      ],
+      "gap_opportunities": [],
+      "global_capture_indices": [
+        32,
+        33,
+        34
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ],
+      "scene_cluster_index": 9,
+      "scene_id": "scene_j",
+      "stages": [
+        {
+          "global_capture_indices": [
+            32
+          ],
+          "local_input_capture_ids": [
+            "scene_j_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_j_0"
+        },
+        {
+          "global_capture_indices": [
+            32,
+            33
+          ],
+          "local_input_capture_ids": [
+            "scene_j_0",
+            "scene_j_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_j_1"
+        },
+        {
+          "global_capture_indices": [
+            33,
+            34
+          ],
+          "local_input_capture_ids": [
+            "scene_j_1",
+            "scene_j_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_j_2"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_k_0",
+        "scene_k_1",
+        "scene_k_2"
+      ],
+      "gap_opportunities": [],
+      "global_capture_indices": [
+        35,
+        36,
+        37
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "scene_cluster_index": 10,
+      "scene_id": "scene_k",
+      "stages": [
+        {
+          "global_capture_indices": [
+            35
+          ],
+          "local_input_capture_ids": [
+            "scene_k_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_k_0"
+        },
+        {
+          "global_capture_indices": [
+            35,
+            36
+          ],
+          "local_input_capture_ids": [
+            "scene_k_0",
+            "scene_k_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_k_1"
+        },
+        {
+          "global_capture_indices": [
+            36,
+            37
+          ],
+          "local_input_capture_ids": [
+            "scene_k_1",
+            "scene_k_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_k_2"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_l_0",
+        "scene_l_1",
+        "scene_l_2",
+        "scene_l_3"
+      ],
+      "gap_opportunities": [],
+      "global_capture_indices": [
+        38,
+        39,
+        40,
+        41
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "scene_cluster_index": 11,
+      "scene_id": "scene_l",
+      "stages": [
+        {
+          "global_capture_indices": [
+            38
+          ],
+          "local_input_capture_ids": [
+            "scene_l_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_l_0"
+        },
+        {
+          "global_capture_indices": [
+            38,
+            39
+          ],
+          "local_input_capture_ids": [
+            "scene_l_0",
+            "scene_l_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_l_1"
+        },
+        {
+          "global_capture_indices": [
+            39,
+            40
+          ],
+          "local_input_capture_ids": [
+            "scene_l_1",
+            "scene_l_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_l_2"
+        },
+        {
+          "global_capture_indices": [
+            40,
+            41
+          ],
+          "local_input_capture_ids": [
+            "scene_l_2",
+            "scene_l_3"
+          ],
+          "stage_index": 3,
+          "target_capture_id": "scene_l_3"
+        }
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_m_0",
+        "scene_m_1",
+        "scene_m_2"
+      ],
+      "gap_opportunities": [],
+      "global_capture_indices": [
+        42,
+        43,
+        44
+      ],
+      "level_a_semantic_inconsistent_identity_ids": [],
+      "level_b_identity_ids": [
+        2,
+        3,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80
+      ],
+      "scene_cluster_index": 12,
+      "scene_id": "scene_m",
+      "stages": [
+        {
+          "global_capture_indices": [
+            42
+          ],
+          "local_input_capture_ids": [
+            "scene_m_0"
+          ],
+          "stage_index": 0,
+          "target_capture_id": "scene_m_0"
+        },
+        {
+          "global_capture_indices": [
+            42,
+            43
+          ],
+          "local_input_capture_ids": [
+            "scene_m_0",
+            "scene_m_1"
+          ],
+          "stage_index": 1,
+          "target_capture_id": "scene_m_1"
+        },
+        {
+          "global_capture_indices": [
+            43,
+            44
+          ],
+          "local_input_capture_ids": [
+            "scene_m_1",
+            "scene_m_2"
+          ],
+          "stage_index": 2,
+          "target_capture_id": "scene_m_2"
+        }
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "statistics": {
+    "bootstrap_replicates": 10000,
+    "cluster_unit": "independent physical scene",
+    "paired": true,
+    "seed": 45
+  },
+  "status": "pass"
+}

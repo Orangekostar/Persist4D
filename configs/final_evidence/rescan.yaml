@@ -1,0 +1,87 @@
+schema_version: 1
+stage_name: independent-rescan-frozen-validation
+
+dataset:
+  reference: external:rescan/dataset
+  archive_reference: external:rescan/rescan_dataset.zip
+  archive_sha256: 6985096973085de6c3f9b1463022edbbddc19f5bcb2c6536fb42f8e74ba28f9a
+  manifest_reference: repo:artifacts/final_evidence/external/rescan_dataset_manifest.json
+  chronology: official_index_order
+  artificial_permutations: false
+  cluster_unit: independent_physical_scene
+
+adapter:
+  local_perception_window: 2
+  first_capture_initialization_window: 1
+  geometry_segment_source: xyz_only_voxel_grid
+  geometry_segment_size_m: 0.1
+  geometry_segment_selection: preregistered_to_match_frozen_training_segment_density
+  model_voxel_size_m: 0.02
+  collator_mode: validation
+  input_fields: [xyz, rgb, normals, geometric_segment_ids]
+  evaluator_only_fields: [class_idx, instance_idx, ambiguity_alternatives]
+  placeholder_semantic_id: 2
+  placeholder_instance_id: 0
+  placeholder_change_id: 0
+
+frozen_model:
+  checkpoint_reference: repo:checkpoints/rescene4d_concerto_t2_repro.ckpt
+  checkpoint_sha256: 85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e
+  runtime_config_reference: repo:configs/system_comparison/persist4d_incumbent.yaml
+  runtime_config_sha256: aadca1c1608bae4ad4e812a6261536d9e386a85c460bbd85f4c5d215c9a68717
+  metric_taxonomy_reference: external:frozen-rio/rio.yaml
+  metric_taxonomy_sha256: fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba
+  seed: 45
+
+memory:
+  capacity: 100
+  association_threshold: 0.5
+  class_weight: 0.25
+  background_class: 18
+  update_rate: 0.2
+  max_update_rate: 0.2
+  confidence_threshold: 0.5
+  mask_threshold: 0.5
+  minimum_mask_support: 1
+
+levels:
+  A:
+    name: exact_class_aware_transfer
+    mapping_status: exact
+    label_map_reference: repo:artifacts/final_evidence/rescan_to_rescene_label_map.json
+    metrics: [t_mAP, t_mAP50, t_mAP25, t_REC, normalized_id_switch_rate, gap_recovery_accuracy, gap_recovery_recall, fragmentation_count, merge_count]
+  B:
+    name: object_identity_transfer
+    instance_id_range: [0, 255]
+    excluded_structural_class_ids: [1, 2, 22]
+    metrics: [observation_coverage, normalized_id_switch_rate, fragmentation_count, merge_count, gap_recovery_accuracy, gap_recovery_recall]
+
+baselines:
+  pairwise_feature:
+    paper_name: Pairwise Feature Association
+    feature_threshold: 0.5
+  pairwise_feature_class:
+    paper_name: Pairwise Feature-Class Association
+    feature_threshold: 0.5
+    class_weight: 0.25
+  ema_temporal:
+    paper_name: EMA Temporal Association
+    feature_threshold: 0.5
+    class_weight: 0.25
+    update_rate: 0.2
+    dormant_lifecycle: false
+  persist4d:
+    paper_name: Persist4D
+  primary_comparator: pairwise_feature_class
+
+statistics:
+  bootstrap_replicates: 10000
+  seed: 45
+  paired: true
+  report_every_scene: true
+
+external_gate:
+  minimum_gap_opportunities: 10
+  minimum_gap_scene_clusters: 3
+  minimum_observation_coverage: 0.1
+  contradiction_requires_negative_upper_ci: true

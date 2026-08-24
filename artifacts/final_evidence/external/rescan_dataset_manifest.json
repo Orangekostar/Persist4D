@@ -1,0 +1,6006 @@
+{
+  "chronology": {
+    "evidence": [
+      "official pipeline sorts gt_segmentation PLY basenames",
+      "official paper and supplement define captures as t0..tn",
+      "package capture suffixes are contiguous 0..n"
+    ],
+    "ordering_rule": "scene_list order; contiguous numeric capture suffix",
+    "status": "official_index_order"
+  },
+  "coordinate_metadata": {
+    "object_transform_input_allowed": false,
+    "scene_transform_file_count": 0,
+    "status": "requires_geometry_audit"
+  },
+  "dataset_content_sha256": "612810f1f8ec8ff8e4a1693b4b451da34ea0501cee46e1b34fedf3ed1910a420",
+  "files": [
+    {
+      "bytes": 736,
+      "relative_path": "nyu40_classes.txt",
+      "sha256": "4adf1198688cbd14030af02e93f4052ec7c70728402a2069b879b6d945d84299"
+    },
+    {
+      "bytes": 331065862,
+      "relative_path": "scene_a/color/scene_a_0.h264",
+      "sha256": "a7f473e98c3ffa5b703f4be3453f160b1d485f9127a6552ffd821aaaf3f0d502"
+    },
+    {
+      "bytes": 356073125,
+      "relative_path": "scene_a/color/scene_a_1.h264",
+      "sha256": "20144efa4db2f671ce624ab900ca154e7e7896eba78faac1cf3ed958a28ccad8"
+    },
+    {
+      "bytes": 242845935,
+      "relative_path": "scene_a/color/scene_a_2.h264",
+      "sha256": "83da22951ae2d77d74055fe513dec2dfcd531089a85edd60314387f09d9334e6"
+    },
+    {
+      "bytes": 335469498,
+      "relative_path": "scene_a/color/scene_a_3.h264",
+      "sha256": "830cfebf6361501742617a822b773c7fe918239539ddbef7c988b237ca24cd5a"
+    },
+    {
+      "bytes": 292461539,
+      "relative_path": "scene_a/depth/scene_a_0.depth",
+      "sha256": "d49bc9dfba30c1d5ec81d822b84f25f2da0e484a5575bfcc43830c7cc200f855"
+    },
+    {
+      "bytes": 313116864,
+      "relative_path": "scene_a/depth/scene_a_1.depth",
+      "sha256": "e85e2b49bda4a67349c3a86e6b7049f9a4d39f55ce4b1defb424a200ff87635b"
+    },
+    {
+      "bytes": 207551941,
+      "relative_path": "scene_a/depth/scene_a_2.depth",
+      "sha256": "7da5e7cf466d0b990bd60dac3a7d50317dd3817e9210393161f7c84282902f4a"
+    },
+    {
+      "bytes": 297756006,
+      "relative_path": "scene_a/depth/scene_a_3.depth",
+      "sha256": "5ff3b036f1b872643e3ffbee6e401907b07981d2a9fd8e14579ce01d7e9e599d"
+    },
+    {
+      "bytes": 11033094,
+      "relative_path": "scene_a/gt_segmentation/scene_a_0.ply",
+      "sha256": "409ff23ba4c9dddb2f7926e29595bc38fbcfd95b3e61b64710f8a0858c9b0bd3"
+    },
+    {
+      "bytes": 13578818,
+      "relative_path": "scene_a/gt_segmentation/scene_a_1.ply",
+      "sha256": "18e9886db141bfcf0bd89b06ffee3770444d99a894c07edceb92b67d6addba1c"
+    },
+    {
+      "bytes": 42,
+      "relative_path": "scene_a/gt_segmentation/scene_a_1.txt",
+      "sha256": "ce3f858078980197b49b12f30316ea438464df69c8116fc80e4f058dc6af6254"
+    },
+    {
+      "bytes": 13126886,
+      "relative_path": "scene_a/gt_segmentation/scene_a_2.ply",
+      "sha256": "cc6a2dc2f70483ea775d1b5841e051496a5e4fc0de633a15f43476be4b3a1913"
+    },
+    {
+      "bytes": 78,
+      "relative_path": "scene_a/gt_segmentation/scene_a_2.txt",
+      "sha256": "4f1d284c3f8303c5dfd61a0bf041e0aeac642afcf16ac2d221dcffded5d8e874"
+    },
+    {
+      "bytes": 12164561,
+      "relative_path": "scene_a/gt_segmentation/scene_a_3.ply",
+      "sha256": "eef6e818825923535e3982d3a6c51e47846d15ae6edcb194f99a1505a974b8e0"
+    },
+    {
+      "bytes": 56,
+      "relative_path": "scene_a/gt_segmentation/scene_a_3.txt",
+      "sha256": "56fd1dd61cf0cda261e51a2156de3349f782355b8b6fe24fc3d53ea00d62defc"
+    },
+    {
+      "bytes": 378995294,
+      "relative_path": "scene_b/color/scene_b_0.h264",
+      "sha256": "4425f84257569eccc6fa3658e31af7365d27db8bf1a1cad90b012ff65d521bfa"
+    },
+    {
+      "bytes": 220793241,
+      "relative_path": "scene_b/color/scene_b_1.h264",
+      "sha256": "5837c8830f71e720b492c0d71a870e385b6ceccb21c2b8e6ac5e903cff4a2f56"
+    },
+    {
+      "bytes": 402653701,
+      "relative_path": "scene_b/color/scene_b_2.h264",
+      "sha256": "4afd37143113800826a9fba055d8ff8497f8c41285ebad4a8e71ee962c6d4e75"
+    },
+    {
+      "bytes": 312571551,
+      "relative_path": "scene_b/color/scene_b_3.h264",
+      "sha256": "a5dbbc33d58458d22efe36846730952432573e6c5d13f0057b998c41ab67ce5d"
+    },
+    {
+      "bytes": 357926617,
+      "relative_path": "scene_b/depth/scene_b_0.depth",
+      "sha256": "508aec721ac6603085ef71990ccd34e4a252cc0dd6b0a0e7660bd9567d38249d"
+    },
+    {
+      "bytes": 215925786,
+      "relative_path": "scene_b/depth/scene_b_1.depth",
+      "sha256": "c4a2b3099d53f0788d5204db48f30d5d4feabd8a28fd5710ce6ab00d6c88f670"
+    },
+    {
+      "bytes": 375697193,
+      "relative_path": "scene_b/depth/scene_b_2.depth",
+      "sha256": "279fc2fcbf38f110ca5b54a49fe69ddcb38bf3a83c9e8b3d51f12d4c4f7459df"
+    },
+    {
+      "bytes": 286668451,
+      "relative_path": "scene_b/depth/scene_b_3.depth",
+      "sha256": "e89f9137f9dacf2fec32884dd7f61e2157b3981af2b81f4c3485e0795ce7c68d"
+    },
+    {
+      "bytes": 21557789,
+      "relative_path": "scene_b/gt_segmentation/scene_b_0.ply",
+      "sha256": "127d1e2b2eb02a83aa38745989e2a42a903baed4f4103190b1b4dbeb7aa0dbd8"
+    },
+    {
+      "bytes": 14331362,
+      "relative_path": "scene_b/gt_segmentation/scene_b_1.ply",
+      "sha256": "c6d32e8258167ad3ac465b11a126eb058243478007452fb36059c25409ff8590"
+    },
+    {
+      "bytes": 20786486,
+      "relative_path": "scene_b/gt_segmentation/scene_b_2.ply",
+      "sha256": "e0dd558513540107c62e54facf1afbe40d73b257093b5ded71e6d8b64634aa03"
+    },
+    {
+      "bytes": 117,
+      "relative_path": "scene_b/gt_segmentation/scene_b_2.txt",
+      "sha256": "e20ec35a16e59aec73aff9a5017a8f7a01c6039922347e1f3c715c4814c32003"
+    },
+    {
+      "bytes": 13954778,
+      "relative_path": "scene_b/gt_segmentation/scene_b_3.ply",
+      "sha256": "15040df437b78a741eb3ae853b97016eb4b95d6f686af1dccc39581b9e21bf5b"
+    },
+    {
+      "bytes": 73,
+      "relative_path": "scene_b/gt_segmentation/scene_b_3.txt",
+      "sha256": "edae258d757adf3932156698e26608ad9dd95cd9581bac12b202d853bec95cf1"
+    },
+    {
+      "bytes": 164248980,
+      "relative_path": "scene_c/color/scene_c_0.h264",
+      "sha256": "ffa09e67358424a3a49d65da23dc7ca440ae8e4d28bbabc45647d3146d619d4b"
+    },
+    {
+      "bytes": 158076968,
+      "relative_path": "scene_c/color/scene_c_1.h264",
+      "sha256": "9669e2e0fbfccfbfc2ab18c6c380f943e52cbd491b4c68c916cafef35e8a60a9"
+    },
+    {
+      "bytes": 191481946,
+      "relative_path": "scene_c/color/scene_c_2.h264",
+      "sha256": "68f7ac62ccf90462580bdd7984d783f598a6b296e50a6816f1ce24efab55bb8f"
+    },
+    {
+      "bytes": 158370630,
+      "relative_path": "scene_c/color/scene_c_3.h264",
+      "sha256": "f1a3091b54d3f11dd6798d3e84a52d7810941a88b1c1d5e270bf1f28e0f5fa7c"
+    },
+    {
+      "bytes": 196049771,
+      "relative_path": "scene_c/color/scene_c_4.h264",
+      "sha256": "958f361eefc00f296f029a50ee78eb1ddb9b95131a39ea56f1c56daaf9b92e4b"
+    },
+    {
+      "bytes": 165784748,
+      "relative_path": "scene_c/depth/scene_c_0.depth",
+      "sha256": "651534773184ec5daaa8cb8ddf892b811e67f022614060c7fd6877a82a172b41"
+    },
+    {
+      "bytes": 157310460,
+      "relative_path": "scene_c/depth/scene_c_1.depth",
+      "sha256": "41e7ad73737bdb1d24d51266b92b4681e8a72cb87f673de05b74d8d22c7b1007"
+    },
+    {
+      "bytes": 193175884,
+      "relative_path": "scene_c/depth/scene_c_2.depth",
+      "sha256": "1b5f9f187a197f7e835411e6060ddfcf05854e04e8add93f37dd84f99477f0ab"
+    },
+    {
+      "bytes": 158349826,
+      "relative_path": "scene_c/depth/scene_c_3.depth",
+      "sha256": "c7bc3900cc38f1313edf0e2449af60bbf8f8e3aa0a423ada94081bb413d0a440"
+    },
+    {
+      "bytes": 191577814,
+      "relative_path": "scene_c/depth/scene_c_4.depth",
+      "sha256": "59d1cd9012cf8f43681e0abbaf701509627d623d3a9c5fc4ee8c0a583a0dac94"
+    },
+    {
+      "bytes": 12686459,
+      "relative_path": "scene_c/gt_segmentation/scene_c_0.ply",
+      "sha256": "f4b2c273237209431f88f495b1d8fa454d09fcd38ec4e29f7319c580aa7a8e75"
+    },
+    {
+      "bytes": 11527574,
+      "relative_path": "scene_c/gt_segmentation/scene_c_1.ply",
+      "sha256": "0180ff00a44f68b90a5d7fb09494c2019bfd57a262901128754d453dd1064a2e"
+    },
+    {
+      "bytes": 9592394,
+      "relative_path": "scene_c/gt_segmentation/scene_c_2.ply",
+      "sha256": "63d0c33dde68f5c0b2a60d0c5e5964dd6801d850f326e5f9a6db0cccb5c60baf"
+    },
+    {
+      "bytes": 50,
+      "relative_path": "scene_c/gt_segmentation/scene_c_2.txt",
+      "sha256": "7fe06999aa56142444657a38d1808f34c88b1a731d4aa9cc054879ea1cfb88d7"
+    },
+    {
+      "bytes": 10300634,
+      "relative_path": "scene_c/gt_segmentation/scene_c_3.ply",
+      "sha256": "a408f7e395e57f0ccd10c0e23957526477833898f80d904a288a05eb9aa76e87"
+    },
+    {
+      "bytes": 138,
+      "relative_path": "scene_c/gt_segmentation/scene_c_3.txt",
+      "sha256": "de62a7e67df5b6c2d5c9bcdf3f85d094fd0b384300d19f454b011602599602b1"
+    },
+    {
+      "bytes": 12329999,
+      "relative_path": "scene_c/gt_segmentation/scene_c_4.ply",
+      "sha256": "331f80a1b3772e0fa365058b170e8085160c0f0bb716d05559b464263ef9f05a"
+    },
+    {
+      "bytes": 110,
+      "relative_path": "scene_c/gt_segmentation/scene_c_4.txt",
+      "sha256": "f41434d8c932161b45823a6521aa7fe4594a1585b90953f33a2472f3963b4626"
+    },
+    {
+      "bytes": 225103929,
+      "relative_path": "scene_d/color/scene_d_0.h264",
+      "sha256": "31a73db67d80fa10620dbf2af64ff392c02533ecd84501541486e0d7c53adc9e"
+    },
+    {
+      "bytes": 237377037,
+      "relative_path": "scene_d/color/scene_d_1.h264",
+      "sha256": "9ddf05aebe81ed85101fb66bba1bd517765af902b16f366409ada7695443ca43"
+    },
+    {
+      "bytes": 295045607,
+      "relative_path": "scene_d/color/scene_d_2.h264",
+      "sha256": "bad96d390935dec8fd5237391ae35d2c5c93698c62208d25014ed5afa1782123"
+    },
+    {
+      "bytes": 241229146,
+      "relative_path": "scene_d/color/scene_d_3.h264",
+      "sha256": "a636a891aec6ad4c5842bdd632164f56f2284094cf31f0286c3fdea5af51eafa"
+    },
+    {
+      "bytes": 202669802,
+      "relative_path": "scene_d/depth/scene_d_0.depth",
+      "sha256": "a64aec24d537b5ce0eb9ef89ca3fb3d1bc3fb3aa31d389da9fa88375c4e2f746"
+    },
+    {
+      "bytes": 225475908,
+      "relative_path": "scene_d/depth/scene_d_1.depth",
+      "sha256": "ccf0b1d0c0b2a6fa7b3bdaf58830cc80ec83b7d86d905f9347185b77bca6c2e5"
+    },
+    {
+      "bytes": 284798719,
+      "relative_path": "scene_d/depth/scene_d_2.depth",
+      "sha256": "0c96d762e438370d2658bd94f926dfa6edef801f7e6ab1c47d41353f865962fe"
+    },
+    {
+      "bytes": 213490435,
+      "relative_path": "scene_d/depth/scene_d_3.depth",
+      "sha256": "04bfa285380bba2ed4fba98e580953fbb1be545258611ee86fc2817668b6a559"
+    },
+    {
+      "bytes": 13889141,
+      "relative_path": "scene_d/gt_segmentation/scene_d_0.ply",
+      "sha256": "7b87400dc548e22d60ea172f8fc63a2269de8b71105170ce7c63d4d7b68468cc"
+    },
+    {
+      "bytes": 13597421,
+      "relative_path": "scene_d/gt_segmentation/scene_d_1.ply",
+      "sha256": "6ef36868776c2d980b23e2dba7f4529a14e85815730b09e19516f56fcd638e77"
+    },
+    {
+      "bytes": 24,
+      "relative_path": "scene_d/gt_segmentation/scene_d_1.txt",
+      "sha256": "2622e41191a68058218cb3f0b02a4702972d3f20e8fe327b71eb810b7e794894"
+    },
+    {
+      "bytes": 15790274,
+      "relative_path": "scene_d/gt_segmentation/scene_d_2.ply",
+      "sha256": "819fb2ff8123a59a196f773840f8f5d4d5c7171237a39ffe0e5ab2c830713ba8"
+    },
+    {
+      "bytes": 24,
+      "relative_path": "scene_d/gt_segmentation/scene_d_2.txt",
+      "sha256": "2622e41191a68058218cb3f0b02a4702972d3f20e8fe327b71eb810b7e794894"
+    },
+    {
+      "bytes": 17749127,
+      "relative_path": "scene_d/gt_segmentation/scene_d_3.ply",
+      "sha256": "80d5d3e194de5d8a61561623ff5d386b50a38eb747533d0d056084c177c7c5da"
+    },
+    {
+      "bytes": 24,
+      "relative_path": "scene_d/gt_segmentation/scene_d_3.txt",
+      "sha256": "2622e41191a68058218cb3f0b02a4702972d3f20e8fe327b71eb810b7e794894"
+    },
+    {
+      "bytes": 180096344,
+      "relative_path": "scene_e/color/scene_e_0.h264",
+      "sha256": "73b47bfd5b169819ff6451919c303954571a188033ed3c379dfd50e7771776f7"
+    },
+    {
+      "bytes": 149996925,
+      "relative_path": "scene_e/color/scene_e_1.h264",
+      "sha256": "70a427edfccf43265dd5756f715585274a7dd95afe901e2bb3881908d8ca2204"
+    },
+    {
+      "bytes": 171158817,
+      "relative_path": "scene_e/color/scene_e_2.h264",
+      "sha256": "19185bfd11b15da52658db3dcb4ba8e091a892773152d95bdf2bb249c2fedc78"
+    },
+    {
+      "bytes": 172379635,
+      "relative_path": "scene_e/depth/scene_e_0.depth",
+      "sha256": "906752a14f6c30ffd4279feb44d001820574fda6713ad31af2d8bfa4f16bf6b5"
+    },
+    {
+      "bytes": 140101653,
+      "relative_path": "scene_e/depth/scene_e_1.depth",
+      "sha256": "2e4656533b881e49b4e55c756ae0357ec591b1473a6f356ad29173bf4624d3a9"
+    },
+    {
+      "bytes": 156635539,
+      "relative_path": "scene_e/depth/scene_e_2.depth",
+      "sha256": "44845b11844bbcd1c91c9e517f9c8267ac985a67df102001488058e2b92c526f"
+    },
+    {
+      "bytes": 14236826,
+      "relative_path": "scene_e/gt_segmentation/scene_e_0.ply",
+      "sha256": "72e34e02255b650ce2257792382bcacb61afb494b0acd9a9713c2ec41bdab796"
+    },
+    {
+      "bytes": 13279064,
+      "relative_path": "scene_e/gt_segmentation/scene_e_1.ply",
+      "sha256": "b4b78b4a1c25feb4bebd51b4d8b8fb16fc2c2b0a354f88739dff53fb68ae507d"
+    },
+    {
+      "bytes": 12,
+      "relative_path": "scene_e/gt_segmentation/scene_e_1.txt",
+      "sha256": "4f72900e95cfd7c532bf2129a9879362fa9768989874634573690e61b161ff1d"
+    },
+    {
+      "bytes": 8022761,
+      "relative_path": "scene_e/gt_segmentation/scene_e_2.ply",
+      "sha256": "c03442ab8b474d9ad4eb619f226496f2b6d24bcb4d3f2573f4638a42657b4c4e"
+    },
+    {
+      "bytes": 24,
+      "relative_path": "scene_e/gt_segmentation/scene_e_2.txt",
+      "sha256": "e3044583a89f538e6dc8abfa869ca17b3b0dd5e1966e2a89bad93c3c4e0661d7"
+    },
+    {
+      "bytes": 234550680,
+      "relative_path": "scene_f/color/scene_f_0.h264",
+      "sha256": "91d44a177879cf224ff7097e08dd3ffdd78714eaea8e4f39df3974aed1cf26ed"
+    },
+    {
+      "bytes": 340068774,
+      "relative_path": "scene_f/color/scene_f_1.h264",
+      "sha256": "0284f1be3f930d38a34905b5ae80c65dfaf462ea4783116582ace6db21ed090a"
+    },
+    {
+      "bytes": 236771464,
+      "relative_path": "scene_f/color/scene_f_2.h264",
+      "sha256": "d0a466226f0a7b9c401d7a5889883d54e9e0f345130feadc04fb4eb95663cb29"
+    },
+    {
+      "bytes": 222561362,
+      "relative_path": "scene_f/depth/scene_f_0.depth",
+      "sha256": "08f7a1d67d3d89630889acb6e8ea9d65d06b7ed8133bceefbb92567b77cd72a1"
+    },
+    {
+      "bytes": 350438554,
+      "relative_path": "scene_f/depth/scene_f_1.depth",
+      "sha256": "cd7e4ad577e042c1c0354569b83f8e8f4bd5a38295749cf7e16e07f5e609256f"
+    },
+    {
+      "bytes": 233983955,
+      "relative_path": "scene_f/depth/scene_f_2.depth",
+      "sha256": "99ece815addfb4f7fbc81747b176e60a0560b3013ab5cff18f30859e844182b8"
+    },
+    {
+      "bytes": 23278508,
+      "relative_path": "scene_f/gt_segmentation/scene_f_0.ply",
+      "sha256": "956d7f8f0fc200830fbbb5587046cb58cb474fa159cdcd10acd7418182469ec7"
+    },
+    {
+      "bytes": 23254094,
+      "relative_path": "scene_f/gt_segmentation/scene_f_1.ply",
+      "sha256": "16ed4d69d7970052a49d0fc8f9c19554cf16f17062d8989bcd1370ef21515ec7"
+    },
+    {
+      "bytes": 24351164,
+      "relative_path": "scene_f/gt_segmentation/scene_f_2.ply",
+      "sha256": "76e0c5a0ab1bca25262c8bede1569a453a479e4e4275419fe5b12c33faec1ff4"
+    },
+    {
+      "bytes": 458801798,
+      "relative_path": "scene_g/color/scene_g_0.h264",
+      "sha256": "8f501ea57c32259e9dee97a51e8c9c8c2f5c71ffa945baf8e494b8bb2c0cc83b"
+    },
+    {
+      "bytes": 443221303,
+      "relative_path": "scene_g/color/scene_g_1.h264",
+      "sha256": "d23d6653c246776eff7f6ec622430c20dd41fce76b1d818838c10b49c83d735e"
+    },
+    {
+      "bytes": 333679563,
+      "relative_path": "scene_g/color/scene_g_2.h264",
+      "sha256": "984c2ac21df1f20a51f5a1a70f4741b5c1c1205618b2e423a6fb326ad036c8ac"
+    },
+    {
+      "bytes": 454598029,
+      "relative_path": "scene_g/depth/scene_g_0.depth",
+      "sha256": "62786aef886db33c290f6e2b092af05caadc25493f85027729b56df08c6b2876"
+    },
+    {
+      "bytes": 438759608,
+      "relative_path": "scene_g/depth/scene_g_1.depth",
+      "sha256": "a6f984177761bd2bc796614a649499140a406049dc0e5489185e54e6e2ffd760"
+    },
+    {
+      "bytes": 336390570,
+      "relative_path": "scene_g/depth/scene_g_2.depth",
+      "sha256": "71a4086805cbb3e5cb1a46de293fd41c5746e38d7c4c827cbb88104b274b10d9"
+    },
+    {
+      "bytes": 24932225,
+      "relative_path": "scene_g/gt_segmentation/scene_g_0.ply",
+      "sha256": "6e56fc3a834f8090b6eefa1fcfaa8c6549083c20043d7e1eef139e38649f48a2"
+    },
+    {
+      "bytes": 26524049,
+      "relative_path": "scene_g/gt_segmentation/scene_g_1.ply",
+      "sha256": "793db062147d1097e3163a02ed8e532791a8d5cc0308ff84043c7dfd30a2e9ca"
+    },
+    {
+      "bytes": 27813155,
+      "relative_path": "scene_g/gt_segmentation/scene_g_2.ply",
+      "sha256": "747901d3c38ed9e3e8b5d0103a4e97cd3ec1cf9a85618286420c7686f1787923"
+    },
+    {
+      "bytes": 45,
+      "relative_path": "scene_g/gt_segmentation/scene_g_2.txt",
+      "sha256": "cc4dcabbec2d833455624fcac9f8a35991df95d8af8f7f0764c81b186c927f0e"
+    },
+    {
+      "bytes": 264675581,
+      "relative_path": "scene_h/color/scene_h_0.h264",
+      "sha256": "bab2bb7e4f0e75b934ee54e21889e20a04601a109269595b5a849dff9d3eafa9"
+    },
+    {
+      "bytes": 245337021,
+      "relative_path": "scene_h/color/scene_h_1.h264",
+      "sha256": "76fdc6f9d2aecde691b205b3782177f65ba268990ad5ccc93457a0b9b694c96d"
+    },
+    {
+      "bytes": 262521938,
+      "relative_path": "scene_h/color/scene_h_2.h264",
+      "sha256": "a4f246599b8ee1bc6a5a5bca0dcc549697942d237ef4714ca4f19c94c9d963ab"
+    },
+    {
+      "bytes": 267928834,
+      "relative_path": "scene_h/depth/scene_h_0.depth",
+      "sha256": "57967aada16024719fef1efa74e150f7379804b5e66125a807f7dfdcca84cca2"
+    },
+    {
+      "bytes": 250617345,
+      "relative_path": "scene_h/depth/scene_h_1.depth",
+      "sha256": "cab6da171c8a6c6dffea09d5edb77248f858db14083586e7fa11e756d15f9b0a"
+    },
+    {
+      "bytes": 269566819,
+      "relative_path": "scene_h/depth/scene_h_2.depth",
+      "sha256": "5fe8f633b9a2d783b0843f69bbae85465927c2d7fe6681530401474284b3708e"
+    },
+    {
+      "bytes": 16194743,
+      "relative_path": "scene_h/gt_segmentation/scene_h_0.ply",
+      "sha256": "31181df0b6f36c3382f05aa56a8c72a7813c029f2da1b56c0d380385d62dc11a"
+    },
+    {
+      "bytes": 16961132,
+      "relative_path": "scene_h/gt_segmentation/scene_h_1.ply",
+      "sha256": "a8f9d82b7b8dbaa8b6e6f79474be78a2f2462598f66e4ef171003423f02827d0"
+    },
+    {
+      "bytes": 24,
+      "relative_path": "scene_h/gt_segmentation/scene_h_1.txt",
+      "sha256": "dc77e15cc0c5c76ce69dda2d183c685b2d4d75086bb13ec4c4ed7c054684a6dc"
+    },
+    {
+      "bytes": 15625928,
+      "relative_path": "scene_h/gt_segmentation/scene_h_2.ply",
+      "sha256": "ddb8edfc2c7fe61ab5715d7b008c601c7e9a56997a7ee46b9f17d3b25020f6a5"
+    },
+    {
+      "bytes": 24,
+      "relative_path": "scene_h/gt_segmentation/scene_h_2.txt",
+      "sha256": "dc77e15cc0c5c76ce69dda2d183c685b2d4d75086bb13ec4c4ed7c054684a6dc"
+    },
+    {
+      "bytes": 141613856,
+      "relative_path": "scene_i/color/scene_i_0.h264",
+      "sha256": "a434dd1b634adf0e481da357a3dd868062a940a5125f2749d6697ea757688f78"
+    },
+    {
+      "bytes": 130566580,
+      "relative_path": "scene_i/color/scene_i_1.h264",
+      "sha256": "21720b8f119cc3e5c6fab8435dc8006e45c65dff5abff000146ebeab9ba233d8"
+    },
+    {
+      "bytes": 119360010,
+      "relative_path": "scene_i/color/scene_i_2.h264",
+      "sha256": "757adf6afc5e7d911f5a0a93f709509203076ea84aff17b9605500179df833e7"
+    },
+    {
+      "bytes": 133530278,
+      "relative_path": "scene_i/depth/scene_i_0.depth",
+      "sha256": "9e45f2ec4319917a4288d0189a3c09fc0e8d27cfb9fcaad0a77c3d6a3997dd2d"
+    },
+    {
+      "bytes": 122922665,
+      "relative_path": "scene_i/depth/scene_i_1.depth",
+      "sha256": "9a105d340f80c16595ee8eb90d9e8e7e949b97209699f6e13c80079511d93dda"
+    },
+    {
+      "bytes": 119339088,
+      "relative_path": "scene_i/depth/scene_i_2.depth",
+      "sha256": "39dc6838aa38efc5b3088cace426ba266947992073ab7d9fea721e351d9e9745"
+    },
+    {
+      "bytes": 7238237,
+      "relative_path": "scene_i/gt_segmentation/scene_i_0.ply",
+      "sha256": "f0f43f3c8cee98d5e3b4c3cbde55e995f9061b324a38661ee5bf1d6dda8f09e9"
+    },
+    {
+      "bytes": 6966524,
+      "relative_path": "scene_i/gt_segmentation/scene_i_1.ply",
+      "sha256": "e62e981a4db3ab6c79aaabcd434b1834bc6ed2fdee03208d58c926ef5335148f"
+    },
+    {
+      "bytes": 6290147,
+      "relative_path": "scene_i/gt_segmentation/scene_i_2.ply",
+      "sha256": "891231ab6423a2e1b259be4d350684645fa963737da13612f0a0fd89daf84767"
+    },
+    {
+      "bytes": 592317124,
+      "relative_path": "scene_j/color/scene_j_0.h264",
+      "sha256": "31a041c8018bf47e4fda97409324a04691326293564123adb9119f9c938537cd"
+    },
+    {
+      "bytes": 681074764,
+      "relative_path": "scene_j/color/scene_j_1.h264",
+      "sha256": "72606aa58c60d5f7c9334dd0a31e575305e002cf39e22d30f918bcea0e38e1e3"
+    },
+    {
+      "bytes": 538058746,
+      "relative_path": "scene_j/color/scene_j_2.h264",
+      "sha256": "9fba454988fc158747498c6bedcbd1f8cedae86cfe9b731d4d17792c5d383ed5"
+    },
+    {
+      "bytes": 542215048,
+      "relative_path": "scene_j/depth/scene_j_0.depth",
+      "sha256": "df602b39d287f5df88c3e6cf41ce144c0a8e01b6ee20bd8aca592ac5d66df7ea"
+    },
+    {
+      "bytes": 633754126,
+      "relative_path": "scene_j/depth/scene_j_1.depth",
+      "sha256": "f2585a76aceae73e892b8e0038dc4cb304eaf57a4a4b7016c659aec2ac95bea0"
+    },
+    {
+      "bytes": 502378631,
+      "relative_path": "scene_j/depth/scene_j_2.depth",
+      "sha256": "e56cbebb11510b9106e33c132c41bb5fbe031814f87f28bc2b5663d5c275e37f"
+    },
+    {
+      "bytes": 35099993,
+      "relative_path": "scene_j/gt_segmentation/scene_j_0.ply",
+      "sha256": "483eb919cc8dc0499f225758a99fabe49cf1fa8c39028032050a538302627860"
+    },
+    {
+      "bytes": 36198701,
+      "relative_path": "scene_j/gt_segmentation/scene_j_1.ply",
+      "sha256": "053f292c9e28420aa6927802e516b8173a7d7deff3a696ee5250b6687617e107"
+    },
+    {
+      "bytes": 264,
+      "relative_path": "scene_j/gt_segmentation/scene_j_1.txt",
+      "sha256": "edecb664e14f1da8bb6f27d68070db07100940c55a5162c9fe56310f93a058b3"
+    },
+    {
+      "bytes": 33429155,
+      "relative_path": "scene_j/gt_segmentation/scene_j_2.ply",
+      "sha256": "6685b18c939cc641f6a75f8a546dbbac52c88d2ca80513cc5c96bd5d0952b7d3"
+    },
+    {
+      "bytes": 264,
+      "relative_path": "scene_j/gt_segmentation/scene_j_2.txt",
+      "sha256": "edecb664e14f1da8bb6f27d68070db07100940c55a5162c9fe56310f93a058b3"
+    },
+    {
+      "bytes": 466670266,
+      "relative_path": "scene_k/color/scene_k_0.h264",
+      "sha256": "d00073dfd3de1c37a1150cef6fcb4b5100ac5859a698dfcf990ed7ad072b0e19"
+    },
+    {
+      "bytes": 444347997,
+      "relative_path": "scene_k/color/scene_k_1.h264",
+      "sha256": "8074d6a89de5823fb55c9521a67460c8f00676d7ecc1be532b995556942510f6"
+    },
+    {
+      "bytes": 467855355,
+      "relative_path": "scene_k/color/scene_k_2.h264",
+      "sha256": "3906a7a10a62439d99d5c975b4b1934eb11f07059a8245bc8e30cbfc3274c8c8"
+    },
+    {
+      "bytes": 447136135,
+      "relative_path": "scene_k/depth/scene_k_0.depth",
+      "sha256": "b501c06753f09408a8b3d3f5ddc1c8cfb261accf6a0012fee27945590989e623"
+    },
+    {
+      "bytes": 423173301,
+      "relative_path": "scene_k/depth/scene_k_1.depth",
+      "sha256": "490fe2d1866faaae3ff73ef365909839c038ea65fafb15a10df31fd9ae6a8115"
+    },
+    {
+      "bytes": 448926063,
+      "relative_path": "scene_k/depth/scene_k_2.depth",
+      "sha256": "95d0ccfb8a3382e5486f3455bbac48a621a918389c1ad75ad32c950d5f2b2c3b"
+    },
+    {
+      "bytes": 41160555,
+      "relative_path": "scene_k/gt_segmentation/scene_k_0.ply",
+      "sha256": "b0c2af4f78b14768b99dfd9a34f0beb92d5d001f72d2b7871b186a957a6f125f"
+    },
+    {
+      "bytes": 45254580,
+      "relative_path": "scene_k/gt_segmentation/scene_k_1.ply",
+      "sha256": "c128c407ec07a6f1f1d70b622e2e66ba4d94f27e11c680f40a64032ac8a340c7"
+    },
+    {
+      "bytes": 84,
+      "relative_path": "scene_k/gt_segmentation/scene_k_1.txt",
+      "sha256": "61a8491a4b8a2f60bbf5a95492cfa7f0137a2bf5f1689360ea1c2d8a375c2c68"
+    },
+    {
+      "bytes": 41778471,
+      "relative_path": "scene_k/gt_segmentation/scene_k_2.ply",
+      "sha256": "e950633261912fad76b4a609ab1f2ebe3116781100c1d705bec250714d812ec9"
+    },
+    {
+      "bytes": 84,
+      "relative_path": "scene_k/gt_segmentation/scene_k_2.txt",
+      "sha256": "61a8491a4b8a2f60bbf5a95492cfa7f0137a2bf5f1689360ea1c2d8a375c2c68"
+    },
+    {
+      "bytes": 289741183,
+      "relative_path": "scene_l/color/scene_l_0.h264",
+      "sha256": "8f81acc3f3904164a10bfa7e7687f6a7e5479fb04ac41096410557ebfce63f01"
+    },
+    {
+      "bytes": 292616808,
+      "relative_path": "scene_l/color/scene_l_1.h264",
+      "sha256": "546c5a01410a5351abdaf6434a2ae6df3a9d2f2b189c8c9bbe773e94c9818bb3"
+    },
+    {
+      "bytes": 231005671,
+      "relative_path": "scene_l/color/scene_l_2.h264",
+      "sha256": "c08fac8596f962a90d9f3f5967427956f5b04f235ebbf51be4c1d311a4318528"
+    },
+    {
+      "bytes": 273698374,
+      "relative_path": "scene_l/color/scene_l_3.h264",
+      "sha256": "374970d7f6d507f5fa414ef7aca66c9232e081b47271a73dbc375e8d7789ec11"
+    },
+    {
+      "bytes": 282348597,
+      "relative_path": "scene_l/depth/scene_l_0.depth",
+      "sha256": "943c9269aa42937f32ce81abfe6c436bad7a1d3f26849bed11b6750743f46066"
+    },
+    {
+      "bytes": 285632711,
+      "relative_path": "scene_l/depth/scene_l_1.depth",
+      "sha256": "91bc9069e6915786941490c6522951239b933560001d578ff87b5c00e04b6d3e"
+    },
+    {
+      "bytes": 220845859,
+      "relative_path": "scene_l/depth/scene_l_2.depth",
+      "sha256": "70d0ef6f5d4b410ee765132d19798734c27944d3d9dd2457a0c5c669dbc3bd78"
+    },
+    {
+      "bytes": 276753985,
+      "relative_path": "scene_l/depth/scene_l_3.depth",
+      "sha256": "329902326db0914091c3b8faa0cb62ce499b6b42087d156363811774ccf1de68"
+    },
+    {
+      "bytes": 10390412,
+      "relative_path": "scene_l/gt_segmentation/scene_l_0.ply",
+      "sha256": "6e162cc6a35ab37a0fab55f2dcbd473ffdd9c06808f91cb8f79483c011fa0106"
+    },
+    {
+      "bytes": 10918121,
+      "relative_path": "scene_l/gt_segmentation/scene_l_1.ply",
+      "sha256": "17db149fcbc0a317884dfbca5d7d3c1e9ab7dbab77c8154fe7f4e1f2f23b53f0"
+    },
+    {
+      "bytes": 9563612,
+      "relative_path": "scene_l/gt_segmentation/scene_l_2.ply",
+      "sha256": "43b7c4ecedc1f4a36e65eee57201376969222d4a657497e18c792952b1917c0f"
+    },
+    {
+      "bytes": 11033912,
+      "relative_path": "scene_l/gt_segmentation/scene_l_3.ply",
+      "sha256": "5ca92124e6d4c88cef771833e518f74df49c3ea8da45982a6f2b71044f268e64"
+    },
+    {
+      "bytes": 104,
+      "relative_path": "scene_list.txt",
+      "sha256": "56f74ef6cd5967642148c6f7255ef60fef7b3e3ea7d6560f479c67b30680e678"
+    },
+    {
+      "bytes": 467471841,
+      "relative_path": "scene_m/color/scene_m_0.h264",
+      "sha256": "9eb4a8cfd078b0fb24674eae5e7c4848b225606d9471a83bfaa264b5d399372c"
+    },
+    {
+      "bytes": 510414368,
+      "relative_path": "scene_m/color/scene_m_1.h264",
+      "sha256": "ce36503a63d6a427b32558fa7b5bafe9b4844401995c24bc4104cab7fce58c11"
+    },
+    {
+      "bytes": 512195826,
+      "relative_path": "scene_m/color/scene_m_2.h264",
+      "sha256": "299529a9929ca602d94c0f06ef9ca41aaecb4a25e49fdbbe1f5072ef0a5ab52e"
+    },
+    {
+      "bytes": 439808634,
+      "relative_path": "scene_m/depth/scene_m_0.depth",
+      "sha256": "421df8f51c8d325a077f96a3c20ad1864df34524f84804687c7faed025f339db"
+    },
+    {
+      "bytes": 501577962,
+      "relative_path": "scene_m/depth/scene_m_1.depth",
+      "sha256": "646315c58508a56e2b4cfee97ef6ac4ef42824c4f729da46be4cbc7971738ebd"
+    },
+    {
+      "bytes": 499155170,
+      "relative_path": "scene_m/depth/scene_m_2.depth",
+      "sha256": "b90cbb0ecfc67f324cd9ad22fa8ae48cec227d61185baa6990da5fc25eed2468"
+    },
+    {
+      "bytes": 38810024,
+      "relative_path": "scene_m/gt_segmentation/scene_m_0.ply",
+      "sha256": "2932fd0f1228d1fe50c96ac8f6b640af2794c9c907044043eaabdbb558a38c0e"
+    },
+    {
+      "bytes": 34883504,
+      "relative_path": "scene_m/gt_segmentation/scene_m_1.ply",
+      "sha256": "98149f72bc0f83efbbd246437aff56a1ad050d68bc65860e7f7577b1e1027a0f"
+    },
+    {
+      "bytes": 93,
+      "relative_path": "scene_m/gt_segmentation/scene_m_1.txt",
+      "sha256": "98df02179c0dcacc78654272b05e95471ab6f42205df6aa6407741c85e0489f9"
+    },
+    {
+      "bytes": 33952496,
+      "relative_path": "scene_m/gt_segmentation/scene_m_2.ply",
+      "sha256": "034201ee9cf0f0fd037fd3ebe2ddf255448fa54879fcb1b376bce0360cbf9510"
+    },
+    {
+      "bytes": 108,
+      "relative_path": "scene_m/gt_segmentation/scene_m_2.txt",
+      "sha256": "7d7ae4879535e00dedbbad59c81f9e469ab45ebc15cbd30720727c11e111235b"
+    }
+  ],
+  "scenes": [
+    {
+      "capture_ids": [
+        "scene_a_0",
+        "scene_a_1",
+        "scene_a_2",
+        "scene_a_3"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_a_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            31
+          ],
+          "ply_reference": "external:rescan/dataset/scene_a/gt_segmentation/scene_a_0.ply",
+          "point_count": 282892,
+          "temporal_index": 0,
+          "xyz_max": [
+            5.037164688110352,
+            1.3592448234558105,
+            1.6558457612991333
+          ],
+          "xyz_min": [
+            -5.574875831604004,
+            -0.3613596558570862,
+            -4.311466693878174
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "10": [
+              9,
+              10,
+              12
+            ],
+            "5": [
+              5,
+              6
+            ],
+            "6": [
+              6,
+              5
+            ],
+            "9": [
+              9,
+              12
+            ]
+          },
+          "capture_id": "scene_a_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "ply_reference": "external:rescan/dataset/scene_a/gt_segmentation/scene_a_1.ply",
+          "point_count": 348167,
+          "temporal_index": 1,
+          "xyz_max": [
+            4.501866817474365,
+            1.4467484951019287,
+            3.176551580429077
+          ],
+          "xyz_min": [
+            -5.749353885650635,
+            -0.01754528284072876,
+            -3.8477418422698975
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "10": [
+              10,
+              12
+            ],
+            "11": [
+              7,
+              11
+            ],
+            "12": [
+              10,
+              12
+            ],
+            "4": [
+              4,
+              7
+            ],
+            "5": [
+              4,
+              6,
+              5
+            ],
+            "6": [
+              4,
+              5,
+              6
+            ],
+            "7": [
+              4,
+              7,
+              11
+            ]
+          },
+          "capture_id": "scene_a_2",
+          "class_ids": [
+            0,
+            2,
+            5,
+            7,
+            39
+          ],
+          "instance_ids": [
+            0,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "ply_reference": "external:rescan/dataset/scene_a/gt_segmentation/scene_a_2.ply",
+          "point_count": 336579,
+          "temporal_index": 2,
+          "xyz_max": [
+            5.465690612792969,
+            1.0981390476226807,
+            2.8978796005249023
+          ],
+          "xyz_min": [
+            -6.009471893310547,
+            -0.02305213175714016,
+            -4.248316287994385
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "10": [
+              10,
+              6,
+              12
+            ],
+            "11": [
+              7,
+              11
+            ],
+            "4": [
+              4,
+              7
+            ],
+            "6": [
+              10,
+              6
+            ],
+            "7": [
+              4,
+              7,
+              11
+            ]
+          },
+          "capture_id": "scene_a_3",
+          "class_ids": [
+            0,
+            2,
+            5,
+            7,
+            39
+          ],
+          "instance_ids": [
+            0,
+            3,
+            4,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            14,
+            15,
+            16,
+            17,
+            18,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "ply_reference": "external:rescan/dataset/scene_a/gt_segmentation/scene_a_3.ply",
+          "point_count": 311904,
+          "temporal_index": 3,
+          "xyz_max": [
+            5.279156684875488,
+            1.4949169158935547,
+            2.773177146911621
+          ],
+          "xyz_min": [
+            -5.262099742889404,
+            -0.024954000487923622,
+            -3.9648923873901367
+          ]
+        }
+      ],
+      "gap_opportunities": [
+        {
+          "absent_capture_ids": [
+            "scene_a_1"
+          ],
+          "identity": 19,
+          "left_capture_id": "scene_a_0",
+          "right_capture_id": "scene_a_2"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_a_1"
+          ],
+          "identity": 31,
+          "left_capture_id": "scene_a_0",
+          "right_capture_id": "scene_a_2"
+        }
+      ],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "10": [
+          5
+        ],
+        "11": [
+          5
+        ],
+        "12": [
+          5
+        ],
+        "13": [
+          39
+        ],
+        "14": [
+          39
+        ],
+        "15": [
+          7
+        ],
+        "16": [
+          7
+        ],
+        "17": [
+          5
+        ],
+        "18": [
+          5
+        ],
+        "19": [
+          5
+        ],
+        "20": [
+          7
+        ],
+        "21": [
+          7
+        ],
+        "22": [
+          7
+        ],
+        "23": [
+          5
+        ],
+        "24": [
+          5
+        ],
+        "25": [
+          5
+        ],
+        "26": [
+          5
+        ],
+        "27": [
+          5
+        ],
+        "28": [
+          7
+        ],
+        "29": [
+          7
+        ],
+        "3": [
+          5
+        ],
+        "30": [
+          7
+        ],
+        "31": [
+          39
+        ],
+        "32": [
+          39
+        ],
+        "33": [
+          5
+        ],
+        "34": [
+          5
+        ],
+        "35": [
+          5
+        ],
+        "4": [
+          5
+        ],
+        "5": [
+          5
+        ],
+        "6": [
+          5
+        ],
+        "7": [
+          5
+        ],
+        "8": [
+          5
+        ],
+        "9": [
+          5
+        ]
+      },
+      "scene_id": "scene_a",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "stable_object_identity_ids": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_b_0",
+        "scene_b_1",
+        "scene_b_2",
+        "scene_b_3"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_b_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            14,
+            15,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "ply_reference": "external:rescan/dataset/scene_b/gt_segmentation/scene_b_0.ply",
+          "point_count": 552756,
+          "temporal_index": 0,
+          "xyz_max": [
+            6.711655616760254,
+            3.3794617652893066,
+            4.788873672485352
+          ],
+          "xyz_min": [
+            -4.446956634521484,
+            -0.015607436187565327,
+            -6.10778284072876
+          ]
+        },
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_b_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            14,
+            15,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            26,
+            27,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "ply_reference": "external:rescan/dataset/scene_b/gt_segmentation/scene_b_1.ply",
+          "point_count": 367463,
+          "temporal_index": 1,
+          "xyz_max": [
+            5.72451639175415,
+            2.903262138366699,
+            4.6458740234375
+          ],
+          "xyz_min": [
+            -4.117798328399658,
+            -0.0345638282597065,
+            -4.779343605041504
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "12": [
+              4,
+              5,
+              12,
+              13,
+              24
+            ],
+            "13": [
+              4,
+              5,
+              12,
+              13,
+              24
+            ],
+            "17": [
+              17,
+              19
+            ],
+            "19": [
+              17,
+              19
+            ],
+            "24": [
+              4,
+              5,
+              12,
+              13,
+              24
+            ],
+            "4": [
+              4,
+              5,
+              12,
+              13,
+              24
+            ],
+            "5": [
+              4,
+              5,
+              12,
+              13,
+              24
+            ]
+          },
+          "capture_id": "scene_b_2",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            14,
+            15,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            4,
+            5,
+            6,
+            7,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36
+          ],
+          "ply_reference": "external:rescan/dataset/scene_b/gt_segmentation/scene_b_2.ply",
+          "point_count": 532979,
+          "temporal_index": 2,
+          "xyz_max": [
+            7.052967548370361,
+            2.894127607345581,
+            4.6540727615356445
+          ],
+          "xyz_min": [
+            -4.260995864868164,
+            -0.019198238849639893,
+            -5.893313407897949
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "17": [
+              17,
+              19
+            ],
+            "19": [
+              17,
+              19
+            ],
+            "30": [
+              30,
+              33
+            ],
+            "32": [
+              32,
+              35
+            ],
+            "33": [
+              30,
+              33
+            ],
+            "35": [
+              32,
+              35
+            ]
+          },
+          "capture_id": "scene_b_3",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            25,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "ply_reference": "external:rescan/dataset/scene_b/gt_segmentation/scene_b_3.ply",
+          "point_count": 357807,
+          "temporal_index": 3,
+          "xyz_max": [
+            5.78400993347168,
+            4.214594841003418,
+            5.1946282386779785
+          ],
+          "xyz_min": [
+            -3.5453057289123535,
+            -0.03504007309675217,
+            -4.124550819396973
+          ]
+        }
+      ],
+      "gap_opportunities": [
+        {
+          "absent_capture_ids": [
+            "scene_b_2"
+          ],
+          "identity": 8,
+          "left_capture_id": "scene_b_1",
+          "right_capture_id": "scene_b_3"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_b_2"
+          ],
+          "identity": 9,
+          "left_capture_id": "scene_b_1",
+          "right_capture_id": "scene_b_3"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_b_1"
+          ],
+          "identity": 12,
+          "left_capture_id": "scene_b_0",
+          "right_capture_id": "scene_b_2"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_b_1"
+          ],
+          "identity": 24,
+          "left_capture_id": "scene_b_0",
+          "right_capture_id": "scene_b_2"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_b_1"
+          ],
+          "identity": 25,
+          "left_capture_id": "scene_b_0",
+          "right_capture_id": "scene_b_2"
+        },
+        {
+          "absent_capture_ids": [
+            "scene_b_1"
+          ],
+          "identity": 28,
+          "left_capture_id": "scene_b_0",
+          "right_capture_id": "scene_b_2"
+        }
+      ],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "10": [
+          7
+        ],
+        "11": [
+          7
+        ],
+        "12": [
+          5
+        ],
+        "13": [
+          5
+        ],
+        "14": [
+          5
+        ],
+        "15": [
+          5
+        ],
+        "16": [
+          5
+        ],
+        "17": [
+          5
+        ],
+        "18": [
+          5
+        ],
+        "19": [
+          5
+        ],
+        "20": [
+          5
+        ],
+        "21": [
+          5
+        ],
+        "22": [
+          5
+        ],
+        "23": [
+          5
+        ],
+        "24": [
+          5
+        ],
+        "25": [
+          7
+        ],
+        "26": [
+          39
+        ],
+        "27": [
+          15
+        ],
+        "28": [
+          15
+        ],
+        "29": [
+          39
+        ],
+        "30": [
+          5
+        ],
+        "31": [
+          5
+        ],
+        "32": [
+          5
+        ],
+        "33": [
+          5
+        ],
+        "34": [
+          5
+        ],
+        "35": [
+          5
+        ],
+        "36": [
+          5
+        ],
+        "4": [
+          5
+        ],
+        "5": [
+          5
+        ],
+        "6": [
+          14
+        ],
+        "7": [
+          39
+        ],
+        "8": [
+          39
+        ],
+        "9": [
+          7
+        ]
+      },
+      "scene_id": "scene_b",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "stable_object_identity_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_c_0",
+        "scene_c_1",
+        "scene_c_2",
+        "scene_c_3",
+        "scene_c_4"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_c_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            9,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            4,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "ply_reference": "external:rescan/dataset/scene_c/gt_segmentation/scene_c_0.ply",
+          "point_count": 325286,
+          "temporal_index": 0,
+          "xyz_max": [
+            3.0701730251312256,
+            3.3734421730041504,
+            4.192875385284424
+          ],
+          "xyz_min": [
+            -3.218143939971924,
+            -0.06424235552549362,
+            -3.979538917541504
+          ]
+        },
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_c_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            9,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            4,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "ply_reference": "external:rescan/dataset/scene_c/gt_segmentation/scene_c_1.ply",
+          "point_count": 295571,
+          "temporal_index": 1,
+          "xyz_max": [
+            3.5799896717071533,
+            3.267378807067871,
+            4.034861087799072
+          ],
+          "xyz_min": [
+            -3.131875514984131,
+            -0.0807684063911438,
+            -2.7342610359191895
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "10": [
+              9,
+              10,
+              11
+            ],
+            "11": [
+              9,
+              10,
+              11
+            ],
+            "8": [
+              8,
+              9,
+              21
+            ],
+            "9": [
+              9,
+              10
+            ]
+          },
+          "capture_id": "scene_c_2",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            9,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            4,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "ply_reference": "external:rescan/dataset/scene_c/gt_segmentation/scene_c_2.ply",
+          "point_count": 245951,
+          "temporal_index": 2,
+          "xyz_max": [
+            3.2598061561584473,
+            3.3021373748779297,
+            4.107011318206787
+          ],
+          "xyz_min": [
+            -2.6562459468841553,
+            -0.03648579120635986,
+            -2.663317918777466
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "10": [
+              9,
+              10,
+              11,
+              21
+            ],
+            "11": [
+              10,
+              11,
+              12,
+              21
+            ],
+            "12": [
+              12,
+              21
+            ],
+            "13": [
+              12,
+              13,
+              21
+            ],
+            "15": [
+              15,
+              16
+            ],
+            "16": [
+              15,
+              16
+            ],
+            "21": [
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              21
+            ],
+            "8": [
+              8,
+              9,
+              21
+            ],
+            "9": [
+              8,
+              9,
+              10,
+              21
+            ]
+          },
+          "capture_id": "scene_c_3",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            9,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            4,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "ply_reference": "external:rescan/dataset/scene_c/gt_segmentation/scene_c_3.ply",
+          "point_count": 264111,
+          "temporal_index": 3,
+          "xyz_max": [
+            4.584707260131836,
+            3.270719051361084,
+            4.106939792633057
+          ],
+          "xyz_min": [
+            -2.916970729827881,
+            -0.03711264953017235,
+            -3.5299904346466064
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "10": [
+              9,
+              10,
+              21
+            ],
+            "11": [
+              10,
+              11,
+              13,
+              21
+            ],
+            "12": [
+              12,
+              13,
+              21
+            ],
+            "13": [
+              12,
+              13,
+              21
+            ],
+            "15": [
+              15,
+              16
+            ],
+            "16": [
+              16,
+              15
+            ],
+            "8": [
+              8,
+              9,
+              21
+            ],
+            "9": [
+              8,
+              9,
+              21
+            ]
+          },
+          "capture_id": "scene_c_4",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            9,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            4,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "ply_reference": "external:rescan/dataset/scene_c/gt_segmentation/scene_c_4.ply",
+          "point_count": 316146,
+          "temporal_index": 4,
+          "xyz_max": [
+            3.966919422149658,
+            3.2941253185272217,
+            4.063263416290283
+          ],
+          "xyz_min": [
+            -2.849468231201172,
+            -0.0573626309633255,
+            -3.5124757289886475
+          ]
+        }
+      ],
+      "gap_opportunities": [],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "10": [
+          5
+        ],
+        "11": [
+          5
+        ],
+        "12": [
+          5
+        ],
+        "13": [
+          5
+        ],
+        "14": [
+          6
+        ],
+        "15": [
+          7
+        ],
+        "16": [
+          7
+        ],
+        "17": [
+          7
+        ],
+        "18": [
+          7
+        ],
+        "19": [
+          7
+        ],
+        "20": [
+          39
+        ],
+        "21": [
+          5
+        ],
+        "4": [
+          9
+        ],
+        "8": [
+          5
+        ],
+        "9": [
+          5
+        ]
+      },
+      "scene_id": "scene_c",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        4,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "stable_object_identity_ids": [
+        4,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_d_0",
+        "scene_d_1",
+        "scene_d_2",
+        "scene_d_3"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_d_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "ply_reference": "external:rescan/dataset/scene_d/gt_segmentation/scene_d_0.ply",
+          "point_count": 356124,
+          "temporal_index": 0,
+          "xyz_max": [
+            3.2258706092834473,
+            2.7521002292633057,
+            1.9069111347198486
+          ],
+          "xyz_min": [
+            -3.4838356971740723,
+            -0.010227201506495476,
+            -2.607184886932373
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "22": [
+              22,
+              23
+            ],
+            "23": [
+              23,
+              22
+            ]
+          },
+          "capture_id": "scene_d_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "ply_reference": "external:rescan/dataset/scene_d/gt_segmentation/scene_d_1.ply",
+          "point_count": 348644,
+          "temporal_index": 1,
+          "xyz_max": [
+            3.959540367126465,
+            2.5780837535858154,
+            1.9793715476989746
+          ],
+          "xyz_min": [
+            -5.031278610229492,
+            -0.02191069722175598,
+            -2.9374148845672607
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "22": [
+              22,
+              23
+            ],
+            "23": [
+              23,
+              22
+            ]
+          },
+          "capture_id": "scene_d_2",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "ply_reference": "external:rescan/dataset/scene_d/gt_segmentation/scene_d_2.ply",
+          "point_count": 404871,
+          "temporal_index": 2,
+          "xyz_max": [
+            3.6245834827423096,
+            2.7629237174987793,
+            2.4284839630126953
+          ],
+          "xyz_min": [
+            -4.7705769538879395,
+            -0.03468618169426918,
+            -2.5945959091186523
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "22": [
+              22,
+              23
+            ],
+            "23": [
+              23,
+              22
+            ]
+          },
+          "capture_id": "scene_d_3",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "ply_reference": "external:rescan/dataset/scene_d/gt_segmentation/scene_d_3.ply",
+          "point_count": 455098,
+          "temporal_index": 3,
+          "xyz_max": [
+            4.073951244354248,
+            2.758303642272949,
+            1.8842427730560303
+          ],
+          "xyz_min": [
+            -4.875229358673096,
+            -0.04791179671883583,
+            -2.5811500549316406
+          ]
+        }
+      ],
+      "gap_opportunities": [],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "10": [
+          5
+        ],
+        "11": [
+          5
+        ],
+        "12": [
+          5
+        ],
+        "13": [
+          5
+        ],
+        "14": [
+          5
+        ],
+        "15": [
+          5
+        ],
+        "16": [
+          5
+        ],
+        "17": [
+          5
+        ],
+        "18": [
+          5
+        ],
+        "19": [
+          5
+        ],
+        "20": [
+          5
+        ],
+        "21": [
+          39
+        ],
+        "22": [
+          39
+        ],
+        "23": [
+          39
+        ],
+        "24": [
+          7
+        ],
+        "25": [
+          39
+        ],
+        "26": [
+          7
+        ],
+        "27": [
+          7
+        ],
+        "28": [
+          7
+        ],
+        "29": [
+          7
+        ],
+        "30": [
+          7
+        ],
+        "31": [
+          39
+        ],
+        "32": [
+          39
+        ],
+        "33": [
+          39
+        ]
+      },
+      "scene_id": "scene_d",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "stable_object_identity_ids": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_e_0",
+        "scene_e_1",
+        "scene_e_2"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_e_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            9,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            6,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27
+          ],
+          "ply_reference": "external:rescan/dataset/scene_e/gt_segmentation/scene_e_0.ply",
+          "point_count": 365039,
+          "temporal_index": 0,
+          "xyz_max": [
+            6.236441612243652,
+            1.5066533088684082,
+            3.747663974761963
+          ],
+          "xyz_min": [
+            -5.638918399810791,
+            -0.05583454295992851,
+            -2.3725647926330566
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "27": [
+              27,
+              29
+            ]
+          },
+          "capture_id": "scene_e_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            9,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            6,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            24,
+            25,
+            26,
+            27
+          ],
+          "ply_reference": "external:rescan/dataset/scene_e/gt_segmentation/scene_e_1.ply",
+          "point_count": 340481,
+          "temporal_index": 1,
+          "xyz_max": [
+            5.421108245849609,
+            1.423292875289917,
+            3.4758388996124268
+          ],
+          "xyz_min": [
+            -6.506160736083984,
+            -0.08075626194477081,
+            -2.2811856269836426
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "28": [
+              19,
+              28
+            ],
+            "29": [
+              21,
+              29
+            ]
+          },
+          "capture_id": "scene_e_2",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            9,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            6,
+            9,
+            11,
+            12,
+            13,
+            18,
+            19,
+            20,
+            21,
+            25,
+            27,
+            28,
+            29
+          ],
+          "ply_reference": "external:rescan/dataset/scene_e/gt_segmentation/scene_e_2.ply",
+          "point_count": 205704,
+          "temporal_index": 2,
+          "xyz_max": [
+            4.789755821228027,
+            2.4424004554748535,
+            2.1144392490386963
+          ],
+          "xyz_min": [
+            -5.325798988342285,
+            -0.02808491513133049,
+            -2.305532217025757
+          ]
+        }
+      ],
+      "gap_opportunities": [],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "10": [
+          7
+        ],
+        "11": [
+          39
+        ],
+        "12": [
+          39
+        ],
+        "13": [
+          39
+        ],
+        "14": [
+          5
+        ],
+        "15": [
+          5
+        ],
+        "16": [
+          5
+        ],
+        "17": [
+          5
+        ],
+        "18": [
+          39
+        ],
+        "19": [
+          5
+        ],
+        "20": [
+          5
+        ],
+        "21": [
+          5
+        ],
+        "22": [
+          5
+        ],
+        "23": [
+          39
+        ],
+        "24": [
+          14
+        ],
+        "25": [
+          6
+        ],
+        "26": [
+          6
+        ],
+        "27": [
+          7,
+          39
+        ],
+        "28": [
+          5
+        ],
+        "29": [
+          5
+        ],
+        "6": [
+          9
+        ],
+        "9": [
+          7
+        ]
+      },
+      "scene_id": "scene_e",
+      "semantic_inconsistent_identity_ids": [
+        27
+      ],
+      "stable_identity_ids": [
+        0,
+        1,
+        6,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "stable_object_identity_ids": [
+        6,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_f_0",
+        "scene_f_1",
+        "scene_f_2"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_f_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            22,
+            24,
+            28,
+            29,
+            30
+          ],
+          "ply_reference": "external:rescan/dataset/scene_f/gt_segmentation/scene_f_0.ply",
+          "point_count": 596877,
+          "temporal_index": 0,
+          "xyz_max": [
+            7.09095573425293,
+            2.8122100830078125,
+            3.9887938499450684
+          ],
+          "xyz_min": [
+            -5.286778926849365,
+            -0.10609639436006546,
+            -2.4995408058166504
+          ]
+        },
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_f_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            27,
+            28,
+            29,
+            30
+          ],
+          "ply_reference": "external:rescan/dataset/scene_f/gt_segmentation/scene_f_1.ply",
+          "point_count": 596251,
+          "temporal_index": 1,
+          "xyz_max": [
+            6.944469451904297,
+            2.780790090560913,
+            5.129736423492432
+          ],
+          "xyz_min": [
+            -5.857574462890625,
+            -0.13187043368816376,
+            -2.548794746398926
+          ]
+        },
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_f_2",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "ply_reference": "external:rescan/dataset/scene_f/gt_segmentation/scene_f_2.ply",
+          "point_count": 624381,
+          "temporal_index": 2,
+          "xyz_max": [
+            7.091419219970703,
+            2.770057201385498,
+            4.310349941253662
+          ],
+          "xyz_min": [
+            -5.728151321411133,
+            -0.12028126418590546,
+            -2.599109172821045
+          ]
+        }
+      ],
+      "gap_opportunities": [],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "10": [
+          5
+        ],
+        "11": [
+          5
+        ],
+        "12": [
+          5
+        ],
+        "13": [
+          5
+        ],
+        "14": [
+          5
+        ],
+        "15": [
+          5
+        ],
+        "16": [
+          5
+        ],
+        "17": [
+          5
+        ],
+        "18": [
+          5
+        ],
+        "19": [
+          5
+        ],
+        "20": [
+          5
+        ],
+        "21": [
+          39
+        ],
+        "22": [
+          39
+        ],
+        "23": [
+          39
+        ],
+        "24": [
+          5
+        ],
+        "25": [
+          5
+        ],
+        "26": [
+          5
+        ],
+        "27": [
+          39
+        ],
+        "28": [
+          14
+        ],
+        "29": [
+          14
+        ],
+        "30": [
+          14
+        ],
+        "8": [
+          39
+        ],
+        "9": [
+          39
+        ]
+      },
+      "scene_id": "scene_f",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "stable_object_identity_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_g_0",
+        "scene_g_1",
+        "scene_g_2"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_g_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            14,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            25,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46
+          ],
+          "ply_reference": "external:rescan/dataset/scene_g/gt_segmentation/scene_g_0.ply",
+          "point_count": 639280,
+          "temporal_index": 0,
+          "xyz_max": [
+            6.927931308746338,
+            3.5306344032287598,
+            2.2313005924224854
+          ],
+          "xyz_min": [
+            -8.615336418151855,
+            -0.009309273213148117,
+            -4.503474235534668
+          ]
+        },
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_g_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            14,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            25,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          "ply_reference": "external:rescan/dataset/scene_g/gt_segmentation/scene_g_1.ply",
+          "point_count": 680096,
+          "temporal_index": 1,
+          "xyz_max": [
+            6.887659072875977,
+            3.687490463256836,
+            2.222886323928833
+          ],
+          "xyz_min": [
+            -9.04141616821289,
+            -0.017378294840455055,
+            -4.153503894805908
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "36": [
+              36,
+              37,
+              38
+            ],
+            "37": [
+              36,
+              37,
+              38
+            ],
+            "38": [
+              36,
+              37,
+              38
+            ]
+          },
+          "capture_id": "scene_g_2",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            14,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            25,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            50
+          ],
+          "ply_reference": "external:rescan/dataset/scene_g/gt_segmentation/scene_g_2.ply",
+          "point_count": 713150,
+          "temporal_index": 2,
+          "xyz_max": [
+            6.862435817718506,
+            3.435170888900757,
+            2.2796621322631836
+          ],
+          "xyz_min": [
+            -8.068866729736328,
+            -0.02211417444050312,
+            -4.8031110763549805
+          ]
+        }
+      ],
+      "gap_opportunities": [],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "25": [
+          22
+        ],
+        "27": [
+          14
+        ],
+        "28": [
+          5
+        ],
+        "29": [
+          5
+        ],
+        "30": [
+          5
+        ],
+        "31": [
+          5
+        ],
+        "32": [
+          5
+        ],
+        "33": [
+          5
+        ],
+        "34": [
+          5
+        ],
+        "35": [
+          5
+        ],
+        "36": [
+          39
+        ],
+        "37": [
+          39
+        ],
+        "38": [
+          39
+        ],
+        "39": [
+          7
+        ],
+        "40": [
+          7
+        ],
+        "41": [
+          7
+        ],
+        "42": [
+          7
+        ],
+        "43": [
+          5
+        ],
+        "44": [
+          5
+        ],
+        "45": [
+          5
+        ],
+        "46": [
+          5
+        ],
+        "47": [
+          5
+        ],
+        "48": [
+          5
+        ],
+        "49": [
+          14
+        ],
+        "50": [
+          39
+        ]
+      },
+      "scene_id": "scene_g",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        25,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50
+      ],
+      "stable_object_identity_ids": [
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_h_0",
+        "scene_h_1",
+        "scene_h_2"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_h_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            14,
+            15,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            8,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ],
+          "ply_reference": "external:rescan/dataset/scene_h/gt_segmentation/scene_h_0.ply",
+          "point_count": 415242,
+          "temporal_index": 0,
+          "xyz_max": [
+            3.8846945762634277,
+            3.780233144760132,
+            3.0574746131896973
+          ],
+          "xyz_min": [
+            -2.8971939086914062,
+            -0.060930561274290085,
+            -2.9830212593078613
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "16": [
+              16,
+              17
+            ],
+            "17": [
+              16,
+              17
+            ]
+          },
+          "capture_id": "scene_h_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            14,
+            15,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            8,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ],
+          "ply_reference": "external:rescan/dataset/scene_h/gt_segmentation/scene_h_1.ply",
+          "point_count": 434893,
+          "temporal_index": 1,
+          "xyz_max": [
+            4.148769855499268,
+            3.778719663619995,
+            1.4656468629837036
+          ],
+          "xyz_min": [
+            -2.90096116065979,
+            -0.07429152727127075,
+            -3.970111131668091
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "16": [
+              16,
+              17
+            ],
+            "17": [
+              16,
+              17
+            ]
+          },
+          "capture_id": "scene_h_2",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            14,
+            15,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            8,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ],
+          "ply_reference": "external:rescan/dataset/scene_h/gt_segmentation/scene_h_2.ply",
+          "point_count": 400657,
+          "temporal_index": 2,
+          "xyz_max": [
+            3.896519660949707,
+            3.5208969116210938,
+            1.3525071144104004
+          ],
+          "xyz_min": [
+            -2.9412765502929688,
+            -0.0690448060631752,
+            -3.1173927783966064
+          ]
+        }
+      ],
+      "gap_opportunities": [],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "10": [
+          22
+        ],
+        "11": [
+          5
+        ],
+        "12": [
+          5
+        ],
+        "13": [
+          5
+        ],
+        "14": [
+          14
+        ],
+        "15": [
+          5
+        ],
+        "16": [
+          5
+        ],
+        "17": [
+          5
+        ],
+        "18": [
+          5
+        ],
+        "19": [
+          5
+        ],
+        "20": [
+          14
+        ],
+        "21": [
+          15
+        ],
+        "22": [
+          39
+        ],
+        "23": [
+          39
+        ],
+        "24": [
+          39
+        ],
+        "25": [
+          39
+        ],
+        "26": [
+          39
+        ],
+        "8": [
+          22
+        ]
+      },
+      "scene_id": "scene_h",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        8,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "stable_object_identity_ids": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_i_0",
+        "scene_i_1",
+        "scene_i_2"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_i_0",
+          "class_ids": [
+            0,
+            2,
+            5,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "ply_reference": "external:rescan/dataset/scene_i/gt_segmentation/scene_i_0.ply",
+          "point_count": 185588,
+          "temporal_index": 0,
+          "xyz_max": [
+            3.1269803047180176,
+            1.3147953748703003,
+            1.864668369293213
+          ],
+          "xyz_min": [
+            -3.2914862632751465,
+            -0.05150983855128288,
+            -4.071193218231201
+          ]
+        },
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_i_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "ply_reference": "external:rescan/dataset/scene_i/gt_segmentation/scene_i_1.ply",
+          "point_count": 178621,
+          "temporal_index": 1,
+          "xyz_max": [
+            3.243741273880005,
+            1.312862515449524,
+            1.2492843866348267
+          ],
+          "xyz_min": [
+            -2.9237709045410156,
+            -0.04643192142248154,
+            -4.457549095153809
+          ]
+        },
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_i_2",
+          "class_ids": [
+            0,
+            2,
+            5,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "ply_reference": "external:rescan/dataset/scene_i/gt_segmentation/scene_i_2.ply",
+          "point_count": 161278,
+          "temporal_index": 2,
+          "xyz_max": [
+            2.2729685306549072,
+            1.3136467933654785,
+            1.2560955286026
+          ],
+          "xyz_min": [
+            -2.959198474884033,
+            -0.03688357025384903,
+            -3.6741695404052734
+          ]
+        }
+      ],
+      "gap_opportunities": [],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "10": [
+          5
+        ],
+        "11": [
+          5
+        ],
+        "12": [
+          5
+        ],
+        "13": [
+          5
+        ],
+        "14": [
+          5
+        ],
+        "2": [
+          39
+        ],
+        "3": [
+          39
+        ],
+        "4": [
+          39
+        ],
+        "5": [
+          39
+        ],
+        "6": [
+          39
+        ],
+        "7": [
+          39
+        ],
+        "8": [
+          14
+        ],
+        "9": [
+          5
+        ]
+      },
+      "scene_id": "scene_i",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "stable_object_identity_ids": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_j_0",
+        "scene_j_1",
+        "scene_j_2"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_j_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47
+          ],
+          "ply_reference": "external:rescan/dataset/scene_j/gt_segmentation/scene_j_0.ply",
+          "point_count": 899992,
+          "temporal_index": 0,
+          "xyz_max": [
+            6.351271152496338,
+            2.8660645484924316,
+            5.982630729675293
+          ],
+          "xyz_min": [
+            -6.720037937164307,
+            -0.02198408730328083,
+            -5.601425647735596
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "25": [
+              25,
+              26
+            ],
+            "26": [
+              25,
+              26
+            ],
+            "36": [
+              36,
+              37,
+              38,
+              39,
+              44,
+              45,
+              46,
+              47
+            ],
+            "37": [
+              36,
+              37,
+              38,
+              39
+            ],
+            "38": [
+              36,
+              37,
+              38,
+              39
+            ],
+            "39": [
+              36,
+              37,
+              38,
+              39,
+              44,
+              45,
+              46,
+              47
+            ],
+            "40": [
+              40,
+              41,
+              42,
+              43,
+              44,
+              45,
+              46,
+              47
+            ],
+            "41": [
+              40,
+              41,
+              42,
+              43
+            ],
+            "42": [
+              40,
+              41,
+              42,
+              43
+            ],
+            "43": [
+              40,
+              41,
+              42,
+              43,
+              44,
+              45,
+              46,
+              47
+            ],
+            "44": [
+              44,
+              45
+            ],
+            "45": [
+              44,
+              45
+            ],
+            "46": [
+              46,
+              47
+            ],
+            "47": [
+              46,
+              47
+            ]
+          },
+          "capture_id": "scene_j_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49
+          ],
+          "ply_reference": "external:rescan/dataset/scene_j/gt_segmentation/scene_j_1.ply",
+          "point_count": 928164,
+          "temporal_index": 1,
+          "xyz_max": [
+            5.806705474853516,
+            2.067418098449707,
+            6.146483898162842
+          ],
+          "xyz_min": [
+            -6.90844202041626,
+            -0.013036694377660751,
+            -5.501228332519531
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "25": [
+              25,
+              26
+            ],
+            "26": [
+              25,
+              26
+            ],
+            "36": [
+              36,
+              37,
+              38,
+              39,
+              44,
+              45,
+              46,
+              47
+            ],
+            "37": [
+              36,
+              37,
+              38,
+              39
+            ],
+            "38": [
+              36,
+              37,
+              38,
+              39
+            ],
+            "39": [
+              36,
+              37,
+              38,
+              39,
+              44,
+              45,
+              46,
+              47
+            ],
+            "40": [
+              40,
+              41,
+              42,
+              43,
+              44,
+              45,
+              46,
+              47
+            ],
+            "41": [
+              40,
+              41,
+              42,
+              43
+            ],
+            "42": [
+              40,
+              41,
+              42,
+              43
+            ],
+            "43": [
+              40,
+              41,
+              42,
+              43,
+              44,
+              45,
+              46,
+              47
+            ],
+            "44": [
+              44,
+              45
+            ],
+            "45": [
+              44,
+              45
+            ],
+            "46": [
+              46,
+              47
+            ],
+            "47": [
+              46,
+              47
+            ]
+          },
+          "capture_id": "scene_j_2",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            14,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51
+          ],
+          "ply_reference": "external:rescan/dataset/scene_j/gt_segmentation/scene_j_2.ply",
+          "point_count": 857150,
+          "temporal_index": 2,
+          "xyz_max": [
+            6.369881629943848,
+            2.0393528938293457,
+            5.573192596435547
+          ],
+          "xyz_min": [
+            -6.688806056976318,
+            -0.017561141401529312,
+            -5.4586358070373535
+          ]
+        }
+      ],
+      "gap_opportunities": [],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "10": [
+          5
+        ],
+        "11": [
+          5
+        ],
+        "12": [
+          5
+        ],
+        "13": [
+          5
+        ],
+        "14": [
+          5
+        ],
+        "15": [
+          5
+        ],
+        "16": [
+          6
+        ],
+        "17": [
+          6
+        ],
+        "18": [
+          6
+        ],
+        "19": [
+          6
+        ],
+        "20": [
+          6
+        ],
+        "21": [
+          14
+        ],
+        "22": [
+          39
+        ],
+        "23": [
+          39
+        ],
+        "24": [
+          39
+        ],
+        "25": [
+          39
+        ],
+        "26": [
+          39
+        ],
+        "27": [
+          39
+        ],
+        "28": [
+          39
+        ],
+        "29": [
+          39
+        ],
+        "30": [
+          39
+        ],
+        "31": [
+          39
+        ],
+        "32": [
+          39
+        ],
+        "33": [
+          39
+        ],
+        "34": [
+          39
+        ],
+        "35": [
+          39
+        ],
+        "36": [
+          5
+        ],
+        "37": [
+          5
+        ],
+        "38": [
+          5
+        ],
+        "39": [
+          5
+        ],
+        "40": [
+          5
+        ],
+        "41": [
+          5
+        ],
+        "42": [
+          5
+        ],
+        "43": [
+          5
+        ],
+        "44": [
+          5
+        ],
+        "45": [
+          5
+        ],
+        "46": [
+          5
+        ],
+        "47": [
+          5
+        ],
+        "48": [
+          39
+        ],
+        "49": [
+          39
+        ],
+        "50": [
+          39
+        ],
+        "51": [
+          39
+        ]
+      },
+      "scene_id": "scene_j",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ],
+      "stable_object_identity_ids": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_k_0",
+        "scene_k_1",
+        "scene_k_2"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_k_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            14,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44
+          ],
+          "ply_reference": "external:rescan/dataset/scene_k/gt_segmentation/scene_k_0.ply",
+          "point_count": 1055391,
+          "temporal_index": 0,
+          "xyz_max": [
+            8.878257751464844,
+            3.002471446990967,
+            4.8046698570251465
+          ],
+          "xyz_min": [
+            -7.474607944488525,
+            -0.034265998750925064,
+            -5.636594772338867
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "31": [
+              31,
+              32,
+              45
+            ],
+            "32": [
+              31,
+              32,
+              45
+            ],
+            "37": [
+              37,
+              38
+            ],
+            "38": [
+              37,
+              38,
+              39
+            ],
+            "39": [
+              38,
+              39
+            ],
+            "45": [
+              31,
+              32,
+              45
+            ]
+          },
+          "capture_id": "scene_k_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            14,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45
+          ],
+          "ply_reference": "external:rescan/dataset/scene_k/gt_segmentation/scene_k_1.ply",
+          "point_count": 1160366,
+          "temporal_index": 1,
+          "xyz_max": [
+            8.879878044128418,
+            2.9977869987487793,
+            4.009012222290039
+          ],
+          "xyz_min": [
+            -6.360168933868408,
+            -0.029567375779151917,
+            -5.008739948272705
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "31": [
+              31,
+              32,
+              45
+            ],
+            "32": [
+              31,
+              32,
+              45
+            ],
+            "37": [
+              37,
+              38
+            ],
+            "38": [
+              37,
+              38,
+              39
+            ],
+            "39": [
+              38,
+              39
+            ],
+            "45": [
+              31,
+              32,
+              45
+            ]
+          },
+          "capture_id": "scene_k_2",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            14,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46
+          ],
+          "ply_reference": "external:rescan/dataset/scene_k/gt_segmentation/scene_k_2.ply",
+          "point_count": 1071235,
+          "temporal_index": 2,
+          "xyz_max": [
+            8.802186965942383,
+            3.0150156021118164,
+            3.9905617237091064
+          ],
+          "xyz_min": [
+            -6.9751129150390625,
+            -0.025457123294472694,
+            -5.504022121429443
+          ]
+        }
+      ],
+      "gap_opportunities": [],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "11": [
+          22
+        ],
+        "12": [
+          39
+        ],
+        "13": [
+          6
+        ],
+        "14": [
+          6
+        ],
+        "15": [
+          6
+        ],
+        "16": [
+          14
+        ],
+        "17": [
+          5
+        ],
+        "18": [
+          5
+        ],
+        "19": [
+          5
+        ],
+        "20": [
+          5
+        ],
+        "21": [
+          5
+        ],
+        "22": [
+          7
+        ],
+        "23": [
+          7
+        ],
+        "24": [
+          7
+        ],
+        "25": [
+          5
+        ],
+        "26": [
+          7
+        ],
+        "27": [
+          5
+        ],
+        "28": [
+          5
+        ],
+        "29": [
+          39
+        ],
+        "30": [
+          39
+        ],
+        "31": [
+          39
+        ],
+        "32": [
+          39
+        ],
+        "33": [
+          5
+        ],
+        "34": [
+          5
+        ],
+        "35": [
+          5
+        ],
+        "36": [
+          5
+        ],
+        "37": [
+          5
+        ],
+        "38": [
+          5
+        ],
+        "39": [
+          5
+        ],
+        "40": [
+          5
+        ],
+        "41": [
+          5
+        ],
+        "42": [
+          5
+        ],
+        "43": [
+          5
+        ],
+        "44": [
+          5
+        ],
+        "45": [
+          39
+        ],
+        "46": [
+          39
+        ]
+      },
+      "scene_id": "scene_k",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "stable_object_identity_ids": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_l_0",
+        "scene_l_1",
+        "scene_l_2",
+        "scene_l_3"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_l_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            15,
+            22
+          ],
+          "instance_ids": [
+            0,
+            1,
+            5,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "ply_reference": "external:rescan/dataset/scene_l/gt_segmentation/scene_l_0.ply",
+          "point_count": 266413,
+          "temporal_index": 0,
+          "xyz_max": [
+            4.535984992980957,
+            2.6138694286346436,
+            1.5433933734893799
+          ],
+          "xyz_min": [
+            -1.392404556274414,
+            -0.03610355406999588,
+            -2.231868028640747
+          ]
+        },
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_l_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            15,
+            22
+          ],
+          "instance_ids": [
+            0,
+            1,
+            5,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "ply_reference": "external:rescan/dataset/scene_l/gt_segmentation/scene_l_1.ply",
+          "point_count": 279944,
+          "temporal_index": 1,
+          "xyz_max": [
+            4.475876331329346,
+            2.6234822273254395,
+            1.543186068534851
+          ],
+          "xyz_min": [
+            -1.3370403051376343,
+            -0.031045185402035713,
+            -2.211864471435547
+          ]
+        },
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_l_2",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            15,
+            22
+          ],
+          "instance_ids": [
+            0,
+            1,
+            5,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "ply_reference": "external:rescan/dataset/scene_l/gt_segmentation/scene_l_2.ply",
+          "point_count": 245213,
+          "temporal_index": 2,
+          "xyz_max": [
+            4.499176025390625,
+            2.592846393585205,
+            1.5708507299423218
+          ],
+          "xyz_min": [
+            -1.3111257553100586,
+            -0.045684073120355606,
+            -2.1954047679901123
+          ]
+        },
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_l_3",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7,
+            15,
+            22
+          ],
+          "instance_ids": [
+            0,
+            1,
+            5,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "ply_reference": "external:rescan/dataset/scene_l/gt_segmentation/scene_l_3.ply",
+          "point_count": 282913,
+          "temporal_index": 3,
+          "xyz_max": [
+            4.52001953125,
+            2.628540277481079,
+            1.5595338344573975
+          ],
+          "xyz_min": [
+            -1.1280542612075806,
+            -0.043980538845062256,
+            -2.2053709030151367
+          ]
+        }
+      ],
+      "gap_opportunities": [],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "10": [
+          5
+        ],
+        "11": [
+          5
+        ],
+        "12": [
+          5
+        ],
+        "5": [
+          22
+        ],
+        "7": [
+          15
+        ],
+        "8": [
+          6
+        ],
+        "9": [
+          7
+        ]
+      },
+      "scene_id": "scene_l",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "stable_object_identity_ids": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "capture_ids": [
+        "scene_m_0",
+        "scene_m_1",
+        "scene_m_2"
+      ],
+      "captures": [
+        {
+          "ambiguity_alternatives": {},
+          "capture_id": "scene_m_0",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            9,
+            14,
+            15,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            2,
+            3,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76
+          ],
+          "ply_reference": "external:rescan/dataset/scene_m/gt_segmentation/scene_m_0.ply",
+          "point_count": 995121,
+          "temporal_index": 0,
+          "xyz_max": [
+            4.617035865783691,
+            3.3940107822418213,
+            5.1863813400268555
+          ],
+          "xyz_min": [
+            -6.316103458404541,
+            -0.03682791814208031,
+            -3.762507677078247
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "51": [
+              51,
+              52,
+              55
+            ],
+            "52": [
+              51,
+              52,
+              55
+            ],
+            "55": [
+              51,
+              52,
+              55
+            ],
+            "72": [
+              72,
+              77
+            ],
+            "77": [
+              77,
+              72
+            ],
+            "78": [
+              78,
+              79
+            ],
+            "79": [
+              78,
+              79
+            ]
+          },
+          "capture_id": "scene_m_1",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            9,
+            14,
+            15,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            2,
+            3,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79
+          ],
+          "ply_reference": "external:rescan/dataset/scene_m/gt_segmentation/scene_m_1.ply",
+          "point_count": 894441,
+          "temporal_index": 1,
+          "xyz_max": [
+            4.624111652374268,
+            3.2518768310546875,
+            5.063911437988281
+          ],
+          "xyz_min": [
+            -6.378714084625244,
+            -0.03803761303424835,
+            -3.7753734588623047
+          ]
+        },
+        {
+          "ambiguity_alternatives": {
+            "51": [
+              51,
+              52,
+              55
+            ],
+            "52": [
+              51,
+              52,
+              55
+            ],
+            "55": [
+              51,
+              52,
+              55
+            ],
+            "72": [
+              72,
+              77
+            ],
+            "75": [
+              75,
+              77
+            ],
+            "77": [
+              77,
+              72,
+              75
+            ],
+            "78": [
+              78,
+              79
+            ],
+            "79": [
+              78,
+              79
+            ]
+          },
+          "capture_id": "scene_m_2",
+          "class_ids": [
+            0,
+            1,
+            2,
+            5,
+            7,
+            9,
+            14,
+            15,
+            22,
+            39
+          ],
+          "instance_ids": [
+            0,
+            1,
+            2,
+            3,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            76,
+            77,
+            79,
+            80
+          ],
+          "ply_reference": "external:rescan/dataset/scene_m/gt_segmentation/scene_m_2.ply",
+          "point_count": 870569,
+          "temporal_index": 2,
+          "xyz_max": [
+            4.633394718170166,
+            3.4544131755828857,
+            5.3011298179626465
+          ],
+          "xyz_min": [
+            -6.347503185272217,
+            -0.0556357242166996,
+            -3.740196704864502
+          ]
+        }
+      ],
+      "gap_opportunities": [],
+      "identity_source_class_ids": {
+        "0": [
+          2
+        ],
+        "1": [
+          1
+        ],
+        "2": [
+          9
+        ],
+        "3": [
+          9
+        ],
+        "35": [
+          22
+        ],
+        "36": [
+          5
+        ],
+        "37": [
+          5
+        ],
+        "38": [
+          5
+        ],
+        "39": [
+          5
+        ],
+        "40": [
+          5
+        ],
+        "41": [
+          5
+        ],
+        "42": [
+          5
+        ],
+        "43": [
+          5
+        ],
+        "44": [
+          5
+        ],
+        "45": [
+          14
+        ],
+        "46": [
+          14
+        ],
+        "47": [
+          14
+        ],
+        "48": [
+          14
+        ],
+        "49": [
+          7
+        ],
+        "50": [
+          7
+        ],
+        "51": [
+          7
+        ],
+        "52": [
+          7
+        ],
+        "53": [
+          7
+        ],
+        "54": [
+          15
+        ],
+        "55": [
+          7
+        ],
+        "56": [
+          5
+        ],
+        "57": [
+          5
+        ],
+        "58": [
+          5
+        ],
+        "59": [
+          5
+        ],
+        "60": [
+          5
+        ],
+        "61": [
+          5
+        ],
+        "62": [
+          5
+        ],
+        "63": [
+          5
+        ],
+        "64": [
+          5
+        ],
+        "65": [
+          5
+        ],
+        "66": [
+          5
+        ],
+        "67": [
+          5
+        ],
+        "68": [
+          5
+        ],
+        "69": [
+          5
+        ],
+        "70": [
+          5
+        ],
+        "71": [
+          5
+        ],
+        "72": [
+          5
+        ],
+        "73": [
+          5
+        ],
+        "74": [
+          5
+        ],
+        "75": [
+          5
+        ],
+        "76": [
+          39
+        ],
+        "77": [
+          5
+        ],
+        "78": [
+          39
+        ],
+        "79": [
+          39
+        ],
+        "80": [
+          39
+        ]
+      },
+      "scene_id": "scene_m",
+      "semantic_inconsistent_identity_ids": [],
+      "stable_identity_ids": [
+        0,
+        1,
+        2,
+        3,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80
+      ],
+      "stable_object_identity_ids": [
+        2,
+        3,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "archive": {
+      "bytes": 26239218080,
+      "external_reference": "external:rescan/rescan_dataset.zip",
+      "sha256": "6985096973085de6c3f9b1463022edbbddc19f5bcb2c6536fb42f8e74ba28f9a"
+    },
+    "dataset_reference": "external:rescan/dataset",
+    "official_code_commit": "f45283be31119e9bd955d40bc159b1774dfed092",
+    "official_download_url": "https://rescan.cs.princeton.edu/assets/rescan_dataset.zip"
+  },
+  "status": "pass",
+  "summary": {
+    "ambiguity_file_count": 22,
+    "capture_count": 45,
+    "encountered_class_ids": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      7,
+      9,
+      14,
+      15,
+      22,
+      39
+    ],
+    "file_count": 159,
+    "gap_opportunity_count": 8,
+    "object_identity_excluded_source_class_ids": [
+      1,
+      2,
+      22
+    ],
+    "scene_count": 13,
+    "semantic_inconsistent_identity_count": 1,
+    "stable_identity_count": 365,
+    "stable_object_identity_count": 333
+  }
+}
