@@ -1,0 +1,22 @@
+{
+  "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+  "decision": {
+    "authorized": false,
+    "dominating_variants": [],
+    "rule": "strict_pareto_improvement_over_P2R-0_on_t_mAP_stage1_mAP_stage2_mAP_then_max_t_mAP",
+    "selected_variant": null
+  },
+  "outputs": {
+    "P2R_PILOT_DECISION.md": "e3a575677532e4042a82be78324bc0c9eec09102d579f524de64ede6e4dd508c",
+    "PILOT_MATRIX.csv": "294117a5585e2fd8a3960f3be31419bf666e84a9b5c00fc784f5fa0f0885ea2a"
+  },
+  "pilot_result_sha256": {
+    "P2R-0": "5b27e7d90bdfe1798e30ee1fc7ee6ac33d6e735dd2987fbd38dc3cf92bfe1be4",
+    "P2R-A": "a1b6aae73696a2fc0a81cacdf60a5c661a0da6268c7f0c00baf643c480676951",
+    "P2R-B": "169df0fa4ca3ff6df83f2ea40c9c88e720b47ca9f087eef6281e00f19aeb029e",
+    "P2R-C": "c9f2df8d63b34b25e14bec9284fc915e440d9cb3ea94fdbb5526bb95ef1cf2e9"
+  },
+  "schema_version": 1,
+  "source_commit": "f4a10908107b26f6da0e943db18c2d2be7900922",
+  "status": "pass"
+}
