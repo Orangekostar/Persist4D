@@ -84,6 +84,27 @@ class StageIdentityMatches:
                 ) from error
 
 
+def select_rescan_inference_indices(
+    scene_indices: Sequence[int], stage_index: int, history_strategy: str
+) -> tuple[int, ...]:
+    if not scene_indices:
+        raise RescanEvaluationError("scene capture indices must not be empty")
+    if (
+        isinstance(stage_index, bool)
+        or not isinstance(stage_index, int)
+        or stage_index < 0
+        or stage_index >= len(scene_indices)
+    ):
+        raise RescanEvaluationError("stage index is outside the scene sequence")
+    if history_strategy == "local_pair":
+        start = max(0, stage_index - 1)
+    elif history_strategy == "full_history":
+        start = 0
+    else:
+        raise RescanEvaluationError("unknown ReScan history strategy")
+    return tuple(int(index) for index in scene_indices[start : stage_index + 1])
+
+
 def _label_mappings(value: Mapping[str, object]) -> dict[int, Mapping[str, object]]:
     raw = value.get("mappings")
     if isinstance(raw, (str, bytes)) or not isinstance(raw, Sequence):
@@ -1023,6 +1044,7 @@ def _cache_provenance(
     dataset_manifest: Mapping[str, object],
     config_path: Path,
     checkpoint_path: Path,
+    history_strategy: str,
 ) -> dict[str, object]:
     checkpoint_digest = _sha256_file(checkpoint_path)
     if checkpoint_digest != CHECKPOINT_SHA256:
@@ -1030,7 +1052,7 @@ def _cache_provenance(
     dataset_digest = dataset_manifest.get("dataset_content_sha256")
     if not isinstance(dataset_digest, str) or len(dataset_digest) != 64:
         raise RescanEvaluationError("dataset manifest lacks a content digest")
-    return {
+    provenance = {
         "source_commit": _git_commit(),
         "checkpoint_sha256": checkpoint_digest,
         "external_config_sha256": _sha256_file(config_path),
@@ -1040,6 +1062,9 @@ def _cache_provenance(
         "model_voxel_size_m": 0.02,
         "seed": 45,
     }
+    if history_strategy == "full_history":
+        provenance["history_strategy"] = history_strategy
+    return provenance
 
 
 def _tensor_cpu(value: Tensor) -> Tensor:
@@ -1121,6 +1146,7 @@ def run_rescan_inference(
     cache_root: Path,
     device_name: str,
     scene_limit: int | None = None,
+    history_strategy: str = "local_pair",
 ) -> dict[str, object]:
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     import hydra
@@ -1139,6 +1165,7 @@ def run_rescan_inference(
         dataset_manifest=dataset_manifest,
         config_path=config_path,
         checkpoint_path=checkpoint_path,
+        history_strategy=history_strategy,
     )
     dataset = RescanTemporalDataset(dataset_root, geometry_segment_size_m=0.1)
     selected_scene_count = len(dataset)
@@ -1188,10 +1215,10 @@ def run_rescan_inference(
                             f"cache provenance differs: {entry_path.name}"
                         )
                 else:
-                    local_indices = (
-                        (target_scan_index,)
-                        if stage_index == 0
-                        else (scene_indices[stage_index - 1], target_scan_index)
+                    local_indices = select_rescan_inference_indices(
+                        scene_indices,
+                        stage_index,
+                        history_strategy,
                     )
                     sample = dataset.load_scan_indices(
                         scene_index, local_indices, change_file=None
@@ -1254,6 +1281,7 @@ def run_rescan_inference(
                                 for index in local_indices
                             ],
                             "target_scan_index": target_scan_index,
+                            "history_strategy": history_strategy,
                         },
                         "observation": {
                             "features": _tensor_cpu(observation.features[0]),
@@ -1628,6 +1656,11 @@ def _parser() -> argparse.ArgumentParser:
         default=PROJECT_ROOT / "artifacts/final_evidence",
     )
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument(
+        "--history-strategy",
+        choices=("local_pair", "full_history"),
+        default="local_pair",
+    )
     parser.add_argument("--scene-limit", type=int)
     parser.add_argument("--smoke-output", type=Path)
     return parser
@@ -1645,6 +1678,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             cache_root=arguments.cache_root,
             device_name=arguments.device,
             scene_limit=arguments.scene_limit,
+            history_strategy=arguments.history_strategy,
         )
         if arguments.smoke_output is not None:
             _atomic_json(
@@ -1681,6 +1715,7 @@ __all__ = [
     "evaluate_rescan_sequence",
     "prepare_rescan_model_batch",
     "run_rescan_inference",
+    "select_rescan_inference_indices",
     "write_rescan_evaluation_artifacts",
 ]
 

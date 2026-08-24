@@ -1,0 +1,9 @@
+ci95_high,ci95_low,comparator,comparator_mean,higher_is_better,level,mean_absolute_effect,mean_effect,metric,persist4d_mean,relative_effect
+0.0,0.0,B2,0.0016822683489350156,True,level_a,0.0,0.0,online_t_mAP,0.0016822683489350156,0.0
+0.0,0.0,B2,0.007977207977207978,True,level_a,0.0,0.0,online_t_REC,0.007977207977207978,0.0
+0.0,0.0,B2,0.07188106904048946,True,level_b,0.0,0.0,observation_coverage,0.07188106904048946,0.0
+0.0,0.0,B2,0.0,True,level_b,0.0,0.0,gap_recovery_accuracy,0.0,
+0.0,0.0,B2,0.0,True,level_b,0.0,0.0,gap_recovery_recall,0.0,
+0.0,0.0,B2,0.17307692307692307,False,level_b,0.0,0.0,normalized_id_switch_rate,0.17307692307692307,0.0
+0.0,0.0,B2,0.23076923076923078,False,level_b,0.0,0.0,fragmentation_count,0.23076923076923078,0.0
+0.0,0.0,B2,0.23076923076923078,False,level_b,0.0,0.0,merge_count,0.23076923076923078,0.0

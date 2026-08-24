@@ -15,6 +15,7 @@ REPOSITORY_SOURCES = (
     "scripts/audit_rescan_dataset.py",
     "scripts/build_final_evidence_manifest.py",
     "scripts/build_final_paper_evidence.py",
+    "scripts/build_rescan_per_scene_effects.py",
     "scripts/evaluate_rescan_persist4d.py",
     "scripts/final_capacity_figures.py",
     "scripts/final_paper_figures.py",
@@ -75,6 +76,22 @@ def build(root: Path, output_path: Path) -> dict[str, object]:
     source_binding = json.loads(
         (artifact_root / "source_binding.json").read_text(encoding="utf-8")
     )
+    rescan_raw = json.loads(
+        (artifact_root / "external/rescan_raw.json").read_text(encoding="utf-8")
+    )
+    full_history_manifest_path = (
+        artifact_root / "external/rescan_full_history_cache_manifest.json"
+    )
+    full_history_manifest = json.loads(
+        full_history_manifest_path.read_text(encoding="utf-8")
+    )
+    full_history_raw = json.loads(
+        (artifact_root / "external/rescan_full_history_raw.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    local_provenance = rescan_raw["provenance"]
+    full_history_provenance = full_history_raw["provenance"]
     generation_commit = _git(root, "rev-parse", "HEAD")
     manifest = {
         "classifications": {
@@ -107,7 +124,15 @@ def build(root: Path, output_path: Path) -> dict[str, object]:
             },
             "rescan_observation_cache": {
                 "external_reference": "external:rescan/persist4d-cache",
-                "manifest_sha256": "be13320a5408dffc3a3b5dacdca67b49ec7a5a368a6bc9a1c0402fadbaa8db96",
+                "manifest_sha256": local_provenance["cache_manifest_sha256"],
+            },
+            "rescan_full_history_observation_cache": {
+                "entry_count": full_history_manifest["entry_count"],
+                "external_reference": ("external:rescan/full-history-cache-v1"),
+                "manifest_sha256": _sha256(full_history_manifest_path),
+                "size_bytes": sum(
+                    int(entry["bytes"]) for entry in full_history_manifest["entries"]
+                ),
             },
         },
         "generation_base": {
@@ -118,14 +143,26 @@ def build(root: Path, output_path: Path) -> dict[str, object]:
         "frozen_runtime": {
             "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
             "config_sha256": _sha256(root / "configs/final_evidence/rescan.yaml"),
+            "current_evaluator_sha256": _sha256(
+                root / "scripts/evaluate_rescan_persist4d.py"
+            ),
+            "current_source_commit": generation_commit,
             "dataset_manifest_sha256": _sha256(
                 artifact_root / "external/rescan_dataset_manifest.json"
             ),
-            "evaluator_sha256": _sha256(root / "scripts/evaluate_rescan_persist4d.py"),
+            "evaluator_sha256": local_provenance["evaluator_sha256"],
             "label_map_sha256": _sha256(
                 artifact_root / "rescan_to_rescene_label_map.json"
             ),
-            "source_commit": generation_commit,
+            "source_commit": local_provenance["source_commit"],
+        },
+        "full_history_runtime": {
+            "cache_manifest_sha256": full_history_provenance["cache_manifest_sha256"],
+            "checkpoint_sha256": full_history_provenance["checkpoint_sha256"],
+            "dataset_content_sha256": full_history_provenance["dataset_content_sha256"],
+            "evaluator_sha256": full_history_provenance["evaluator_sha256"],
+            "history_strategy": full_history_manifest["provenance"]["history_strategy"],
+            "source_commit": full_history_provenance["source_commit"],
         },
         "repository_files": [
             _entry(root, path) for path in sorted(set(repository_paths))

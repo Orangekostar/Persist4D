@@ -1,0 +1,797 @@
+{
+  "entries": [
+    {
+      "bytes": 28353374,
+      "filename": "scene_a_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_a_0"
+        ],
+        "scene_id": "scene_a",
+        "scene_index": 0,
+        "stage_index": 0,
+        "target_capture_id": "scene_a_0",
+        "target_scan_index": 0
+      },
+      "sha256": "a9f578092c6520123800314a7cb59a0831a7b030d689e08fd3abe6821bdbac78"
+    },
+    {
+      "bytes": 34880926,
+      "filename": "scene_a_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_a_0",
+          "scene_a_1"
+        ],
+        "scene_id": "scene_a",
+        "scene_index": 0,
+        "stage_index": 1,
+        "target_capture_id": "scene_a_1",
+        "target_scan_index": 1
+      },
+      "sha256": "bf3cc8c05bdad6fd95f3009124246f89cb5574b8ff7321ec4e110f4c01ca4da7"
+    },
+    {
+      "bytes": 33722142,
+      "filename": "scene_a_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_a_0",
+          "scene_a_1",
+          "scene_a_2"
+        ],
+        "scene_id": "scene_a",
+        "scene_index": 0,
+        "stage_index": 2,
+        "target_capture_id": "scene_a_2",
+        "target_scan_index": 2
+      },
+      "sha256": "261c93dd77366aee1178e3d3024dc33bc6aeeb802700893456941c4da921492b"
+    },
+    {
+      "bytes": 31254686,
+      "filename": "scene_a_3.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_a_0",
+          "scene_a_1",
+          "scene_a_2",
+          "scene_a_3"
+        ],
+        "scene_id": "scene_a",
+        "scene_index": 0,
+        "stage_index": 3,
+        "target_capture_id": "scene_a_3",
+        "target_scan_index": 3
+      },
+      "sha256": "f1a684a0d4900c3f3c37be40cdc1f914dd2162f73b1b2f016a53b10c45910c35"
+    },
+    {
+      "bytes": 55339806,
+      "filename": "scene_b_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_b_0"
+        ],
+        "scene_id": "scene_b",
+        "scene_index": 1,
+        "stage_index": 0,
+        "target_capture_id": "scene_b_0",
+        "target_scan_index": 4
+      },
+      "sha256": "16c072ccc3625547cfd4584df35a39c0aed1441397e3c0f6862627610c7049de"
+    },
+    {
+      "bytes": 36810526,
+      "filename": "scene_b_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_b_0",
+          "scene_b_1"
+        ],
+        "scene_id": "scene_b",
+        "scene_index": 1,
+        "stage_index": 1,
+        "target_capture_id": "scene_b_1",
+        "target_scan_index": 5
+      },
+      "sha256": "b01d60de37a9b6db95180f96f67b89c1bcd3ad7ab4b87fd90a2dec82dc6c44b8"
+    },
+    {
+      "bytes": 53362142,
+      "filename": "scene_b_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_b_0",
+          "scene_b_1",
+          "scene_b_2"
+        ],
+        "scene_id": "scene_b",
+        "scene_index": 1,
+        "stage_index": 2,
+        "target_capture_id": "scene_b_2",
+        "target_scan_index": 6
+      },
+      "sha256": "29e9fd47d88c535c977cdac40fb436624992ddebb96193cc0aea69195807284f"
+    },
+    {
+      "bytes": 35844958,
+      "filename": "scene_b_3.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_b_0",
+          "scene_b_1",
+          "scene_b_2",
+          "scene_b_3"
+        ],
+        "scene_id": "scene_b",
+        "scene_index": 1,
+        "stage_index": 3,
+        "target_capture_id": "scene_b_3",
+        "target_scan_index": 7
+      },
+      "sha256": "2de5002b213e3c52c04778b4292bf811c08591a379a94860ec96ccff66fc58c5"
+    },
+    {
+      "bytes": 32592798,
+      "filename": "scene_c_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_c_0"
+        ],
+        "scene_id": "scene_c",
+        "scene_index": 2,
+        "stage_index": 0,
+        "target_capture_id": "scene_c_0",
+        "target_scan_index": 8
+      },
+      "sha256": "97e77c6add39292e0f07beba26c3dee3febe99620c78826b1874e9a61564615a"
+    },
+    {
+      "bytes": 29621278,
+      "filename": "scene_c_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_c_0",
+          "scene_c_1"
+        ],
+        "scene_id": "scene_c",
+        "scene_index": 2,
+        "stage_index": 1,
+        "target_capture_id": "scene_c_1",
+        "target_scan_index": 9
+      },
+      "sha256": "37431080fabab70cb2eca36386f142a0100cd03806a33bf49f399fa26a55efd4"
+    },
+    {
+      "bytes": 24659358,
+      "filename": "scene_c_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_c_0",
+          "scene_c_1",
+          "scene_c_2"
+        ],
+        "scene_id": "scene_c",
+        "scene_index": 2,
+        "stage_index": 2,
+        "target_capture_id": "scene_c_2",
+        "target_scan_index": 10
+      },
+      "sha256": "7209fba2476e6646c7278820a304f3afed38a7f82efaa6ebde6dbbe251d756f8"
+    },
+    {
+      "bytes": 26475358,
+      "filename": "scene_c_3.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_c_0",
+          "scene_c_1",
+          "scene_c_2",
+          "scene_c_3"
+        ],
+        "scene_id": "scene_c",
+        "scene_index": 2,
+        "stage_index": 3,
+        "target_capture_id": "scene_c_3",
+        "target_scan_index": 11
+      },
+      "sha256": "74e1e9bcb7395ba2300b0be32aee58b5ef6f8e2924deee079b9b76fade2aaa97"
+    },
+    {
+      "bytes": 31678878,
+      "filename": "scene_c_4.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_c_0",
+          "scene_c_1",
+          "scene_c_2",
+          "scene_c_3",
+          "scene_c_4"
+        ],
+        "scene_id": "scene_c",
+        "scene_index": 2,
+        "stage_index": 4,
+        "target_capture_id": "scene_c_4",
+        "target_scan_index": 12
+      },
+      "sha256": "52e1dd50616ba91465a9c3dfee30134486535f7c9e37af74f3c0ad5ed7286b89"
+    },
+    {
+      "bytes": 35676574,
+      "filename": "scene_d_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_d_0"
+        ],
+        "scene_id": "scene_d",
+        "scene_index": 3,
+        "stage_index": 0,
+        "target_capture_id": "scene_d_0",
+        "target_scan_index": 13
+      },
+      "sha256": "f782cb662ed1952c03a4deab641703dc186ac5d81603ad567c2f6b8e661dc97a"
+    },
+    {
+      "bytes": 34928606,
+      "filename": "scene_d_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_d_0",
+          "scene_d_1"
+        ],
+        "scene_id": "scene_d",
+        "scene_index": 3,
+        "stage_index": 1,
+        "target_capture_id": "scene_d_1",
+        "target_scan_index": 14
+      },
+      "sha256": "8da93f7324dbfe6b0b7af2f0058cf2ee4d6fba60a55c8f189c73484fa0e55164"
+    },
+    {
+      "bytes": 40551390,
+      "filename": "scene_d_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_d_0",
+          "scene_d_1",
+          "scene_d_2"
+        ],
+        "scene_id": "scene_d",
+        "scene_index": 3,
+        "stage_index": 2,
+        "target_capture_id": "scene_d_2",
+        "target_scan_index": 15
+      },
+      "sha256": "bc05895255c0df3f36c5dc96113afd688a69e32a178bf7e633d35c840a36ce9b"
+    },
+    {
+      "bytes": 45574046,
+      "filename": "scene_d_3.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_d_0",
+          "scene_d_1",
+          "scene_d_2",
+          "scene_d_3"
+        ],
+        "scene_id": "scene_d",
+        "scene_index": 3,
+        "stage_index": 3,
+        "target_capture_id": "scene_d_3",
+        "target_scan_index": 16
+      },
+      "sha256": "1cb6a8643eace9cb0dacc4510c6bfcb26fa19710696c7caa4c1212bc08af7afd"
+    },
+    {
+      "bytes": 36568094,
+      "filename": "scene_e_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_e_0"
+        ],
+        "scene_id": "scene_e",
+        "scene_index": 4,
+        "stage_index": 0,
+        "target_capture_id": "scene_e_0",
+        "target_scan_index": 17
+      },
+      "sha256": "786e00661be109d235945134d63867a18353623cc4588e665394c132869ebcc0"
+    },
+    {
+      "bytes": 34112286,
+      "filename": "scene_e_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_e_0",
+          "scene_e_1"
+        ],
+        "scene_id": "scene_e",
+        "scene_index": 4,
+        "stage_index": 1,
+        "target_capture_id": "scene_e_1",
+        "target_scan_index": 18
+      },
+      "sha256": "9c7e1fc8622579c84add004e9aa183d186beea789f36b88eccc8b40fade5a414"
+    },
+    {
+      "bytes": 20634654,
+      "filename": "scene_e_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_e_0",
+          "scene_e_1",
+          "scene_e_2"
+        ],
+        "scene_id": "scene_e",
+        "scene_index": 4,
+        "stage_index": 2,
+        "target_capture_id": "scene_e_2",
+        "target_scan_index": 19
+      },
+      "sha256": "5da63cfa25ab258a1dd7703075959e22e9f38275ddca3cc409d362ea74d7f5e2"
+    },
+    {
+      "bytes": 59751902,
+      "filename": "scene_f_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_f_0"
+        ],
+        "scene_id": "scene_f",
+        "scene_index": 5,
+        "stage_index": 0,
+        "target_capture_id": "scene_f_0",
+        "target_scan_index": 20
+      },
+      "sha256": "7799962cf5b858012cb4221ed517e580483ffb128b4ec2d5bc4fdf6b6d2a7e91"
+    },
+    {
+      "bytes": 59689310,
+      "filename": "scene_f_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_f_0",
+          "scene_f_1"
+        ],
+        "scene_id": "scene_f",
+        "scene_index": 5,
+        "stage_index": 1,
+        "target_capture_id": "scene_f_1",
+        "target_scan_index": 21
+      },
+      "sha256": "d17bc1245458d3cc26eda4584501b7bd2d80b28e059cffbf586e878224381c6f"
+    },
+    {
+      "bytes": 62502366,
+      "filename": "scene_f_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_f_0",
+          "scene_f_1",
+          "scene_f_2"
+        ],
+        "scene_id": "scene_f",
+        "scene_index": 5,
+        "stage_index": 2,
+        "target_capture_id": "scene_f_2",
+        "target_scan_index": 22
+      },
+      "sha256": "d5f9729e80dcd8123504660cfdc30cc87b3535cbc517b28483aafbdb42babb78"
+    },
+    {
+      "bytes": 63992222,
+      "filename": "scene_g_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_g_0"
+        ],
+        "scene_id": "scene_g",
+        "scene_index": 6,
+        "stage_index": 0,
+        "target_capture_id": "scene_g_0",
+        "target_scan_index": 23
+      },
+      "sha256": "f2075596f71240aab0f2a8ea65066112079dd2dcfbb2f9a64cc8755897b63c24"
+    },
+    {
+      "bytes": 68073822,
+      "filename": "scene_g_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_g_0",
+          "scene_g_1"
+        ],
+        "scene_id": "scene_g",
+        "scene_index": 6,
+        "stage_index": 1,
+        "target_capture_id": "scene_g_1",
+        "target_scan_index": 24
+      },
+      "sha256": "ec806dd67fc3f87e29f83d7b4453f385c35454ff2fd4b8556b11f2fa16ac805d"
+    },
+    {
+      "bytes": 71379294,
+      "filename": "scene_g_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_g_0",
+          "scene_g_1",
+          "scene_g_2"
+        ],
+        "scene_id": "scene_g",
+        "scene_index": 6,
+        "stage_index": 2,
+        "target_capture_id": "scene_g_2",
+        "target_scan_index": 25
+      },
+      "sha256": "2f977347dc16c807d42d384bddea0db2d72d1a1eae08b5a8626a79c4d8d7f982"
+    },
+    {
+      "bytes": 41588382,
+      "filename": "scene_h_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_h_0"
+        ],
+        "scene_id": "scene_h",
+        "scene_index": 7,
+        "stage_index": 0,
+        "target_capture_id": "scene_h_0",
+        "target_scan_index": 26
+      },
+      "sha256": "26606bf712da7a7f5b60fb9b5f4eff8ea8eba7122a80953792570b5d1edb8d52"
+    },
+    {
+      "bytes": 43553502,
+      "filename": "scene_h_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_h_0",
+          "scene_h_1"
+        ],
+        "scene_id": "scene_h",
+        "scene_index": 7,
+        "stage_index": 1,
+        "target_capture_id": "scene_h_1",
+        "target_scan_index": 27
+      },
+      "sha256": "6b46e989d57d168cc00624ea1d486624ff35c23dc09567002c131bc026b20ef1"
+    },
+    {
+      "bytes": 40129950,
+      "filename": "scene_h_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_h_0",
+          "scene_h_1",
+          "scene_h_2"
+        ],
+        "scene_id": "scene_h",
+        "scene_index": 7,
+        "stage_index": 2,
+        "target_capture_id": "scene_h_2",
+        "target_scan_index": 28
+      },
+      "sha256": "210cb684a26ea07092e56b0b89c6fa6aecad07278514142786865166fcc62c9c"
+    },
+    {
+      "bytes": 18623006,
+      "filename": "scene_i_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_i_0"
+        ],
+        "scene_id": "scene_i",
+        "scene_index": 8,
+        "stage_index": 0,
+        "target_capture_id": "scene_i_0",
+        "target_scan_index": 29
+      },
+      "sha256": "696625bff6aea2fc179d36afe5b1ddcd3c3e78e0191a96dda1f2c84b7675bc95"
+    },
+    {
+      "bytes": 17926302,
+      "filename": "scene_i_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_i_0",
+          "scene_i_1"
+        ],
+        "scene_id": "scene_i",
+        "scene_index": 8,
+        "stage_index": 1,
+        "target_capture_id": "scene_i_1",
+        "target_scan_index": 30
+      },
+      "sha256": "3a673cb4d9075efa8adafdb43dc726b65dbed92f2f646a62f767b6661e2295f4"
+    },
+    {
+      "bytes": 16192094,
+      "filename": "scene_i_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_i_0",
+          "scene_i_1",
+          "scene_i_2"
+        ],
+        "scene_id": "scene_i",
+        "scene_index": 8,
+        "stage_index": 2,
+        "target_capture_id": "scene_i_2",
+        "target_scan_index": 31
+      },
+      "sha256": "b5ffac9bcc9f0de4a0b15d9c269114e1d9714396464aabb1f1542eabdecb2c57"
+    },
+    {
+      "bytes": 90063390,
+      "filename": "scene_j_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_j_0"
+        ],
+        "scene_id": "scene_j",
+        "scene_index": 9,
+        "stage_index": 0,
+        "target_capture_id": "scene_j_0",
+        "target_scan_index": 32
+      },
+      "sha256": "f67fb68c4318e392a442476b01262bd386c73edff5189f6129dcfeacd0a1470e"
+    },
+    {
+      "bytes": 92880606,
+      "filename": "scene_j_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_j_0",
+          "scene_j_1"
+        ],
+        "scene_id": "scene_j",
+        "scene_index": 9,
+        "stage_index": 1,
+        "target_capture_id": "scene_j_1",
+        "target_scan_index": 33
+      },
+      "sha256": "e45b59f14de621b372e3dca8f01404db32b075f7154967c758fa516f2ba57f1d"
+    },
+    {
+      "bytes": 85779294,
+      "filename": "scene_j_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_j_0",
+          "scene_j_1",
+          "scene_j_2"
+        ],
+        "scene_id": "scene_j",
+        "scene_index": 9,
+        "stage_index": 2,
+        "target_capture_id": "scene_j_2",
+        "target_scan_index": 34
+      },
+      "sha256": "641f77ac3b0ff79718af0d1ba583c56d0b2a596d2b7ea0ba56eb4855e28cd39d"
+    },
+    {
+      "bytes": 105603294,
+      "filename": "scene_k_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_k_0"
+        ],
+        "scene_id": "scene_k",
+        "scene_index": 10,
+        "stage_index": 0,
+        "target_capture_id": "scene_k_0",
+        "target_scan_index": 35
+      },
+      "sha256": "60966db1251501d2eade6e39a15a4e0c94549e58b30ebe9e4af3b666876b70dd"
+    },
+    {
+      "bytes": 116100830,
+      "filename": "scene_k_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_k_0",
+          "scene_k_1"
+        ],
+        "scene_id": "scene_k",
+        "scene_index": 10,
+        "stage_index": 1,
+        "target_capture_id": "scene_k_1",
+        "target_scan_index": 36
+      },
+      "sha256": "6b558230667f4262fba65040b21c3b5340d3bdf241e56e9ec4a8d80b56deccff"
+    },
+    {
+      "bytes": 107187742,
+      "filename": "scene_k_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_k_0",
+          "scene_k_1",
+          "scene_k_2"
+        ],
+        "scene_id": "scene_k",
+        "scene_index": 10,
+        "stage_index": 2,
+        "target_capture_id": "scene_k_2",
+        "target_scan_index": 37
+      },
+      "sha256": "3c7d293e1e115335312de17f3fef2d90c0e85161e46d317827d6857deef8c8a7"
+    },
+    {
+      "bytes": 26705502,
+      "filename": "scene_l_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_l_0"
+        ],
+        "scene_id": "scene_l",
+        "scene_index": 11,
+        "stage_index": 0,
+        "target_capture_id": "scene_l_0",
+        "target_scan_index": 38
+      },
+      "sha256": "fb18c46ec40c6a5a5fd60f5a7cd52247e8e2ae55fcd1584bedec32b0004ab98b"
+    },
+    {
+      "bytes": 28058590,
+      "filename": "scene_l_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_l_0",
+          "scene_l_1"
+        ],
+        "scene_id": "scene_l",
+        "scene_index": 11,
+        "stage_index": 1,
+        "target_capture_id": "scene_l_1",
+        "target_scan_index": 39
+      },
+      "sha256": "e4bafb59b3d004c3f3c15924099a05768f095a4c42e0bddf6095aee6e9d1b5f5"
+    },
+    {
+      "bytes": 24585566,
+      "filename": "scene_l_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_l_0",
+          "scene_l_1",
+          "scene_l_2"
+        ],
+        "scene_id": "scene_l",
+        "scene_index": 11,
+        "stage_index": 2,
+        "target_capture_id": "scene_l_2",
+        "target_scan_index": 40
+      },
+      "sha256": "9d90ff6b7ac7ba0051cde3acc224921dd1b6531a33e658068908b8d0c2594c5b"
+    },
+    {
+      "bytes": 28355550,
+      "filename": "scene_l_3.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_l_0",
+          "scene_l_1",
+          "scene_l_2",
+          "scene_l_3"
+        ],
+        "scene_id": "scene_l",
+        "scene_index": 11,
+        "stage_index": 3,
+        "target_capture_id": "scene_l_3",
+        "target_scan_index": 41
+      },
+      "sha256": "933ce87ef1fef62efd682ca550a4130248f0e12c15b16a439c684ee8ed29c474"
+    },
+    {
+      "bytes": 99576286,
+      "filename": "scene_m_0.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_m_0"
+        ],
+        "scene_id": "scene_m",
+        "scene_index": 12,
+        "stage_index": 0,
+        "target_capture_id": "scene_m_0",
+        "target_scan_index": 42
+      },
+      "sha256": "d271fc921b013c18c886b2729ec0b550e353625479ad63d54dc16642ee34e478"
+    },
+    {
+      "bytes": 89508318,
+      "filename": "scene_m_1.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_m_0",
+          "scene_m_1"
+        ],
+        "scene_id": "scene_m",
+        "scene_index": 12,
+        "stage_index": 1,
+        "target_capture_id": "scene_m_1",
+        "target_scan_index": 43
+      },
+      "sha256": "e2f0f47fdbc4f91a6955f59746c170ce553799d311f3c705f5cc10d9e44ec9cc"
+    },
+    {
+      "bytes": 87121182,
+      "filename": "scene_m_2.pt",
+      "key": {
+        "history_strategy": "full_history",
+        "local_capture_ids": [
+          "scene_m_0",
+          "scene_m_1",
+          "scene_m_2"
+        ],
+        "scene_id": "scene_m",
+        "scene_index": 12,
+        "stage_index": 2,
+        "target_capture_id": "scene_m_2",
+        "target_scan_index": 44
+      },
+      "sha256": "ea7b7bd26f837f1719a4aec607e6f725bbb75214cc7a0f9f4a067b99211b7685"
+    }
+  ],
+  "entry_count": 45,
+  "provenance": {
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "dataset_content_sha256": "612810f1f8ec8ff8e4a1693b4b451da34ea0501cee46e1b34fedf3ed1910a420",
+    "evaluator_sha256": "37577968402be7dd42126d13194d3ab305c3783b8fe62bd4a0fa2a266987395d",
+    "external_config_sha256": "b7898eca6a912955b0cb03f749456090d86a29caf8885842e94d3a497aa8b4de",
+    "geometry_segment_size_m": 0.1,
+    "history_strategy": "full_history",
+    "model_voxel_size_m": 0.02,
+    "seed": 45,
+    "source_commit": "d3655142a9fc82896a787a1c1ca3f0b30ec61de1"
+  },
+  "scene_count": 13,
+  "schema_version": 1,
+  "status": "pass"
+}
