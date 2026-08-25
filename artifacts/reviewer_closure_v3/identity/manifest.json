@@ -1,0 +1,111 @@
+{
+  "channel_contract": {
+    "identity": "registered query-level tracker decisions -> identity diagnostics",
+    "task": "official task candidates plus trajectory linkage -> t-mAP/t-REC",
+    "task_and_identity_are_separate": true
+  },
+  "coverage": {
+    "aggregate_row_count": 48,
+    "cluster_effect_row_count": 24,
+    "horizons": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "methods": [
+      "B2",
+      "B3",
+      "B4"
+    ],
+    "orders": [
+      "canonical",
+      "reverse",
+      "sha256_seed45"
+    ],
+    "per_cluster_row_count": 288,
+    "per_sequence_row_count": 1548,
+    "reference_cluster_count": 6,
+    "sequence_count": 129
+  },
+  "execution": {
+    "gpu_inference_performed": false,
+    "gt_available_to_tracker": false,
+    "gt_used_post_prediction_for_identity_matching": true,
+    "identity_iou_threshold": 0.5,
+    "mode": "fresh_registered_trackers_on_frozen_query_observations",
+    "regression_input": "frozen_v1_query_observation_cache",
+    "v2_task_cache_used_for_identity": false
+  },
+  "gate_id0": {
+    "b4_frozen_regression": {
+      "cell_count": 7224,
+      "max_abs_diff": 0,
+      "row_count": 516,
+      "status": "pass_exact"
+    },
+    "b4_long_gap_supported_at_t4_and_t5": true,
+    "copied_v1_identity_fields": false,
+    "fresh_tracker_coverage": "pass_exact",
+    "long_gap_comparison": {
+      "T4": {
+        "b2_gap_recovery_recall": 0.09770114942528736,
+        "b4_gap_recovery_recall": 0.2974137931034483,
+        "b4_minus_b2": 0.19971264367816094
+      },
+      "T5": {
+        "b2_gap_recovery_recall": 0.08508691674290943,
+        "b4_gap_recovery_recall": 0.3119853613906679,
+        "b4_minus_b2": 0.2268984446477585
+      }
+    },
+    "status": "PASS"
+  },
+  "generated_at": "2026-08-25T23:04:56.000733Z",
+  "inputs": {
+    "cache_entries_sha256": "00a61caeb90da5c485bdc338a7013619cedeeb6ff89785344e52d76f98352957",
+    "cache_manifest": {
+      "reference": "repo:artifacts/system_comparison/persistent_predictions/manifest.json",
+      "sha256": "44a089ae079b864a8417954fb0cc9b3e17f1650400e747c6d3c73c1ac71aaa0f"
+    },
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "dataset_sha256": "656dd934ed845e66e431cd223bf31e291681b8a59832db0f2c12d93af4ad450e",
+    "frozen_identity_csv": {
+      "reference": "repo:artifacts/system_comparison/per_sequence_results.csv",
+      "sha256": "0071913ca5616d9bce61fa8c89f96b788d5e8cf81fe77e17ef97d7525cd4c209",
+      "use": "regression_reference_only"
+    },
+    "frozen_system_manifest": {
+      "reference": "repo:artifacts/system_comparison/system_comparison_manifest.json",
+      "sha256": "a7186318d329f5907ff3c67d37671359d2a81d058d5dea817c0ca53af2e783e8"
+    },
+    "observation_config_sha256": "34d10651643d1d01993a0b735f590fc555489462beda85b9dd215fc20823213d",
+    "protocol_manifest_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+    "tracker_system_config_sha256": "aadca1c1608bae4ad4e812a6261536d9e386a85c460bbd85f4c5d215c9a68717"
+  },
+  "outputs": {
+    "IDENTITY_RECOMPUTATION.md": {
+      "bytes": 3738,
+      "sha256": "00281ce7ab64acce327f5c30d18e7f8f29d7b20734e5f2c54a7defd804f5c2fd"
+    },
+    "identity_aggregate.csv": {
+      "bytes": 7747,
+      "sha256": "d4bf1550528e739d9cafc45657543c352f97d0f27913baf02af1414be8655966"
+    },
+    "identity_per_cluster.csv": {
+      "bytes": 52264,
+      "sha256": "2ce07e00230ccfa039924924228ca7273c448099d1e842ccc037a7d665cf3289"
+    },
+    "identity_per_sequence.csv": {
+      "bytes": 492053,
+      "sha256": "7fac013028c90c9c35e0e899d33a8f9e9b0e180a6182c787749436bec35c2bb7"
+    }
+  },
+  "schema_version": 1,
+  "scripts": {
+    "identity_sha256": "fe8f6a99c5b23c43c5d1386e9fd57cda36f94e521b814392e262a74fea79040a",
+    "test_sha256": "3a1fa67d9de646cf32bf0abee858bd9e406e73f113b5a86bbee37a240970f1f7"
+  },
+  "source_commit": "394fc75291c110b00d7ffb64857b4d51eb6e0ebf",
+  "status": "pass"
+}
