@@ -1,0 +1,5 @@
+record_type,seed,method,full154_t_mAP,bridge43_canonical_t_mAP,delta_population_t_mAP,full_sequence_count,bridge_sequence_count,same_runtime_binding,interpretation,delta_mean,delta_min,delta_max
+seed,45,ReScene4D-C-local-reimplementation,0.2767498791217804,0.2034766674041748,-0.07327321171760559,154,43,true,population-bridge diagnostic,,,
+seed,46,ReScene4D-C-local-reimplementation,0.26606613397598267,0.1951536387205124,-0.07091249525547028,154,43,true,population-bridge diagnostic,,,
+seed,47,ReScene4D-C-local-reimplementation,0.2803468108177185,0.20068682730197906,-0.07965998351573944,154,43,true,population-bridge diagnostic,,,
+summary,mean/range,ReScene4D-C-local-reimplementation,,,,154,43,true,descriptive mean/range across preregistered seeds,-0.07461523016293843,-0.07965998351573944,-0.07091249525547028

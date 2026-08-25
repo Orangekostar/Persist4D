@@ -1,0 +1,179 @@
+{
+  "gate_pb1": {
+    "additive_34_8_to_19_1_decomposition": false,
+    "all_cluster_effects_reported": true,
+    "factors_reported_separately": [
+      "population",
+      "order",
+      "horizon"
+    ],
+    "horizons": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "order_count": 3,
+    "order_master_count": 43,
+    "order_unit_count": 129,
+    "order_units_treated_as_independent": false,
+    "population_comparisons_are_runtime_paired": true,
+    "population_seed_count": 3,
+    "reference_cluster_count": 6,
+    "status": "PASS"
+  },
+  "generated_at": "2026-08-25T14:41:28.065006Z",
+  "inputs": {
+    "pb0_bridge_manifest": {
+      "reference": "repo:artifacts/reviewer_closure_v3/protocol_bridge/bridge_manifest.json",
+      "sha256": "011d7b8350eaaa6ad7c0aa21200a5f8b18794631361100f18773db5a6adbfa8a"
+    },
+    "protocol_b_manifest": {
+      "reference": "repo:artifacts/P6A/protocol_b_manifest.json",
+      "sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe"
+    },
+    "v2_per_order": {
+      "reference": "repo:artifacts/system_comparison_v2/per_order_results.csv",
+      "sha256": "a520fdccc6e31d4075c0ef2f122151a4881758a648bec8d22cad0d9f6c3d7a8f"
+    },
+    "v2_per_sequence": {
+      "reference": "repo:artifacts/system_comparison_v2/per_sequence_results.csv",
+      "sha256": "f8d7b325c3075edfd7ca45cc22b5fbaa65dd10773f31a426e52eac0dde3837b0"
+    }
+  },
+  "outputs": {
+    "PROTOCOL_BRIDGE_EVALUATION.md": {
+      "bytes": 2360,
+      "sha256": "2e0031c6cf232a70389458c1bc663e3a501a9c4288064d1a6be44b34b959722c"
+    },
+    "bridge_aggregate.csv": {
+      "bytes": 7625,
+      "sha256": "9e04a61f274d647d7e3155c33f7bb79f838dd03bad36b828577767bcd114c163"
+    },
+    "bridge_per_sequence.csv": {
+      "bytes": 52213,
+      "sha256": "126b40fc98dfddc8e92d21784cb3c96c45ee351d7e8485681d2f5cdb429403dc"
+    },
+    "horizon_retention.csv": {
+      "bytes": 3977,
+      "sha256": "8f9961067f3a32db8b31dbd41ecfaf19b18e5ea535d82b4cac4ed9cd9f1db496"
+    },
+    "order_effect.csv": {
+      "bytes": 5803,
+      "sha256": "458be3131c5bec7e188a46eb6e86e479def0786af6b18a8ea5fea007b6a9679a"
+    },
+    "population_effect.csv": {
+      "bytes": 817,
+      "sha256": "039753357f86d210ebff4f4acb482eeada60fcca27e1cfbe589be73286ecd5ea"
+    }
+  },
+  "runtime": {
+    "cache_files": [
+      {
+        "bytes": 106605242,
+        "reference": "external:/mnt/shared/ww/persist4d-reviewer-closure-v3/protocol_bridge/seed45_bridge43_canonical_t2.pt",
+        "sha256": "629282570526948d1377eb54830695f344203e122d6637c87b43944661b84a1a"
+      },
+      {
+        "bytes": 332392966,
+        "reference": "external:/mnt/shared/ww/persist4d-reviewer-closure-v3/protocol_bridge/seed45_full154_t2.pt",
+        "sha256": "d43f4963a40682af6f69a08003c860c9a5d0fff3668e4d816defd8c3536fc4d3"
+      },
+      {
+        "bytes": 106605242,
+        "reference": "external:/mnt/shared/ww/persist4d-reviewer-closure-v3/protocol_bridge/seed46_bridge43_canonical_t2.pt",
+        "sha256": "7c58ff0cb2974bb42fe498e684db5cc585aad3656ed241ef8caabd1ea66f641a"
+      },
+      {
+        "bytes": 332392966,
+        "reference": "external:/mnt/shared/ww/persist4d-reviewer-closure-v3/protocol_bridge/seed46_full154_t2.pt",
+        "sha256": "b202c5b9bacdb84e7df44fea04d3f23331a39dded5cd1c01d5bffd013d6c5bc5"
+      },
+      {
+        "bytes": 106605242,
+        "reference": "external:/mnt/shared/ww/persist4d-reviewer-closure-v3/protocol_bridge/seed47_bridge43_canonical_t2.pt",
+        "sha256": "5d4f72626d54444362db1ebd0c3fdba0c6d35348776875d5ba318dac2df78680"
+      },
+      {
+        "bytes": 332392966,
+        "reference": "external:/mnt/shared/ww/persist4d-reviewer-closure-v3/protocol_bridge/seed47_full154_t2.pt",
+        "sha256": "4219f7d096f2e28babd48a01b8e3bd24d2813987cebdca8cecc0c6ac36e368a1"
+      }
+    ],
+    "groups": [
+      {
+        "horizon": 2,
+        "order_id": "canonical",
+        "population": "bridge43_canonical_t2",
+        "seed": 45,
+        "sequence_count": 43
+      },
+      {
+        "horizon": 2,
+        "order_id": "official",
+        "population": "full154_t2",
+        "seed": 45,
+        "sequence_count": 154
+      },
+      {
+        "horizon": 2,
+        "order_id": "canonical",
+        "population": "bridge43_canonical_t2",
+        "seed": 46,
+        "sequence_count": 43
+      },
+      {
+        "horizon": 2,
+        "order_id": "official",
+        "population": "full154_t2",
+        "seed": 46,
+        "sequence_count": 154
+      },
+      {
+        "horizon": 2,
+        "order_id": "canonical",
+        "population": "bridge43_canonical_t2",
+        "seed": 47,
+        "sequence_count": 43
+      },
+      {
+        "horizon": 2,
+        "order_id": "official",
+        "population": "full154_t2",
+        "seed": 47,
+        "sequence_count": 154
+      }
+    ],
+    "runtime_binding": {
+      "batch_size": 1,
+      "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+      "metric_adapter_sha256": "7ec32d71423f5b1a75a9175f56d9108c93bc75abdd4ec22cef21a7de965d2e2b",
+      "metric_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "min_region_size": 100,
+      "num_workers": 4,
+      "postprocess_sha256": "e1c77860b5631b2a49faeb2ace39f288d76019153b93cc193d3da16a1ca566c1",
+      "precision": "32-true",
+      "runtime_config_sha256": "3c596ee2c2857b1f010c7638508ad95ccd8866fb187e52c6e993d6c230f15ea2"
+    }
+  },
+  "schema_version": 1,
+  "scripts": {
+    "analyzer_sha256": "2b570835bbc0d113d9f3e5ceb09a5d6b0c840b4d63ac09ccb351e52e0682b084",
+    "evaluator_sha256": "ffbfd1d07d531e970dda2ed805ebdfb964bd1b11e31cdbafa6bf8a05c95e0561",
+    "test_sha256": "9a9ed9a914a85307dc5becd73920631d01cf71006c144b8736bf9cafc8d07106"
+  },
+  "source_commit": "afa1f10e48d70c0072335ecd04a14186ab1675b1",
+  "statistics": {
+    "bootstrap_interpretation": "descriptive robustness evidence",
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 45047,
+    "cluster_count": 6,
+    "cluster_unit": "reference_scene_id",
+    "evaluation_seeds": [
+      45,
+      46,
+      47
+    ]
+  },
+  "status": "pass"
+}

@@ -1,0 +1,25 @@
+method,order_id,horizon,sequence_count,t_mAP,t_REC,current_local_AP_calibration,relative_retention,paired_within_master_order,cross_horizon_independence_claimed,source_channel
+FullHistory,canonical,2,43,0.20722658932209015,0.349545419216156,0.36980727314949036,1.0,true,false,frozen Protocol-B V2 exact-prefix evaluation
+FullHistory,canonical,3,43,0.11683275550603867,0.24738429486751556,0.36100059747695923,0.563792300439046,true,false,frozen Protocol-B V2 exact-prefix evaluation
+FullHistory,canonical,4,43,0.07123789936304092,0.18176354467868805,0.3538123667240143,0.3437681409325161,true,false,frozen Protocol-B V2 exact-prefix evaluation
+FullHistory,canonical,5,43,0.04427722096443176,0.13959765434265137,0.3493248224258423,0.21366573232362637,true,false,frozen Protocol-B V2 exact-prefix evaluation
+FullHistory,reverse,2,43,0.21109874546527863,0.3575153052806854,0.3819788098335266,1.0,true,false,frozen Protocol-B V2 exact-prefix evaluation
+FullHistory,reverse,3,43,0.11031090468168259,0.2456331104040146,0.3576786518096924,0.5225559462163002,true,false,frozen Protocol-B V2 exact-prefix evaluation
+FullHistory,reverse,4,43,0.07150053977966309,0.17215292155742645,0.36842235922813416,0.3387066068160194,true,false,frozen Protocol-B V2 exact-prefix evaluation
+FullHistory,reverse,5,43,0.04792429134249687,0.13858845829963684,0.36924096941947937,0.22702309877241514,true,false,frozen Protocol-B V2 exact-prefix evaluation
+FullHistory,sha256_seed45,2,43,0.1711808741092682,0.3174183666706085,0.407415509223938,1.0,true,false,frozen Protocol-B V2 exact-prefix evaluation
+FullHistory,sha256_seed45,3,43,0.10536342114210129,0.25162041187286377,0.4406520426273346,0.6155093066930228,true,false,frozen Protocol-B V2 exact-prefix evaluation
+FullHistory,sha256_seed45,4,43,0.07458800822496414,0.20881201326847076,0.37656667828559875,0.43572629601922186,true,false,frozen Protocol-B V2 exact-prefix evaluation
+FullHistory,sha256_seed45,5,43,0.044928643852472305,0.13143137097358704,0.4201193153858185,0.2624629888488211,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,canonical,2,43,0.2149520218372345,0.3534661531448364,0.36135682463645935,1.0,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,canonical,3,43,0.12587131559848785,0.2581102252006531,0.3651871085166931,0.585578653890494,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,canonical,4,43,0.08434075117111206,0.19350217282772064,0.3651706278324127,0.3923701226452123,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,canonical,5,43,0.05635813623666763,0.14681090414524078,0.3605973720550537,0.26218937488916955,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,reverse,2,43,0.21162836253643036,0.3542424142360687,0.3749467134475708,1.0,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,reverse,3,43,0.12758111953735352,0.24586574733257294,0.36367639899253845,0.6028545418404931,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,reverse,4,43,0.0839800015091896,0.1726631224155426,0.3741271197795868,0.39682772433082086,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,reverse,5,43,0.05898100882768631,0.12585897743701935,0.3643885850906372,0.27870087034072827,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,sha256_seed45,2,43,0.19893194735050201,0.3360233008861542,0.3985053598880768,1.0,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,sha256_seed45,3,43,0.12826353311538696,0.2552339434623718,0.43555212020874023,0.6447608582918911,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,sha256_seed45,4,43,0.05318271741271019,0.15999412536621094,0.35083675384521484,0.2673412597676257,true,false,frozen Protocol-B V2 exact-prefix evaluation
+Persist4D-V2,sha256_seed45,5,43,0.05809342861175537,0.1424552947282791,0.4374626576900482,0.29202664220342367,true,false,frozen Protocol-B V2 exact-prefix evaluation
