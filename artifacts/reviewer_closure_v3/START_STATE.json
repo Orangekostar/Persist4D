@@ -1,0 +1,100 @@
+{
+  "audit_timestamp": "2026-08-25T13:34:12Z",
+  "baseline_tests": {
+    "command": "conda run -n persist4d python -m pytest -q tests/test_rescene_task_postprocess.py tests/test_system_comparison_v2_inference.py tests/test_system_comparison_v2_analysis.py tests/test_system_comparison_v2_attribution.py tests/test_system_comparison_v2_parity.py tests/test_audit_tmap_protocol_shift.py tests/test_p6a_protocol.py tests/test_p6a_metrics.py tests/test_system_comparison_metrics.py",
+    "passed": 59,
+    "status": "pass"
+  },
+  "checkpoint": {
+    "bytes": 754917862,
+    "reference": "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt",
+    "sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e"
+  },
+  "environment": {
+    "cuda_available": true,
+    "cuda_runtime": "12.6",
+    "gpu_count": 3,
+    "gpus": [
+      {
+        "driver": "595.71.05",
+        "memory_mib": 46068,
+        "model": "NVIDIA A40"
+      },
+      {
+        "driver": "595.71.05",
+        "memory_mib": 46068,
+        "model": "NVIDIA A40"
+      },
+      {
+        "driver": "595.71.05",
+        "memory_mib": 46068,
+        "model": "NVIDIA A40"
+      }
+    ],
+    "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.39",
+    "python": "3.10.20",
+    "stmetrics": "0.1.0",
+    "torch": "2.6.0+cu126"
+  },
+  "frozen_artifacts": {
+    "p2_environment_manifest": {
+      "reference": "repo:artifacts/P2/environment_manifest.json",
+      "sha256": "cb700278ee69ad1800b47af8bfb9f21e621b320abc2843ba2947528964290cda"
+    },
+    "p2_g2_report": {
+      "reference": "repo:artifacts/P2_G2_REPRODUCTION_REPORT.md",
+      "sha256": "d891fb7fd53306d8ab65db81b9bb85f08664a9689de850ac7836143b238816bc"
+    },
+    "p2r_pilot_manifest": {
+      "reference": "repo:artifacts/P2R/pilot_manifest.json",
+      "sha256": "bed2743f42e16574c514778d6b3fa9f6864ca489fe88be13a72cbaafdc4f0e0c"
+    },
+    "protocol_b_manifest": {
+      "reference": "repo:artifacts/P6A/protocol_b_manifest.json",
+      "sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe"
+    },
+    "v2_aggregate_results": {
+      "reference": "repo:artifacts/system_comparison_v2/aggregate_results.csv",
+      "sha256": "20875d32712062660d8ff9b441b2ecc1f41919b924a64cb2b66f7dbe08a34ab0"
+    },
+    "v2_attribution_manifest": {
+      "reference": "repo:artifacts/tmap_root_cause_v2/postprocessing_attribution_manifest.json",
+      "sha256": "7e795aa3ea6e885fdc8e0ef002caf826416c726fa54b62bcc4a41aa2a57b3a15"
+    },
+    "v2_cache_manifest": {
+      "reference": "repo:artifacts/system_comparison_v2/cache_manifest.json",
+      "sha256": "f525252cd306f29e7db80788e4d5c773d2a35c8767d5eaa63b189740ea212182"
+    },
+    "v2_manifest": {
+      "reference": "repo:artifacts/system_comparison_v2/manifest.json",
+      "sha256": "48b708f86097003faa2d8c64658e1676a6aaa82033e9e057811d995f9a22f8f4"
+    },
+    "v2_per_order_results": {
+      "reference": "repo:artifacts/system_comparison_v2/per_order_results.csv",
+      "sha256": "a520fdccc6e31d4075c0ef2f122151a4881758a648bec8d22cad0d9f6c3d7a8f"
+    },
+    "v2_per_sequence_results": {
+      "reference": "repo:artifacts/system_comparison_v2/per_sequence_results.csv",
+      "sha256": "f8d7b325c3075edfd7ca45cc22b5fbaa65dd10773f31a426e52eac0dde3837b0"
+    }
+  },
+  "repository": {
+    "branch": "research/persist4d-reviewer-closure-v3",
+    "expected_start_commit": "c2f1bcacff1ec244909426b57403965f679f08cc",
+    "head": "c2f1bcacff1ec244909426b57403965f679f08cc",
+    "initial_worktree_clean": true,
+    "origin": "git@github.com:Orangekostar/Persist4D.git",
+    "root": "/home/ww/paper5/.worktrees/persist4d-final-evidence",
+    "submodules": [],
+    "upstream": "https://github.com/GradientSpaces/rescene4d.git"
+  },
+  "source_revisions": {
+    "concerto": "10a7d17cff4dddff028f1522c2e72de4c4515df7",
+    "detectron2": "b4a4a3bd136852dae5fb1de37978dee412653e31",
+    "official_rescene4d": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+    "scannet_tools": "3830fce7f8b2e48ef047ef7fd76ea5f62903f51c",
+    "sonata": "18c09ff8d713494f78a8213792262b910977a65d",
+    "stmetrics": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f"
+  },
+  "status": "pass"
+}
