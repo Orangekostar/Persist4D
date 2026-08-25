@@ -1,0 +1,979 @@
+scene0069_00-scene0069_02:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0069_00-scene0069_02.txt
+  nonrigid:
+  - []
+  removed:
+  - - 26
+  rigid:
+  - - 12
+    - 23
+    - 24
+  scene: 69
+  sub_scenes:
+  - 0
+  - 2
+  type: validation
+scene0069_01-scene0069_06:
+  added:
+  - - 24
+    - 26
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0069_01-scene0069_06.txt
+  nonrigid:
+  - []
+  removed:
+  - - 19
+  rigid:
+  - - 7
+    - 12
+    - 23
+  scene: 69
+  sub_scenes:
+  - 1
+  - 6
+  type: validation
+scene0069_02-scene0069_04:
+  added:
+  - - 26
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0069_02-scene0069_04.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 7
+    - 12
+    - 23
+    - 24
+    - 26
+  scene: 69
+  sub_scenes:
+  - 2
+  - 4
+  type: validation
+scene0069_03-scene0069_01:
+  added:
+  - - 30
+    - 31
+    - 32
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0069_03-scene0069_01.txt
+  nonrigid:
+  - []
+  removed:
+  - - 24
+    - 26
+  rigid:
+  - - 7
+    - 12
+    - 23
+    - 24
+  scene: 69
+  sub_scenes:
+  - 3
+  - 1
+  type: validation
+scene0069_04-scene0069_03:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0069_04-scene0069_03.txt
+  nonrigid:
+  - []
+  removed:
+  - - 30
+    - 31
+    - 32
+  rigid:
+  - - 7
+    - 12
+    - 23
+    - 24
+    - 26
+  scene: 69
+  sub_scenes:
+  - 4
+  - 3
+  type: validation
+scene0069_05-scene0069_08:
+  added:
+  - - 19
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0069_05-scene0069_08.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 12
+    - 23
+    - 24
+  scene: 69
+  sub_scenes:
+  - 5
+  - 8
+  type: validation
+scene0069_06-scene0069_09:
+  added:
+  - - 19
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0069_06-scene0069_09.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 12
+    - 23
+  scene: 69
+  sub_scenes:
+  - 6
+  - 9
+  type: validation
+scene0069_07-scene0069_00:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0069_07-scene0069_00.txt
+  nonrigid:
+  - - 10
+  removed:
+  - []
+  rigid:
+  - - 12
+    - 23
+  scene: 69
+  sub_scenes:
+  - 7
+  - 0
+  type: validation
+scene0069_08-scene0069_07:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0069_08-scene0069_07.txt
+  nonrigid:
+  - - 10
+  removed:
+  - []
+  rigid:
+  - - 12
+    - 23
+  scene: 69
+  sub_scenes:
+  - 8
+  - 7
+  type: validation
+scene0069_09-scene0069_05:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0069_09-scene0069_05.txt
+  nonrigid:
+  - []
+  removed:
+  - - 19
+  rigid:
+  - - 12
+    - 23
+    - 24
+  scene: 69
+  sub_scenes:
+  - 9
+  - 5
+  type: validation
+scene0079_00-scene0079_09:
+  added:
+  - []
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_00-scene0079_09.txt
+  nonrigid:
+  - - 6
+  removed:
+  - []
+  rigid:
+  - - 20
+    - 21
+  scene: 79
+  sub_scenes:
+  - 0
+  - 9
+  type: validation
+scene0079_01-scene0079_06:
+  added:
+  - []
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_01-scene0079_06.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 20
+    - 21
+    - 34
+  scene: 79
+  sub_scenes:
+  - 1
+  - 6
+  type: validation
+scene0079_02-scene0079_08:
+  added:
+  - - 20
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_02-scene0079_08.txt
+  nonrigid:
+  - - 6
+  removed:
+  - []
+  rigid:
+  - - 10
+    - 20
+    - 21
+    - 24
+    - 33
+  scene: 79
+  sub_scenes:
+  - 2
+  - 8
+  type: validation
+scene0079_03-scene0079_07:
+  added:
+  - []
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_03-scene0079_07.txt
+  nonrigid:
+  - - 35
+  removed:
+  - - 31
+  rigid:
+  - - 20
+    - 21
+    - 31
+    - 32
+    - 33
+    - 34
+    - 35
+  scene: 79
+  sub_scenes:
+  - 3
+  - 7
+  type: validation
+scene0079_04-scene0079_03:
+  added:
+  - []
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_04-scene0079_03.txt
+  nonrigid:
+  - - 6
+  removed:
+  - []
+  rigid:
+  - - 20
+    - 21
+    - 31
+    - 34
+    - 35
+  scene: 79
+  sub_scenes:
+  - 4
+  - 3
+  type: validation
+scene0079_05-scene0079_04:
+  added:
+  - []
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_05-scene0079_04.txt
+  nonrigid:
+  - - 6
+  removed:
+  - []
+  rigid:
+  - - 31
+  scene: 79
+  sub_scenes:
+  - 5
+  - 4
+  type: validation
+scene0079_06-scene0079_11:
+  added:
+  - []
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_06-scene0079_11.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 20
+    - 21
+    - 31
+    - 32
+    - 34
+    - 36
+    - 37
+    - 38
+  scene: 79
+  sub_scenes:
+  - 6
+  - 11
+  type: validation
+scene0079_07-scene0079_01:
+  added:
+  - - 31
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_07-scene0079_01.txt
+  nonrigid:
+  - - 35
+  removed:
+  - []
+  rigid:
+  - - 20
+    - 21
+    - 32
+    - 33
+    - 34
+  scene: 79
+  sub_scenes:
+  - 7
+  - 1
+  type: validation
+scene0079_08-scene0079_00:
+  added:
+  - []
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_08-scene0079_00.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 20
+    - 21
+    - 33
+  scene: 79
+  sub_scenes:
+  - 8
+  - 0
+  type: validation
+scene0079_09-scene0079_05:
+  added:
+  - []
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_09-scene0079_05.txt
+  nonrigid:
+  - - 6
+  removed:
+  - []
+  rigid:
+  - - 20
+    - 21
+    - 31
+  scene: 79
+  sub_scenes:
+  - 9
+  - 5
+  type: validation
+scene0079_10-scene0079_02:
+  added:
+  - []
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_10-scene0079_02.txt
+  nonrigid:
+  - - 6
+  removed:
+  - - 20
+  rigid:
+  - - 10
+    - 16
+    - 24
+  scene: 79
+  sub_scenes:
+  - 10
+  - 2
+  type: validation
+scene0079_11-scene0079_10:
+  added:
+  - []
+  ambiguities:
+  - - 12
+    - 13
+  - - 14
+    - 15
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0079_11-scene0079_10.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 16
+    - 20
+    - 21
+    - 31
+    - 32
+    - 34
+    - 36
+    - 37
+    - 38
+  scene: 79
+  sub_scenes:
+  - 11
+  - 10
+  type: validation
+scene0119_00-scene0119_02:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0119_00-scene0119_02.txt
+  nonrigid:
+  - []
+  removed:
+  - - 47
+  rigid:
+  - - 10
+    - 15
+    - 19
+    - 46
+    - 56
+  scene: 119
+  sub_scenes:
+  - 0
+  - 2
+  type: validation
+scene0119_01-scene0119_04:
+  added:
+  - - 49
+    - 58
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0119_01-scene0119_04.txt
+  nonrigid:
+  - []
+  removed:
+  - - 66
+    - 67
+    - 74
+  rigid:
+  - - 10
+    - 15
+    - 23
+    - 24
+    - 28
+    - 43
+    - 45
+    - 46
+    - 48
+    - 56
+  scene: 119
+  sub_scenes:
+  - 1
+  - 4
+  type: validation
+scene0119_02-scene0119_03:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0119_02-scene0119_03.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 10
+    - 15
+    - 28
+    - 45
+    - 46
+    - 56
+  scene: 119
+  sub_scenes:
+  - 2
+  - 3
+  type: validation
+scene0119_03-scene0119_01:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0119_03-scene0119_01.txt
+  nonrigid:
+  - []
+  removed:
+  - - 49
+    - 58
+  rigid:
+  - - 10
+    - 15
+    - 28
+    - 43
+    - 45
+    - 46
+    - 48
+    - 56
+  scene: 119
+  sub_scenes:
+  - 3
+  - 1
+  type: validation
+scene0119_04-scene0119_00:
+  added:
+  - - 47
+    - 66
+    - 67
+    - 74
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0119_04-scene0119_00.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 10
+    - 15
+    - 19
+    - 23
+    - 24
+    - 28
+    - 43
+    - 48
+    - 56
+  scene: 119
+  sub_scenes:
+  - 4
+  - 0
+  type: validation
+scene0219_00-scene0219_03:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0219_00-scene0219_03.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 14
+    - 19
+  scene: 219
+  sub_scenes:
+  - 0
+  - 3
+  type: validation
+scene0219_01-scene0219_04:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0219_01-scene0219_04.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 14
+    - 16
+    - 19
+  scene: 219
+  sub_scenes:
+  - 1
+  - 4
+  type: validation
+scene0219_02-scene0219_01:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0219_02-scene0219_01.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 14
+    - 19
+  scene: 219
+  sub_scenes:
+  - 2
+  - 1
+  type: validation
+scene0219_03-scene0219_02:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0219_03-scene0219_02.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 19
+  scene: 219
+  sub_scenes:
+  - 3
+  - 2
+  type: validation
+scene0219_04-scene0219_00:
+  added:
+  - []
+  ambiguities: []
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0219_04-scene0219_00.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 14
+    - 16
+    - 19
+  scene: 219
+  sub_scenes:
+  - 4
+  - 0
+  type: validation
+scene0309_00-scene0309_02:
+  added:
+  - []
+  ambiguities:
+  - - 50
+    - 51
+    - 53
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0309_00-scene0309_02.txt
+  nonrigid:
+  - []
+  removed:
+  - - 48
+    - 60
+    - 61
+    - 62
+    - 490
+  rigid:
+  - - 20
+  scene: 309
+  sub_scenes:
+  - 0
+  - 2
+  type: validation
+scene0309_01-scene0309_04:
+  added:
+  - - 28
+    - 29
+    - 100
+  ambiguities:
+  - - 50
+    - 51
+    - 53
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0309_01-scene0309_04.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 8
+    - 10
+    - 13
+    - 16
+    - 20
+    - 51
+    - 53
+  scene: 309
+  sub_scenes:
+  - 1
+  - 4
+  type: validation
+scene0309_02-scene0309_01:
+  added:
+  - - 48
+    - 60
+    - 61
+    - 62
+    - 490
+  ambiguities:
+  - - 50
+    - 51
+    - 53
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0309_02-scene0309_01.txt
+  nonrigid:
+  - []
+  removed:
+  - - 28
+    - 29
+    - 100
+  rigid:
+  - - 8
+    - 10
+    - 13
+    - 16
+    - 20
+  scene: 309
+  sub_scenes:
+  - 2
+  - 1
+  type: validation
+scene0309_03-scene0309_00:
+  added:
+  - - 17
+    - 28
+    - 29
+    - 33
+    - 71
+    - 72
+    - 100
+  ambiguities:
+  - - 50
+    - 51
+    - 53
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0309_03-scene0309_00.txt
+  nonrigid:
+  - []
+  removed:
+  - []
+  rigid:
+  - - 8
+    - 10
+    - 11
+    - 16
+    - 73
+  scene: 309
+  sub_scenes:
+  - 3
+  - 0
+  type: validation
+scene0309_04-scene0309_03:
+  added:
+  - []
+  ambiguities:
+  - - 50
+    - 51
+    - 53
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0309_04-scene0309_03.txt
+  nonrigid:
+  - []
+  removed:
+  - - 17
+    - 28
+    - 29
+    - 33
+    - 71
+    - 72
+    - 100
+  rigid:
+  - - 8
+    - 10
+    - 11
+    - 16
+    - 20
+    - 51
+    - 53
+    - 73
+  scene: 309
+  sub_scenes:
+  - 4
+  - 3
+  type: validation
+scene0449_00-scene0449_04:
+  added:
+  - []
+  ambiguities:
+  - - 11
+    - 12
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0449_00-scene0449_04.txt
+  nonrigid:
+  - - 6
+    - 7
+  removed:
+  - []
+  rigid:
+  - - 9
+    - 11
+    - 12
+    - 15
+    - 20
+  scene: 449
+  sub_scenes:
+  - 0
+  - 4
+  type: validation
+scene0449_01-scene0449_02:
+  added:
+  - - 17
+    - 18
+  ambiguities:
+  - - 11
+    - 12
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0449_01-scene0449_02.txt
+  nonrigid:
+  - - 6
+    - 7
+  removed:
+  - []
+  rigid:
+  - - 9
+    - 11
+    - 12
+    - 14
+    - 15
+    - 16
+    - 20
+  scene: 449
+  sub_scenes:
+  - 1
+  - 2
+  type: validation
+scene0449_02-scene0449_00:
+  added:
+  - []
+  ambiguities:
+  - - 11
+    - 12
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0449_02-scene0449_00.txt
+  nonrigid:
+  - - 6
+    - 7
+  removed:
+  - []
+  rigid:
+  - - 9
+    - 11
+    - 12
+    - 20
+  scene: 449
+  sub_scenes:
+  - 2
+  - 0
+  type: validation
+scene0449_03-scene0449_01:
+  added:
+  - []
+  ambiguities:
+  - - 11
+    - 12
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0449_03-scene0449_01.txt
+  nonrigid:
+  - - 6
+    - 7
+  removed:
+  - - 17
+    - 18
+  rigid:
+  - - 9
+    - 10
+    - 11
+    - 12
+    - 14
+    - 15
+    - 16
+  scene: 449
+  sub_scenes:
+  - 3
+  - 1
+  type: validation
+scene0449_04-scene0449_05:
+  added:
+  - []
+  ambiguities:
+  - - 11
+    - 12
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0449_04-scene0449_05.txt
+  nonrigid:
+  - - 6
+    - 7
+  removed:
+  - - 16
+    - 17
+    - 18
+    - 44
+    - 104
+    - 105
+  rigid:
+  - - 10
+    - 11
+    - 12
+    - 15
+    - 19
+    - 20
+    - 26
+    - 27
+    - 34
+    - 57
+  scene: 449
+  sub_scenes:
+  - 4
+  - 5
+  type: validation
+scene0449_05-scene0449_03:
+  added:
+  - - 16
+    - 17
+    - 18
+    - 44
+    - 104
+    - 105
+  ambiguities:
+  - - 11
+    - 12
+  filepath: artifacts/reviewer_closure_v3/protocol_bridge/bridge_change_gt/scene0449_05-scene0449_03.txt
+  nonrigid:
+  - - 6
+    - 7
+  removed:
+  - []
+  rigid:
+  - - 10
+    - 11
+    - 12
+    - 15
+    - 19
+    - 20
+    - 26
+    - 27
+    - 34
+    - 57
+  scene: 449
+  sub_scenes:
+  - 5
+  - 3
+  type: validation

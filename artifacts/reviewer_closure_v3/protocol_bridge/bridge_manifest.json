@@ -1,0 +1,82 @@
+{
+  "cache_hash": null,
+  "cache_used": false,
+  "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+  "checkpoint_used": false,
+  "config_hash": "dd7a9fccc098fc7e5faecc059d6202ca7f8a762aaee3e7182738a2d7f800aac2",
+  "construction": {
+    "change_target": "T5 rows for canonical scans 1-2, first transition column only",
+    "future_stage_access": "forbidden",
+    "horizon": 2,
+    "order": "canonical",
+    "pair_substitution": "forbidden"
+  },
+  "gate_pb0": {
+    "canonical_prefix_count": 43,
+    "future_stage_leakage_count": 0,
+    "overlap_count": 14,
+    "overlap_parity_count": 14,
+    "pair_substitution_count": 0,
+    "reverse_pair_substitution_count": 0,
+    "status": "PASS",
+    "validation_supervised_count": 43
+  },
+  "generated_at": "2026-08-25T13:56:47Z",
+  "hardware": {
+    "gpu_inference": false
+  },
+  "outputs": {
+    "BRIDGE_BUILD_REPORT.md": {
+      "bytes": 1306,
+      "sha256": "cf2fb12d9d105df9878e58c7c8d7016adac57b9d314a24500b5d3c34dc1158ca"
+    },
+    "bridge_change_gt": {
+      "file_count": 43,
+      "sha256": "85f1e978de6ccbd460bf9c84ffe66cd5a83f2c6beccaeb83568ac81602fe01e5"
+    },
+    "bridge_inventory.csv": {
+      "bytes": 12875,
+      "sha256": "cc6632fc631056b882751b1eeaf6f8d06714302d82b8a06fbe1086ef5839f10d"
+    },
+    "sequence_database_protocol_b_exact_t2.yaml": {
+      "bytes": 14599,
+      "sha256": "c42f35cfddd65e92e70091e57b07b5772dac0484cd71272a8116354ac781bc60"
+    }
+  },
+  "protocol_hash": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "schema_version": 1,
+  "scripts": {
+    "builder": {
+      "reference": "repo:scripts/build_protocol_b_t2_bridge.py",
+      "sha256": "0e2cb9856c615545b631fa3e1b75773f6f8e7d48307eb03eb0e244fb914ad1c0"
+    },
+    "test": {
+      "reference": "repo:tests/test_protocol_b_t2_bridge.py",
+      "sha256": "86a888cb6c8354f8988f20622a5f6d50b2ddda2cde1379e337f9e7f3027cd8c4"
+    }
+  },
+  "source_commit": "a040c11e17d219c383ec3cf0199377efbe791e96",
+  "sources": {
+    "frozen_t2_inventory_audit": {
+      "reference": "repo:artifacts/tmap_root_cause_v2/PROTOCOL_SHIFT_AUDIT.md",
+      "sha256": "f861aa4f65e618bc34985e3fdb9e08bef79db81131c0d91907c3a43d8d746ce3"
+    },
+    "official_sliding_t2_database": {
+      "reference": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
+      "sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416"
+    },
+    "protocol_b_manifest": {
+      "reference": "repo:artifacts/P6A/protocol_b_manifest.json",
+      "sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe"
+    },
+    "source_t5_database": {
+      "reference": "repo:data/processed/rio/sequence_database_sliding_5.yaml",
+      "sha256": "252363f76524bb7eeff9f65b303aadda67dcd2646477daae1ac90f7f53398290"
+    },
+    "validation_scan_metadata": {
+      "reference": "repo:data/processed/rio/validation_database.yaml",
+      "sha256": "cc69f9de660e6be5b6aee739ee2580b614f132ad8c3a42ce2e301b4d4dbb1906"
+    }
+  },
+  "status": "pass"
+}
