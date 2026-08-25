@@ -60,7 +60,9 @@ class CandidateTrajectoryKey:
             try:
                 hash(self.persistent_track_id)
             except TypeError as error:
-                raise V2InferenceError("persistent track ID must be hashable") from error
+                raise V2InferenceError(
+                    "persistent track ID must be hashable"
+                ) from error
             if self.stage_index is not None or self.source_query_id is not None:
                 raise V2InferenceError("persistent key cannot contain ephemeral fields")
         elif (
@@ -93,9 +95,13 @@ class _Occurrence:
 class OfficialCandidateTrajectoryAccumulator:
     """Commit latest-stage official candidates under persistent/ephemeral keys."""
 
+    _SCORE_REDUCERS = frozenset({"mean", "latest", "max"})
+
     def __init__(self, *, score_reducer: str = "mean") -> None:
-        if score_reducer != "mean":
-            raise V2InferenceError("the preregistered score reducer must be mean")
+        if score_reducer not in self._SCORE_REDUCERS:
+            raise V2InferenceError(
+                f"score reducer must be one of {sorted(self._SCORE_REDUCERS)}"
+            )
         self.score_reducer = score_reducer
         self._stage_point_counts: list[int] = []
         self._keys: list[CandidateTrajectoryKey] = []
@@ -105,9 +111,7 @@ class OfficialCandidateTrajectoryAccumulator:
     def stage_count(self) -> int:
         return len(self._stage_point_counts)
 
-    def add_stage(
-        self, sidecar: Mapping[str, object], track_step: object
-    ) -> None:
+    def add_stage(self, sidecar: Mapping[str, object], track_step: object) -> None:
         validate_task_sidecar(sidecar)
         key = sidecar["key"]
         task = sidecar["task_prediction"]
@@ -177,9 +181,7 @@ class OfficialCandidateTrajectoryAccumulator:
     def snapshot(self) -> V2TrajectorySnapshot:
         total_points = sum(self._stage_point_counts)
         candidate_count = len(self._keys)
-        output_masks = torch.zeros(
-            (total_points, candidate_count), dtype=torch.bool
-        )
+        output_masks = torch.zeros((total_points, candidate_count), dtype=torch.bool)
         output_scores = torch.empty(candidate_count, dtype=torch.float32)
         output_classes = torch.empty(candidate_count, dtype=torch.long)
         offsets = [0]
@@ -194,9 +196,15 @@ class OfficialCandidateTrajectoryAccumulator:
                 if occurrence.mask.numel() != stop - start:
                     raise V2InferenceError("committed mask point count differs")
                 output_masks[start:stop, column] = occurrence.mask
-            output_scores[column] = sum(
-                occurrence.score for occurrence in occurrences
-            ) / len(occurrences)
+            if self.score_reducer == "mean":
+                score = sum(occurrence.score for occurrence in occurrences) / len(
+                    occurrences
+                )
+            elif self.score_reducer == "latest":
+                score = occurrences[-1].score
+            else:
+                score = max(occurrence.score for occurrence in occurrences)
+            output_scores[column] = score
             output_classes[column] = key.class_id
         return V2TrajectorySnapshot(
             prediction={

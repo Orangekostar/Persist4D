@@ -1,0 +1,101 @@
+{
+  "channel_contract": {
+    "local_current": "latest-stage official sidecar with raw-local stmetrics",
+    "trajectory": "causal linked candidates with explicit score reducer",
+    "trajectory_current_slice_is_local_current": false
+  },
+  "coverage": {
+    "aggregate_row_count": 144,
+    "horizons": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "orders": [
+      "canonical",
+      "reverse",
+      "sha256_seed45"
+    ],
+    "per_cluster_row_count": 648,
+    "per_sequence_row_count": 4644,
+    "reducers": [
+      "mean",
+      "latest",
+      "max"
+    ],
+    "reference_cluster_count": 6,
+    "sequence_count": 129,
+    "trackers": [
+      "B2",
+      "B3",
+      "B4"
+    ]
+  },
+  "execution": {
+    "gpu_inference_performed": false,
+    "metric_backend": "stmetrics via OfficialMetricAccumulator",
+    "mode": "frozen_cache_postprocessing"
+  },
+  "gate_ev0": {
+    "local_current_invariance": {
+      "group_count": 516,
+      "status": "pass_exact"
+    },
+    "mean_v2_regression_max_abs_diff": 0.0,
+    "primary_reducer": "mean",
+    "score_only_snapshot_check_count": 1935,
+    "score_only_snapshot_status": "pass_exact",
+    "sensitivity_reducers": [
+      "latest",
+      "max"
+    ],
+    "status": "PASS"
+  },
+  "generated_at": "2026-08-25T22:19:31.913299Z",
+  "inputs": {
+    "cache_manifest": {
+      "reference": "repo:artifacts/system_comparison_v2/cache_manifest.json",
+      "sha256": "f525252cd306f29e7db80788e4d5c773d2a35c8767d5eaa63b189740ea212182"
+    },
+    "cache_records_sha256": "4d31692ef503a8126116aa0b752f02a3ed9be4b181ca5f49651e9dcdd9a96a46",
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "config_sha256": "aadca1c1608bae4ad4e812a6261536d9e386a85c460bbd85f4c5d215c9a68717",
+    "external_cache_root": "external:/mnt/shared/ww/persist4d-tmap-root-cause-v2/system_comparison_v2_full",
+    "frozen_v2_manifest": {
+      "reference": "repo:artifacts/system_comparison_v2/manifest.json",
+      "sha256": "48b708f86097003faa2d8c64658e1676a6aaa82033e9e057811d995f9a22f8f4"
+    },
+    "protocol_manifest_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+    "reproducibility_binding": {
+      "reference": "repo:artifacts/system_comparison/reproducibility_binding.json",
+      "sha256": "acb86339d9462144fbcc85bc169bbf37c34845dd272b77a7910e8298f00eb995"
+    }
+  },
+  "outputs": {
+    "SCORE_REDUCER_SENSITIVITY.md": {
+      "bytes": 1519,
+      "sha256": "ae5ad16b02158128dd3a38dab150aae2b9d90df16a3c2c0c14066a34845d83f5"
+    },
+    "aggregate.csv": {
+      "bytes": 42383,
+      "sha256": "aeb8eb86933e608af79713f057a91bf47f1573d1713d8a470bc516454025e3b9"
+    },
+    "per_cluster.csv": {
+      "bytes": 223890,
+      "sha256": "8c1f9e92769da9bac1d9c4ab505acdfbf7bfff10d10b3c469c355313a96eb284"
+    },
+    "per_sequence.csv": {
+      "bytes": 2925746,
+      "sha256": "bb9ecfe9306ccb38d09e0c39e6c12474bf6bbdbb48f91fc3d49d29fa5527bf3e"
+    }
+  },
+  "schema_version": 1,
+  "scripts": {
+    "score_sensitivity_sha256": "9cf3fb58568c5411d611751d9fe9bb333bfd31b3ea320270bc4e7600d5eab4d2",
+    "test_sha256": "9cac35c5c2dd4b4e1a01b8dd05d702870c82a63cfd154e7e89755b3de728a028",
+    "trajectory_accumulator_sha256": "49787b1babff24b4f2892538e3bcf6694f3b9a1c003da36aadec67c273b2381b"
+  },
+  "source_commit": "e66ba197fcedbab58aa9a464a16bc9b0af0b91d6",
+  "status": "pass"
+}
