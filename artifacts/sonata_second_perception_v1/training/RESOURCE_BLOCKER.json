@@ -1,0 +1,40 @@
+{
+  "candidate_id": "d98291fd2dd14d089663d86e79acd9d0c5daad11012bc818e80bee6c7f5a17f8",
+  "completed_epochs": 0,
+  "evidence": {
+    "console_log_ref": "external:sonata_training_output/formal_training_console.log",
+    "runtime_events_ref": "external:sonata_training_output/.sonata_runtime_events.jsonl"
+  },
+  "failed_attempts": [
+    {
+      "allocator": "default",
+      "batch_index": 254,
+      "discarded_optimizer_steps": 63,
+      "free_vram_mib": 231.12,
+      "requested_allocation_mib": 274.0,
+      "reserved_unallocated_vram_mib": 5007.36
+    },
+    {
+      "allocator": "expandable_segments",
+      "batch_index": 254,
+      "discarded_optimizer_steps": 63,
+      "free_vram_mib": 334.44,
+      "requested_allocation_mib": 364.0,
+      "reserved_unallocated_vram_mib": 403.94
+    }
+  ],
+  "gate": "SS4-RESOURCE-BLOCKED",
+  "no_checkpoint_available": true,
+  "proposed_reauthorization": {
+    "accumulate_grad_batches": 8,
+    "effective_global_batch": 32,
+    "microbatch_per_gpu": 2,
+    "requires_new_candidate": true,
+    "world_size": 2
+  },
+  "reason": "The preregistered per-GPU microbatch 4 deterministically exceeds A40 memory on a training batch; allocator fragmentation is not the root cause.",
+  "schema_version": 1,
+  "source_commit": "d6b8d8154c3b9f69e936309a5ffa8bbe6e85ea7e",
+  "source_tree_sha256": "1d007d818eaf68cc137db6be2763219692599629985cc4d96bf11d7eb278d0e2",
+  "status": "blocked"
+}
