@@ -34,7 +34,7 @@ general:
   sonata_fail_closed_runtime: true
 
 data:
-  batch_size: 4
+  batch_size: 2
   voxel_size: 0.02
   train_dataset:
     filter_out_classes: [0, 1, 255]
@@ -91,5 +91,5 @@ scheduler:
 
 trainer:
   max_epochs: 450
-  accumulate_grad_batches: 4
+  accumulate_grad_batches: 8
   precision: 32-true

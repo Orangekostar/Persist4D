@@ -9,6 +9,7 @@ import importlib.metadata
 import json
 import os
 import platform
+import re
 import stat
 import subprocess
 from collections.abc import Mapping
@@ -48,6 +49,59 @@ def canonical_sha256(payload: object) -> str:
         separators=(",", ":"),
     )
     return hashlib.sha256(serialized.encode("ascii")).hexdigest()
+
+
+def validate_formal_resource_blocker(payload: Mapping[str, Any]) -> dict[str, Any]:
+    """Validate and normalize the failed physical-batch evidence."""
+
+    if (
+        payload.get("schema_version") != 1
+        or payload.get("status") != "blocked"
+        or payload.get("gate") != "SS4-RESOURCE-BLOCKED"
+        or payload.get("completed_epochs") != 0
+        or payload.get("no_checkpoint_available") is not True
+    ):
+        raise SonataSecondPreflightError("formal resource blocker is invalid")
+    candidate_id = payload.get("candidate_id")
+    if not isinstance(candidate_id, str) or not re.fullmatch(
+        r"[0-9a-f]{64}", candidate_id
+    ):
+        raise SonataSecondPreflightError("resource blocker candidate ID is invalid")
+    failed = payload.get("failed_configuration")
+    expected_failed = {
+        "microbatch_per_gpu": 4,
+        "world_size": 2,
+        "accumulate_grad_batches": 4,
+        "effective_global_batch": 32,
+    }
+    replacement = payload.get("proposed_reauthorization")
+    expected_replacement = {
+        "microbatch_per_gpu": 2,
+        "world_size": 2,
+        "accumulate_grad_batches": 8,
+        "effective_global_batch": 32,
+        "requires_new_candidate": True,
+    }
+    if failed != expected_failed or replacement != expected_replacement:
+        raise SonataSecondPreflightError("resource blocker batch recipe differs")
+    attempts = payload.get("failed_attempts")
+    if not isinstance(attempts, list) or len(attempts) != 2:
+        raise SonataSecondPreflightError("resource blocker replay count differs")
+    if {item.get("allocator") for item in attempts if isinstance(item, Mapping)} != {
+        "default",
+        "expandable_segments",
+    } or any(
+        not isinstance(item, Mapping) or item.get("batch_index") != 254
+        for item in attempts
+    ):
+        raise SonataSecondPreflightError("resource blocker replay evidence differs")
+    return {
+        "gate": "SS4-RESOURCE-BLOCKED",
+        "superseded_candidate_id": candidate_id,
+        "failed_microbatch_per_gpu": 4,
+        "replacement_microbatch_per_gpu": 2,
+        "independent_replays": 2,
+    }
 
 
 def _stable_file_hash(path: Path) -> tuple[int, str]:
@@ -791,8 +845,8 @@ def validate_sonata_training_config_contract(
         "general.experiment_name": SONATA_EXPERIMENT_NAME,
         "general.sonata_weighted_objective": True,
         "general.sonata_fail_closed_runtime": True,
-        "data.batch_size": 4,
-        "data.train_dataloader.batch_size": 4,
+        "data.batch_size": 2,
+        "data.train_dataloader.batch_size": 2,
         "data.voxel_size": 0.02,
         "data.train_dataset._target_": (
             "datasets.multi_dataset.MultiDataset.from_config"
@@ -841,7 +895,7 @@ def validate_sonata_training_config_contract(
         "scheduler.scheduler.max_lr": 0.0005,
         "scheduler.pytorch_lightning_params.interval": "step",
         "trainer.max_epochs": 450,
-        "trainer.accumulate_grad_batches": 4,
+        "trainer.accumulate_grad_batches": 8,
         "trainer.precision": "32-true",
     }
     errors: list[str] = []

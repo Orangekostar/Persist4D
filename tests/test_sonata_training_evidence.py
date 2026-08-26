@@ -116,27 +116,57 @@ def test_unique_candidate_refuses_unowned_checkpoints(tmp_path: Path) -> None:
         authorize_unique_candidate(tmp_path, contract)
 
 
-def test_candidate_contract_uses_frozen_real_budget() -> None:
+def test_candidate_contract_uses_frozen_real_budget(tmp_path: Path) -> None:
     from scripts.run_sonata_second_training import (
-        DEFAULT_ARTIFACT_DIR,
+        RESOURCE_BLOCKER_PATH,
         _candidate_contract,
     )
+    from utils.sonata_second_preflight import file_sha256
 
-    smoke = json.loads(
-        (
-            Path(__file__).resolve().parents[1]
-            / "artifacts/sonata_second_perception_v1/smoke/smoke_results.json"
-        ).read_text(encoding="ascii")
+    (tmp_path / "preflight_authorization.json").write_text(
+        json.dumps({"authorization_sha256": "a" * 64, "bindings": {}}),
+        encoding="ascii",
     )
+    (tmp_path / "data_manifest.json").write_text(
+        json.dumps({"mixed_runtime": {"sampler_num_samples": 2112}}),
+        encoding="ascii",
+    )
+    (tmp_path / "training_semantics.json").write_text(
+        json.dumps(
+            {
+                "physical_batch_per_device": 2,
+                "accumulate_grad_batches": 8,
+                "effective_global_batch": 32,
+            }
+        ),
+        encoding="ascii",
+    )
+    smoke = {
+        "authorization_sha256": "b" * 64,
+        "bindings": {
+            "resource_blocker_sha256": file_sha256(RESOURCE_BLOCKER_PATH)
+        },
+    }
 
     contract = _candidate_contract(
-        artifact_dir=DEFAULT_ARTIFACT_DIR,
+        artifact_dir=tmp_path,
         smoke_authorization=smoke,
         devices=(1, 2),
     )
 
     assert contract["recipe"]["samples_per_epoch"] == 2112
     assert contract["recipe"]["optimizer_steps_per_epoch"] == 66
+    assert contract["recipe"]["microbatch_per_gpu"] == 2
+    assert contract["recipe"]["accumulate_grad_batches"] == 8
+    assert contract["recipe"]["effective_global_batch"] == 32
+    assert contract["reauthorization"] == {
+        "basis": "user_authorized_recommended_configuration_after_resource_failure",
+        "reason_gate": "SS4-RESOURCE-BLOCKED",
+        "resource_blocker_sha256": file_sha256(RESOURCE_BLOCKER_PATH),
+        "supersedes_candidate_id": (
+            "d98291fd2dd14d089663d86e79acd9d0c5daad11012bc818e80bee6c7f5a17f8"
+        ),
+    }
 
 
 def _completed_runtime(output_dir: Path, *, epochs: int = 450) -> None:

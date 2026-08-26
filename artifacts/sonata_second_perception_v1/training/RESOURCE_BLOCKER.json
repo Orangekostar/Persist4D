@@ -5,6 +5,12 @@
     "console_log_ref": "external:sonata_training_output/formal_training_console.log",
     "runtime_events_ref": "external:sonata_training_output/.sonata_runtime_events.jsonl"
   },
+  "failed_configuration": {
+    "accumulate_grad_batches": 4,
+    "effective_global_batch": 32,
+    "microbatch_per_gpu": 4,
+    "world_size": 2
+  },
   "failed_attempts": [
     {
       "allocator": "default",

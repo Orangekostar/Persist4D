@@ -32,6 +32,7 @@ from utils.sonata_second_preflight import (
     directory_content_manifest,
     file_sha256,
     portable_resolved_config,
+    validate_formal_resource_blocker,
     validate_sonata_preflight_authorization,
     validate_sonata_training_config_contract,
 )
@@ -46,6 +47,13 @@ DEFAULT_ARTIFACT_DIR = (
 )
 DEFAULT_DEVICES = (1, 2)
 CANDIDATE_RECORD_NAME = ".sonata_second_candidate.json"
+RESOURCE_BLOCKER_PATH = (
+    PROJECT_ROOT
+    / "artifacts"
+    / "sonata_second_perception_v1"
+    / "training"
+    / "RESOURCE_BLOCKER.json"
+)
 
 
 def _load_json(path: Path, *, name: str) -> dict[str, Any]:
@@ -277,11 +285,26 @@ def _candidate_contract(
         Path(artifact_dir) / "training_semantics.json",
         name="Sonata training semantics",
     )
+    resource_blocker = _load_json(
+        RESOURCE_BLOCKER_PATH, name="Sonata formal resource blocker"
+    )
+    blocker_evidence = validate_formal_resource_blocker(resource_blocker)
+    blocker_sha256 = file_sha256(RESOURCE_BLOCKER_PATH)
+    smoke_bindings = smoke_authorization.get("bindings", {})
+    if smoke_bindings.get("resource_blocker_sha256") != blocker_sha256:
+        raise SonataSecondPreflightError("SSMOKE resource blocker binding differs")
     samples_per_epoch = data_manifest.get("mixed_runtime", {}).get(
         "sampler_num_samples"
     )
     effective_batch = training_semantics.get("effective_global_batch")
-    if samples_per_epoch != 2112 or effective_batch != 32:
+    microbatch = training_semantics.get("physical_batch_per_device")
+    accumulation = training_semantics.get("accumulate_grad_batches")
+    if (
+        samples_per_epoch != 2112
+        or microbatch != 2
+        or accumulation != 8
+        or effective_batch != 32
+    ):
         raise SonataSecondPreflightError("formal training budget inputs mismatch")
     bindings = dict(preflight.get("bindings", {}))
     bindings["preflight_authorization_sha256"] = preflight.get(
@@ -291,6 +314,7 @@ def _candidate_contract(
         "authorization_sha256"
     )
     bindings["weight_sha256"] = OFFICIAL_SONATA_WEIGHT_SPEC.sha256
+    bindings["resource_blocker_sha256"] = blocker_sha256
     payload: dict[str, Any] = {
         "schema_version": 1,
         "status": "active",
@@ -299,12 +323,25 @@ def _candidate_contract(
             "seed": 45,
             "epochs": 450,
             "devices": list(devices),
+            "microbatch_per_gpu": microbatch,
+            "accumulate_grad_batches": accumulation,
+            "effective_global_batch": effective_batch,
             "samples_per_epoch": samples_per_epoch,
             "optimizer_steps_per_epoch": (
                 samples_per_epoch + effective_batch - 1
             )
             // effective_batch,
             "checkpoint_selection": "highest val_mean_t-AP",
+        },
+        "reauthorization": {
+            "basis": (
+                "user_authorized_recommended_configuration_after_resource_failure"
+            ),
+            "reason_gate": blocker_evidence["gate"],
+            "resource_blocker_sha256": blocker_sha256,
+            "supersedes_candidate_id": blocker_evidence[
+                "superseded_candidate_id"
+            ],
         },
     }
     payload["candidate_id"] = canonical_sha256(payload)
@@ -373,7 +410,8 @@ def main() -> int:
     command = [
         sys.executable,
         str(PROJECT_ROOT / "main_instance_segmentation.py"),
-        f"--config-name={SONATA_CONFIG_NAME}",
+        "--config-name",
+        SONATA_CONFIG_NAME,
     ]
     os.execve(sys.executable, command, environment)
     return 1

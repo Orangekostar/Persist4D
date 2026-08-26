@@ -333,10 +333,11 @@ def test_smoke_authorization_binds_source_sp0_batch_gradients_query_and_devices(
             "batch_feasibility_sha256": "3" * 64,
             "gradient_contract_sha256": "4" * 64,
             "query_interface_sha256": "5" * 64,
+            "resource_blocker_sha256": "6" * 64,
         },
         "batch_selection": {
-            "microbatch_per_gpu": 4,
-            "accumulate_grad_batches": 4,
+            "microbatch_per_gpu": 2,
+            "accumulate_grad_batches": 8,
             "effective_global_batch": 32,
             "selection_uses_validation_accuracy": False,
         },
@@ -351,12 +352,13 @@ def test_smoke_authorization_binds_source_sp0_batch_gradients_query_and_devices(
         batch_feasibility_sha256="3" * 64,
         gradient_contract_sha256="4" * 64,
         query_interface_sha256="5" * 64,
-        expected_microbatch_per_gpu=4,
-        expected_accumulation=4,
+        resource_blocker_sha256="6" * 64,
+        expected_microbatch_per_gpu=2,
+        expected_accumulation=8,
         expected_devices=(1, 2),
     )
 
-    payload["batch_selection"]["accumulate_grad_batches"] = 8
+    payload["batch_selection"]["accumulate_grad_batches"] = 4
     with pytest.raises(SonataSecondPreflightError, match="payload hash"):
         validate_smoke_authorization(
             payload,
@@ -365,8 +367,9 @@ def test_smoke_authorization_binds_source_sp0_batch_gradients_query_and_devices(
             batch_feasibility_sha256="3" * 64,
             gradient_contract_sha256="4" * 64,
             query_interface_sha256="5" * 64,
-            expected_microbatch_per_gpu=4,
-            expected_accumulation=4,
+            resource_blocker_sha256="6" * 64,
+            expected_microbatch_per_gpu=2,
+            expected_accumulation=8,
             expected_devices=(1, 2),
         )
 
@@ -465,6 +468,17 @@ def test_training_execute_binds_selected_same_numa_devices(
         raise ExecutionCalled
 
     monkeypatch.setattr(smoke, "require_smoke_authorization", accept_smoke)
+    monkeypatch.setattr(
+        launcher,
+        "_candidate_contract",
+        lambda **_kwargs: {
+            "schema_version": 1,
+            "status": "active",
+            "candidate_id": "a" * 64,
+            "bindings": {},
+            "recipe": {"seed": 45, "epochs": 450, "devices": [1, 2]},
+        },
+    )
     monkeypatch.setattr(launcher.os, "execve", capture_execve)
     monkeypatch.setattr(
         sys,
@@ -485,13 +499,19 @@ def test_training_execute_binds_selected_same_numa_devices(
         launcher.main()
 
     assert captured["smoke_kwargs"] == {
-        "expected_microbatch_per_gpu": 4,
-        "expected_accumulation": 4,
+        "expected_microbatch_per_gpu": 2,
+        "expected_accumulation": 8,
         "expected_devices": (1, 2),
     }
     environment = captured["environment"]
     assert isinstance(environment, dict)
     assert environment["CUDA_VISIBLE_DEVICES"] == "1,2"
+    assert captured["command"] == [
+        sys.executable,
+        str(Path(__file__).resolve().parents[1] / "main_instance_segmentation.py"),
+        "--config-name",
+        "config_rescene4d_sonata_second",
+    ]
 
 
 def test_preflight_composition_materializes_runtime_paths_before_env_restore(

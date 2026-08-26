@@ -7,6 +7,7 @@ import pytest
 import torch
 
 from scripts.sonata_second_smoke import (
+    apply_formal_resource_blocker,
     build_load_interface_contract,
     classify_sonata_parameters,
     select_batch_configuration,
@@ -108,6 +109,74 @@ def test_batch_selection_uses_largest_stable_divisor_without_accuracy() -> None:
     records[1]["finite_gradients"] = False
     selected = select_batch_configuration(records, gpu_count=2)
     assert selected["microbatch_per_gpu"] == 1
+
+
+def test_formal_training_oom_supersedes_the_p95_probe() -> None:
+    records = [
+        {
+            "microbatch_per_gpu": 2,
+            "status": "stable",
+            "finite_loss": True,
+            "finite_gradients": True,
+            "safe_headroom": True,
+            "peak_vram_mib": 18000.0,
+            "memory_total_mib": 46068.0,
+            "samples_per_second": 1.5,
+        },
+        {
+            "microbatch_per_gpu": 4,
+            "status": "stable",
+            "finite_loss": True,
+            "finite_gradients": True,
+            "safe_headroom": True,
+            "peak_vram_mib": 36000.0,
+            "memory_total_mib": 46068.0,
+            "samples_per_second": 1.6,
+        },
+    ]
+    blocker = {
+        "schema_version": 1,
+        "status": "blocked",
+        "gate": "SS4-RESOURCE-BLOCKED",
+        "candidate_id": "a" * 64,
+        "completed_epochs": 0,
+        "no_checkpoint_available": True,
+        "failed_configuration": {
+            "microbatch_per_gpu": 4,
+            "world_size": 2,
+            "accumulate_grad_batches": 4,
+            "effective_global_batch": 32,
+        },
+        "failed_attempts": [
+            {"allocator": "default", "batch_index": 254},
+            {"allocator": "expandable_segments", "batch_index": 254},
+        ],
+        "proposed_reauthorization": {
+            "microbatch_per_gpu": 2,
+            "world_size": 2,
+            "accumulate_grad_batches": 8,
+            "effective_global_batch": 32,
+            "requires_new_candidate": True,
+        },
+    }
+
+    updated, evidence = apply_formal_resource_blocker(records, blocker)
+
+    assert records[1]["status"] == "stable"
+    assert updated[1]["status"] == "oom_observed_formal_training"
+    assert updated[1]["finite_loss"] is False
+    assert updated[1]["finite_gradients"] is False
+    assert updated[1]["safe_headroom"] is False
+    assert evidence == {
+        "gate": "SS4-RESOURCE-BLOCKED",
+        "superseded_candidate_id": "a" * 64,
+        "failed_microbatch_per_gpu": 4,
+        "replacement_microbatch_per_gpu": 2,
+        "independent_replays": 2,
+    }
+    assert select_batch_configuration(updated, gpu_count=2)[
+        "microbatch_per_gpu"
+    ] == 2
 
 
 def test_query_interface_and_tiny_optimization_contract() -> None:

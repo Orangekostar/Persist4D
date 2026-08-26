@@ -34,6 +34,7 @@ from utils.sonata_second_preflight import (
     build_sonata_source_tree_contract,
     canonical_sha256,
     file_sha256,
+    validate_formal_resource_blocker,
 )
 from utils.sonata_weight_provenance import OFFICIAL_SONATA_WEIGHT_SPEC
 
@@ -41,6 +42,13 @@ PREFLIGHT_DIR = (
     PROJECT_ROOT / "artifacts" / "sonata_second_perception_v1" / "preflight"
 )
 SMOKE_DIR = PROJECT_ROOT / "artifacts" / "sonata_second_perception_v1" / "smoke"
+RESOURCE_BLOCKER_PATH = (
+    PROJECT_ROOT
+    / "artifacts"
+    / "sonata_second_perception_v1"
+    / "training"
+    / "RESOURCE_BLOCKER.json"
+)
 TINY_T2_SAMPLE = "scene0112_00-scene0112_01"
 RESOURCE_SAMPLE_INDICES = {"rio": 359, "scannet": 921}
 MICROBATCH_CANDIDATES = (1, 2, 4, 8, 16)
@@ -307,6 +315,40 @@ def select_batch_configuration(
         "effective_global_batch": target_effective_batch,
         "selection_uses_validation_accuracy": False,
     }
+
+
+def apply_formal_resource_blocker(
+    records: Sequence[Mapping[str, Any]], blocker: Mapping[str, Any]
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Supersede a short p95 probe with the stronger full-loader OOM evidence."""
+
+    evidence = validate_formal_resource_blocker(blocker)
+    failed_microbatch = evidence["failed_microbatch_per_gpu"]
+    updated: list[dict[str, Any]] = []
+    found = False
+    for record in records:
+        item = dict(record)
+        if item.get("microbatch_per_gpu") == failed_microbatch:
+            found = True
+            item.update(
+                {
+                    "probe_scope": (
+                        f"{item.get('probe_scope', 'resource_probe')}"
+                        "+formal_epoch0_replay"
+                    ),
+                    "status": "oom_observed_formal_training",
+                    "finite_loss": False,
+                    "finite_gradients": False,
+                    "loss": "",
+                    "safe_headroom": False,
+                }
+            )
+        updated.append(item)
+    if not found:
+        raise SonataSecondPreflightError(
+            "resource probe omits the formally failed microbatch"
+        )
+    return updated, evidence
 
 
 def validate_query_interface(
@@ -1010,8 +1052,7 @@ def _write_batch_artifacts(
     content = csv_path.read_text(encoding="utf-8")
     _artifact_privacy(content)
     topology = hardware["links"][0]["interconnect"]
-    markdown = "\n".join(
-        [
+    lines = [
             "# Sonata Batch Selection",
             "",
             "- Gate scope: resource feasibility only; validation accuracy was not inspected.",
@@ -1024,11 +1065,24 @@ def _write_batch_artifacts(
             f"- Effective global batch: {selection['effective_global_batch']}",
             "- Probe: one real forward/backward on fixed approximately 95th-percentile mixed-data samples.",
             "- Interpretation: this preserves the effective batch target but does not claim unpublished official physical-batch equivalence.",
+    ]
+    blocker = details.get("formal_resource_blocker")
+    if isinstance(blocker, Mapping):
+        lines.extend(
+            [
+                f"- Formal replay gate: `{blocker['gate']}`.",
+                "- The p95 microbatch-4 result is superseded by two deterministic full-loader epoch-0 OOM replays.",
+                f"- Resource blocker SHA-256: `{blocker['resource_blocker_sha256']}`.",
+            ]
+        )
+    lines.extend(
+        [
             "",
             f"Candidate sample bindings: `{canonical_sha256(details)}`.",
             "",
         ]
     )
+    markdown = "\n".join(lines)
     _write_text(PREFLIGHT_DIR / "BATCH_SELECTION.md", markdown)
 
 
@@ -1059,6 +1113,7 @@ def _issue_smoke_results(
         "batch_feasibility_sha256": file_sha256(batch_path),
         "gradient_contract_sha256": file_sha256(gradient_path),
         "query_interface_sha256": file_sha256(query_path),
+        "resource_blocker_sha256": file_sha256(RESOURCE_BLOCKER_PATH),
     }
     payload = {
         "schema_version": 1,
@@ -1082,6 +1137,7 @@ def validate_smoke_authorization(
     batch_feasibility_sha256: str,
     gradient_contract_sha256: str,
     query_interface_sha256: str,
+    resource_blocker_sha256: str,
     expected_microbatch_per_gpu: int,
     expected_accumulation: int,
     expected_devices: Sequence[int],
@@ -1100,6 +1156,7 @@ def validate_smoke_authorization(
         "batch_feasibility_sha256": batch_feasibility_sha256,
         "gradient_contract_sha256": gradient_contract_sha256,
         "query_interface_sha256": query_interface_sha256,
+        "resource_blocker_sha256": resource_blocker_sha256,
     }
     if not isinstance(bindings, Mapping) or any(
         bindings.get(key) != value for key, value in expected_bindings.items()
@@ -1142,6 +1199,7 @@ def require_smoke_authorization(
             smoke_dir / "gradient_contract.json"
         ),
         query_interface_sha256=file_sha256(smoke_dir / "query_interface.json"),
+        resource_blocker_sha256=file_sha256(RESOURCE_BLOCKER_PATH),
         expected_microbatch_per_gpu=expected_microbatch_per_gpu,
         expected_accumulation=expected_accumulation,
         expected_devices=expected_devices,
@@ -1198,6 +1256,12 @@ def run_smoke(
         device,
         gpu_count=len(devices),
     )
+    blocker = _load_json(RESOURCE_BLOCKER_PATH, label="formal resource blocker")
+    records, blocker_evidence = apply_formal_resource_blocker(records, blocker)
+    details["formal_resource_blocker"] = {
+        **blocker_evidence,
+        "resource_blocker_sha256": file_sha256(RESOURCE_BLOCKER_PATH),
+    }
     selection = select_batch_configuration(records, gpu_count=len(devices))
     _write_batch_artifacts(records, selection, hardware, details)
 
