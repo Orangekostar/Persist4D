@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "captured_at_utc": "2026-08-26T07:52:39Z",
+  "branch": "research/persist4d-sonata-second-perception-v1",
+  "start_commit": "e5d7f4e96fedc76c0c6d414ab293f54909c61df3",
+  "tracked_worktree_clean": true,
+  "origin": "github:Orangekostar/Persist4D",
+  "frozen_inputs": {
+    "reviewer_closure_v3_report": {
+      "ref": "repo:artifacts/reviewer_closure_v3/FINAL_REVIEWER_CLOSURE_V3.md",
+      "sha256": "265efb46684727194f76eff88b2a662dc2de1369987c80cdf43a6d320f9acf1d"
+    },
+    "reviewer_closure_v3_manifest": {
+      "ref": "repo:artifacts/reviewer_closure_v3/FINAL_MANIFEST.json",
+      "sha256": "73f87bd094ef13f5dbf555c71fb7604ca42ea7bcef1d6dd3f31fc9e1eae99c42"
+    },
+    "concerto_pretrained_weight": {
+      "ref": "local_cache:persist4d/concerto/concerto_base.pth",
+      "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+      "bytes": 433987358
+    },
+    "current_concerto_task_checkpoint": {
+      "ref": "external:frozen_v3_checkpoint",
+      "sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e"
+    },
+    "protocol_b_manifest": {
+      "ref": "repo:artifacts/P6A/protocol_b_manifest.json",
+      "sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe"
+    }
+  },
+  "external_sources": {
+    "rescene4d": {
+      "ref": "github:GradientSpaces/rescene4d",
+      "revision": "fb2fe42eb8f1e926567c48eea9acb874e608ee10",
+      "readme_sha256": "4550760cce90bc372175cc9638148c6cf6d581058b24c590bf0c88c27a31d070",
+      "checkpoint_status": "Coming soon"
+    },
+    "sonata_code": {
+      "ref": "github:facebookresearch/sonata",
+      "revision": "18c09ff8d713494f78a8213792262b910977a65d",
+      "readme_sha256": "345a3dd5f4d2712cb427e768e5159a4b05ac30588b3aaebc5efeffdcdd15667c"
+    },
+    "sonata_weight_repo": {
+      "ref": "huggingface:facebook/sonata",
+      "revision": "df99897472c09f91ba9288da0a034aacffc0b010",
+      "filename": "sonata.pth",
+      "declared_lfs_sha256": "c5ced5acdae30d1c469713398073a866e25e6e414e23feed5dc025373657ac50",
+      "declared_bytes": 434008287,
+      "gated": false
+    }
+  },
+  "baseline_verification": {
+    "command_ref": "pytest:frozen_sonata_prerequisite_regressions",
+    "passed": 57,
+    "failed": 0,
+    "duration_seconds": 10.71,
+    "status": "pass"
+  },
+  "status": "pass"
+}
+
