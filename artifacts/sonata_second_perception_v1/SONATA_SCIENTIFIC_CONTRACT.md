@@ -78,4 +78,3 @@ key, unexplained unexpected key, missing/invalid mixed data, config mismatch,
 non-finite batch/gradient/loss, failed local-candidate invariance, or failed
 stage gate. A newly released official ReScene task checkpoint is recorded and
 reported but never silently substituted.
-

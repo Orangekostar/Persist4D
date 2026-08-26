@@ -146,4 +146,3 @@ all 10 Sonata tests, frozen regressions, changed-file ruff, broader tests where
 available, `git diff --check`, large-file exclusion, portable paths, and no
 V1/V2/V3 mutation. Inspect the complete diff, commit each stage separately,
 push the branch to `origin`, and report the required 24 items in order.
-

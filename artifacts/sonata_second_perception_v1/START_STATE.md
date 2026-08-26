@@ -24,4 +24,3 @@ The official ReScene4D README still reports task checkpoints as `Coming soon`.
 The declared official `sonata.pth` object is public, 434,008,287 bytes, with LFS
 SHA-256 `c5ced5acdae30d1c469713398073a866e25e6e414e23feed5dc025373657ac50`.
 Observed local bytes/hash are deferred to SS1.
-

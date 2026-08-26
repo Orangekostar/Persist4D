@@ -76,4 +76,3 @@ gate stops the affected downstream stages without weakening the contract.
 - A training interruption may resume only the same candidate from a verified
   epoch-boundary checkpoint with recorded runtime events.
 - No final Sonata result may tune checkpoint epoch, trackers, or score reducer.
-
