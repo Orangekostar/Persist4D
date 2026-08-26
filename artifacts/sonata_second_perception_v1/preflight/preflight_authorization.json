@@ -1,22 +1,22 @@
 {
-  "authorization_sha256": "675708bff07447655926013cb2cbb8103429a0d703fa199aa07b570078676667",
+  "authorization_sha256": "7d48bdacb1aa6f1380a811204b871da3e3ecfa2480bc60de2cb8083190d153be",
   "bindings": {
-    "config_sha256": "7f2f7069f6498e800302b568a826f8a0c4facfbf60c55c09375a545a0ca0c674",
+    "config_sha256": "16e65bf747ffa245b8711270c1297f26baf20e810c33d1398795cc04290b6937",
     "data_manifest_sha256": "694d4394b481b02bf49573dc121276a452526fe274657ca7d1915ba0afba5c4e",
-    "environment_manifest_sha256": "54385a7179de6bb43a6d0c3b917af493d9b73d2cf7d1e32c71f54029fe1ad0d6",
-    "source_commit": "d6b8d8154c3b9f69e936309a5ffa8bbe6e85ea7e",
-    "source_tree_sha256": "1d007d818eaf68cc137db6be2763219692599629985cc4d96bf11d7eb278d0e2",
-    "training_semantics_sha256": "01020bb2d80cf05c06f966cd2ca8750d89631ac1365299edf7e041017f3aba0f",
+    "environment_manifest_sha256": "a063f2c860a66b54d54a685b9ce0e1925d05ccf061777f4670657303cf6d2aac",
+    "source_commit": "7c61d89bcb70ec89ce9b857c6ec6321acb1d7f1e",
+    "source_tree_sha256": "9aa27db8e8608c965f0ae7cfb380261ce86ed21120dbb077776a174c603155cc",
+    "training_semantics_sha256": "b961df5d9b3caa391f0c651e21fbb05b636cbc60dbf2e457196bd2d98a200948",
     "weight_manifest_sha256": "cf9b129cb58fea76c76632134dfd225eccfa065fd2a5ef58f93427c56fe150e7"
   },
   "gate": "SP0-PASS",
-  "issued_at": "2026-08-26T09:50:04Z",
+  "issued_at": "2026-08-26T10:41:09Z",
   "max_age_seconds": 86400,
   "repository": {
     "authorized_start_commit": "e5d7f4e96fedc76c0c6d414ab293f54909c61df3",
     "branch": "research/persist4d-sonata-second-perception-v1",
     "repository_root": "repo:.",
-    "source_commit": "d6b8d8154c3b9f69e936309a5ffa8bbe6e85ea7e",
+    "source_commit": "7c61d89bcb70ec89ce9b857c6ec6321acb1d7f1e",
     "start_is_ancestor": true
   },
   "schema_version": 1,

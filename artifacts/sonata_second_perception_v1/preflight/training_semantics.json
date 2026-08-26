@@ -1,5 +1,5 @@
 {
-  "accumulate_grad_batches": 4,
+  "accumulate_grad_batches": 8,
   "checkpoint_selection": {
     "mode": "max",
     "monitor": "val_mean_t-AP",
@@ -35,7 +35,7 @@
     "target": "torch.optim.AdamW",
     "weight_decay": 0.01
   },
-  "physical_batch_per_device": 4,
+  "physical_batch_per_device": 2,
   "precision": "32-true",
   "scheduler": {
     "interval": "step",
@@ -47,7 +47,7 @@
   "seed": 45,
   "status": "pass",
   "upstream": {
-    "config_sha256": "7f2f7069f6498e800302b568a826f8a0c4facfbf60c55c09375a545a0ca0c674",
+    "config_sha256": "16e65bf747ffa245b8711270c1297f26baf20e810c33d1398795cc04290b6937",
     "load_key_audit_sha256": "ae613936abf48b37a3cf41d3fdbf5cfe0a17cd812b7d8c58b108048ffd44ab61",
     "weight_manifest_sha256": "cf9b129cb58fea76c76632134dfd225eccfa065fd2a5ef58f93427c56fe150e7"
   },

@@ -1,8 +1,8 @@
 # Sonata Second-Perception Preflight
 
 - Gate: `SP0-PASS`
-- Authorized source commit: `d6b8d8154c3b9f69e936309a5ffa8bbe6e85ea7e`
-- Source tree SHA-256: `1d007d818eaf68cc137db6be2763219692599629985cc4d96bf11d7eb278d0e2`
+- Authorized source commit: `7c61d89bcb70ec89ce9b857c6ec6321acb1d7f1e`
+- Source tree SHA-256: `9aa27db8e8608c965f0ae7cfb380261ce86ed21120dbb077776a174c603155cc`
 - Data manifest SHA-256: `694d4394b481b02bf49573dc121276a452526fe274657ca7d1915ba0afba5c4e`
 - Effective global batch: 32
 - Precision: `32-true`

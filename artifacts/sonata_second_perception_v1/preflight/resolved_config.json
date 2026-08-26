@@ -40,7 +40,7 @@
     "add_instance": true,
     "add_normals": false,
     "add_raw_coordinates": true,
-    "batch_size": 4,
+    "batch_size": 2,
     "ignore_label": 255,
     "in_channels": 3,
     "num_changes": 6,
@@ -121,7 +121,7 @@
     },
     "train_dataloader": {
       "_target_": "torch.utils.data.DataLoader",
-      "batch_size": 4,
+      "batch_size": 2,
       "num_workers": 4,
       "pin_memory": false,
       "shuffle": true
@@ -428,7 +428,7 @@
     "target": "sonata_second_perception"
   },
   "trainer": {
-    "accumulate_grad_batches": 4,
+    "accumulate_grad_batches": 8,
     "check_val_every_n_epoch": 15,
     "deterministic": false,
     "gradient_clip_val": 1.0,
