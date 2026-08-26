@@ -81,6 +81,11 @@ def test_portable_resolved_config_removes_machine_paths() -> None:
     payload = {
         "backbone": {"name": "/private/weights/sonata.pth"},
         "general": {"save_dir": "/private/training/output"},
+        "model": {
+            "config": {
+                "backbone": {"name": "/private/weights/sonata.pth"}
+            }
+        },
         "data": {"voxel_size": 0.02},
     }
 
@@ -92,6 +97,9 @@ def test_portable_resolved_config_removes_machine_paths() -> None:
     )
 
     assert portable["backbone"]["name"] == "external:sonata_verified_input/" + "a" * 64
+    assert portable["model"]["config"]["backbone"]["name"] == (
+        "external:sonata_verified_input/" + "a" * 64
+    )
     assert portable["general"]["save_dir"] == "external:sonata_training_output"
     serialized = json.dumps(portable, sort_keys=True)
     assert "/private" not in serialized

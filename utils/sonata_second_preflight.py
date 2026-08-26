@@ -391,15 +391,21 @@ def portable_resolved_config(
         raise SonataSecondPreflightError("resolved training output path mismatch")
     if len(weight_sha256) != 64:
         raise SonataSecondPreflightError("weight SHA256 is invalid")
-    config["backbone"]["name"] = f"external:sonata_verified_input/{weight_sha256}"
-    config["general"]["save_dir"] = "external:sonata_training_output"
-    for logger in config.get("logging", []):
-        if isinstance(logger, dict) and "save_dir" in logger:
-            logger["save_dir"] = "external:sonata_training_output"
-    for callback in config.get("callbacks", []):
-        if isinstance(callback, dict) and "dirpath" in callback:
-            callback["dirpath"] = "external:sonata_training_output"
-    return config
+    weight_reference = f"external:sonata_verified_input/{weight_sha256}"
+    output_reference = "external:sonata_training_output"
+
+    def replace_paths(value: Any) -> Any:
+        if isinstance(value, dict):
+            return {key: replace_paths(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [replace_paths(item) for item in value]
+        if isinstance(value, str) and _paths_equal(value, expected_weight_path):
+            return weight_reference
+        if isinstance(value, str) and _paths_equal(value, expected_output_dir):
+            return output_reference
+        return value
+
+    return replace_paths(config)
 
 
 def build_sonata_training_semantics(
