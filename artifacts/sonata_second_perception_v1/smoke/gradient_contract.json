@@ -471,7 +471,7 @@
     },
     "trainable_rescene_decoder": {
       "finite": true,
-      "maximum_grad_norm": 279.0947570800781,
+      "maximum_grad_norm": 279.09765625,
       "missing_grad_tensors": 0,
       "nonzero_grad_tensors": 82,
       "parameter_name_sha256": "c9bfd04ef29d14025fe7418662ecada43951c81d48162f9e984e97d0d8cd683d",
@@ -585,7 +585,7 @@
     },
     "trainable_sonata_decoder": {
       "finite": true,
-      "maximum_grad_norm": 172.1520538330078,
+      "maximum_grad_norm": 172.1509246826172,
       "missing_grad_tensors": 0,
       "nonzero_grad_tensors": 248,
       "parameter_name_sha256": "dd0d35dba70fae2d45fdf14726981afc8e9487ff54114debeeed1438351cae7f",

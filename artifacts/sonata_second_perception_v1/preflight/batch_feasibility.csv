@@ -1,5 +1,5 @@
 schema_version,probe_scope,microbatch_per_gpu,gpu_count,physical_global_batch,status,finite_loss,finite_gradients,loss,peak_allocated_vram_mib,peak_reserved_vram_mib,memory_total_mib,safe_headroom,step_latency_seconds,samples_per_second,raw_points,voxels,validation_accuracy_inspected
-1,single_gpu_replica_real_p95_mixed_batch,1,2,2,stable,True,True,151.58709716796875,9056.9228515625,9554.0,45490.0,True,14.713851475156844,0.067963170736664,224853,145723,False
-1,single_gpu_replica_real_p95_mixed_batch,2,2,4,stable,True,True,221.62306213378906,17671.59326171875,18682.0,45490.0,True,1.616912519093603,1.2369252982969947,513139,352127,False
-1,single_gpu_replica_real_p95_mixed_batch,4,2,8,stable,True,True,393.345703125,34239.88330078125,36742.0,45490.0,True,2.8298311242833734,1.4135119108964356,1026278,687392,False
-1,single_gpu_replica_real_p95_mixed_batch,8,2,16,oom,False,False,,42173.52734375,44044.0,45490.0,False,8.516633327584714,0.0,2052556,1375532,False
+1,single_gpu_replica_real_p95_mixed_batch,1,2,2,stable,True,True,151.58763122558594,9056.9228515625,9554.0,45490.0,True,14.804895325098187,0.06754522595676427,224853,145723,False
+1,single_gpu_replica_real_p95_mixed_batch,2,2,4,stable,True,True,221.55868530273438,17671.59326171875,18682.0,45490.0,True,1.663177765905857,1.2025172780678024,513139,352127,False
+1,single_gpu_replica_real_p95_mixed_batch,4,2,8,stable,True,True,393.3468017578125,34239.88330078125,36742.0,45490.0,True,2.8458901760168374,1.4055356154321026,1026278,687392,False
+1,single_gpu_replica_real_p95_mixed_batch,8,2,16,oom,False,False,,42173.52734375,44044.0,45490.0,False,8.71635450096801,0.0,2052556,1375532,False

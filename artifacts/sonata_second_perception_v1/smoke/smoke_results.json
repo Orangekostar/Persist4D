@@ -1,5 +1,5 @@
 {
-  "authorization_sha256": "e7ec06bed07896c1f1a3021162c015360bf948235cdd41701103b826ad6b0fc4",
+  "authorization_sha256": "727eb7e7cc4317ee76f6d823ab25d6483036a1fd9e9549fbd93c24b75b746599",
   "batch_selection": {
     "accumulate_grad_batches": 4,
     "effective_global_batch": 32,
@@ -9,19 +9,19 @@
     "selection_uses_validation_accuracy": false
   },
   "bindings": {
-    "batch_feasibility_sha256": "4d3a95b1fffa91b3313d2f7691aa0de236dcd42c5ecda1a7f005d26c45087f65",
-    "config_sha256": "9d1e0e5615008bd7fda9296b853bfe90f54f7fc7fa31217fe9a64a2424b8689b",
+    "batch_feasibility_sha256": "2e4ff5c2cba28db365becabe337cab38c17d3836bfefa93184d588cb65fb1b25",
+    "config_sha256": "7f2f7069f6498e800302b568a826f8a0c4facfbf60c55c09375a545a0ca0c674",
     "data_manifest_sha256": "694d4394b481b02bf49573dc121276a452526fe274657ca7d1915ba0afba5c4e",
-    "gradient_contract_sha256": "520eb2c975e1c5ff8993b66837e85c5dee60685dce34086c07ec26cbecf084bb",
+    "gradient_contract_sha256": "e6dbe924c5665f3b9ef48bfeac2fea966667d6070c5519d6110da974558c434f",
     "query_interface_sha256": "dec40df550769d465eb92fd4cda5e795afc0e057be0654f72c31a267cbe47d49",
-    "source_commit": "f09e56c105a827e142f475053b1c40a2c35cb7cf",
-    "source_tree_sha256": "f8c4c71f4441d565c9935532ace88a1ee54a5fec3821880d4ef877e625a8a0bb",
-    "sp0_authorization_payload_sha256": "9796afa97ab44caa5cbe4eb256fb1021c6a9ae82081c5305fafa7e23071488e2",
-    "sp0_authorization_sha256": "7b4085c5afa82f4a1c3cfe64b0391b5cb9743dc91d67216b9b5c1c4e0c512922",
+    "source_commit": "d6b8d8154c3b9f69e936309a5ffa8bbe6e85ea7e",
+    "source_tree_sha256": "1d007d818eaf68cc137db6be2763219692599629985cc4d96bf11d7eb278d0e2",
+    "sp0_authorization_payload_sha256": "675708bff07447655926013cb2cbb8103429a0d703fa199aa07b570078676667",
+    "sp0_authorization_sha256": "8619285dabe09d7977297f3859b76db076c93cf838d2be76fc1c54d0ced06763",
     "weight_sha256": "c5ced5acdae30d1c469713398073a866e25e6e414e23feed5dc025373657ac50"
   },
   "functional": {
-    "elapsed_seconds": 1.6219675913453102,
+    "elapsed_seconds": 1.6418746472336352,
     "load_interface": {
       "decoder_initialized": true,
       "decoder_parameter_tensor_count": 248,
@@ -55,41 +55,41 @@
         "loss_dice": 0.7219499349594116,
         "loss_dice_0": 0.5375033020973206,
         "loss_dice_1": 0.6737285852432251,
-        "loss_dice_10": 0.5658476948738098,
+        "loss_dice_10": 0.5658477544784546,
         "loss_dice_11": 0.5854884386062622,
         "loss_dice_2": 0.5097990036010742,
         "loss_dice_3": 0.5442795753479004,
         "loss_dice_4": 0.5996918678283691,
-        "loss_dice_5": 0.5529454946517944,
-        "loss_dice_6": 0.5238606333732605,
+        "loss_dice_5": 0.5529455542564392,
+        "loss_dice_6": 0.5238605737686157,
         "loss_dice_7": 0.5418713092803955,
-        "loss_dice_8": 0.6472530961036682,
-        "loss_dice_9": 0.6845796704292297,
+        "loss_dice_8": 0.647253155708313,
+        "loss_dice_9": 0.6845797300338745,
         "loss_mask": 1.0911047458648682,
         "loss_mask_0": 0.7457535266876221,
-        "loss_mask_1": 0.9970729947090149,
-        "loss_mask_10": 0.9726568460464478,
+        "loss_mask_1": 0.9970730543136597,
+        "loss_mask_10": 0.9726567268371582,
         "loss_mask_11": 0.9580551981925964,
-        "loss_mask_2": 1.0328118801116943,
+        "loss_mask_2": 1.0328117609024048,
         "loss_mask_3": 1.0028455257415771,
         "loss_mask_4": 0.9381257891654968,
         "loss_mask_5": 0.8759998679161072,
-        "loss_mask_6": 1.0053048133850098,
+        "loss_mask_6": 1.0053046941757202,
         "loss_mask_7": 1.0002946853637695,
         "loss_mask_8": 0.9768475890159607,
-        "loss_mask_9": 1.008618950843811
+        "loss_mask_9": 1.0086190700531006
       },
       "history": [
         174.70753479003906,
-        160.6251983642578,
-        256.71905517578125,
-        398.2406005859375
+        160.62074279785156,
+        256.7789001464844,
+        397.9346008300781
       ],
       "tiny_optimization": {
-        "final_objective": 398.2406005859375,
+        "final_objective": 397.9346008300781,
         "initial_objective": 174.70753479003906,
-        "minimum_after_initial": 160.6251983642578,
-        "minimum_over_initial_ratio": 0.9193947963222926,
+        "minimum_after_initial": 160.62074279785156,
+        "minimum_over_initial_ratio": 0.919369293321454,
         "passed": true,
         "steps": 4
       },
@@ -178,7 +178,7 @@
     "selected_same_numa": true,
     "visible_gpu_count": 3
   },
-  "issued_at": "2026-08-26T09:26:32Z",
+  "issued_at": "2026-08-26T09:51:48Z",
   "schema_version": 1,
   "status": "pass"
 }

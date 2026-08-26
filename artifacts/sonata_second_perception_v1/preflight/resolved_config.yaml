@@ -307,6 +307,8 @@ trainer:
   accumulate_grad_batches: 4
   precision: 32-true
 callbacks:
+- _target_: utils.sonata_training_evidence.SonataTrainingEvidenceCallback
+  output_dir: external:sonata_training_output
 - _target_: pytorch_lightning.callbacks.ModelCheckpoint
   monitor: val_mean_t-AP
   mode: max
