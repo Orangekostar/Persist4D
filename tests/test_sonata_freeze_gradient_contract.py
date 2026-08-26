@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -147,3 +148,51 @@ def test_load_interface_uses_ss1_audit_schema_without_null_counts() -> None:
     assert contract["missing_decoder_key_count"] == 248
     assert contract["unexpected_key_count"] == 0
     assert contract["decoder_initialized"] is True
+
+
+def test_batch_feasibility_csv_uses_repository_lf_endings(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import scripts.sonata_second_smoke as smoke
+
+    output = Path(tmp_path)
+    monkeypatch.setattr(smoke, "PREFLIGHT_DIR", output)
+    smoke._write_batch_artifacts(
+        [
+            {
+                "schema_version": 1,
+                "probe_scope": "real",
+                "microbatch_per_gpu": 4,
+                "gpu_count": 2,
+                "physical_global_batch": 8,
+                "status": "stable",
+                "finite_loss": True,
+                "finite_gradients": True,
+                "loss": 1.0,
+                "peak_allocated_vram_mib": 10.0,
+                "peak_reserved_vram_mib": 12.0,
+                "memory_total_mib": 100.0,
+                "safe_headroom": True,
+                "step_latency_seconds": 1.0,
+                "samples_per_second": 4.0,
+                "raw_points": 100,
+                "voxels": 80,
+                "validation_accuracy_inspected": False,
+            }
+        ],
+        {
+            "gpu_count": 2,
+            "microbatch_per_gpu": 4,
+            "physical_global_batch": 8,
+            "accumulate_grad_batches": 4,
+            "effective_global_batch": 32,
+        },
+        {
+            "devices": [{"model": "NVIDIA A40"}],
+            "selected_same_numa": True,
+            "links": [{"interconnect": "NODE"}],
+        },
+        {},
+    )
+
+    assert b"\r" not in (output / "batch_feasibility.csv").read_bytes()

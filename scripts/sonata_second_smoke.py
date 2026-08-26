@@ -999,7 +999,12 @@ def _write_batch_artifacts(
     csv_path = PREFLIGHT_DIR / "batch_feasibility.csv"
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     with csv_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=BATCH_FIELDS, extrasaction="ignore")
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=BATCH_FIELDS,
+            extrasaction="ignore",
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(records)
     content = csv_path.read_text(encoding="utf-8")
