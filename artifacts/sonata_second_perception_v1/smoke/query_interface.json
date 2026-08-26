@@ -1,0 +1,72 @@
+{
+  "all_outputs_finite": true,
+  "aux_output_count": 12,
+  "backbone_feature_shape": [
+    5285,
+    96
+  ],
+  "mask_shapes": [
+    [
+      426,
+      100
+    ]
+  ],
+  "official_extraction": {
+    "candidate_count": 100,
+    "class_shape": [
+      100
+    ],
+    "finite": true,
+    "heatmap_shape": [
+      426,
+      100
+    ],
+    "mask_shape": [
+      426,
+      100
+    ],
+    "score_shape": [
+      100
+    ]
+  },
+  "official_output_extraction_compatible": true,
+  "output_feature_hierarchy": {
+    "all_features_finite": true,
+    "coordinate_group_counts": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "feature_dimensions": [
+      512,
+      384,
+      192,
+      96,
+      96
+    ],
+    "level_count": 5,
+    "point_counts": [
+      129,
+      427,
+      1217,
+      2898,
+      5285
+    ]
+  },
+  "persist4d_observation_interface_compatible": true,
+  "pred_logits_shape": [
+    1,
+    100,
+    19
+  ],
+  "query_feature_dimension": 128,
+  "query_feature_shape": [
+    1,
+    100,
+    128
+  ],
+  "schema_version": 1,
+  "status": "pass"
+}
