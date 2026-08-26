@@ -341,3 +341,24 @@ def test_preflight_composition_materializes_runtime_paths_before_env_restore(
     assert cfg.general.save_dir == str(output)
     assert "SONATA_CHECKPOINT" not in os.environ
     assert "SONATA_OUTPUT_DIR" not in os.environ
+
+
+def test_real_sonata_mix_and_collator_contract() -> None:
+    from scripts.sonata_second_preflight import _compose_config, _inspect_mixed_runtime
+
+    project_root = Path(__file__).resolve().parents[1]
+    if not (project_root / "data/processed/scannet/train_database.yaml").is_file():
+        pytest.skip("external ScanNet binding is unavailable")
+    cfg = _compose_config(Path("/verified/sonata.pth"), Path("/training/sonata"))
+
+    runtime = _inspect_mixed_runtime(cfg)
+
+    assert runtime["status"] == "pass"
+    assert runtime["sampler"] == "WeightedRandomSampler"
+    assert runtime["dataset_names"] == ["rio", "scannet"]
+    assert runtime["dataset_sizes"] == [1174, 1199]
+    assert runtime["weights"] == [1.0, 0.8]
+    assert runtime["temporal_windows"] == [2, 1]
+    assert runtime["collated_feature_dimension"] == 9
+    assert runtime["collated_coordinate_dimension"] == 5
+    assert runtime["collated_temporal_stage_counts"] == [2, 1]

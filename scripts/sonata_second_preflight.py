@@ -254,7 +254,7 @@ def _inspect_mixed_runtime(cfg: Any) -> dict[str, Any]:
         raise SonataSecondPreflightError("real collated T2 coordinates are invalid")
     if not isinstance(targets, list) or len(targets) != 2:
         raise SonataSecondPreflightError("real collated targets are invalid")
-    if not isinstance(temporal_stages, list) or len(temporal_stages) != 2:
+    if not isinstance(temporal_stages, (list, tuple)) or len(temporal_stages) != 2:
         raise SonataSecondPreflightError("real temporal stage tensors are invalid")
     observed_stage_counts = [
         int(torch.unique(stages).numel()) for stages in temporal_stages
