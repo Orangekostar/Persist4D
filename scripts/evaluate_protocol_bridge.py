@@ -26,8 +26,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 OUTPUT_ROOT = PROJECT_ROOT / "artifacts/reviewer_closure_v3/protocol_bridge"
-DEFAULT_CACHE_ROOT = Path(
-    "/mnt/shared/ww/persist4d-reviewer-closure-v3/protocol_bridge"
+DEFAULT_CACHE_ROOT = (
+    Path("/mnt/shared")
+    / os.environ.get("USER", "user")
+    / "persist4d-reviewer-closure-v3/protocol_bridge"
 )
 BRIDGE_INVENTORY = OUTPUT_ROOT / "bridge_inventory.csv"
 BRIDGE_DATABASE = OUTPUT_ROOT / "sequence_database_protocol_b_exact_t2.yaml"
@@ -794,7 +796,7 @@ def run_evaluation(
         "group_count": len(payloads),
         "bridge_per_sequence_count": len(per_sequence),
         "aggregate_count": len(aggregate),
-        "cache_root": str(cache_root.resolve()),
+        "cache_reference": f"external:{cache_root.name}",
     }
 
 

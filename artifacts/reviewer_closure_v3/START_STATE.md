@@ -4,7 +4,7 @@ Audit time: `2026-08-25T13:34:12Z`
 
 | Field | Verified value |
 |---|---|
-| Repository root | `/home/ww/paper5/.worktrees/persist4d-final-evidence` |
+| Repository root | `repo:.` |
 | Branch | `research/persist4d-reviewer-closure-v3` |
 | HEAD | `c2f1bcacff1ec244909426b57403965f679f08cc` |
 | Expected start | `c2f1bcacff1ec244909426b57403965f679f08cc` |

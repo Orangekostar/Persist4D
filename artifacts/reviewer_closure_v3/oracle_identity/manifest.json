@@ -67,7 +67,7 @@
     },
     "score_sensitivity_manifest": {
       "reference": "repo:artifacts/reviewer_closure_v3/score_sensitivity/manifest.json",
-      "sha256": "dbe0a23ebbeceba3ae1817b5c2257f8c87b063a4ada1dd0f039a630b07b123a2"
+      "sha256": "4f19963ab77df4d19d56eec6bea0469be778d7c424f72cb1f9121acb518541a1"
     }
   },
   "outputs": {
@@ -87,7 +87,7 @@
   "schema_version": 1,
   "scripts": {
     "official_trajectory_sha256": "49787b1babff24b4f2892538e3bcf6694f3b9a1c003da36aadec67c273b2381b",
-    "oracle_identity_sha256": "4c83280e67ab0dcf0f94efc6890a17cad5b9eec298552165bf58d1e5a95211ce",
+    "oracle_identity_sha256": "4f81eac85750ff55267198ac6cdb806517f39deb4ed14d0814701e1543f28257",
     "test_sha256": "02f4dae4f6f69df2deac741bc98cf885aa091944e97f0685939f2d83a79ca469"
   },
   "source_commit": "a2127b4f1f5a46d6f66ce3c7c1ecaed17d00a8b5",

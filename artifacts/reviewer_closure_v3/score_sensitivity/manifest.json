@@ -61,7 +61,7 @@
     "cache_records_sha256": "4d31692ef503a8126116aa0b752f02a3ed9be4b181ca5f49651e9dcdd9a96a46",
     "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
     "config_sha256": "aadca1c1608bae4ad4e812a6261536d9e386a85c460bbd85f4c5d215c9a68717",
-    "external_cache_root": "external:/mnt/shared/ww/persist4d-tmap-root-cause-v2/system_comparison_v2_full",
+    "external_cache_root": "external:system_comparison_v2_full",
     "frozen_v2_manifest": {
       "reference": "repo:artifacts/system_comparison_v2/manifest.json",
       "sha256": "48b708f86097003faa2d8c64658e1676a6aaa82033e9e057811d995f9a22f8f4"
@@ -92,7 +92,7 @@
   },
   "schema_version": 1,
   "scripts": {
-    "score_sensitivity_sha256": "9cf3fb58568c5411d611751d9fe9bb333bfd31b3ea320270bc4e7600d5eab4d2",
+    "score_sensitivity_sha256": "6b0e413fcf107dfd933d9862fb9e59e412b4a1504b1deee4d7d23ef82f87ebc0",
     "test_sha256": "9cac35c5c2dd4b4e1a01b8dd05d702870c82a63cfd154e7e89755b3de728a028",
     "trajectory_accumulator_sha256": "49787b1babff24b4f2892538e3bcf6694f3b9a1c003da36aadec67c273b2381b"
   },

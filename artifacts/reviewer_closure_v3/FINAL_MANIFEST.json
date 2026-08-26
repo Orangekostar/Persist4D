@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "status": "pass",
+  "decision": "RC3-YELLOW",
+  "generated_at": "2026-08-26T01:51:09Z",
+  "branch": "research/persist4d-reviewer-closure-v3",
+  "start_commit": "c2f1bcacff1ec244909426b57403965f679f08cc",
+  "synthesis_parent_commit": "838b3b0ec93e2f314ab2114e26340b8d6a531d98",
+  "decision_basis": "All V3 gates pass; score-reducer sensitivity changes the T2 B4-versus-B2 sign, so claims are narrowed.",
+  "gates": {
+    "B0": "PASS",
+    "PB0": "PASS",
+    "PB1": "PASS",
+    "EV0": "PASS",
+    "ID0": "PASS",
+    "OR0": "PASS"
+  },
+  "frozen_inputs": {
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "protocol_b_manifest_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+    "v2_cache_manifest_sha256": "f525252cd306f29e7db80788e4d5c773d2a35c8767d5eaa63b189740ea212182",
+    "v2_manifest_sha256": "48b708f86097003faa2d8c64658e1676a6aaa82033e9e057811d995f9a22f8f4",
+    "v1_system_manifest_sha256": "a7186318d329f5907ff3c67d37671359d2a81d058d5dea817c0ca53af2e783e8"
+  },
+  "key_artifacts": {
+    "START_STATE.json": "1726ce8d6df380951397fa35454b42485ed548dfccebdefd959a191be1432612",
+    "CODE_AUDIT.md": "5abeec9bb43bc351240133f589511a7f8b6faced3b0b2e6e0dec8cb7ed4f1360",
+    "STATISTICAL_CONTRACT.md": "cb47477734121bdc5f4bc3a2ffa7b4e33fbd800a340b71827fd2678f7f204b80",
+    "baseline/baseline_evidence_contract.json": "8e8c3a3903793caf0eaa4abef61401675ae878fc7c070b4a64bc47933a20a52d",
+    "protocol_bridge/bridge_manifest.json": "011d7b8350eaaa6ad7c0aa21200a5f8b18794631361100f18773db5a6adbfa8a",
+    "protocol_bridge/protocol_bridge_manifest.json": "ce52cbe5707203c7840e0a0614341cb50149f893ccf1afc6f2dda61710dbacd8",
+    "score_sensitivity/manifest.json": "4f19963ab77df4d19d56eec6bea0469be778d7c424f72cb1f9121acb518541a1",
+    "identity/manifest.json": "03ead35bdc5e714265123b105960dfcde794bc7ccc92faf0b1b118f697adc0de",
+    "oracle_identity/manifest.json": "b3ae18e90595ee6955c93bfaea61060c1af9c15fd38e03189a6de6168f82d822",
+    "FINAL_REVIEWER_CLOSURE_V3.md": "1365c45f1c35d26ca6e98bb83f2997c26191862d00f88119de2d8431c6308583"
+  },
+  "coverage": {
+    "bridge_exact_prefixes": 43,
+    "bridge_overlap_parity": "14/14",
+    "reference_scene_clusters": 6,
+    "order_units": 129,
+    "score_per_sequence_rows": 4644,
+    "identity_per_sequence_rows": 1548,
+    "oracle_per_sequence_rows": 2064,
+    "bridge_change_gt_files": 43
+  },
+  "changed_file_contract": {
+    "total_file_count_including_final_manifest": 92,
+    "artifact_root": "repo:artifacts/reviewer_closure_v3",
+    "artifact_file_count_including_final_manifest": 76,
+    "artifact_exact_inventory": "All regular files recursively below artifact_root; generated submanifests contain per-output hashes and bridge_manifest contains the 43-file target-set digest.",
+    "documentation": [
+      "repo:docs/superpowers/plans/2026-08-25-persist4d-reviewer-closure-v3.md",
+      "repo:docs/superpowers/specs/2026-08-25-persist4d-reviewer-closure-v3-design.md"
+    ],
+    "scripts": [
+      "repo:scripts/analyze_protocol_bridge.py",
+      "repo:scripts/build_baseline_evidence_contract.py",
+      "repo:scripts/build_protocol_b_t2_bridge.py",
+      "repo:scripts/evaluate_protocol_bridge.py",
+      "repo:scripts/system_comparison_v2_inference.py",
+      "repo:scripts/system_comparison_v3_identity.py",
+      "repo:scripts/system_comparison_v3_oracle_identity.py",
+      "repo:scripts/system_comparison_v3_score_sensitivity.py"
+    ],
+    "tests": [
+      "repo:tests/test_baseline_evidence_contract.py",
+      "repo:tests/test_protocol_b_t2_bridge.py",
+      "repo:tests/test_protocol_bridge_evaluation.py",
+      "repo:tests/test_system_comparison_v3_identity.py",
+      "repo:tests/test_system_comparison_v3_oracle_identity.py",
+      "repo:tests/test_system_comparison_v3_score_reducers.py"
+    ]
+  },
+  "verification": {
+    "new_v3_tests": {
+      "passed": 40,
+      "failed": 0
+    },
+    "required_frozen_regression_tests": {
+      "passed": 59,
+      "failed": 0
+    },
+    "post_sanitization_path_manifest_tests": {
+      "passed": 33,
+      "failed": 0
+    },
+    "changed_python_ruff": {
+      "status": "pass",
+      "file_count": 14
+    },
+    "full_repository_pytest": {
+      "passed": 1908,
+      "failed_before_path_fix": 5,
+      "skipped": 11,
+      "path_failure_fixed_and_rerun": true,
+      "remaining_external_runtime_failures_rerun": 4
+    },
+    "full_repository_ruff": {
+      "status": "pre_existing_failures",
+      "finding_count": 566,
+      "v3_changed_file_findings": 0
+    },
+    "git_diff_check": "pass"
+  },
+  "remaining_external_runtime_failures": [
+    "Pinned concerto/detectron2/sonata/stmetrics repository roots and native extension are unavailable to the P2 runtime-source contract.",
+    "Official ScanNet split snapshot files are unavailable.",
+    "FullHistory replay cache directory coverage differs from its frozen manifest.",
+    "Eleven opt-in GPU, real-cache, and official-ReScan tests remain skipped by explicit environment gates."
+  ],
+  "optional_checkpoint_audit": {
+    "eligible_second_checkpoint_found": false,
+    "observed_provenanced_checkpoint_count": 1,
+    "action": "Do not run the optional two-quality-level stage."
+  },
+  "claim_audit": {
+    "supported": [
+      "Exact-prefix PB0/PB1 protocol closure.",
+      "Tracker/reducer-invariant direct local candidates.",
+      "Fresh B4 identity regression and stronger B4 long-gap recovery than B2 at T4/T5 in all six clusters.",
+      "Bounded-update compute behavior from frozen compute evidence."
+    ],
+    "forbidden": [
+      "Persist4D beats the unavailable official ReScene4D checkpoint.",
+      "Temporal AP ranking is reducer-independent.",
+      "Oracle-ID is a method, baseline, or monotonic AP upper bound.",
+      "The 129 order-units are independent scenes.",
+      "Persist4D is SOTA."
+    ]
+  },
+  "no_invention_status": "pass"
+}

@@ -362,7 +362,7 @@ def _cache_contract(cache_root: Path) -> dict[str, object]:
         groups.append(dict(payload["group"]))
         cache_files.append(
             {
-                "reference": f"external:{path.resolve()}",
+                "reference": f"external:protocol_bridge/{path.name}",
                 "bytes": path.stat().st_size,
                 "sha256": _sha256(path),
             }

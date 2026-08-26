@@ -47,13 +47,15 @@ from scripts.system_comparison_v2_inference import (
 )
 
 OUTPUT_ROOT = PROJECT_ROOT / "artifacts/reviewer_closure_v3/oracle_identity"
-CACHE_ROOT = Path(
-    "/mnt/shared/ww/persist4d-tmap-root-cause-v2/system_comparison_v2_full"
+CACHE_ROOT = (
+    Path("/mnt/shared")
+    / os.environ.get("USER", "user")
+    / "persist4d-tmap-root-cause-v2/system_comparison_v2_full"
 )
 CACHE_MANIFEST = PROJECT_ROOT / "artifacts/system_comparison_v2/cache_manifest.json"
 V2_ROOT = PROJECT_ROOT / "artifacts/system_comparison_v2"
 SCORE_ROOT = PROJECT_ROOT / "artifacts/reviewer_closure_v3/score_sensitivity"
-METADATA = Path("/home/ww/3RScan.json")
+METADATA = Path.home() / "3RScan.json"
 METHODS = ("FullHistory", "B2", "B4", "Oracle-ID")
 LINKED_METHODS = ("B2", "B4", "Oracle-ID")
 TRACKERS = ("B2", "B4")

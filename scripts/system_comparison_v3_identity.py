@@ -44,7 +44,7 @@ FROZEN_IDENTITY_CSV = (
 FROZEN_SYSTEM_MANIFEST = (
     PROJECT_ROOT / "artifacts/system_comparison/system_comparison_manifest.json"
 )
-METADATA = Path("/home/ww/3RScan.json")
+METADATA = Path.home() / "3RScan.json"
 METHODS = ("B2", "B3", "B4")
 ORDERS = ("canonical", "reverse", "sha256_seed45")
 HORIZONS = (2, 3, 4, 5)
