@@ -1,0 +1,55 @@
+{
+  "hardware": {
+    "cuda_device_count": 3,
+    "gpu_names": [
+      "NVIDIA A40",
+      "NVIDIA A40",
+      "NVIDIA A40"
+    ],
+    "gpu_total_memory_bytes": [
+      47699722240,
+      47699722240,
+      47699722240
+    ]
+  },
+  "runtime": {
+    "cuda": "12.6",
+    "flash_attn": {
+      "active": true,
+      "version": "2.8.3"
+    },
+    "python": "3.10.20",
+    "pytorch_lightning": "2.6.5",
+    "sonata": "1.0",
+    "spconv": "2.3.8",
+    "stmetrics": "0.1.0",
+    "torch": "2.6.0+cu126",
+    "torch_scatter": "2.1.2+pt26cu126"
+  },
+  "schema_version": 1,
+  "source": {
+    "branch": "research/persist4d-sonata-second-perception-v1",
+    "commit": "6f0d6fee51d45ad8ed076c643475a6951d76834e",
+    "tree_sha256": "65f8e6826a7f17084a240a166db9804cc67a3ffad0185339ce137e4730a166b9"
+  },
+  "status": "pass",
+  "third_party_sources": {
+    "rescene4d": {
+      "local_start_commit": "e5d7f4e96fedc76c0c6d414ab293f54909c61df3",
+      "ref": "external:github/GradientSpaces/rescene4d",
+      "revision": "fb2fe42eb8f1e926567c48eea9acb874e608ee10"
+    },
+    "scannet_tools": {
+      "ref": "external:github/ScanNet/ScanNet",
+      "revision": "3830fce7f8b2e48ef047ef7fd76ea5f62903f51c"
+    },
+    "sonata": {
+      "ref": "external:github/facebookresearch/sonata",
+      "revision": "18c09ff8d713494f78a8213792262b910977a65d"
+    },
+    "stmetrics": {
+      "ref": "external:github/GradientSpaces/stmetrics",
+      "revision": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f"
+    }
+  }
+}

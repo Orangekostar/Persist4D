@@ -1,0 +1,371 @@
+data:
+  train_mode: train
+  validation_mode: validation
+  test_mode: validation
+  ignore_label: 255
+  add_raw_coordinates: true
+  add_colors: true
+  add_normals: false
+  in_channels: 3
+  num_labels: 20
+  num_changes: 6
+  add_instance: true
+  pin_memory: false
+  num_workers: 4
+  batch_size: 2
+  test_batch_size: 1
+  voxel_size: 0.02
+  temporal_window: 2
+  train_dataloader:
+    _target_: torch.utils.data.DataLoader
+    shuffle: true
+    pin_memory: false
+    num_workers: 4
+    batch_size: 2
+  validation_dataloader:
+    _target_: torch.utils.data.DataLoader
+    shuffle: false
+    pin_memory: false
+    num_workers: 4
+    batch_size: 1
+  test_dataloader:
+    _target_: torch.utils.data.DataLoader
+    shuffle: false
+    pin_memory: false
+    num_workers: 4
+    batch_size: 1
+  train_dataset:
+    _target_: datasets.multi_dataset.MultiDataset.from_config
+    weights:
+    - 1.0
+    - 0.8
+    datasets:
+    - target: datasets.semseg.SemanticSegmentationDataset
+      dataset_name: rio
+      data_dir: data/processed/rio
+      label_db_filepath: data/processed/rio/label_database.yaml
+      color_mean_std: data/processed/rio/color_mean_std.yaml
+      temporal_window: 2
+    - target: datasets.semseg.SemanticSegmentationDataset
+      dataset_name: scannet
+      data_dir: data/processed/scannet
+      label_db_filepath: data/processed/scannet/label_database.yaml
+      color_mean_std: data/processed/scannet/color_mean_std.yaml
+      temporal_window: 1
+    image_augmentations_path: conf/augmentation/albumentations_aug.yaml
+    volume_augmentations_path: conf/augmentation/volumentations_aug.yaml
+    mode: train
+    ignore_label: 255
+    num_labels: 20
+    add_raw_coordinates: true
+    add_colors: true
+    add_normals: false
+    add_instance: true
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    label_offset: 2
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
+    epoch_sample_multiple: 32
+    sampler_seed: 45
+  validation_dataset:
+    _target_: datasets.semseg.SemanticSegmentationDataset
+    dataset_name: rio
+    data_dir: data/processed/rio
+    image_augmentations_path: null
+    volume_augmentations_path: null
+    label_db_filepath: data/processed/rio/label_database.yaml
+    color_mean_std: data/processed/rio/color_mean_std.yaml
+    mode: validation
+    ignore_label: 255
+    num_labels: 20
+    add_raw_coordinates: true
+    add_colors: true
+    add_normals: false
+    add_instance: true
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    label_offset: 2
+    temporal_window: 2
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
+  test_dataset:
+    _target_: datasets.semseg.SemanticSegmentationDataset
+    dataset_name: rio
+    data_dir: data/processed/rio
+    image_augmentations_path: null
+    volume_augmentations_path: null
+    label_db_filepath: data/processed/rio/label_database.yaml
+    color_mean_std: data/processed/rio/color_mean_std.yaml
+    mode: validation
+    ignore_label: 255
+    num_labels: 20
+    add_raw_coordinates: true
+    add_colors: true
+    add_normals: false
+    add_instance: true
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    label_offset: 2
+    temporal_window: 2
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
+  train_collation:
+    _target_: datasets.auto_collate.create_auto_collate
+    backbone_target: models.PointceptBackbone
+    ignore_label: 255
+    voxel_size: 0.02
+    mode: train
+    small_crops: false
+    very_small_crops: false
+    batch_instance: false
+    probing: false
+    ignore_class_threshold: 100
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    label_offset: 2
+    num_queries: 100
+  validation_collation:
+    _target_: datasets.auto_collate.create_auto_collate
+    backbone_target: models.PointceptBackbone
+    ignore_label: 255
+    voxel_size: 0.02
+    mode: validation
+    batch_instance: false
+    probing: false
+    ignore_class_threshold: 100
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    label_offset: 2
+    num_queries: 100
+  test_collation:
+    _target_: datasets.auto_collate.create_auto_collate
+    backbone_target: models.PointceptBackbone
+    ignore_label: 255
+    voxel_size: 0.02
+    mode: validation
+    batch_instance: false
+    probing: false
+    ignore_class_threshold: 100
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    label_offset: 2
+    num_queries: 100
+logging:
+- _target_: pytorch_lightning.loggers.CSVLogger
+  save_dir: external:sonata_training_output
+  name: local_metrics
+model:
+  _target_: models.ReScene
+  hidden_dim: 128
+  dim_feedforward: 1024
+  num_queries: 100
+  num_heads: 8
+  num_decoders: 3
+  dropout: 0.0
+  pre_norm: false
+  use_level_embed: false
+  normalize_pos_enc: true
+  positional_encoding_type: fourier
+  gauss_scale: 1.0
+  hlevels:
+  - 0
+  - 1
+  - 2
+  - 3
+  non_parametric_queries: true
+  random_query_both: false
+  random_normal: false
+  random_queries: false
+  use_np_features: false
+  sample_sizes:
+  - 200
+  - 800
+  - 3200
+  - 12800
+  - 51200
+  max_sample_size: false
+  shared_decoder: true
+  num_classes: 19
+  train_on_segments: true
+  scatter_type: mean
+  voxel_size: 0.02
+  D: 4
+  num_changes: 6
+  temporal_masking: true
+  use_changes_loss: false
+  save_segment_info: false
+  config:
+    backbone:
+      _target_: models.PointceptBackbone
+      name: external:sonata_verified_input/c5ced5acdae30d1c469713398073a866e25e6e414e23feed5dc025373657ac50
+      repo_id: facebook/sonata
+      model_lib: sonata
+      custom_config:
+        enc_mode: false
+      decoder_serializations:
+      - standard
+      - temporal_overlay
+    temporal_window: 2
+    backbone_wrapper: true
+backbone:
+  _target_: models.PointceptBackbone
+  name: external:sonata_verified_input/c5ced5acdae30d1c469713398073a866e25e6e414e23feed5dc025373657ac50
+  repo_id: facebook/sonata
+  model_lib: sonata
+  custom_config:
+    enc_mode: false
+  decoder_serializations:
+  - standard
+  - temporal_overlay
+loss:
+  _target_: models.criterion.SetCriterion
+  num_classes: 19
+  eos_coef: 0.2
+  losses:
+  - labels
+  - masks
+  num_points: -1
+  oversample_ratio: 3.0
+  importance_sample_ratio: 0.75
+  class_weights: -1
+  num_changes: 6
+  change_weights:
+  - 0.1
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  contrastive_loss: false
+instance_metric:
+  _target_: stmetrics.InstanceMetrics
+  dataset: data/processed/rio/rio.yaml
+  log_prefix: val
+  timestep_key: temporal_stages
+  heads:
+  - _target_: stmetrics.TemporalEvaluator
+    recall: true
+    aux: changes
+  - _target_: stmetrics.LegacyAPEvaluator
+  - _target_: stmetrics.instances.SelectTimestepEvaluator
+    timesteps:
+    - 0
+  - _target_: stmetrics.instances.SelectTimestepEvaluator
+    timesteps:
+    - 1
+aux_metric: null
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0005
+  betas:
+  - 0.9
+  - 0.999
+  eps: 1.0e-08
+  weight_decay: 0.01
+  amsgrad: false
+scheduler:
+  scheduler:
+    _target_: torch.optim.lr_scheduler.OneCycleLR
+    max_lr: 0.0005
+    epochs: 450
+    total_steps: -1
+    pct_start: 0.3
+    anneal_strategy: cos
+    cycle_momentum: true
+    base_momentum: 0.85
+    max_momentum: 0.95
+    div_factor: 25.0
+    final_div_factor: 10000.0
+    three_phase: false
+    last_epoch: -1
+  pytorch_lightning_params:
+    interval: step
+trainer:
+  deterministic: false
+  max_epochs: 450
+  min_epochs: 1
+  check_val_every_n_epoch: 15
+  num_sanity_val_steps: 2
+  gradient_clip_val: 1.0
+  strategy: ddp_find_unused_parameters_true
+  accumulate_grad_batches: 8
+  precision: 32-true
+callbacks:
+- _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  monitor: val_mean_t-AP
+  mode: max
+  save_top_k: 1
+  save_last: true
+  dirpath: external:sonata_training_output
+  filename: epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}
+  every_n_epochs: 1
+  save_on_train_epoch_end: true
+  save_weights_only: false
+  auto_insert_metric_name: false
+- _target_: pytorch_lightning.callbacks.LearningRateMonitor
+matcher:
+  _target_: models.matcher.HungarianMatcher
+  cost_class: 2.0
+  cost_mask: 5.0
+  cost_dice: 2.0
+  num_points: -1
+general:
+  train_mode: true
+  seed: 45
+  checkpoint: null
+  backbone_checkpoint: null
+  freeze: backbone_encoder
+  linear_probing_backbone: false
+  train_on_segments: true
+  eval_on_segments: true
+  filter_out_instances: false
+  save_visualizations: false
+  visualization_point_size: 20
+  decoder_id: -1
+  export: false
+  postprocessing_export: false
+  save_features: false
+  save_segment_info: false
+  use_dbscan: false
+  ignore_class_threshold: 100
+  project_name: rescene4d_sonata_second_perception
+  workspace: null
+  experiment_name: rescene4d_sonata_second_perception
+  version: 0
+  num_targets: 19
+  num_changes: 6
+  add_instance: true
+  dbscan_eps: 0.95
+  dbscan_min_points: 1
+  matmul_precision: high
+  compile_model: false
+  export_threshold: 0.0001
+  scores_threshold: 0.0
+  iou_threshold: 1.0
+  topk_per_image: 100
+  ignore_mask_idx: []
+  max_batch_size: 99999999
+  save_dir: external:sonata_training_output
+  gpus: 2
+  frozen_encoder_eval: false
+  sonata_weighted_objective: true
+  sonata_fail_closed_runtime: true
+sonata_second_preflight:
+  target: sonata_second_perception
+  artifact_path: artifacts/sonata_second_perception_v1/preflight/preflight_authorization.json

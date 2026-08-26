@@ -1,0 +1,24 @@
+{
+  "authorization_sha256": "962b4ab36253f12a13b307b5990b47a4f8331ccf161eeee4ce7be2aa06134805",
+  "bindings": {
+    "config_sha256": "a95ce4aab1bd94add6bb7d17baffabd45e6abad5d2ffee45a06cb958ac3a778e",
+    "data_manifest_sha256": "694d4394b481b02bf49573dc121276a452526fe274657ca7d1915ba0afba5c4e",
+    "environment_manifest_sha256": "5e2eef98342fd90ca9fea58c5535c1a0711934bb3506f32ad0bf7b01fe0901dc",
+    "source_commit": "6f0d6fee51d45ad8ed076c643475a6951d76834e",
+    "source_tree_sha256": "65f8e6826a7f17084a240a166db9804cc67a3ffad0185339ce137e4730a166b9",
+    "training_semantics_sha256": "1899262b0b2580f79f8db70e5236efc9f65e6a5b962d8c407cb4dfd56d7b719d",
+    "weight_manifest_sha256": "cf9b129cb58fea76c76632134dfd225eccfa065fd2a5ef58f93427c56fe150e7"
+  },
+  "gate": "SP0-PASS",
+  "issued_at": "2026-08-26T08:42:37Z",
+  "max_age_seconds": 86400,
+  "repository": {
+    "authorized_start_commit": "e5d7f4e96fedc76c0c6d414ab293f54909c61df3",
+    "branch": "research/persist4d-sonata-second-perception-v1",
+    "repository_root": "repo:.",
+    "source_commit": "6f0d6fee51d45ad8ed076c643475a6951d76834e",
+    "start_is_ancestor": true
+  },
+  "schema_version": 1,
+  "status": "pass"
+}

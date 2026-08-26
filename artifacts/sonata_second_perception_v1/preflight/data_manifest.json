@@ -1,0 +1,157 @@
+{
+  "datasets": {
+    "rio": {
+      "content": {
+        "content_sha256": "bf1dc30493ae453d4202f3a0ef9ca28d35c8123df880e21770aca460e7f997f7",
+        "file_count": 5855,
+        "total_bytes": 5964404592
+      },
+      "databases": {
+        "t2_sequences": 1482,
+        "train": 1178,
+        "validation": 157
+      },
+      "label_database_ref": "repo:data/processed/rio/label_database.yaml",
+      "normals": {
+        "array_count": 1335,
+        "dimension": 3,
+        "dtypes": [
+          "float32"
+        ],
+        "finite": true,
+        "minimum_column_count": 12,
+        "row_count": 69044794
+      },
+      "root_ref": "repo:data/processed/rio",
+      "t2_sequence_database_ref": "repo:data/processed/rio/sequence_database_sliding_2.yaml"
+    },
+    "scannet": {
+      "content": {
+        "content_sha256": "6147418b6378d5b5b41cfd1082f336f1dabbc8d400989af3eee988c89b08676a",
+        "file_count": 3134,
+        "total_bytes": 12579495583
+      },
+      "databases": {
+        "test": 100,
+        "train": 1201,
+        "validation": 312
+      },
+      "label_database_ref": "external:scannet_processed/label_database.yaml",
+      "normals": {
+        "array_count": 1613,
+        "dimension": 3,
+        "dtypes": [
+          "float32"
+        ],
+        "finite": true,
+        "minimum_column_count": 10,
+        "row_count": 242068930
+      },
+      "root_ref": "external:data_root/scannet/6147418b6378d5b5b41cfd1082f336f1dabbc8d400989af3eee988c89b08676a"
+    }
+  },
+  "mix_contract": {
+    "datasets": [
+      "rio",
+      "scannet"
+    ],
+    "sampling_weights": [
+      1.0,
+      0.8
+    ],
+    "temporal_windows": [
+      2,
+      1
+    ]
+  },
+  "mixed_runtime": {
+    "collated_coordinate_dimension": 5,
+    "collated_feature_dimension": 9,
+    "collated_features_finite": true,
+    "collated_point_count": 107941,
+    "collated_sample_names": [
+      "scene0001_00-scene0001_01",
+      "scene0000_00"
+    ],
+    "collated_temporal_stage_counts": [
+      2,
+      1
+    ],
+    "dataset_names": [
+      "rio",
+      "scannet"
+    ],
+    "dataset_sizes": [
+      1174,
+      1199
+    ],
+    "implementation": "datasets.multi_dataset.MultiDataset",
+    "sampler": "WeightedRandomSampler",
+    "sampler_num_samples": 2112,
+    "sampler_seed": 45,
+    "status": "pass",
+    "temporal_windows": [
+      2,
+      1
+    ],
+    "weights": [
+      1.0,
+      0.8
+    ]
+  },
+  "provenance": {
+    "frozen_p2_scannet_preflight_ref": "repo:artifacts/P2/scannet_preflight.json",
+    "frozen_p2_scannet_preflight_sha256": "8a6f0e07af0e5c566d027489cc24a7d60347c3a1a19a0bd21629464cd9cd7bd0"
+  },
+  "schema_version": 1,
+  "status": "pass",
+  "taxonomy": {
+    "class_count": 20,
+    "class_ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      14,
+      16,
+      24,
+      28,
+      33,
+      34,
+      36,
+      39
+    ],
+    "class_labels": [
+      "wall",
+      "floor",
+      "cabinet",
+      "bed",
+      "chair",
+      "sofa",
+      "table",
+      "door",
+      "window",
+      "bookshelf",
+      "picture",
+      "counter",
+      "desk",
+      "curtain",
+      "refrigerator",
+      "shower_curtain",
+      "toilet",
+      "sink",
+      "bathtub",
+      "otherfurniture"
+    ],
+    "sha256": "2a368329ae3c0eb484c681f4a45c779c60f6a50f6000795b350e8063f2e4aab8",
+    "status": "match"
+  }
+}

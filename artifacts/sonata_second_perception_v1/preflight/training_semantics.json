@@ -1,0 +1,62 @@
+{
+  "accumulate_grad_batches": 8,
+  "checkpoint_selection": {
+    "mode": "max",
+    "monitor": "val_mean_t-AP",
+    "persist4d_inputs_allowed": false,
+    "save_last": true,
+    "save_top_k": 1
+  },
+  "effective_global_batch": 32,
+  "epochs": 450,
+  "freeze": {
+    "frozen_encoder_eval": false,
+    "mode": "backbone_encoder"
+  },
+  "objective": {
+    "class_mask_dice_weights": [
+      2.0,
+      5.0,
+      2.0
+    ],
+    "contrastive": false,
+    "eos_coef": 0.2,
+    "implementation": "trainer.trainer.aggregate_objective_loss",
+    "weighted": true
+  },
+  "optimizer": {
+    "amsgrad": false,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "eps": 1e-08,
+    "lr": 0.0005,
+    "target": "torch.optim.AdamW",
+    "weight_decay": 0.01
+  },
+  "physical_batch_per_device": 2,
+  "precision": "32-true",
+  "scheduler": {
+    "interval": "step",
+    "max_lr": 0.0005,
+    "target": "torch.optim.lr_scheduler.OneCycleLR",
+    "total_steps": -1
+  },
+  "schema_version": 1,
+  "seed": 45,
+  "status": "pass",
+  "upstream": {
+    "config_sha256": "a95ce4aab1bd94add6bb7d17baffabd45e6abad5d2ffee45a06cb958ac3a778e",
+    "load_key_audit_sha256": "ae613936abf48b37a3cf41d3fdbf5cfe0a17cd812b7d8c58b108048ffd44ab61",
+    "weight_manifest_sha256": "cf9b129cb58fea76c76632134dfd225eccfa065fd2a5ef58f93427c56fe150e7"
+  },
+  "verified_weight": {
+    "bytes": 434008287,
+    "reference": "external:sonata_verified_input/c5ced5acdae30d1c469713398073a866e25e6e414e23feed5dc025373657ac50",
+    "regular_file": true,
+    "sha256": "c5ced5acdae30d1c469713398073a866e25e6e414e23feed5dc025373657ac50",
+    "symlink": false
+  },
+  "world_size": 2
+}
