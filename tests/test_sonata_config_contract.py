@@ -100,8 +100,8 @@ def test_primary_sonata_config_locks_paper_supported_recipe(
     assert cfg.scheduler.pytorch_lightning_params.interval == "step"
     assert cfg.trainer.max_epochs == 450
     assert cfg.trainer.precision == "32-true"
-    assert cfg.data.batch_size == 2
-    assert cfg.trainer.accumulate_grad_batches == 8
+    assert cfg.data.batch_size == 4
+    assert cfg.trainer.accumulate_grad_batches == 4
     assert cfg.general.gpus * cfg.data.batch_size * cfg.trainer.accumulate_grad_batches == 32
     callbacks = OmegaConf.to_container(cfg.callbacks, resolve=True)
     checkpoints = [
@@ -131,7 +131,7 @@ def test_primary_sonata_config_locks_paper_supported_recipe(
         ("loss.eos_coef", 0.1, "loss.eos_coef"),
         ("general.freeze", None, "general.freeze"),
         ("trainer.max_epochs", 449, "trainer.max_epochs"),
-        ("trainer.accumulate_grad_batches", 4, "effective_global_batch"),
+        ("trainer.accumulate_grad_batches", 8, "effective_global_batch"),
     ],
 )
 def test_config_contract_rejects_primary_recipe_drift(

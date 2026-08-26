@@ -790,8 +790,8 @@ def validate_sonata_training_config_contract(
         "general.experiment_name": SONATA_EXPERIMENT_NAME,
         "general.sonata_weighted_objective": True,
         "general.sonata_fail_closed_runtime": True,
-        "data.batch_size": 2,
-        "data.train_dataloader.batch_size": 2,
+        "data.batch_size": 4,
+        "data.train_dataloader.batch_size": 4,
         "data.voxel_size": 0.02,
         "data.train_dataset._target_": (
             "datasets.multi_dataset.MultiDataset.from_config"
@@ -840,7 +840,7 @@ def validate_sonata_training_config_contract(
         "scheduler.scheduler.max_lr": 0.0005,
         "scheduler.pytorch_lightning_params.interval": "step",
         "trainer.max_epochs": 450,
-        "trainer.accumulate_grad_batches": 8,
+        "trainer.accumulate_grad_batches": 4,
         "trainer.precision": "32-true",
     }
     errors: list[str] = []
