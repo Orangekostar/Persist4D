@@ -1,6 +1,12 @@
 {
   "channel_contract": {
     "local_current": "latest-stage official sidecar with raw-local stmetrics",
+    "local_current_tracker_independence_tested": [
+      "B0",
+      "B2",
+      "B3",
+      "B4"
+    ],
     "trajectory": "causal linked candidates with explicit score reducer",
     "trajectory_current_slice_is_local_current": false
   },
@@ -92,8 +98,8 @@
   },
   "schema_version": 1,
   "scripts": {
-    "score_sensitivity_sha256": "6b0e413fcf107dfd933d9862fb9e59e412b4a1504b1deee4d7d23ef82f87ebc0",
-    "test_sha256": "9cac35c5c2dd4b4e1a01b8dd05d702870c82a63cfd154e7e89755b3de728a028",
+    "score_sensitivity_sha256": "f918a3f2fc4ec0428d765c560f3b9a2ac6fd274abb7aee45eea949ce492ccafe",
+    "test_sha256": "3000426366ad848fcf5dcbbfe4dc6ed7972d0b7bd2204248ffe9a3efc9683ada",
     "trajectory_accumulator_sha256": "49787b1babff24b4f2892538e3bcf6694f3b9a1c003da36aadec67c273b2381b"
   },
   "source_commit": "e66ba197fcedbab58aa9a464a16bc9b0af0b91d6",

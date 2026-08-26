@@ -22,7 +22,21 @@
     "reference_cluster_count": 6,
     "status": "PASS"
   },
-  "generated_at": "2026-08-25T14:41:28.065006Z",
+  "generated_at": "2026-08-26T02:10:40.867606Z",
+  "hardware": {
+    "available_gpu_count": 3,
+    "cuda_runtime": "12.6",
+    "device_alias": "not_recorded_in_frozen_cache",
+    "driver": "595.71.05",
+    "gpu_inference_performed": true,
+    "gpu_model": "NVIDIA A40",
+    "limitation": "The exact device alias was not recorded in the frozen PB1 cache; all audited visible GPUs had identical hardware properties.",
+    "memory_mib": 46068,
+    "source": {
+      "reference": "repo:artifacts/reviewer_closure_v3/START_STATE.json",
+      "sha256": "1726ce8d6df380951397fa35454b42485ed548dfccebdefd959a191be1432612"
+    }
+  },
   "inputs": {
     "pb0_bridge_manifest": {
       "reference": "repo:artifacts/reviewer_closure_v3/protocol_bridge/bridge_manifest.json",
@@ -158,11 +172,11 @@
   },
   "schema_version": 1,
   "scripts": {
-    "analyzer_sha256": "802c6efd145e5781ddc56626a672c603da50e8b73cc7e8ec41f4760e8bbacf23",
+    "analyzer_sha256": "107fb9d2dfef084d5327c81724ff33c4ef240edfed8702cd7b4d15a3a74b794c",
     "evaluator_sha256": "f01a522db71378a8384c80adf1b0ea438ace374b2d01aa1af90fe4c8a9959941",
-    "test_sha256": "9a9ed9a914a85307dc5becd73920631d01cf71006c144b8736bf9cafc8d07106"
+    "test_sha256": "d302a93e0f82ecd46f4125a0c312c85f2d0f6d671f72b26fa9044d9e6c52a45f"
   },
-  "source_commit": "afa1f10e48d70c0072335ecd04a14186ab1675b1",
+  "source_commit": "b16844764a8a11c424ba053ed1b76d303a60b37e",
   "statistics": {
     "bootstrap_interpretation": "descriptive robustness evidence",
     "bootstrap_replicates": 10000,

@@ -62,6 +62,7 @@ CACHE_MANIFEST = PROJECT_ROOT / "artifacts/system_comparison_v2/cache_manifest.j
 METADATA = Path.home() / "3RScan.json"
 V2_ROOT = PROJECT_ROOT / "artifacts/system_comparison_v2"
 TRACKERS = ("B2", "B3", "B4")
+LOCAL_CURRENT_TRACKERS = ("B0", "B2", "B3", "B4")
 REDUCERS = ("mean", "latest", "max")
 ORDERS = ("canonical", "reverse", "sha256_seed45")
 HORIZONS = (2, 3, 4, 5)
@@ -216,7 +217,12 @@ def assert_score_only_snapshots(
 
 def assert_local_current_invariance(
     rows: Sequence[Mapping[str, object]],
+    *,
+    expected_trackers: Sequence[str] = TRACKERS,
 ) -> dict[str, object]:
+    tracker_set = {str(tracker) for tracker in expected_trackers}
+    if not tracker_set or len(tracker_set) != len(expected_trackers):
+        raise ScoreSensitivityError("expected local-current trackers are invalid")
     groups: dict[tuple[str, str, str, int], list[Mapping[str, object]]] = defaultdict(
         list
     )
@@ -229,11 +235,11 @@ def assert_local_current_invariance(
         )
         groups[key].append(row)
     for values in groups.values():
-        if len(values) != len(TRACKERS) * len(REDUCERS):
+        if len(values) != len(tracker_set) * len(REDUCERS):
             raise ScoreSensitivityError(
                 "local-current tracker/reducer coverage differs"
             )
-        if {str(row["tracker"]) for row in values} != set(TRACKERS) or {
+        if {str(row["tracker"]) for row in values} != tracker_set or {
             str(row["score_reducer"]) for row in values
         } != set(REDUCERS):
             raise ScoreSensitivityError("local-current labels differ")
@@ -760,6 +766,9 @@ def run_score_sensitivity(
         },
         "channel_contract": {
             "local_current": "latest-stage official sidecar with raw-local stmetrics",
+            "local_current_tracker_independence_tested": list(
+                LOCAL_CURRENT_TRACKERS
+            ),
             "trajectory": "causal linked candidates with explicit score reducer",
             "trajectory_current_slice_is_local_current": False,
         },

@@ -37,6 +37,7 @@ from scripts.evaluate_protocol_bridge import (
 )
 
 V2_ROOT = PROJECT_ROOT / "artifacts/system_comparison_v2"
+START_STATE = PROJECT_ROOT / "artifacts/reviewer_closure_v3/START_STATE.json"
 BOOTSTRAP_SEED = 45047
 BOOTSTRAP_REPLICATES = 10_000
 
@@ -73,6 +74,49 @@ def _sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _hardware_contract() -> dict[str, object]:
+    payload = json.loads(START_STATE.read_text(encoding="utf-8"))
+    environment = payload.get("environment")
+    if not isinstance(environment, Mapping):
+        raise ProtocolBridgeAnalysisError("START_STATE environment is unavailable")
+    gpus = environment.get("gpus")
+    if not isinstance(gpus, list) or not gpus:
+        raise ProtocolBridgeAnalysisError("START_STATE GPU inventory is unavailable")
+    if not all(
+        isinstance(gpu, Mapping)
+        and isinstance(gpu.get("model"), str)
+        and isinstance(gpu.get("memory_mib"), int)
+        and isinstance(gpu.get("driver"), str)
+        for gpu in gpus
+    ):
+        raise ProtocolBridgeAnalysisError("START_STATE GPU inventory is incomplete")
+    cuda_runtime = environment.get("cuda_runtime")
+    if not isinstance(cuda_runtime, str):
+        raise ProtocolBridgeAnalysisError("START_STATE CUDA runtime is unavailable")
+    models = {str(gpu["model"]) for gpu in gpus}
+    memory = {int(gpu["memory_mib"]) for gpu in gpus}
+    drivers = {str(gpu["driver"]) for gpu in gpus}
+    if len(models) != 1 or len(memory) != 1 or len(drivers) != 1:
+        raise ProtocolBridgeAnalysisError("START_STATE GPU inventory is heterogeneous")
+    return {
+        "gpu_inference_performed": True,
+        "device_alias": "not_recorded_in_frozen_cache",
+        "gpu_model": models.pop(),
+        "memory_mib": memory.pop(),
+        "driver": drivers.pop(),
+        "cuda_runtime": cuda_runtime,
+        "available_gpu_count": len(gpus),
+        "limitation": (
+            "The exact device alias was not recorded in the frozen PB1 cache; "
+            "all audited visible GPUs had identical hardware properties."
+        ),
+        "source": {
+            "reference": "repo:artifacts/reviewer_closure_v3/START_STATE.json",
+            "sha256": _sha256(START_STATE),
+        },
+    }
 
 
 def _write(path: Path, content: bytes) -> None:
@@ -535,6 +579,7 @@ def run_analysis(
         .isoformat()
         .replace("+00:00", "Z"),
         "source_commit": _git_head(),
+        "hardware": _hardware_contract(),
         "gate_pb1": {
             "status": "PASS",
             "population_seed_count": 3,

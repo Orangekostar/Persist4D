@@ -2,7 +2,7 @@
   "schema_version": 1,
   "status": "pass",
   "decision": "RC3-YELLOW",
-  "generated_at": "2026-08-26T01:51:09Z",
+  "generated_at": "2026-08-26T02:25:38Z",
   "branch": "research/persist4d-reviewer-closure-v3",
   "start_commit": "c2f1bcacff1ec244909426b57403965f679f08cc",
   "synthesis_parent_commit": "838b3b0ec93e2f314ab2114e26340b8d6a531d98",
@@ -26,13 +26,13 @@
     "START_STATE.json": "1726ce8d6df380951397fa35454b42485ed548dfccebdefd959a191be1432612",
     "CODE_AUDIT.md": "5abeec9bb43bc351240133f589511a7f8b6faced3b0b2e6e0dec8cb7ed4f1360",
     "STATISTICAL_CONTRACT.md": "cb47477734121bdc5f4bc3a2ffa7b4e33fbd800a340b71827fd2678f7f204b80",
-    "baseline/baseline_evidence_contract.json": "8e8c3a3903793caf0eaa4abef61401675ae878fc7c070b4a64bc47933a20a52d",
+    "baseline/baseline_evidence_contract.json": "48405dfb6e14eb6720f02a3a142e527477ffccb9fdf49623f2f1385520e67c94",
     "protocol_bridge/bridge_manifest.json": "011d7b8350eaaa6ad7c0aa21200a5f8b18794631361100f18773db5a6adbfa8a",
-    "protocol_bridge/protocol_bridge_manifest.json": "ce52cbe5707203c7840e0a0614341cb50149f893ccf1afc6f2dda61710dbacd8",
-    "score_sensitivity/manifest.json": "4f19963ab77df4d19d56eec6bea0469be778d7c424f72cb1f9121acb518541a1",
+    "protocol_bridge/protocol_bridge_manifest.json": "6a766c6da15bd15defb6d143976dee3ddeeb5257cf833889846ca023a8912116",
+    "score_sensitivity/manifest.json": "4d8dce0b8fad49ff379a6c413243a5d04cea944b9923da1a018aa0ebe246ff89",
     "identity/manifest.json": "03ead35bdc5e714265123b105960dfcde794bc7ccc92faf0b1b118f697adc0de",
-    "oracle_identity/manifest.json": "b3ae18e90595ee6955c93bfaea61060c1af9c15fd38e03189a6de6168f82d822",
-    "FINAL_REVIEWER_CLOSURE_V3.md": "1365c45f1c35d26ca6e98bb83f2997c26191862d00f88119de2d8431c6308583"
+    "oracle_identity/manifest.json": "8051dd662a3a7e31df2ef22897e95b91d95346b897a8889e4249c976a842bb0f",
+    "FINAL_REVIEWER_CLOSURE_V3.md": "265efb46684727194f76eff88b2a662dc2de1369987c80cdf43a6d320f9acf1d"
   },
   "coverage": {
     "bridge_exact_prefixes": 43,
@@ -74,7 +74,7 @@
   },
   "verification": {
     "new_v3_tests": {
-      "passed": 40,
+      "passed": 41,
       "failed": 0
     },
     "required_frozen_regression_tests": {
@@ -89,6 +89,12 @@
       "status": "pass",
       "file_count": 14
     },
+    "pb1_hardware_provenance": {
+      "status": "pass",
+      "gpu_inference_performed": true,
+      "gpu_model": "NVIDIA A40",
+      "exact_device_alias_recorded": false
+    },
     "full_repository_pytest": {
       "passed": 1908,
       "failed_before_path_fix": 5,
@@ -102,6 +108,16 @@
       "v3_changed_file_findings": 0
     },
     "git_diff_check": "pass"
+  },
+  "completion_audit": {
+    "required_prompt_file_count": 31,
+    "required_prompt_files_present": 31,
+    "bridge_target_file_count": 43,
+    "key_artifact_hashes": "pass",
+    "submanifest_output_hashes": "pass",
+    "manifest_provenance_contract": "pass",
+    "changed_path_privacy": "pass",
+    "frozen_v1_v2_artifacts_modified": 0
   },
   "remaining_external_runtime_failures": [
     "Pinned concerto/detectron2/sonata/stmetrics repository roots and native extension are unavailable to the P2 runtime-source contract.",

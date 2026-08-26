@@ -12,6 +12,8 @@ from scripts.build_baseline_evidence_contract import (
     write_baseline_evidence_contract,
 )
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -111,3 +113,23 @@ def test_contract_rejects_checkpoint_hash_mismatch(tmp_path: Path) -> None:
 
     with pytest.raises(BaselineEvidenceError, match="checkpoint SHA256"):
         build_baseline_evidence_contract(**inputs)
+
+
+def test_real_contract_records_generation_and_execution_provenance() -> None:
+    contract_path = (
+        PROJECT_ROOT
+        / "artifacts/reviewer_closure_v3/baseline/baseline_evidence_contract.json"
+    )
+    contract = json.loads(contract_path.read_text(encoding="utf-8"))
+
+    assert contract["generated_at"] == "2026-08-25T13:34:12Z"
+    assert contract["execution"] == {"gpu_inference_performed": False}
+    assert contract["configuration"] == {
+        "config_hash": "not_applicable",
+        "cache_hash": "not_applicable",
+    }
+    builder = contract["scripts"]["builder"]
+    assert builder["reference"] == "repo:scripts/build_baseline_evidence_contract.py"
+    assert builder["sha256"] == _sha256(
+        PROJECT_ROOT / "scripts/build_baseline_evidence_contract.py"
+    )

@@ -16,6 +16,7 @@ from scripts.system_comparison_v2_inference import (
     V2InferenceError,
 )
 from scripts.system_comparison_v3_score_sensitivity import (
+    LOCAL_CURRENT_TRACKERS,
     assert_local_current_invariance,
     assert_score_only_snapshots,
     build_local_current_pair,
@@ -295,14 +296,21 @@ def test_local_current_invariance_is_exact_across_trackers_and_reducers():
             "local_current_AP25": 0.6,
             "local_current_REC": 0.7,
         }
-        for tracker in ("B2", "B3", "B4")
+        for tracker in LOCAL_CURRENT_TRACKERS
         for reducer in REDUCERS
     ]
-    assert assert_local_current_invariance(rows)["status"] == "pass_exact"
+    assert (
+        assert_local_current_invariance(
+            rows, expected_trackers=LOCAL_CURRENT_TRACKERS
+        )["status"]
+        == "pass_exact"
+    )
 
     rows[-1]["local_current_AP"] = 0.4000001
     with pytest.raises(ValueError, match="local-current"):
-        assert_local_current_invariance(rows)
+        assert_local_current_invariance(
+            rows, expected_trackers=LOCAL_CURRENT_TRACKERS
+        )
 
 
 def test_score_sensitivity_cli_help_runs_directly():
@@ -338,6 +346,9 @@ def test_score_sensitivity_artifact_contract_when_generated():
     assert len(manifest["inputs"]["protocol_manifest_sha256"]) == 64
     assert len(manifest["inputs"]["cache_records_sha256"]) == 64
     assert manifest["execution"]["gpu_inference_performed"] is False
+    assert manifest["channel_contract"][
+        "local_current_tracker_independence_tested"
+    ] == ["B0", "B2", "B3", "B4"]
     assert manifest["coverage"] == {
         "aggregate_row_count": 144,
         "horizons": [2, 3, 4, 5],

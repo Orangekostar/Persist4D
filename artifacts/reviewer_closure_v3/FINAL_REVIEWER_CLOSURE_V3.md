@@ -16,6 +16,9 @@ regime and to the directly supported long-gap identity result.
 - Shared checkpoint SHA256: `85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e`.
 - Protocol-B manifest SHA256: `246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe`.
 - V2 cache manifest SHA256: `f525252cd306f29e7db80788e4d5c773d2a35c8767d5eaa63b189740ea212182`.
+- PB1 GPU inference ran on the audited NVIDIA A40 inventory (46,068 MiB,
+  driver 595.71.05, CUDA 12.6). The frozen PB1 cache did not record the exact
+  device alias; all three audited visible GPUs had identical properties.
 - No frozen V1/V2 artifact was overwritten.
 
 ## Gate Ledger
@@ -117,8 +120,9 @@ T4 value of 6.900%, B4 is +0.123 points under mean but -0.992 under latest and
 -0.493 under max.
 
 Direct local-current masks, classes, scores, and AP are exactly invariant over
-516 fixed sidecar/horizon groups. The mean V2 regression maximum absolute
-difference is zero; 1,935 score-only trajectory checks pass.
+516 fixed sidecar/horizon groups. Tracker independence is also covered explicitly
+for B0/B2/B3/B4. The mean V2 regression maximum absolute difference is zero;
+1,935 score-only trajectory checks pass.
 
 ## Fresh Identity And Long-Gap Evidence
 
@@ -161,10 +165,13 @@ rerun or selected in V3.
 
 ## Verification
 
-- New V3 tests: 40 passed.
+- New V3 tests: 41 passed.
 - Required frozen-regression tests: 59 passed.
 - Post-sanitization path/manifest tests: 33 passed.
 - All changed Python files: `ruff check` passed.
+- Completion audit: 31/31 prompt-required files and all 43 bridge targets are
+  present; key/submanifest hashes and manifest provenance contracts pass; no
+  frozen V1/V2 artifact changed.
 - Full repository suite before the path fix: 1908 passed, 5 failed, 11 skipped.
 - The fixed path-privacy failure was rerun and passed; the remaining four tests
   were rerun together and failed only on unavailable external/runtime assets.
@@ -189,12 +196,12 @@ provenance; the optional two-quality-level stage is therefore not run.
 
 | Artifact | SHA256 |
 |---|---|
-| `baseline/baseline_evidence_contract.json` | `8e8c3a3903793caf0eaa4abef61401675ae878fc7c070b4a64bc47933a20a52d` |
+| `baseline/baseline_evidence_contract.json` | `48405dfb6e14eb6720f02a3a142e527477ffccb9fdf49623f2f1385520e67c94` |
 | `protocol_bridge/bridge_manifest.json` | `011d7b8350eaaa6ad7c0aa21200a5f8b18794631361100f18773db5a6adbfa8a` |
-| `protocol_bridge/protocol_bridge_manifest.json` | `ce52cbe5707203c7840e0a0614341cb50149f893ccf1afc6f2dda61710dbacd8` |
-| `score_sensitivity/manifest.json` | `4f19963ab77df4d19d56eec6bea0469be778d7c424f72cb1f9121acb518541a1` |
+| `protocol_bridge/protocol_bridge_manifest.json` | `6a766c6da15bd15defb6d143976dee3ddeeb5257cf833889846ca023a8912116` |
+| `score_sensitivity/manifest.json` | `4d8dce0b8fad49ff379a6c413243a5d04cea944b9923da1a018aa0ebe246ff89` |
 | `identity/manifest.json` | `03ead35bdc5e714265123b105960dfcde794bc7ccc92faf0b1b118f697adc0de` |
-| `oracle_identity/manifest.json` | `b3ae18e90595ee6955c93bfaea61060c1af9c15fd38e03189a6de6168f82d822` |
+| `oracle_identity/manifest.json` | `8051dd662a3a7e31df2ef22897e95b91d95346b897a8889e4249c976a842bb0f` |
 | Frozen compute table | `267911184acf1050ce589f07401a228c5b6cf49262f17409951445262a9a65c2` |
 
 The final manifest contains the complete changed-file contract and hashes for

@@ -219,7 +219,21 @@ def test_real_pb1_artifact_contract_is_complete_and_hash_bound():
     manifest_path = PB1_ROOT / "protocol_bridge_manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     gate = manifest["gate_pb1"]
+    hardware = manifest["hardware"]
     assert manifest["status"] == "pass"
+    assert hardware["gpu_inference_performed"] is True
+    assert hardware["device_alias"] == "not_recorded_in_frozen_cache"
+    assert hardware["gpu_model"] == "NVIDIA A40"
+    assert hardware["memory_mib"] == 46068
+    assert hardware["driver"] == "595.71.05"
+    assert hardware["cuda_runtime"] == "12.6"
+    assert hardware["available_gpu_count"] == 3
+    assert "exact device alias" in hardware["limitation"]
+    hardware_source = hardware["source"]
+    assert hardware_source["reference"] == (
+        "repo:artifacts/reviewer_closure_v3/START_STATE.json"
+    )
+    assert _sha256(PB1_ROOT.parent / "START_STATE.json") == hardware_source["sha256"]
     assert gate["status"] == "PASS"
     assert gate["population_seed_count"] == 3
     assert gate["order_unit_count"] == 129

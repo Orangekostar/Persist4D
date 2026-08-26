@@ -2,7 +2,7 @@
 
 Date: 2026-08-25
 Status: approved by the researcher-supplied V3 execution prompt
-Source prompt: `/home/ww/paper5/docs/Persist4D_Codex_Reviewer_Closure_V3_Prompt.md`
+Source prompt: `repo:docs/Persist4D_Codex_Reviewer_Closure_V3_Prompt.md`
 
 ## Objective
 
@@ -106,5 +106,5 @@ pass. Expensive inference cannot start before the preceding construction gate.
 - Mean V2 mismatch or B4 identity mismatch: diagnose before sensitivity work.
 - Official checkpoint release during execution: record it, do not replace the
   checkpoint, and require separate authorization for a new validation stage.
-- Disk pressure: use `/mnt/shared/ww` only for large untracked caches/checkpoints,
+- Disk pressure: use `/mnt/shared/$USER` only for large untracked caches/checkpoints,
   retain content hashes, and never move tracked evidence there.

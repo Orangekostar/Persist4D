@@ -12,6 +12,10 @@
       "34.8 -> Protocol-B t-mAP is a direct model degradation."
     ]
   },
+  "configuration": {
+    "cache_hash": "not_applicable",
+    "config_hash": "not_applicable"
+  },
   "evidence_rows": [
     {
       "checkpoint_availability": "not_publicly_exposed",
@@ -45,6 +49,9 @@
       "table_label": "FullHistory (shared frozen local reimplementation)"
     }
   ],
+  "execution": {
+    "gpu_inference_performed": false
+  },
   "frozen_provenance": {
     "checkpoint": {
       "reference": "repo:checkpoints/rescene4d_concerto_t2_repro.ckpt",
@@ -69,6 +76,7 @@
     "status": "PASS",
     "table_labels_generated_from_contract": true
   },
+  "generated_at": "2026-08-25T13:34:12Z",
   "official_repository_audit": {
     "checkpoint_section_status": "Coming soon.",
     "live_verified": true,
@@ -79,5 +87,11 @@
     "revision": "fb2fe42eb8f1e926567c48eea9acb874e608ee10"
   },
   "schema_version": 1,
+  "scripts": {
+    "builder": {
+      "reference": "repo:scripts/build_baseline_evidence_contract.py",
+      "sha256": "ce8f35eb90df5537f73fb731d030c23179626391baad6f49d45a196d06efe7c1"
+    }
+  },
   "source_commit": "c2f1bcacff1ec244909426b57403965f679f08cc"
 }

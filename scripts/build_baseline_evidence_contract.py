@@ -174,6 +174,18 @@ def build_baseline_evidence_contract(
     return {
         "schema_version": 1,
         "source_commit": source_commit,
+        "generated_at": retrieved_at,
+        "execution": {"gpu_inference_performed": False},
+        "configuration": {
+            "config_hash": "not_applicable",
+            "cache_hash": "not_applicable",
+        },
+        "scripts": {
+            "builder": {
+                "reference": "repo:scripts/build_baseline_evidence_contract.py",
+                "sha256": _sha256(Path(__file__)),
+            }
+        },
         "evidence_rows": evidence_rows,
         "official_repository_audit": {
             "repository_url": official_repository_url,
