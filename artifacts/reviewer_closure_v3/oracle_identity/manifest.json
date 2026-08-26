@@ -1,0 +1,95 @@
+{
+  "audit": {
+    "b2_b4_v3_mean_regression_max_abs_diff": 0.0,
+    "candidate_field_digest_status": "pass_exact",
+    "candidate_stage_count": 645,
+    "ephemeral_occurrence_count": 58768,
+    "matching_uses_gt_class": false,
+    "persistent_occurrence_count": 5732
+  },
+  "coverage": {
+    "aggregate_row_count": 64,
+    "horizons": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "methods": [
+      "FullHistory",
+      "B2",
+      "B4",
+      "Oracle-ID"
+    ],
+    "orders": [
+      "canonical",
+      "reverse",
+      "sha256_seed45"
+    ],
+    "per_sequence_row_count": 2064,
+    "sequence_count": 129
+  },
+  "execution": {
+    "gpu_inference_performed": false,
+    "gt_available_to_cache_generation": false,
+    "gt_available_to_oracle_linkage": true,
+    "gt_available_to_registered_trackers": false,
+    "metric_backend": "stmetrics via CausalTaskAccumulator",
+    "mode": "frozen_official_candidates_post_prediction_oracle_linkage",
+    "score_reducer": "mean"
+  },
+  "gate_or0": {
+    "candidate_fields_unchanged": true,
+    "gt_access": "post_prediction_linkage_only",
+    "iou_threshold": 0.5,
+    "predicted_class_retained": true,
+    "status": "PASS",
+    "unmatched_candidates_ephemeral": true
+  },
+  "generated_at": "2026-08-26T00:57:19.649366Z",
+  "inputs": {
+    "cache_manifest": {
+      "external_reference": "external:system_comparison_v2_full",
+      "records_sha256": "4d31692ef503a8126116aa0b752f02a3ed9be4b181ca5f49651e9dcdd9a96a46",
+      "reference": "repo:artifacts/system_comparison_v2/cache_manifest.json",
+      "sha256": "f525252cd306f29e7db80788e4d5c773d2a35c8767d5eaa63b189740ea212182"
+    },
+    "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+    "config_sha256": "aadca1c1608bae4ad4e812a6261536d9e386a85c460bbd85f4c5d215c9a68717",
+    "frozen_v2_manifest": {
+      "reference": "repo:artifacts/system_comparison_v2/manifest.json",
+      "sha256": "48b708f86097003faa2d8c64658e1676a6aaa82033e9e057811d995f9a22f8f4"
+    },
+    "protocol_manifest_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+    "reproducibility_binding": {
+      "reference": "repo:artifacts/system_comparison/reproducibility_binding.json",
+      "sha256": "acb86339d9462144fbcc85bc169bbf37c34845dd272b77a7910e8298f00eb995"
+    },
+    "score_sensitivity_manifest": {
+      "reference": "repo:artifacts/reviewer_closure_v3/score_sensitivity/manifest.json",
+      "sha256": "dbe0a23ebbeceba3ae1817b5c2257f8c87b063a4ada1dd0f039a630b07b123a2"
+    }
+  },
+  "outputs": {
+    "ORACLE_IDENTITY_HEADROOM.md": {
+      "bytes": 1512,
+      "sha256": "6f191209305a13cb531a88559adc5471362c837712beff04b1662a72512c8ac4"
+    },
+    "oracle_aggregate.csv": {
+      "bytes": 13957,
+      "sha256": "323eb28cd0cd69fe4807539b6b92317265b8a5a2e6e2294e3cc10508f4ecc6ac"
+    },
+    "oracle_per_sequence.csv": {
+      "bytes": 617517,
+      "sha256": "d7a60e3d42dc8144f4d76b87a9d235e3838da0bd87120191ecef38fedd37074a"
+    }
+  },
+  "schema_version": 1,
+  "scripts": {
+    "official_trajectory_sha256": "49787b1babff24b4f2892538e3bcf6694f3b9a1c003da36aadec67c273b2381b",
+    "oracle_identity_sha256": "4c83280e67ab0dcf0f94efc6890a17cad5b9eec298552165bf58d1e5a95211ce",
+    "test_sha256": "02f4dae4f6f69df2deac741bc98cf885aa091944e97f0685939f2d83a79ca469"
+  },
+  "source_commit": "a2127b4f1f5a46d6f66ce3c7c1ecaed17d00a8b5",
+  "status": "pass"
+}
