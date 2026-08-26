@@ -43,6 +43,7 @@ from utils.sonata_weight_provenance import (
 DEFAULT_ARTIFACT_DIR = (
     PROJECT_ROOT / "artifacts" / "sonata_second_perception_v1" / "preflight"
 )
+DEFAULT_DEVICES = (1, 2)
 
 
 def _load_json(path: Path, *, name: str) -> dict[str, Any]:
@@ -199,11 +200,24 @@ def require_formal_authorization(
     return verified_weight.resolve()
 
 
+def _parse_devices(value: str) -> tuple[int, ...]:
+    try:
+        devices = tuple(int(item) for item in value.split(","))
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(
+            "devices must be comma-separated integers"
+        ) from error
+    if len(devices) != 2 or len(set(devices)) != 2 or any(item < 0 for item in devices):
+        raise argparse.ArgumentTypeError("devices must identify two distinct GPUs")
+    return devices
+
+
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--weight-path", type=Path, required=True)
     parser.add_argument("--training-output-dir", type=Path, required=True)
     parser.add_argument("--artifact-dir", type=Path, default=DEFAULT_ARTIFACT_DIR)
+    parser.add_argument("--devices", type=_parse_devices, default=DEFAULT_DEVICES)
     parser.add_argument(
         "--execute",
         action="store_true",
@@ -222,9 +236,20 @@ def main() -> int:
     if not args.execute:
         print(json.dumps({"gate": "SP0-PASS", "training_launched": False}))
         return 0
+    from scripts.sonata_second_smoke import require_smoke_authorization
+
+    cfg = _compose_config(verified_weight, args.training_output_dir)
+    require_smoke_authorization(
+        expected_microbatch_per_gpu=int(cfg.data.batch_size),
+        expected_accumulation=int(cfg.trainer.accumulate_grad_batches),
+        expected_devices=args.devices,
+    )
     environment = os.environ.copy()
     environment["SONATA_CHECKPOINT"] = str(verified_weight)
     environment["SONATA_OUTPUT_DIR"] = str(Path(args.training_output_dir).resolve())
+    environment["CUDA_VISIBLE_DEVICES"] = ",".join(
+        str(device) for device in args.devices
+    )
     command = [
         sys.executable,
         str(PROJECT_ROOT / "main_instance_segmentation.py"),

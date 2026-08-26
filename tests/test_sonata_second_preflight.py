@@ -11,6 +11,7 @@ import numpy as np
 import pytest
 import yaml
 
+from scripts.sonata_second_smoke import validate_smoke_authorization
 from utils.sonata_second_preflight import (
     SonataSecondPreflightError,
     build_sonata_data_manifest,
@@ -295,7 +296,11 @@ def test_training_semantics_are_derived_from_the_resolved_config(
 
 @pytest.mark.parametrize(
     "script",
-    ["scripts/sonata_second_preflight.py", "scripts/run_sonata_second_training.py"],
+    [
+        "scripts/sonata_second_preflight.py",
+        "scripts/sonata_second_smoke.py",
+        "scripts/run_sonata_second_training.py",
+    ],
 )
 def test_sonata_preflight_clis_support_direct_execution(script: str) -> None:
     project_root = Path(__file__).resolve().parents[1]
@@ -308,6 +313,55 @@ def test_sonata_preflight_clis_support_direct_execution(script: str) -> None:
     )
 
     assert result.returncode == 0, result.stderr
+
+
+def test_smoke_authorization_binds_source_sp0_batch_gradients_query_and_devices() -> None:
+    payload = {
+        "schema_version": 1,
+        "status": "pass",
+        "gate": "SSMOKE-PASS",
+        "bindings": {
+            "source_tree_sha256": "1" * 64,
+            "sp0_authorization_sha256": "2" * 64,
+            "batch_feasibility_sha256": "3" * 64,
+            "gradient_contract_sha256": "4" * 64,
+            "query_interface_sha256": "5" * 64,
+        },
+        "batch_selection": {
+            "microbatch_per_gpu": 2,
+            "accumulate_grad_batches": 8,
+            "effective_global_batch": 32,
+            "selection_uses_validation_accuracy": False,
+        },
+        "hardware": {"selected_devices": ["device-1", "device-2"]},
+    }
+    payload["authorization_sha256"] = canonical_sha256(payload)
+
+    validate_smoke_authorization(
+        payload,
+        source_tree_sha256="1" * 64,
+        sp0_authorization_sha256="2" * 64,
+        batch_feasibility_sha256="3" * 64,
+        gradient_contract_sha256="4" * 64,
+        query_interface_sha256="5" * 64,
+        expected_microbatch_per_gpu=2,
+        expected_accumulation=8,
+        expected_devices=(1, 2),
+    )
+
+    payload["batch_selection"]["accumulate_grad_batches"] = 4
+    with pytest.raises(SonataSecondPreflightError, match="payload hash"):
+        validate_smoke_authorization(
+            payload,
+            source_tree_sha256="1" * 64,
+            sp0_authorization_sha256="2" * 64,
+            batch_feasibility_sha256="3" * 64,
+            gradient_contract_sha256="4" * 64,
+            query_interface_sha256="5" * 64,
+            expected_microbatch_per_gpu=2,
+            expected_accumulation=8,
+            expected_devices=(1, 2),
+        )
 
 
 def test_training_launcher_rejects_missing_authorization(tmp_path: Path) -> None:
@@ -331,6 +385,106 @@ def test_training_launcher_rejects_missing_authorization(tmp_path: Path) -> None
 
     assert result.returncode != 0
     assert "authorization" in result.stderr.lower()
+
+
+def test_training_execute_requires_ssmoke_gate(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import scripts.run_sonata_second_training as launcher
+    import scripts.sonata_second_smoke as smoke
+
+    verified_weight = tmp_path / "verified.pth"
+    monkeypatch.setattr(
+        launcher,
+        "require_formal_authorization",
+        lambda **_kwargs: verified_weight,
+    )
+
+    def reject_smoke(**_kwargs: object) -> None:
+        raise SonataSecondPreflightError("SSMOKE authorization is missing")
+
+    monkeypatch.setattr(smoke, "require_smoke_authorization", reject_smoke)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_sonata_second_training.py",
+            "--weight-path",
+            str(tmp_path / "source.pth"),
+            "--training-output-dir",
+            str(tmp_path / "training"),
+            "--execute",
+        ],
+    )
+    monkeypatch.setattr(
+        launcher.os,
+        "execve",
+        lambda *_args: pytest.fail("training must not launch without SSMOKE"),
+    )
+
+    with pytest.raises(SonataSecondPreflightError, match="SSMOKE"):
+        launcher.main()
+
+
+def test_training_execute_binds_selected_same_numa_devices(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import scripts.run_sonata_second_training as launcher
+    import scripts.sonata_second_smoke as smoke
+
+    class ExecutionCalled(RuntimeError):
+        pass
+
+    verified_weight = tmp_path / "verified.pth"
+    captured: dict[str, object] = {}
+    monkeypatch.setattr(
+        launcher,
+        "require_formal_authorization",
+        lambda **_kwargs: verified_weight,
+    )
+
+    def accept_smoke(**kwargs: object) -> dict[str, str]:
+        captured["smoke_kwargs"] = kwargs
+        return {"gate": "SSMOKE-PASS"}
+
+    def capture_execve(
+        executable: str, command: list[str], environment: dict[str, str]
+    ) -> None:
+        captured.update(
+            executable=executable,
+            command=command,
+            environment=environment,
+        )
+        raise ExecutionCalled
+
+    monkeypatch.setattr(smoke, "require_smoke_authorization", accept_smoke)
+    monkeypatch.setattr(launcher.os, "execve", capture_execve)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_sonata_second_training.py",
+            "--weight-path",
+            str(tmp_path / "source.pth"),
+            "--training-output-dir",
+            str(tmp_path / "training"),
+            "--devices",
+            "1,2",
+            "--execute",
+        ],
+    )
+
+    with pytest.raises(ExecutionCalled):
+        launcher.main()
+
+    assert captured["smoke_kwargs"] == {
+        "expected_microbatch_per_gpu": 2,
+        "expected_accumulation": 8,
+        "expected_devices": (1, 2),
+    }
+    environment = captured["environment"]
+    assert isinstance(environment, dict)
+    assert environment["CUDA_VISIBLE_DEVICES"] == "1,2"
 
 
 def test_preflight_composition_materializes_runtime_paths_before_env_restore(
