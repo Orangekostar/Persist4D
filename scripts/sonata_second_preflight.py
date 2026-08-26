@@ -19,6 +19,7 @@ import numpy as np
 import torch
 import yaml
 from hydra import compose, initialize_config_dir
+from omegaconf import OmegaConf
 from torch.utils.data import WeightedRandomSampler
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -190,7 +191,9 @@ def _compose_config(weight_path: Path, training_output_dir: Path):
         with initialize_config_dir(
             config_dir=str(PROJECT_ROOT / "conf"), version_base="1.2"
         ):
-            return compose(config_name=SONATA_CONFIG_NAME)
+            cfg = compose(config_name=SONATA_CONFIG_NAME)
+            OmegaConf.resolve(cfg)
+            return cfg
     finally:
         if previous_weight is None:
             os.environ.pop("SONATA_CHECKPOINT", None)

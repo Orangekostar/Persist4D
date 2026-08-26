@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -322,3 +323,21 @@ def test_training_launcher_rejects_missing_authorization(tmp_path: Path) -> None
 
     assert result.returncode != 0
     assert "authorization" in result.stderr.lower()
+
+
+def test_preflight_composition_materializes_runtime_paths_before_env_restore(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from scripts.sonata_second_preflight import _compose_config
+
+    monkeypatch.delenv("SONATA_CHECKPOINT", raising=False)
+    monkeypatch.delenv("SONATA_OUTPUT_DIR", raising=False)
+    weight = Path("/verified/sonata.pth")
+    output = Path("/training/sonata-second")
+
+    cfg = _compose_config(weight, output)
+
+    assert cfg.backbone.name == str(weight)
+    assert cfg.general.save_dir == str(output)
+    assert "SONATA_CHECKPOINT" not in os.environ
+    assert "SONATA_OUTPUT_DIR" not in os.environ
