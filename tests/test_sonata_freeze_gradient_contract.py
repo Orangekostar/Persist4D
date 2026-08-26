@@ -6,6 +6,7 @@ import pytest
 import torch
 
 from scripts.sonata_second_smoke import (
+    build_load_interface_contract,
     classify_sonata_parameters,
     select_batch_configuration,
     summarize_gradients,
@@ -129,3 +130,20 @@ def test_query_interface_and_tiny_optimization_contract() -> None:
 
     with pytest.raises(ValueError, match="decrease"):
         validate_tiny_optimization([9.0, 9.1, 9.2, 9.3])
+
+
+def test_load_interface_uses_ss1_audit_schema_without_null_counts() -> None:
+    contract = build_load_interface_contract(
+        {
+            "gate": "SW0-PASS",
+            "loaded_encoder_key_count": 453,
+            "expected_decoder_missing_key_count": 248,
+            "unexpected_keys": [],
+        },
+        decoder_parameter_tensor_count=248,
+    )
+
+    assert contract["loaded_encoder_key_count"] == 453
+    assert contract["missing_decoder_key_count"] == 248
+    assert contract["unexpected_key_count"] == 0
+    assert contract["decoder_initialized"] is True

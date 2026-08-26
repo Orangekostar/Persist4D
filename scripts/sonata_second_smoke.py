@@ -363,6 +363,36 @@ def validate_query_interface(
     }
 
 
+def build_load_interface_contract(
+    load_audit: Mapping[str, Any], *, decoder_parameter_tensor_count: int
+) -> dict[str, Any]:
+    loaded_encoder = load_audit.get("loaded_encoder_key_count")
+    missing_decoder = load_audit.get("expected_decoder_missing_key_count")
+    unexpected = load_audit.get("unexpected_keys")
+    if (
+        load_audit.get("gate") != "SW0-PASS"
+        or not isinstance(loaded_encoder, int)
+        or isinstance(loaded_encoder, bool)
+        or loaded_encoder <= 0
+        or not isinstance(missing_decoder, int)
+        or isinstance(missing_decoder, bool)
+        or missing_decoder <= 0
+        or not isinstance(unexpected, list)
+        or unexpected
+        or decoder_parameter_tensor_count != missing_decoder
+    ):
+        raise ValueError("SS1 load audit and runtime decoder interface differ")
+    return {
+        "verified_weight_sha256": OFFICIAL_SONATA_WEIGHT_SPEC.sha256,
+        "load_gate": "SW0-PASS",
+        "loaded_encoder_key_count": loaded_encoder,
+        "missing_decoder_key_count": missing_decoder,
+        "unexpected_key_count": len(unexpected),
+        "decoder_parameter_tensor_count": decoder_parameter_tensor_count,
+        "decoder_initialized": True,
+    }
+
+
 def validate_tiny_optimization(history: Sequence[float]) -> dict[str, Any]:
     values = [float(value) for value in history]
     if len(values) < 3 or not all(math.isfinite(value) for value in values):
@@ -861,15 +891,10 @@ def _functional_smoke(
     }
     result = {
         "sample": sample,
-        "load_interface": {
-            "verified_weight_sha256": OFFICIAL_SONATA_WEIGHT_SPEC.sha256,
-            "load_gate": load_audit.get("gate"),
-            "loaded_encoder_key_count": load_audit.get("loaded_key_count"),
-            "missing_decoder_key_count": load_audit.get("missing_key_count"),
-            "unexpected_key_count": load_audit.get("unexpected_key_count"),
-            "decoder_parameter_tensor_count": len(decoder_parameters),
-            "decoder_initialized": bool(decoder_parameters),
-        },
+        "load_interface": build_load_interface_contract(
+            load_audit,
+            decoder_parameter_tensor_count=len(decoder_parameters),
+        ),
         "temporal_execution": {
             **counters,
             "decoder_serializations": ["standard", "temporal_overlay"],
