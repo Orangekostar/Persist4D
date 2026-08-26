@@ -1,0 +1,95 @@
+defaults:
+  - config_base_instance_segmentation
+  - override data/datasets: mix
+  - override model: rescene
+  - override backbone: sonata
+  - override serialization: mixed
+  - override optimizer: adamw
+  - override scheduler: onecyclelr
+  - override trainer: trainer
+  - override logging: local_csv
+  - override callbacks: sonata_second
+  - override matcher: hungarian_matcher
+  - override loss: set_criterion
+  - override loss/contrastive: null
+  - _self_
+
+aux_metric: null
+
+sonata_second_preflight:
+  target: sonata_second_perception
+  artifact_path: artifacts/sonata_second_perception_v1/preflight/preflight_authorization.json
+
+general:
+  train_mode: true
+  seed: 45
+  freeze: backbone_encoder
+  frozen_encoder_eval: false
+  gpus: 2
+  project_name: rescene4d_sonata_second_perception
+  workspace: null
+  experiment_name: rescene4d_sonata_second_perception
+  save_dir: ${oc.env:SONATA_OUTPUT_DIR,checkpoints/rescene4d_sonata_second_perception}
+  sonata_weighted_objective: true
+  sonata_fail_closed_runtime: true
+
+data:
+  batch_size: 2
+  voxel_size: 0.02
+  train_dataset:
+    filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
+    epoch_sample_multiple: 32
+    sampler_seed: 45
+  validation_dataset:
+    filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
+  test_dataset:
+    filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
+
+backbone:
+  name: ${oc.env:SONATA_CHECKPOINT}
+
+model:
+  num_queries: 100
+  non_parametric_queries: true
+  random_query_both: false
+  random_normal: false
+  random_queries: false
+  temporal_masking: true
+  config:
+    temporal_window: 2
+
+loss:
+  eos_coef: 0.2
+
+optimizer:
+  lr: 0.0005
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.01
+  amsgrad: false
+
+scheduler:
+  scheduler:
+    pct_start: 0.3
+    anneal_strategy: cos
+    cycle_momentum: true
+    base_momentum: 0.85
+    max_momentum: 0.95
+    div_factor: 25.0
+    final_div_factor: 10000.0
+    three_phase: false
+    last_epoch: -1
+
+trainer:
+  max_epochs: 450
+  accumulate_grad_batches: 8
+  precision: 32-true

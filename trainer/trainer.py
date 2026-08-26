@@ -27,13 +27,17 @@ def _p2_general_flag(config, name):
 def _runtime_safety_enabled(config):
     return _p2_general_flag(
         config, "p2_fail_closed_runtime"
-    ) or _p2_general_flag(config, "reviewer_closure_fail_closed_runtime")
+    ) or _p2_general_flag(
+        config, "reviewer_closure_fail_closed_runtime"
+    ) or _p2_general_flag(config, "sonata_fail_closed_runtime")
 
 
 def _weighted_objective_enabled(config):
     return _p2_general_flag(
         config, "p2_weighted_objective"
-    ) or _p2_general_flag(config, "reviewer_closure_weighted_objective")
+    ) or _p2_general_flag(
+        config, "reviewer_closure_weighted_objective"
+    ) or _p2_general_flag(config, "sonata_weighted_objective")
 
 
 def _safe_length(value):
