@@ -35,6 +35,7 @@ from utils.sonata_second_preflight import (
     validate_sonata_preflight_authorization,
     validate_sonata_training_config_contract,
 )
+from utils.sonata_training_evidence import append_runtime_event
 from utils.sonata_weight_provenance import (
     OFFICIAL_SONATA_WEIGHT_SPEC,
     validate_sonata_weight_manifest,
@@ -44,6 +45,7 @@ DEFAULT_ARTIFACT_DIR = (
     PROJECT_ROOT / "artifacts" / "sonata_second_perception_v1" / "preflight"
 )
 DEFAULT_DEVICES = (1, 2)
+CANDIDATE_RECORD_NAME = ".sonata_second_candidate.json"
 
 
 def _load_json(path: Path, *, name: str) -> dict[str, Any]:
@@ -73,6 +75,7 @@ def require_formal_authorization(
     weight_path: Path,
     training_output_dir: Path,
     artifact_dir: Path,
+    allow_stale_resume: bool = False,
 ) -> Path:
     if Path.cwd().resolve() != PROJECT_ROOT.resolve():
         raise SonataSecondPreflightError("training launcher requires repository root")
@@ -196,6 +199,7 @@ def require_formal_authorization(
     validate_sonata_preflight_authorization(
         authorization,
         expected_bindings=bindings,
+        enforce_age=not allow_stale_resume,
     )
     return verified_weight.resolve()
 
@@ -210,6 +214,101 @@ def _parse_devices(value: str) -> tuple[int, ...]:
     if len(devices) != 2 or len(set(devices)) != 2 or any(item < 0 for item in devices):
         raise argparse.ArgumentTypeError("devices must identify two distinct GPUs")
     return devices
+
+
+def authorize_unique_candidate(
+    training_output_dir: Path,
+    contract: dict[str, Any],
+) -> str:
+    """Create the immutable candidate record or validate an identical resume."""
+
+    output_dir = Path(training_output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    record_path = output_dir / CANDIDATE_RECORD_NAME
+    if record_path.exists() or record_path.is_symlink():
+        if record_path.is_symlink() or not record_path.is_file():
+            raise SonataSecondPreflightError("candidate record is not a regular file")
+        observed = _load_json(record_path, name="Sonata candidate record")
+        if observed != contract:
+            raise SonataSecondPreflightError("candidate contract mismatch")
+        return "resume"
+
+    if any(output_dir.glob("*.ckpt")):
+        raise SonataSecondPreflightError(
+            "formal training directory contains an unowned checkpoint"
+        )
+    runtime_events = output_dir / ".sonata_runtime_events.jsonl"
+    if runtime_events.exists() or runtime_events.is_symlink():
+        raise SonataSecondPreflightError(
+            "formal training directory contains unowned runtime events"
+        )
+    encoded = (
+        json.dumps(contract, allow_nan=False, ensure_ascii=True, indent=2, sort_keys=True)
+        + "\n"
+    ).encode("ascii")
+    descriptor = os.open(
+        record_path,
+        os.O_CREAT | os.O_EXCL | os.O_WRONLY,
+        0o444,
+    )
+    try:
+        os.write(descriptor, encoded)
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+    return "fresh"
+
+
+def _candidate_contract(
+    *,
+    artifact_dir: Path,
+    smoke_authorization: dict[str, Any],
+    devices: tuple[int, ...],
+) -> dict[str, Any]:
+    preflight = _load_json(
+        Path(artifact_dir) / "preflight_authorization.json",
+        name="Sonata preflight authorization",
+    )
+    data_manifest = _load_json(
+        Path(artifact_dir) / "data_manifest.json",
+        name="Sonata data manifest",
+    )
+    training_semantics = _load_json(
+        Path(artifact_dir) / "training_semantics.json",
+        name="Sonata training semantics",
+    )
+    samples_per_epoch = data_manifest.get("mixed_runtime", {}).get(
+        "sampler_num_samples"
+    )
+    effective_batch = training_semantics.get("effective_global_batch")
+    if samples_per_epoch != 2112 or effective_batch != 32:
+        raise SonataSecondPreflightError("formal training budget inputs mismatch")
+    bindings = dict(preflight.get("bindings", {}))
+    bindings["preflight_authorization_sha256"] = preflight.get(
+        "authorization_sha256"
+    )
+    bindings["smoke_authorization_sha256"] = smoke_authorization.get(
+        "authorization_sha256"
+    )
+    bindings["weight_sha256"] = OFFICIAL_SONATA_WEIGHT_SPEC.sha256
+    payload: dict[str, Any] = {
+        "schema_version": 1,
+        "status": "active",
+        "bindings": bindings,
+        "recipe": {
+            "seed": 45,
+            "epochs": 450,
+            "devices": list(devices),
+            "samples_per_epoch": samples_per_epoch,
+            "optimizer_steps_per_epoch": (
+                samples_per_epoch + effective_batch - 1
+            )
+            // effective_batch,
+            "checkpoint_selection": "highest val_mean_t-AP",
+        },
+    }
+    payload["candidate_id"] = canonical_sha256(payload)
+    return payload
 
 
 def _parse_args() -> argparse.Namespace:
@@ -228,10 +327,15 @@ def _parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = _parse_args()
+    candidate_path = Path(args.training_output_dir) / CANDIDATE_RECORD_NAME
+    allow_stale_resume = (
+        args.execute and candidate_path.is_file() and not candidate_path.is_symlink()
+    )
     verified_weight = require_formal_authorization(
         weight_path=args.weight_path,
         training_output_dir=args.training_output_dir,
         artifact_dir=args.artifact_dir,
+        allow_stale_resume=allow_stale_resume,
     )
     if not args.execute:
         print(json.dumps({"gate": "SP0-PASS", "training_launched": False}))
@@ -239,10 +343,26 @@ def main() -> int:
     from scripts.sonata_second_smoke import require_smoke_authorization
 
     cfg = _compose_config(verified_weight, args.training_output_dir)
-    require_smoke_authorization(
+    smoke_authorization = require_smoke_authorization(
         expected_microbatch_per_gpu=int(cfg.data.batch_size),
         expected_accumulation=int(cfg.trainer.accumulate_grad_batches),
         expected_devices=args.devices,
+    )
+    candidate = _candidate_contract(
+        artifact_dir=args.artifact_dir,
+        smoke_authorization=smoke_authorization,
+        devices=args.devices,
+    )
+    launch_mode = authorize_unique_candidate(args.training_output_dir, candidate)
+    append_runtime_event(
+        args.training_output_dir,
+        {
+            "schema_version": 1,
+            "event": "launch_authorized",
+            "candidate_id": candidate["candidate_id"],
+            "launch_mode": launch_mode,
+            "checkpoint_count": len(list(Path(args.training_output_dir).glob("*.ckpt"))),
+        },
     )
     environment = os.environ.copy()
     environment["SONATA_CHECKPOINT"] = str(verified_weight)

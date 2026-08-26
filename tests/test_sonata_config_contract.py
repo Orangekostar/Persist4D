@@ -115,6 +115,21 @@ def test_primary_sonata_config_locks_paper_supported_recipe(
     assert checkpoints[0]["mode"] == "max"
     assert checkpoints[0]["save_top_k"] == 1
     assert checkpoints[0]["save_last"] is True
+    evidence_callbacks = [
+        callback
+        for callback in callbacks
+        if callback.get("_target_")
+        == "utils.sonata_training_evidence.SonataTrainingEvidenceCallback"
+    ]
+    assert evidence_callbacks == [
+        {
+            "_target_": (
+                "utils.sonata_training_evidence."
+                "SonataTrainingEvidenceCallback"
+            ),
+            "output_dir": "/training/sonata-second",
+        }
+    ]
 
     assert validate_sonata_training_config_contract(
         cfg,
@@ -132,6 +147,7 @@ def test_primary_sonata_config_locks_paper_supported_recipe(
         ("general.freeze", None, "general.freeze"),
         ("trainer.max_epochs", 449, "trainer.max_epochs"),
         ("trainer.accumulate_grad_batches", 8, "effective_global_batch"),
+        ("callbacks.1.save_on_train_epoch_end", False, "callbacks.save_on_train_epoch_end"),
     ],
 )
 def test_config_contract_rejects_primary_recipe_drift(

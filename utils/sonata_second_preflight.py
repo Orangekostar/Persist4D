@@ -706,6 +706,7 @@ def validate_sonata_preflight_authorization(
     *,
     expected_bindings: Mapping[str, str],
     now: datetime | None = None,
+    enforce_age: bool = True,
 ) -> None:
     if not isinstance(authorization, Mapping):
         raise SonataSecondPreflightError("authorization must be an object")
@@ -730,7 +731,7 @@ def validate_sonata_preflight_authorization(
         raise SonataSecondPreflightError("authorization age contract is invalid") from error
     current = now or datetime.now(timezone.utc)
     age_seconds = (current - issued_at).total_seconds()
-    if age_seconds < 0 or age_seconds > max_age:
+    if enforce_age and (age_seconds < 0 or age_seconds > max_age):
         raise SonataSecondPreflightError("authorization is stale")
 
 
@@ -907,6 +908,17 @@ def validate_sonata_training_config_contract(
         )
 
     callbacks = payload.get("callbacks")
+    evidence_callbacks = [
+        callback
+        for callback in callbacks or []
+        if isinstance(callback, Mapping)
+        and callback.get("_target_")
+        == "utils.sonata_training_evidence.SonataTrainingEvidenceCallback"
+    ]
+    if len(evidence_callbacks) != 1 or not _paths_equal(
+        evidence_callbacks[0].get("output_dir"), expected_output_dir
+    ):
+        errors.append("training_config.callbacks evidence callback mismatch")
     checkpoint_callbacks = [
         callback
         for callback in callbacks or []
@@ -923,6 +935,9 @@ def validate_sonata_training_config_contract(
             "mode": "max",
             "save_top_k": 1,
             "save_last": True,
+            "every_n_epochs": 1,
+            "save_on_train_epoch_end": True,
+            "save_weights_only": False,
         }
         for field, expected_value in required_callback.items():
             if checkpoint.get(field) != expected_value:

@@ -213,6 +213,12 @@ def test_authorization_rejects_tampering_staleness_and_binding_drift() -> None:
             expected_bindings=bindings,
             now=datetime(2026, 8, 26, 8, 2, tzinfo=timezone.utc),
         )
+    validate_sonata_preflight_authorization(
+        authorization,
+        expected_bindings=bindings,
+        now=datetime(2026, 8, 26, 8, 2, tzinfo=timezone.utc),
+        enforce_age=False,
+    )
     drifted = dict(bindings)
     drifted["data_manifest_sha256"] = "9" * 64
     with pytest.raises(SonataSecondPreflightError, match="bindings"):
@@ -300,6 +306,7 @@ def test_training_semantics_are_derived_from_the_resolved_config(
         "scripts/sonata_second_preflight.py",
         "scripts/sonata_second_smoke.py",
         "scripts/run_sonata_second_training.py",
+        "scripts/finalize_sonata_second_training.py",
     ],
 )
 def test_sonata_preflight_clis_support_direct_execution(script: str) -> None:
