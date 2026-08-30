@@ -128,7 +128,7 @@ def validate_checkpoint_payload(
     }
 
 
-def _require_candidate_binding(
+def validate_candidate_binding(
     *,
     variant: str,
     authorization: Mapping[str, Any],
@@ -294,7 +294,7 @@ def build_checkpoint_manifest(
 ) -> dict[str, object]:
     """Bind a short-curve checkpoint without serializing its machine path."""
 
-    _require_candidate_binding(
+    validate_candidate_binding(
         variant=variant, authorization=authorization, candidate=candidate
     )
     byte_size = file_identity.get("bytes")
