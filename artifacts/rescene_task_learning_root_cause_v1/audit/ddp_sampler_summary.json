@@ -1,0 +1,57 @@
+{
+  "analysis": {
+    "correctly_sharded": true,
+    "cross_rank_value_overlap_count": 322,
+    "cross_rank_value_overlap_is_sampler_bug": false,
+    "cross_rank_value_overlap_rate": 0.15246212121212122,
+    "draws_per_rank": {
+      "0": 1056,
+      "1": 1056
+    },
+    "gate": "sampler_contract_pass",
+    "observed_union_size": 1387,
+    "positional_mismatch_count": 0,
+    "replacement_duplicate_count": 725,
+    "world_size": 2
+  },
+  "dataset_draws": {
+    "rank0:rio": 591,
+    "rank0:scannet": 465,
+    "rank1:rio": 604,
+    "rank1:scannet": 452
+  },
+  "global_sampler": {
+    "contract_sha256": "7d81cecb03f5da8cda32abcb8cff3c88e4173f9c3594c5c9cddf5dc25c52d593",
+    "generator_seed": 45,
+    "num_samples": 2112
+  },
+  "sampler_chains": {
+    "0": [
+      {
+        "class": "lightning_fabric.utilities.distributed.DistributedSamplerWrapper",
+        "rank": 0,
+        "world_size": 2
+      },
+      {
+        "class": "torch.utils.data.sampler.WeightedRandomSampler"
+      }
+    ],
+    "1": [
+      {
+        "class": "lightning_fabric.utilities.distributed.DistributedSamplerWrapper",
+        "rank": 1,
+        "world_size": 2
+      },
+      {
+        "class": "torch.utils.data.sampler.WeightedRandomSampler"
+      }
+    ]
+  },
+  "schema_version": 1,
+  "source_commit": "4bae7529ba6524d186e14f780acb9fe89e4a6024",
+  "status": "pass",
+  "topology": {
+    "accelerator": "cuda",
+    "world_size": 2
+  }
+}

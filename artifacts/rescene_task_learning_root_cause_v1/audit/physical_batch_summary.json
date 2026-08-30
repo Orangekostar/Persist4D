@@ -1,0 +1,179 @@
+{
+  "fixed_panel_sha256": "81215dc2389d6b8d4016a1380dadcfad355267ec1a8eb5da6de4f9941cfcc68f",
+  "gate": {
+    "authorized": true,
+    "authorized_physical_global_batches": [
+      8
+    ]
+  },
+  "gradient_gates": {
+    "16": {
+      "authorized": false,
+      "feasible": false,
+      "thresholds": {
+        "maximum_relative_norm_difference": 0.1,
+        "minimum_cosine": 0.98,
+        "minimum_triggered_groups": 2
+      },
+      "triggered_group_count": 0,
+      "triggered_groups": []
+    },
+    "4": {
+      "authorized": false,
+      "feasible": true,
+      "thresholds": {
+        "maximum_relative_norm_difference": 0.1,
+        "minimum_cosine": 0.98,
+        "minimum_triggered_groups": 2
+      },
+      "triggered_group_count": 0,
+      "triggered_groups": []
+    },
+    "8": {
+      "authorized": true,
+      "feasible": true,
+      "thresholds": {
+        "maximum_relative_norm_difference": 0.1,
+        "minimum_cosine": 0.98,
+        "minimum_triggered_groups": 2
+      },
+      "triggered_group_count": 5,
+      "triggered_groups": [
+        "first_cross_attention",
+        "last_cross_attention",
+        "mask_embed_head",
+        "ptv3_decoder",
+        "query_projection"
+      ]
+    }
+  },
+  "reference_physical_global_batch": 4,
+  "runs": [
+    {
+      "accumulation": 8,
+      "effective_global_batch": 32,
+      "feasible": true,
+      "gpu_model": "NVIDIA A40",
+      "loss_components": {
+        "loss_aux_contrastive": 0.0,
+        "loss_ce": 3.4363163113594055,
+        "loss_ce_0": 2.9709022492170334,
+        "loss_ce_1": 3.2171406000852585,
+        "loss_ce_10": 3.4925541281700134,
+        "loss_ce_11": 3.294921800494194,
+        "loss_ce_2": 3.1769983172416687,
+        "loss_ce_3": 3.194734498858452,
+        "loss_ce_4": 3.1782566010951996,
+        "loss_ce_5": 3.461816966533661,
+        "loss_ce_6": 3.4705644100904465,
+        "loss_ce_7": 3.335260733962059,
+        "loss_ce_8": 3.4665028154850006,
+        "loss_ce_9": 3.5871419459581375,
+        "loss_dice": 1.8793596550822258,
+        "loss_dice_0": 1.849567674100399,
+        "loss_dice_1": 1.8504822850227356,
+        "loss_dice_10": 1.8606547117233276,
+        "loss_dice_11": 1.876980945467949,
+        "loss_dice_2": 1.8516606539487839,
+        "loss_dice_3": 1.881198801100254,
+        "loss_dice_4": 1.88610128313303,
+        "loss_dice_5": 1.8736568167805672,
+        "loss_dice_6": 1.8612834885716438,
+        "loss_dice_7": 1.8831580206751823,
+        "loss_dice_8": 1.8841076046228409,
+        "loss_dice_9": 1.8648408204317093,
+        "loss_mask": 0.7392196804285049,
+        "loss_mask_0": 1.7477474957704544,
+        "loss_mask_1": 2.477605029940605,
+        "loss_mask_10": 2.203974075615406,
+        "loss_mask_11": 0.7182043995708227,
+        "loss_mask_2": 2.439546823501587,
+        "loss_mask_3": 0.9184879548847675,
+        "loss_mask_4": 0.9357230961322784,
+        "loss_mask_5": 1.2244171500205994,
+        "loss_mask_6": 1.850876472890377,
+        "loss_mask_7": 0.7934101112186909,
+        "loss_mask_8": 0.876997321844101,
+        "loss_mask_9": 1.4262965992093086,
+        "loss_segment_contrastive": 2.864426836371422,
+        "loss_segment_contrastive_layer0": 2.864426836371422
+      },
+      "objective_value": 229.79928016662598,
+      "peak_memory_mib": 21563.1171875,
+      "per_device_batch": 2,
+      "physical_global_batch": 4,
+      "step_seconds": 34.177795205730945
+    },
+    {
+      "accumulation": 4,
+      "effective_global_batch": 32,
+      "feasible": true,
+      "gpu_model": "NVIDIA A40",
+      "loss_components": {
+        "loss_aux_contrastive": 0.0,
+        "loss_ce": 3.424033522605896,
+        "loss_ce_0": 2.9708661139011383,
+        "loss_ce_1": 3.1998541355133057,
+        "loss_ce_10": 3.4788091480731964,
+        "loss_ce_11": 3.290609300136566,
+        "loss_ce_2": 3.15212419629097,
+        "loss_ce_3": 3.179863154888153,
+        "loss_ce_4": 3.1634589433670044,
+        "loss_ce_5": 3.4556753039360046,
+        "loss_ce_6": 3.4348252415657043,
+        "loss_ce_7": 3.308689594268799,
+        "loss_ce_8": 3.4404413402080536,
+        "loss_ce_9": 3.586603581905365,
+        "loss_dice": 3.766432523727417,
+        "loss_dice_0": 3.699012875556946,
+        "loss_dice_1": 3.697984606027603,
+        "loss_dice_10": 3.714216500520706,
+        "loss_dice_11": 3.762353479862213,
+        "loss_dice_2": 3.6991621255874634,
+        "loss_dice_3": 3.7592437267303467,
+        "loss_dice_4": 3.768266201019287,
+        "loss_dice_5": 3.738993376493454,
+        "loss_dice_6": 3.7050627768039703,
+        "loss_dice_7": 3.758668452501297,
+        "loss_dice_8": 3.759004980325699,
+        "loss_dice_9": 3.7282644510269165,
+        "loss_mask": 1.3826033100485802,
+        "loss_mask_0": 3.4983886778354645,
+        "loss_mask_1": 4.928535133600235,
+        "loss_mask_10": 4.004229426383972,
+        "loss_mask_11": 1.4759511426091194,
+        "loss_mask_2": 5.214180141687393,
+        "loss_mask_3": 1.8454664051532745,
+        "loss_mask_4": 1.8403742909431458,
+        "loss_mask_5": 2.390566438436508,
+        "loss_mask_6": 3.7883985340595245,
+        "loss_mask_7": 1.6123900413513184,
+        "loss_mask_8": 1.5277829319238663,
+        "loss_mask_9": 2.506376102566719,
+        "loss_segment_contrastive": 2.867041230201721,
+        "loss_segment_contrastive_layer0": 2.867041230201721
+      },
+      "objective_value": 366.2283020019531,
+      "peak_memory_mib": 31517.5810546875,
+      "per_device_batch": 4,
+      "physical_global_batch": 8,
+      "step_seconds": 42.518411110155284
+    },
+    {
+      "accumulation": 2,
+      "effective_global_batch": 32,
+      "failure": "CUDAOutOfMemoryError",
+      "feasible": false,
+      "physical_global_batch": 16
+    }
+  ],
+  "schema_version": 1,
+  "source_commit": "d670c3ba342b34bae6ee9963620f3458d4b1458b",
+  "topology": {
+    "cuda_device_indices": [
+      1,
+      2
+    ],
+    "world_size": 2
+  }
+}

@@ -1,0 +1,1705 @@
+{
+  "backbone_training": true,
+  "drop_path_disabled_modules": [
+    "model.enc.enc0.block1.drop_path.0",
+    "model.enc.enc0.block2.drop_path.0",
+    "model.enc.enc1.block0.drop_path.0",
+    "model.enc.enc1.block1.drop_path.0",
+    "model.enc.enc1.block2.drop_path.0",
+    "model.enc.enc2.block0.drop_path.0",
+    "model.enc.enc2.block1.drop_path.0",
+    "model.enc.enc2.block2.drop_path.0",
+    "model.enc.enc3.block0.drop_path.0",
+    "model.enc.enc3.block1.drop_path.0",
+    "model.enc.enc3.block2.drop_path.0",
+    "model.enc.enc3.block3.drop_path.0",
+    "model.enc.enc3.block4.drop_path.0",
+    "model.enc.enc3.block5.drop_path.0",
+    "model.enc.enc3.block6.drop_path.0",
+    "model.enc.enc3.block7.drop_path.0",
+    "model.enc.enc3.block8.drop_path.0",
+    "model.enc.enc3.block9.drop_path.0",
+    "model.enc.enc3.block10.drop_path.0",
+    "model.enc.enc3.block11.drop_path.0",
+    "model.enc.enc4.block0.drop_path.0",
+    "model.enc.enc4.block1.drop_path.0",
+    "model.enc.enc4.block2.drop_path.0",
+    "model.dec.dec3.block0.drop_path.0",
+    "model.dec.dec3.block1.drop_path.0",
+    "model.dec.dec3.block2.drop_path.0",
+    "model.dec.dec2.block0.drop_path.0",
+    "model.dec.dec2.block1.drop_path.0",
+    "model.dec.dec2.block2.drop_path.0",
+    "model.dec.dec1.block0.drop_path.0",
+    "model.dec.dec1.block1.drop_path.0",
+    "model.dec.dec1.block2.drop_path.0",
+    "model.dec.dec0.block0.drop_path.0",
+    "model.dec.dec0.block1.drop_path.0"
+  ],
+  "frozen_parameter_count": 453,
+  "gate": {
+    "authorized": true,
+    "maximum_relative_rms_deviation": 0.001,
+    "minimum_cosine": 0.999,
+    "triggered_levels": [
+      "decoder_level_0",
+      "decoder_level_1",
+      "decoder_level_2",
+      "decoder_level_3",
+      "decoder_level_4",
+      "decoder_level_5"
+    ]
+  },
+  "input_provenance": {
+    "change_ground_truth": {
+      "reference": "repo:data/processed/rio/change_gt/train/scene0112_00-scene0112_01.txt",
+      "sha256": "75baf0a2d41956bd7d8c27b2a4257f5b8e606ab7a43a3436cc1bce07cbe0003c"
+    },
+    "change_label_database": {
+      "reference": "repo:data/processed/rio/change_label_database.yaml",
+      "sha256": "593e8c5d18883b9bd97a926e786b000425320b6d746f055d1aab5e54439814f1"
+    },
+    "color_statistics": {
+      "reference": "repo:data/processed/rio/color_mean_std.yaml",
+      "sha256": "c1a388cf2fbfd60703ec06bc81864e103895120c37a477cc6ad51f393dd7eb78"
+    },
+    "dataset": "3RScan",
+    "instance_ground_truth": [
+      {
+        "reference": "repo:data/processed/rio/instance_gt/train/scene0112_00.txt",
+        "sha256": "f5f9df1505fc72d23ca6c70b5180e6dffe6588a72d474feae9f072673b37f7a3"
+      },
+      {
+        "reference": "repo:data/processed/rio/instance_gt/train/scene0112_01.txt",
+        "sha256": "1aa55e3012f1cfe6e19def7caa0af67383d8311710c98465b3f47b5feb921b5a"
+      }
+    ],
+    "processed_point_clouds": [
+      {
+        "reference": "repo:data/processed/rio/train/0112_00.npy",
+        "sha256": "ecbbbc3fbcd52a3f752c43b8c983d3fb204206bc22549219d294be240a27b362"
+      },
+      {
+        "reference": "repo:data/processed/rio/train/0112_01.npy",
+        "sha256": "213b69bffc52948f7934f0a21c3e6c48be7180ff68487cb79bf5b64ffd75cd78"
+      }
+    ],
+    "resolved_composed_config": {
+      "format": "canonical-json-sort-keys-v1",
+      "portable_references": true,
+      "serialized_bytes": 9420,
+      "sha256": "c04291fd18ac761e44d545e615639c88054cd625d5af96ece09dd5b70c03eec6"
+    },
+    "sample_name": "scene0112_00-scene0112_01",
+    "semantic_label_database": {
+      "reference": "repo:data/processed/rio/label_database.yaml",
+      "sha256": "b03b15ecd0791a0ecd05912e9fe5617dd29a466d117cf5c2188f28638293a063"
+    },
+    "sequence_database": {
+      "reference": "repo:data/processed/rio/sequence_database_sliding_2.yaml",
+      "sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416"
+    },
+    "split_database": {
+      "reference": "repo:data/processed/rio/train_database.yaml",
+      "sha256": "9bb033e9e1e81c5f89e6e9f170392f95e930c9362ac83ac04c549a8b9a9c0ab0"
+    },
+    "temporal_window": 2,
+    "train_augmentations": {
+      "image": {
+        "reference": "repo:conf/augmentation/albumentations_aug.yaml",
+        "sha256": "0ee794f06cfa1552423ea6e51cec64d905e32dd27e63cc48defba9b17753d587"
+      },
+      "volume": {
+        "reference": "repo:conf/augmentation/volumentations_aug.yaml",
+        "sha256": "1ff353485c25fb37cf89776a60921c40d257bf627d9f89f8665ef49cc1e85cd4"
+      }
+    }
+  },
+  "model_training": true,
+  "pass_count": 8,
+  "policies": {
+    "current": {
+      "decoder_level_0": {
+        "element_count": 507360,
+        "mean_cosine": 0.9641018084117344,
+        "mean_feature_variance": 0.12308785319328308,
+        "minimum_cosine": 0.9622581005096436,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.2507860912980214
+      },
+      "decoder_level_1": {
+        "element_count": 66048,
+        "mean_cosine": 0.8695689524923053,
+        "mean_feature_variance": 0.01497531495988369,
+        "minimum_cosine": 0.8531995415687561,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.4785570717957743
+      },
+      "decoder_level_2": {
+        "element_count": 163968,
+        "mean_cosine": 0.910716678415026,
+        "mean_feature_variance": 0.3310863971710205,
+        "minimum_cosine": 0.8995176553726196,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.3950837556640224
+      },
+      "decoder_level_3": {
+        "element_count": 233664,
+        "mean_cosine": 0.9312567796025958,
+        "mean_feature_variance": 0.24655510485172272,
+        "minimum_cosine": 0.9242932796478271,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.3467404472800389
+      },
+      "decoder_level_4": {
+        "element_count": 278208,
+        "mean_cosine": 0.9523258805274963,
+        "mean_feature_variance": 0.16983571648597717,
+        "minimum_cosine": 0.9504762291908264,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.28874077853541325
+      },
+      "decoder_level_5": {
+        "element_count": 507360,
+        "mean_cosine": 0.9641018084117344,
+        "mean_feature_variance": 0.12308785319328308,
+        "minimum_cosine": 0.9622581005096436,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.2507860912980214
+      }
+    },
+    "drop_path_disabled": {
+      "decoder_level_0": {
+        "element_count": 507360,
+        "mean_cosine": 0.9942500335829598,
+        "mean_feature_variance": 0.018048366531729698,
+        "minimum_cosine": 0.9925602674484253,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.1004059813519615
+      },
+      "decoder_level_1": {
+        "element_count": 66048,
+        "mean_cosine": 0.998365751334599,
+        "mean_feature_variance": 0.0001730445510474965,
+        "minimum_cosine": 0.9972226023674011,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.05374082988602919
+      },
+      "decoder_level_2": {
+        "element_count": 163968,
+        "mean_cosine": 0.9985861011913845,
+        "mean_feature_variance": 0.005337747745215893,
+        "minimum_cosine": 0.9974300861358643,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.04977402065659558
+      },
+      "decoder_level_3": {
+        "element_count": 233664,
+        "mean_cosine": 0.9983426587922233,
+        "mean_feature_variance": 0.005539772100746632,
+        "minimum_cosine": 0.9979159832000732,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.0538904317667816
+      },
+      "decoder_level_4": {
+        "element_count": 278208,
+        "mean_cosine": 0.9969785979815892,
+        "mean_feature_variance": 0.009804029949009418,
+        "minimum_cosine": 0.9962350130081177,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.07275268097704733
+      },
+      "decoder_level_5": {
+        "element_count": 507360,
+        "mean_cosine": 0.9942500335829598,
+        "mean_feature_variance": 0.018048366531729698,
+        "minimum_cosine": 0.9925602674484253,
+        "pass_count": 8,
+        "relative_rms_deviation": 0.1004059813519615
+      }
+    }
+  },
+  "sample": {
+    "name": "scene0112_00-scene0112_01",
+    "raw_points": 8977,
+    "supervised_instances": 2,
+    "temporal_stages": [
+      0,
+      1
+    ],
+    "voxels": 5285
+  },
+  "schema_version": 1,
+  "source_commit": "963eceb43ae845e6e1bb19d296c24f530c3bd9b6",
+  "status": "pass",
+  "stochastic_modules": [
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.embedding.stem.norm",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc0.block0.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc0.block0.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc0.block0.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc0.block0.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc0.block0.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc0.block1.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc0.block1.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc0.block1.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc0.block1.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc0.block1.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.013043479062616825,
+      "kind": "drop_path",
+      "name": "model.enc.enc0.block1.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc0.block2.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc0.block2.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc0.block2.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc0.block2.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc0.block2.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.02608695812523365,
+      "kind": "drop_path",
+      "name": "model.enc.enc0.block2.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc1.down.norm.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc1.block0.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc1.block0.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc1.block0.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc1.block0.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc1.block0.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.03913043811917305,
+      "kind": "drop_path",
+      "name": "model.enc.enc1.block0.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc1.block1.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc1.block1.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc1.block1.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc1.block1.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc1.block1.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.0521739162504673,
+      "kind": "drop_path",
+      "name": "model.enc.enc1.block1.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc1.block2.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc1.block2.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc1.block2.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc1.block2.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc1.block2.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.06521739810705185,
+      "kind": "drop_path",
+      "name": "model.enc.enc1.block2.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc2.down.norm.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc2.block0.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc2.block0.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc2.block0.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc2.block0.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc2.block0.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.0782608762383461,
+      "kind": "drop_path",
+      "name": "model.enc.enc2.block0.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc2.block1.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc2.block1.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc2.block1.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc2.block1.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc2.block1.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.09130435436964035,
+      "kind": "drop_path",
+      "name": "model.enc.enc2.block1.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc2.block2.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc2.block2.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc2.block2.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc2.block2.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc2.block2.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.1043478325009346,
+      "kind": "drop_path",
+      "name": "model.enc.enc2.block2.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.down.norm.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block0.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block0.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block0.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block0.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block0.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.11739131063222885,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block0.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block1.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block1.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block1.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block1.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block1.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.1304347962141037,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block1.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block2.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block2.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block2.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block2.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block2.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.14347827434539795,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block2.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block3.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block3.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block3.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block3.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block3.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.156521737575531,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block3.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block4.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block4.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block4.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block4.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block4.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.16956521570682526,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block4.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block5.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block5.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block5.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block5.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block5.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.1826086938381195,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block5.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block6.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block6.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block6.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block6.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block6.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.19565218687057495,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block6.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block7.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block7.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block7.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block7.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block7.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.2086956650018692,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block7.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block8.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block8.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block8.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block8.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block8.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.22173914313316345,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block8.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block9.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block9.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block9.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block9.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block9.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.2347826212644577,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block9.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block10.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block10.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block10.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block10.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block10.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.24782609939575195,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block10.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block11.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block11.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block11.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc3.block11.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc3.block11.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.260869562625885,
+      "kind": "drop_path",
+      "name": "model.enc.enc3.block11.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc4.down.norm.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc4.block0.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc4.block0.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc4.block0.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc4.block0.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc4.block0.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.27391305565834045,
+      "kind": "drop_path",
+      "name": "model.enc.enc4.block0.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc4.block1.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc4.block1.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc4.block1.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc4.block1.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc4.block1.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.2869565188884735,
+      "kind": "drop_path",
+      "name": "model.enc.enc4.block1.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc4.block2.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc4.block2.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc4.block2.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.enc.enc4.block2.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.enc.enc4.block2.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.30000001192092896,
+      "kind": "drop_path",
+      "name": "model.enc.enc4.block2.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec3.up.proj.1",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec3.up.proj_skip.1",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec3.block0.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec3.block0.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec3.block0.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec3.block0.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec3.block0.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.30000001192092896,
+      "kind": "drop_path",
+      "name": "model.dec.dec3.block0.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec3.block1.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec3.block1.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec3.block1.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec3.block1.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec3.block1.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.27272728085517883,
+      "kind": "drop_path",
+      "name": "model.dec.dec3.block1.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec3.block2.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec3.block2.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec3.block2.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec3.block2.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec3.block2.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.2454545497894287,
+      "kind": "drop_path",
+      "name": "model.dec.dec3.block2.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec2.up.proj.1",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec2.up.proj_skip.1",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec2.block0.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec2.block0.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec2.block0.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec2.block0.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec2.block0.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.2181818187236786,
+      "kind": "drop_path",
+      "name": "model.dec.dec2.block0.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec2.block1.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec2.block1.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec2.block1.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec2.block1.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec2.block1.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.19090908765792847,
+      "kind": "drop_path",
+      "name": "model.dec.dec2.block1.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec2.block2.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec2.block2.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec2.block2.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec2.block2.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec2.block2.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.16363637149333954,
+      "kind": "drop_path",
+      "name": "model.dec.dec2.block2.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec1.up.proj.1",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec1.up.proj_skip.1",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec1.block0.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec1.block0.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec1.block0.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec1.block0.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec1.block0.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.13636364042758942,
+      "kind": "drop_path",
+      "name": "model.dec.dec1.block0.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec1.block1.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec1.block1.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec1.block1.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec1.block1.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec1.block1.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.10909091681241989,
+      "kind": "drop_path",
+      "name": "model.dec.dec1.block1.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec1.block2.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec1.block2.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec1.block2.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec1.block2.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec1.block2.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.08181818574666977,
+      "kind": "drop_path",
+      "name": "model.dec.dec1.block2.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec0.up.proj.1",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec0.up.proj_skip.1",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec0.block0.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec0.block0.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec0.block0.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec0.block0.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec0.block0.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.054545458406209946,
+      "kind": "drop_path",
+      "name": "model.dec.dec0.block0.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec0.block1.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec0.block1.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec0.block1.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec0.block1.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec0.block1.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "timm.layers.drop.DropPath",
+      "drop_prob": 0.027272729203104973,
+      "kind": "drop_path",
+      "name": "model.dec.dec0.block1.drop_path.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec0.block2.cpe.2",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec0.block2.norm1.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec0.block2.attn.proj_drop",
+      "p": 0.0,
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.normalization.LayerNorm",
+      "kind": "normalization",
+      "name": "model.dec.dec0.block2.norm2.0",
+      "training": true
+    },
+    {
+      "class": "torch.nn.modules.dropout.Dropout",
+      "kind": "dropout",
+      "name": "model.dec.dec0.block2.mlp.0.drop",
+      "p": 0.0,
+      "training": true
+    }
+  ]
+}

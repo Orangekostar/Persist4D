@@ -1,0 +1,79 @@
+{
+  "contract_sha256": "b715709276288e4749efc569c881fe8c47aab521051208ee1864d99647871150",
+  "database_counts": {
+    "current_filtered_rio_train_sequences": 1174,
+    "current_filtered_scannet_train_scans": 1199,
+    "official_unmodified_rio_train_sequences": 1178,
+    "official_unmodified_scannet_train_scans": 1201,
+    "rio_t2_all_split_sequences": 1482,
+    "sampler_num_samples": 2112
+  },
+  "filter255": {
+    "excluded_classes": [
+      0,
+      1
+    ],
+    "gate": {
+      "material": true,
+      "threshold": 0.005
+    },
+    "per_dataset": [
+      {
+        "dataset": "rio",
+        "instance_fraction": 0.6238173527313335,
+        "label255_instances": 20110,
+        "label255_points": 37410909,
+        "point_fraction": 0.48946907554961977,
+        "target_instances": 32237,
+        "target_points": 76431609
+      },
+      {
+        "dataset": "scannet",
+        "instance_fraction": 0.4816828095143968,
+        "label255_instances": 14621,
+        "label255_points": 25277174,
+        "point_fraction": 0.3068661064512009,
+        "target_instances": 30354,
+        "target_points": 82371997
+      }
+    ],
+    "sample_count": 2373,
+    "schema_version": 1,
+    "totals": {
+      "instance_fraction": 0.554888082951223,
+      "label255_instances": 34731,
+      "label255_points": 62688083,
+      "point_fraction": 0.3947522640008565,
+      "target_instances": 62591,
+      "target_points": 158803606
+    }
+  },
+  "schema_version": 1,
+  "source_commit": "d670c3ba342b34bae6ee9963620f3458d4b1458b",
+  "status": "pass",
+  "supervision_contract": {
+    "classification": "ignored",
+    "instance_semantic_resolution": "first_point_matching_training_collator",
+    "mask_and_dice": "included",
+    "matcher_class_cost": "ignore_sentinel",
+    "matcher_mask_cost": "included",
+    "raw_label": 255,
+    "target_construction_with_filter_255": "excluded",
+    "target_construction_without_filter_255": "included",
+    "target_label": 253
+  },
+  "weighted_sampler": {
+    "dataset_draw_ratios": {
+      "rio": 0.5658143939393939,
+      "scannet": 0.4341856060606061
+    },
+    "dataset_draws": {
+      "rio": 1195,
+      "scannet": 917
+    },
+    "draw_count": 2112,
+    "replacement_duplicate_count": 725,
+    "replacement_duplicate_rate": 0.34327651515151514,
+    "unique_sample_count": 1387
+  }
+}
