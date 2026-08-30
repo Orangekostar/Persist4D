@@ -1566,6 +1566,19 @@ def get_parameters(cfg: DictConfig):
     # Only rank 0 creates directories
     if rank_zero_only.rank == 0:
         os.makedirs(cfg.general.save_dir, exist_ok=True)
+
+    common_initialization = cfg.general.get(
+        "rootcause_common_initialization", None
+    )
+    common_initialization_sha256 = cfg.general.get(
+        "rootcause_common_initialization_sha256", None
+    )
+    if cfg.general.get("rootcause_fail_closed_runtime", False) and (
+        not common_initialization or not common_initialization_sha256
+    ):
+        raise RuntimeError(
+            "Root-cause training requires a complete common initialization binding"
+        )
     
     model = InstanceSegmentation(cfg)
     
@@ -1576,15 +1589,12 @@ def get_parameters(cfg: DictConfig):
     if cfg.general.checkpoint:
         print("loading checkpoint")
         cfg, model = load_checkpoint_with_missing_or_exsessive_keys(cfg, model)
-    common_initialization = cfg.general.get(
-        "rootcause_common_initialization", None
-    )
     if common_initialization:
         print("loading root-cause common initialization")
         load_common_initialization(
             model,
             common_initialization,
-            expected_sha256=cfg.general.rootcause_common_initialization_sha256,
+            expected_sha256=common_initialization_sha256,
         )
     
     return cfg, model

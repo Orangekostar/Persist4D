@@ -143,3 +143,37 @@ def test_entrypoint_loads_common_state_after_pretrained_backbone(monkeypatch) ->
 
     assert observed is system
     assert events == ["instantiate", "pretrained", "common"]
+
+
+@pytest.mark.parametrize(
+    ("common_state", "common_sha256"),
+    [(None, None), ("common.pt", None), (None, "a" * 64)],
+)
+def test_rootcause_entrypoint_requires_complete_common_initialization_binding(
+    monkeypatch,
+    common_state: str | None,
+    common_sha256: str | None,
+) -> None:
+    config = OmegaConf.create(
+        {
+            "general": {
+                "seed": 45,
+                "gpus": 1,
+                "save_dir": "saved/test-rootcause-common",
+                "backbone_checkpoint": None,
+                "checkpoint": None,
+                "rootcause_fail_closed_runtime": True,
+                "rootcause_common_initialization": common_state,
+                "rootcause_common_initialization_sha256": common_sha256,
+            }
+        }
+    )
+    monkeypatch.setattr(entrypoint.rank_zero_only, "rank", 1)
+    monkeypatch.setattr(
+        entrypoint,
+        "InstanceSegmentation",
+        lambda _cfg: pytest.fail("model must not instantiate without common state"),
+    )
+
+    with pytest.raises(RuntimeError, match="common initialization"):
+        entrypoint.get_parameters(config)
