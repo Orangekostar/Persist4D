@@ -1549,6 +1549,18 @@ def find_resume_checkpoint(save_dir, *, formal_p2=False, cfg=None):
     return None
 
 
+def _rootcause_allowed_new_initialization_prefixes(
+    cfg: DictConfig,
+) -> tuple[str, ...]:
+    model_cfg = cfg.get("model", {})
+    prefixes = []
+    if model_cfg.get("use_np_features", False) is True:
+        prefixes.append("model.np_feature_projection.")
+    if model_cfg.get("scatter_type", "mean") == "adaptive":
+        prefixes.append("model.scatter_fn.")
+    return tuple(prefixes)
+
+
 def get_parameters(cfg: DictConfig):    
     # Environment setup for optimal performance
     os.environ.setdefault("OMP_NUM_THREADS", "8")
@@ -1595,6 +1607,9 @@ def get_parameters(cfg: DictConfig):
             model,
             common_initialization,
             expected_sha256=common_initialization_sha256,
+            allowed_new_prefixes=_rootcause_allowed_new_initialization_prefixes(
+                cfg
+            ),
         )
     
     return cfg, model

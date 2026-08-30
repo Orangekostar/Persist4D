@@ -123,10 +123,11 @@ def test_entrypoint_loads_common_state_after_pretrained_backbone(monkeypatch) ->
         events.append("pretrained")
         return cfg, model
 
-    def load_common(model, path, *, expected_sha256):
+    def load_common(model, path, *, expected_sha256, allowed_new_prefixes):
         assert model is system
         assert path == "common.pt"
         assert expected_sha256 == "a" * 64
+        assert allowed_new_prefixes == ()
         events.append("common")
         return {"status": "pass"}
 
@@ -177,3 +178,69 @@ def test_rootcause_entrypoint_requires_complete_common_initialization_binding(
 
     with pytest.raises(RuntimeError, match="common initialization"):
         entrypoint.get_parameters(config)
+
+
+@pytest.mark.parametrize(
+    ("model_config", "expected_prefixes"),
+    [
+        (
+            {"use_np_features": True, "scatter_type": "mean"},
+            ("model.np_feature_projection.",),
+        ),
+        (
+            {"use_np_features": False, "scatter_type": "adaptive"},
+            ("model.scatter_fn.",),
+        ),
+        (
+            {"use_np_features": True, "scatter_type": "adaptive"},
+            ("model.np_feature_projection.", "model.scatter_fn."),
+        ),
+        ({"use_np_features": False, "scatter_type": "mean"}, ()),
+    ],
+)
+def test_entrypoint_allows_only_configured_strong_variant_namespaces(
+    monkeypatch,
+    model_config: dict[str, object],
+    expected_prefixes: tuple[str, ...],
+) -> None:
+    class _System:
+        pass
+
+    system = _System()
+    config = OmegaConf.create(
+        {
+            "general": {
+                "seed": 45,
+                "gpus": 1,
+                "save_dir": "saved/test-strong-local-common",
+                "backbone_checkpoint": None,
+                "checkpoint": None,
+                "rootcause_fail_closed_runtime": True,
+                "rootcause_common_initialization": "common.pt",
+                "rootcause_common_initialization_sha256": "a" * 64,
+            },
+            "model": model_config,
+        }
+    )
+    observed_prefixes: list[tuple[str, ...]] = []
+
+    def load_common(
+        model,
+        path,
+        *,
+        expected_sha256,
+        allowed_new_prefixes,
+    ):
+        assert model is system
+        assert path == "common.pt"
+        assert expected_sha256 == "a" * 64
+        observed_prefixes.append(allowed_new_prefixes)
+        return {"status": "pass"}
+
+    monkeypatch.setattr(entrypoint, "InstanceSegmentation", lambda _cfg: system)
+    monkeypatch.setattr(entrypoint, "load_common_initialization", load_common)
+    monkeypatch.setattr(entrypoint.rank_zero_only, "rank", 1)
+
+    entrypoint.get_parameters(config)
+
+    assert observed_prefixes == [expected_prefixes]
