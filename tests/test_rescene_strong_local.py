@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+from pathlib import Path
 
 import pytest
 
@@ -458,3 +459,25 @@ def test_strong_launcher_preserves_base_semantics_and_applies_native_switches(
             pretrained_identity={"bytes": 201, "sha256": "5" * 64},
             input_identities={},
         )
+
+
+def test_strong_local_pipeline_has_no_persist4d_selection_inputs() -> None:
+    root = Path(__file__).resolve().parents[1]
+    source = "\n".join(
+        (root / path).read_text(encoding="utf-8")
+        for path in (
+            "utils/rescene_strong_local.py",
+            "scripts/prepare_rescene_strong_local.py",
+            "scripts/run_rescene_strong_local_training.py",
+            "scripts/finalize_rescene_strong_local.py",
+            "scripts/finalize_rescene_strong_local_full_evaluation.py",
+        )
+    )
+    forbidden = (
+        "artifacts/P6A",
+        "artifacts/system_comparison",
+        "artifacts/reviewer_closure_v3",
+        "gap_recovery",
+        "Protocol-B",
+    )
+    assert all(fragment not in source for fragment in forbidden)
