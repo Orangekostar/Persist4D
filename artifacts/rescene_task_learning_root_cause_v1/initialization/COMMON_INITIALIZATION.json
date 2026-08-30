@@ -1,0 +1,55 @@
+{
+  "common_state": {
+    "bytes": 540886910,
+    "config_sha256": "f31acf492c6eec0b7e908dd9a86c70e841ec6dbd0ac1e76172c390e0f43328f5",
+    "creating_commit": "68373a3cc6ba2415359d69dc0f9158a2e287e2d2",
+    "logical_name": "rootcause_common_initial_state",
+    "reference": "external:checkpoint/rootcause_common/d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+    "schema_version": 1,
+    "selected_epoch": 0,
+    "selected_step": 0,
+    "sha256": "d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+    "upstream_checkpoint_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+  },
+  "concerto_pretrained": {
+    "bytes": 433987358,
+    "reference": "external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+    "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+  },
+  "config_sha256": "f31acf492c6eec0b7e908dd9a86c70e841ec6dbd0ac1e76172c390e0f43328f5",
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "frozen_encoder_state": {
+    "content_sha256": "7a4bf3282599344d9d0fc6e27a886dc7742a826393dcad6a8246fc4274191b48",
+    "schema_sha256": "6ab94f14237154485ea922fadc38b3e412418e9d45a7f4bc2e705cbf83b0da18",
+    "schema_version": 1,
+    "tensor_count": 453,
+    "total_elements": 108461376,
+    "trainable_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "rng_contract": {
+    "numpy_seed": 45,
+    "python_seed": 45,
+    "sampler_seed": 45,
+    "torch_seed": 45
+  },
+  "schema_version": 1,
+  "seed": 45,
+  "source_commit": "68373a3cc6ba2415359d69dc0f9158a2e287e2d2",
+  "status": "pass",
+  "tensor_state": {
+    "content_sha256": "2949cc5ec1022aa2bd50cfeb2a97e8bca23e3913353e6b2ffd33738f89669abd",
+    "schema_sha256": "e375f33246965e4568f2553ffb3f97c94f91f4f484442984030659195642d324",
+    "schema_version": 1,
+    "tensor_count": 798,
+    "total_elements": 135149676,
+    "trainable_schema_sha256": "6a398f2c29ba67cb342aada6bc8029781a5379aee09c03f57d40891af12e10b6"
+  },
+  "trainable_state": {
+    "content_sha256": "8a40be6cfef91b8c8d8198d2dcdd9b366efff1c1ad0a12319156024c2b60c3df",
+    "schema_sha256": "6a398f2c29ba67cb342aada6bc8029781a5379aee09c03f57d40891af12e10b6",
+    "schema_version": 1,
+    "tensor_count": 342,
+    "total_elements": 26688019,
+    "trainable_schema_sha256": "6a398f2c29ba67cb342aada6bc8029781a5379aee09c03f57d40891af12e10b6"
+  }
+}
