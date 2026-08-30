@@ -316,6 +316,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--root-official-like-epoch90", type=Path, required=True)
     parser.add_argument("--a1-result", type=Path)
     parser.add_argument("--a2-result", type=Path)
+    parser.add_argument("--a1-authorization", type=Path)
+    parser.add_argument("--a2-authorization", type=Path)
     parser.add_argument("--pretrained", type=Path, required=True)
     parser.add_argument("--common-state", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -332,8 +334,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     }
     if arguments.a1_result:
         evidence_paths["a1_result"] = arguments.a1_result
+    if arguments.a1_authorization:
+        evidence_paths["a1_authorization"] = arguments.a1_authorization
     if arguments.a2_result:
         evidence_paths["a2_result"] = arguments.a2_result
+    if arguments.a2_authorization:
+        evidence_paths["a2_authorization"] = arguments.a2_authorization
     authorization, portable = require_strong_authorization(
         authorization_path=arguments.authorization,
         root_authorization_path=arguments.root_authorization,

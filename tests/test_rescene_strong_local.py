@@ -283,6 +283,8 @@ def _authorization_inputs() -> tuple[dict, dict, dict]:
     short = {
         "schema_version": 1,
         "status": "pass",
+        "experiment": "rescene_task_learning_root_cause_v1",
+        "variant_authorization_sha256": root["authorization_sha256"],
         "selected_variant": None,
         "epoch90_summary": {
             "R0": {
@@ -301,11 +303,18 @@ def _authorization_inputs() -> tuple[dict, dict, dict]:
     diagnostics = {
         "schema_version": 1,
         "status": "pass",
+        "experiment": "rescene_task_learning_root_cause_v1",
         "gates": {
             "A1": {"authorized": True},
             "A2": {"diagnostic_evidence_pass": True},
         },
-        "provenance": {"bindings": {"variant": "R1", "completed_epoch": 90}},
+        "provenance": {
+            "bindings": {
+                "variant": "R1",
+                "completed_epoch": 90,
+                "variant_authorization_sha256": root["authorization_sha256"],
+            }
+        },
     }
     _signed(diagnostics, "content_sha256")
     return root, short, diagnostics
@@ -376,13 +385,41 @@ def test_strong_authorization_rejects_stale_evidence_or_external_state() -> None
             input_identities={},
         )
 
+    root, short, diagnostics = _authorization_inputs()
+    diagnostics["provenance"]["bindings"]["variant_authorization_sha256"] = "0" * 64
+    diagnostics.pop("content_sha256")
+    _signed(diagnostics, "content_sha256")
+    with pytest.raises(RootCauseContractError, match="authorization differs"):
+        build_strong_authorization(
+            variant="A1",
+            root_authorization=root,
+            short_decision=short,
+            diagnostics=diagnostics,
+            source_commit="6" * 40,
+            common_identity={"bytes": 100, "sha256": "4" * 64},
+            pretrained_identity={"bytes": 200, "sha256": "5" * 64},
+            input_identities=_upstream_identities(),
+        )
+
 
 def test_a2_authorization_binds_signed_a1_failure() -> None:
     root, short, diagnostics = _authorization_inputs()
     a1_result = {"status": "pass", "all_gates_pass": False}
+    a1_authorization = {
+        "status": "authorized",
+        "selected_variants": ["A1"],
+    }
+    _signed(a1_authorization, "authorization_sha256")
+    a1_result.update(
+        {
+            "variant": "A1",
+            "variant_authorization_sha256": a1_authorization["authorization_sha256"],
+        }
+    )
     _signed(a1_result, "content_sha256")
     identities = _upstream_identities()
     identities["a1_result"] = {"bytes": 16, "sha256": "d" * 64}
+    identities["a1_authorization"] = {"bytes": 17, "sha256": "e" * 64}
 
     authorization = build_strong_authorization(
         variant="A2",
@@ -394,6 +431,7 @@ def test_a2_authorization_binds_signed_a1_failure() -> None:
         pretrained_identity={"bytes": 200, "sha256": "5" * 64},
         input_identities=identities,
         a1_result=a1_result,
+        a1_authorization=a1_authorization,
     )
 
     assert authorization["status"] == "authorized"
@@ -411,6 +449,7 @@ def test_a2_authorization_binds_signed_a1_failure() -> None:
             pretrained_identity={"bytes": 200, "sha256": "5" * 64},
             input_identities=identities,
             a1_result=a1_result,
+            a1_authorization=a1_authorization,
         )
 
 

@@ -57,6 +57,34 @@ def _identity(value: Mapping[str, Any], *, name: str) -> dict[str, object]:
     return {"bytes": byte_size, "sha256": sha256}
 
 
+def _validate_prior_variant_result(
+    *,
+    name: str,
+    expected_variant: str,
+    result: Mapping[str, Any] | None,
+    authorization: Mapping[str, Any] | None,
+) -> None:
+    if result is None and authorization is None:
+        return
+    if result is None or authorization is None:
+        raise RootCauseContractError(f"{name} result authorization is incomplete")
+    _validate_signed(
+        authorization,
+        field="authorization_sha256",
+        name=f"{name} authorization",
+    )
+    _validate_signed(result, field="content_sha256", name=f"{name} result")
+    if (
+        authorization.get("status") != "authorized"
+        or authorization.get("selected_variants") != [expected_variant]
+        or result.get("status") != "pass"
+        or result.get("variant") != expected_variant
+        or result.get("variant_authorization_sha256")
+        != authorization["authorization_sha256"]
+    ):
+        raise RootCauseContractError(f"{name} result binding differs")
+
+
 def build_strong_authorization(
     *,
     variant: str,
@@ -69,6 +97,8 @@ def build_strong_authorization(
     input_identities: Mapping[str, Mapping[str, Any]],
     a1_result: Mapping[str, Any] | None = None,
     a2_result: Mapping[str, Any] | None = None,
+    a1_authorization: Mapping[str, Any] | None = None,
+    a2_authorization: Mapping[str, Any] | None = None,
 ) -> dict[str, object]:
     """Bind a native structural variant to all upstream scientific gates."""
 
@@ -85,16 +115,43 @@ def build_strong_authorization(
     )
     if root_authorization.get("status") != "authorized":
         raise RootCauseContractError("root-cause authorization is inactive")
+    root_authorization_sha256 = root_authorization["authorization_sha256"]
     _validate_signed(
         short_decision, field="content_sha256", name="root-cause short decision"
     )
     _validate_signed(
         diagnostics, field="content_sha256", name="decoder diagnostic decision"
     )
-    if a1_result is not None:
-        _validate_signed(a1_result, field="content_sha256", name="A1 result")
-    if a2_result is not None:
-        _validate_signed(a2_result, field="content_sha256", name="A2 result")
+    diagnostic_provenance = diagnostics.get("provenance")
+    diagnostic_bindings = (
+        diagnostic_provenance.get("bindings")
+        if isinstance(diagnostic_provenance, Mapping)
+        else None
+    )
+    if (
+        short_decision.get("status") != "pass"
+        or short_decision.get("experiment") != "rescene_task_learning_root_cause_v1"
+        or short_decision.get("variant_authorization_sha256")
+        != root_authorization_sha256
+        or diagnostics.get("status") != "pass"
+        or diagnostics.get("experiment") != "rescene_task_learning_root_cause_v1"
+        or not isinstance(diagnostic_bindings, Mapping)
+        or diagnostic_bindings.get("variant_authorization_sha256")
+        != root_authorization_sha256
+    ):
+        raise RootCauseContractError("root-cause evidence authorization differs")
+    _validate_prior_variant_result(
+        name="A1",
+        expected_variant="A1",
+        result=a1_result,
+        authorization=a1_authorization,
+    )
+    _validate_prior_variant_result(
+        name="A2",
+        expected_variant="A2",
+        result=a2_result,
+        authorization=a2_authorization,
+    )
     base_variant = choose_diagnostic_base_variant(short_decision, diagnostics)
     gate = strong_variant_gate(
         variant,
@@ -137,9 +194,9 @@ def build_strong_authorization(
         "root_official_like_epoch90",
     }
     if a1_result is not None:
-        required_inputs.add("a1_result")
+        required_inputs.update(("a1_result", "a1_authorization"))
     if a2_result is not None:
-        required_inputs.add("a2_result")
+        required_inputs.update(("a2_result", "a2_authorization"))
     if set(input_identities) != required_inputs:
         raise RootCauseContractError("strong-local evidence identities are incomplete")
     evidence = {
@@ -294,6 +351,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--pretrained", type=Path, required=True)
     parser.add_argument("--a1-result", type=Path)
     parser.add_argument("--a2-result", type=Path)
+    parser.add_argument("--a1-authorization", type=Path)
+    parser.add_argument("--a2-authorization", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args(argv)
     paths = {
@@ -306,8 +365,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     }
     if arguments.a1_result:
         paths["a1_result"] = arguments.a1_result
+    if arguments.a1_authorization:
+        paths["a1_authorization"] = arguments.a1_authorization
     if arguments.a2_result:
         paths["a2_result"] = arguments.a2_result
+    if arguments.a2_authorization:
+        paths["a2_authorization"] = arguments.a2_authorization
     result = build_strong_authorization(
         variant=arguments.variant,
         root_authorization=_load_json(
@@ -331,6 +394,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         a2_result=(
             _load_json(arguments.a2_result, name="A2 result")
             if arguments.a2_result
+            else None
+        ),
+        a1_authorization=(
+            _load_json(arguments.a1_authorization, name="A1 authorization")
+            if arguments.a1_authorization
+            else None
+        ),
+        a2_authorization=(
+            _load_json(arguments.a2_authorization, name="A2 authorization")
+            if arguments.a2_authorization
             else None
         ),
     )
