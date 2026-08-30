@@ -15,10 +15,12 @@ from scripts.evaluate_rescene_rootcause_checkpoint import (
 from utils.rescene_rootcause_evaluation import (
     RootCauseEvaluationError,
     build_checkpoint_manifest,
+    build_full_checkpoint_manifest,
     decide_full_candidate,
     summarize_epoch_runs,
     validate_checkpoint_manifest_binding,
     validate_checkpoint_payload,
+    validate_full_checkpoint_payload,
 )
 from utils.rescene_rootcause_preflight import canonical_sha256
 
@@ -151,6 +153,20 @@ def test_checkpoint_payload_rejects_wrong_boundary_and_sampler_scope() -> None:
         )
 
 
+def test_full_checkpoint_payload_allows_validation_selected_boundary() -> None:
+    payload = _checkpoint(completed_epoch=315)
+
+    facts = validate_full_checkpoint_payload(
+        payload, completed_epoch=315, expected_state_dict_entries=1
+    )
+
+    assert facts["selected_epoch"] == 315
+    assert facts["selected_step"] == 20_790
+    with pytest.raises(RootCauseEvaluationError, match="outside the contract"):
+        validate_checkpoint_payload(
+            payload, completed_epoch=315, expected_state_dict_entries=1
+        )
+
 def test_checkpoint_manifest_binds_authorization_candidate_and_file() -> None:
     manifest = build_checkpoint_manifest(
         variant="R0",
@@ -182,6 +198,35 @@ def test_checkpoint_manifest_binds_authorization_candidate_and_file() -> None:
             file_identity={"bytes": 123, "sha256": "a" * 64},
             checkpoint_facts=_checkpoint_facts(),
         )
+
+
+def test_full_checkpoint_manifest_binds_completed_training_and_selected_epoch() -> None:
+    facts = validate_full_checkpoint_payload(
+        _checkpoint(completed_epoch=315),
+        completed_epoch=315,
+        expected_state_dict_entries=1,
+    )
+    facts["training_config_sha256"] = _authorization()["variants"]["R0"][
+        "config_sha256"
+    ]
+
+    manifest = build_full_checkpoint_manifest(
+        variant="R0",
+        completed_epoch=315,
+        authorization=_authorization(),
+        candidate=_candidate(),
+        file_identity={"bytes": 123, "sha256": "a" * 64},
+        checkpoint_facts=facts,
+        full_training_manifest_sha256="b" * 64,
+        full_training_completed_epoch=450,
+    )
+
+    assert manifest["stage"] == "full_candidate"
+    assert manifest["checkpoint"]["selected_epoch"] == 315
+    assert manifest["full_training"]["completed_epoch"] == 450
+    assert validate_checkpoint_manifest_binding(
+        manifest, authorization=_authorization()
+    ) == "R0"
 
 
 def test_checkpoint_manifest_rejects_stale_or_malformed_authorization_binding() -> None:

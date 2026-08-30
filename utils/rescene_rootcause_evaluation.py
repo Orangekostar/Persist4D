@@ -55,7 +55,44 @@ def validate_checkpoint_payload(
 ) -> dict[str, object]:
     """Require one full, epoch-boundary, exactly resumable Lightning state."""
 
-    if completed_epoch not in (60, 90, 450):
+    return _validate_checkpoint_payload(
+        payload,
+        completed_epoch=completed_epoch,
+        expected_state_dict_entries=expected_state_dict_entries,
+        full_validation_selection=False,
+    )
+
+
+def validate_full_checkpoint_payload(
+    payload: Mapping[str, Any],
+    *,
+    completed_epoch: int,
+    expected_state_dict_entries: int = 798,
+) -> dict[str, object]:
+    """Require a full-run checkpoint from a registered validation boundary."""
+
+    return _validate_checkpoint_payload(
+        payload,
+        completed_epoch=completed_epoch,
+        expected_state_dict_entries=expected_state_dict_entries,
+        full_validation_selection=True,
+    )
+
+
+def _validate_checkpoint_payload(
+    payload: Mapping[str, Any],
+    *,
+    completed_epoch: int,
+    expected_state_dict_entries: int,
+    full_validation_selection: bool,
+) -> dict[str, object]:
+    allowed_epoch = (
+        15 <= completed_epoch <= 450 and completed_epoch % 15 == 0
+        if full_validation_selection
+        else completed_epoch in (60, 90, 450)
+    )
+
+    if not allowed_epoch:
         raise RootCauseEvaluationError("checkpoint epoch is outside the contract")
     if not isinstance(payload, Mapping):
         raise RootCauseEvaluationError("checkpoint payload is invalid")
@@ -260,10 +297,25 @@ def validate_checkpoint_manifest_binding(
     ):
         raise RootCauseEvaluationError("checkpoint authorization binding differs")
     completed_epoch = checkpoint.get("selected_epoch")
+    stage = manifest.get("stage", "short_curve")
+    full_training = manifest.get("full_training")
+    if stage == "short_curve":
+        valid_epoch = completed_epoch in (60, 90, 450)
+    elif stage == "full_candidate":
+        valid_epoch = (
+            isinstance(completed_epoch, int)
+            and not isinstance(completed_epoch, bool)
+            and 15 <= completed_epoch <= 450
+            and completed_epoch % 15 == 0
+            and isinstance(full_training, Mapping)
+            and full_training.get("completed_epoch") == 450
+            and full_training.get("selected_by") == "highest val_mean_t-AP"
+            and _is_lower_hex(full_training.get("manifest_sha256"), 64)
+        )
+    else:
+        valid_epoch = False
     expected_step = (
-        completed_epoch * OPTIMIZER_STEPS_PER_EPOCH
-        if completed_epoch in (60, 90, 450)
-        else None
+        completed_epoch * OPTIMIZER_STEPS_PER_EPOCH if valid_epoch else None
     )
     checkpoint_sha256 = checkpoint.get("sha256")
     reference = checkpoint.get("reference")
@@ -294,6 +346,61 @@ def build_checkpoint_manifest(
 ) -> dict[str, object]:
     """Bind a short-curve checkpoint without serializing its machine path."""
 
+    return _build_checkpoint_manifest(
+        variant=variant,
+        completed_epoch=completed_epoch,
+        authorization=authorization,
+        candidate=candidate,
+        file_identity=file_identity,
+        checkpoint_facts=checkpoint_facts,
+        stage="short_curve",
+    )
+
+
+def build_full_checkpoint_manifest(
+    *,
+    variant: str,
+    completed_epoch: int,
+    authorization: Mapping[str, Any],
+    candidate: Mapping[str, Any],
+    file_identity: Mapping[str, Any],
+    checkpoint_facts: Mapping[str, Any],
+    full_training_manifest_sha256: str,
+    full_training_completed_epoch: int,
+) -> dict[str, object]:
+    """Bind the validation-selected checkpoint from one completed full run."""
+
+    if (
+        full_training_completed_epoch != 450
+        or not _is_lower_hex(full_training_manifest_sha256, 64)
+        or not 15 <= completed_epoch <= 450
+        or completed_epoch % 15 != 0
+    ):
+        raise RootCauseEvaluationError("full-training checkpoint scope is invalid")
+    return _build_checkpoint_manifest(
+        variant=variant,
+        completed_epoch=completed_epoch,
+        authorization=authorization,
+        candidate=candidate,
+        file_identity=file_identity,
+        checkpoint_facts=checkpoint_facts,
+        stage="full_candidate",
+        full_training_manifest_sha256=full_training_manifest_sha256,
+    )
+
+
+def _build_checkpoint_manifest(
+    *,
+    variant: str,
+    completed_epoch: int,
+    authorization: Mapping[str, Any],
+    candidate: Mapping[str, Any],
+    file_identity: Mapping[str, Any],
+    checkpoint_facts: Mapping[str, Any],
+    stage: str,
+    full_training_manifest_sha256: str | None = None,
+) -> dict[str, object]:
+
     validate_candidate_binding(
         variant=variant, authorization=authorization, candidate=candidate
     )
@@ -315,15 +422,27 @@ def build_checkpoint_manifest(
         raise RootCauseEvaluationError("checkpoint facts differ from requested boundary")
     variants = authorization["variants"]
     initialization = authorization["initialization"]
+    is_full = stage == "full_candidate"
     payload: dict[str, object] = {
         "schema_version": 1,
         "status": "pass",
         "experiment": "rescene_task_learning_root_cause_v1",
         "variant": variant,
         "checkpoint": {
-            "logical_name": f"rootcause_{variant.lower()}_epoch_{completed_epoch:03d}",
+            "logical_name": (
+                f"rootcause_{variant.lower()}_full_selected_epoch_"
+                f"{completed_epoch:03d}"
+                if is_full
+                else f"rootcause_{variant.lower()}_epoch_{completed_epoch:03d}"
+            ),
             "reference": portable_reference(
-                f"checkpoint/rootcause_short/{variant.lower()}/epoch{completed_epoch:03d}",
+                (
+                    f"checkpoint/rootcause_full/{variant.lower()}/"
+                    f"epoch{completed_epoch:03d}"
+                    if is_full
+                    else f"checkpoint/rootcause_short/{variant.lower()}/"
+                    f"epoch{completed_epoch:03d}"
+                ),
                 sha256,
             ),
             "sha256": sha256,
@@ -344,6 +463,13 @@ def build_checkpoint_manifest(
             "pretrained_sha256": initialization["pretrained"]["sha256"],
         },
     }
+    if is_full:
+        payload["stage"] = "full_candidate"
+        payload["full_training"] = {
+            "completed_epoch": 450,
+            "selected_by": "highest val_mean_t-AP",
+            "manifest_sha256": full_training_manifest_sha256,
+        }
     payload["content_sha256"] = canonical_sha256(payload)
     try:
         validate_portable_payload(payload)
