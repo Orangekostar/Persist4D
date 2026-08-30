@@ -97,8 +97,16 @@ def compare_gradients(left: torch.Tensor, right: torch.Tensor) -> dict[str, floa
     elif left_norm == 0.0 or right_norm == 0.0:
         cosine = 0.0
     else:
-        cosine = float(
-            torch.nn.functional.cosine_similarity(left, right, dim=0).item()
+        cosine = max(
+            -1.0,
+            min(
+                1.0,
+                float(
+                    torch.nn.functional.cosine_similarity(
+                        left, right, dim=0
+                    ).item()
+                ),
+            ),
         )
     relative = abs(right_norm - left_norm) / max(left_norm, torch.finfo(torch.float32).eps)
     return {

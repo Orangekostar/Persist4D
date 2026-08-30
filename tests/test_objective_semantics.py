@@ -95,3 +95,11 @@ def test_gradient_comparison_rejects_nonfinite_or_misaligned() -> None:
         compare_gradients(torch.ones(2), torch.ones(3))
     with pytest.raises(ValueError, match="finite"):
         compare_gradients(torch.tensor([float("nan")]), torch.ones(1))
+
+
+def test_gradient_cosine_is_bounded_under_large_float_accumulation() -> None:
+    gradient = torch.ones(2_000_000)
+
+    comparison = compare_gradients(gradient, gradient)
+
+    assert -1.0 <= comparison["cosine"] <= 1.0
