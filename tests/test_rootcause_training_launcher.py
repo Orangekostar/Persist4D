@@ -83,6 +83,25 @@ def test_composed_variants_retain_full_schedule_and_short_horizon() -> None:
         assert callbacks[2]["completed_epoch"] == 90
 
 
+def test_runtime_locations_normalize_to_same_portable_config(tmp_path: Path) -> None:
+    runtime = compose_variant_config(
+        "R0",
+        pretrained=tmp_path / "concerto.pth",
+        common_state=tmp_path / "common.pt",
+        common_sha256="2" * 64,
+        output=tmp_path / "R0",
+    )
+
+    portable = portable_variant_config(
+        runtime,
+        variant="R0",
+        pretrained_reference=PRETRAINED_REF,
+        common_reference=COMMON_REF,
+    )
+
+    assert portable == _configs()["R0"]
+
+
 def test_candidate_record_is_immutable_and_resume_exact(tmp_path: Path) -> None:
     candidate = {
         "schema_version": 1,

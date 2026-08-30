@@ -183,9 +183,16 @@ def portable_variant_config(
     result["backbone"]["name"] = pretrained_reference
     result["model"]["config"]["backbone"]["name"] = pretrained_reference
     result["general"]["rootcause_common_initialization"] = common_reference
-    result["general"]["save_dir"] = (
-        f"external:checkpoint/rootcause_short/{variant}"
-    )
+    output_reference = f"external:checkpoint/rootcause_short/{variant}"
+    result["general"]["save_dir"] = output_reference
+    for callback in result["callbacks"]:
+        if "dirpath" in callback:
+            callback["dirpath"] = output_reference
+        if "output_dir" in callback:
+            callback["output_dir"] = output_reference
+    for logger in result["logging"]:
+        if "save_dir" in logger:
+            logger["save_dir"] = output_reference
     validate_portable_payload(result)
     return result
 
