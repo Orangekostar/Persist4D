@@ -1,0 +1,3 @@
+reference,filename,role,sha256,byte_size,epoch,global_step,selection_metric_name,selection_metric_exact,selection_metric_filename_rounded,state_dict_entry_count,optimizer_state_count,scheduler_state_count
+external:sonata_training_output/epoch=449-val_mean_t-AP=0.243.ckpt,epoch=449-val_mean_t-AP=0.243.ckpt,best_validation,3d6432711dd9639d9e9203134d846d9a1a29f09b7fb3fbb85375e2127945a199,754809064,449,29700,val_mean_t-AP,0.2430925965309143,0.243,798,1,1
+external:sonata_training_output/last.ckpt,last.ckpt,last,3d6432711dd9639d9e9203134d846d9a1a29f09b7fb3fbb85375e2127945a199,754809064,449,29700,val_mean_t-AP,0.2430925965309143,,798,1,1

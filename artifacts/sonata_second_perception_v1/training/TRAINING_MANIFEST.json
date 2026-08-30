@@ -1,0 +1,113 @@
+{
+  "artifacts": {
+    "checkpoint_inventory_sha256": "62485a2a3f4c30edc435ae440f56a218501778b7793a46b905a5e20252b87550",
+    "learning_curve_sha256": "3a5423086b38baf1c139dcaa54651f5902a9c51d95e7d1746b6030e3d953de86",
+    "runtime_events_sha256": "983d2552ee181296e0bb1f6282e5f5bc6f92153e6255d2ecffed6ac75c438f9f",
+    "source_snapshot_manifest_sha256": "9afea1f19a01558b945b61b2816eb52539f6f166188b389a4f225e09b21b19aa"
+  },
+  "bindings": {
+    "config_sha256": "16e65bf747ffa245b8711270c1297f26baf20e810c33d1398795cc04290b6937",
+    "data_manifest_sha256": "694d4394b481b02bf49573dc121276a452526fe274657ca7d1915ba0afba5c4e",
+    "environment_manifest_sha256": "a063f2c860a66b54d54a685b9ce0e1925d05ccf061777f4670657303cf6d2aac",
+    "preflight_authorization_sha256": "7d48bdacb1aa6f1380a811204b871da3e3ecfa2480bc60de2cb8083190d153be",
+    "resource_blocker_sha256": "d6e8078eb62144885aa4daff388b7ad8d66e8ef4fbeda3bd5189b69009ef0277",
+    "smoke_authorization_sha256": "631784c412a4f4dd2d5e4928fce5dafe64dca007f2901046299e497e5c81c66f",
+    "source_commit": "7c61d89bcb70ec89ce9b857c6ec6321acb1d7f1e",
+    "source_tree_sha256": "9aa27db8e8608c965f0ae7cfb380261ce86ed21120dbb077776a174c603155cc",
+    "training_semantics_sha256": "b961df5d9b3caa391f0c651e21fbb05b636cbc60dbf2e457196bd2d98a200948",
+    "weight_manifest_sha256": "cf9b129cb58fea76c76632134dfd225eccfa065fd2a5ef58f93427c56fe150e7",
+    "weight_sha256": "c5ced5acdae30d1c469713398073a866e25e6e414e23feed5dc025373657ac50"
+  },
+  "budget": {
+    "completed_epochs": 450,
+    "optimizer_steps": 29700,
+    "samples_seen": 950400,
+    "stage_observations_seen": 1478039
+  },
+  "candidate_id": "6aca91399a937b387e2f290041be31d968470b33e143ec03a566759108817ee4",
+  "checkpoint_selection": {
+    "mode": "max",
+    "monitor": "val_mean_t-AP",
+    "selected_epoch": 449,
+    "selection_metric_exact": 0.2430925965309143,
+    "selection_metric_filename_rounded": 0.243,
+    "validation_event_count": 30
+  },
+  "checkpoint_semantics": {
+    "last_is_full_budget": true,
+    "last_is_top1_byte_identical_alias": true
+  },
+  "checkpoints": [
+    {
+      "byte_size": 754809064,
+      "epoch": 449,
+      "filename": "epoch=449-val_mean_t-AP=0.243.ckpt",
+      "global_step": 29700,
+      "optimizer_state_count": 1,
+      "reference": "external:sonata_training_output/epoch=449-val_mean_t-AP=0.243.ckpt",
+      "role": "best_validation",
+      "scheduler_state_count": 1,
+      "selection_metric_exact": 0.2430925965309143,
+      "selection_metric_filename_rounded": 0.243,
+      "selection_metric_name": "val_mean_t-AP",
+      "sha256": "3d6432711dd9639d9e9203134d846d9a1a29f09b7fb3fbb85375e2127945a199",
+      "state_dict_entry_count": 798
+    },
+    {
+      "byte_size": 754809064,
+      "epoch": 449,
+      "filename": "last.ckpt",
+      "global_step": 29700,
+      "optimizer_state_count": 1,
+      "reference": "external:sonata_training_output/last.ckpt",
+      "role": "last",
+      "scheduler_state_count": 1,
+      "selection_metric_exact": 0.2430925965309143,
+      "selection_metric_filename_rounded": null,
+      "selection_metric_name": "val_mean_t-AP",
+      "sha256": "3d6432711dd9639d9e9203134d846d9a1a29f09b7fb3fbb85375e2127945a199",
+      "state_dict_entry_count": 798
+    }
+  ],
+  "content_sha256": "2b7d1da9f3d3233849916a0b4dbfd914e33c448a6b6b9c5d733bade1893d006b",
+  "recipe": {
+    "accumulate_grad_batches": 8,
+    "checkpoint_selection": "highest val_mean_t-AP",
+    "devices": [
+      1,
+      2
+    ],
+    "effective_global_batch": 32,
+    "epochs": 450,
+    "microbatch_per_gpu": 2,
+    "optimizer_steps_per_epoch": 66,
+    "samples_per_epoch": 2112,
+    "seed": 45
+  },
+  "runtime": {
+    "correction_version": 2,
+    "hardware": {
+      "cuda_device_count": 3,
+      "gpu_names": [
+        "NVIDIA A40",
+        "NVIDIA A40",
+        "NVIDIA A40"
+      ],
+      "gpu_total_memory_bytes": [
+        47699722240,
+        47699722240,
+        47699722240
+      ]
+    },
+    "interruption_count": 3,
+    "observed_wall_clock_seconds": 319637.0,
+    "peak_allocated_vram_mib": 39993.7548828125,
+    "peak_reserved_vram_mib": 41292.0,
+    "raw_fit_interrupted_count": 1,
+    "raw_resume_launch_count": 4,
+    "resume_launch_count": 3
+  },
+  "schema_version": 1,
+  "stage": "SS4",
+  "status": "pass"
+}

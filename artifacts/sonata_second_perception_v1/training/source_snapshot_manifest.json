@@ -1,0 +1,2584 @@
+{
+  "evidence_producer": {
+    "branch": "research/persist4d-sonata-second-perception-v1",
+    "content_sha256": "72bdd17ab8757b253ade7971840812cb8bce34a39030fffc326dbb3e89e4e073",
+    "file_count": 254,
+    "files": [
+      {
+        "bytes": 0,
+        "ref": "repo:conf/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 704,
+        "ref": "repo:conf/augmentation/albumentations_aug.yaml",
+        "sha256": "0ee794f06cfa1552423ea6e51cec64d905e32dd27e63cc48defba9b17753d587"
+      },
+      {
+        "bytes": 1276,
+        "ref": "repo:conf/augmentation/volumentations_aug.yaml",
+        "sha256": "1ff353485c25fb37cf89776a60921c40d257bf627d9f89f8665ef49cc1e85cd4"
+      },
+      {
+        "bytes": 247,
+        "ref": "repo:conf/backbone/concerto.yaml",
+        "sha256": "5b116a9e21fbb7d4a0c19c9e090dfc01f1e48c176c72e4121c8a9ed57d971101"
+      },
+      {
+        "bytes": 183,
+        "ref": "repo:conf/backbone/concerto_enc.yaml",
+        "sha256": "e659dad59dd7e6cbb93e0315885a1b7f781cddc47fa8b6671b81f84d293f2895"
+      },
+      {
+        "bytes": 399,
+        "ref": "repo:conf/backbone/minkowski.yaml",
+        "sha256": "e3655e93ea7f67e3ce0ef3563881726be55b4f8e3621bc20288b784d91ea9344"
+      },
+      {
+        "bytes": 237,
+        "ref": "repo:conf/backbone/sonata.yaml",
+        "sha256": "0b3d99ae11df103abe642a2569f728f27ed8f226cdcced4ab8a3d5eaad7721b8"
+      },
+      {
+        "bytes": 205,
+        "ref": "repo:conf/backbone/sonata_enc.yaml",
+        "sha256": "4911562d5908b73e4102ce3fbd66a603252da5e4b6dd0ad18780dbff6b8cb3d3"
+      },
+      {
+        "bytes": 538,
+        "ref": "repo:conf/callbacks/callbacks_instance_segmentation.yaml",
+        "sha256": "fd207ec7fe667c5e433835fcb4a824bd6273fea2595ea6b7b619bea78b344ce2"
+      },
+      {
+        "bytes": 1030,
+        "ref": "repo:conf/callbacks/p2_reproduction.yaml",
+        "sha256": "af4c2ea90f5f8e24ed416db4e95276e83bbd54b0d414bd80674b90c6f36fa92d"
+      },
+      {
+        "bytes": 527,
+        "ref": "repo:conf/callbacks/sonata_second.yaml",
+        "sha256": "3340b1433e17201041f73045c10a4add2d44e362445420c118b353f5a2739a92"
+      },
+      {
+        "bytes": 2091,
+        "ref": "repo:conf/config_base_instance_segmentation.yaml",
+        "sha256": "3bce8e35dde4d5932a42b20f33a1d737758683fd1f3f0e89c581aadb9620f377"
+      },
+      {
+        "bytes": 2449,
+        "ref": "repo:conf/config_p2_rescene4d_concerto_t2.yaml",
+        "sha256": "3077e89b9bca60049e1551654d5b3df78178d5647d84f0037bcb7ab91807c443"
+      },
+      {
+        "bytes": 232,
+        "ref": "repo:conf/config_p2r_a_frozen_encoder_eval.yaml",
+        "sha256": "f2d00ef7bce0322d05a915202c633e87456005473f6f1c7177bf5a3f29123c89"
+      },
+      {
+        "bytes": 2278,
+        "ref": "repo:conf/config_rescene4d_sonata_second.yaml",
+        "sha256": "fa773c74711da2e4b0efa6ff82522d194cb7340d16a1322eea92f0915b9ff38a"
+      },
+      {
+        "bytes": 1703,
+        "ref": "repo:conf/data/collation_functions/auto_collate.yaml",
+        "sha256": "68bb0ac2362d79b0b3e92693cbdd7b9ada6914de504a26ac44b800994ed277f6"
+      },
+      {
+        "bytes": 1401,
+        "ref": "repo:conf/data/collation_functions/voxelize_collate.yaml",
+        "sha256": "a463cdc0322212218d4bd7f3546cbfa258ce9d2bd73fed7533454330ba185a96"
+      },
+      {
+        "bytes": 1422,
+        "ref": "repo:conf/data/collation_functions/voxelize_collate_sonata.yaml",
+        "sha256": "009830b4e1d508760bac366d15a06120839be8fd07652d5e1d1454e2348e9786"
+      },
+      {
+        "bytes": 560,
+        "ref": "repo:conf/data/data_loaders/simple_loader.yaml",
+        "sha256": "acf546880a7be65f6ea4ce2f9f75c1225cff84b63343b9006dc7686ec4945775"
+      },
+      {
+        "bytes": 2941,
+        "ref": "repo:conf/data/datasets/mix.yaml",
+        "sha256": "71af83a4dbd64edf21e819b8900b060d1c13c47bcfde83ca2866a9acdf3e6b8c"
+      },
+      {
+        "bytes": 3061,
+        "ref": "repo:conf/data/datasets/mix200.yaml",
+        "sha256": "75cb8c5c8fba596c0088fb203b8ad2d845a2c5033d32b85f876b205aad31aff3"
+      },
+      {
+        "bytes": 3048,
+        "ref": "repo:conf/data/datasets/mix_and_val_w1.yaml",
+        "sha256": "05af9e2b9eb5f6a7e7cbdf631b99d3b7fe6fb1a898f6957473632d08d290c3c4"
+      },
+      {
+        "bytes": 3168,
+        "ref": "repo:conf/data/datasets/mix_and_val_w1_200.yaml",
+        "sha256": "7cf1134f9cc937aa6adbaa856bdd6612c1bd116800ee86a5d5b022b99d888046"
+      },
+      {
+        "bytes": 3067,
+        "ref": "repo:conf/data/datasets/mix_aug.yaml",
+        "sha256": "8a0e005aa7d5b5c5a92861eec5a96472b412b44274d5e7432a360cf686c701a9"
+      },
+      {
+        "bytes": 3048,
+        "ref": "repo:conf/data/datasets/mix_w1.yaml",
+        "sha256": "bf19a66b21f0b02535075e93b4e22ff61c383eae5a6f7f515ce765b205432118"
+      },
+      {
+        "bytes": 3221,
+        "ref": "repo:conf/data/datasets/mix_w3.yaml",
+        "sha256": "c00f70e074c436b6125218b5e76d61c690cf1263f2b1079a34b6375b60499b52"
+      },
+      {
+        "bytes": 3497,
+        "ref": "repo:conf/data/datasets/mix_w4.yaml",
+        "sha256": "22383f94b2783f720c24e5d59c24c2bf35ecf21a2f5fe8e9a41832d5723f19ab"
+      },
+      {
+        "bytes": 2948,
+        "ref": "repo:conf/data/datasets/mix_weight_exp_1t03.yaml",
+        "sha256": "40f69d78178cf46381dd7a4f537fa13da8da07918e3488ec4373c80529305678"
+      },
+      {
+        "bytes": 2948,
+        "ref": "repo:conf/data/datasets/mix_weight_exp_1t05.yaml",
+        "sha256": "fb823753a2a4a8f9135a7170382da5a76e5af9a695bebea63fcd2338c00d72f4"
+      },
+      {
+        "bytes": 2250,
+        "ref": "repo:conf/data/datasets/multi_dataset.yaml",
+        "sha256": "99c107ccb8390b7dadb0861ab63ab76c3a883961febe4dbf69a7ec0c2d39779f"
+      },
+      {
+        "bytes": 2423,
+        "ref": "repo:conf/data/datasets/rio.yaml",
+        "sha256": "52b7efc46c78733b20b78b31d8a96351b6dcb687f590279d43384f667bdd0b36"
+      },
+      {
+        "bytes": 2468,
+        "ref": "repo:conf/data/datasets/rio200.yaml",
+        "sha256": "206874d8e96d86768013c318afc22b188008b48bd5e9a9117280f55dbc1f510c"
+      },
+      {
+        "bytes": 2144,
+        "ref": "repo:conf/data/datasets/scannet.yaml",
+        "sha256": "474a8c8e375efab6a2a35bd26392bc3614f3480dfd6921c3ce3a296977a68a1a"
+      },
+      {
+        "bytes": 2180,
+        "ref": "repo:conf/data/datasets/scannet200.yaml",
+        "sha256": "07d9bf01b8b4acc1e186947e60dd8614a2500aa82a3711fbcff718dccbb0b7b6"
+      },
+      {
+        "bytes": 2223,
+        "ref": "repo:conf/data/datasets/scannet_sequence.yaml",
+        "sha256": "ff5558f468d49408f651c89be8706f54691406a7173550c6054902e236e5b914"
+      },
+      {
+        "bytes": 773,
+        "ref": "repo:conf/data/indoor.yaml",
+        "sha256": "a43cbaf3616e845d218f2182349dce2bd4960bb5f77f6997ad64398fa8e68c23"
+      },
+      {
+        "bytes": 287,
+        "ref": "repo:conf/logging/full.yaml",
+        "sha256": "855b6eebb4dbbb4cc401d362410c6a50250d8465c170d422fc20c4e3a91ebd50"
+      },
+      {
+        "bytes": 121,
+        "ref": "repo:conf/logging/local_csv.yaml",
+        "sha256": "2b9c7859a7b3dbb6d3ac9858e4b16aa4696ecab3745c664fc4b2c847d44f6678"
+      },
+      {
+        "bytes": 193,
+        "ref": "repo:conf/logging/sweep.yaml",
+        "sha256": "a89e64042aa43a9f10050e86bd9bcac31433f9f1b0308b6e6ad21ececa1f6657"
+      },
+      {
+        "bytes": 415,
+        "ref": "repo:conf/loss/contrastive/infoNCE.yaml",
+        "sha256": "ec30a47af3af2654ee03f1ec33e3512e9b1a69f019828acdbc5d5c4c9f0fae56"
+      },
+      {
+        "bytes": 87,
+        "ref": "repo:conf/loss/cross_entropy.yaml",
+        "sha256": "0515cdb3b2dd4f97f08482a779a3aa50572308e761e58f8d302129ff073097fe"
+      },
+      {
+        "bytes": 482,
+        "ref": "repo:conf/loss/set_criterion.yaml",
+        "sha256": "6e0d85081f7f6b062320e79c65afe4f35e876e3a086bc5b5b8c423b7d8f4daba"
+      },
+      {
+        "bytes": 119,
+        "ref": "repo:conf/matcher/hungarian_matcher.yaml",
+        "sha256": "52db7a752430652b6661f5857a746d0e95399a5c3edf8ef61abfbad58bc52dd7"
+      },
+      {
+        "bytes": 489,
+        "ref": "repo:conf/metrics/tmap.yaml",
+        "sha256": "e4ab3f87b7ccdade59035d309d51d929bbf03456c0c2f73e6b42969e61b749eb"
+      },
+      {
+        "bytes": 305,
+        "ref": "repo:conf/metrics/tsim.yaml",
+        "sha256": "99db9e4b20f81d9bc932aa6ab58b1c25e92b9ecb82f2ca607cb5680e1ff96bfb"
+      },
+      {
+        "bytes": 210,
+        "ref": "repo:conf/model/persist4d.yaml",
+        "sha256": "45fb6809f38d802a1a3e4b03ef689d5e82319427f2cb8b2db02980c71a1a6ea9"
+      },
+      {
+        "bytes": 950,
+        "ref": "repo:conf/model/rescene.yaml",
+        "sha256": "93ecef561f9b7555b08fa85a985b5b957a3148ae48ae868492cd4894c78f72fd"
+      },
+      {
+        "bytes": 59,
+        "ref": "repo:conf/optimizer/adamw.yaml",
+        "sha256": "f291cba4a37836bbb36239a84520a45a1e0d455cb8bee4489e5168575e0d4a62"
+      },
+      {
+        "bytes": 3888,
+        "ref": "repo:conf/p6a/default.yaml",
+        "sha256": "dd7a9fccc098fc7e5faecc059d6202ca7f8a762aaee3e7182738a2d7f800aac2"
+      },
+      {
+        "bytes": 2119,
+        "ref": "repo:conf/p6b/default.yaml",
+        "sha256": "974acd51648fa952b55e7bb45bac8799db673578782c127c848294b301156fae"
+      },
+      {
+        "bytes": 244,
+        "ref": "repo:conf/profiling/p0_p1_a40.yaml",
+        "sha256": "87ea55ac6cf2aa00a0d25fe3c82a2e7a122b60395ade4b96f2f58c9803a087c0"
+      },
+      {
+        "bytes": 257,
+        "ref": "repo:conf/scheduler/onecyclelr.yaml",
+        "sha256": "1c550d893e4432ff0c014b64c11f2b43bd9c0b4e82e44060ec4bdb2b2c17d651"
+      },
+      {
+        "bytes": 98,
+        "ref": "repo:conf/serialization/mixed.yaml",
+        "sha256": "139970f1e702ec0bb7ae6417880e6aeb73814ebdc511e2c45b2987b5c8fadcc6"
+      },
+      {
+        "bytes": 81,
+        "ref": "repo:conf/serialization/st_only.yaml",
+        "sha256": "bb6476388c43b5d8c61742df8d313f205717083ff9ee6951da3e60517ae5b06a"
+      },
+      {
+        "bytes": 260,
+        "ref": "repo:conf/trainer/trainer.yaml",
+        "sha256": "8b1ea3a0647eaac1fbc5f7269587897874c5e48b6c00340e65680d7cb46a9fc2"
+      },
+      {
+        "bytes": 237,
+        "ref": "repo:conf/trainer/trainer_mixed.yaml",
+        "sha256": "2971f4896c363326c3e4defa5748fab538da84263a5a95965585fc3a4179362d"
+      },
+      {
+        "bytes": 32966,
+        "ref": "repo:datasets/RScan/RScan_constants.py",
+        "sha256": "63be4d4728f813ac09aa04228c084912d8f183e8d247f9a737a73ad91ddde6d4"
+      },
+      {
+        "bytes": 4238,
+        "ref": "repo:datasets/RScan/RScan_splits.py",
+        "sha256": "c0cedcf3cd77ec2d7428b773b3d38a63238384afaab43f6c97c70780a90a9fb5"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:datasets/RScan/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 30148,
+        "ref": "repo:datasets/RScan/check_mappying.py",
+        "sha256": "a591204cf7b410a7245157b1259e4cf6638e6f9402e0a51bdfb1be3d0ce46e65"
+      },
+      {
+        "bytes": 438,
+        "ref": "repo:datasets/__init__.py",
+        "sha256": "c21d3ee4d73af6f67210c896e935a327b5dcd095e4e0037094de7365a70bcdf5"
+      },
+      {
+        "bytes": 1806,
+        "ref": "repo:datasets/auto_collate.py",
+        "sha256": "c16d1386e392f4cede917d60c2f2bbc0662876d699e187be4eeb36423db72438"
+      },
+      {
+        "bytes": 21268,
+        "ref": "repo:datasets/minkowski_utils.py",
+        "sha256": "4a46be3cef80ce0690487b0ba43b91e6cd4486120a47705a634934be7f721939"
+      },
+      {
+        "bytes": 8851,
+        "ref": "repo:datasets/multi_dataset.py",
+        "sha256": "2531e6e91643eea4af79c705692f414bea47c3563e10ada894fafc45b3c465ab"
+      },
+      {
+        "bytes": 18539,
+        "ref": "repo:datasets/pointcept_utils.py",
+        "sha256": "962686891547c0719670774d35917562c7f4b7c90aaad1b7002ccda676112a83"
+      },
+      {
+        "bytes": 36192,
+        "ref": "repo:datasets/preprocessing/RScan_preprocessing.py",
+        "sha256": "ca33230db161b36f44d5646b364455e6b79f099227611f76231e5063495df2b8"
+      },
+      {
+        "bytes": 7009,
+        "ref": "repo:datasets/preprocessing/base_preprocessing.py",
+        "sha256": "939d543a2e01a24074da1edccf52ace85b79bc1766f43353956dd22b21cd116a"
+      },
+      {
+        "bytes": 4095,
+        "ref": "repo:datasets/preprocessing/build_rscan_sequence_db.py",
+        "sha256": "c9b19aa3494c6ce65e5b8d39dd5289177873b32a4eb68002fb752092c693d9e2"
+      },
+      {
+        "bytes": 4229,
+        "ref": "repo:datasets/preprocessing/metric_spec_writer.py",
+        "sha256": "b5613408ddcb8e2d2fe432c4bf63a58a75ecd41b186250fa67295e0bfa71877c"
+      },
+      {
+        "bytes": 420,
+        "ref": "repo:datasets/preprocessing/metric_specs/rio.yaml",
+        "sha256": "c96bd34ed3e4898d09286a763e300c546a97b3b0409ce752aaa3fb2ab188275b"
+      },
+      {
+        "bytes": 3636,
+        "ref": "repo:datasets/preprocessing/metric_specs/rio200.yaml",
+        "sha256": "a3c876adc29680fac0b15d41bba00e2a0b97a18f509494522777f0a3f4f5072a"
+      },
+      {
+        "bytes": 424,
+        "ref": "repo:datasets/preprocessing/metric_specs/scannet.yaml",
+        "sha256": "1e7a7c5797f7ea073012142c5682141ea54e1d17699e048929e8a995919eeeb5"
+      },
+      {
+        "bytes": 6041,
+        "ref": "repo:datasets/preprocessing/metric_specs/scannet200.yaml",
+        "sha256": "05abc6453c0daeb0ac29654d362e58ef7aee31eb3b50074090aa7b12b4422f87"
+      },
+      {
+        "bytes": 15332,
+        "ref": "repo:datasets/preprocessing/scannet_preprocessing.py",
+        "sha256": "4bce6d42172852b072bcc5e7c957d70b5dc735abd0928004ba186189c8f07441"
+      },
+      {
+        "bytes": 32517,
+        "ref": "repo:datasets/preprocessing/scannet_sequence_aug.py",
+        "sha256": "c33d9eefc3dc1adce4e484f64f664b6988f48cb2701c886f5f3e2d8abdd4c8f4"
+      },
+      {
+        "bytes": 5735,
+        "ref": "repo:datasets/preprocessing/segment_script.py",
+        "sha256": "14dd8fa177807fd63587ed1806e3a586ec5f539c3a84a63c936fadd9c8a89a73"
+      },
+      {
+        "bytes": 22080,
+        "ref": "repo:datasets/rescan_adapter.py",
+        "sha256": "d94b70613f5862adbb8c142134ada15cc234b55b87e1ff8aebe98cd474601fe4"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:datasets/scannet200/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 13175,
+        "ref": "repo:datasets/scannet200/scannet200_constants.py",
+        "sha256": "1ccf2b35c4c9a40ea289c6f3c8bb61bf173a7f9302dd81d5ba09c8f8dbfc100c"
+      },
+      {
+        "bytes": 9133,
+        "ref": "repo:datasets/scannet200/scannet200_splits.py",
+        "sha256": "87136a89d4b125b47de3620558b25bb220cc31f0f41feb1db0c6589008df4901"
+      },
+      {
+        "bytes": 56406,
+        "ref": "repo:datasets/scannet200/scannetv2-labels.combined.tsv",
+        "sha256": "68674782476d967c35e8d0776933b70e10d21f1ea8019eba20221d38275139c0"
+      },
+      {
+        "bytes": 35651,
+        "ref": "repo:datasets/semseg.py",
+        "sha256": "9235caf7cf525e6225148ca7353712a8837d9bae21785ee57a7cf44074ad8104"
+      },
+      {
+        "bytes": 914,
+        "ref": "repo:datasets/streaming_sequence.py",
+        "sha256": "d7d25840c2f630a7206e0da3cd1e078dccfc24f48a8d04e1b8da3c8640fc3415"
+      },
+      {
+        "bytes": 62155,
+        "ref": "repo:main_instance_segmentation.py",
+        "sha256": "3a69397b7fe2062a9c180f545742a782dcfff677fffa197596aa5fc9f8df0bcb"
+      },
+      {
+        "bytes": 3376,
+        "ref": "repo:models/__init__.py",
+        "sha256": "caf092ab566fc46260a6ba06ce12693ef610fab88c76c9a2607c16d4d93d5a12"
+      },
+      {
+        "bytes": 55360,
+        "ref": "repo:models/criterion.py",
+        "sha256": "5cb5c05c7429c58588f88a933828f68798f65a882da98cfc4de851d8dfe3ff88"
+      },
+      {
+        "bytes": 21224,
+        "ref": "repo:models/layers.py",
+        "sha256": "d03ac43f0eeaed02ad0d5b67ce175f56413546f3e58092fffb81dce53d09b1f3"
+      },
+      {
+        "bytes": 10756,
+        "ref": "repo:models/matcher.py",
+        "sha256": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc"
+      },
+      {
+        "bytes": 14592,
+        "ref": "repo:models/minkowski.py",
+        "sha256": "5d41de74cf3187bc74e2e7eedb238c8461846aec9d20a12dcfbecedd49c9a5fc"
+      },
+      {
+        "bytes": 3978,
+        "ref": "repo:models/misc.py",
+        "sha256": "40e0cda9567ae890e8c1701c8d7165837ac40a4de8e385c5a25ffebebf89af7c"
+      },
+      {
+        "bytes": 746,
+        "ref": "repo:models/model.py",
+        "sha256": "aa8962cf19663903635705495d6483f579f5732448c004080b5b0aa899c247dd"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:models/modules/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 7548,
+        "ref": "repo:models/modules/common.py",
+        "sha256": "a40ed66ebb05033f737f322063ed6a0813f770edbec813a73ea065fc3adbd755"
+      },
+      {
+        "bytes": 3180,
+        "ref": "repo:models/modules/helpers_3detr.py",
+        "sha256": "2ede87a08bc311d5120fff4be719292b8a0b246be308a5e75f019602d8087bd8"
+      },
+      {
+        "bytes": 3936,
+        "ref": "repo:models/modules/resnet_block.py",
+        "sha256": "6742ce282353c05adb367b409f75b9ff7c3be9535d0370b60dff959a60165e6e"
+      },
+      {
+        "bytes": 39465,
+        "ref": "repo:models/persistent_memory.py",
+        "sha256": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8"
+      },
+      {
+        "bytes": 30153,
+        "ref": "repo:models/persistent_memory_p6b.py",
+        "sha256": "112ac4daddb2cce8c2b19ebf4c1fd7fa3b99d740ba0951dad636aa0a62ff2c09"
+      },
+      {
+        "bytes": 27394,
+        "ref": "repo:models/pointcept.py",
+        "sha256": "96f130d780d57ecf0c88e51c016b4feef768ad3805e47c2b633893f17fd4581a"
+      },
+      {
+        "bytes": 7757,
+        "ref": "repo:models/position_embedding.py",
+        "sha256": "9903ec30fe62414651138a7e24b7d03508a9b54399d5fff9c72be892d3bac590"
+      },
+      {
+        "bytes": 24629,
+        "ref": "repo:models/rescene.py",
+        "sha256": "0345685b3ee81ed1262e150c3a18acae983e238b279621acc5855eaad74512d0"
+      },
+      {
+        "bytes": 6117,
+        "ref": "repo:models/resnet.py",
+        "sha256": "d72ed25df837ffbe3fd52e366cfdacbd5f55c631cd2ccdfe26028f4b6114fc26"
+      },
+      {
+        "bytes": 17273,
+        "ref": "repo:models/resunet.py",
+        "sha256": "6f62243aa03bf189aada3b6b5cf9b3f37ae65da3f5924432a0824e0a68bdbe43"
+      },
+      {
+        "bytes": 4857,
+        "ref": "repo:models/scatter.py",
+        "sha256": "99ed4fc0e377fe57927cf31980f100428e6b8623f2caff05bba6d4f39aa85d20"
+      },
+      {
+        "bytes": 7059,
+        "ref": "repo:models/streaming_rescene.py",
+        "sha256": "21266662c7b35d5b6d625b5a88b371e812bdfafa1b72348ba60b8fd2daa3c247"
+      },
+      {
+        "bytes": 9475,
+        "ref": "repo:scripts/acquire_sonata_weight.py",
+        "sha256": "0ee430e21ad1986d60c30cd81b8698e198dfbd20b3e3646305a55aae7b305662"
+      },
+      {
+        "bytes": 9425,
+        "ref": "repo:scripts/analyze_3rscan_temporal_distribution.py",
+        "sha256": "6e5afb6742336bcca6e758411e322ea23d0c51cdedd112d78c422d9ceaffda25"
+      },
+      {
+        "bytes": 26444,
+        "ref": "repo:scripts/analyze_protocol_bridge.py",
+        "sha256": "107fb9d2dfef084d5327c81724ff33c4ef240edfed8702cd7b4d15a3a74b794c"
+      },
+      {
+        "bytes": 16606,
+        "ref": "repo:scripts/audit_p2_hardware_topology.py",
+        "sha256": "a0d1b836672a72c3c1642f194c8760ea8c1a90d15b4868984f0c4676e2eafbfa"
+      },
+      {
+        "bytes": 28664,
+        "ref": "repo:scripts/audit_p2_lr_schedule.py",
+        "sha256": "9c41da22b8e5580c73e0866d715da1fc5d30885a761f1056fa8c3a2258aaa6be"
+      },
+      {
+        "bytes": 129568,
+        "ref": "repo:scripts/audit_p2_reproduction.py",
+        "sha256": "8c01906ebb03352325da052a40cf9de1f8b11235890655e69128ec3528ae21c8"
+      },
+      {
+        "bytes": 5127,
+        "ref": "repo:scripts/audit_rescan_coordinates.py",
+        "sha256": "0e2b5edfce9c98d68f26394eb79607fc3807c348ae51135d3432f96fdf6d7bbf"
+      },
+      {
+        "bytes": 13208,
+        "ref": "repo:scripts/audit_rescan_dataset.py",
+        "sha256": "0a36e456afa9c23c777f6509c9a2e76312fd08aa12cc78fcbfb0a25a32274496"
+      },
+      {
+        "bytes": 15440,
+        "ref": "repo:scripts/audit_temporal_loader.py",
+        "sha256": "f69bde0deab7959a4347af0f37730d2d469b49bdc9475ed10790de59eec39f2b"
+      },
+      {
+        "bytes": 17696,
+        "ref": "repo:scripts/audit_tmap_protocol_shift.py",
+        "sha256": "04751cf8bb8211cc45b2ef528509a56e845be5f92a23c9f1cfc9965e14233df2"
+      },
+      {
+        "bytes": 14397,
+        "ref": "repo:scripts/build_baseline_evidence_contract.py",
+        "sha256": "ce8f35eb90df5537f73fb731d030c23179626391baad6f49d45a196d06efe7c1"
+      },
+      {
+        "bytes": 7806,
+        "ref": "repo:scripts/build_final_evidence_manifest.py",
+        "sha256": "34414e2284d7288026b6f7e704da3786fa80dead41a527062dca77260c3af6eb"
+      },
+      {
+        "bytes": 6300,
+        "ref": "repo:scripts/build_final_paper_evidence.py",
+        "sha256": "2f22d54f8c1f8eb31b532975cec1c096d41963eb61cc29cb214cf99d2aa26b18"
+      },
+      {
+        "bytes": 29437,
+        "ref": "repo:scripts/build_protocol_b_t2_bridge.py",
+        "sha256": "0e2cb9856c615545b631fa3e1b75773f6f8e7d48307eb03eb0e244fb914ad1c0"
+      },
+      {
+        "bytes": 4356,
+        "ref": "repo:scripts/build_rescan_per_scene_effects.py",
+        "sha256": "6259483fc7504c6e35cae5eb9076baa6aa8323200d46f429674e88c4f6e3fef3"
+      },
+      {
+        "bytes": 24223,
+        "ref": "repo:scripts/build_reviewer_closure_artifacts.py",
+        "sha256": "a52c7c951a97fb6062a76fad3369d1c7543020510dfeb6661069026efc24dd9c"
+      },
+      {
+        "bytes": 11282,
+        "ref": "repo:scripts/build_rscan_sequence_dbs.py",
+        "sha256": "9affb7fec22f31a8422684c312bd7b5dfa9e814971263cb43b07139e59a988ea"
+      },
+      {
+        "bytes": 26019,
+        "ref": "repo:scripts/build_system_comparison_artifacts.py",
+        "sha256": "89a45b7817e331bcfe65b5b0d616a961dcdc0118185372325037cf222dd8e1fa"
+      },
+      {
+        "bytes": 96939,
+        "ref": "repo:scripts/evaluate_persist4d.py",
+        "sha256": "908cb6e581f70d03a7fd6796edf218ee106a4bcf91cb9788bd220288b91e23f5"
+      },
+      {
+        "bytes": 110896,
+        "ref": "repo:scripts/evaluate_persist4d_p6a.py",
+        "sha256": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614"
+      },
+      {
+        "bytes": 31389,
+        "ref": "repo:scripts/evaluate_protocol_bridge.py",
+        "sha256": "f01a522db71378a8384c80adf1b0ea438ace374b2d01aa1af90fe4c8a9959941"
+      },
+      {
+        "bytes": 67688,
+        "ref": "repo:scripts/evaluate_rescan_persist4d.py",
+        "sha256": "37577968402be7dd42126d13194d3ab305c3783b8fe62bd4a0fa2a266987395d"
+      },
+      {
+        "bytes": 13697,
+        "ref": "repo:scripts/final_capacity_figures.py",
+        "sha256": "db9e86e9da6f105f34af28d3e3bec47c13ad04198cfa618d7e4dd4f3cf96579a"
+      },
+      {
+        "bytes": 42390,
+        "ref": "repo:scripts/final_evidence_capacity.py",
+        "sha256": "d9497856b55e0ef5e4f5cf15981360d2e04ae626615d857ea9a9ad3b4e829dab"
+      },
+      {
+        "bytes": 9689,
+        "ref": "repo:scripts/final_paper_figures.py",
+        "sha256": "e0b32374284551a8ff72a1e22be6a9c0cef718e50e3db911eed137899435f4a2"
+      },
+      {
+        "bytes": 28205,
+        "ref": "repo:scripts/finalize_sonata_second_training.py",
+        "sha256": "e2010c0d68859aa578f72b0537267445723f86f3c0e9addd890d382ca59a5bd9"
+      },
+      {
+        "bytes": 19015,
+        "ref": "repo:scripts/p2r_diagnostics.py",
+        "sha256": "72429d9938ec072754f98b7260bbe76da2b44a12358a7afd7a8e14d53db40aa7"
+      },
+      {
+        "bytes": 19533,
+        "ref": "repo:scripts/p2r_pilots.py",
+        "sha256": "b241c32a58ec5e32503d8c31fdaa9c646136ba6cc97110f524527acd7f603d96"
+      },
+      {
+        "bytes": 72293,
+        "ref": "repo:scripts/p6a_analysis.py",
+        "sha256": "83b459cc2ccdaf6898c1751e5c7cac5188303e0d8e9b4828e13e149189025b87"
+      },
+      {
+        "bytes": 69915,
+        "ref": "repo:scripts/p6a_artifacts.py",
+        "sha256": "34b63278f8022c1acab6dfee0582e9e4dec21eadc6265afcd12e7ea18729f1b3"
+      },
+      {
+        "bytes": 65641,
+        "ref": "repo:scripts/p6a_association.py",
+        "sha256": "135d196b98a29ed323202aefe49d7625ba6f1093c464d5b3f19da97b8e7b5842"
+      },
+      {
+        "bytes": 28363,
+        "ref": "repo:scripts/p6a_builder.py",
+        "sha256": "5d4cc362c2354994e50d612211afb3bdf67eb89d4c7e4fadc92a46e2f0c6a2e0"
+      },
+      {
+        "bytes": 31291,
+        "ref": "repo:scripts/p6a_cache.py",
+        "sha256": "52ef3228bc18445448121f5fc471ea0fed89fad8a138af44339ecafaec223ca4"
+      },
+      {
+        "bytes": 16287,
+        "ref": "repo:scripts/p6a_efficiency.py",
+        "sha256": "c8746e082bf72961c6c32c6337573a7e17a243a8ca8a57e2cf87edea70eaf09c"
+      },
+      {
+        "bytes": 27224,
+        "ref": "repo:scripts/p6a_figures.py",
+        "sha256": "53fb96cda8c6deec08b1e83e572656cc9530e4ba3713b372d6f7bc1050cb8f56"
+      },
+      {
+        "bytes": 59651,
+        "ref": "repo:scripts/p6a_metrics.py",
+        "sha256": "7ec32d71423f5b1a75a9175f56d9108c93bc75abdd4ec22cef21a7de965d2e2b"
+      },
+      {
+        "bytes": 36911,
+        "ref": "repo:scripts/p6a_protocol.py",
+        "sha256": "df7e0582cd2b73d996203ce9d6dbd4a52ddd0099b0e591fe377e570404c1c0ab"
+      },
+      {
+        "bytes": 16766,
+        "ref": "repo:scripts/p6a_results.py",
+        "sha256": "c9c8cd661e85a4072eaaa00688840ebb41260663204ae1b97454aa877fd353d7"
+      },
+      {
+        "bytes": 50222,
+        "ref": "repo:scripts/p6b_artifacts.py",
+        "sha256": "0efce8511d45515639926158765fcf99aee8be0d4c803648449a7d7bd926bd98"
+      },
+      {
+        "bytes": 12533,
+        "ref": "repo:scripts/p6b_association.py",
+        "sha256": "167f4fc154804d92df64c9f0902b803a91fc8fbd287d8c88aa9bb4f8a35ae7ec"
+      },
+      {
+        "bytes": 4568,
+        "ref": "repo:scripts/p6b_figures.py",
+        "sha256": "9805e880a96c948207b475a77a8b6f112b4b90a620136019b262d7ed94e87d7a"
+      },
+      {
+        "bytes": 23891,
+        "ref": "repo:scripts/p6b_protocol.py",
+        "sha256": "0c50bf551eaca33c8a2f0386d0fd1e7dc7bd94ed2695765128d19bc6c102c5d9"
+      },
+      {
+        "bytes": 63614,
+        "ref": "repo:scripts/p6b_sweep.py",
+        "sha256": "3de898471a550336ad3aa09fab31d025fb560a9c19aa2f76297d6f00c4ddac5b"
+      },
+      {
+        "bytes": 31806,
+        "ref": "repo:scripts/profile_p6a_efficiency.py",
+        "sha256": "4a42a5fa40eefc2a8343b383eb68cf2f8d35cb97925e8b78e82830b1d185bb54"
+      },
+      {
+        "bytes": 27421,
+        "ref": "repo:scripts/profile_system_comparison.py",
+        "sha256": "9c848ff130509b74fb8078e55a0681d8a998e9a2beb4675008b10097483094b6"
+      },
+      {
+        "bytes": 48140,
+        "ref": "repo:scripts/profile_temporal_scaling.py",
+        "sha256": "41056175309ecd299ff3b7c89d4613b26f5ea9b713c0b9fdb9319d391f9f1490"
+      },
+      {
+        "bytes": 15850,
+        "ref": "repo:scripts/rescan_protocol.py",
+        "sha256": "4038199c37379e796c13faee6d482accdd9b5d5e17a52a164e951eb4bc8d10df"
+      },
+      {
+        "bytes": 9153,
+        "ref": "repo:scripts/rescene_task_postprocess.py",
+        "sha256": "2cfa05df84446f0baacff185dd3ad5df6d6f1200f08a815090f5e1df68324cf8"
+      },
+      {
+        "bytes": 47357,
+        "ref": "repo:scripts/reviewer_closure_adaptation.py",
+        "sha256": "d3456c8b17d4072df2a71eef77c87eb4b89f2068f87ad4752e95f29c43a0efa2"
+      },
+      {
+        "bytes": 53147,
+        "ref": "repo:scripts/reviewer_closure_analysis.py",
+        "sha256": "d9d70f30872bc62829ba8996081f84ddc2d17edad1493e8392660f5f23dd53bc"
+      },
+      {
+        "bytes": 11468,
+        "ref": "repo:scripts/reviewer_closure_decomposition.py",
+        "sha256": "2243db3456d27b8caf9d1dc6b3bb73ea74b4db24c95d66f8307c906e2184a5c0"
+      },
+      {
+        "bytes": 35332,
+        "ref": "repo:scripts/reviewer_closure_figures.py",
+        "sha256": "6161d94ad06585ada77c28de1deb2c960f961abe4d3fa5b617cef08aa7f99e34"
+      },
+      {
+        "bytes": 20729,
+        "ref": "repo:scripts/reviewer_closure_protocol.py",
+        "sha256": "da6f3158d81973c4b858e59026a1df01e18ce39b21026d3dee1ceef3d68814a4"
+      },
+      {
+        "bytes": 49660,
+        "ref": "repo:scripts/reviewer_closure_sidecar.py",
+        "sha256": "d747ea3aaaef153c07d561a745e9a62ee175cc0915c30cc58f442e0e2f431937"
+      },
+      {
+        "bytes": 28403,
+        "ref": "repo:scripts/reviewer_closure_tracking.py",
+        "sha256": "cf16eb77767529d48adff0586428f6062287dc83b79b384722107df0ef7f1ca7"
+      },
+      {
+        "bytes": 20832,
+        "ref": "repo:scripts/reviewer_closure_training.py",
+        "sha256": "de874a0b2ce8ea4e30c32a458217941cf11201f98e7e5c8d0e2a76d44b706081"
+      },
+      {
+        "bytes": 14840,
+        "ref": "repo:scripts/run_final_capacity.py",
+        "sha256": "4e461335c8fb9f3f2999be540fce9412003b86ca54959b7763ac7fdda93b94c6"
+      },
+      {
+        "bytes": 105717,
+        "ref": "repo:scripts/run_p2_native_smoke.py",
+        "sha256": "eba3610a93d9f72ff887442b35757b4501df45ac620699d738b1eac0d3350fc9"
+      },
+      {
+        "bytes": 11139,
+        "ref": "repo:scripts/run_p6a_evaluation.py",
+        "sha256": "d48e2d12479ebb284291f43d53ad9ed6307d8af4a11026fb5323dd9a6f4000f9"
+      },
+      {
+        "bytes": 108965,
+        "ref": "repo:scripts/run_p6b_evaluation.py",
+        "sha256": "a42ebe376e2d8949c8647615ae8f03abbe97771c19e3c58c9b011510fe2a7483"
+      },
+      {
+        "bytes": 24737,
+        "ref": "repo:scripts/run_reviewer_closure.py",
+        "sha256": "f762c19149a536d9bb304b3216f5d33a280ac97a65eb1c99ebaa069b1a9ed50b"
+      },
+      {
+        "bytes": 56455,
+        "ref": "repo:scripts/run_reviewer_closure_adaptation.py",
+        "sha256": "3c6ac48062bae2aa8e9e0524c8bedc35ffb67b52d900251dbbe343bb3f066302"
+      },
+      {
+        "bytes": 27893,
+        "ref": "repo:scripts/run_reviewer_closure_decomposition.py",
+        "sha256": "034ef9a1d5493c9b48854c2843e104c720eb19565a766fea41a5695b5be914b9"
+      },
+      {
+        "bytes": 28168,
+        "ref": "repo:scripts/run_reviewer_closure_t3.py",
+        "sha256": "5866aa424d428945ca5fb0fbad6a418c820beb741c0c284a30afe89d25d257ae"
+      },
+      {
+        "bytes": 15277,
+        "ref": "repo:scripts/run_sonata_second_training.py",
+        "sha256": "ea7a490c736f3e93c8e95a04886c451a6aab76e978fc16b14ed159c026c61402"
+      },
+      {
+        "bytes": 38801,
+        "ref": "repo:scripts/run_system_comparison.py",
+        "sha256": "3824f63ce8912d5f04057f83e31572a9d54d938fce50c8c697fbe3562f44c2af"
+      },
+      {
+        "bytes": 14451,
+        "ref": "repo:scripts/run_system_comparison_v2.py",
+        "sha256": "75ef6e990a1ef773152045d2dda73941e2aa9d89e22a8201b802a37dc121dcd6"
+      },
+      {
+        "bytes": 17284,
+        "ref": "repo:scripts/run_t2_task_parity.py",
+        "sha256": "836cc8ef991171ab78f0d53e2db7d552e9dbfeaa4803dfad2589f9211baed366"
+      },
+      {
+        "bytes": 18083,
+        "ref": "repo:scripts/sonata_second_preflight.py",
+        "sha256": "e44ae0740fbcb52080ee2700202828a6121cc13c091af9f99bf22aafe50732ad"
+      },
+      {
+        "bytes": 50994,
+        "ref": "repo:scripts/sonata_second_smoke.py",
+        "sha256": "c49e8097771f070afd3cad009c19ac411812cb9ce1d9bceecc159c077a814d31"
+      },
+      {
+        "bytes": 41458,
+        "ref": "repo:scripts/system_comparison_analysis.py",
+        "sha256": "854b4e01aa4275d1bab72d95674757eafe0266d3dcafda86540ea95fd7f39010"
+      },
+      {
+        "bytes": 23130,
+        "ref": "repo:scripts/system_comparison_audit.py",
+        "sha256": "68910393fc8f4d96e4c0955b905a8d35ff2b96c7b480d7157a036d03fdb0c06d"
+      },
+      {
+        "bytes": 22173,
+        "ref": "repo:scripts/system_comparison_figures.py",
+        "sha256": "64af60a6c339b198447a88a6213846975944dad02d8ce3dc5e09857a1676b7b6"
+      },
+      {
+        "bytes": 52515,
+        "ref": "repo:scripts/system_comparison_inference.py",
+        "sha256": "4380d21ec0a18b5236c79ab786996990a4c05535d7c195dd600a7b035e16df9d"
+      },
+      {
+        "bytes": 21700,
+        "ref": "repo:scripts/system_comparison_metrics.py",
+        "sha256": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd"
+      },
+      {
+        "bytes": 19816,
+        "ref": "repo:scripts/system_comparison_protocol.py",
+        "sha256": "8e489fa4da91631f262563894da1a05908777774187cbade78cfd6386ae0e8a9"
+      },
+      {
+        "bytes": 23217,
+        "ref": "repo:scripts/system_comparison_v2_analysis.py",
+        "sha256": "8958822f290081ede0cdfb7db8584d81c0992a208dd1e5595d778658a77b3830"
+      },
+      {
+        "bytes": 17732,
+        "ref": "repo:scripts/system_comparison_v2_attribution.py",
+        "sha256": "3cd753cbeac4ed0343cedfb32ce419b6734e82c524aef4c56f835e9f976b47de"
+      },
+      {
+        "bytes": 12270,
+        "ref": "repo:scripts/system_comparison_v2_cache.py",
+        "sha256": "308c7e08ba570470a52c207eaed7e7ce726ba45bb0dd6dcd86751be53d9c8ab2"
+      },
+      {
+        "bytes": 9031,
+        "ref": "repo:scripts/system_comparison_v2_inference.py",
+        "sha256": "49787b1babff24b4f2892538e3bcf6694f3b9a1c003da36aadec67c273b2381b"
+      },
+      {
+        "bytes": 9028,
+        "ref": "repo:scripts/system_comparison_v2_parity.py",
+        "sha256": "14d469ab35b62ea3190bd0c83eb10f773630e25957aadf4ee14e010c55565f31"
+      },
+      {
+        "bytes": 31739,
+        "ref": "repo:scripts/system_comparison_v3_identity.py",
+        "sha256": "6ad16bb5ad0abf1370b383f56934e402340b64a8d224b2edde1cff2fb84108c6"
+      },
+      {
+        "bytes": 36948,
+        "ref": "repo:scripts/system_comparison_v3_oracle_identity.py",
+        "sha256": "4f81eac85750ff55267198ac6cdb806517f39deb4ed14d0814701e1543f28257"
+      },
+      {
+        "bytes": 31494,
+        "ref": "repo:scripts/system_comparison_v3_score_sensitivity.py",
+        "sha256": "f918a3f2fc4ec0428d765c560f3b9a2ac6fd274abb7aee45eea949ce492ccafe"
+      },
+      {
+        "bytes": 7676,
+        "ref": "repo:scripts/verify_final_evidence.py",
+        "sha256": "316e1525c97daa1bde9a46ff235ad54b709b210a176dcc5a3a08f8a9b8cc0812"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:trainer/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 88227,
+        "ref": "repo:trainer/trainer.py",
+        "sha256": "1042ef9d71fecef7126cf87ad81b3f4d372db56ffcfe2c34f3b51a5f7bc4287f"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:utils/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 3148,
+        "ref": "repo:utils/kfold.py",
+        "sha256": "f42be8f09ae38429917482bed967e02739cb61b27d820145e6316ac40b2df226"
+      },
+      {
+        "bytes": 89193,
+        "ref": "repo:utils/p2_preflight.py",
+        "sha256": "e326c8ed11957c70a5625cbe44079f82f172f0b34f929b0f869992f2b8ca3053"
+      },
+      {
+        "bytes": 4516,
+        "ref": "repo:utils/point_cloud_utils.py",
+        "sha256": "6e8d6e1f03c497a014d32591560c662592ff2ba4afb41273be5c5f8099f2ba44"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:utils/pointops2/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:utils/pointops2/functions/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 38234,
+        "ref": "repo:utils/pointops2/functions/pointops.py",
+        "sha256": "2d69f8dac8900eed6a7f0b66335bc014c3bea055fae911811b961bcbdcccf0ae"
+      },
+      {
+        "bytes": 8835,
+        "ref": "repo:utils/pointops2/functions/pointops2.py",
+        "sha256": "14802f5a7f92eecb6b7e7c7ac42ce8a167dd8d1d9255dcfc5d04ed3b41da6e86"
+      },
+      {
+        "bytes": 8904,
+        "ref": "repo:utils/pointops2/functions/pointops_ablation.py",
+        "sha256": "2a1324e73f0da9e04ab544353f6443cf185d711e97b04efe9deb9d9c4475e7b3"
+      },
+      {
+        "bytes": 2734,
+        "ref": "repo:utils/pointops2/functions/test_attention_op_step1.py",
+        "sha256": "d53856297eafd1bc9681ef76d321256be0843821997194a6f8a7d746c82aa586"
+      },
+      {
+        "bytes": 3369,
+        "ref": "repo:utils/pointops2/functions/test_attention_op_step1_v2.py",
+        "sha256": "5c231fb97db6aa448a168b32d37a86e1c4e7013a151250b4153dfff98538344f"
+      },
+      {
+        "bytes": 1754,
+        "ref": "repo:utils/pointops2/functions/test_attention_op_step2.py",
+        "sha256": "ac848208299b621e2a7007096a99f4f388a4f2fdb265e69b412763e1b93d8f17"
+      },
+      {
+        "bytes": 1969,
+        "ref": "repo:utils/pointops2/functions/test_relative_pos_encoding_op_step1.py",
+        "sha256": "d0d2ba91024e72875d04e74c34912cf28500f42bc24230291242438adc17577e"
+      },
+      {
+        "bytes": 2234,
+        "ref": "repo:utils/pointops2/functions/test_relative_pos_encoding_op_step1_v2.py",
+        "sha256": "8c5315798a234167c681a02c56ed5657b26769420575bf3c7b064e12c325bb53"
+      },
+      {
+        "bytes": 3005,
+        "ref": "repo:utils/pointops2/functions/test_relative_pos_encoding_op_step1_v3.py",
+        "sha256": "6468526dd199d4953adad3930640f31eb8ce08f54172a2d16c3b63ee791b8b30"
+      },
+      {
+        "bytes": 2434,
+        "ref": "repo:utils/pointops2/functions/test_relative_pos_encoding_op_step2.py",
+        "sha256": "e125d77328fce4175efe377db475126b27ff0b9715e06dff400045f9997858ff"
+      },
+      {
+        "bytes": 2932,
+        "ref": "repo:utils/pointops2/functions/test_relative_pos_encoding_op_step2_v2.py",
+        "sha256": "333a6d9d479887f6bcd7b7542bbe4bc06210c0269f4f5257b6c4f2d248bacd18"
+      },
+      {
+        "bytes": 1779,
+        "ref": "repo:utils/pointops2/setup.py",
+        "sha256": "20772c58dedc27e76b8b9ded6a66eb7bb6f8ec579bdb5f4af7ac2cdd63ad4a6a"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:utils/pointops2/src/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 1652,
+        "ref": "repo:utils/pointops2/src/aggregation/aggregation_cuda.cpp",
+        "sha256": "4207de2232f0bd3d0ca910888f91ad06f1d0aab9a7319da66751e1d6b06131d0"
+      },
+      {
+        "bytes": 3296,
+        "ref": "repo:utils/pointops2/src/aggregation/aggregation_cuda_kernel.cu",
+        "sha256": "c10500f39f0937684ed6b031bdfa9db1a32f8b21030b7c1878f39ec21faedc78"
+      },
+      {
+        "bytes": 1138,
+        "ref": "repo:utils/pointops2/src/aggregation/aggregation_cuda_kernel.h",
+        "sha256": "7e0b0af26ae73f2659858a3ab3854fc079d7843c366e38312f6d8d077d02634b"
+      },
+      {
+        "bytes": 2716,
+        "ref": "repo:utils/pointops2/src/attention/attention_cuda.cpp",
+        "sha256": "311ac03652910c046e251608971ab41e6d39a8dde32742c9d6539324b5317224"
+      },
+      {
+        "bytes": 4708,
+        "ref": "repo:utils/pointops2/src/attention/attention_cuda_kernel.cu",
+        "sha256": "2cd18e40ac28d572df35ffc901657ff043c49a44034075265ae8369c544df4c4"
+      },
+      {
+        "bytes": 1793,
+        "ref": "repo:utils/pointops2/src/attention/attention_cuda_kernel.h",
+        "sha256": "511b873e4d847eb128c4119f6bcaec41706f63303eb3cef85b67024d8d08c098"
+      },
+      {
+        "bytes": 7484,
+        "ref": "repo:utils/pointops2/src/attention_v2/attention_cuda_kernel_v2.cu",
+        "sha256": "2104968d76ca704ef4eb25aa4ee5bca6d9ed9c4278b184d220cb897f0dd577f8"
+      },
+      {
+        "bytes": 1959,
+        "ref": "repo:utils/pointops2/src/attention_v2/attention_cuda_kernel_v2.h",
+        "sha256": "d4f1f197e1f75f6e58821915c2e7170d3ac741b092daf2a4789a10e1b431e974"
+      },
+      {
+        "bytes": 2873,
+        "ref": "repo:utils/pointops2/src/attention_v2/attention_cuda_v2.cpp",
+        "sha256": "75cab8236da1992ec68111db4876d41390a241ea4783d5b77707cf3fe9ff2ee2"
+      },
+      {
+        "bytes": 644,
+        "ref": "repo:utils/pointops2/src/cuda_utils.h",
+        "sha256": "98bee32f25de63f31ae77339ac95368bcbdf3cb24d4f266dee5e7c55bb68cce3"
+      },
+      {
+        "bytes": 913,
+        "ref": "repo:utils/pointops2/src/grouping/grouping_cuda.cpp",
+        "sha256": "103e749892b1304c5508ac6470c391d18e482ee0480535912b2316b8fdb4035f"
+      },
+      {
+        "bytes": 2066,
+        "ref": "repo:utils/pointops2/src/grouping/grouping_cuda_kernel.cu",
+        "sha256": "d8dedca5a5e9baf252860d2c3f1e0d23bfd388240840edb0beb6acd9d6e0f601"
+      },
+      {
+        "bytes": 737,
+        "ref": "repo:utils/pointops2/src/grouping/grouping_cuda_kernel.h",
+        "sha256": "dadcdccf6582ed45f9ffd8fe0d17ddc5bd4fe2078c5e84643a0ac53a2f977b5b"
+      },
+      {
+        "bytes": 1100,
+        "ref": "repo:utils/pointops2/src/interpolation/interpolation_cuda.cpp",
+        "sha256": "e002b8668931d6cd50186edd839d2af0ab16a6e4632b29a713537625e7bc7f88"
+      },
+      {
+        "bytes": 2074,
+        "ref": "repo:utils/pointops2/src/interpolation/interpolation_cuda_kernel.cu",
+        "sha256": "ab7f2d860ed0a65da94e91778baac22151e63e7d8d6881187074a90d6f84f7f2"
+      },
+      {
+        "bytes": 837,
+        "ref": "repo:utils/pointops2/src/interpolation/interpolation_cuda_kernel.h",
+        "sha256": "9f926b78dfffe53e87d6fdfbfa87177396b97ca584fb40a925b84cc8212e8ec1"
+      },
+      {
+        "bytes": 755,
+        "ref": "repo:utils/pointops2/src/knnquery/knnquery_cuda.cpp",
+        "sha256": "779ea3eaacc4914a420ccf73e8ab653d485d25f83f89d3ea0f4757698f67aaa9"
+      },
+      {
+        "bytes": 2985,
+        "ref": "repo:utils/pointops2/src/knnquery/knnquery_cuda_kernel.cu",
+        "sha256": "86759f1152fc0f148819f52de407b16d209745526655e6fc3729b76de1aaf258"
+      },
+      {
+        "bytes": 576,
+        "ref": "repo:utils/pointops2/src/knnquery/knnquery_cuda_kernel.h",
+        "sha256": "cfe97d73cc4207e5c1d840a2828336c3dd12682592aec49e70a7114b94e17cac"
+      },
+      {
+        "bytes": 3794,
+        "ref": "repo:utils/pointops2/src/pointops_api.cpp",
+        "sha256": "2f717bfafd646b9c6dc8a7f60124be6382d47c7ad8964bf0a5c49bba71f973b1"
+      },
+      {
+        "bytes": 3357,
+        "ref": "repo:utils/pointops2/src/rpe/relative_pos_encoding_cuda.cpp",
+        "sha256": "cf67e890bee78cb9ea7b1083c2040235cd4d71d0d1a88ce2091fc546262440fb"
+      },
+      {
+        "bytes": 6577,
+        "ref": "repo:utils/pointops2/src/rpe/relative_pos_encoding_cuda_kernel.cu",
+        "sha256": "0caba4420f87ca51498ebc33fd402c46b82555ebab3c3350099111d1d63d8daa"
+      },
+      {
+        "bytes": 2150,
+        "ref": "repo:utils/pointops2/src/rpe/relative_pos_encoding_cuda_kernel.h",
+        "sha256": "2c45c9a1813d2f26ac8dd53683b85add50f17222d5f670f857c94ab824a88211"
+      },
+      {
+        "bytes": 21831,
+        "ref": "repo:utils/pointops2/src/rpe_v2/relative_pos_encoding_cuda_kernel_v2.cu",
+        "sha256": "6c80b4d4c1d343664dec57fef9fd78009f6eeb6d2442fed7f33793383d0e6011"
+      },
+      {
+        "bytes": 4236,
+        "ref": "repo:utils/pointops2/src/rpe_v2/relative_pos_encoding_cuda_kernel_v2.h",
+        "sha256": "5aed2ab63f243f31b8a9f4fdfff212da265711882153ed8d42fe6e3d949ffc1f"
+      },
+      {
+        "bytes": 7017,
+        "ref": "repo:utils/pointops2/src/rpe_v2/relative_pos_encoding_cuda_v2.cpp",
+        "sha256": "89af43ac373fc6bf2c8f8ecb84dc280b7af67f2ed4eed25e6645afeebc8378dc"
+      },
+      {
+        "bytes": 654,
+        "ref": "repo:utils/pointops2/src/sampling/sampling_cuda.cpp",
+        "sha256": "357437ad7da3f15913d209ae0b8e20ab262b6e00b3d6f8902a84cf386f89f966"
+      },
+      {
+        "bytes": 5476,
+        "ref": "repo:utils/pointops2/src/sampling/sampling_cuda_kernel.cu",
+        "sha256": "2056408cd7fad30e14a29caf748ab44971e48e2b0580a4abff2c0dfed5c1c2d6"
+      },
+      {
+        "bytes": 527,
+        "ref": "repo:utils/pointops2/src/sampling/sampling_cuda_kernel.h",
+        "sha256": "5e651d12975fc92514d3fcf6542255ed127f3b19805335907dd52fe2cddafe09"
+      },
+      {
+        "bytes": 1136,
+        "ref": "repo:utils/pointops2/src/subtraction/subtraction_cuda.cpp",
+        "sha256": "3efd607e5ef9661b7a3d8173b326441f72ca58c51f9895f9151345ecb355700b"
+      },
+      {
+        "bytes": 2405,
+        "ref": "repo:utils/pointops2/src/subtraction/subtraction_cuda_kernel.cu",
+        "sha256": "531cba1ca2dc061212cb0b44defaff117da8ca8fa21924d7b5a72e3f57566a4d"
+      },
+      {
+        "bytes": 857,
+        "ref": "repo:utils/pointops2/src/subtraction/subtraction_cuda_kernel.h",
+        "sha256": "5ad49f5fd7435906164a79139744c26fdd4f204203e74efd32656d89fbbefa37"
+      },
+      {
+        "bytes": 40573,
+        "ref": "repo:utils/sonata_second_preflight.py",
+        "sha256": "b5ad9d6f84b4596e93ab110c6220e76c6185e8e64863df9e8a1d52346407a2a9"
+      },
+      {
+        "bytes": 8984,
+        "ref": "repo:utils/sonata_training_evidence.py",
+        "sha256": "58082d139bf97a47e94e1a2cd0bd3e1026c9f4c7cb0b6b64bd2e01b45ece73a1"
+      },
+      {
+        "bytes": 15573,
+        "ref": "repo:utils/sonata_weight_provenance.py",
+        "sha256": "7e9be5bf9ffcc56a47c5581fbd94cce83d1df7e1c5a704436e6ba75ce36f7cd9"
+      },
+      {
+        "bytes": 6208,
+        "ref": "repo:utils/utils.py",
+        "sha256": "2b29a11c6c9e5ffae8cbbec6e627fbc034e2f9679d959ca91e5f604e08d9b4e7"
+      },
+      {
+        "bytes": 10961,
+        "ref": "repo:utils/votenet_utils/box_util.py",
+        "sha256": "65ebba0ea41e35613a21e685103f436f26c703e60b4816246cd09c2dc1012ef3"
+      },
+      {
+        "bytes": 9324,
+        "ref": "repo:utils/votenet_utils/eval_det.py",
+        "sha256": "1bf1b42bae4522b34f18fc1a38e3c77e018272204ff6dec3428a2889b40493d4"
+      },
+      {
+        "bytes": 5873,
+        "ref": "repo:utils/votenet_utils/metric_util.py",
+        "sha256": "3fb25d4060d25e587cbd9bb502e477d02e2b1b2ddfadc98ec5f1c4108ba1acd4"
+      },
+      {
+        "bytes": 5206,
+        "ref": "repo:utils/votenet_utils/nms.py",
+        "sha256": "41f9d8ee6955fd4ea6657904768e98d95128a2196fb5e3ac28d631c706349e92"
+      },
+      {
+        "bytes": 2953,
+        "ref": "repo:utils/votenet_utils/nn_distance.py",
+        "sha256": "97e982287ce59bbcc06c66341a2e080fc8baa9aae91af5f0e29c3c1a73a246eb"
+      },
+      {
+        "bytes": 18952,
+        "ref": "repo:utils/votenet_utils/pc_util.py",
+        "sha256": "d893e17b64c0bca41490cb20fe165e2ec52cd3d698d6f8ed02489c9b6ef423aa"
+      },
+      {
+        "bytes": 2575,
+        "ref": "repo:utils/votenet_utils/tf_logger.py",
+        "sha256": "3e7a8010e255145edf23c5ca0c94ce85879c69b7d68e6718fcfd9cf9c86a625b"
+      },
+      {
+        "bytes": 1876,
+        "ref": "repo:utils/votenet_utils/tf_visualizer.py",
+        "sha256": "03123eac9f9e442598933ab6061d51802495dc26cf40fad1ed13951dd13d87e3"
+      }
+    ],
+    "schema_version": 1,
+    "scopes": [
+      "conf",
+      "datasets",
+      "models",
+      "trainer",
+      "utils",
+      "scripts",
+      "main_instance_segmentation.py"
+    ],
+    "source_commit": "51acc8818ff7186b80f6cf2e3c3b1db2a7693fee",
+    "source_materialization": "worktree",
+    "status": "pass"
+  },
+  "schema_version": 2,
+  "status": "pass",
+  "training_source": {
+    "branch": null,
+    "content_sha256": "9aa27db8e8608c965f0ae7cfb380261ce86ed21120dbb077776a174c603155cc",
+    "file_count": 254,
+    "files": [
+      {
+        "bytes": 0,
+        "ref": "repo:conf/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 704,
+        "ref": "repo:conf/augmentation/albumentations_aug.yaml",
+        "sha256": "0ee794f06cfa1552423ea6e51cec64d905e32dd27e63cc48defba9b17753d587"
+      },
+      {
+        "bytes": 1276,
+        "ref": "repo:conf/augmentation/volumentations_aug.yaml",
+        "sha256": "1ff353485c25fb37cf89776a60921c40d257bf627d9f89f8665ef49cc1e85cd4"
+      },
+      {
+        "bytes": 247,
+        "ref": "repo:conf/backbone/concerto.yaml",
+        "sha256": "5b116a9e21fbb7d4a0c19c9e090dfc01f1e48c176c72e4121c8a9ed57d971101"
+      },
+      {
+        "bytes": 183,
+        "ref": "repo:conf/backbone/concerto_enc.yaml",
+        "sha256": "e659dad59dd7e6cbb93e0315885a1b7f781cddc47fa8b6671b81f84d293f2895"
+      },
+      {
+        "bytes": 399,
+        "ref": "repo:conf/backbone/minkowski.yaml",
+        "sha256": "e3655e93ea7f67e3ce0ef3563881726be55b4f8e3621bc20288b784d91ea9344"
+      },
+      {
+        "bytes": 237,
+        "ref": "repo:conf/backbone/sonata.yaml",
+        "sha256": "0b3d99ae11df103abe642a2569f728f27ed8f226cdcced4ab8a3d5eaad7721b8"
+      },
+      {
+        "bytes": 205,
+        "ref": "repo:conf/backbone/sonata_enc.yaml",
+        "sha256": "4911562d5908b73e4102ce3fbd66a603252da5e4b6dd0ad18780dbff6b8cb3d3"
+      },
+      {
+        "bytes": 538,
+        "ref": "repo:conf/callbacks/callbacks_instance_segmentation.yaml",
+        "sha256": "fd207ec7fe667c5e433835fcb4a824bd6273fea2595ea6b7b619bea78b344ce2"
+      },
+      {
+        "bytes": 1030,
+        "ref": "repo:conf/callbacks/p2_reproduction.yaml",
+        "sha256": "af4c2ea90f5f8e24ed416db4e95276e83bbd54b0d414bd80674b90c6f36fa92d"
+      },
+      {
+        "bytes": 527,
+        "ref": "repo:conf/callbacks/sonata_second.yaml",
+        "sha256": "3340b1433e17201041f73045c10a4add2d44e362445420c118b353f5a2739a92"
+      },
+      {
+        "bytes": 2091,
+        "ref": "repo:conf/config_base_instance_segmentation.yaml",
+        "sha256": "3bce8e35dde4d5932a42b20f33a1d737758683fd1f3f0e89c581aadb9620f377"
+      },
+      {
+        "bytes": 2449,
+        "ref": "repo:conf/config_p2_rescene4d_concerto_t2.yaml",
+        "sha256": "3077e89b9bca60049e1551654d5b3df78178d5647d84f0037bcb7ab91807c443"
+      },
+      {
+        "bytes": 232,
+        "ref": "repo:conf/config_p2r_a_frozen_encoder_eval.yaml",
+        "sha256": "f2d00ef7bce0322d05a915202c633e87456005473f6f1c7177bf5a3f29123c89"
+      },
+      {
+        "bytes": 2278,
+        "ref": "repo:conf/config_rescene4d_sonata_second.yaml",
+        "sha256": "fa773c74711da2e4b0efa6ff82522d194cb7340d16a1322eea92f0915b9ff38a"
+      },
+      {
+        "bytes": 1703,
+        "ref": "repo:conf/data/collation_functions/auto_collate.yaml",
+        "sha256": "68bb0ac2362d79b0b3e92693cbdd7b9ada6914de504a26ac44b800994ed277f6"
+      },
+      {
+        "bytes": 1401,
+        "ref": "repo:conf/data/collation_functions/voxelize_collate.yaml",
+        "sha256": "a463cdc0322212218d4bd7f3546cbfa258ce9d2bd73fed7533454330ba185a96"
+      },
+      {
+        "bytes": 1422,
+        "ref": "repo:conf/data/collation_functions/voxelize_collate_sonata.yaml",
+        "sha256": "009830b4e1d508760bac366d15a06120839be8fd07652d5e1d1454e2348e9786"
+      },
+      {
+        "bytes": 560,
+        "ref": "repo:conf/data/data_loaders/simple_loader.yaml",
+        "sha256": "acf546880a7be65f6ea4ce2f9f75c1225cff84b63343b9006dc7686ec4945775"
+      },
+      {
+        "bytes": 2941,
+        "ref": "repo:conf/data/datasets/mix.yaml",
+        "sha256": "71af83a4dbd64edf21e819b8900b060d1c13c47bcfde83ca2866a9acdf3e6b8c"
+      },
+      {
+        "bytes": 3061,
+        "ref": "repo:conf/data/datasets/mix200.yaml",
+        "sha256": "75cb8c5c8fba596c0088fb203b8ad2d845a2c5033d32b85f876b205aad31aff3"
+      },
+      {
+        "bytes": 3048,
+        "ref": "repo:conf/data/datasets/mix_and_val_w1.yaml",
+        "sha256": "05af9e2b9eb5f6a7e7cbdf631b99d3b7fe6fb1a898f6957473632d08d290c3c4"
+      },
+      {
+        "bytes": 3168,
+        "ref": "repo:conf/data/datasets/mix_and_val_w1_200.yaml",
+        "sha256": "7cf1134f9cc937aa6adbaa856bdd6612c1bd116800ee86a5d5b022b99d888046"
+      },
+      {
+        "bytes": 3067,
+        "ref": "repo:conf/data/datasets/mix_aug.yaml",
+        "sha256": "8a0e005aa7d5b5c5a92861eec5a96472b412b44274d5e7432a360cf686c701a9"
+      },
+      {
+        "bytes": 3048,
+        "ref": "repo:conf/data/datasets/mix_w1.yaml",
+        "sha256": "bf19a66b21f0b02535075e93b4e22ff61c383eae5a6f7f515ce765b205432118"
+      },
+      {
+        "bytes": 3221,
+        "ref": "repo:conf/data/datasets/mix_w3.yaml",
+        "sha256": "c00f70e074c436b6125218b5e76d61c690cf1263f2b1079a34b6375b60499b52"
+      },
+      {
+        "bytes": 3497,
+        "ref": "repo:conf/data/datasets/mix_w4.yaml",
+        "sha256": "22383f94b2783f720c24e5d59c24c2bf35ecf21a2f5fe8e9a41832d5723f19ab"
+      },
+      {
+        "bytes": 2948,
+        "ref": "repo:conf/data/datasets/mix_weight_exp_1t03.yaml",
+        "sha256": "40f69d78178cf46381dd7a4f537fa13da8da07918e3488ec4373c80529305678"
+      },
+      {
+        "bytes": 2948,
+        "ref": "repo:conf/data/datasets/mix_weight_exp_1t05.yaml",
+        "sha256": "fb823753a2a4a8f9135a7170382da5a76e5af9a695bebea63fcd2338c00d72f4"
+      },
+      {
+        "bytes": 2250,
+        "ref": "repo:conf/data/datasets/multi_dataset.yaml",
+        "sha256": "99c107ccb8390b7dadb0861ab63ab76c3a883961febe4dbf69a7ec0c2d39779f"
+      },
+      {
+        "bytes": 2423,
+        "ref": "repo:conf/data/datasets/rio.yaml",
+        "sha256": "52b7efc46c78733b20b78b31d8a96351b6dcb687f590279d43384f667bdd0b36"
+      },
+      {
+        "bytes": 2468,
+        "ref": "repo:conf/data/datasets/rio200.yaml",
+        "sha256": "206874d8e96d86768013c318afc22b188008b48bd5e9a9117280f55dbc1f510c"
+      },
+      {
+        "bytes": 2144,
+        "ref": "repo:conf/data/datasets/scannet.yaml",
+        "sha256": "474a8c8e375efab6a2a35bd26392bc3614f3480dfd6921c3ce3a296977a68a1a"
+      },
+      {
+        "bytes": 2180,
+        "ref": "repo:conf/data/datasets/scannet200.yaml",
+        "sha256": "07d9bf01b8b4acc1e186947e60dd8614a2500aa82a3711fbcff718dccbb0b7b6"
+      },
+      {
+        "bytes": 2223,
+        "ref": "repo:conf/data/datasets/scannet_sequence.yaml",
+        "sha256": "ff5558f468d49408f651c89be8706f54691406a7173550c6054902e236e5b914"
+      },
+      {
+        "bytes": 773,
+        "ref": "repo:conf/data/indoor.yaml",
+        "sha256": "a43cbaf3616e845d218f2182349dce2bd4960bb5f77f6997ad64398fa8e68c23"
+      },
+      {
+        "bytes": 287,
+        "ref": "repo:conf/logging/full.yaml",
+        "sha256": "855b6eebb4dbbb4cc401d362410c6a50250d8465c170d422fc20c4e3a91ebd50"
+      },
+      {
+        "bytes": 121,
+        "ref": "repo:conf/logging/local_csv.yaml",
+        "sha256": "2b9c7859a7b3dbb6d3ac9858e4b16aa4696ecab3745c664fc4b2c847d44f6678"
+      },
+      {
+        "bytes": 193,
+        "ref": "repo:conf/logging/sweep.yaml",
+        "sha256": "a89e64042aa43a9f10050e86bd9bcac31433f9f1b0308b6e6ad21ececa1f6657"
+      },
+      {
+        "bytes": 415,
+        "ref": "repo:conf/loss/contrastive/infoNCE.yaml",
+        "sha256": "ec30a47af3af2654ee03f1ec33e3512e9b1a69f019828acdbc5d5c4c9f0fae56"
+      },
+      {
+        "bytes": 87,
+        "ref": "repo:conf/loss/cross_entropy.yaml",
+        "sha256": "0515cdb3b2dd4f97f08482a779a3aa50572308e761e58f8d302129ff073097fe"
+      },
+      {
+        "bytes": 482,
+        "ref": "repo:conf/loss/set_criterion.yaml",
+        "sha256": "6e0d85081f7f6b062320e79c65afe4f35e876e3a086bc5b5b8c423b7d8f4daba"
+      },
+      {
+        "bytes": 119,
+        "ref": "repo:conf/matcher/hungarian_matcher.yaml",
+        "sha256": "52db7a752430652b6661f5857a746d0e95399a5c3edf8ef61abfbad58bc52dd7"
+      },
+      {
+        "bytes": 489,
+        "ref": "repo:conf/metrics/tmap.yaml",
+        "sha256": "e4ab3f87b7ccdade59035d309d51d929bbf03456c0c2f73e6b42969e61b749eb"
+      },
+      {
+        "bytes": 305,
+        "ref": "repo:conf/metrics/tsim.yaml",
+        "sha256": "99db9e4b20f81d9bc932aa6ab58b1c25e92b9ecb82f2ca607cb5680e1ff96bfb"
+      },
+      {
+        "bytes": 210,
+        "ref": "repo:conf/model/persist4d.yaml",
+        "sha256": "45fb6809f38d802a1a3e4b03ef689d5e82319427f2cb8b2db02980c71a1a6ea9"
+      },
+      {
+        "bytes": 950,
+        "ref": "repo:conf/model/rescene.yaml",
+        "sha256": "93ecef561f9b7555b08fa85a985b5b957a3148ae48ae868492cd4894c78f72fd"
+      },
+      {
+        "bytes": 59,
+        "ref": "repo:conf/optimizer/adamw.yaml",
+        "sha256": "f291cba4a37836bbb36239a84520a45a1e0d455cb8bee4489e5168575e0d4a62"
+      },
+      {
+        "bytes": 3888,
+        "ref": "repo:conf/p6a/default.yaml",
+        "sha256": "dd7a9fccc098fc7e5faecc059d6202ca7f8a762aaee3e7182738a2d7f800aac2"
+      },
+      {
+        "bytes": 2119,
+        "ref": "repo:conf/p6b/default.yaml",
+        "sha256": "974acd51648fa952b55e7bb45bac8799db673578782c127c848294b301156fae"
+      },
+      {
+        "bytes": 244,
+        "ref": "repo:conf/profiling/p0_p1_a40.yaml",
+        "sha256": "87ea55ac6cf2aa00a0d25fe3c82a2e7a122b60395ade4b96f2f58c9803a087c0"
+      },
+      {
+        "bytes": 257,
+        "ref": "repo:conf/scheduler/onecyclelr.yaml",
+        "sha256": "1c550d893e4432ff0c014b64c11f2b43bd9c0b4e82e44060ec4bdb2b2c17d651"
+      },
+      {
+        "bytes": 98,
+        "ref": "repo:conf/serialization/mixed.yaml",
+        "sha256": "139970f1e702ec0bb7ae6417880e6aeb73814ebdc511e2c45b2987b5c8fadcc6"
+      },
+      {
+        "bytes": 81,
+        "ref": "repo:conf/serialization/st_only.yaml",
+        "sha256": "bb6476388c43b5d8c61742df8d313f205717083ff9ee6951da3e60517ae5b06a"
+      },
+      {
+        "bytes": 260,
+        "ref": "repo:conf/trainer/trainer.yaml",
+        "sha256": "8b1ea3a0647eaac1fbc5f7269587897874c5e48b6c00340e65680d7cb46a9fc2"
+      },
+      {
+        "bytes": 237,
+        "ref": "repo:conf/trainer/trainer_mixed.yaml",
+        "sha256": "2971f4896c363326c3e4defa5748fab538da84263a5a95965585fc3a4179362d"
+      },
+      {
+        "bytes": 32966,
+        "ref": "repo:datasets/RScan/RScan_constants.py",
+        "sha256": "63be4d4728f813ac09aa04228c084912d8f183e8d247f9a737a73ad91ddde6d4"
+      },
+      {
+        "bytes": 4238,
+        "ref": "repo:datasets/RScan/RScan_splits.py",
+        "sha256": "c0cedcf3cd77ec2d7428b773b3d38a63238384afaab43f6c97c70780a90a9fb5"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:datasets/RScan/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 30148,
+        "ref": "repo:datasets/RScan/check_mappying.py",
+        "sha256": "a591204cf7b410a7245157b1259e4cf6638e6f9402e0a51bdfb1be3d0ce46e65"
+      },
+      {
+        "bytes": 438,
+        "ref": "repo:datasets/__init__.py",
+        "sha256": "c21d3ee4d73af6f67210c896e935a327b5dcd095e4e0037094de7365a70bcdf5"
+      },
+      {
+        "bytes": 1806,
+        "ref": "repo:datasets/auto_collate.py",
+        "sha256": "c16d1386e392f4cede917d60c2f2bbc0662876d699e187be4eeb36423db72438"
+      },
+      {
+        "bytes": 21268,
+        "ref": "repo:datasets/minkowski_utils.py",
+        "sha256": "4a46be3cef80ce0690487b0ba43b91e6cd4486120a47705a634934be7f721939"
+      },
+      {
+        "bytes": 8851,
+        "ref": "repo:datasets/multi_dataset.py",
+        "sha256": "2531e6e91643eea4af79c705692f414bea47c3563e10ada894fafc45b3c465ab"
+      },
+      {
+        "bytes": 18539,
+        "ref": "repo:datasets/pointcept_utils.py",
+        "sha256": "962686891547c0719670774d35917562c7f4b7c90aaad1b7002ccda676112a83"
+      },
+      {
+        "bytes": 36192,
+        "ref": "repo:datasets/preprocessing/RScan_preprocessing.py",
+        "sha256": "ca33230db161b36f44d5646b364455e6b79f099227611f76231e5063495df2b8"
+      },
+      {
+        "bytes": 7009,
+        "ref": "repo:datasets/preprocessing/base_preprocessing.py",
+        "sha256": "939d543a2e01a24074da1edccf52ace85b79bc1766f43353956dd22b21cd116a"
+      },
+      {
+        "bytes": 4095,
+        "ref": "repo:datasets/preprocessing/build_rscan_sequence_db.py",
+        "sha256": "c9b19aa3494c6ce65e5b8d39dd5289177873b32a4eb68002fb752092c693d9e2"
+      },
+      {
+        "bytes": 4229,
+        "ref": "repo:datasets/preprocessing/metric_spec_writer.py",
+        "sha256": "b5613408ddcb8e2d2fe432c4bf63a58a75ecd41b186250fa67295e0bfa71877c"
+      },
+      {
+        "bytes": 420,
+        "ref": "repo:datasets/preprocessing/metric_specs/rio.yaml",
+        "sha256": "c96bd34ed3e4898d09286a763e300c546a97b3b0409ce752aaa3fb2ab188275b"
+      },
+      {
+        "bytes": 3636,
+        "ref": "repo:datasets/preprocessing/metric_specs/rio200.yaml",
+        "sha256": "a3c876adc29680fac0b15d41bba00e2a0b97a18f509494522777f0a3f4f5072a"
+      },
+      {
+        "bytes": 424,
+        "ref": "repo:datasets/preprocessing/metric_specs/scannet.yaml",
+        "sha256": "1e7a7c5797f7ea073012142c5682141ea54e1d17699e048929e8a995919eeeb5"
+      },
+      {
+        "bytes": 6041,
+        "ref": "repo:datasets/preprocessing/metric_specs/scannet200.yaml",
+        "sha256": "05abc6453c0daeb0ac29654d362e58ef7aee31eb3b50074090aa7b12b4422f87"
+      },
+      {
+        "bytes": 15332,
+        "ref": "repo:datasets/preprocessing/scannet_preprocessing.py",
+        "sha256": "4bce6d42172852b072bcc5e7c957d70b5dc735abd0928004ba186189c8f07441"
+      },
+      {
+        "bytes": 32517,
+        "ref": "repo:datasets/preprocessing/scannet_sequence_aug.py",
+        "sha256": "c33d9eefc3dc1adce4e484f64f664b6988f48cb2701c886f5f3e2d8abdd4c8f4"
+      },
+      {
+        "bytes": 5735,
+        "ref": "repo:datasets/preprocessing/segment_script.py",
+        "sha256": "14dd8fa177807fd63587ed1806e3a586ec5f539c3a84a63c936fadd9c8a89a73"
+      },
+      {
+        "bytes": 22080,
+        "ref": "repo:datasets/rescan_adapter.py",
+        "sha256": "d94b70613f5862adbb8c142134ada15cc234b55b87e1ff8aebe98cd474601fe4"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:datasets/scannet200/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 13175,
+        "ref": "repo:datasets/scannet200/scannet200_constants.py",
+        "sha256": "1ccf2b35c4c9a40ea289c6f3c8bb61bf173a7f9302dd81d5ba09c8f8dbfc100c"
+      },
+      {
+        "bytes": 9133,
+        "ref": "repo:datasets/scannet200/scannet200_splits.py",
+        "sha256": "87136a89d4b125b47de3620558b25bb220cc31f0f41feb1db0c6589008df4901"
+      },
+      {
+        "bytes": 56406,
+        "ref": "repo:datasets/scannet200/scannetv2-labels.combined.tsv",
+        "sha256": "68674782476d967c35e8d0776933b70e10d21f1ea8019eba20221d38275139c0"
+      },
+      {
+        "bytes": 35651,
+        "ref": "repo:datasets/semseg.py",
+        "sha256": "9235caf7cf525e6225148ca7353712a8837d9bae21785ee57a7cf44074ad8104"
+      },
+      {
+        "bytes": 914,
+        "ref": "repo:datasets/streaming_sequence.py",
+        "sha256": "d7d25840c2f630a7206e0da3cd1e078dccfc24f48a8d04e1b8da3c8640fc3415"
+      },
+      {
+        "bytes": 62155,
+        "ref": "repo:main_instance_segmentation.py",
+        "sha256": "3a69397b7fe2062a9c180f545742a782dcfff677fffa197596aa5fc9f8df0bcb"
+      },
+      {
+        "bytes": 3376,
+        "ref": "repo:models/__init__.py",
+        "sha256": "caf092ab566fc46260a6ba06ce12693ef610fab88c76c9a2607c16d4d93d5a12"
+      },
+      {
+        "bytes": 55360,
+        "ref": "repo:models/criterion.py",
+        "sha256": "5cb5c05c7429c58588f88a933828f68798f65a882da98cfc4de851d8dfe3ff88"
+      },
+      {
+        "bytes": 21224,
+        "ref": "repo:models/layers.py",
+        "sha256": "d03ac43f0eeaed02ad0d5b67ce175f56413546f3e58092fffb81dce53d09b1f3"
+      },
+      {
+        "bytes": 10756,
+        "ref": "repo:models/matcher.py",
+        "sha256": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc"
+      },
+      {
+        "bytes": 14592,
+        "ref": "repo:models/minkowski.py",
+        "sha256": "5d41de74cf3187bc74e2e7eedb238c8461846aec9d20a12dcfbecedd49c9a5fc"
+      },
+      {
+        "bytes": 3978,
+        "ref": "repo:models/misc.py",
+        "sha256": "40e0cda9567ae890e8c1701c8d7165837ac40a4de8e385c5a25ffebebf89af7c"
+      },
+      {
+        "bytes": 746,
+        "ref": "repo:models/model.py",
+        "sha256": "aa8962cf19663903635705495d6483f579f5732448c004080b5b0aa899c247dd"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:models/modules/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 7548,
+        "ref": "repo:models/modules/common.py",
+        "sha256": "a40ed66ebb05033f737f322063ed6a0813f770edbec813a73ea065fc3adbd755"
+      },
+      {
+        "bytes": 3180,
+        "ref": "repo:models/modules/helpers_3detr.py",
+        "sha256": "2ede87a08bc311d5120fff4be719292b8a0b246be308a5e75f019602d8087bd8"
+      },
+      {
+        "bytes": 3936,
+        "ref": "repo:models/modules/resnet_block.py",
+        "sha256": "6742ce282353c05adb367b409f75b9ff7c3be9535d0370b60dff959a60165e6e"
+      },
+      {
+        "bytes": 39465,
+        "ref": "repo:models/persistent_memory.py",
+        "sha256": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8"
+      },
+      {
+        "bytes": 30153,
+        "ref": "repo:models/persistent_memory_p6b.py",
+        "sha256": "112ac4daddb2cce8c2b19ebf4c1fd7fa3b99d740ba0951dad636aa0a62ff2c09"
+      },
+      {
+        "bytes": 27394,
+        "ref": "repo:models/pointcept.py",
+        "sha256": "96f130d780d57ecf0c88e51c016b4feef768ad3805e47c2b633893f17fd4581a"
+      },
+      {
+        "bytes": 7757,
+        "ref": "repo:models/position_embedding.py",
+        "sha256": "9903ec30fe62414651138a7e24b7d03508a9b54399d5fff9c72be892d3bac590"
+      },
+      {
+        "bytes": 24629,
+        "ref": "repo:models/rescene.py",
+        "sha256": "0345685b3ee81ed1262e150c3a18acae983e238b279621acc5855eaad74512d0"
+      },
+      {
+        "bytes": 6117,
+        "ref": "repo:models/resnet.py",
+        "sha256": "d72ed25df837ffbe3fd52e366cfdacbd5f55c631cd2ccdfe26028f4b6114fc26"
+      },
+      {
+        "bytes": 17273,
+        "ref": "repo:models/resunet.py",
+        "sha256": "6f62243aa03bf189aada3b6b5cf9b3f37ae65da3f5924432a0824e0a68bdbe43"
+      },
+      {
+        "bytes": 4857,
+        "ref": "repo:models/scatter.py",
+        "sha256": "99ed4fc0e377fe57927cf31980f100428e6b8623f2caff05bba6d4f39aa85d20"
+      },
+      {
+        "bytes": 7059,
+        "ref": "repo:models/streaming_rescene.py",
+        "sha256": "21266662c7b35d5b6d625b5a88b371e812bdfafa1b72348ba60b8fd2daa3c247"
+      },
+      {
+        "bytes": 9475,
+        "ref": "repo:scripts/acquire_sonata_weight.py",
+        "sha256": "0ee430e21ad1986d60c30cd81b8698e198dfbd20b3e3646305a55aae7b305662"
+      },
+      {
+        "bytes": 9425,
+        "ref": "repo:scripts/analyze_3rscan_temporal_distribution.py",
+        "sha256": "6e5afb6742336bcca6e758411e322ea23d0c51cdedd112d78c422d9ceaffda25"
+      },
+      {
+        "bytes": 26444,
+        "ref": "repo:scripts/analyze_protocol_bridge.py",
+        "sha256": "107fb9d2dfef084d5327c81724ff33c4ef240edfed8702cd7b4d15a3a74b794c"
+      },
+      {
+        "bytes": 16606,
+        "ref": "repo:scripts/audit_p2_hardware_topology.py",
+        "sha256": "a0d1b836672a72c3c1642f194c8760ea8c1a90d15b4868984f0c4676e2eafbfa"
+      },
+      {
+        "bytes": 28664,
+        "ref": "repo:scripts/audit_p2_lr_schedule.py",
+        "sha256": "9c41da22b8e5580c73e0866d715da1fc5d30885a761f1056fa8c3a2258aaa6be"
+      },
+      {
+        "bytes": 129568,
+        "ref": "repo:scripts/audit_p2_reproduction.py",
+        "sha256": "8c01906ebb03352325da052a40cf9de1f8b11235890655e69128ec3528ae21c8"
+      },
+      {
+        "bytes": 5127,
+        "ref": "repo:scripts/audit_rescan_coordinates.py",
+        "sha256": "0e2b5edfce9c98d68f26394eb79607fc3807c348ae51135d3432f96fdf6d7bbf"
+      },
+      {
+        "bytes": 13208,
+        "ref": "repo:scripts/audit_rescan_dataset.py",
+        "sha256": "0a36e456afa9c23c777f6509c9a2e76312fd08aa12cc78fcbfb0a25a32274496"
+      },
+      {
+        "bytes": 15440,
+        "ref": "repo:scripts/audit_temporal_loader.py",
+        "sha256": "f69bde0deab7959a4347af0f37730d2d469b49bdc9475ed10790de59eec39f2b"
+      },
+      {
+        "bytes": 17696,
+        "ref": "repo:scripts/audit_tmap_protocol_shift.py",
+        "sha256": "04751cf8bb8211cc45b2ef528509a56e845be5f92a23c9f1cfc9965e14233df2"
+      },
+      {
+        "bytes": 14397,
+        "ref": "repo:scripts/build_baseline_evidence_contract.py",
+        "sha256": "ce8f35eb90df5537f73fb731d030c23179626391baad6f49d45a196d06efe7c1"
+      },
+      {
+        "bytes": 7806,
+        "ref": "repo:scripts/build_final_evidence_manifest.py",
+        "sha256": "34414e2284d7288026b6f7e704da3786fa80dead41a527062dca77260c3af6eb"
+      },
+      {
+        "bytes": 6300,
+        "ref": "repo:scripts/build_final_paper_evidence.py",
+        "sha256": "2f22d54f8c1f8eb31b532975cec1c096d41963eb61cc29cb214cf99d2aa26b18"
+      },
+      {
+        "bytes": 29437,
+        "ref": "repo:scripts/build_protocol_b_t2_bridge.py",
+        "sha256": "0e2cb9856c615545b631fa3e1b75773f6f8e7d48307eb03eb0e244fb914ad1c0"
+      },
+      {
+        "bytes": 4356,
+        "ref": "repo:scripts/build_rescan_per_scene_effects.py",
+        "sha256": "6259483fc7504c6e35cae5eb9076baa6aa8323200d46f429674e88c4f6e3fef3"
+      },
+      {
+        "bytes": 24223,
+        "ref": "repo:scripts/build_reviewer_closure_artifacts.py",
+        "sha256": "a52c7c951a97fb6062a76fad3369d1c7543020510dfeb6661069026efc24dd9c"
+      },
+      {
+        "bytes": 11282,
+        "ref": "repo:scripts/build_rscan_sequence_dbs.py",
+        "sha256": "9affb7fec22f31a8422684c312bd7b5dfa9e814971263cb43b07139e59a988ea"
+      },
+      {
+        "bytes": 26019,
+        "ref": "repo:scripts/build_system_comparison_artifacts.py",
+        "sha256": "89a45b7817e331bcfe65b5b0d616a961dcdc0118185372325037cf222dd8e1fa"
+      },
+      {
+        "bytes": 96939,
+        "ref": "repo:scripts/evaluate_persist4d.py",
+        "sha256": "908cb6e581f70d03a7fd6796edf218ee106a4bcf91cb9788bd220288b91e23f5"
+      },
+      {
+        "bytes": 110896,
+        "ref": "repo:scripts/evaluate_persist4d_p6a.py",
+        "sha256": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614"
+      },
+      {
+        "bytes": 31389,
+        "ref": "repo:scripts/evaluate_protocol_bridge.py",
+        "sha256": "f01a522db71378a8384c80adf1b0ea438ace374b2d01aa1af90fe4c8a9959941"
+      },
+      {
+        "bytes": 67688,
+        "ref": "repo:scripts/evaluate_rescan_persist4d.py",
+        "sha256": "37577968402be7dd42126d13194d3ab305c3783b8fe62bd4a0fa2a266987395d"
+      },
+      {
+        "bytes": 13697,
+        "ref": "repo:scripts/final_capacity_figures.py",
+        "sha256": "db9e86e9da6f105f34af28d3e3bec47c13ad04198cfa618d7e4dd4f3cf96579a"
+      },
+      {
+        "bytes": 42390,
+        "ref": "repo:scripts/final_evidence_capacity.py",
+        "sha256": "d9497856b55e0ef5e4f5cf15981360d2e04ae626615d857ea9a9ad3b4e829dab"
+      },
+      {
+        "bytes": 9689,
+        "ref": "repo:scripts/final_paper_figures.py",
+        "sha256": "e0b32374284551a8ff72a1e22be6a9c0cef718e50e3db911eed137899435f4a2"
+      },
+      {
+        "bytes": 17983,
+        "ref": "repo:scripts/finalize_sonata_second_training.py",
+        "sha256": "5308d5a55a041338f811291e5adc96565b7ae1b0a14e10e032328d15c24b6748"
+      },
+      {
+        "bytes": 19015,
+        "ref": "repo:scripts/p2r_diagnostics.py",
+        "sha256": "72429d9938ec072754f98b7260bbe76da2b44a12358a7afd7a8e14d53db40aa7"
+      },
+      {
+        "bytes": 19533,
+        "ref": "repo:scripts/p2r_pilots.py",
+        "sha256": "b241c32a58ec5e32503d8c31fdaa9c646136ba6cc97110f524527acd7f603d96"
+      },
+      {
+        "bytes": 72293,
+        "ref": "repo:scripts/p6a_analysis.py",
+        "sha256": "83b459cc2ccdaf6898c1751e5c7cac5188303e0d8e9b4828e13e149189025b87"
+      },
+      {
+        "bytes": 69915,
+        "ref": "repo:scripts/p6a_artifacts.py",
+        "sha256": "34b63278f8022c1acab6dfee0582e9e4dec21eadc6265afcd12e7ea18729f1b3"
+      },
+      {
+        "bytes": 65641,
+        "ref": "repo:scripts/p6a_association.py",
+        "sha256": "135d196b98a29ed323202aefe49d7625ba6f1093c464d5b3f19da97b8e7b5842"
+      },
+      {
+        "bytes": 28363,
+        "ref": "repo:scripts/p6a_builder.py",
+        "sha256": "5d4cc362c2354994e50d612211afb3bdf67eb89d4c7e4fadc92a46e2f0c6a2e0"
+      },
+      {
+        "bytes": 31291,
+        "ref": "repo:scripts/p6a_cache.py",
+        "sha256": "52ef3228bc18445448121f5fc471ea0fed89fad8a138af44339ecafaec223ca4"
+      },
+      {
+        "bytes": 16287,
+        "ref": "repo:scripts/p6a_efficiency.py",
+        "sha256": "c8746e082bf72961c6c32c6337573a7e17a243a8ca8a57e2cf87edea70eaf09c"
+      },
+      {
+        "bytes": 27224,
+        "ref": "repo:scripts/p6a_figures.py",
+        "sha256": "53fb96cda8c6deec08b1e83e572656cc9530e4ba3713b372d6f7bc1050cb8f56"
+      },
+      {
+        "bytes": 59651,
+        "ref": "repo:scripts/p6a_metrics.py",
+        "sha256": "7ec32d71423f5b1a75a9175f56d9108c93bc75abdd4ec22cef21a7de965d2e2b"
+      },
+      {
+        "bytes": 36911,
+        "ref": "repo:scripts/p6a_protocol.py",
+        "sha256": "df7e0582cd2b73d996203ce9d6dbd4a52ddd0099b0e591fe377e570404c1c0ab"
+      },
+      {
+        "bytes": 16766,
+        "ref": "repo:scripts/p6a_results.py",
+        "sha256": "c9c8cd661e85a4072eaaa00688840ebb41260663204ae1b97454aa877fd353d7"
+      },
+      {
+        "bytes": 50222,
+        "ref": "repo:scripts/p6b_artifacts.py",
+        "sha256": "0efce8511d45515639926158765fcf99aee8be0d4c803648449a7d7bd926bd98"
+      },
+      {
+        "bytes": 12533,
+        "ref": "repo:scripts/p6b_association.py",
+        "sha256": "167f4fc154804d92df64c9f0902b803a91fc8fbd287d8c88aa9bb4f8a35ae7ec"
+      },
+      {
+        "bytes": 4568,
+        "ref": "repo:scripts/p6b_figures.py",
+        "sha256": "9805e880a96c948207b475a77a8b6f112b4b90a620136019b262d7ed94e87d7a"
+      },
+      {
+        "bytes": 23891,
+        "ref": "repo:scripts/p6b_protocol.py",
+        "sha256": "0c50bf551eaca33c8a2f0386d0fd1e7dc7bd94ed2695765128d19bc6c102c5d9"
+      },
+      {
+        "bytes": 63614,
+        "ref": "repo:scripts/p6b_sweep.py",
+        "sha256": "3de898471a550336ad3aa09fab31d025fb560a9c19aa2f76297d6f00c4ddac5b"
+      },
+      {
+        "bytes": 31806,
+        "ref": "repo:scripts/profile_p6a_efficiency.py",
+        "sha256": "4a42a5fa40eefc2a8343b383eb68cf2f8d35cb97925e8b78e82830b1d185bb54"
+      },
+      {
+        "bytes": 27421,
+        "ref": "repo:scripts/profile_system_comparison.py",
+        "sha256": "9c848ff130509b74fb8078e55a0681d8a998e9a2beb4675008b10097483094b6"
+      },
+      {
+        "bytes": 48140,
+        "ref": "repo:scripts/profile_temporal_scaling.py",
+        "sha256": "41056175309ecd299ff3b7c89d4613b26f5ea9b713c0b9fdb9319d391f9f1490"
+      },
+      {
+        "bytes": 15850,
+        "ref": "repo:scripts/rescan_protocol.py",
+        "sha256": "4038199c37379e796c13faee6d482accdd9b5d5e17a52a164e951eb4bc8d10df"
+      },
+      {
+        "bytes": 9153,
+        "ref": "repo:scripts/rescene_task_postprocess.py",
+        "sha256": "2cfa05df84446f0baacff185dd3ad5df6d6f1200f08a815090f5e1df68324cf8"
+      },
+      {
+        "bytes": 47357,
+        "ref": "repo:scripts/reviewer_closure_adaptation.py",
+        "sha256": "d3456c8b17d4072df2a71eef77c87eb4b89f2068f87ad4752e95f29c43a0efa2"
+      },
+      {
+        "bytes": 53147,
+        "ref": "repo:scripts/reviewer_closure_analysis.py",
+        "sha256": "d9d70f30872bc62829ba8996081f84ddc2d17edad1493e8392660f5f23dd53bc"
+      },
+      {
+        "bytes": 11468,
+        "ref": "repo:scripts/reviewer_closure_decomposition.py",
+        "sha256": "2243db3456d27b8caf9d1dc6b3bb73ea74b4db24c95d66f8307c906e2184a5c0"
+      },
+      {
+        "bytes": 35332,
+        "ref": "repo:scripts/reviewer_closure_figures.py",
+        "sha256": "6161d94ad06585ada77c28de1deb2c960f961abe4d3fa5b617cef08aa7f99e34"
+      },
+      {
+        "bytes": 20729,
+        "ref": "repo:scripts/reviewer_closure_protocol.py",
+        "sha256": "da6f3158d81973c4b858e59026a1df01e18ce39b21026d3dee1ceef3d68814a4"
+      },
+      {
+        "bytes": 49660,
+        "ref": "repo:scripts/reviewer_closure_sidecar.py",
+        "sha256": "d747ea3aaaef153c07d561a745e9a62ee175cc0915c30cc58f442e0e2f431937"
+      },
+      {
+        "bytes": 28403,
+        "ref": "repo:scripts/reviewer_closure_tracking.py",
+        "sha256": "cf16eb77767529d48adff0586428f6062287dc83b79b384722107df0ef7f1ca7"
+      },
+      {
+        "bytes": 20832,
+        "ref": "repo:scripts/reviewer_closure_training.py",
+        "sha256": "de874a0b2ce8ea4e30c32a458217941cf11201f98e7e5c8d0e2a76d44b706081"
+      },
+      {
+        "bytes": 14840,
+        "ref": "repo:scripts/run_final_capacity.py",
+        "sha256": "4e461335c8fb9f3f2999be540fce9412003b86ca54959b7763ac7fdda93b94c6"
+      },
+      {
+        "bytes": 105717,
+        "ref": "repo:scripts/run_p2_native_smoke.py",
+        "sha256": "eba3610a93d9f72ff887442b35757b4501df45ac620699d738b1eac0d3350fc9"
+      },
+      {
+        "bytes": 11139,
+        "ref": "repo:scripts/run_p6a_evaluation.py",
+        "sha256": "d48e2d12479ebb284291f43d53ad9ed6307d8af4a11026fb5323dd9a6f4000f9"
+      },
+      {
+        "bytes": 108965,
+        "ref": "repo:scripts/run_p6b_evaluation.py",
+        "sha256": "a42ebe376e2d8949c8647615ae8f03abbe97771c19e3c58c9b011510fe2a7483"
+      },
+      {
+        "bytes": 24737,
+        "ref": "repo:scripts/run_reviewer_closure.py",
+        "sha256": "f762c19149a536d9bb304b3216f5d33a280ac97a65eb1c99ebaa069b1a9ed50b"
+      },
+      {
+        "bytes": 56455,
+        "ref": "repo:scripts/run_reviewer_closure_adaptation.py",
+        "sha256": "3c6ac48062bae2aa8e9e0524c8bedc35ffb67b52d900251dbbe343bb3f066302"
+      },
+      {
+        "bytes": 27893,
+        "ref": "repo:scripts/run_reviewer_closure_decomposition.py",
+        "sha256": "034ef9a1d5493c9b48854c2843e104c720eb19565a766fea41a5695b5be914b9"
+      },
+      {
+        "bytes": 28168,
+        "ref": "repo:scripts/run_reviewer_closure_t3.py",
+        "sha256": "5866aa424d428945ca5fb0fbad6a418c820beb741c0c284a30afe89d25d257ae"
+      },
+      {
+        "bytes": 15277,
+        "ref": "repo:scripts/run_sonata_second_training.py",
+        "sha256": "ea7a490c736f3e93c8e95a04886c451a6aab76e978fc16b14ed159c026c61402"
+      },
+      {
+        "bytes": 38801,
+        "ref": "repo:scripts/run_system_comparison.py",
+        "sha256": "3824f63ce8912d5f04057f83e31572a9d54d938fce50c8c697fbe3562f44c2af"
+      },
+      {
+        "bytes": 14451,
+        "ref": "repo:scripts/run_system_comparison_v2.py",
+        "sha256": "75ef6e990a1ef773152045d2dda73941e2aa9d89e22a8201b802a37dc121dcd6"
+      },
+      {
+        "bytes": 17284,
+        "ref": "repo:scripts/run_t2_task_parity.py",
+        "sha256": "836cc8ef991171ab78f0d53e2db7d552e9dbfeaa4803dfad2589f9211baed366"
+      },
+      {
+        "bytes": 18083,
+        "ref": "repo:scripts/sonata_second_preflight.py",
+        "sha256": "e44ae0740fbcb52080ee2700202828a6121cc13c091af9f99bf22aafe50732ad"
+      },
+      {
+        "bytes": 50994,
+        "ref": "repo:scripts/sonata_second_smoke.py",
+        "sha256": "c49e8097771f070afd3cad009c19ac411812cb9ce1d9bceecc159c077a814d31"
+      },
+      {
+        "bytes": 41458,
+        "ref": "repo:scripts/system_comparison_analysis.py",
+        "sha256": "854b4e01aa4275d1bab72d95674757eafe0266d3dcafda86540ea95fd7f39010"
+      },
+      {
+        "bytes": 23130,
+        "ref": "repo:scripts/system_comparison_audit.py",
+        "sha256": "68910393fc8f4d96e4c0955b905a8d35ff2b96c7b480d7157a036d03fdb0c06d"
+      },
+      {
+        "bytes": 22173,
+        "ref": "repo:scripts/system_comparison_figures.py",
+        "sha256": "64af60a6c339b198447a88a6213846975944dad02d8ce3dc5e09857a1676b7b6"
+      },
+      {
+        "bytes": 52515,
+        "ref": "repo:scripts/system_comparison_inference.py",
+        "sha256": "4380d21ec0a18b5236c79ab786996990a4c05535d7c195dd600a7b035e16df9d"
+      },
+      {
+        "bytes": 21700,
+        "ref": "repo:scripts/system_comparison_metrics.py",
+        "sha256": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd"
+      },
+      {
+        "bytes": 19816,
+        "ref": "repo:scripts/system_comparison_protocol.py",
+        "sha256": "8e489fa4da91631f262563894da1a05908777774187cbade78cfd6386ae0e8a9"
+      },
+      {
+        "bytes": 23217,
+        "ref": "repo:scripts/system_comparison_v2_analysis.py",
+        "sha256": "8958822f290081ede0cdfb7db8584d81c0992a208dd1e5595d778658a77b3830"
+      },
+      {
+        "bytes": 17732,
+        "ref": "repo:scripts/system_comparison_v2_attribution.py",
+        "sha256": "3cd753cbeac4ed0343cedfb32ce419b6734e82c524aef4c56f835e9f976b47de"
+      },
+      {
+        "bytes": 12270,
+        "ref": "repo:scripts/system_comparison_v2_cache.py",
+        "sha256": "308c7e08ba570470a52c207eaed7e7ce726ba45bb0dd6dcd86751be53d9c8ab2"
+      },
+      {
+        "bytes": 9031,
+        "ref": "repo:scripts/system_comparison_v2_inference.py",
+        "sha256": "49787b1babff24b4f2892538e3bcf6694f3b9a1c003da36aadec67c273b2381b"
+      },
+      {
+        "bytes": 9028,
+        "ref": "repo:scripts/system_comparison_v2_parity.py",
+        "sha256": "14d469ab35b62ea3190bd0c83eb10f773630e25957aadf4ee14e010c55565f31"
+      },
+      {
+        "bytes": 31739,
+        "ref": "repo:scripts/system_comparison_v3_identity.py",
+        "sha256": "6ad16bb5ad0abf1370b383f56934e402340b64a8d224b2edde1cff2fb84108c6"
+      },
+      {
+        "bytes": 36948,
+        "ref": "repo:scripts/system_comparison_v3_oracle_identity.py",
+        "sha256": "4f81eac85750ff55267198ac6cdb806517f39deb4ed14d0814701e1543f28257"
+      },
+      {
+        "bytes": 31494,
+        "ref": "repo:scripts/system_comparison_v3_score_sensitivity.py",
+        "sha256": "f918a3f2fc4ec0428d765c560f3b9a2ac6fd274abb7aee45eea949ce492ccafe"
+      },
+      {
+        "bytes": 7676,
+        "ref": "repo:scripts/verify_final_evidence.py",
+        "sha256": "316e1525c97daa1bde9a46ff235ad54b709b210a176dcc5a3a08f8a9b8cc0812"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:trainer/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 88227,
+        "ref": "repo:trainer/trainer.py",
+        "sha256": "1042ef9d71fecef7126cf87ad81b3f4d372db56ffcfe2c34f3b51a5f7bc4287f"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:utils/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 3148,
+        "ref": "repo:utils/kfold.py",
+        "sha256": "f42be8f09ae38429917482bed967e02739cb61b27d820145e6316ac40b2df226"
+      },
+      {
+        "bytes": 89193,
+        "ref": "repo:utils/p2_preflight.py",
+        "sha256": "e326c8ed11957c70a5625cbe44079f82f172f0b34f929b0f869992f2b8ca3053"
+      },
+      {
+        "bytes": 4516,
+        "ref": "repo:utils/point_cloud_utils.py",
+        "sha256": "6e8d6e1f03c497a014d32591560c662592ff2ba4afb41273be5c5f8099f2ba44"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:utils/pointops2/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:utils/pointops2/functions/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 38234,
+        "ref": "repo:utils/pointops2/functions/pointops.py",
+        "sha256": "2d69f8dac8900eed6a7f0b66335bc014c3bea055fae911811b961bcbdcccf0ae"
+      },
+      {
+        "bytes": 8835,
+        "ref": "repo:utils/pointops2/functions/pointops2.py",
+        "sha256": "14802f5a7f92eecb6b7e7c7ac42ce8a167dd8d1d9255dcfc5d04ed3b41da6e86"
+      },
+      {
+        "bytes": 8904,
+        "ref": "repo:utils/pointops2/functions/pointops_ablation.py",
+        "sha256": "2a1324e73f0da9e04ab544353f6443cf185d711e97b04efe9deb9d9c4475e7b3"
+      },
+      {
+        "bytes": 2734,
+        "ref": "repo:utils/pointops2/functions/test_attention_op_step1.py",
+        "sha256": "d53856297eafd1bc9681ef76d321256be0843821997194a6f8a7d746c82aa586"
+      },
+      {
+        "bytes": 3369,
+        "ref": "repo:utils/pointops2/functions/test_attention_op_step1_v2.py",
+        "sha256": "5c231fb97db6aa448a168b32d37a86e1c4e7013a151250b4153dfff98538344f"
+      },
+      {
+        "bytes": 1754,
+        "ref": "repo:utils/pointops2/functions/test_attention_op_step2.py",
+        "sha256": "ac848208299b621e2a7007096a99f4f388a4f2fdb265e69b412763e1b93d8f17"
+      },
+      {
+        "bytes": 1969,
+        "ref": "repo:utils/pointops2/functions/test_relative_pos_encoding_op_step1.py",
+        "sha256": "d0d2ba91024e72875d04e74c34912cf28500f42bc24230291242438adc17577e"
+      },
+      {
+        "bytes": 2234,
+        "ref": "repo:utils/pointops2/functions/test_relative_pos_encoding_op_step1_v2.py",
+        "sha256": "8c5315798a234167c681a02c56ed5657b26769420575bf3c7b064e12c325bb53"
+      },
+      {
+        "bytes": 3005,
+        "ref": "repo:utils/pointops2/functions/test_relative_pos_encoding_op_step1_v3.py",
+        "sha256": "6468526dd199d4953adad3930640f31eb8ce08f54172a2d16c3b63ee791b8b30"
+      },
+      {
+        "bytes": 2434,
+        "ref": "repo:utils/pointops2/functions/test_relative_pos_encoding_op_step2.py",
+        "sha256": "e125d77328fce4175efe377db475126b27ff0b9715e06dff400045f9997858ff"
+      },
+      {
+        "bytes": 2932,
+        "ref": "repo:utils/pointops2/functions/test_relative_pos_encoding_op_step2_v2.py",
+        "sha256": "333a6d9d479887f6bcd7b7542bbe4bc06210c0269f4f5257b6c4f2d248bacd18"
+      },
+      {
+        "bytes": 1779,
+        "ref": "repo:utils/pointops2/setup.py",
+        "sha256": "20772c58dedc27e76b8b9ded6a66eb7bb6f8ec579bdb5f4af7ac2cdd63ad4a6a"
+      },
+      {
+        "bytes": 0,
+        "ref": "repo:utils/pointops2/src/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 1652,
+        "ref": "repo:utils/pointops2/src/aggregation/aggregation_cuda.cpp",
+        "sha256": "4207de2232f0bd3d0ca910888f91ad06f1d0aab9a7319da66751e1d6b06131d0"
+      },
+      {
+        "bytes": 3296,
+        "ref": "repo:utils/pointops2/src/aggregation/aggregation_cuda_kernel.cu",
+        "sha256": "c10500f39f0937684ed6b031bdfa9db1a32f8b21030b7c1878f39ec21faedc78"
+      },
+      {
+        "bytes": 1138,
+        "ref": "repo:utils/pointops2/src/aggregation/aggregation_cuda_kernel.h",
+        "sha256": "7e0b0af26ae73f2659858a3ab3854fc079d7843c366e38312f6d8d077d02634b"
+      },
+      {
+        "bytes": 2716,
+        "ref": "repo:utils/pointops2/src/attention/attention_cuda.cpp",
+        "sha256": "311ac03652910c046e251608971ab41e6d39a8dde32742c9d6539324b5317224"
+      },
+      {
+        "bytes": 4708,
+        "ref": "repo:utils/pointops2/src/attention/attention_cuda_kernel.cu",
+        "sha256": "2cd18e40ac28d572df35ffc901657ff043c49a44034075265ae8369c544df4c4"
+      },
+      {
+        "bytes": 1793,
+        "ref": "repo:utils/pointops2/src/attention/attention_cuda_kernel.h",
+        "sha256": "511b873e4d847eb128c4119f6bcaec41706f63303eb3cef85b67024d8d08c098"
+      },
+      {
+        "bytes": 7484,
+        "ref": "repo:utils/pointops2/src/attention_v2/attention_cuda_kernel_v2.cu",
+        "sha256": "2104968d76ca704ef4eb25aa4ee5bca6d9ed9c4278b184d220cb897f0dd577f8"
+      },
+      {
+        "bytes": 1959,
+        "ref": "repo:utils/pointops2/src/attention_v2/attention_cuda_kernel_v2.h",
+        "sha256": "d4f1f197e1f75f6e58821915c2e7170d3ac741b092daf2a4789a10e1b431e974"
+      },
+      {
+        "bytes": 2873,
+        "ref": "repo:utils/pointops2/src/attention_v2/attention_cuda_v2.cpp",
+        "sha256": "75cab8236da1992ec68111db4876d41390a241ea4783d5b77707cf3fe9ff2ee2"
+      },
+      {
+        "bytes": 644,
+        "ref": "repo:utils/pointops2/src/cuda_utils.h",
+        "sha256": "98bee32f25de63f31ae77339ac95368bcbdf3cb24d4f266dee5e7c55bb68cce3"
+      },
+      {
+        "bytes": 913,
+        "ref": "repo:utils/pointops2/src/grouping/grouping_cuda.cpp",
+        "sha256": "103e749892b1304c5508ac6470c391d18e482ee0480535912b2316b8fdb4035f"
+      },
+      {
+        "bytes": 2066,
+        "ref": "repo:utils/pointops2/src/grouping/grouping_cuda_kernel.cu",
+        "sha256": "d8dedca5a5e9baf252860d2c3f1e0d23bfd388240840edb0beb6acd9d6e0f601"
+      },
+      {
+        "bytes": 737,
+        "ref": "repo:utils/pointops2/src/grouping/grouping_cuda_kernel.h",
+        "sha256": "dadcdccf6582ed45f9ffd8fe0d17ddc5bd4fe2078c5e84643a0ac53a2f977b5b"
+      },
+      {
+        "bytes": 1100,
+        "ref": "repo:utils/pointops2/src/interpolation/interpolation_cuda.cpp",
+        "sha256": "e002b8668931d6cd50186edd839d2af0ab16a6e4632b29a713537625e7bc7f88"
+      },
+      {
+        "bytes": 2074,
+        "ref": "repo:utils/pointops2/src/interpolation/interpolation_cuda_kernel.cu",
+        "sha256": "ab7f2d860ed0a65da94e91778baac22151e63e7d8d6881187074a90d6f84f7f2"
+      },
+      {
+        "bytes": 837,
+        "ref": "repo:utils/pointops2/src/interpolation/interpolation_cuda_kernel.h",
+        "sha256": "9f926b78dfffe53e87d6fdfbfa87177396b97ca584fb40a925b84cc8212e8ec1"
+      },
+      {
+        "bytes": 755,
+        "ref": "repo:utils/pointops2/src/knnquery/knnquery_cuda.cpp",
+        "sha256": "779ea3eaacc4914a420ccf73e8ab653d485d25f83f89d3ea0f4757698f67aaa9"
+      },
+      {
+        "bytes": 2985,
+        "ref": "repo:utils/pointops2/src/knnquery/knnquery_cuda_kernel.cu",
+        "sha256": "86759f1152fc0f148819f52de407b16d209745526655e6fc3729b76de1aaf258"
+      },
+      {
+        "bytes": 576,
+        "ref": "repo:utils/pointops2/src/knnquery/knnquery_cuda_kernel.h",
+        "sha256": "cfe97d73cc4207e5c1d840a2828336c3dd12682592aec49e70a7114b94e17cac"
+      },
+      {
+        "bytes": 3794,
+        "ref": "repo:utils/pointops2/src/pointops_api.cpp",
+        "sha256": "2f717bfafd646b9c6dc8a7f60124be6382d47c7ad8964bf0a5c49bba71f973b1"
+      },
+      {
+        "bytes": 3357,
+        "ref": "repo:utils/pointops2/src/rpe/relative_pos_encoding_cuda.cpp",
+        "sha256": "cf67e890bee78cb9ea7b1083c2040235cd4d71d0d1a88ce2091fc546262440fb"
+      },
+      {
+        "bytes": 6577,
+        "ref": "repo:utils/pointops2/src/rpe/relative_pos_encoding_cuda_kernel.cu",
+        "sha256": "0caba4420f87ca51498ebc33fd402c46b82555ebab3c3350099111d1d63d8daa"
+      },
+      {
+        "bytes": 2150,
+        "ref": "repo:utils/pointops2/src/rpe/relative_pos_encoding_cuda_kernel.h",
+        "sha256": "2c45c9a1813d2f26ac8dd53683b85add50f17222d5f670f857c94ab824a88211"
+      },
+      {
+        "bytes": 21831,
+        "ref": "repo:utils/pointops2/src/rpe_v2/relative_pos_encoding_cuda_kernel_v2.cu",
+        "sha256": "6c80b4d4c1d343664dec57fef9fd78009f6eeb6d2442fed7f33793383d0e6011"
+      },
+      {
+        "bytes": 4236,
+        "ref": "repo:utils/pointops2/src/rpe_v2/relative_pos_encoding_cuda_kernel_v2.h",
+        "sha256": "5aed2ab63f243f31b8a9f4fdfff212da265711882153ed8d42fe6e3d949ffc1f"
+      },
+      {
+        "bytes": 7017,
+        "ref": "repo:utils/pointops2/src/rpe_v2/relative_pos_encoding_cuda_v2.cpp",
+        "sha256": "89af43ac373fc6bf2c8f8ecb84dc280b7af67f2ed4eed25e6645afeebc8378dc"
+      },
+      {
+        "bytes": 654,
+        "ref": "repo:utils/pointops2/src/sampling/sampling_cuda.cpp",
+        "sha256": "357437ad7da3f15913d209ae0b8e20ab262b6e00b3d6f8902a84cf386f89f966"
+      },
+      {
+        "bytes": 5476,
+        "ref": "repo:utils/pointops2/src/sampling/sampling_cuda_kernel.cu",
+        "sha256": "2056408cd7fad30e14a29caf748ab44971e48e2b0580a4abff2c0dfed5c1c2d6"
+      },
+      {
+        "bytes": 527,
+        "ref": "repo:utils/pointops2/src/sampling/sampling_cuda_kernel.h",
+        "sha256": "5e651d12975fc92514d3fcf6542255ed127f3b19805335907dd52fe2cddafe09"
+      },
+      {
+        "bytes": 1136,
+        "ref": "repo:utils/pointops2/src/subtraction/subtraction_cuda.cpp",
+        "sha256": "3efd607e5ef9661b7a3d8173b326441f72ca58c51f9895f9151345ecb355700b"
+      },
+      {
+        "bytes": 2405,
+        "ref": "repo:utils/pointops2/src/subtraction/subtraction_cuda_kernel.cu",
+        "sha256": "531cba1ca2dc061212cb0b44defaff117da8ca8fa21924d7b5a72e3f57566a4d"
+      },
+      {
+        "bytes": 857,
+        "ref": "repo:utils/pointops2/src/subtraction/subtraction_cuda_kernel.h",
+        "sha256": "5ad49f5fd7435906164a79139744c26fdd4f204203e74efd32656d89fbbefa37"
+      },
+      {
+        "bytes": 37925,
+        "ref": "repo:utils/sonata_second_preflight.py",
+        "sha256": "aa89f7f31a46fd3d9468b192aa7f1fb45b1298cb211b475e2b21570b930a0eee"
+      },
+      {
+        "bytes": 8984,
+        "ref": "repo:utils/sonata_training_evidence.py",
+        "sha256": "58082d139bf97a47e94e1a2cd0bd3e1026c9f4c7cb0b6b64bd2e01b45ece73a1"
+      },
+      {
+        "bytes": 15573,
+        "ref": "repo:utils/sonata_weight_provenance.py",
+        "sha256": "7e9be5bf9ffcc56a47c5581fbd94cce83d1df7e1c5a704436e6ba75ce36f7cd9"
+      },
+      {
+        "bytes": 6208,
+        "ref": "repo:utils/utils.py",
+        "sha256": "2b29a11c6c9e5ffae8cbbec6e627fbc034e2f9679d959ca91e5f604e08d9b4e7"
+      },
+      {
+        "bytes": 10961,
+        "ref": "repo:utils/votenet_utils/box_util.py",
+        "sha256": "65ebba0ea41e35613a21e685103f436f26c703e60b4816246cd09c2dc1012ef3"
+      },
+      {
+        "bytes": 9324,
+        "ref": "repo:utils/votenet_utils/eval_det.py",
+        "sha256": "1bf1b42bae4522b34f18fc1a38e3c77e018272204ff6dec3428a2889b40493d4"
+      },
+      {
+        "bytes": 5873,
+        "ref": "repo:utils/votenet_utils/metric_util.py",
+        "sha256": "3fb25d4060d25e587cbd9bb502e477d02e2b1b2ddfadc98ec5f1c4108ba1acd4"
+      },
+      {
+        "bytes": 5206,
+        "ref": "repo:utils/votenet_utils/nms.py",
+        "sha256": "41f9d8ee6955fd4ea6657904768e98d95128a2196fb5e3ac28d631c706349e92"
+      },
+      {
+        "bytes": 2953,
+        "ref": "repo:utils/votenet_utils/nn_distance.py",
+        "sha256": "97e982287ce59bbcc06c66341a2e080fc8baa9aae91af5f0e29c3c1a73a246eb"
+      },
+      {
+        "bytes": 18952,
+        "ref": "repo:utils/votenet_utils/pc_util.py",
+        "sha256": "d893e17b64c0bca41490cb20fe165e2ec52cd3d698d6f8ed02489c9b6ef423aa"
+      },
+      {
+        "bytes": 2575,
+        "ref": "repo:utils/votenet_utils/tf_logger.py",
+        "sha256": "3e7a8010e255145edf23c5ca0c94ce85879c69b7d68e6718fcfd9cf9c86a625b"
+      },
+      {
+        "bytes": 1876,
+        "ref": "repo:utils/votenet_utils/tf_visualizer.py",
+        "sha256": "03123eac9f9e442598933ab6061d51802495dc26cf40fad1ed13951dd13d87e3"
+      }
+    ],
+    "schema_version": 1,
+    "scopes": [
+      "conf",
+      "datasets",
+      "models",
+      "trainer",
+      "utils",
+      "scripts",
+      "main_instance_segmentation.py"
+    ],
+    "source_commit": "7c61d89bcb70ec89ce9b857c6ec6321acb1d7f1e",
+    "source_materialization": "git_object_database",
+    "status": "pass"
+  }
+}
