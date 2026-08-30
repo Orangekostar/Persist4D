@@ -1,0 +1,2068 @@
+{
+  "audit_bindings": {
+    "data": "78f8eccd1e8af168ec6b147a3608117caca5d9e02dae7e4e380bda87599a71a4",
+    "ddp_sampler": "47ae193b8aabface7944b6d2323445f2041166d917f698201fe615cd4882c1ef",
+    "encoder_stochasticity": "90ad1ee507c3d592d918c06f5d818467a69f3bebd8de21586595d028dbe83818",
+    "objective": "7e81cd059e22b710ab0148ac48b8a9e674b4eaf7da186fbb90dc502ef54adf38",
+    "physical_batch": "d483502e97632aefb119cc3d044a6b5a6ff7abd9390d36bbb558b0cc17862315"
+  },
+  "authorization_sha256": "4d40ef874a88fa2dcc88eca047a45078c5fee7c6c355006d334a8aa36bd714fd",
+  "data": {
+    "rio": {
+      "content_sha256": "bf1dc30493ae453d4202f3a0ef9ca28d35c8123df880e21770aca460e7f997f7",
+      "file_count": 5855,
+      "total_bytes": 5964404592
+    },
+    "rio_t2_sequence_database_sha256": "974299916db02d2ee0233564eb7b36e314dada93e997584d9dfef21ad70d0416",
+    "scannet": {
+      "content_sha256": "6147418b6378d5b5b41cfd1082f336f1dabbc8d400989af3eee988c89b08676a",
+      "file_count": 3134,
+      "total_bytes": 12579495583
+    },
+    "scannet_train_split_sha256": "96acca299b7855f02824c496b19077904d80996e7ced1bb9f0dac98f7dd4d0c8",
+    "scannet_validation_split_sha256": "d75d4971c3fa7128c643695840e279042c212ef904fe933bd00cf9918c61b083"
+  },
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "gates": {
+    "authorized_not_selected": [
+      "R3"
+    ],
+    "not_authorized": [
+      "R5"
+    ],
+    "results": {
+      "R2": true,
+      "R3": true,
+      "R4": true,
+      "R5": false
+    },
+    "selected_conditionals": [
+      "R2",
+      "R4"
+    ]
+  },
+  "initialization": {
+    "common_state": {
+      "bytes": 540886910,
+      "config_sha256": "f31acf492c6eec0b7e908dd9a86c70e841ec6dbd0ac1e76172c390e0f43328f5",
+      "creating_commit": "68373a3cc6ba2415359d69dc0f9158a2e287e2d2",
+      "logical_name": "rootcause_common_initial_state",
+      "reference": "external:checkpoint/rootcause_common/d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+      "schema_version": 1,
+      "selected_epoch": 0,
+      "selected_step": 0,
+      "sha256": "d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+      "upstream_checkpoint_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+    },
+    "frozen_encoder_state": {
+      "content_sha256": "7a4bf3282599344d9d0fc6e27a886dc7742a826393dcad6a8246fc4274191b48",
+      "schema_sha256": "6ab94f14237154485ea922fadc38b3e412418e9d45a7f4bc2e705cbf83b0da18",
+      "schema_version": 1,
+      "tensor_count": 453,
+      "total_elements": 108461376,
+      "trainable_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "manifest_sha256": "7d3586ca78659ee8e4304ca0561fb9b9f5545082904472bee3be6d36600cb843",
+    "pretrained": {
+      "bytes": 433987358,
+      "reference": "external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+      "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+    },
+    "tensor_state": {
+      "content_sha256": "2949cc5ec1022aa2bd50cfeb2a97e8bca23e3913353e6b2ffd33738f89669abd",
+      "schema_sha256": "e375f33246965e4568f2553ffb3f97c94f91f4f484442984030659195642d324",
+      "schema_version": 1,
+      "tensor_count": 798,
+      "total_elements": 135149676,
+      "trainable_schema_sha256": "6a398f2c29ba67cb342aada6bc8029781a5379aee09c03f57d40891af12e10b6"
+    },
+    "trainable_state": {
+      "content_sha256": "8a40be6cfef91b8c8d8198d2dcdd9b366efff1c1ad0a12319156024c2b60c3df",
+      "schema_sha256": "6a398f2c29ba67cb342aada6bc8029781a5379aee09c03f57d40891af12e10b6",
+      "schema_version": 1,
+      "tensor_count": 342,
+      "total_elements": 26688019,
+      "trainable_schema_sha256": "6a398f2c29ba67cb342aada6bc8029781a5379aee09c03f57d40891af12e10b6"
+    }
+  },
+  "metrics": {
+    "config_reference": "repo:conf/metrics/tmap.yaml",
+    "config_sha256": "e4ab3f87b7ccdade59035d309d51d929bbf03456c0c2f73e6b42969e61b749eb",
+    "evaluator_reference": "repo:scripts/evaluate_rescan_persist4d.py",
+    "evaluator_sha256": "37577968402be7dd42126d13194d3ab305c3783b8fe62bd4a0fa2a266987395d",
+    "official_like_validation_sequences": 154,
+    "paired_seeds": [
+      45,
+      46,
+      47
+    ],
+    "stmetrics_commit": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f"
+  },
+  "runtime": {
+    "cuda": "12.6",
+    "gpu_count": 3,
+    "gpu_models": [
+      "NVIDIA A40",
+      "NVIDIA A40",
+      "NVIDIA A40"
+    ],
+    "hydra": "1.3.4",
+    "python": "3.10.20",
+    "pytorch_lightning": "2.6.5",
+    "torch": "2.6.0+cu126"
+  },
+  "sampler": {
+    "contract_sha256": "7d81cecb03f5da8cda32abcb8cff3c88e4173f9c3594c5c9cddf5dc25c52d593",
+    "correctly_sharded": true,
+    "num_samples": 2112,
+    "runtime_audit_sha256": "47ae193b8aabface7944b6d2323445f2041166d917f698201fe615cd4882c1ef",
+    "sampler_seed": 45
+  },
+  "schedule": {
+    "external_evaluation_epochs": [
+      60,
+      90
+    ],
+    "full_epochs": 450,
+    "optimizer_steps_per_epoch": 66,
+    "short_horizon_epochs": 90,
+    "total_optimizer_steps": 29700,
+    "validation_epochs": [
+      15,
+      30,
+      45,
+      60,
+      75,
+      90
+    ]
+  },
+  "schema_version": 1,
+  "selected_variants": [
+    "R0",
+    "R1",
+    "R2",
+    "R4"
+  ],
+  "selection_reason": "R2 and R4 are gate-passed released-runtime/data recipe differences; R3 remains an authorized diagnostic control but was not selected under the two-conditional-variant cap; R5 failed its materiality gate.",
+  "source_commit": "9d0b9fa775e0ff84833dd0d6d7785831007b8e21",
+  "status": "authorized",
+  "variants": {
+    "R0": {
+      "config_sha256": "ac669303b5262cefb47d69ce07f85e713075e68745395dad003a64c40f333a30",
+      "isolation": {
+        "changed_paths": [],
+        "diff_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "effective_global_batch": 32,
+        "status": "pass",
+        "variant": "R0"
+      },
+      "resolved_config": {
+        "aux_metric": null,
+        "backbone": {
+          "_target_": "models.PointceptBackbone",
+          "custom_config": {
+            "enc_mode": false
+          },
+          "decoder_serializations": [
+            "standard",
+            "temporal_overlay"
+          ],
+          "model_lib": "concerto",
+          "name": "external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+          "repo_id": "Pointcept/Concerto"
+        },
+        "callbacks": [
+          {
+            "_target_": "pytorch_lightning.callbacks.ModelCheckpoint",
+            "auto_insert_metric_name": false,
+            "dirpath": "external:checkpoint/rootcause_short/R0",
+            "every_n_epochs": 1,
+            "filename": "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}",
+            "mode": "max",
+            "monitor": "val_mean_t-AP",
+            "save_last": true,
+            "save_on_train_epoch_end": true,
+            "save_top_k": 1,
+            "save_weights_only": false
+          },
+          {
+            "_target_": "utils.rescene_rootcause_callbacks.EpochSetCheckpointCallback",
+            "completed_epochs": [
+              60,
+              90,
+              450
+            ],
+            "output_dir": "external:checkpoint/rootcause_short/R0"
+          },
+          {
+            "_target_": "utils.rescene_rootcause_callbacks.RootCauseHorizonCallback",
+            "completed_epoch": 90
+          },
+          {
+            "_target_": "pytorch_lightning.callbacks.LearningRateMonitor"
+          }
+        ],
+        "data": {
+          "add_colors": true,
+          "add_instance": true,
+          "add_normals": false,
+          "add_raw_coordinates": true,
+          "batch_size": 2,
+          "ignore_label": 255,
+          "in_channels": 3,
+          "num_changes": 6,
+          "num_labels": 20,
+          "num_workers": 4,
+          "pin_memory": false,
+          "temporal_window": 2,
+          "test_batch_size": 1,
+          "test_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "validation",
+            "num_queries": 100,
+            "probing": false,
+            "voxel_size": 0.02
+          },
+          "test_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 1,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": false
+          },
+          "test_dataset": {
+            "_target_": "datasets.semseg.SemanticSegmentationDataset",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+            "data_dir": "data/processed/rio",
+            "dataset_name": "rio",
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": null,
+            "known_empty_scan_policy": "official_substitute",
+            "label_db_filepath": "data/processed/rio/label_database.yaml",
+            "label_offset": 2,
+            "mode": "validation",
+            "num_labels": 20,
+            "temporal_window": 2,
+            "volume_augmentations_path": null
+          },
+          "test_mode": "validation",
+          "train_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "train",
+            "num_queries": 100,
+            "probing": false,
+            "small_crops": false,
+            "very_small_crops": false,
+            "voxel_size": 0.02
+          },
+          "train_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 2,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": true
+          },
+          "train_dataset": {
+            "_target_": "datasets.multi_dataset.MultiDataset.from_config",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "datasets": [
+              {
+                "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+                "data_dir": "data/processed/rio",
+                "dataset_name": "rio",
+                "label_db_filepath": "data/processed/rio/label_database.yaml",
+                "target": "datasets.semseg.SemanticSegmentationDataset",
+                "temporal_window": 2
+              },
+              {
+                "color_mean_std": "data/processed/scannet/color_mean_std.yaml",
+                "data_dir": "data/processed/scannet",
+                "dataset_name": "scannet",
+                "label_db_filepath": "data/processed/scannet/label_database.yaml",
+                "target": "datasets.semseg.SemanticSegmentationDataset",
+                "temporal_window": 1
+              }
+            ],
+            "epoch_sample_multiple": 32,
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": "conf/augmentation/albumentations_aug.yaml",
+            "known_empty_scan_policy": "official_substitute",
+            "label_offset": 2,
+            "mode": "train",
+            "num_labels": 20,
+            "sampler_seed": 45,
+            "volume_augmentations_path": "conf/augmentation/volumentations_aug.yaml",
+            "weights": [
+              1.0,
+              0.8
+            ]
+          },
+          "train_mode": "train",
+          "validation_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "validation",
+            "num_queries": 100,
+            "probing": false,
+            "voxel_size": 0.02
+          },
+          "validation_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 1,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": false
+          },
+          "validation_dataset": {
+            "_target_": "datasets.semseg.SemanticSegmentationDataset",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+            "data_dir": "data/processed/rio",
+            "dataset_name": "rio",
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": null,
+            "known_empty_scan_policy": "official_substitute",
+            "label_db_filepath": "data/processed/rio/label_database.yaml",
+            "label_offset": 2,
+            "mode": "validation",
+            "num_labels": 20,
+            "temporal_window": 2,
+            "volume_augmentations_path": null
+          },
+          "validation_mode": "validation",
+          "voxel_size": 0.02
+        },
+        "general": {
+          "add_instance": true,
+          "backbone_checkpoint": null,
+          "checkpoint": null,
+          "compile_model": false,
+          "dbscan_eps": 0.95,
+          "dbscan_min_points": 1,
+          "decoder_id": -1,
+          "eval_on_segments": true,
+          "experiment_name": "R0",
+          "export": false,
+          "export_threshold": 0.0001,
+          "filter_out_instances": false,
+          "freeze": "backbone_encoder",
+          "frozen_encoder_eval": false,
+          "gpus": 2,
+          "ignore_class_threshold": 100,
+          "ignore_mask_idx": [],
+          "iou_threshold": 1.0,
+          "linear_probing_backbone": false,
+          "matmul_precision": "high",
+          "max_batch_size": 99999999,
+          "num_changes": 6,
+          "num_targets": 19,
+          "postprocessing_export": false,
+          "project_name": "rescene_task_learning_root_cause_v1",
+          "rootcause_common_initialization": "external:checkpoint/rootcause_common/d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+          "rootcause_common_initialization_sha256": "d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+          "rootcause_fail_closed_runtime": true,
+          "rootcause_frozen_encoder_stochastic_policy": "current",
+          "rootcause_objective_mode": "weighted",
+          "save_dir": "external:checkpoint/rootcause_short/R0",
+          "save_features": false,
+          "save_segment_info": false,
+          "save_visualizations": false,
+          "scores_threshold": 0.0,
+          "seed": 45,
+          "topk_per_image": 100,
+          "train_mode": true,
+          "train_on_segments": true,
+          "use_dbscan": false,
+          "version": 0,
+          "visualization_point_size": 20,
+          "workspace": null
+        },
+        "instance_metric": {
+          "_target_": "stmetrics.InstanceMetrics",
+          "dataset": "data/processed/rio/rio.yaml",
+          "heads": [
+            {
+              "_target_": "stmetrics.TemporalEvaluator",
+              "aux": "changes",
+              "recall": true
+            },
+            {
+              "_target_": "stmetrics.LegacyAPEvaluator"
+            },
+            {
+              "_target_": "stmetrics.instances.SelectTimestepEvaluator",
+              "timesteps": [
+                0
+              ]
+            },
+            {
+              "_target_": "stmetrics.instances.SelectTimestepEvaluator",
+              "timesteps": [
+                1
+              ]
+            }
+          ],
+          "log_prefix": "val",
+          "timestep_key": "temporal_stages"
+        },
+        "logging": [
+          {
+            "_target_": "pytorch_lightning.loggers.CSVLogger",
+            "name": "local_metrics",
+            "save_dir": "external:checkpoint/rootcause_short/R0"
+          }
+        ],
+        "loss": {
+          "_target_": "models.criterion.SetCriterion",
+          "change_weights": [
+            0.1,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "chunk_size": 2048,
+          "class_weights": -1,
+          "contrastive_loss": true,
+          "contrastive_loss_type": "infoNCE",
+          "contrastive_loss_weight": 1.0,
+          "eos_coef": 0.2,
+          "importance_sample_ratio": 0.75,
+          "initial_bias": 0.0,
+          "initial_temperature": 0.5,
+          "learnable_bias": false,
+          "learnable_temperature": false,
+          "losses": [
+            "labels",
+            "masks"
+          ],
+          "max_points": 5000,
+          "norm_type": "log_odds",
+          "num_changes": 6,
+          "num_classes": 19,
+          "num_negatives": 256,
+          "num_points": -1,
+          "oversample_ratio": 3.0,
+          "scale_contrastive_loss": false,
+          "temporal_positive_weight": 1.0,
+          "use_chunked_loss": true,
+          "weight_temporal_stages": true
+        },
+        "matcher": {
+          "_target_": "models.matcher.HungarianMatcher",
+          "cost_class": 2.0,
+          "cost_dice": 2.0,
+          "cost_mask": 5.0,
+          "num_points": -1
+        },
+        "model": {
+          "D": 4,
+          "_target_": "models.ReScene",
+          "config": {
+            "backbone": {
+              "_target_": "models.PointceptBackbone",
+              "custom_config": {
+                "enc_mode": false
+              },
+              "decoder_serializations": [
+                "standard",
+                "temporal_overlay"
+              ],
+              "model_lib": "concerto",
+              "name": "external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+              "repo_id": "Pointcept/Concerto"
+            },
+            "backbone_wrapper": true,
+            "temporal_window": 2
+          },
+          "dim_feedforward": 1024,
+          "dropout": 0.0,
+          "gauss_scale": 1.0,
+          "hidden_dim": 128,
+          "hlevels": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "max_sample_size": false,
+          "non_parametric_queries": true,
+          "normalize_pos_enc": true,
+          "num_changes": 6,
+          "num_classes": 19,
+          "num_decoders": 3,
+          "num_heads": 8,
+          "num_queries": 100,
+          "positional_encoding_type": "fourier",
+          "pre_norm": false,
+          "random_normal": false,
+          "random_queries": false,
+          "random_query_both": false,
+          "sample_sizes": [
+            200,
+            800,
+            3200,
+            12800,
+            51200
+          ],
+          "save_segment_info": false,
+          "scatter_type": "mean",
+          "shared_decoder": true,
+          "temporal_masking": false,
+          "train_on_segments": true,
+          "use_changes_loss": false,
+          "use_level_embed": false,
+          "use_np_features": false,
+          "voxel_size": 0.02
+        },
+        "optimizer": {
+          "_target_": "torch.optim.AdamW",
+          "amsgrad": false,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "eps": 1e-08,
+          "lr": 0.0005,
+          "weight_decay": 0.01
+        },
+        "rootcause_preflight": {
+          "initialization_manifest": "artifacts/rescene_task_learning_root_cause_v1/initialization/COMMON_INITIALIZATION.json",
+          "target": "rescene_task_learning_root_cause_v1",
+          "variant_manifest": "artifacts/rescene_task_learning_root_cause_v1/short_curves/variant_manifest.json"
+        },
+        "scheduler": {
+          "pytorch_lightning_params": {
+            "interval": "step"
+          },
+          "scheduler": {
+            "_target_": "torch.optim.lr_scheduler.OneCycleLR",
+            "anneal_strategy": "cos",
+            "base_momentum": 0.85,
+            "cycle_momentum": true,
+            "div_factor": 25.0,
+            "epochs": 450,
+            "final_div_factor": 10000.0,
+            "last_epoch": -1,
+            "max_lr": 0.0005,
+            "max_momentum": 0.95,
+            "pct_start": 0.3,
+            "three_phase": false,
+            "total_steps": 29700
+          }
+        },
+        "trainer": {
+          "accumulate_grad_batches": 8,
+          "check_val_every_n_epoch": 15,
+          "deterministic": false,
+          "gradient_clip_val": 1.0,
+          "max_epochs": 450,
+          "min_epochs": 1,
+          "num_sanity_val_steps": 2,
+          "precision": "32-true",
+          "strategy": "ddp_find_unused_parameters_true"
+        }
+      }
+    },
+    "R1": {
+      "config_sha256": "3846415b6de3ea12b7b08d39ea20398916dd685c99ce7ad33e42df17d9ac6536",
+      "isolation": {
+        "changed_paths": [
+          "general.rootcause_objective_mode"
+        ],
+        "diff_sha256": "77d4b4d500863219b08655c349bf2b5a74b1b2de67515341d745848973bb8b9a",
+        "effective_global_batch": 32,
+        "status": "pass",
+        "variant": "R1"
+      },
+      "resolved_config": {
+        "aux_metric": null,
+        "backbone": {
+          "_target_": "models.PointceptBackbone",
+          "custom_config": {
+            "enc_mode": false
+          },
+          "decoder_serializations": [
+            "standard",
+            "temporal_overlay"
+          ],
+          "model_lib": "concerto",
+          "name": "external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+          "repo_id": "Pointcept/Concerto"
+        },
+        "callbacks": [
+          {
+            "_target_": "pytorch_lightning.callbacks.ModelCheckpoint",
+            "auto_insert_metric_name": false,
+            "dirpath": "external:checkpoint/rootcause_short/R1",
+            "every_n_epochs": 1,
+            "filename": "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}",
+            "mode": "max",
+            "monitor": "val_mean_t-AP",
+            "save_last": true,
+            "save_on_train_epoch_end": true,
+            "save_top_k": 1,
+            "save_weights_only": false
+          },
+          {
+            "_target_": "utils.rescene_rootcause_callbacks.EpochSetCheckpointCallback",
+            "completed_epochs": [
+              60,
+              90,
+              450
+            ],
+            "output_dir": "external:checkpoint/rootcause_short/R1"
+          },
+          {
+            "_target_": "utils.rescene_rootcause_callbacks.RootCauseHorizonCallback",
+            "completed_epoch": 90
+          },
+          {
+            "_target_": "pytorch_lightning.callbacks.LearningRateMonitor"
+          }
+        ],
+        "data": {
+          "add_colors": true,
+          "add_instance": true,
+          "add_normals": false,
+          "add_raw_coordinates": true,
+          "batch_size": 2,
+          "ignore_label": 255,
+          "in_channels": 3,
+          "num_changes": 6,
+          "num_labels": 20,
+          "num_workers": 4,
+          "pin_memory": false,
+          "temporal_window": 2,
+          "test_batch_size": 1,
+          "test_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "validation",
+            "num_queries": 100,
+            "probing": false,
+            "voxel_size": 0.02
+          },
+          "test_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 1,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": false
+          },
+          "test_dataset": {
+            "_target_": "datasets.semseg.SemanticSegmentationDataset",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+            "data_dir": "data/processed/rio",
+            "dataset_name": "rio",
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": null,
+            "known_empty_scan_policy": "official_substitute",
+            "label_db_filepath": "data/processed/rio/label_database.yaml",
+            "label_offset": 2,
+            "mode": "validation",
+            "num_labels": 20,
+            "temporal_window": 2,
+            "volume_augmentations_path": null
+          },
+          "test_mode": "validation",
+          "train_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "train",
+            "num_queries": 100,
+            "probing": false,
+            "small_crops": false,
+            "very_small_crops": false,
+            "voxel_size": 0.02
+          },
+          "train_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 2,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": true
+          },
+          "train_dataset": {
+            "_target_": "datasets.multi_dataset.MultiDataset.from_config",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "datasets": [
+              {
+                "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+                "data_dir": "data/processed/rio",
+                "dataset_name": "rio",
+                "label_db_filepath": "data/processed/rio/label_database.yaml",
+                "target": "datasets.semseg.SemanticSegmentationDataset",
+                "temporal_window": 2
+              },
+              {
+                "color_mean_std": "data/processed/scannet/color_mean_std.yaml",
+                "data_dir": "data/processed/scannet",
+                "dataset_name": "scannet",
+                "label_db_filepath": "data/processed/scannet/label_database.yaml",
+                "target": "datasets.semseg.SemanticSegmentationDataset",
+                "temporal_window": 1
+              }
+            ],
+            "epoch_sample_multiple": 32,
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": "conf/augmentation/albumentations_aug.yaml",
+            "known_empty_scan_policy": "official_substitute",
+            "label_offset": 2,
+            "mode": "train",
+            "num_labels": 20,
+            "sampler_seed": 45,
+            "volume_augmentations_path": "conf/augmentation/volumentations_aug.yaml",
+            "weights": [
+              1.0,
+              0.8
+            ]
+          },
+          "train_mode": "train",
+          "validation_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "validation",
+            "num_queries": 100,
+            "probing": false,
+            "voxel_size": 0.02
+          },
+          "validation_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 1,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": false
+          },
+          "validation_dataset": {
+            "_target_": "datasets.semseg.SemanticSegmentationDataset",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+            "data_dir": "data/processed/rio",
+            "dataset_name": "rio",
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": null,
+            "known_empty_scan_policy": "official_substitute",
+            "label_db_filepath": "data/processed/rio/label_database.yaml",
+            "label_offset": 2,
+            "mode": "validation",
+            "num_labels": 20,
+            "temporal_window": 2,
+            "volume_augmentations_path": null
+          },
+          "validation_mode": "validation",
+          "voxel_size": 0.02
+        },
+        "general": {
+          "add_instance": true,
+          "backbone_checkpoint": null,
+          "checkpoint": null,
+          "compile_model": false,
+          "dbscan_eps": 0.95,
+          "dbscan_min_points": 1,
+          "decoder_id": -1,
+          "eval_on_segments": true,
+          "experiment_name": "R1",
+          "export": false,
+          "export_threshold": 0.0001,
+          "filter_out_instances": false,
+          "freeze": "backbone_encoder",
+          "frozen_encoder_eval": false,
+          "gpus": 2,
+          "ignore_class_threshold": 100,
+          "ignore_mask_idx": [],
+          "iou_threshold": 1.0,
+          "linear_probing_backbone": false,
+          "matmul_precision": "high",
+          "max_batch_size": 99999999,
+          "num_changes": 6,
+          "num_targets": 19,
+          "postprocessing_export": false,
+          "project_name": "rescene_task_learning_root_cause_v1",
+          "rootcause_common_initialization": "external:checkpoint/rootcause_common/d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+          "rootcause_common_initialization_sha256": "d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+          "rootcause_fail_closed_runtime": true,
+          "rootcause_frozen_encoder_stochastic_policy": "current",
+          "rootcause_objective_mode": "raw_sum",
+          "save_dir": "external:checkpoint/rootcause_short/R1",
+          "save_features": false,
+          "save_segment_info": false,
+          "save_visualizations": false,
+          "scores_threshold": 0.0,
+          "seed": 45,
+          "topk_per_image": 100,
+          "train_mode": true,
+          "train_on_segments": true,
+          "use_dbscan": false,
+          "version": 0,
+          "visualization_point_size": 20,
+          "workspace": null
+        },
+        "instance_metric": {
+          "_target_": "stmetrics.InstanceMetrics",
+          "dataset": "data/processed/rio/rio.yaml",
+          "heads": [
+            {
+              "_target_": "stmetrics.TemporalEvaluator",
+              "aux": "changes",
+              "recall": true
+            },
+            {
+              "_target_": "stmetrics.LegacyAPEvaluator"
+            },
+            {
+              "_target_": "stmetrics.instances.SelectTimestepEvaluator",
+              "timesteps": [
+                0
+              ]
+            },
+            {
+              "_target_": "stmetrics.instances.SelectTimestepEvaluator",
+              "timesteps": [
+                1
+              ]
+            }
+          ],
+          "log_prefix": "val",
+          "timestep_key": "temporal_stages"
+        },
+        "logging": [
+          {
+            "_target_": "pytorch_lightning.loggers.CSVLogger",
+            "name": "local_metrics",
+            "save_dir": "external:checkpoint/rootcause_short/R1"
+          }
+        ],
+        "loss": {
+          "_target_": "models.criterion.SetCriterion",
+          "change_weights": [
+            0.1,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "chunk_size": 2048,
+          "class_weights": -1,
+          "contrastive_loss": true,
+          "contrastive_loss_type": "infoNCE",
+          "contrastive_loss_weight": 1.0,
+          "eos_coef": 0.2,
+          "importance_sample_ratio": 0.75,
+          "initial_bias": 0.0,
+          "initial_temperature": 0.5,
+          "learnable_bias": false,
+          "learnable_temperature": false,
+          "losses": [
+            "labels",
+            "masks"
+          ],
+          "max_points": 5000,
+          "norm_type": "log_odds",
+          "num_changes": 6,
+          "num_classes": 19,
+          "num_negatives": 256,
+          "num_points": -1,
+          "oversample_ratio": 3.0,
+          "scale_contrastive_loss": false,
+          "temporal_positive_weight": 1.0,
+          "use_chunked_loss": true,
+          "weight_temporal_stages": true
+        },
+        "matcher": {
+          "_target_": "models.matcher.HungarianMatcher",
+          "cost_class": 2.0,
+          "cost_dice": 2.0,
+          "cost_mask": 5.0,
+          "num_points": -1
+        },
+        "model": {
+          "D": 4,
+          "_target_": "models.ReScene",
+          "config": {
+            "backbone": {
+              "_target_": "models.PointceptBackbone",
+              "custom_config": {
+                "enc_mode": false
+              },
+              "decoder_serializations": [
+                "standard",
+                "temporal_overlay"
+              ],
+              "model_lib": "concerto",
+              "name": "external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+              "repo_id": "Pointcept/Concerto"
+            },
+            "backbone_wrapper": true,
+            "temporal_window": 2
+          },
+          "dim_feedforward": 1024,
+          "dropout": 0.0,
+          "gauss_scale": 1.0,
+          "hidden_dim": 128,
+          "hlevels": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "max_sample_size": false,
+          "non_parametric_queries": true,
+          "normalize_pos_enc": true,
+          "num_changes": 6,
+          "num_classes": 19,
+          "num_decoders": 3,
+          "num_heads": 8,
+          "num_queries": 100,
+          "positional_encoding_type": "fourier",
+          "pre_norm": false,
+          "random_normal": false,
+          "random_queries": false,
+          "random_query_both": false,
+          "sample_sizes": [
+            200,
+            800,
+            3200,
+            12800,
+            51200
+          ],
+          "save_segment_info": false,
+          "scatter_type": "mean",
+          "shared_decoder": true,
+          "temporal_masking": false,
+          "train_on_segments": true,
+          "use_changes_loss": false,
+          "use_level_embed": false,
+          "use_np_features": false,
+          "voxel_size": 0.02
+        },
+        "optimizer": {
+          "_target_": "torch.optim.AdamW",
+          "amsgrad": false,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "eps": 1e-08,
+          "lr": 0.0005,
+          "weight_decay": 0.01
+        },
+        "rootcause_preflight": {
+          "initialization_manifest": "artifacts/rescene_task_learning_root_cause_v1/initialization/COMMON_INITIALIZATION.json",
+          "target": "rescene_task_learning_root_cause_v1",
+          "variant_manifest": "artifacts/rescene_task_learning_root_cause_v1/short_curves/variant_manifest.json"
+        },
+        "scheduler": {
+          "pytorch_lightning_params": {
+            "interval": "step"
+          },
+          "scheduler": {
+            "_target_": "torch.optim.lr_scheduler.OneCycleLR",
+            "anneal_strategy": "cos",
+            "base_momentum": 0.85,
+            "cycle_momentum": true,
+            "div_factor": 25.0,
+            "epochs": 450,
+            "final_div_factor": 10000.0,
+            "last_epoch": -1,
+            "max_lr": 0.0005,
+            "max_momentum": 0.95,
+            "pct_start": 0.3,
+            "three_phase": false,
+            "total_steps": 29700
+          }
+        },
+        "trainer": {
+          "accumulate_grad_batches": 8,
+          "check_val_every_n_epoch": 15,
+          "deterministic": false,
+          "gradient_clip_val": 1.0,
+          "max_epochs": 450,
+          "min_epochs": 1,
+          "num_sanity_val_steps": 2,
+          "precision": "32-true",
+          "strategy": "ddp_find_unused_parameters_true"
+        }
+      }
+    },
+    "R2": {
+      "config_sha256": "c4c941fe0eedfa34f476a77672cc1867ae4e27cf042d8f4dcc9f93430666ecd4",
+      "isolation": {
+        "changed_paths": [
+          "data.batch_size",
+          "trainer.accumulate_grad_batches"
+        ],
+        "diff_sha256": "5266f1936d24c564dd35f3600bb2c17280e2572c6c79335738e12f9aa7cbc4a9",
+        "effective_global_batch": 32,
+        "status": "pass",
+        "variant": "R2"
+      },
+      "resolved_config": {
+        "aux_metric": null,
+        "backbone": {
+          "_target_": "models.PointceptBackbone",
+          "custom_config": {
+            "enc_mode": false
+          },
+          "decoder_serializations": [
+            "standard",
+            "temporal_overlay"
+          ],
+          "model_lib": "concerto",
+          "name": "external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+          "repo_id": "Pointcept/Concerto"
+        },
+        "callbacks": [
+          {
+            "_target_": "pytorch_lightning.callbacks.ModelCheckpoint",
+            "auto_insert_metric_name": false,
+            "dirpath": "external:checkpoint/rootcause_short/R2",
+            "every_n_epochs": 1,
+            "filename": "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}",
+            "mode": "max",
+            "monitor": "val_mean_t-AP",
+            "save_last": true,
+            "save_on_train_epoch_end": true,
+            "save_top_k": 1,
+            "save_weights_only": false
+          },
+          {
+            "_target_": "utils.rescene_rootcause_callbacks.EpochSetCheckpointCallback",
+            "completed_epochs": [
+              60,
+              90,
+              450
+            ],
+            "output_dir": "external:checkpoint/rootcause_short/R2"
+          },
+          {
+            "_target_": "utils.rescene_rootcause_callbacks.RootCauseHorizonCallback",
+            "completed_epoch": 90
+          },
+          {
+            "_target_": "pytorch_lightning.callbacks.LearningRateMonitor"
+          }
+        ],
+        "data": {
+          "add_colors": true,
+          "add_instance": true,
+          "add_normals": false,
+          "add_raw_coordinates": true,
+          "batch_size": 4,
+          "ignore_label": 255,
+          "in_channels": 3,
+          "num_changes": 6,
+          "num_labels": 20,
+          "num_workers": 4,
+          "pin_memory": false,
+          "temporal_window": 2,
+          "test_batch_size": 1,
+          "test_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "validation",
+            "num_queries": 100,
+            "probing": false,
+            "voxel_size": 0.02
+          },
+          "test_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 1,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": false
+          },
+          "test_dataset": {
+            "_target_": "datasets.semseg.SemanticSegmentationDataset",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+            "data_dir": "data/processed/rio",
+            "dataset_name": "rio",
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": null,
+            "known_empty_scan_policy": "official_substitute",
+            "label_db_filepath": "data/processed/rio/label_database.yaml",
+            "label_offset": 2,
+            "mode": "validation",
+            "num_labels": 20,
+            "temporal_window": 2,
+            "volume_augmentations_path": null
+          },
+          "test_mode": "validation",
+          "train_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "train",
+            "num_queries": 100,
+            "probing": false,
+            "small_crops": false,
+            "very_small_crops": false,
+            "voxel_size": 0.02
+          },
+          "train_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 4,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": true
+          },
+          "train_dataset": {
+            "_target_": "datasets.multi_dataset.MultiDataset.from_config",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "datasets": [
+              {
+                "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+                "data_dir": "data/processed/rio",
+                "dataset_name": "rio",
+                "label_db_filepath": "data/processed/rio/label_database.yaml",
+                "target": "datasets.semseg.SemanticSegmentationDataset",
+                "temporal_window": 2
+              },
+              {
+                "color_mean_std": "data/processed/scannet/color_mean_std.yaml",
+                "data_dir": "data/processed/scannet",
+                "dataset_name": "scannet",
+                "label_db_filepath": "data/processed/scannet/label_database.yaml",
+                "target": "datasets.semseg.SemanticSegmentationDataset",
+                "temporal_window": 1
+              }
+            ],
+            "epoch_sample_multiple": 32,
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": "conf/augmentation/albumentations_aug.yaml",
+            "known_empty_scan_policy": "official_substitute",
+            "label_offset": 2,
+            "mode": "train",
+            "num_labels": 20,
+            "sampler_seed": 45,
+            "volume_augmentations_path": "conf/augmentation/volumentations_aug.yaml",
+            "weights": [
+              1.0,
+              0.8
+            ]
+          },
+          "train_mode": "train",
+          "validation_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "validation",
+            "num_queries": 100,
+            "probing": false,
+            "voxel_size": 0.02
+          },
+          "validation_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 1,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": false
+          },
+          "validation_dataset": {
+            "_target_": "datasets.semseg.SemanticSegmentationDataset",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+            "data_dir": "data/processed/rio",
+            "dataset_name": "rio",
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": null,
+            "known_empty_scan_policy": "official_substitute",
+            "label_db_filepath": "data/processed/rio/label_database.yaml",
+            "label_offset": 2,
+            "mode": "validation",
+            "num_labels": 20,
+            "temporal_window": 2,
+            "volume_augmentations_path": null
+          },
+          "validation_mode": "validation",
+          "voxel_size": 0.02
+        },
+        "general": {
+          "add_instance": true,
+          "backbone_checkpoint": null,
+          "checkpoint": null,
+          "compile_model": false,
+          "dbscan_eps": 0.95,
+          "dbscan_min_points": 1,
+          "decoder_id": -1,
+          "eval_on_segments": true,
+          "experiment_name": "R2",
+          "export": false,
+          "export_threshold": 0.0001,
+          "filter_out_instances": false,
+          "freeze": "backbone_encoder",
+          "frozen_encoder_eval": false,
+          "gpus": 2,
+          "ignore_class_threshold": 100,
+          "ignore_mask_idx": [],
+          "iou_threshold": 1.0,
+          "linear_probing_backbone": false,
+          "matmul_precision": "high",
+          "max_batch_size": 99999999,
+          "num_changes": 6,
+          "num_targets": 19,
+          "postprocessing_export": false,
+          "project_name": "rescene_task_learning_root_cause_v1",
+          "rootcause_common_initialization": "external:checkpoint/rootcause_common/d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+          "rootcause_common_initialization_sha256": "d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+          "rootcause_fail_closed_runtime": true,
+          "rootcause_frozen_encoder_stochastic_policy": "current",
+          "rootcause_objective_mode": "weighted",
+          "save_dir": "external:checkpoint/rootcause_short/R2",
+          "save_features": false,
+          "save_segment_info": false,
+          "save_visualizations": false,
+          "scores_threshold": 0.0,
+          "seed": 45,
+          "topk_per_image": 100,
+          "train_mode": true,
+          "train_on_segments": true,
+          "use_dbscan": false,
+          "version": 0,
+          "visualization_point_size": 20,
+          "workspace": null
+        },
+        "instance_metric": {
+          "_target_": "stmetrics.InstanceMetrics",
+          "dataset": "data/processed/rio/rio.yaml",
+          "heads": [
+            {
+              "_target_": "stmetrics.TemporalEvaluator",
+              "aux": "changes",
+              "recall": true
+            },
+            {
+              "_target_": "stmetrics.LegacyAPEvaluator"
+            },
+            {
+              "_target_": "stmetrics.instances.SelectTimestepEvaluator",
+              "timesteps": [
+                0
+              ]
+            },
+            {
+              "_target_": "stmetrics.instances.SelectTimestepEvaluator",
+              "timesteps": [
+                1
+              ]
+            }
+          ],
+          "log_prefix": "val",
+          "timestep_key": "temporal_stages"
+        },
+        "logging": [
+          {
+            "_target_": "pytorch_lightning.loggers.CSVLogger",
+            "name": "local_metrics",
+            "save_dir": "external:checkpoint/rootcause_short/R2"
+          }
+        ],
+        "loss": {
+          "_target_": "models.criterion.SetCriterion",
+          "change_weights": [
+            0.1,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "chunk_size": 2048,
+          "class_weights": -1,
+          "contrastive_loss": true,
+          "contrastive_loss_type": "infoNCE",
+          "contrastive_loss_weight": 1.0,
+          "eos_coef": 0.2,
+          "importance_sample_ratio": 0.75,
+          "initial_bias": 0.0,
+          "initial_temperature": 0.5,
+          "learnable_bias": false,
+          "learnable_temperature": false,
+          "losses": [
+            "labels",
+            "masks"
+          ],
+          "max_points": 5000,
+          "norm_type": "log_odds",
+          "num_changes": 6,
+          "num_classes": 19,
+          "num_negatives": 256,
+          "num_points": -1,
+          "oversample_ratio": 3.0,
+          "scale_contrastive_loss": false,
+          "temporal_positive_weight": 1.0,
+          "use_chunked_loss": true,
+          "weight_temporal_stages": true
+        },
+        "matcher": {
+          "_target_": "models.matcher.HungarianMatcher",
+          "cost_class": 2.0,
+          "cost_dice": 2.0,
+          "cost_mask": 5.0,
+          "num_points": -1
+        },
+        "model": {
+          "D": 4,
+          "_target_": "models.ReScene",
+          "config": {
+            "backbone": {
+              "_target_": "models.PointceptBackbone",
+              "custom_config": {
+                "enc_mode": false
+              },
+              "decoder_serializations": [
+                "standard",
+                "temporal_overlay"
+              ],
+              "model_lib": "concerto",
+              "name": "external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+              "repo_id": "Pointcept/Concerto"
+            },
+            "backbone_wrapper": true,
+            "temporal_window": 2
+          },
+          "dim_feedforward": 1024,
+          "dropout": 0.0,
+          "gauss_scale": 1.0,
+          "hidden_dim": 128,
+          "hlevels": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "max_sample_size": false,
+          "non_parametric_queries": true,
+          "normalize_pos_enc": true,
+          "num_changes": 6,
+          "num_classes": 19,
+          "num_decoders": 3,
+          "num_heads": 8,
+          "num_queries": 100,
+          "positional_encoding_type": "fourier",
+          "pre_norm": false,
+          "random_normal": false,
+          "random_queries": false,
+          "random_query_both": false,
+          "sample_sizes": [
+            200,
+            800,
+            3200,
+            12800,
+            51200
+          ],
+          "save_segment_info": false,
+          "scatter_type": "mean",
+          "shared_decoder": true,
+          "temporal_masking": false,
+          "train_on_segments": true,
+          "use_changes_loss": false,
+          "use_level_embed": false,
+          "use_np_features": false,
+          "voxel_size": 0.02
+        },
+        "optimizer": {
+          "_target_": "torch.optim.AdamW",
+          "amsgrad": false,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "eps": 1e-08,
+          "lr": 0.0005,
+          "weight_decay": 0.01
+        },
+        "rootcause_preflight": {
+          "initialization_manifest": "artifacts/rescene_task_learning_root_cause_v1/initialization/COMMON_INITIALIZATION.json",
+          "target": "rescene_task_learning_root_cause_v1",
+          "variant_manifest": "artifacts/rescene_task_learning_root_cause_v1/short_curves/variant_manifest.json"
+        },
+        "scheduler": {
+          "pytorch_lightning_params": {
+            "interval": "step"
+          },
+          "scheduler": {
+            "_target_": "torch.optim.lr_scheduler.OneCycleLR",
+            "anneal_strategy": "cos",
+            "base_momentum": 0.85,
+            "cycle_momentum": true,
+            "div_factor": 25.0,
+            "epochs": 450,
+            "final_div_factor": 10000.0,
+            "last_epoch": -1,
+            "max_lr": 0.0005,
+            "max_momentum": 0.95,
+            "pct_start": 0.3,
+            "three_phase": false,
+            "total_steps": 29700
+          }
+        },
+        "trainer": {
+          "accumulate_grad_batches": 4,
+          "check_val_every_n_epoch": 15,
+          "deterministic": false,
+          "gradient_clip_val": 1.0,
+          "max_epochs": 450,
+          "min_epochs": 1,
+          "num_sanity_val_steps": 2,
+          "precision": "32-true",
+          "strategy": "ddp_find_unused_parameters_true"
+        }
+      }
+    },
+    "R4": {
+      "config_sha256": "a71ef4c8f5c45f719c7ee63111959234dd8cbc7477db201140ef557487ae4ae2",
+      "isolation": {
+        "changed_paths": [
+          "data.train_dataset.filter_out_classes"
+        ],
+        "diff_sha256": "480693c38347e99c03ede0e62b5b9f8579787121207c9c40d879b31f51de3c65",
+        "effective_global_batch": 32,
+        "status": "pass",
+        "variant": "R4"
+      },
+      "resolved_config": {
+        "aux_metric": null,
+        "backbone": {
+          "_target_": "models.PointceptBackbone",
+          "custom_config": {
+            "enc_mode": false
+          },
+          "decoder_serializations": [
+            "standard",
+            "temporal_overlay"
+          ],
+          "model_lib": "concerto",
+          "name": "external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+          "repo_id": "Pointcept/Concerto"
+        },
+        "callbacks": [
+          {
+            "_target_": "pytorch_lightning.callbacks.ModelCheckpoint",
+            "auto_insert_metric_name": false,
+            "dirpath": "external:checkpoint/rootcause_short/R4",
+            "every_n_epochs": 1,
+            "filename": "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}",
+            "mode": "max",
+            "monitor": "val_mean_t-AP",
+            "save_last": true,
+            "save_on_train_epoch_end": true,
+            "save_top_k": 1,
+            "save_weights_only": false
+          },
+          {
+            "_target_": "utils.rescene_rootcause_callbacks.EpochSetCheckpointCallback",
+            "completed_epochs": [
+              60,
+              90,
+              450
+            ],
+            "output_dir": "external:checkpoint/rootcause_short/R4"
+          },
+          {
+            "_target_": "utils.rescene_rootcause_callbacks.RootCauseHorizonCallback",
+            "completed_epoch": 90
+          },
+          {
+            "_target_": "pytorch_lightning.callbacks.LearningRateMonitor"
+          }
+        ],
+        "data": {
+          "add_colors": true,
+          "add_instance": true,
+          "add_normals": false,
+          "add_raw_coordinates": true,
+          "batch_size": 2,
+          "ignore_label": 255,
+          "in_channels": 3,
+          "num_changes": 6,
+          "num_labels": 20,
+          "num_workers": 4,
+          "pin_memory": false,
+          "temporal_window": 2,
+          "test_batch_size": 1,
+          "test_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "validation",
+            "num_queries": 100,
+            "probing": false,
+            "voxel_size": 0.02
+          },
+          "test_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 1,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": false
+          },
+          "test_dataset": {
+            "_target_": "datasets.semseg.SemanticSegmentationDataset",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+            "data_dir": "data/processed/rio",
+            "dataset_name": "rio",
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": null,
+            "known_empty_scan_policy": "official_substitute",
+            "label_db_filepath": "data/processed/rio/label_database.yaml",
+            "label_offset": 2,
+            "mode": "validation",
+            "num_labels": 20,
+            "temporal_window": 2,
+            "volume_augmentations_path": null
+          },
+          "test_mode": "validation",
+          "train_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "train",
+            "num_queries": 100,
+            "probing": false,
+            "small_crops": false,
+            "very_small_crops": false,
+            "voxel_size": 0.02
+          },
+          "train_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 2,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": true
+          },
+          "train_dataset": {
+            "_target_": "datasets.multi_dataset.MultiDataset.from_config",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "datasets": [
+              {
+                "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+                "data_dir": "data/processed/rio",
+                "dataset_name": "rio",
+                "label_db_filepath": "data/processed/rio/label_database.yaml",
+                "target": "datasets.semseg.SemanticSegmentationDataset",
+                "temporal_window": 2
+              },
+              {
+                "color_mean_std": "data/processed/scannet/color_mean_std.yaml",
+                "data_dir": "data/processed/scannet",
+                "dataset_name": "scannet",
+                "label_db_filepath": "data/processed/scannet/label_database.yaml",
+                "target": "datasets.semseg.SemanticSegmentationDataset",
+                "temporal_window": 1
+              }
+            ],
+            "epoch_sample_multiple": 32,
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": "conf/augmentation/albumentations_aug.yaml",
+            "known_empty_scan_policy": "official_substitute",
+            "label_offset": 2,
+            "mode": "train",
+            "num_labels": 20,
+            "sampler_seed": 45,
+            "volume_augmentations_path": "conf/augmentation/volumentations_aug.yaml",
+            "weights": [
+              1.0,
+              0.8
+            ]
+          },
+          "train_mode": "train",
+          "validation_collation": {
+            "_target_": "datasets.auto_collate.create_auto_collate",
+            "backbone_target": "models.PointceptBackbone",
+            "batch_instance": false,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_class_threshold": 100,
+            "ignore_label": 255,
+            "label_offset": 2,
+            "mode": "validation",
+            "num_queries": 100,
+            "probing": false,
+            "voxel_size": 0.02
+          },
+          "validation_dataloader": {
+            "_target_": "torch.utils.data.DataLoader",
+            "batch_size": 1,
+            "num_workers": 4,
+            "pin_memory": false,
+            "shuffle": false
+          },
+          "validation_dataset": {
+            "_target_": "datasets.semseg.SemanticSegmentationDataset",
+            "add_colors": true,
+            "add_instance": true,
+            "add_normals": false,
+            "add_raw_coordinates": true,
+            "color_mean_std": "data/processed/rio/color_mean_std.yaml",
+            "data_dir": "data/processed/rio",
+            "dataset_name": "rio",
+            "exclude_unsupervised_sequences": true,
+            "fail_closed": true,
+            "filter_out_classes": [
+              0,
+              1,
+              255
+            ],
+            "ignore_label": 255,
+            "image_augmentations_path": null,
+            "known_empty_scan_policy": "official_substitute",
+            "label_db_filepath": "data/processed/rio/label_database.yaml",
+            "label_offset": 2,
+            "mode": "validation",
+            "num_labels": 20,
+            "temporal_window": 2,
+            "volume_augmentations_path": null
+          },
+          "validation_mode": "validation",
+          "voxel_size": 0.02
+        },
+        "general": {
+          "add_instance": true,
+          "backbone_checkpoint": null,
+          "checkpoint": null,
+          "compile_model": false,
+          "dbscan_eps": 0.95,
+          "dbscan_min_points": 1,
+          "decoder_id": -1,
+          "eval_on_segments": true,
+          "experiment_name": "R4",
+          "export": false,
+          "export_threshold": 0.0001,
+          "filter_out_instances": false,
+          "freeze": "backbone_encoder",
+          "frozen_encoder_eval": false,
+          "gpus": 2,
+          "ignore_class_threshold": 100,
+          "ignore_mask_idx": [],
+          "iou_threshold": 1.0,
+          "linear_probing_backbone": false,
+          "matmul_precision": "high",
+          "max_batch_size": 99999999,
+          "num_changes": 6,
+          "num_targets": 19,
+          "postprocessing_export": false,
+          "project_name": "rescene_task_learning_root_cause_v1",
+          "rootcause_common_initialization": "external:checkpoint/rootcause_common/d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+          "rootcause_common_initialization_sha256": "d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+          "rootcause_fail_closed_runtime": true,
+          "rootcause_frozen_encoder_stochastic_policy": "current",
+          "rootcause_objective_mode": "weighted",
+          "save_dir": "external:checkpoint/rootcause_short/R4",
+          "save_features": false,
+          "save_segment_info": false,
+          "save_visualizations": false,
+          "scores_threshold": 0.0,
+          "seed": 45,
+          "topk_per_image": 100,
+          "train_mode": true,
+          "train_on_segments": true,
+          "use_dbscan": false,
+          "version": 0,
+          "visualization_point_size": 20,
+          "workspace": null
+        },
+        "instance_metric": {
+          "_target_": "stmetrics.InstanceMetrics",
+          "dataset": "data/processed/rio/rio.yaml",
+          "heads": [
+            {
+              "_target_": "stmetrics.TemporalEvaluator",
+              "aux": "changes",
+              "recall": true
+            },
+            {
+              "_target_": "stmetrics.LegacyAPEvaluator"
+            },
+            {
+              "_target_": "stmetrics.instances.SelectTimestepEvaluator",
+              "timesteps": [
+                0
+              ]
+            },
+            {
+              "_target_": "stmetrics.instances.SelectTimestepEvaluator",
+              "timesteps": [
+                1
+              ]
+            }
+          ],
+          "log_prefix": "val",
+          "timestep_key": "temporal_stages"
+        },
+        "logging": [
+          {
+            "_target_": "pytorch_lightning.loggers.CSVLogger",
+            "name": "local_metrics",
+            "save_dir": "external:checkpoint/rootcause_short/R4"
+          }
+        ],
+        "loss": {
+          "_target_": "models.criterion.SetCriterion",
+          "change_weights": [
+            0.1,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "chunk_size": 2048,
+          "class_weights": -1,
+          "contrastive_loss": true,
+          "contrastive_loss_type": "infoNCE",
+          "contrastive_loss_weight": 1.0,
+          "eos_coef": 0.2,
+          "importance_sample_ratio": 0.75,
+          "initial_bias": 0.0,
+          "initial_temperature": 0.5,
+          "learnable_bias": false,
+          "learnable_temperature": false,
+          "losses": [
+            "labels",
+            "masks"
+          ],
+          "max_points": 5000,
+          "norm_type": "log_odds",
+          "num_changes": 6,
+          "num_classes": 19,
+          "num_negatives": 256,
+          "num_points": -1,
+          "oversample_ratio": 3.0,
+          "scale_contrastive_loss": false,
+          "temporal_positive_weight": 1.0,
+          "use_chunked_loss": true,
+          "weight_temporal_stages": true
+        },
+        "matcher": {
+          "_target_": "models.matcher.HungarianMatcher",
+          "cost_class": 2.0,
+          "cost_dice": 2.0,
+          "cost_mask": 5.0,
+          "num_points": -1
+        },
+        "model": {
+          "D": 4,
+          "_target_": "models.ReScene",
+          "config": {
+            "backbone": {
+              "_target_": "models.PointceptBackbone",
+              "custom_config": {
+                "enc_mode": false
+              },
+              "decoder_serializations": [
+                "standard",
+                "temporal_overlay"
+              ],
+              "model_lib": "concerto",
+              "name": "external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+              "repo_id": "Pointcept/Concerto"
+            },
+            "backbone_wrapper": true,
+            "temporal_window": 2
+          },
+          "dim_feedforward": 1024,
+          "dropout": 0.0,
+          "gauss_scale": 1.0,
+          "hidden_dim": 128,
+          "hlevels": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "max_sample_size": false,
+          "non_parametric_queries": true,
+          "normalize_pos_enc": true,
+          "num_changes": 6,
+          "num_classes": 19,
+          "num_decoders": 3,
+          "num_heads": 8,
+          "num_queries": 100,
+          "positional_encoding_type": "fourier",
+          "pre_norm": false,
+          "random_normal": false,
+          "random_queries": false,
+          "random_query_both": false,
+          "sample_sizes": [
+            200,
+            800,
+            3200,
+            12800,
+            51200
+          ],
+          "save_segment_info": false,
+          "scatter_type": "mean",
+          "shared_decoder": true,
+          "temporal_masking": false,
+          "train_on_segments": true,
+          "use_changes_loss": false,
+          "use_level_embed": false,
+          "use_np_features": false,
+          "voxel_size": 0.02
+        },
+        "optimizer": {
+          "_target_": "torch.optim.AdamW",
+          "amsgrad": false,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "eps": 1e-08,
+          "lr": 0.0005,
+          "weight_decay": 0.01
+        },
+        "rootcause_preflight": {
+          "initialization_manifest": "artifacts/rescene_task_learning_root_cause_v1/initialization/COMMON_INITIALIZATION.json",
+          "target": "rescene_task_learning_root_cause_v1",
+          "variant_manifest": "artifacts/rescene_task_learning_root_cause_v1/short_curves/variant_manifest.json"
+        },
+        "scheduler": {
+          "pytorch_lightning_params": {
+            "interval": "step"
+          },
+          "scheduler": {
+            "_target_": "torch.optim.lr_scheduler.OneCycleLR",
+            "anneal_strategy": "cos",
+            "base_momentum": 0.85,
+            "cycle_momentum": true,
+            "div_factor": 25.0,
+            "epochs": 450,
+            "final_div_factor": 10000.0,
+            "last_epoch": -1,
+            "max_lr": 0.0005,
+            "max_momentum": 0.95,
+            "pct_start": 0.3,
+            "three_phase": false,
+            "total_steps": 29700
+          }
+        },
+        "trainer": {
+          "accumulate_grad_batches": 8,
+          "check_val_every_n_epoch": 15,
+          "deterministic": false,
+          "gradient_clip_val": 1.0,
+          "max_epochs": 450,
+          "min_epochs": 1,
+          "num_sanity_val_steps": 2,
+          "precision": "32-true",
+          "strategy": "ddp_find_unused_parameters_true"
+        }
+      }
+    }
+  }
+}
