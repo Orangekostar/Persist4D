@@ -29,7 +29,9 @@ def _runtime_safety_enabled(config):
         config, "p2_fail_closed_runtime"
     ) or _p2_general_flag(
         config, "reviewer_closure_fail_closed_runtime"
-    ) or _p2_general_flag(config, "sonata_fail_closed_runtime")
+    ) or _p2_general_flag(
+        config, "sonata_fail_closed_runtime"
+    ) or _p2_general_flag(config, "rootcause_fail_closed_runtime")
 
 
 def _weighted_objective_enabled(config):
@@ -38,6 +40,16 @@ def _weighted_objective_enabled(config):
     ) or _p2_general_flag(
         config, "reviewer_closure_weighted_objective"
     ) or _p2_general_flag(config, "sonata_weighted_objective")
+
+
+def _rootcause_objective_mode(config):
+    general = getattr(config, "general", None)
+    mode = getattr(general, "rootcause_objective_mode", None)
+    if mode is None:
+        return None
+    if mode not in {"weighted", "raw_sum"}:
+        raise ValueError("root-cause objective mode must be weighted or raw_sum")
+    return str(mode)
 
 
 def _safe_length(value):
@@ -551,7 +563,10 @@ def aggregate_objective_loss(losses, weight_dict, validate_finite=True):
 
 def _configured_objective_loss(module, losses):
     runtime_safety_enabled = _runtime_safety_enabled(module.config)
-    if _weighted_objective_enabled(module.config):
+    rootcause_mode = _rootcause_objective_mode(module.config)
+    if rootcause_mode == "weighted" or (
+        rootcause_mode is None and _weighted_objective_enabled(module.config)
+    ):
         return aggregate_objective_loss(
             losses,
             module.criterion.weight_dict,

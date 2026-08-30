@@ -1,0 +1,102 @@
+defaults:
+  - config_base_instance_segmentation
+  - override data/datasets: mix
+  - override model: rescene
+  - override backbone: concerto
+  - override serialization: mixed
+  - override optimizer: adamw
+  - override scheduler: onecyclelr
+  - override trainer: trainer
+  - override logging: local_csv
+  - override callbacks: rescene_rootcause
+  - override matcher: hungarian_matcher
+  - override loss: set_criterion
+  - override loss/contrastive: infoNCE
+  - _self_
+
+aux_metric: null
+
+rootcause_preflight:
+  target: rescene_task_learning_root_cause_v1
+  variant_manifest: artifacts/rescene_task_learning_root_cause_v1/short_curves/variant_manifest.json
+  initialization_manifest: artifacts/rescene_task_learning_root_cause_v1/initialization/COMMON_INITIALIZATION.json
+
+general:
+  train_mode: true
+  seed: 45
+  freeze: backbone_encoder
+  frozen_encoder_eval: false
+  gpus: 2
+  project_name: rescene_task_learning_root_cause_v1
+  workspace: null
+  experiment_name: ${oc.env:RESCENE_ROOTCAUSE_VARIANT,R0}
+  save_dir: ${oc.env:RESCENE_ROOTCAUSE_OUTPUT_DIR,checkpoints/rescene_task_learning_root_cause_v1/R0}
+  rootcause_objective_mode: ${oc.env:RESCENE_ROOTCAUSE_OBJECTIVE_MODE,weighted}
+  rootcause_frozen_encoder_stochastic_policy: current
+  rootcause_fail_closed_runtime: true
+  rootcause_common_initialization: ${oc.env:RESCENE_ROOTCAUSE_COMMON_STATE,null}
+  rootcause_common_initialization_sha256: ${oc.env:RESCENE_ROOTCAUSE_COMMON_SHA256,null}
+
+data:
+  batch_size: 2
+  voxel_size: 0.02
+  train_dataset:
+    filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
+    epoch_sample_multiple: 32
+    sampler_seed: 45
+  validation_dataset:
+    filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
+  test_dataset:
+    filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    known_empty_scan_policy: official_substitute
+
+backbone:
+  name: ${oc.env:CONCERTO_CHECKPOINT,${oc.env:HOME}/.cache/persist4d/concerto/concerto_base.pth}
+
+model:
+  num_queries: 100
+  non_parametric_queries: true
+  random_query_both: false
+  random_normal: false
+  random_queries: false
+  use_np_features: false
+  scatter_type: mean
+  temporal_masking: false
+  config:
+    temporal_window: 2
+
+loss:
+  eos_coef: 0.2
+
+optimizer:
+  lr: 0.0005
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.01
+  amsgrad: false
+
+scheduler:
+  scheduler:
+    total_steps: 29700
+    pct_start: 0.3
+    anneal_strategy: cos
+    cycle_momentum: true
+    base_momentum: 0.85
+    max_momentum: 0.95
+    div_factor: 25.0
+    final_div_factor: 10000.0
+    three_phase: false
+    last_epoch: -1
+
+trainer:
+  max_epochs: 450
+  accumulate_grad_batches: 8
+  precision: 32-true

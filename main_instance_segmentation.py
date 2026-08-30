@@ -37,6 +37,7 @@ from utils.p2_preflight import (
     P2_TARGET,
     require_p2_preflight_authorization as _require_p2_preflight_authorization,
 )
+from utils.rescene_rootcause_preflight import load_common_initialization
 
 # Fix W&B args before imports that use Hydra decorators
 sys.argv[1:] = [arg.lstrip('-') for arg in sys.argv[1:] if not arg.startswith('---')] if any('--' in arg and '=' in arg for arg in sys.argv[1:]) else sys.argv[1:]
@@ -1575,6 +1576,16 @@ def get_parameters(cfg: DictConfig):
     if cfg.general.checkpoint:
         print("loading checkpoint")
         cfg, model = load_checkpoint_with_missing_or_exsessive_keys(cfg, model)
+    common_initialization = cfg.general.get(
+        "rootcause_common_initialization", None
+    )
+    if common_initialization:
+        print("loading root-cause common initialization")
+        load_common_initialization(
+            model,
+            common_initialization,
+            expected_sha256=cfg.general.rootcause_common_initialization_sha256,
+        )
     
     return cfg, model
 

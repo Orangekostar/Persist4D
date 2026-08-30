@@ -1,0 +1,21 @@
+# @package callbacks
+- _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  monitor: val_mean_t-AP
+  mode: max
+  save_top_k: 1
+  save_last: true
+  dirpath: ${general.save_dir}
+  filename: "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}"
+  every_n_epochs: 1
+  save_on_train_epoch_end: true
+  save_weights_only: false
+  auto_insert_metric_name: false
+
+- _target_: utils.rescene_rootcause_callbacks.EpochSetCheckpointCallback
+  output_dir: ${general.save_dir}
+  completed_epochs: [60, 90, 450]
+
+- _target_: utils.rescene_rootcause_callbacks.RootCauseHorizonCallback
+  completed_epoch: 90
+
+- _target_: pytorch_lightning.callbacks.LearningRateMonitor
