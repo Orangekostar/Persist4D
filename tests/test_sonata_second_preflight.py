@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import subprocess
@@ -264,6 +265,47 @@ def test_source_tree_contract_requires_committed_scoped_files(tmp_path: Path) ->
             scopes=("conf", "train.py"),
             require_clean=True,
         )
+
+
+def test_source_tree_contract_reads_an_exact_git_revision(tmp_path: Path) -> None:
+    repository = tmp_path / "repo"
+    (repository / "conf").mkdir(parents=True)
+    config = repository / "conf" / "config.yaml"
+    config.write_text("value: 1\n", encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=repository, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "test@example.invalid"],
+        cwd=repository,
+        check=True,
+    )
+    subprocess.run(["git", "config", "user.name", "Test"], cwd=repository, check=True)
+    subprocess.run(["git", "add", "."], cwd=repository, check=True)
+    subprocess.run(["git", "commit", "-qm", "fixture"], cwd=repository, check=True)
+    revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=repository,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    config.write_text("value: 2\n", encoding="utf-8")
+
+    contract = build_sonata_source_tree_contract(
+        repository,
+        scopes=("conf",),
+        require_clean=False,
+        revision=revision,
+    )
+
+    assert contract["source_commit"] == revision
+    assert contract["source_materialization"] == "git_object_database"
+    assert contract["files"] == [
+        {
+            "ref": "repo:conf/config.yaml",
+            "bytes": len(b"value: 1\n"),
+            "sha256": hashlib.sha256(b"value: 1\n").hexdigest(),
+        }
+    ]
 
 
 def test_training_semantics_are_derived_from_the_resolved_config(

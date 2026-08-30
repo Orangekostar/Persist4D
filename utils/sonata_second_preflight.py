@@ -199,10 +199,81 @@ def build_sonata_source_tree_contract(
     *,
     scopes: tuple[str, ...] = SONATA_SOURCE_SCOPES,
     require_clean: bool = True,
+    revision: str | None = None,
 ) -> dict[str, Any]:
     """Hash committed training source and reject scoped worktree changes."""
 
     repository = Path(repository).resolve()
+    if revision is not None:
+        resolved_revision = _git_output(
+            repository, "rev-parse", "--verify", f"{revision}^{{commit}}"
+        ).strip()
+        tree = subprocess.run(
+            [
+                "git",
+                "ls-tree",
+                "-r",
+                "-z",
+                "--full-tree",
+                resolved_revision,
+                "--",
+                *scopes,
+            ],
+            cwd=repository,
+            capture_output=True,
+            check=False,
+        )
+        if tree.returncode != 0:
+            raise SonataSecondPreflightError(
+                "git ls-tree failed for training source revision"
+            )
+        files: list[dict[str, Any]] = []
+        for raw_entry in tree.stdout.split(b"\0"):
+            if not raw_entry:
+                continue
+            try:
+                metadata, raw_path = raw_entry.split(b"\t", 1)
+                _, object_type, _ = metadata.decode("ascii").split()
+                relative = raw_path.decode("utf-8")
+            except (UnicodeError, ValueError) as error:
+                raise SonataSecondPreflightError(
+                    "git source tree entry is malformed"
+                ) from error
+            if object_type != "blob":
+                raise SonataSecondPreflightError(
+                    "training source revision contains a non-blob entry"
+                )
+            shown = subprocess.run(
+                ["git", "show", f"{resolved_revision}:{relative}"],
+                cwd=repository,
+                capture_output=True,
+                check=False,
+            )
+            if shown.returncode != 0:
+                raise SonataSecondPreflightError(
+                    "git show failed for training source revision"
+                )
+            files.append(
+                {
+                    "ref": f"repo:{relative}",
+                    "bytes": len(shown.stdout),
+                    "sha256": hashlib.sha256(shown.stdout).hexdigest(),
+                }
+            )
+        if not files:
+            raise SonataSecondPreflightError("training source scope is empty")
+        files.sort(key=lambda item: item["ref"])
+        return {
+            "schema_version": 1,
+            "status": "pass",
+            "source_commit": resolved_revision,
+            "branch": None,
+            "source_materialization": "git_object_database",
+            "scopes": list(scopes),
+            "file_count": len(files),
+            "content_sha256": canonical_sha256(files),
+            "files": files,
+        }
     if require_clean:
         status = _git_output(
             repository,
@@ -248,6 +319,7 @@ def build_sonata_source_tree_contract(
         "branch": _git_output(
             repository, "rev-parse", "--abbrev-ref", "HEAD"
         ).strip(),
+        "source_materialization": "worktree",
         "scopes": list(scopes),
         "file_count": len(files),
         "content_sha256": canonical_sha256(files),

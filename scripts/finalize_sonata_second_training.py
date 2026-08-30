@@ -8,6 +8,7 @@ import csv
 import hashlib
 import io
 import json
+import math
 import os
 import re
 import subprocess
@@ -126,6 +127,8 @@ def _completed_epochs(
             f"formal run requires exactly {epochs} completed epochs"
         )
     ordered = [by_epoch[epoch] for epoch in range(epochs)]
+    reconstructed_samples = 0
+    reconstructed_stages = 0
     for epoch, event in enumerate(ordered):
         expected_steps = (epoch + 1) * steps_per_epoch
         if event.get("optimizer_steps") != expected_steps:
@@ -141,6 +144,20 @@ def _completed_epochs(
             raise SonataTrainingFinalizationError(
                 "stage-observation trajectory is incomplete"
             )
+        raw_samples_total = event.get("samples_seen_total")
+        raw_stages_total = event.get("stage_observations_total")
+        if not isinstance(raw_samples_total, int) or not isinstance(
+            raw_stages_total, int
+        ):
+            raise SonataTrainingFinalizationError(
+                "raw cumulative observation totals are invalid"
+            )
+        reconstructed_samples += samples_per_epoch
+        reconstructed_stages += stage_count
+        event["samples_seen_total_raw"] = raw_samples_total
+        event["stage_observations_total_raw"] = raw_stages_total
+        event["samples_seen_total_reconstructed"] = reconstructed_samples
+        event["stage_observations_total_reconstructed"] = reconstructed_stages
     final_steps = epochs * steps_per_epoch
     if not any(
         event.get("event") == "fit_completed"
@@ -182,6 +199,44 @@ def _checkpoint_record(path: Path) -> dict[str, Any]:
     if not isinstance(epoch, int) or not isinstance(global_step, int):
         raise SonataTrainingFinalizationError("checkpoint budget metadata is invalid")
     best_match = _BEST_CHECKPOINT_RE.fullmatch(path.name)
+    callbacks = checkpoint.get("callbacks")
+    selection_states = (
+        [
+            state
+            for state in callbacks.values()
+            if isinstance(state, Mapping)
+            and state.get("monitor") == "val_mean_t-AP"
+            and "best_model_score" in state
+        ]
+        if isinstance(callbacks, Mapping)
+        else []
+    )
+    if len(selection_states) != 1:
+        raise SonataTrainingFinalizationError(
+            "checkpoint lacks a unique val_mean_t-AP callback state"
+        )
+    exact_score = selection_states[0]["best_model_score"]
+    if isinstance(exact_score, torch.Tensor):
+        if exact_score.numel() != 1:
+            raise SonataTrainingFinalizationError(
+                "checkpoint selection metric is not scalar"
+            )
+        exact_score = exact_score.detach().cpu().item()
+    if (
+        isinstance(exact_score, bool)
+        or not isinstance(exact_score, (int, float))
+        or not math.isfinite(float(exact_score))
+    ):
+        raise SonataTrainingFinalizationError("checkpoint selection metric is invalid")
+    exact_score = float(exact_score)
+    filename_score = float(best_match.group("score")) if best_match else None
+    if best_match and (
+        epoch != int(best_match.group("epoch"))
+        or filename_score != float(f"{exact_score:.3f}")
+    ):
+        raise SonataTrainingFinalizationError(
+            "checkpoint filename does not match its exact callback score"
+        )
     role = "best_validation" if best_match else "last"
     return {
         "reference": f"external:sonata_training_output/{path.name}",
@@ -191,14 +246,18 @@ def _checkpoint_record(path: Path) -> dict[str, Any]:
         "byte_size": path.stat().st_size,
         "epoch": epoch,
         "global_step": global_step,
-        "val_mean_t_ap": float(best_match.group("score")) if best_match else None,
+        "selection_metric_name": "val_mean_t-AP",
+        "selection_metric_exact": exact_score,
+        "selection_metric_filename_rounded": filename_score,
         "state_dict_entry_count": len(checkpoint["state_dict"]),
         "optimizer_state_count": len(checkpoint["optimizer_states"]),
         "scheduler_state_count": len(checkpoint["lr_schedulers"]),
     }
 
 
-def _checkpoint_inventory(output_dir: Path) -> list[dict[str, Any]]:
+def _checkpoint_inventory(
+    output_dir: Path,
+) -> tuple[list[dict[str, Any]], dict[str, bool]]:
     paths = sorted(output_dir.glob("*.ckpt"), key=lambda path: path.name)
     recognized = [
         path
@@ -215,11 +274,76 @@ def _checkpoint_inventory(output_dir: Path) -> list[dict[str, Any]]:
         raise SonataTrainingFinalizationError(
             "best-validation and last checkpoint evidence are required"
         )
-    if max(record["global_step"] for record in last) != 29_700:
+    last_is_full_budget = any(record["global_step"] == 29_700 for record in last)
+    last_is_top1_alias = any(
+        record["sha256"] == best[0]["sha256"] for record in last
+    )
+    if not last_is_full_budget and not last_is_top1_alias:
         raise SonataTrainingFinalizationError(
-            "last checkpoint does not contain the full training budget"
+            "last checkpoint is neither full-budget nor a Top-1 alias"
         )
-    return records
+    return records, {
+        "last_is_full_budget": last_is_full_budget,
+        "last_is_top1_byte_identical_alias": last_is_top1_alias,
+    }
+
+
+def _checkpoint_selection_contract(
+    records: Sequence[Mapping[str, Any]],
+    completed: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    validation_scores: list[tuple[int, float]] = []
+    for event in completed:
+        epoch = int(event["completed_epoch"])
+        if (epoch + 1) % 15 != 0:
+            continue
+        metrics = event.get("metrics")
+        score = metrics.get("val_mean_t-AP") if isinstance(metrics, Mapping) else None
+        if (
+            isinstance(score, bool)
+            or not isinstance(score, (int, float))
+            or not math.isfinite(float(score))
+        ):
+            raise SonataTrainingFinalizationError(
+                "validation checkpoint metric trajectory is incomplete"
+            )
+        validation_scores.append((epoch, float(score)))
+    if len(validation_scores) != 30:
+        raise SonataTrainingFinalizationError(
+            "formal run requires exactly 30 validation metric points"
+        )
+    best_records = [record for record in records if record["role"] == "best_validation"]
+    if len(best_records) != 1:
+        raise SonataTrainingFinalizationError(
+            "formal run requires one best-validation checkpoint"
+        )
+    record = best_records[0]
+    best_score = max(score for _, score in validation_scores)
+    selected_epoch_score = dict(validation_scores).get(int(record["epoch"]))
+    exact_score = float(record["selection_metric_exact"])
+    if (
+        selected_epoch_score is None
+        or not math.isclose(exact_score, best_score, rel_tol=0.0, abs_tol=1.0e-6)
+        or not math.isclose(
+            selected_epoch_score,
+            best_score,
+            rel_tol=0.0,
+            abs_tol=1.0e-6,
+        )
+    ):
+        raise SonataTrainingFinalizationError(
+            "checkpoint does not match the highest validation val_mean_t-AP"
+        )
+    return {
+        "monitor": "val_mean_t-AP",
+        "mode": "max",
+        "validation_event_count": len(validation_scores),
+        "selected_epoch": int(record["epoch"]),
+        "selection_metric_exact": exact_score,
+        "selection_metric_filename_rounded": record[
+            "selection_metric_filename_rounded"
+        ],
+    }
 
 
 def _csv_bytes(rows: Sequence[Mapping[str, Any]], fields: Sequence[str]) -> bytes:
@@ -241,9 +365,14 @@ def _learning_curve(events: Sequence[Mapping[str, Any]]) -> bytes:
     )
     base_fields = [
         "epoch",
+        "validation_performed",
         "optimizer_steps",
         "samples_seen_epoch",
+        "samples_seen_total_raw",
+        "samples_seen_total_reconstructed",
         "stage_observations_epoch",
+        "stage_observations_total_raw",
+        "stage_observations_total_reconstructed",
         "learning_rate",
         "peak_allocated_vram_mib",
         "peak_reserved_vram_mib",
@@ -251,12 +380,27 @@ def _learning_curve(events: Sequence[Mapping[str, Any]]) -> bytes:
     ]
     rows = []
     for event in events:
+        validation_performed = (int(event["completed_epoch"]) + 1) % 15 == 0
         row = {
             "epoch": event["completed_epoch"],
-            **{field: event.get(field) for field in base_fields if field != "epoch"},
+            "validation_performed": str(validation_performed).lower(),
+            **{
+                field: event.get(field)
+                for field in base_fields
+                if field not in {"epoch", "validation_performed"}
+            },
         }
         metrics = event.get("metrics", {})
-        row.update({name: metrics.get(name, "") for name in metric_names})
+        row.update(
+            {
+                name: (
+                    ""
+                    if name.startswith("val_") and not validation_performed
+                    else metrics.get(name, "")
+                )
+                for name in metric_names
+            }
+        )
         rows.append(row)
     return _csv_bytes(rows, [*base_fields, *metric_names])
 
@@ -270,7 +414,9 @@ def _checkpoint_csv(records: Sequence[Mapping[str, Any]]) -> bytes:
         "byte_size",
         "epoch",
         "global_step",
-        "val_mean_t_ap",
+        "selection_metric_name",
+        "selection_metric_exact",
+        "selection_metric_filename_rounded",
         "state_dict_entry_count",
         "optimizer_state_count",
         "scheduler_state_count",
@@ -293,6 +439,92 @@ def _observed_wall_clock(events: Sequence[Mapping[str, Any]]) -> float | None:
     return (max(timestamps) - min(timestamps)).total_seconds()
 
 
+def _runtime_reconciliation(
+    events: Sequence[Mapping[str, Any]],
+) -> dict[str, int | None]:
+    interruption_count = 0
+    resume_launch_count = 0
+    raw_resume_launch_count = 0
+    raw_fit_interrupted_count = 0
+    zero_checkpoint_resume_seen = False
+    correction_version: int | None = None
+    termination_events = {
+        "storage_migration_started",
+        "checkpoint_callback_path_repaired",
+    }
+    for event in events:
+        event_name = event.get("event")
+        if event_name == "launch_authorized" and event.get("launch_mode") == "resume":
+            raw_resume_launch_count += 1
+            checkpoint_count = event.get("checkpoint_count")
+            if isinstance(checkpoint_count, int) and checkpoint_count > 0:
+                resume_launch_count += 1
+            elif checkpoint_count == 0:
+                zero_checkpoint_resume_seen = True
+            else:
+                raise SonataTrainingFinalizationError(
+                    "resume launch checkpoint count is invalid"
+                )
+        if event_name == "fit_interrupted":
+            raw_fit_interrupted_count += 1
+            interruption_count += 1
+        elif event_name in termination_events and isinstance(
+            event.get("termination"), str
+        ):
+            interruption_count += 1
+        if event_name != "runtime_evidence_semantics_correction":
+            continue
+        version = event.get("correction_version")
+        if not isinstance(version, int) or version <= 0:
+            raise SonataTrainingFinalizationError(
+                "runtime correction version is invalid"
+            )
+        if correction_version is None:
+            if version != 1:
+                raise SonataTrainingFinalizationError(
+                    "runtime correction chain must start at version 1"
+                )
+        elif (
+            version != correction_version + 1
+            or event.get("supersedes_correction_version") != correction_version
+        ):
+            raise SonataTrainingFinalizationError(
+                "runtime correction chain is not contiguous"
+            )
+        if (
+            event.get("expected_checkpoint_resume_count") != resume_launch_count
+            or event.get("expected_infrastructure_interruption_count")
+            != interruption_count
+        ):
+            raise SonataTrainingFinalizationError(
+                "runtime correction counts do not match their event prefix"
+            )
+        if (
+            version == 1
+            and zero_checkpoint_resume_seen
+            and (
+                event.get("basis_checkpoint_count") != 0
+                or event.get("original_launch_mode") != "resume"
+                or event.get("corrected_launch_mode") != "retry_before_checkpoint"
+            )
+        ):
+            raise SonataTrainingFinalizationError(
+                "zero-checkpoint launch correction is invalid"
+            )
+        correction_version = version
+    if zero_checkpoint_resume_seen and correction_version is None:
+        raise SonataTrainingFinalizationError(
+            "zero-checkpoint resume launch lacks a semantics correction"
+        )
+    return {
+        "interruption_count": interruption_count,
+        "resume_launch_count": resume_launch_count,
+        "correction_version": correction_version,
+        "raw_fit_interrupted_count": raw_fit_interrupted_count,
+        "raw_resume_launch_count": raw_resume_launch_count,
+    }
+
+
 def finalize_training(
     *,
     training_output_dir: Path,
@@ -310,13 +542,30 @@ def finalize_training(
     if candidate != dict(expected_candidate):
         raise SonataTrainingFinalizationError("candidate contract mismatch")
     bindings = candidate.get("bindings", {})
+    training_source = source_snapshot_manifest.get("training_source")
+    evidence_producer = source_snapshot_manifest.get("evidence_producer")
     if (
-        source_snapshot_manifest.get("source_commit")
-        != bindings.get("source_commit")
-        or source_snapshot_manifest.get("content_sha256")
-        != bindings.get("source_tree_sha256")
+        source_snapshot_manifest.get("schema_version") != 2
+        or source_snapshot_manifest.get("status") != "pass"
+        or not isinstance(training_source, Mapping)
+        or not isinstance(evidence_producer, Mapping)
+        or training_source.get("status") != "pass"
+        or evidence_producer.get("status") != "pass"
+        or training_source.get("source_commit") != bindings.get("source_commit")
+        or training_source.get("content_sha256") != bindings.get("source_tree_sha256")
     ):
         raise SonataTrainingFinalizationError("source snapshot binding mismatch")
+    producer_commit = evidence_producer.get("source_commit")
+    producer_sha256 = evidence_producer.get("content_sha256")
+    if (
+        not isinstance(producer_commit, str)
+        or not re.fullmatch(r"[0-9a-f]{40}", producer_commit)
+        or not isinstance(producer_sha256, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", producer_sha256)
+    ):
+        raise SonataTrainingFinalizationError(
+            "evidence producer source identity is invalid"
+        )
 
     recipe = candidate.get("recipe", {})
     epochs = int(recipe.get("epochs", -1))
@@ -331,7 +580,8 @@ def finalize_training(
         steps_per_epoch=steps_per_epoch,
         samples_per_epoch=samples_per_epoch,
     )
-    checkpoints = _checkpoint_inventory(output_dir)
+    checkpoints, checkpoint_semantics = _checkpoint_inventory(output_dir)
+    checkpoint_selection = _checkpoint_selection_contract(checkpoints, completed)
     target_names = (
         "TRAINING_MANIFEST.json",
         "TRAINING_REPORT.md",
@@ -346,6 +596,7 @@ def finalize_training(
     learning_curve = _learning_curve(completed)
     checkpoint_csv = _checkpoint_csv(checkpoints)
     source_bytes = _json_bytes(source_snapshot_manifest)
+    runtime_reconciliation = _runtime_reconciliation(events)
     stage_observations = sum(
         int(event["stage_observations_epoch"]) for event in completed
     )
@@ -364,14 +615,7 @@ def finalize_training(
         },
         "runtime": {
             "observed_wall_clock_seconds": _observed_wall_clock(events),
-            "interruption_count": sum(
-                event.get("event") == "fit_interrupted" for event in events
-            ),
-            "resume_launch_count": sum(
-                event.get("event") == "launch_authorized"
-                and event.get("launch_mode") == "resume"
-                for event in events
-            ),
+            **runtime_reconciliation,
             "peak_allocated_vram_mib": max(
                 float(event.get("peak_allocated_vram_mib", 0.0))
                 for event in completed
@@ -382,6 +626,8 @@ def finalize_training(
             ),
             "hardware": dict(hardware or {}),
         },
+        "checkpoint_semantics": checkpoint_semantics,
+        "checkpoint_selection": checkpoint_selection,
         "checkpoints": checkpoints,
         "artifacts": {
             "learning_curve_sha256": hashlib.sha256(learning_curve).hexdigest(),
@@ -448,18 +694,26 @@ def main() -> int:
         smoke_authorization=smoke,
         devices=devices,
     )
-    source_snapshot = build_sonata_source_tree_contract(
+    training_source = build_sonata_source_tree_contract(
+        PROJECT_ROOT,
+        require_clean=False,
+        revision=expected_candidate["bindings"]["source_commit"],
+    )
+    evidence_producer = build_sonata_source_tree_contract(
         PROJECT_ROOT, require_clean=True
     )
-    source_snapshot["source_commit"] = expected_candidate["bindings"][
-        "source_commit"
-    ]
+    source_snapshot = {
+        "schema_version": 2,
+        "status": "pass",
+        "training_source": training_source,
+        "evidence_producer": evidence_producer,
+    }
     ancestor = subprocess.run(
         [
             "git",
             "merge-base",
             "--is-ancestor",
-            source_snapshot["source_commit"],
+            training_source["source_commit"],
             "HEAD",
         ],
         cwd=PROJECT_ROOT,
