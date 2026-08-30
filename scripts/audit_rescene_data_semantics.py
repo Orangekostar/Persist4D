@@ -120,6 +120,9 @@ def run_audit() -> dict[str, object]:
     )
     counts = {
         "official_unmodified_rio_train_sequences": _yaml_count(
+            PROJECT_ROOT / "data/processed/rio/train_database.yaml"
+        ),
+        "rio_t2_all_split_sequences": _yaml_count(
             PROJECT_ROOT / "data/processed/rio/sequence_database_sliding_2.yaml"
         ),
         "current_filtered_rio_train_sequences": sizes[0],
@@ -187,7 +190,7 @@ def _markdown(result: dict[str, object]) -> str:
             "",
             "## Database And Mix",
             "",
-            f"Unmodified/current RIO train counts are `{counts['official_unmodified_rio_train_sequences']}` / `{counts['current_filtered_rio_train_sequences']}`; ScanNet counts are `{counts['official_unmodified_scannet_train_scans']}` / `{counts['current_filtered_scannet_train_scans']}`. The active sampler draws `{counts['sampler_num_samples']}` examples.",
+            f"Unmodified/current RIO train counts are `{counts['official_unmodified_rio_train_sequences']}` / `{counts['current_filtered_rio_train_sequences']}` (the all-split T2 map has `{counts['rio_t2_all_split_sequences']}` records); ScanNet counts are `{counts['official_unmodified_scannet_train_scans']}` / `{counts['current_filtered_scannet_train_scans']}`. The active sampler draws `{counts['sampler_num_samples']}` examples.",
             "",
             f"Observed one-epoch draws are `{sampler['dataset_draws']}` with `{sampler['unique_sample_count']}` unique concatenated indices and replacement duplicate rate `{sampler['replacement_duplicate_rate']:.12g}`.",
             "",
