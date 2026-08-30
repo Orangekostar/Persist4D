@@ -142,7 +142,8 @@ def build_launch_command(variant: str) -> list[str]:
     return [
         sys.executable,
         str(PROJECT_ROOT / "main_instance_segmentation.py"),
-        f"--config-name={ROOTCAUSE_CONFIG_NAME}",
+        "--config-name",
+        ROOTCAUSE_CONFIG_NAME,
         *variant_overrides(variant),
     ]
 

@@ -154,7 +154,10 @@ def test_launch_environment_and_command_bind_exact_variant(tmp_path: Path) -> No
         "data.batch_size=4",
         "trainer.accumulate_grad_batches=4",
     ]
-    assert build_launch_command("R1")[-1] == "--config-name=config_rescene4d_concerto_rootcause"
+    assert build_launch_command("R1")[-2:] == [
+        "--config-name",
+        "config_rescene4d_concerto_rootcause",
+    ]
     assert build_launch_environment(
         variant="R1",
         devices=(0, 1),
