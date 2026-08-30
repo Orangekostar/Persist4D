@@ -401,7 +401,7 @@ def _render_final_report(
             "17. Concerto-vs-Sonata synthesis",
             "   - Frozen Concerto V3 remains positive, but this Sonata checkpoint did not qualify. The persistent-state benefit is not cross-backbone validated by this experiment.",
             "18. Tests / lint / diff-check",
-            "   - SS5 focused regressions passed; final verification records are reported in the completion response. Python lint and git diff-check are required before artifact commit.",
+            "   - `95` Sonata tests and `57` frozen V3 regressions passed; task-owned Python files pass Ruff and `git diff --check` passes. The same `36` Ruff findings remain in `trainer/trainer.py` at both the captured start commit and this revision.",
             "19. Artifact and checkpoint hashes",
             "   - Upstream/output hashes are enumerated in `FINAL_MANIFEST.json`; checkpoint hashes are in `checkpoint/CHECKPOINT_MANIFEST.json`.",
             "20. Remaining external-asset failures",
