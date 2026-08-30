@@ -1,0 +1,46 @@
+{
+  "config_name": "config_rescene4d_sonata_second",
+  "data_manifest_sha256": "694d4394b481b02bf49573dc121276a452526fe274657ca7d1915ba0afba5c4e",
+  "elapsed_seconds": 268.61057203868404,
+  "evaluation_contract_sha256": "6682306397f7e323a8b21d0972f17f5ad6b5646169c74595cbea3934b5d2a2af",
+  "metrics": {
+    "overall_mAP": 0.32393673062324524,
+    "stage1_mAP": 0.37985745072364807,
+    "stage2_mAP": 0.38793352246284485,
+    "t_mAP": 0.24205704033374786,
+    "t_mAP25": 0.562261164188385,
+    "t_mAP50": 0.41813141107559204
+  },
+  "model": "sonata",
+  "portable_config_sha256": "b473b0249a21eee36e10a399668827956b31a0424c9e4e238dbb63c4adcda45e",
+  "pretrained_checkpoint": {
+    "byte_size": 434008287,
+    "reference": "external:verified_pretrained/sonata.pth",
+    "sha256": "c5ced5acdae30d1c469713398073a866e25e6e414e23feed5dc025373657ac50"
+  },
+  "runtime": {
+    "accelerator": "gpu",
+    "batch_size": 1,
+    "device_index": 0,
+    "devices": 1,
+    "gpu_name": "NVIDIA A40",
+    "num_workers": 4,
+    "precision": "32-true",
+    "seed_workers": true
+  },
+  "schema_version": 1,
+  "scope": "official_like_t2",
+  "seed": 46,
+  "source_commit": "d5ac56c639b68624c808d426cbe69c9991a13640",
+  "status": "pass",
+  "strict_load": {
+    "state_dict_entry_count": 798,
+    "strict": true
+  },
+  "task_checkpoint": {
+    "byte_size": 754809064,
+    "reference": "repo-ignored:checkpoints/rescene4d_sonata_t2_second.ckpt",
+    "sha256": "3d6432711dd9639d9e9203134d846d9a1a29f09b7fb3fbb85375e2127945a199"
+  },
+  "validation_sequence_count": 154
+}

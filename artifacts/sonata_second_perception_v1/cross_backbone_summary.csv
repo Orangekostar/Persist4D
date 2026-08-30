@@ -1,0 +1,8 @@
+stage,horizon,metric,concerto_value,sonata_value,concerto_status,sonata_status
+SS5,T2,t_mAP,0.2829008499781291,0.24035188059012094,measured_matched_harness,measured_matched_harness
+SS5,T2,overall_mAP,0.3697936435540517,0.31553595264752704,measured_matched_harness,measured_matched_harness
+SS6,T2,local_candidate_invariance,pass,,frozen_v3_evidence,gate_skipped
+SS7,T4,b4_minus_b2_gap_recovery_pp,19.971,,frozen_v3_evidence,gate_skipped
+SS7,T4,positive_reference_scene_clusters,6/6,,frozen_v3_evidence,gate_skipped
+SS7,T5,b4_minus_b2_gap_recovery_pp,22.690,,frozen_v3_evidence,gate_skipped
+SS7,T5,positive_reference_scene_clusters,6/6,,frozen_v3_evidence,gate_skipped

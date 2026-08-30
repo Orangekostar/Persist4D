@@ -1,0 +1,80 @@
+{
+  "concerto": {
+    "byte_size": 754917862,
+    "mode": "0664",
+    "reference": "repo-ignored:checkpoints/rescene4d_concerto_t2_repro.ckpt",
+    "sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e"
+  },
+  "content_sha256": "3ee6469e76f68caa2b7099288d310af0674b647ed254576ffa519cf45f295129",
+  "evaluation_contract": {
+    "data_manifest_sha256": "694d4394b481b02bf49573dc121276a452526fe274657ca7d1915ba0afba5c4e",
+    "metrics": {
+      "overall_mAP": "val_mean_AP",
+      "stage1_mAP": "val_mean_stage1-AP",
+      "stage2_mAP": "val_mean_stage2-AP",
+      "t_mAP": "val_mean_t-AP",
+      "t_mAP25": "val_mean_t-AP_25",
+      "t_mAP50": "val_mean_t-AP_50"
+    },
+    "runtime": {
+      "accelerator": "gpu",
+      "batch_size": 1,
+      "devices": 1,
+      "num_workers": 4,
+      "precision": "32-true"
+    },
+    "schema_version": 1,
+    "seeds": [
+      45,
+      46,
+      47
+    ],
+    "sha256": "6682306397f7e323a8b21d0972f17f5ad6b5646169c74595cbea3934b5d2a2af",
+    "stochastic_grid_sample": "seeded_and_reported",
+    "validation_entrypoint": "pytorch_lightning.Trainer.validate",
+    "validation_split": "rio/validation/T2"
+  },
+  "evidence_source_commit": "d5ac56c639b68624c808d426cbe69c9991a13640",
+  "pretrained_inputs": {
+    "concerto": {
+      "byte_size": 433987358,
+      "mode": "0664",
+      "reference": "external:verified_pretrained/concerto_base.pth",
+      "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+    },
+    "sonata": {
+      "byte_size": 434008287,
+      "mode": "0444",
+      "reference": "external:verified_pretrained/sonata.pth",
+      "sha256": "c5ced5acdae30d1c469713398073a866e25e6e414e23feed5dc025373657ac50"
+    }
+  },
+  "schema_version": 1,
+  "selection_contract": {
+    "mode": "max",
+    "monitor": "val_mean_t-AP",
+    "validation_event_count": 30
+  },
+  "selection_used_protocol_b": false,
+  "sonata": {
+    "byte_size": 754809064,
+    "epoch": 449,
+    "global_step": 29700,
+    "mode": "0444",
+    "reference": "repo-ignored:checkpoints/rescene4d_sonata_t2_second.ckpt",
+    "selection": "highest val_mean_t-AP",
+    "selection_metric_exact": 0.2430925965309143,
+    "sha256": "3d6432711dd9639d9e9203134d846d9a1a29f09b7fb3fbb85375e2127945a199",
+    "state_dict_entry_count": 798
+  },
+  "stage": "SS5",
+  "status": "pass",
+  "training": {
+    "completed_epochs": 450,
+    "config_sha256": "16e65bf747ffa245b8711270c1297f26baf20e810c33d1398795cc04290b6937",
+    "optimizer_steps": 29700,
+    "pretrained_sonata_sha256": "c5ced5acdae30d1c469713398073a866e25e6e414e23feed5dc025373657ac50",
+    "source_commit": "7c61d89bcb70ec89ce9b857c6ec6321acb1d7f1e"
+  },
+  "training_manifest_sha256": "c10e58c47a8b302e8b17a2d647e9c67ec4cd33a0b7ae37d0837ae7c8f310ca57"
+}

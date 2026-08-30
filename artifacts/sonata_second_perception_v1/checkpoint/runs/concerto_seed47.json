@@ -1,0 +1,46 @@
+{
+  "config_name": "config_p2_rescene4d_concerto_t2",
+  "data_manifest_sha256": "694d4394b481b02bf49573dc121276a452526fe274657ca7d1915ba0afba5c4e",
+  "elapsed_seconds": 258.91250017797574,
+  "evaluation_contract_sha256": "6682306397f7e323a8b21d0972f17f5ad6b5646169c74595cbea3934b5d2a2af",
+  "metrics": {
+    "overall_mAP": 0.36850374937057495,
+    "stage1_mAP": 0.41924235224723816,
+    "stage2_mAP": 0.4263458251953125,
+    "t_mAP": 0.2830008566379547,
+    "t_mAP25": 0.5914425849914551,
+    "t_mAP50": 0.45313337445259094
+  },
+  "model": "concerto",
+  "portable_config_sha256": "4d8598c2fb5bbb872dbfc902af825de426aab4ecff15183b92072dee0dd4bac1",
+  "pretrained_checkpoint": {
+    "byte_size": 433987358,
+    "reference": "external:verified_pretrained/concerto_base.pth",
+    "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+  },
+  "runtime": {
+    "accelerator": "gpu",
+    "batch_size": 1,
+    "device_index": 0,
+    "devices": 1,
+    "gpu_name": "NVIDIA A40",
+    "num_workers": 4,
+    "precision": "32-true",
+    "seed_workers": true
+  },
+  "schema_version": 1,
+  "scope": "official_like_t2",
+  "seed": 47,
+  "source_commit": "d5ac56c639b68624c808d426cbe69c9991a13640",
+  "status": "pass",
+  "strict_load": {
+    "state_dict_entry_count": 798,
+    "strict": true
+  },
+  "task_checkpoint": {
+    "byte_size": 754917862,
+    "reference": "repo-ignored:checkpoints/rescene4d_concerto_t2_repro.ckpt",
+    "sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e"
+  },
+  "validation_sequence_count": 154
+}

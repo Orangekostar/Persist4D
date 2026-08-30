@@ -1,0 +1,27 @@
+{
+  "content_sha256": "5d90281710aa925b6adfbff2438245ea59a29eff1bc0bd590e5858c57809f8b1",
+  "gate": {
+    "authorizes_ss6": false,
+    "label": "SQ-RED",
+    "reason": "Sonata is weaker than Concerto on both temporal and spatial metrics",
+    "spatial_tolerance": null,
+    "threshold_t_mAP": 0.297
+  },
+  "output_sha256": {
+    "SONATA_QUALIFICATION_REPORT.md": "dbfb17b668e119ec74c245df0c25ba75c6253b8821e7b738ad2557bf13a84ee2",
+    "official_like_per_seed.csv": "f509ddec3a4eed1ea750c017f6b8e7fcc1a2eff96b86b9530f667da0a6c4b898",
+    "official_like_summary.csv": "3df1ff344ca06b4bb5f1bbe0d140fb08093860ead420cb9d0aecbe67186900cf"
+  },
+  "run_sha256": {
+    "concerto_seed45.json": "a3c454520f41fa2d6b031fb32a365a2f60ecdcdabde3a651ab30d59a7196488b",
+    "concerto_seed46.json": "8ab1e19fe3097b8a8a00f1f11407843de29ee2108dc6a933cf333844eb0cca6f",
+    "concerto_seed47.json": "65818402f5799448b8f65c5b20de131148845b92e43136d75b4f39c0274f1a46",
+    "sonata_seed45.json": "7969fb077d03392bb4325b9e854f77b38a10fa01563b59e259eaaff11cd09868",
+    "sonata_seed46.json": "950102bbeec1e35e7e01fccd2a8b9cc99c4e2cffc72c1fd16452430d5392a04d",
+    "sonata_seed47.json": "274f78e3a781b5c2e846d1d4535b3695e64f5b114b2f523d525e09ffaf2b447d"
+  },
+  "schema_version": 1,
+  "source_commit": "d5ac56c639b68624c808d426cbe69c9991a13640",
+  "stage": "SS5",
+  "status": "pass"
+}
