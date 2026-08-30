@@ -79,9 +79,11 @@ def _compose_config() -> Any:
 
 def _portable_config(config: Any, pretrained_sha256: str) -> dict[str, object]:
     payload = OmegaConf.to_container(config, resolve=True)
-    payload["backbone"]["name"] = portable_reference(
+    checkpoint_reference = portable_reference(
         "checkpoint/concerto_pretrained", pretrained_sha256
     )
+    payload["backbone"]["name"] = checkpoint_reference
+    payload["model"]["config"]["backbone"]["name"] = checkpoint_reference
     validate_portable_payload(payload)
     return payload
 
