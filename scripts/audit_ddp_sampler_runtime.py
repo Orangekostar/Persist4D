@@ -8,6 +8,7 @@ import csv
 import io
 import json
 import os
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -62,6 +63,16 @@ def _json_bytes(payload: object) -> bytes:
         json.dumps(payload, allow_nan=False, ensure_ascii=True, indent=2, sort_keys=True)
         + "\n"
     ).encode("ascii")
+
+
+def _git_head() -> str:
+    return subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=PROJECT_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
 
 
 def _compose_config() -> Any:
@@ -195,6 +206,7 @@ class _SamplerProbe(pl.LightningModule):
         summary = {
             "schema_version": 1,
             "status": "pass",
+            "source_commit": _git_head(),
             "topology": {"accelerator": "cuda", "world_size": 2},
             "sampler_chains": {
                 str(record["rank"]): record["chain"] for record in records
