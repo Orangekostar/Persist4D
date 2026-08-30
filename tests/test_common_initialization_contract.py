@@ -10,6 +10,7 @@ import main_instance_segmentation as entrypoint
 from utils.rescene_rootcause_preflight import (
     RootCauseContractError,
     build_tensor_state_manifest,
+    load_common_initialization,
     validate_common_tensor_state,
 )
 
@@ -91,6 +92,44 @@ def test_missing_common_tensor_is_never_allowed() -> None:
             expected,
             allowed_new_prefixes=("model.np_feature_projection.",),
         )
+
+
+def test_common_loader_accepts_authorized_new_batchnorm_buffers(tmp_path) -> None:
+    class _Base(torch.nn.Module):
+        def __init__(self) -> None:
+            super().__init__()
+            self.shared = torch.nn.Linear(2, 2)
+
+    class _Strong(_Base):
+        def __init__(self) -> None:
+            super().__init__()
+            self.new = torch.nn.BatchNorm1d(2)
+
+    torch.manual_seed(45)
+    base = _Base()
+    state_path = tmp_path / "common.pt"
+    torch.save({"state_dict": base.state_dict()}, state_path)
+    import hashlib
+
+    sha256 = hashlib.sha256(state_path.read_bytes()).hexdigest()
+    torch.manual_seed(45)
+    strong = _Strong()
+
+    result = load_common_initialization(
+        strong,
+        state_path,
+        expected_sha256=sha256,
+        allowed_new_prefixes=("new.",),
+    )
+
+    assert result["shared_tensor_count"] == len(base.state_dict())
+    assert set(result["new_tensor_names"]) == {
+        "new.bias",
+        "new.num_batches_tracked",
+        "new.running_mean",
+        "new.running_var",
+        "new.weight",
+    }
 
 
 def test_entrypoint_loads_common_state_after_pretrained_backbone(monkeypatch) -> None:

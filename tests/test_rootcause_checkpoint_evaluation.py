@@ -7,6 +7,7 @@ import pytest
 import torch
 
 from scripts.evaluate_rescene_rootcause_checkpoint import (
+    _expected_state_dict_entries,
     compose_evaluation_config,
     evaluation_contract,
     portable_evaluation_config,
@@ -45,6 +46,30 @@ def test_evaluation_config_is_shared_and_portable(tmp_path) -> None:
     assert contract["seeds"] == [45, 46, 47]
     assert contract["validation_sequence_count"] == 154
     assert len(contract["sha256"]) == 64
+
+
+def test_evaluation_config_matches_strong_local_structure(tmp_path) -> None:
+    config = compose_evaluation_config(
+        tmp_path / "concerto.pth",
+        use_np_features=True,
+        scatter_type="adaptive",
+    )
+
+    assert config.model.use_np_features is True
+    assert config.model.scatter_type == "adaptive"
+
+
+def test_checkpoint_entry_count_defaults_for_rootcause_and_binds_strong_variant() -> None:
+    root = _authorization()
+    assert _expected_state_dict_entries(root, "R0") == 798
+
+    strong = copy.deepcopy(root)
+    strong["variants"]["R0"]["expected_state_dict_entries"] = 802
+    assert _expected_state_dict_entries(strong, "R0") == 802
+
+    strong["variants"]["R0"]["expected_state_dict_entries"] = 0
+    with pytest.raises(RootCauseEvaluationError, match="entry count"):
+        _expected_state_dict_entries(strong, "R0")
 
 
 def _checkpoint(completed_epoch: int = 60) -> dict[str, object]:

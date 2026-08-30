@@ -78,9 +78,13 @@ def _summary(rows: Mapping[int, Mapping[str, float]]) -> dict[str, float | int]:
 def classify_full_result(
     candidate_rows: Sequence[Mapping[str, Any]],
     baseline_rows: Sequence[Mapping[str, Any]],
+    *,
+    verdict_prefix: str = "ROOTCAUSE",
 ) -> dict[str, object]:
     """Apply the registered RC4 scientific verdict without Persist4D inputs."""
 
+    if verdict_prefix not in {"ROOTCAUSE", "STRONG-LOCAL"}:
+        raise RootCauseEvaluationError("full evaluation verdict prefix is invalid")
     candidate = _normalized_rows(candidate_rows)
     baseline = _normalized_rows(baseline_rows)
     candidate_summary = _summary(candidate)
@@ -116,14 +120,15 @@ def classify_full_result(
         )
     )
     verdict = (
-        "ROOTCAUSE-CONFIRMED"
+        f"{verdict_prefix}-CONFIRMED"
         if confirmed
-        else "ROOTCAUSE-PARTIAL"
+        else f"{verdict_prefix}-PARTIAL"
         if gates["material_spatial_gain"]
-        else "ROOTCAUSE-NOT-CONFIRMED"
+        else f"{verdict_prefix}-NOT-CONFIRMED"
     )
     return {
         "verdict": verdict,
+        "verdict_prefix": verdict_prefix,
         "gates": gates,
         "paired_spatial_deltas": paired_spatial_deltas,
         "paired_spatial_delta_mean": delta_mean,
@@ -286,7 +291,10 @@ def build_full_evaluation_outputs(
     full_training_manifest_path: Path,
     baseline_path: Path,
     start_state_path: Path,
+    study_kind: str = "rootcause",
 ) -> dict[str, bytes]:
+    if study_kind not in {"rootcause", "strong_local"}:
+        raise RootCauseEvaluationError("full evaluation study kind is invalid")
     authorization = _load_json(authorization_path, name="variant authorization")
     _validate_hash(authorization, "authorization_sha256", name="variant authorization")
     training = _load_json(full_training_manifest_path, name="full-training manifest")
@@ -316,7 +324,11 @@ def build_full_evaluation_outputs(
     )
     start_state = _load_json(start_state_path, name="start state")
     baseline = _baseline_rows(baseline_path, start_state=start_state)
-    result = classify_full_result(candidate, baseline)
+    verdict_prefix = "ROOTCAUSE" if study_kind == "rootcause" else "STRONG-LOCAL"
+    model_prefix = (
+        "rootcause_full" if study_kind == "rootcause" else "strong_local_full"
+    )
+    result = classify_full_result(candidate, baseline, verdict_prefix=verdict_prefix)
     result.update(
         {
             "schema_version": 1,
@@ -327,6 +339,11 @@ def build_full_evaluation_outputs(
             "full_training_manifest_sha256": training["content_sha256"],
             "checkpoint_manifest_sha256": checkpoint["content_sha256"],
             "baseline_checkpoint_sha256": FROZEN_CONCERTO_CHECKPOINT_SHA256,
+            "experiment": (
+                "rescene_task_learning_root_cause_v1"
+                if study_kind == "rootcause"
+                else "rescene_strong_local_v1"
+            ),
         }
     )
     result["content_sha256"] = canonical_sha256(result)
@@ -348,7 +365,7 @@ def build_full_evaluation_outputs(
             by_baseline,
             FROZEN_CONCERTO_CHECKPOINT_SHA256,
         ),
-        (f"rootcause_full_{variant}", by_candidate, checkpoint["checkpoint"]["sha256"]),
+        (f"{model_prefix}_{variant}", by_candidate, checkpoint["checkpoint"]["sha256"]),
     ):
         for seed in EVALUATION_SEEDS:
             spatial = (rows[seed]["stage1_mAP"] + rows[seed]["stage2_mAP"]) / 2.0
@@ -383,7 +400,7 @@ def build_full_evaluation_outputs(
             0.0,
         ),
         (
-            f"rootcause_full_{variant}",
+            f"{model_prefix}_{variant}",
             result["candidate_summary"],
             result["paired_spatial_delta_mean"],
         ),
@@ -431,8 +448,13 @@ def _json_bytes(value: object) -> bytes:
 
 
 def _verdict_markdown(result: Mapping[str, Any]) -> bytes:
+    title = (
+        "ReScene-Strong Full Verdict"
+        if result.get("verdict_prefix") == "STRONG-LOCAL"
+        else "Root-Cause Full Verdict"
+    )
     lines = [
-        "# Root-Cause Full Verdict",
+        f"# {title}",
         "",
         f"Verdict: `{result['verdict']}`",
         "",

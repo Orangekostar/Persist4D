@@ -234,7 +234,7 @@ def _tensor_bytes(tensor: torch.Tensor) -> bytes:
     if tensor.layout != torch.strided:
         raise RootCauseContractError("tensor state must use strided tensors")
     value = tensor.detach().cpu().contiguous()
-    return value.view(torch.uint8).numpy().tobytes(order="C")
+    return value.reshape(-1).view(torch.uint8).numpy().tobytes(order="C")
 
 
 def _tensor_record(
@@ -385,6 +385,9 @@ def load_common_initialization(
             "common initialization is missing tensors: "
             + ", ".join(unauthorized_new)
         )
+    new_tensor_bytes = {
+        name: _tensor_bytes(observed_state[name]) for name in new_names
+    }
     for name, expected_tensor in state.items():
         observed_tensor = observed_state[name]
         if (
@@ -395,10 +398,17 @@ def load_common_initialization(
                 f"common initialization tensor schema differs: {name}"
             )
     incompatible = module.load_state_dict(state, strict=False)
-    if incompatible.unexpected_keys or sorted(incompatible.missing_keys) != new_names:
+    reported_missing = set(incompatible.missing_keys)
+    if incompatible.unexpected_keys or not reported_missing.issubset(new_names):
         raise RootCauseContractError("common initialization strict load differs")
+    reloaded_state = module.state_dict()
+    if any(
+        _tensor_bytes(reloaded_state[name]) != new_tensor_bytes[name]
+        for name in new_names
+    ):
+        raise RootCauseContractError("common initialization altered new tensors")
     validation = validate_common_tensor_state(
-        module.state_dict(),
+        reloaded_state,
         state,
         allowed_new_prefixes=allowed_new_prefixes,
     )

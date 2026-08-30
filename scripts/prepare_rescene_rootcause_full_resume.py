@@ -122,10 +122,16 @@ def _core_resume_plan(
         raise RootCauseEvaluationError(
             "exact epoch-90 checkpoint differs from manifest"
         )
+    from scripts.evaluate_rescene_rootcause_checkpoint import (
+        _expected_state_dict_entries,
+    )
+
     return {
         "schema_version": 1,
         "status": "pass",
-        "experiment": "rescene_task_learning_root_cause_v1",
+        "experiment": authorization.get(
+            "experiment", "rescene_task_learning_root_cause_v1"
+        ),
         "variant": variant,
         "completed_epoch": 90,
         "selected_step": 5_940,
@@ -142,6 +148,9 @@ def _core_resume_plan(
             "common_initialization_sha256"
         ],
         "pretrained_sha256": manifest["bindings"]["pretrained_sha256"],
+        "expected_state_dict_entries": _expected_state_dict_entries(
+            authorization, variant
+        ),
     }
 
 
@@ -242,14 +251,20 @@ def _runtime_selected_checkpoint(output_directory: Path) -> Path:
     return Path(selected)
 
 
-def _checkpoint_facts(path: Path) -> dict[str, object]:
+def _checkpoint_facts(
+    path: Path, *, expected_state_dict_entries: int
+) -> dict[str, object]:
     try:
         import torch
 
         payload = torch.load(path, map_location="cpu", weights_only=False)
     except Exception as error:
         raise RootCauseEvaluationError("selected checkpoint is unreadable") from error
-    return validate_checkpoint_payload(payload, completed_epoch=90)
+    return validate_checkpoint_payload(
+        payload,
+        completed_epoch=90,
+        expected_state_dict_entries=expected_state_dict_entries,
+    )
 
 
 def _json_bytes(value: object) -> bytes:
@@ -293,7 +308,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     arguments = parser.parse_args(argv)
 
     exact = arguments.exact_checkpoint.resolve(strict=True)
-    _core_resume_plan(
+    initial_plan = _core_resume_plan(
         variant=arguments.variant,
         authorization_path=arguments.authorization,
         candidate_path=arguments.candidate,
@@ -308,7 +323,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             raise RootCauseEvaluationError(
                 "runtime selector did not choose the exact epoch-90 checkpoint"
             )
-        facts = _checkpoint_facts(selected)
+        facts = _checkpoint_facts(
+            selected,
+            expected_state_dict_entries=initial_plan["expected_state_dict_entries"],
+        )
         archive_directory = exact.parent / "pre_full_resume_checkpoints"
         archived.append(
             archive_conflicting_last_checkpoint(

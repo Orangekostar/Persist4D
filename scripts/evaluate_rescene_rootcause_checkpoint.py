@@ -140,9 +140,21 @@ def _evaluation_environment(pretrained: Path) -> Iterator[None]:
                 os.environ[name] = value
 
 
-def compose_evaluation_config(pretrained: Path) -> DictConfig:
+def compose_evaluation_config(
+    pretrained: Path,
+    *,
+    use_np_features: bool = False,
+    scatter_type: str = "mean",
+) -> DictConfig:
     """Compose one shared evaluation config for every root-cause variant."""
 
+    if not isinstance(use_np_features, bool) or scatter_type not in {
+        "mean",
+        "max",
+        "adaptive",
+        "gem",
+    }:
+        raise RootCauseEvaluationError("evaluation model structure is invalid")
     with _evaluation_environment(pretrained), initialize_config_dir(
         version_base="1.2", config_dir=str(PROJECT_ROOT / "conf")
     ):
@@ -156,6 +168,8 @@ def compose_evaluation_config(pretrained: Path) -> DictConfig:
                 "data.test_batch_size=1",
                 "data.num_workers=4",
                 "trainer.precision=32-true",
+                f"model.use_np_features={str(use_np_features).lower()}",
+                f"model.scatter_type={scatter_type}",
             ],
         )
         OmegaConf.resolve(config)
@@ -221,6 +235,9 @@ def _checkpoint_training_config(
         variant=variant,
         pretrained_reference=initialization["pretrained"]["reference"],
         common_reference=initialization["common_state"]["reference"],
+        output_namespace=authorization.get(
+            "checkpoint_namespace", "rootcause_short"
+        ),
     )
     expected = authorization["variants"][variant]
     if portable != expected["resolved_config"] or canonical_sha256(
@@ -228,6 +245,21 @@ def _checkpoint_training_config(
     ) != expected["config_sha256"]:
         raise RootCauseEvaluationError("checkpoint training config differs")
     return portable
+
+
+def _expected_state_dict_entries(
+    authorization: Mapping[str, Any], variant: str
+) -> int:
+    variants = authorization.get("variants")
+    record = variants.get(variant) if isinstance(variants, Mapping) else None
+    value = (
+        record.get("expected_state_dict_entries", 798)
+        if isinstance(record, Mapping)
+        else None
+    )
+    if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+        raise RootCauseEvaluationError("checkpoint state entry count is invalid")
+    return value
 
 
 def prepare_checkpoint(
@@ -248,7 +280,13 @@ def prepare_checkpoint(
         payload = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
     except Exception as error:
         raise RootCauseEvaluationError("checkpoint is unreadable") from error
-    facts = validate_checkpoint_payload(payload, completed_epoch=completed_epoch)
+    facts = validate_checkpoint_payload(
+        payload,
+        completed_epoch=completed_epoch,
+        expected_state_dict_entries=_expected_state_dict_entries(
+            authorization, variant
+        ),
+    )
     if _stable_file_identity(checkpoint_path) != file_identity:
         raise RootCauseEvaluationError("checkpoint changed while validating")
     portable_config = _checkpoint_training_config(
@@ -315,7 +353,20 @@ def evaluate_checkpoint(
             raise RootCauseEvaluationError("pretrained encoder differs")
 
     seed_everything(seed, workers=True)
-    config = compose_evaluation_config(pretrained_path)
+    variant_record = authorization["variants"][variant]
+    training_config = variant_record.get("resolved_config")
+    model_config = (
+        training_config.get("model")
+        if isinstance(training_config, Mapping)
+        else None
+    )
+    if not isinstance(model_config, Mapping):
+        raise RootCauseEvaluationError("authorized model structure is missing")
+    config = compose_evaluation_config(
+        pretrained_path,
+        use_np_features=model_config.get("use_np_features"),
+        scatter_type=model_config.get("scatter_type"),
+    )
     portable_config = portable_evaluation_config(
         config,
         pretrained=pretrained_path,

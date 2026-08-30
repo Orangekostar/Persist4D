@@ -102,6 +102,35 @@ def test_runtime_locations_normalize_to_same_portable_config(tmp_path: Path) -> 
     assert portable == _configs()["R0"]
 
 
+def test_portable_config_supports_separate_strong_local_namespace(
+    tmp_path: Path,
+) -> None:
+    runtime = compose_variant_config(
+        "R0",
+        pretrained=tmp_path / "concerto.pth",
+        common_state=tmp_path / "common.pt",
+        common_sha256="2" * 64,
+        output=tmp_path / "A1",
+    )
+
+    portable = portable_variant_config(
+        runtime,
+        variant="A1",
+        pretrained_reference=PRETRAINED_REF,
+        common_reference=COMMON_REF,
+        output_namespace="rescene_strong_local",
+    )
+
+    assert portable["general"]["save_dir"] == (
+        "external:checkpoint/rescene_strong_local/A1"
+    )
+    assert all(
+        callback.get("dirpath", portable["general"]["save_dir"])
+        == portable["general"]["save_dir"]
+        for callback in portable["callbacks"]
+    )
+
+
 def test_candidate_record_is_immutable_and_resume_exact(tmp_path: Path) -> None:
     candidate = {
         "schema_version": 1,

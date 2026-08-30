@@ -49,6 +49,15 @@ def test_full_verdict_confirms_stable_all_metric_improvement() -> None:
     assert result["gates"]["t_mAP_mean_improved"] is True
 
 
+def test_full_verdict_labels_strong_local_without_rootcause_claim() -> None:
+    candidate, baseline = _rows(spatial_gain=0.02, tmap_gain=0.01)
+
+    result = classify_full_result(candidate, baseline, verdict_prefix="STRONG-LOCAL")
+
+    assert result["verdict"] == "STRONG-LOCAL-CONFIRMED"
+    assert result["verdict_prefix"] == "STRONG-LOCAL"
+
+
 def test_full_verdict_is_partial_for_material_spatial_but_not_tmap_gain() -> None:
     candidate, baseline = _rows(spatial_gain=0.015, tmap_gain=-0.01)
 

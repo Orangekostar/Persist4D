@@ -105,6 +105,7 @@ def test_full_checkpoint_selection_matches_exact_validation_maximum(tmp_path) ->
 def test_full_training_manifest_binds_resume_decision_and_selection() -> None:
     decision = {
         "content_sha256": "1" * 64,
+        "experiment": "rescene_strong_local_v1",
         "selected_variant": "R1",
         "full_training_authorized": True,
     }
@@ -140,6 +141,7 @@ def test_full_training_manifest_binds_resume_decision_and_selection() -> None:
     )
 
     assert manifest["status"] == "pass"
+    assert manifest["experiment"] == "rescene_strong_local_v1"
     assert manifest["budget"]["completed_epoch"] == 450
     assert manifest["budget"]["optimizer_steps"] == 29_700
     assert manifest["selection"]["selected_epoch"] == 315

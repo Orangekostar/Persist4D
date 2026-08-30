@@ -176,14 +176,17 @@ def portable_variant_config(
     variant: str,
     pretrained_reference: str,
     common_reference: str,
+    output_namespace: str = "rootcause_short",
 ) -> dict[str, Any]:
     """Replace only runtime locations while preserving the exact config."""
 
+    if output_namespace not in {"rootcause_short", "rescene_strong_local"}:
+        raise RootCauseContractError("checkpoint output namespace is invalid")
     result = copy.deepcopy(dict(config))
     result["backbone"]["name"] = pretrained_reference
     result["model"]["config"]["backbone"]["name"] = pretrained_reference
     result["general"]["rootcause_common_initialization"] = common_reference
-    output_reference = f"external:checkpoint/rootcause_short/{variant}"
+    output_reference = f"external:checkpoint/{output_namespace}/{variant}"
     result["general"]["save_dir"] = output_reference
     for callback in result["callbacks"]:
         if "dirpath" in callback:

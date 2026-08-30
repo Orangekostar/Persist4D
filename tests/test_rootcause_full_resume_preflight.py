@@ -109,6 +109,7 @@ def test_exact_epoch90_resume_preflight_binds_selected_checkpoint(tmp_path) -> N
     assert plan["variant"] == "R1"
     assert plan["completed_epoch"] == 90
     assert plan["selected_step"] == 5940
+    assert plan["expected_state_dict_entries"] == 798
     assert (
         plan["exact_checkpoint_sha256"]
         == hashlib.sha256(exact.read_bytes()).hexdigest()

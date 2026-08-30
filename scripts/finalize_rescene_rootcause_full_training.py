@@ -342,7 +342,7 @@ def build_full_training_manifest(
     payload: dict[str, object] = {
         "schema_version": 1,
         "status": "pass",
-        "experiment": "rescene_task_learning_root_cause_v1",
+        "experiment": decision.get("experiment", "rescene_task_learning_root_cause_v1"),
         "stage": "full_candidate",
         "variant": variant,
         "candidate_id": candidate_id,
@@ -512,10 +512,15 @@ def _publish(path: Path, payload: bytes) -> None:
 
 def _report(manifest: Mapping[str, Any]) -> bytes:
     selection = manifest["selection"]
+    title = (
+        "ReScene-Strong Full Training Report"
+        if manifest.get("experiment") == "rescene_strong_local_v1"
+        else "ReScene Root-Cause Full Training Report"
+    )
     return (
         "\n".join(
             [
-                "# ReScene Root-Cause Full Training Report",
+                f"# {title}",
                 "",
                 "- Status: `pass`",
                 f"- Variant: `{manifest['variant']}`",
@@ -565,6 +570,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         run_directory=arguments.run_directory,
         variant=arguments.variant,
         authorization=authorization,
+        expected_state_dict_entries=authorization["variants"][arguments.variant].get(
+            "expected_state_dict_entries", 798
+        ),
     )
     selection = select_full_checkpoint(trajectory["rows"], records)
     manifest = build_full_training_manifest(
