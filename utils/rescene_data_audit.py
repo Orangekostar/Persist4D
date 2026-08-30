@@ -23,24 +23,28 @@ def _sample_counts(
     instances = sample.instance_ids.detach().cpu().long().reshape(-1)
     if semantics.shape != instances.shape or semantics.numel() == 0:
         raise ValueError("label sample tensors must be non-empty and aligned")
-    valid_points = instances != -1
-    for excluded in excluded_classes:
-        valid_points &= semantics != excluded
     target_instances = 0
+    target_points = 0
     label255_instances = 0
-    for instance_id in torch.unique(instances[valid_points]).tolist():
-        selector = valid_points & (instances == int(instance_id))
-        labels = torch.unique(semantics[selector])
-        if labels.numel() != 1:
-            raise ValueError("one target instance has inconsistent semantic labels")
+    label255_points = 0
+    for instance_id in torch.unique(instances).tolist():
+        if int(instance_id) == -1:
+            continue
+        selector = instances == int(instance_id)
+        selected_label = int(semantics[selector][0].item())
+        if selected_label in excluded_classes:
+            continue
+        point_count = int(selector.sum().item())
         target_instances += 1
-        if int(labels.item()) == 255:
+        target_points += point_count
+        if selected_label == 255:
             label255_instances += 1
+            label255_points += point_count
     return {
         "target_instances": target_instances,
-        "target_points": int(valid_points.sum().item()),
+        "target_points": target_points,
         "label255_instances": label255_instances,
-        "label255_points": int((valid_points & (semantics == 255)).sum().item()),
+        "label255_points": label255_points,
     }
 
 
@@ -113,6 +117,7 @@ def filter255_supervision_contract(
     return {
         "raw_label": raw_ignore_label,
         "target_label": target_label,
+        "instance_semantic_resolution": "first_point_matching_training_collator",
         "target_construction_with_filter_255": "excluded",
         "target_construction_without_filter_255": "included",
         "classification": "ignored",

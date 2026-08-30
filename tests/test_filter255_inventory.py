@@ -52,6 +52,22 @@ def test_filter255_gate_uses_fixed_half_percent_threshold() -> None:
     assert result["gate"]["material"] is False
 
 
+def test_filter255_inventory_matches_first_point_instance_semantics() -> None:
+    sample = LabelSample(
+        dataset="rio",
+        sample_id="mixed",
+        semantic_labels=torch.tensor([255, 19, 19, 2, 255]),
+        instance_ids=torch.tensor([7, 7, 7, 8, 8]),
+    )
+
+    result = inventory_filter255([sample], excluded_classes=(0, 1))
+
+    assert result["totals"]["target_instances"] == 2
+    assert result["totals"]["target_points"] == 5
+    assert result["totals"]["label255_instances"] == 1
+    assert result["totals"]["label255_points"] == 3
+
+
 def test_label255_supervision_contract_matches_current_code_path() -> None:
     contract = filter255_supervision_contract(
         raw_ignore_label=255, label_offset=2, criterion_ignore_index=253
@@ -60,6 +76,7 @@ def test_label255_supervision_contract_matches_current_code_path() -> None:
     assert contract == {
         "raw_label": 255,
         "target_label": 253,
+        "instance_semantic_resolution": "first_point_matching_training_collator",
         "target_construction_with_filter_255": "excluded",
         "target_construction_without_filter_255": "included",
         "classification": "ignored",
