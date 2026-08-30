@@ -1,0 +1,23 @@
+{
+  "candidate_id": "807ae1176ebf885ac4185d7d5c0b14e86abc906750102b29391c7074ef5dacfc",
+  "candidate_record": {
+    "bytes": 1092,
+    "reference": "external:rootcause_failed_launch/R0_hydra_cli/candidate_record",
+    "sha256": "75e4e677ad5b592d7e375c678588e5b112b5ba1e13310b15f7a9c936fea98a21"
+  },
+  "failure_stage": "hydra_cli_parse_before_model_instantiation",
+  "fix_commit": "84f4c97dae5e2f0671c92ac20ab264b36fc66488",
+  "gpu_memory_allocated": false,
+  "launch_log": {
+    "bytes": 444,
+    "reference": "external:rootcause_failed_launch/R0_hydra_cli/launch_log",
+    "sha256": "d9faaed11e1c4d40a1e18218df08672fa23216ab3c6b59cdc2499eb52ef67636"
+  },
+  "optimizer_steps": 0,
+  "root_cause": "The launcher passed the Hydra config selector as one equals-form argument instead of the two-argument interface used by this repository.",
+  "schema_version": 1,
+  "source_commit": "01f5949f6bd1c16c090b2d594bff04f68e371d66",
+  "status": "failed_before_training",
+  "variant": "R0",
+  "variant_authorization_sha256": "adf8020f7081bfbee4eb77c38b0271ac916a6425a510bb5063bae74a275a5b04"
+}

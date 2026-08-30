@@ -6,7 +6,7 @@
     "objective": "7e81cd059e22b710ab0148ac48b8a9e674b4eaf7da186fbb90dc502ef54adf38",
     "physical_batch": "d483502e97632aefb119cc3d044a6b5a6ff7abd9390d36bbb558b0cc17862315"
   },
-  "authorization_sha256": "adf8020f7081bfbee4eb77c38b0271ac916a6425a510bb5063bae74a275a5b04",
+  "authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191",
   "data": {
     "rio": {
       "content_sha256": "bf1dc30493ae453d4202f3a0ef9ca28d35c8123df880e21770aca460e7f997f7",
@@ -144,7 +144,7 @@
     "R4"
   ],
   "selection_reason": "R2 and R4 are gate-passed released-runtime/data recipe differences; R3 remains an authorized diagnostic control but was not selected under the two-conditional-variant cap; R5 failed its materiality gate.",
-  "source_commit": "01f5949f6bd1c16c090b2d594bff04f68e371d66",
+  "source_commit": "84f4c97dae5e2f0671c92ac20ab264b36fc66488",
   "status": "authorized",
   "variants": {
     "R0": {
