@@ -38,6 +38,7 @@ from utils.rescene_rootcause_evaluation import (
     RootCauseEvaluationError,
     build_checkpoint_manifest,
     summarize_epoch_runs,
+    validate_checkpoint_manifest_binding,
     validate_checkpoint_payload,
 )
 from utils.rescene_rootcause_preflight import (
@@ -248,6 +249,8 @@ def prepare_checkpoint(
     except Exception as error:
         raise RootCauseEvaluationError("checkpoint is unreadable") from error
     facts = validate_checkpoint_payload(payload, completed_epoch=completed_epoch)
+    if _stable_file_identity(checkpoint_path) != file_identity:
+        raise RootCauseEvaluationError("checkpoint changed while validating")
     portable_config = _checkpoint_training_config(
         payload, variant=variant, authorization=authorization
     )
@@ -290,15 +293,17 @@ def evaluate_checkpoint(
 
     if seed not in EVALUATION_SEEDS:
         raise RootCauseEvaluationError("evaluation seed is not preregistered")
+    if limit_val_batches is not None and limit_val_batches <= 0:
+        raise RootCauseEvaluationError("smoke batch limit must be positive")
     if not torch.cuda.is_available() or not 0 <= device_index < torch.cuda.device_count():
         raise RootCauseEvaluationError("evaluation device is unavailable")
     manifest = _load_json(checkpoint_manifest_path, name="checkpoint manifest")
     _validate_content_hash(manifest, name="checkpoint manifest")
     authorization = _load_json(authorization_path, name="variant authorization")
     _validate_authorization(authorization)
-    variant = manifest.get("variant")
-    if not isinstance(variant, str) or variant not in authorization["selected_variants"]:
-        raise RootCauseEvaluationError("checkpoint variant is not authorized")
+    variant = validate_checkpoint_manifest_binding(
+        manifest, authorization=authorization
+    )
     identity = _stable_file_identity(checkpoint_path)
     for field in ("bytes", "sha256"):
         if identity[field] != manifest["checkpoint"][field]:
@@ -318,7 +323,13 @@ def evaluate_checkpoint(
     )
     system = InstanceSegmentation(config)
     strict_load = strict_load_task_checkpoint(system, checkpoint_path)
+    if _stable_file_identity(checkpoint_path) != identity:
+        raise RootCauseEvaluationError("checkpoint changed while loading")
     validation_dataset = hydra.utils.instantiate(config.data.validation_dataset)
+    if len(validation_dataset) != 154:
+        raise RootCauseEvaluationError("validation sequence count differs")
+    if limit_val_batches is not None and limit_val_batches > len(validation_dataset):
+        raise RootCauseEvaluationError("smoke batch limit exceeds validation split")
     system.validation_dataset = validation_dataset
     system.labels_info = validation_dataset.label_info
     for parameter in system.parameters():

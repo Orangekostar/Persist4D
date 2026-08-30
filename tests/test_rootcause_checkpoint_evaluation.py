@@ -17,6 +17,7 @@ from utils.rescene_rootcause_evaluation import (
     build_checkpoint_manifest,
     decide_full_candidate,
     summarize_epoch_runs,
+    validate_checkpoint_manifest_binding,
     validate_checkpoint_payload,
 )
 from utils.rescene_rootcause_preflight import canonical_sha256
@@ -98,6 +99,16 @@ def _candidate(variant: str = "R0") -> dict[str, object]:
     return candidate
 
 
+def _checkpoint_facts() -> dict[str, object]:
+    facts = validate_checkpoint_payload(
+        _checkpoint(), completed_epoch=60, expected_state_dict_entries=1
+    )
+    facts["training_config_sha256"] = _authorization()["variants"]["R0"][
+        "config_sha256"
+    ]
+    return facts
+
+
 def test_checkpoint_payload_requires_full_resume_state() -> None:
     facts = validate_checkpoint_payload(
         _checkpoint(), completed_epoch=60, expected_state_dict_entries=1
@@ -147,9 +158,7 @@ def test_checkpoint_manifest_binds_authorization_candidate_and_file() -> None:
         authorization=_authorization(),
         candidate=_candidate(),
         file_identity={"bytes": 123, "sha256": "a" * 64},
-        checkpoint_facts=validate_checkpoint_payload(
-            _checkpoint(), completed_epoch=60, expected_state_dict_entries=1
-        ),
+        checkpoint_facts=_checkpoint_facts(),
     )
 
     assert manifest["status"] == "pass"
@@ -158,6 +167,9 @@ def test_checkpoint_manifest_binds_authorization_candidate_and_file() -> None:
     assert manifest["checkpoint"]["selected_step"] == 3_960
     assert manifest["bindings"]["candidate_id"] == _candidate()["candidate_id"]
     assert len(manifest["content_sha256"]) == 64
+    assert validate_checkpoint_manifest_binding(
+        manifest, authorization=_authorization()
+    ) == "R0"
 
     candidate = _candidate()
     candidate["variant_authorization_sha256"] = "b" * 64
@@ -168,9 +180,36 @@ def test_checkpoint_manifest_binds_authorization_candidate_and_file() -> None:
             authorization=_authorization(),
             candidate=candidate,
             file_identity={"bytes": 123, "sha256": "a" * 64},
-            checkpoint_facts=validate_checkpoint_payload(
-                _checkpoint(), completed_epoch=60, expected_state_dict_entries=1
-            ),
+            checkpoint_facts=_checkpoint_facts(),
+        )
+
+
+def test_checkpoint_manifest_rejects_stale_or_malformed_authorization_binding() -> None:
+    authorization = _authorization()
+    manifest = build_checkpoint_manifest(
+        variant="R0",
+        completed_epoch=60,
+        authorization=authorization,
+        candidate=_candidate(),
+        file_identity={"bytes": 123, "sha256": "a" * 64},
+        checkpoint_facts=_checkpoint_facts(),
+    )
+
+    stale = copy.deepcopy(manifest)
+    stale["bindings"]["variant_authorization_sha256"] = "b" * 64
+    with pytest.raises(RootCauseEvaluationError, match="authorization"):
+        validate_checkpoint_manifest_binding(stale, authorization=authorization)
+
+    malformed = copy.deepcopy(manifest)
+    malformed["checkpoint"] = []
+    with pytest.raises(RootCauseEvaluationError, match="manifest"):
+        validate_checkpoint_manifest_binding(malformed, authorization=authorization)
+
+    malformed_authorization = copy.deepcopy(authorization)
+    malformed_authorization["initialization"]["common_state"] = []
+    with pytest.raises(RootCauseEvaluationError, match="authorization"):
+        validate_checkpoint_manifest_binding(
+            manifest, authorization=malformed_authorization
         )
 
 
@@ -190,8 +229,12 @@ def _run(
         "variant": variant,
         "completed_epoch": epoch,
         "seed": seed,
+        "source_commit": "d" * 40,
         "contract_sha256": "c" * 64,
+        "variant_authorization_sha256": "e" * 64,
+        "checkpoint_manifest_sha256": variant.encode().hex().ljust(64, "1"),
         "checkpoint_sha256": variant.encode().hex().ljust(64, "0"),
+        "evaluation_config_sha256": "f" * 64,
         "validation_sequence_count": 154,
         "elapsed_seconds": 10.0,
         "metrics": {
@@ -202,6 +245,7 @@ def _run(
             "stage1_mAP": stage1,
             "stage2_mAP": stage2,
         },
+        "SpatialStageMean": (stage1 + stage2) / 2.0,
     }
 
 
@@ -247,6 +291,26 @@ def test_epoch_summary_uses_paired_spatial_stage_mean() -> None:
         summarize_epoch_runs(
             duplicated, variants=("R0", "R1"), completed_epoch=90
         )
+
+
+@pytest.mark.parametrize(
+    ("field", "replacement"),
+    (
+        ("source_commit", "0" * 40),
+        ("variant_authorization_sha256", "0" * 64),
+        ("evaluation_config_sha256", "0" * 64),
+        ("checkpoint_manifest_sha256", "0" * 64),
+        ("SpatialStageMean", 0.99),
+    ),
+)
+def test_epoch_summary_rejects_mixed_or_inconsistent_provenance(
+    field: str, replacement: object
+) -> None:
+    runs = _epoch_runs()
+    runs[-1][field] = replacement
+
+    with pytest.raises(RootCauseEvaluationError, match="provenance|metric"):
+        summarize_epoch_runs(runs, variants=("R0", "R1"), completed_epoch=90)
 
 
 def test_epoch_outputs_render_fixed_schema_csv(tmp_path) -> None:

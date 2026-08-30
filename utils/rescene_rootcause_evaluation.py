@@ -34,6 +34,14 @@ class RootCauseEvaluationError(ValueError):
     """Raised when checkpoint or metric evidence is not exact."""
 
 
+def _is_lower_hex(value: object, length: int) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == length
+        and all(character in "0123456789abcdef" for character in value)
+    )
+
+
 def _tensor_sha256(tensor: torch.Tensor) -> str:
     value = tensor.detach().cpu().contiguous()
     return hashlib.sha256(value.view(torch.uint8).numpy().tobytes()).hexdigest()
@@ -127,15 +135,32 @@ def _require_candidate_binding(
     candidate: Mapping[str, Any],
 ) -> None:
     variants = authorization.get("variants")
+    selected_variants = authorization.get("selected_variants")
     if (
         authorization.get("status") != "authorized"
-        or variant not in authorization.get("selected_variants", ())
+        or not isinstance(selected_variants, Sequence)
+        or isinstance(selected_variants, (str, bytes))
+        or variant not in selected_variants
         or not isinstance(variants, Mapping)
         or not isinstance(variants.get(variant), Mapping)
     ):
         raise RootCauseEvaluationError("variant authorization is invalid")
     initialization = authorization.get("initialization")
-    if not isinstance(initialization, Mapping):
+    common_state = (
+        initialization.get("common_state")
+        if isinstance(initialization, Mapping)
+        else None
+    )
+    pretrained = (
+        initialization.get("pretrained")
+        if isinstance(initialization, Mapping)
+        else None
+    )
+    if (
+        not isinstance(initialization, Mapping)
+        or not isinstance(common_state, Mapping)
+        or not isinstance(pretrained, Mapping)
+    ):
         raise RootCauseEvaluationError("variant initialization binding is invalid")
     expected = {
         "variant": variant,
@@ -144,22 +169,118 @@ def _require_candidate_binding(
             "authorization_sha256"
         ),
         "config_sha256": variants[variant].get("config_sha256"),
-        "common_initialization_sha256": initialization.get("common_state", {}).get(
-            "sha256"
-        ),
-        "pretrained_sha256": initialization.get("pretrained", {}).get("sha256"),
+        "common_initialization_sha256": common_state.get("sha256"),
+        "pretrained_sha256": pretrained.get("sha256"),
     }
-    if any(candidate.get(key) != value for key, value in expected.items()):
+    if (
+        not _is_lower_hex(expected["source_commit"], 40)
+        or any(
+            not _is_lower_hex(expected[key], 64)
+            for key in (
+                "variant_authorization_sha256",
+                "config_sha256",
+                "common_initialization_sha256",
+                "pretrained_sha256",
+            )
+        )
+        or any(candidate.get(key) != value for key, value in expected.items())
+    ):
         raise RootCauseEvaluationError("candidate binding differs from authorization")
     candidate_id = candidate.get("candidate_id")
     unsigned_candidate = dict(candidate)
     unsigned_candidate.pop("candidate_id", None)
     if (
-        not isinstance(candidate_id, str)
-        or len(candidate_id) != 64
+        not _is_lower_hex(candidate_id, 64)
         or canonical_sha256(unsigned_candidate) != candidate_id
     ):
         raise RootCauseEvaluationError("candidate binding is incomplete")
+
+
+def validate_checkpoint_manifest_binding(
+    manifest: Mapping[str, Any], *, authorization: Mapping[str, Any]
+) -> str:
+    """Require a manifest to remain bound to the current authorization."""
+
+    checkpoint = manifest.get("checkpoint")
+    bindings = manifest.get("bindings")
+    resume_state = manifest.get("resume_state")
+    variant = manifest.get("variant")
+    variants = authorization.get("variants")
+    selected_variants = authorization.get("selected_variants")
+    initialization = authorization.get("initialization")
+    common_state = (
+        initialization.get("common_state")
+        if isinstance(initialization, Mapping)
+        else None
+    )
+    pretrained = (
+        initialization.get("pretrained")
+        if isinstance(initialization, Mapping)
+        else None
+    )
+    if (
+        manifest.get("schema_version") != 1
+        or manifest.get("status") != "pass"
+        or manifest.get("experiment") != "rescene_task_learning_root_cause_v1"
+        or not isinstance(variant, str)
+        or not isinstance(checkpoint, Mapping)
+        or not isinstance(bindings, Mapping)
+        or not isinstance(resume_state, Mapping)
+    ):
+        raise RootCauseEvaluationError("checkpoint manifest schema is invalid")
+    if (
+        authorization.get("status") != "authorized"
+        or not _is_lower_hex(authorization.get("source_commit"), 40)
+        or not _is_lower_hex(authorization.get("authorization_sha256"), 64)
+        or not isinstance(selected_variants, Sequence)
+        or isinstance(selected_variants, (str, bytes))
+        or variant not in selected_variants
+        or not isinstance(variants, Mapping)
+        or not isinstance(variants.get(variant), Mapping)
+        or not isinstance(common_state, Mapping)
+        or not isinstance(pretrained, Mapping)
+    ):
+        raise RootCauseEvaluationError("checkpoint authorization is invalid")
+    variant_contract = variants[variant]
+    expected = {
+        ("checkpoint", "creating_commit"): authorization["source_commit"],
+        ("checkpoint", "config_sha256"): variant_contract.get("config_sha256"),
+        ("checkpoint", "upstream_checkpoint_sha256"): pretrained.get("sha256"),
+        ("bindings", "variant_authorization_sha256"): authorization[
+            "authorization_sha256"
+        ],
+        ("bindings", "common_initialization_sha256"): common_state.get("sha256"),
+        ("bindings", "pretrained_sha256"): pretrained.get("sha256"),
+    }
+    sections = {"checkpoint": checkpoint, "bindings": bindings}
+    if any(
+        not _is_lower_hex(value, 40 if key == "creating_commit" else 64)
+        or sections[section].get(key) != value
+        for (section, key), value in expected.items()
+    ):
+        raise RootCauseEvaluationError("checkpoint authorization binding differs")
+    completed_epoch = checkpoint.get("selected_epoch")
+    expected_step = (
+        completed_epoch * OPTIMIZER_STEPS_PER_EPOCH
+        if completed_epoch in (60, 90, 450)
+        else None
+    )
+    checkpoint_sha256 = checkpoint.get("sha256")
+    reference = checkpoint.get("reference")
+    if (
+        expected_step is None
+        or checkpoint.get("selected_step") != expected_step
+        or resume_state.get("selected_epoch") != completed_epoch
+        or resume_state.get("selected_step") != expected_step
+        or resume_state.get("training_config_sha256")
+        != variant_contract["config_sha256"]
+        or not _is_lower_hex(checkpoint_sha256, 64)
+        or not isinstance(reference, str)
+        or not reference.endswith("/" + checkpoint_sha256)
+        or not _is_lower_hex(bindings.get("candidate_id"), 64)
+    ):
+        raise RootCauseEvaluationError("checkpoint manifest binding is invalid")
+    return variant
 
 
 def build_checkpoint_manifest(
@@ -228,6 +349,7 @@ def build_checkpoint_manifest(
         validate_portable_payload(payload)
     except RootCauseContractError as error:
         raise RootCauseEvaluationError(str(error)) from error
+    validate_checkpoint_manifest_binding(payload, authorization=authorization)
     return payload
 
 
@@ -261,11 +383,22 @@ def summarize_epoch_runs(
     observed = [(run.get("variant"), run.get("seed")) for run in runs]
     if len(observed) != len(expected) or set(observed) != expected:
         raise RootCauseEvaluationError("official-like run matrix differs")
-    contract_hashes = set()
+    global_provenance: dict[str, set[object]] = {
+        field: set()
+        for field in (
+            "source_commit",
+            "contract_sha256",
+            "variant_authorization_sha256",
+            "evaluation_config_sha256",
+        )
+    }
     grouped: dict[str, dict[int, dict[str, float]]] = {
         variant: {} for variant in variant_names
     }
     checkpoint_hashes: dict[str, set[object]] = {
+        variant: set() for variant in variant_names
+    }
+    checkpoint_manifest_hashes: dict[str, set[object]] = {
         variant: set() for variant in variant_names
     }
     for run in runs:
@@ -282,11 +415,35 @@ def summarize_epoch_runs(
         metrics["SpatialStageMean"] = (
             metrics["stage1_mAP"] + metrics["stage2_mAP"]
         ) / 2.0
+        try:
+            reported_spatial = float(run.get("SpatialStageMean"))
+        except (TypeError, ValueError) as error:
+            raise RootCauseEvaluationError("official-like metric binding differs") from error
+        if (
+            not math.isfinite(reported_spatial)
+            or not math.isclose(
+                reported_spatial,
+                metrics["SpatialStageMean"],
+                rel_tol=0.0,
+                abs_tol=1e-12,
+            )
+        ):
+            raise RootCauseEvaluationError("official-like metric binding differs")
         grouped[variant][seed] = metrics
         checkpoint_hashes[variant].add(run.get("checkpoint_sha256"))
-        contract_hashes.add(run.get("contract_sha256"))
-    if len(contract_hashes) != 1 or None in contract_hashes or any(
-        len(values) != 1 or None in values for values in checkpoint_hashes.values()
+        checkpoint_manifest_hashes[variant].add(
+            run.get("checkpoint_manifest_sha256")
+        )
+        for field, values in global_provenance.items():
+            values.add(run.get(field))
+    if any(
+        len(values) != 1
+        or not _is_lower_hex(next(iter(values)), 40 if field == "source_commit" else 64)
+        for field, values in global_provenance.items()
+    ) or any(
+        len(values) != 1 or not _is_lower_hex(next(iter(values)), 64)
+        for hashes in (checkpoint_hashes, checkpoint_manifest_hashes)
+        for values in hashes.values()
     ):
         raise RootCauseEvaluationError("official-like provenance binding differs")
     control = grouped.get("R0")
