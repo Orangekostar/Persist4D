@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 
 import pytest
 import torch
+from omegaconf import OmegaConf
 
 from scripts.evaluate_rescene_rootcause_checkpoint import (
+    _checkpoint_training_config,
     _expected_state_dict_entries,
     compose_evaluation_config,
     evaluation_contract,
@@ -46,6 +49,92 @@ def test_evaluation_config_is_shared_and_portable(tmp_path) -> None:
     assert contract["seeds"] == [45, 46, 47]
     assert contract["validation_sequence_count"] == 154
     assert len(contract["sha256"]) == 64
+
+
+def test_checkpoint_config_resolves_only_authorized_training_environment(
+    monkeypatch,
+) -> None:
+    pretrained_reference = "external:checkpoint/concerto/" + "a" * 64
+    common_reference = "external:checkpoint/rootcause_common/" + "b" * 64
+    common_sha256 = "b" * 64
+    output_reference = "external:checkpoint/rootcause_short/R1"
+    expected = {
+        "backbone": {"name": pretrained_reference},
+        "model": {"config": {"backbone": {"name": pretrained_reference}}},
+        "general": {
+            "experiment_name": "R1",
+            "rootcause_objective_mode": "raw_sum",
+            "rootcause_common_initialization": common_reference,
+            "rootcause_common_initialization_sha256": common_sha256,
+            "save_dir": output_reference,
+        },
+        "callbacks": [
+            {"dirpath": output_reference},
+            {"output_dir": output_reference},
+        ],
+        "logging": [{"save_dir": output_reference}],
+    }
+    raw = copy.deepcopy(expected)
+    raw["backbone"]["name"] = "${oc.env:CONCERTO_CHECKPOINT,missing.pth}"
+    raw["model"]["config"]["backbone"]["name"] = (
+        "${oc.env:CONCERTO_CHECKPOINT,missing.pth}"
+    )
+    raw["general"] = {
+        "experiment_name": "${oc.env:RESCENE_ROOTCAUSE_VARIANT,R0}",
+        "rootcause_objective_mode": (
+            "${oc.env:RESCENE_ROOTCAUSE_OBJECTIVE_MODE,weighted}"
+        ),
+        "rootcause_common_initialization": (
+            "${oc.env:RESCENE_ROOTCAUSE_COMMON_STATE,null}"
+        ),
+        "rootcause_common_initialization_sha256": (
+            "${oc.env:RESCENE_ROOTCAUSE_COMMON_SHA256,null}"
+        ),
+        "save_dir": "${oc.env:RESCENE_ROOTCAUSE_OUTPUT_DIR,missing}",
+    }
+    raw["callbacks"] = [
+        {"dirpath": "${oc.env:RESCENE_ROOTCAUSE_OUTPUT_DIR,missing}"},
+        {"output_dir": "${oc.env:RESCENE_ROOTCAUSE_OUTPUT_DIR,missing}"},
+    ]
+    raw["logging"] = [
+        {"save_dir": "${oc.env:RESCENE_ROOTCAUSE_OUTPUT_DIR,missing}"}
+    ]
+    authorization = {
+        "initialization": {
+            "pretrained": {"reference": pretrained_reference},
+            "common_state": {
+                "reference": common_reference,
+                "sha256": common_sha256,
+            },
+        },
+        "variants": {
+            "R1": {
+                "resolved_config": expected,
+                "config_sha256": canonical_sha256(expected),
+            }
+        },
+    }
+    environment_names = (
+        "CONCERTO_CHECKPOINT",
+        "RESCENE_ROOTCAUSE_VARIANT",
+        "RESCENE_ROOTCAUSE_OUTPUT_DIR",
+        "RESCENE_ROOTCAUSE_COMMON_STATE",
+        "RESCENE_ROOTCAUSE_COMMON_SHA256",
+        "RESCENE_ROOTCAUSE_OBJECTIVE_MODE",
+    )
+    for name in environment_names:
+        monkeypatch.setenv(name, "hostile")
+
+    observed = _checkpoint_training_config(
+        {"hyper_parameters": OmegaConf.create(raw)},
+        variant="R1",
+        authorization=authorization,
+    )
+
+    assert observed == expected
+    assert {name: os.environ[name] for name in environment_names} == {
+        name: "hostile" for name in environment_names
+    }
 
 
 def test_evaluation_config_matches_strong_local_structure(tmp_path) -> None:

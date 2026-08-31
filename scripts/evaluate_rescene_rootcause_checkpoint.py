@@ -140,6 +140,40 @@ def _evaluation_environment(pretrained: Path) -> Iterator[None]:
                 os.environ[name] = value
 
 
+@contextmanager
+def _checkpoint_training_environment(
+    *, variant: str, authorization: Mapping[str, Any]
+) -> Iterator[None]:
+    initialization = authorization["initialization"]
+    output_namespace = authorization.get("checkpoint_namespace", "rootcause_short")
+    values = {
+        "CONCERTO_CHECKPOINT": initialization["pretrained"]["reference"],
+        "RESCENE_ROOTCAUSE_VARIANT": variant,
+        "RESCENE_ROOTCAUSE_OUTPUT_DIR": (
+            f"external:checkpoint/{output_namespace}/{variant}"
+        ),
+        "RESCENE_ROOTCAUSE_COMMON_STATE": initialization["common_state"][
+            "reference"
+        ],
+        "RESCENE_ROOTCAUSE_COMMON_SHA256": initialization["common_state"][
+            "sha256"
+        ],
+        "RESCENE_ROOTCAUSE_OBJECTIVE_MODE": (
+            "raw_sum" if variant == "R1" else "weighted"
+        ),
+    }
+    previous = {name: os.environ.get(name) for name in values}
+    os.environ.update(values)
+    try:
+        yield
+    finally:
+        for name, value in previous.items():
+            if value is None:
+                os.environ.pop(name, None)
+            else:
+                os.environ[name] = value
+
+
 def compose_evaluation_config(
     pretrained: Path,
     *,
@@ -226,7 +260,10 @@ def _checkpoint_training_config(
 ) -> dict[str, Any]:
     config = payload.get("hyper_parameters")
     if isinstance(config, DictConfig):
-        config = OmegaConf.to_container(config, resolve=True)
+        with _checkpoint_training_environment(
+            variant=variant, authorization=authorization
+        ):
+            config = OmegaConf.to_container(config, resolve=True)
     if not isinstance(config, Mapping):
         raise RootCauseEvaluationError("checkpoint config state is invalid")
     initialization = authorization["initialization"]
