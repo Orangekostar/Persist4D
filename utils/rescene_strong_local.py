@@ -181,12 +181,22 @@ def strong_variant_gate(
     elif variant == "A2":
         diagnostic_pass = a2_gate.get("diagnostic_evidence_pass") is True
         a1_complete = a1_result is not None and a1_result.get("status") == "pass"
-        a1_insufficient = a1_complete and a1_result.get("all_gates_pass") is False
+        a1_gates = a1_result.get("gates") if a1_complete else None
+        a1_stable_spatial_benefit = (
+            isinstance(a1_gates, Mapping)
+            and a1_gates.get("positive_for_all_paired_seeds") is True
+        )
+        a1_insufficient = (
+            a1_stable_spatial_benefit
+            and a1_result.get("all_gates_pass") is False
+        )
         authorized = diagnostic_pass and a1_insufficient
         if not diagnostic_pass:
             reason = "superpoint diagnostic evidence gate failed"
         elif not a1_complete:
             reason = "A1 result is pending"
+        elif not a1_stable_spatial_benefit:
+            reason = "A1 had no stable paired spatial benefit"
         elif not a1_insufficient:
             reason = "A1 passed; architecture expansion stopped"
         else:

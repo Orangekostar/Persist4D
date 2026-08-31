@@ -112,7 +112,11 @@ def test_strong_variant_gates_enforce_hierarchy() -> None:
     }
     assert strong_variant_gate("A1", diagnostics=diagnostics)["authorized"] is True
 
-    a1_failed = {"status": "pass", "all_gates_pass": False}
+    a1_failed = {
+        "status": "pass",
+        "all_gates_pass": False,
+        "gates": {"positive_for_all_paired_seeds": True},
+    }
     assert (
         strong_variant_gate("A2", diagnostics=diagnostics, a1_result=a1_failed)[
             "authorized"
@@ -159,6 +163,29 @@ def test_a2_gate_requires_diagnostic_evidence_and_a1_result() -> None:
         )["authorized"]
         is False
     )
+
+
+def test_a2_gate_stops_when_a1_has_no_stable_spatial_benefit() -> None:
+    diagnostics = {
+        "status": "pass",
+        "gates": {
+            "A1": {"authorized": True},
+            "A2": {"diagnostic_evidence_pass": True},
+        },
+    }
+    a1_without_stable_gain = {
+        "status": "pass",
+        "all_gates_pass": False,
+        "gates": {"positive_for_all_paired_seeds": False},
+    }
+
+    gate = strong_variant_gate(
+        "A2", diagnostics=diagnostics, a1_result=a1_without_stable_gain
+    )
+
+    assert gate["status"] == "gate_skipped"
+    assert gate["authorized"] is False
+    assert gate["reason"] == "A1 had no stable paired spatial benefit"
 
 
 def _metric_runs(gain: float) -> dict[int, dict[str, float]]:
@@ -404,7 +431,11 @@ def test_strong_authorization_rejects_stale_evidence_or_external_state() -> None
 
 def test_a2_authorization_binds_signed_a1_failure() -> None:
     root, short, diagnostics = _authorization_inputs()
-    a1_result = {"status": "pass", "all_gates_pass": False}
+    a1_result = {
+        "status": "pass",
+        "all_gates_pass": False,
+        "gates": {"positive_for_all_paired_seeds": True},
+    }
     a1_authorization = {
         "status": "authorized",
         "selected_variants": ["A1"],
