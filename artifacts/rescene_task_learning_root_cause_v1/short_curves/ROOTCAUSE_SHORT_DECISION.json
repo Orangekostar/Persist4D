@@ -1,0 +1,155 @@
+{
+  "authorized_variants": [
+    "R1"
+  ],
+  "completed_epoch": 90,
+  "completed_variants": [
+    "R0",
+    "R1"
+  ],
+  "content_sha256": "c71d7f770fe72dbeb3816fc1bb2e910dd73f46f5b6fbb18b522f12603f4b3def",
+  "contract_integrity": {
+    "R0": true,
+    "R1": true
+  },
+  "decisions": {
+    "R1": {
+      "all_gates_pass": true,
+      "gates": {
+        "contract_integrity": true,
+        "leads_validation_at_75_and_90": true,
+        "mean_spatial_gain_at_least_one_point": true,
+        "overall_map_not_lower_than_r0": true,
+        "positive_for_all_paired_seeds": true
+      }
+    }
+  },
+  "epoch60_summary": {
+    "R0": {
+      "SpatialStageMean_mean": 0.26380302011966705,
+      "SpatialStageMean_std": 0.002188701291228676,
+      "overall_mAP_mean": 0.23015077412128448,
+      "overall_mAP_std": 0.0009307538462044797,
+      "paired_spatial_delta_mean": 0.0,
+      "paired_spatial_deltas": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "paired_spatial_positive_seed_count": 0,
+      "seed_count": 3,
+      "stage1_mAP_mean": 0.25873886545499164,
+      "stage1_mAP_std": 0.0074068239056044125,
+      "stage2_mAP_mean": 0.26886717478434247,
+      "stage2_mAP_std": 0.0030310220098467245,
+      "t_mAP25_mean": 0.5122554699579874,
+      "t_mAP25_std": 0.010415329294291073,
+      "t_mAP50_mean": 0.3202870388825734,
+      "t_mAP50_std": 0.005845086973025311,
+      "t_mAP_mean": 0.16982981065909067,
+      "t_mAP_std": 0.0015241704094296385
+    },
+    "R1": {
+      "SpatialStageMean_mean": 0.314528947075208,
+      "SpatialStageMean_std": 0.00603366728318469,
+      "overall_mAP_mean": 0.28228097160657245,
+      "overall_mAP_std": 0.005824932146869171,
+      "paired_spatial_delta_mean": 0.05072592695554098,
+      "paired_spatial_deltas": [
+        0.05764903128147125,
+        0.04370976984500885,
+        0.05081897974014282
+      ],
+      "paired_spatial_positive_seed_count": 3,
+      "seed_count": 3,
+      "stage1_mAP_mean": 0.3134452899297078,
+      "stage1_mAP_std": 0.007053374790085177,
+      "stage2_mAP_mean": 0.3156126042207082,
+      "stage2_mAP_std": 0.005096421407389651,
+      "t_mAP25_mean": 0.5781651735305786,
+      "t_mAP25_std": 0.009594274285565009,
+      "t_mAP50_mean": 0.35711010297139484,
+      "t_mAP50_std": 0.027543551923479948,
+      "t_mAP_mean": 0.20248334109783173,
+      "t_mAP_std": 0.009187956619029328
+    }
+  },
+  "epoch90_summary": {
+    "R0": {
+      "SpatialStageMean_mean": 0.3339061190684636,
+      "SpatialStageMean_std": 0.0028270523137182185,
+      "overall_mAP_mean": 0.2803946038087209,
+      "overall_mAP_std": 0.004688250149127077,
+      "paired_spatial_delta_mean": 0.0,
+      "paired_spatial_deltas": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "paired_spatial_positive_seed_count": 0,
+      "seed_count": 3,
+      "stage1_mAP_mean": 0.3320860763390859,
+      "stage1_mAP_std": 0.0032475150054518645,
+      "stage2_mAP_mean": 0.33572616179784137,
+      "stage2_mAP_std": 0.004869083448739562,
+      "t_mAP25_mean": 0.5668993592262268,
+      "t_mAP25_std": 0.005233245379456767,
+      "t_mAP50_mean": 0.3776329656442006,
+      "t_mAP50_std": 0.006777010675873919,
+      "t_mAP_mean": 0.20969388882319132,
+      "t_mAP_std": 0.005613826592902677
+    },
+    "R1": {
+      "SpatialStageMean_mean": 0.35234537720680237,
+      "SpatialStageMean_std": 0.004080854927763989,
+      "overall_mAP_mean": 0.3126864234606425,
+      "overall_mAP_std": 0.004872135435113277,
+      "paired_spatial_delta_mean": 0.018439258138338726,
+      "paired_spatial_deltas": [
+        0.013262912631034851,
+        0.02091817557811737,
+        0.021136686205863953
+      ],
+      "paired_spatial_positive_seed_count": 3,
+      "seed_count": 3,
+      "stage1_mAP_mean": 0.35146184762318927,
+      "stage1_mAP_std": 0.003272427066115008,
+      "stage2_mAP_mean": 0.35322890679041546,
+      "stage2_mAP_std": 0.0053970119251179945,
+      "t_mAP25_mean": 0.608402152856191,
+      "t_mAP25_std": 0.010101626249703137,
+      "t_mAP50_mean": 0.4116896589597066,
+      "t_mAP50_std": 0.008878170365116988,
+      "t_mAP_mean": 0.22579213480154672,
+      "t_mAP_std": 0.005628659650985213
+    }
+  },
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "full_training_authorized": true,
+  "full_training_status": "authorized",
+  "infeasible_variants": {
+    "R2": {
+      "candidate_id": "61ed23eb73bbc207670bd91176bd3853884991b3bac1af43085bfc9738b8284b",
+      "reason_code": "full_dataset_cuda_oom"
+    },
+    "R4": {
+      "candidate_id": "d3d0f807ffa83d135f004c354a9524a841fb8d48f1025d8e536e6e3de44b2f1f",
+      "reason_code": "deterministic_nonfinite_objective"
+    }
+  },
+  "schema_version": 1,
+  "selected_variant": "R1",
+  "selection_metric": "highest mean SpatialStageMean at epoch 90",
+  "status": "pass",
+  "tie_breaks": [
+    "mean overall_mAP",
+    "mean t_mAP"
+  ],
+  "validation_leads": {
+    "R1": {
+      "75": true,
+      "90": true
+    }
+  },
+  "variant_authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191"
+}
