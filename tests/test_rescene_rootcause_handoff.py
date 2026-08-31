@@ -12,6 +12,7 @@ import pytest
 from scripts.finalize_rescene_task_learning_root_cause import (
     FinalizationError,
     FinalPackageInputs,
+    StrongSkip,
     StrongStudy,
     aggregate_strong_outputs,
     classify_principal_outcome,
@@ -274,6 +275,34 @@ def _with_strong_full(
     return replace(study, full_directory=full)
 
 
+def _strong_skip(tmp_path: Path, variant: str) -> StrongSkip:
+    path = tmp_path / variant / "variant_manifest.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(
+        json.dumps(
+            _signed(
+                {
+                    "schema_version": 1,
+                    "status": "gate_skipped",
+                    "experiment": "rescene_strong_local_v1",
+                    "variant": variant,
+                    "gate": {
+                        "status": "gate_skipped",
+                        "authorized": False,
+                        "reason": "upstream structural gate did not pass",
+                    },
+                    "upstream_evidence": {
+                        "a1_result": {"bytes": 1, "sha256": "a" * 64}
+                    },
+                },
+                "content_sha256",
+            )
+        ),
+        encoding="ascii",
+    )
+    return StrongSkip(variant=variant, status_path=path)
+
+
 def test_strong_aggregation_deduplicates_bound_root_rows(tmp_path: Path) -> None:
     outputs = aggregate_strong_outputs(
         [_strong_study(tmp_path, "A1", 0.32), _strong_study(tmp_path, "A2", 0.31)]
@@ -328,6 +357,7 @@ def test_strong_aggregation_preserves_bound_full_training_result(
     assert verdict["full_results"] == [
         {
             "variant": "A1",
+            "status": "pass",
             "content_sha256": json.loads(
                 outputs[
                     "variants/A1/full/STRONG_LOCAL_FULL_VERDICT.json"
@@ -357,6 +387,56 @@ def test_strong_aggregation_rejects_full_result_without_short_gate(
 
     with pytest.raises(FinalizationError, match="without short authorization"):
         aggregate_strong_outputs([study])
+
+
+def test_strong_aggregation_records_signed_full_gate_skip(tmp_path: Path) -> None:
+    outputs = aggregate_strong_outputs([_strong_study(tmp_path, "A1", 0.31)])
+
+    status = json.loads(outputs["variants/A1/full/STATUS.json"])
+    aggregate = json.loads(outputs["STRONG_LOCAL_VERDICT.json"])
+    assert status["status"] == "gate_skipped"
+    assert status["upstream_gate"] == "STRONG_LOCAL_VERDICT"
+    assert status["short_verdict_content_sha256"] == aggregate["results"][0][
+        "content_sha256"
+    ]
+    assert canonical_sha256(
+        {key: value for key, value in status.items() if key != "content_sha256"}
+    ) == status["content_sha256"]
+    assert aggregate["full_statuses"] == [
+        {
+            "variant": "A1",
+            "status": "gate_skipped",
+            "content_sha256": status["content_sha256"],
+        }
+    ]
+
+
+def test_strong_aggregation_preserves_signed_skipped_variant(tmp_path: Path) -> None:
+    outputs = aggregate_strong_outputs(
+        [_strong_study(tmp_path, "A1", 0.31)],
+        [_strong_skip(tmp_path, "A2")],
+    )
+
+    manifest = json.loads(outputs["variant_manifest.json"])
+    aggregate = json.loads(outputs["STRONG_LOCAL_VERDICT.json"])
+    assert manifest["skips"][0]["variant"] == "A2"
+    assert aggregate["variants_considered"] == ["A1", "A2"]
+    assert aggregate["skipped_variants"][0]["reason"] == (
+        "upstream structural gate did not pass"
+    )
+    assert "variants/A2/variant_manifest.json" in outputs
+
+
+def test_strong_aggregation_rejects_tampered_skipped_variant(tmp_path: Path) -> None:
+    skipped = _strong_skip(tmp_path, "A2")
+    payload = json.loads(skipped.status_path.read_text(encoding="ascii"))
+    payload["gate"]["reason"] = "changed"
+    skipped.status_path.write_text(json.dumps(payload), encoding="ascii")
+
+    with pytest.raises(FinalizationError, match="A2 skip content hash"):
+        aggregate_strong_outputs(
+            [_strong_study(tmp_path, "A1", 0.31)], [skipped]
+        )
 
 
 def _handoff() -> str:
@@ -553,6 +633,7 @@ def _finalization_inputs(tmp_path: Path) -> FinalPackageInputs:
         handoff_path=handoff,
         repository=_repository(),
         external_files=(_external_file(),),
+        strong_skips=(_strong_skip(tmp_path, "A2"),),
     )
 
 
@@ -587,6 +668,13 @@ def test_finalizer_does_not_publish_partial_tree_when_input_is_missing(
 
     assert not (inputs.artifact_root / "FINAL_REPORT.md").exists()
     assert not (inputs.artifact_root / "FINAL_MANIFEST.json").exists()
+
+
+def test_finalizer_requires_an_explicit_A2_run_or_skip(tmp_path: Path) -> None:
+    inputs = replace(_finalization_inputs(tmp_path), strong_skips=())
+
+    with pytest.raises(FinalizationError, match="A2 decision is missing"):
+        publish_final_package(inputs)
 
 
 def test_finalizer_rejects_short_provenance_from_a_different_decision(
@@ -797,6 +885,13 @@ def _finalization_spec(inputs: FinalPackageInputs) -> dict[str, object]:
                 ),
             }
             for study in inputs.strong_studies
+        ],
+        "strong_skips": [
+            {
+                "variant": skip.variant,
+                "status_path": str(skip.status_path),
+            }
+            for skip in inputs.strong_skips
         ],
         "final_report_path": str(inputs.final_report_path),
         "handoff_path": str(inputs.handoff_path),

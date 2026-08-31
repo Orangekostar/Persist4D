@@ -113,6 +113,14 @@ class StrongStudy:
 
 
 @dataclass(frozen=True)
+class StrongSkip:
+    """One signed structural-variant gate that prevented a training run."""
+
+    variant: str
+    status_path: Path
+
+
+@dataclass(frozen=True)
 class FinalPackageInputs:
     """Explicit evidence roots needed to publish the final portable package."""
 
@@ -126,6 +134,7 @@ class FinalPackageInputs:
     external_files: tuple[Mapping[str, object], ...]
     full_training_directory: Path | None = None
     full_evaluation_directory: Path | None = None
+    strong_skips: tuple[StrongSkip, ...] = ()
 
 
 def _load_json(path: Path, *, name: str) -> dict[str, Any]:
@@ -312,6 +321,12 @@ def publish_final_package(inputs: FinalPackageInputs) -> dict[str, object]:
     _validate_signed(diagnostics, field="content_sha256", name="decoder diagnostics")
     if diagnostics.get("status") != "pass":
         raise FinalizationError("decoder diagnostics are incomplete")
+    considered_strong_variants = {
+        *(study.variant for study in inputs.strong_studies),
+        *(skip.variant for skip in inputs.strong_skips),
+    }
+    if not {"A1", "A2"}.issubset(considered_strong_variants):
+        raise FinalizationError("strong-local A2 decision is missing")
 
     full_verdict: Mapping[str, Any] | None = None
     selected = short_decision.get("selected_variant")
@@ -438,7 +453,9 @@ def publish_final_package(inputs: FinalPackageInputs) -> dict[str, object]:
     ):
         raise FinalizationError("final report outcome differs from evidence")
     handoff = _required_bytes(inputs.handoff_path)
-    strong_outputs = aggregate_strong_outputs(inputs.strong_studies)
+    strong_outputs = aggregate_strong_outputs(
+        inputs.strong_studies, inputs.strong_skips
+    )
 
     inputs.artifact_root.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(
@@ -545,6 +562,7 @@ def load_finalization_inputs(spec_path: Path) -> FinalPackageInputs:
     allowed = required | {
         "full_training_directory",
         "full_evaluation_directory",
+        "strong_skips",
     }
     if (
         spec.get("schema_version") != 1
@@ -597,6 +615,25 @@ def load_finalization_inputs(spec_path: Path) -> FinalPackageInputs:
     external_files = spec["external_files"]
     if not isinstance(repository, Mapping) or not isinstance(external_files, list):
         raise FinalizationError("finalization spec evidence inventory differs")
+    raw_skips = spec.get("strong_skips", [])
+    if not isinstance(raw_skips, list):
+        raise FinalizationError("finalization spec strong skips differ")
+    skips = []
+    for value in raw_skips:
+        if not isinstance(value, Mapping) or set(value) != {
+            "variant",
+            "status_path",
+        }:
+            raise FinalizationError("finalization spec strong skip is invalid")
+        variant = value.get("variant")
+        status_path = value.get("status_path")
+        if (
+            not isinstance(variant, str)
+            or not isinstance(status_path, str)
+            or not status_path
+        ):
+            raise FinalizationError("finalization spec strong skip is invalid")
+        skips.append(StrongSkip(variant=variant, status_path=Path(status_path)))
 
     def optional_path(name: str) -> Path | None:
         value = spec.get(name)
@@ -620,6 +657,7 @@ def load_finalization_inputs(spec_path: Path) -> FinalPackageInputs:
         ),
         full_training_directory=optional_path("full_training_directory"),
         full_evaluation_directory=optional_path("full_evaluation_directory"),
+        strong_skips=tuple(skips),
     )
 
 
@@ -640,7 +678,26 @@ def _strong_full_outputs(
 ) -> tuple[dict[str, object], dict[str, bytes]] | None:
     directory = study.full_directory
     if directory is None:
-        return None
+        if short_verdict.get("all_gates_pass") is True:
+            return None
+        status: dict[str, object] = {
+            "schema_version": 1,
+            "status": "gate_skipped",
+            "experiment": "rescene_strong_local_v1",
+            "variant": study.variant,
+            "reason": "short spatial gate did not authorize full training",
+            "upstream_gate": "STRONG_LOCAL_VERDICT",
+            "short_verdict_content_sha256": short_verdict["content_sha256"],
+        }
+        status["content_sha256"] = canonical_sha256(status)
+        return (
+            {
+                "variant": study.variant,
+                "status": "gate_skipped",
+                "content_sha256": status["content_sha256"],
+            },
+            {f"variants/{study.variant}/full/STATUS.json": _json_bytes(status)},
+        )
     if short_verdict.get("all_gates_pass") is not True:
         raise FinalizationError(
             "strong-local full result exists without short authorization"
@@ -731,6 +788,7 @@ def _strong_full_outputs(
     }
     result = {
         "variant": study.variant,
+        "status": "pass",
         "content_sha256": verdict["content_sha256"],
         "verdict": verdict["verdict"],
     }
@@ -739,22 +797,29 @@ def _strong_full_outputs(
 
 def aggregate_strong_outputs(
     studies: Sequence[StrongStudy],
+    skips: Sequence[StrongSkip] = (),
 ) -> dict[str, bytes]:
     """Merge independently signed strong-local outputs without duplicate baselines."""
 
     variants = [study.variant for study in studies]
+    skipped_variants = [skip.variant for skip in skips]
+    considered_variants = variants + skipped_variants
     if (
         not variants
         or len(variants) != len(set(variants))
         or any(variant not in STRONG_VARIANTS for variant in variants)
         or variants != sorted(variants, key=STRONG_VARIANTS.index)
         or variants[0] != "A1"
+        or len(considered_variants) != len(set(considered_variants))
+        or any(variant not in STRONG_VARIANTS for variant in skipped_variants)
+        or considered_variants != sorted(considered_variants, key=STRONG_VARIANTS.index)
     ):
         raise FinalizationError("strong-local studies differ from registered order")
 
     authorizations = []
     verdicts = []
     full_results = []
+    full_statuses = []
     curve_paths = []
     per_seed_paths = []
     source_outputs: dict[str, bytes] = {}
@@ -822,14 +887,53 @@ def aggregate_strong_outputs(
         )
         if full_result is not None:
             result, outputs = full_result
-            full_results.append(result)
+            if result["status"] == "pass":
+                full_results.append(result)
+            else:
+                full_statuses.append(result)
             source_outputs.update(outputs)
+
+    skip_records = []
+    for skip in skips:
+        payload = _load_json(skip.status_path, name=f"{skip.variant} skip")
+        _validate_signed(
+            payload,
+            field="content_sha256",
+            name=f"{skip.variant} skip",
+        )
+        gate = payload.get("gate")
+        evidence = payload.get("upstream_evidence")
+        if (
+            payload.get("status") != "gate_skipped"
+            or payload.get("experiment") != "rescene_strong_local_v1"
+            or payload.get("variant") != skip.variant
+            or not isinstance(gate, Mapping)
+            or gate.get("status") != "gate_skipped"
+            or gate.get("authorized") is not False
+            or not isinstance(gate.get("reason"), str)
+            or not gate["reason"]
+            or not isinstance(evidence, Mapping)
+            or not evidence
+        ):
+            raise FinalizationError("strong-local skipped variant binding differs")
+        skip_records.append(
+            {
+                "variant": skip.variant,
+                "content_sha256": payload["content_sha256"],
+                "reason": gate["reason"],
+                "file": _file_identity(skip.status_path),
+            }
+        )
+        source_outputs[f"variants/{skip.variant}/variant_manifest.json"] = (
+            _required_bytes(skip.status_path)
+        )
 
     manifest: dict[str, object] = {
         "schema_version": 1,
         "status": "pass",
         "experiment": "rescene_strong_local_v1",
         "authorizations": authorizations,
+        "skips": skip_records,
     }
     manifest["content_sha256"] = canonical_sha256(manifest)
     aggregate: dict[str, object] = {
@@ -837,6 +941,15 @@ def aggregate_strong_outputs(
         "status": "pass",
         "experiment": "rescene_strong_local_v1",
         "variants_run": variants,
+        "variants_considered": considered_variants,
+        "skipped_variants": [
+            {
+                "variant": record["variant"],
+                "content_sha256": record["content_sha256"],
+                "reason": record["reason"],
+            }
+            for record in skip_records
+        ],
         "full_training_authorized_variants": [
             verdict["variant"]
             for verdict in verdicts
@@ -844,6 +957,7 @@ def aggregate_strong_outputs(
         ],
         "selection_used_persist4d": False,
         "full_results": full_results,
+        "full_statuses": full_statuses,
         "results": [
             {
                 "variant": verdict["variant"],
@@ -870,6 +984,10 @@ def aggregate_strong_outputs(
         *[
             (f"- `{result['variant']}` full: `{result['verdict']}`")
             for result in full_results
+        ],
+        *[
+            f"- `{record['variant']}`: `SKIPPED` ({record['reason']})"
+            for record in skip_records
         ],
         "",
         "Persist4D metrics were not used for selection.",
