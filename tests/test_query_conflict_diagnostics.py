@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 import torch
 
+from utils.rescene_rootcause_diagnostic_runtime import RootCauseDiagnosticCollector
 from utils.rescene_rootcause_diagnostics import query_conflict_records
 
 
@@ -65,3 +66,26 @@ def test_query_conflicts_cover_every_prediction_layer() -> None:
         assert row["competed_active_query_fraction"] == pytest.approx(1 / 3)
         assert row["distinct_gt_covered_iou25"] == 2
     assert rows[-1]["feeds_next_attention"] is False
+
+
+def test_diagnostic_collector_captures_direct_system_forward() -> None:
+    class System(torch.nn.Module):
+        def __init__(self) -> None:
+            super().__init__()
+            self.model = torch.nn.Identity()
+
+        def forward(self, *, targets):
+            return _prediction()
+
+        def validation_step(self, batch, batch_idx):
+            return self.forward(targets=batch[1])
+
+    system = System()
+    collector = RootCauseDiagnosticCollector("query_conflicts")
+    collector.install(system)
+
+    batch = (None, [_target()], ["scene000"])
+    system.validation_step(batch, 0)
+
+    assert collector.sequence_count == 1
+    assert len(collector.rows) == 2
