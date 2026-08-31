@@ -72,7 +72,6 @@ def _write_curve(
         "val_mean_t-AP",
         "val_mean_t-AP_50",
         "val_mean_t-AP_25",
-        "val_loss",
     )
     with metrics.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
@@ -88,7 +87,6 @@ def _write_curve(
                     "val_mean_t-AP": 0.18 + epoch / 1000 + offset,
                     "val_mean_t-AP_50": 0.28 + epoch / 1000 + offset,
                     "val_mean_t-AP_25": 0.38 + epoch / 1000 + offset,
-                    "val_loss": 9.0 - epoch / 100,
                 }
             )
     (run / ".rootcause_candidate.json").write_text(

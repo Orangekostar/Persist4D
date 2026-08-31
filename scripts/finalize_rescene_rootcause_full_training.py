@@ -49,7 +49,6 @@ LEARNING_CURVE_FIELDS = (
     "train_log_step",
     *METRIC_NAMES,
     "SpatialStageMean",
-    "val_loss",
     "metrics_csv_sha256",
 )
 BEST_CHECKPOINT = re.compile(
@@ -152,7 +151,7 @@ def read_full_validation_trajectory(
         try:
             with path.open(encoding="utf-8", newline="") as handle:
                 reader = csv.DictReader(handle)
-                required = {"epoch", "step", "val_loss", *METRIC_FIELDS.values()}
+                required = {"epoch", "step", *METRIC_FIELDS.values()}
                 if reader.fieldnames is None or not required.issubset(
                     reader.fieldnames
                 ):
@@ -191,7 +190,6 @@ def read_full_validation_trajectory(
                 **metrics,
                 "SpatialStageMean": (metrics["stage1_mAP"] + metrics["stage2_mAP"])
                 / 2.0,
-                "val_loss": _number(source, "val_loss", unit_interval=False),
                 "metrics_csv_sha256": identity["sha256"],
             }
     if set(by_epoch) != set(VALIDATION_EPOCHS):

@@ -59,7 +59,6 @@ def _write_run(tmp_path, variant: str, *, offset: float = 0.0):
         "val_mean_t-AP",
         "val_mean_t-AP_50",
         "val_mean_t-AP_25",
-        "val_loss",
     )
     with metrics.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
@@ -75,7 +74,6 @@ def _write_run(tmp_path, variant: str, *, offset: float = 0.0):
                     "val_mean_t-AP": 0.1 + completed_epoch / 1000 + offset,
                     "val_mean_t-AP_50": 0.2 + completed_epoch / 1000 + offset,
                     "val_mean_t-AP_25": 0.3 + completed_epoch / 1000 + offset,
-                    "val_loss": 10.0 - completed_epoch / 100,
                 }
             )
     return run, metrics
