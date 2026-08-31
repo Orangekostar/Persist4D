@@ -1,0 +1,137 @@
+{
+  "attention_mask_recall": {
+    "allowed_gt_fraction_mean_all_layers": 0.7457667353612122,
+    "earliest_allowed_gt_fraction_mean": 0.055661157151657564,
+    "earliest_layer": 0,
+    "earliest_severe_recall_fraction": 0.9219185722253207,
+    "post_sample_reset_fraction_mean": 0.11151515151515151,
+    "row_count": 21516
+  },
+  "content_sha256": "b84c7cd95522b878cf966b07693bf08ddd2c0596d40d9fa9fa919824cef341de",
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "gates": {
+    "A1": {
+      "authorized": true,
+      "reason": "required first ReScene-native structural experiment after SD0"
+    },
+    "A2": {
+      "authorized": false,
+      "diagnostic_evidence_pass": true,
+      "status": "pending_A1_result"
+    },
+    "attention_relaxation_design": {
+      "implementation_authorized": false,
+      "supported": true
+    },
+    "query_competition_design": {
+      "implementation_authorized": false,
+      "supported": true
+    }
+  },
+  "provenance": {
+    "bindings": {
+      "checkpoint_manifest_sha256": "a19610228bea688db1e371f73259eb75b16fcec8853bef5a85792da8e56116b8",
+      "checkpoint_sha256": "cb41ff7c11c9df7008759ea62268552fc4207deb037e34f21dae66fea072882b",
+      "completed_epoch": 90,
+      "source_commit": "e02b7b6e02fc74e147505deafd3ed02d00b1c7ee",
+      "variant": "R1",
+      "variant_authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191"
+    },
+    "sources": {
+      "attention_mask_recall": {
+        "contract_sha256": "1b70071c439050069fccba727d8639dcd0f5bd2b6762b589501d1cd3f16a6fc8",
+        "csv": {
+          "bytes": 2090998,
+          "sha256": "7d1d5f2debaa32fcce354aa2164d3af8302f84a88b6387125cc5924312b96f1b"
+        },
+        "manifest": {
+          "bytes": 1338,
+          "sha256": "0c2640247fc440494fdd8833337ca358185d9658373182455bca05b6aff47b61"
+        },
+        "manifest_content_sha256": "d786b91b931840d614100d407e147a1481a6321795fa20ca772472905bad84c2"
+      },
+      "query_conflicts": {
+        "contract_sha256": "76dd80ee568362214d9b6b60bf91967f04587b6359b3219eb83b8e7837053cfc",
+        "csv": {
+          "bytes": 312684,
+          "sha256": "e8ab737f01c44b4c59081e98ba645b2e57ad20801bf01192f6524c0e75948a17"
+        },
+        "manifest": {
+          "bytes": 1326,
+          "sha256": "34c5bbce1c82a039ca4828bb6768f4ce0d07e5adb02cbdae356f6a2179500aeb"
+        },
+        "manifest_content_sha256": "8dccba7998df29a00e24107facf8d7a5a9169720bb286e4f5b57a26f8abde0fc"
+      },
+      "query_initialization": {
+        "contract_sha256": "e2944d94ba029160b730aa849fb0eb9a3c877404ff1115dbd98d7e81b04f36a9",
+        "csv": {
+          "bytes": 155393,
+          "sha256": "88e7724f3a97f944bf6fe53e9712bf7ffeb169df77f9034d2b6ac97e88579fce"
+        },
+        "manifest": {
+          "bytes": 1355,
+          "sha256": "687419465cfc78cf60e2a52facd8684c3cf8ca8ae284466e7d2295ce451b7970"
+        },
+        "manifest_content_sha256": "da21b05035469a7ab4a957f6ef817fbfee85742205bf34d236a060c26cd53d31"
+      },
+      "superpoint_features": {
+        "contract_sha256": "7bb30626b57328e07ef5437357a97137d67dd22c3689b51d9d378601cd16aff2",
+        "csv": {
+          "bytes": 184941,
+          "sha256": "2620bd0544780d12afa23cc18610a0a2c21827bcf215ba62c3e490f5d476c841"
+        },
+        "manifest": {
+          "bytes": 1374,
+          "sha256": "8639721ab8b8b05c0345d065c47e8ba5182c82d3674a85af9dbb91bd2b137903"
+        },
+        "manifest_content_sha256": "1842a36511b36e782faf93aa5c946d3d5288580ae779a152705fe08b27a4c1dc"
+      }
+    }
+  },
+  "query_conflicts": {
+    "attention_feeding_row_count": 1848,
+    "competed_active_query_fraction_mean": 0.8235045625740549,
+    "competing_query_pairwise_iou_mean": 0.6620520193117638,
+    "gt_coverage_iou25_mean": 0.809964463697319,
+    "gt_coverage_iou50_mean": 0.65165698286791,
+    "mean_queries_per_gt_iou25_mean": 8.14773367783982,
+    "query_utilization_iou25_mean": 0.6576190476190477,
+    "row_count": 2002
+  },
+  "query_initialization": {
+    "background_query_fraction_mean": 0.6507792205779583,
+    "foreground_query_fraction_mean": 0.3492207777045377,
+    "gt_instance_count": 1793,
+    "gt_instance_coverage_mean": 0.7890519025650892,
+    "large_ge1000_coverage": 0.8814814814814815,
+    "large_ge1000_instance_count": 1080,
+    "medium_100_999_coverage": 0.5821596244131455,
+    "medium_100_999_instance_count": 639,
+    "query_content_norm_mean": 0.0,
+    "query_content_zero_fraction_mean": 1.0,
+    "scene_count": 154,
+    "small_lt100_coverage": 0.08108108108108109,
+    "small_lt100_instance_count": 74
+  },
+  "schema_version": 1,
+  "status": "pass",
+  "superpoint_features": {
+    "gt_instance_count": 1793,
+    "gt_instances_per_segment_mean": 0.9999999948805827,
+    "nearest_margin_mean": 0.17591446366709618,
+    "nearest_margin_p25": 0.05085533857345581,
+    "segment_purity_mean": 0.9999999948805827,
+    "segments_per_gt_mean": 105.07640825432236,
+    "within_variance_mean": 0.06645896521706104
+  },
+  "thresholds": {
+    "attention_reset_fraction_frequent": 0.1,
+    "early_attention_allowed_fraction_low": 0.5,
+    "early_attention_severe_fraction": 0.25,
+    "early_attention_severe_recall": 0.25,
+    "query_competed_fraction_substantial": 0.25,
+    "query_count_per_gt_substantial": 2.0,
+    "superpoint_nearest_margin_weak": 0.1,
+    "superpoint_within_variance_poor": 0.05
+  }
+}
