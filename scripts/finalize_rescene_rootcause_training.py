@@ -221,10 +221,15 @@ def _validate_infeasible_variants(
     initialization = authorization["initialization"]
     for variant, path in infeasible_variants.items():
         payload = _load_json(path, name="runtime infeasibility record")
+        reason_code = payload.get("reason_code")
+        if reason_code not in {
+            "full_dataset_cuda_oom",
+            "deterministic_nonfinite_objective",
+        }:
+            raise RootCauseEvaluationError("runtime infeasibility reason differs")
         expected = {
             "status": "infeasible",
             "variant": variant,
-            "reason_code": "full_dataset_cuda_oom",
             "variant_authorization_sha256": authorization["authorization_sha256"],
             "config_sha256": variants[variant]["config_sha256"],
             "common_initialization_sha256": initialization["common_state"]["sha256"],
@@ -246,19 +251,39 @@ def _validate_infeasible_variants(
             raise RootCauseEvaluationError("runtime infeasibility record is incomplete")
         sources[f"{variant}/INFEASIBLE.json"] = _file_identity(path)
         evidence_root = path.resolve().parent.parent
-        allocators: set[str] = set()
+        attempt_ids: set[str] = set()
+        if reason_code == "deterministic_nonfinite_objective":
+            failed_rank = payload.get("failed_rank")
+            objective_term = payload.get("objective_term")
+            failed_file_names = payload.get("failed_file_names")
+            if (
+                not isinstance(failed_rank, int)
+                or failed_rank < 0
+                or not isinstance(objective_term, str)
+                or not objective_term
+                or not isinstance(failed_file_names, list)
+                or not failed_file_names
+                or any(not isinstance(name, str) or not name for name in failed_file_names)
+            ):
+                raise RootCauseEvaluationError(
+                    "runtime non-finite evidence is incomplete"
+                )
         for index, attempt in enumerate(attempts, start=1):
             if not isinstance(attempt, Mapping):
                 raise RootCauseEvaluationError("runtime infeasibility attempt is invalid")
-            allocator = attempt.get("allocator")
+            attempt_id = attempt.get(
+                "allocator"
+                if reason_code == "full_dataset_cuda_oom"
+                else "attempt_id"
+            )
             relative = attempt.get("evidence")
             if (
-                not isinstance(allocator, str)
-                or allocator in allocators
+                not isinstance(attempt_id, str)
+                or attempt_id in attempt_ids
                 or not isinstance(relative, str)
             ):
                 raise RootCauseEvaluationError("runtime infeasibility attempt is invalid")
-            allocators.add(allocator)
+            attempt_ids.add(attempt_id)
             evidence = (evidence_root / relative).resolve()
             try:
                 evidence.relative_to(evidence_root)
@@ -289,6 +314,17 @@ def _validate_infeasible_variants(
                 raise RootCauseEvaluationError(
                     "runtime infeasibility evidence binding differs"
                 )
+            if reason_code == "deterministic_nonfinite_objective" and (
+                failure.get("failure_kind") != "nonfinite_objective"
+                or failure.get("objective_term") != objective_term
+                or failure.get("failed_rank") != failed_rank
+                or failure.get("failed_file_names") != failed_file_names
+                or not isinstance(failure.get("completed_epoch"), int)
+                or failure["completed_epoch"] < 0
+            ):
+                raise RootCauseEvaluationError(
+                    "runtime non-finite evidence binding differs"
+                )
             prefix = f"{variant}/attempt{index}"
             sources[f"{prefix}/FAILURE.json"] = _file_identity(evidence)
             sources[f"{prefix}/.rootcause_candidate.json"] = _file_identity(
@@ -297,7 +333,7 @@ def _validate_infeasible_variants(
             sources[f"{prefix}/{variant}.launch.log"] = launch_identity
         records[variant] = {
             "candidate_id": candidate_id,
-            "reason_code": expected["reason_code"],
+            "reason_code": reason_code,
         }
     return records, sources
 

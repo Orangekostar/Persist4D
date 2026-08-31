@@ -243,6 +243,78 @@ def _write_infeasible(
     return path
 
 
+def _write_nonfinite_infeasible(
+    root: Path,
+    variant: str,
+    authorization: dict[str, object],
+) -> Path:
+    candidate = _candidate(variant, authorization)
+    failed_file_names = [
+        "scene0433_01-scene0433_03",
+        "scene0433_03-scene0433_00",
+    ]
+    attempts = []
+    for index in (1, 2):
+        relative = Path("failed_attempts") / f"{variant}_attempt{index}"
+        attempt_root = root / relative
+        attempt_root.mkdir(parents=True)
+        log = (
+            f"{variant} batch=412 non-finite raw objective term 'loss_ce'\n"
+        ).encode("ascii")
+        (attempt_root / f"{variant}.launch.log").write_bytes(log)
+        (attempt_root / ".rootcause_candidate.json").write_text(
+            json.dumps(candidate), encoding="utf-8"
+        )
+        failure = {
+            "schema_version": 1,
+            "status": "failed",
+            "variant": variant,
+            "candidate_id": candidate["candidate_id"],
+            "config_sha256": candidate["config_sha256"],
+            "common_initialization_sha256": candidate[
+                "common_initialization_sha256"
+            ],
+            "completed_epoch": 2,
+            "failed_batch_index": 412,
+            "failed_rank": 1,
+            "failed_file_names": failed_file_names,
+            "failure_kind": "nonfinite_objective",
+            "objective_term": "loss_ce",
+            "launch_log_sha256": hashlib.sha256(log).hexdigest(),
+        }
+        evidence = attempt_root / "FAILURE.json"
+        evidence.write_text(json.dumps(failure), encoding="utf-8")
+        attempts.append(
+            {
+                "attempt_id": f"same_authorized_config_{index}",
+                "evidence": relative.joinpath("FAILURE.json").as_posix(),
+                "launch_log_sha256": failure["launch_log_sha256"],
+            }
+        )
+    payload = {
+        "schema_version": 1,
+        "status": "infeasible",
+        "variant": variant,
+        "reason_code": "deterministic_nonfinite_objective",
+        "variant_authorization_sha256": authorization["authorization_sha256"],
+        "candidate_id": candidate["candidate_id"],
+        "config_sha256": candidate["config_sha256"],
+        "common_initialization_sha256": candidate[
+            "common_initialization_sha256"
+        ],
+        "failed_batch_index": 412,
+        "failed_rank": 1,
+        "failed_file_names": failed_file_names,
+        "objective_term": "loss_ce",
+        "attempts": attempts,
+        "replacement_variant": None,
+    }
+    path = root / variant / "INFEASIBLE.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
 def test_short_finalization_builds_required_outputs_and_selects_one(tmp_path) -> None:
     authorization, runs, evaluation_root = _study(tmp_path)
 
@@ -338,6 +410,51 @@ def test_runtime_infeasible_evidence_resolves_from_symlinked_variant_root(
 
     assert records["R2"]["reason_code"] == "full_dataset_cuda_oom"
     assert len(sources) == 7
+
+
+def test_short_finalization_accepts_two_distinct_runtime_infeasibility_modes(
+    tmp_path: Path,
+) -> None:
+    authorization = _authorization(("R0", "R1", "R2", "R4"))
+    records, sources = _validate_infeasible_variants(
+        infeasible_variants={
+            "R2": _write_infeasible(tmp_path, "R2", authorization),
+            "R4": _write_nonfinite_infeasible(tmp_path, "R4", authorization),
+        },
+        authorization=authorization,
+    )
+
+    assert records == {
+        "R2": {
+            "candidate_id": _candidate("R2", authorization)["candidate_id"],
+            "reason_code": "full_dataset_cuda_oom",
+        },
+        "R4": {
+            "candidate_id": _candidate("R4", authorization)["candidate_id"],
+            "reason_code": "deterministic_nonfinite_objective",
+        },
+    }
+    assert len(sources) == 14
+
+
+def test_nonfinite_infeasibility_rejects_attempt_semantic_mismatch(
+    tmp_path: Path,
+) -> None:
+    authorization = _authorization(("R0", "R1", "R4"))
+    record = _write_nonfinite_infeasible(tmp_path, "R4", authorization)
+    evidence = tmp_path / "failed_attempts/R4_attempt2/FAILURE.json"
+    failure = json.loads(evidence.read_text(encoding="utf-8"))
+    failure["objective_term"] = "loss_mask"
+    evidence.write_text(json.dumps(failure), encoding="utf-8")
+
+    with pytest.raises(
+        RootCauseEvaluationError,
+        match="non-finite evidence binding differs",
+    ):
+        _validate_infeasible_variants(
+            infeasible_variants={"R4": record},
+            authorization=authorization,
+        )
 
 
 def test_short_finalization_rejects_manifest_or_run_rebinding(tmp_path) -> None:
