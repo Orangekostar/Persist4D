@@ -128,7 +128,7 @@ class RootCauseDiagnosticCollector:
         model = system.model
         original_validation_step = system.validation_step
 
-        def validation_step(batch: Any, batch_index: int) -> Any:
+        def validation_step(batch: Any, batch_idx: int) -> Any:
             if (
                 not isinstance(batch, (tuple, list))
                 or len(batch) != 3
@@ -138,7 +138,7 @@ class RootCauseDiagnosticCollector:
             self._file_names = tuple(str(name) for name in batch[2])
             self._initial_queries = []
             self._reset_layers = []
-            return original_validation_step(batch, batch_index)
+            return original_validation_step(batch, batch_idx)
 
         system.validation_step = validation_step
 
@@ -207,7 +207,14 @@ class RootCauseDiagnosticCollector:
 
             model.sample_and_batch_features = sample_and_batch_features
 
-        system.register_forward_hook(self._forward_hook, with_kwargs=True)
+        original_forward = system.forward
+
+        def forward(*args: Any, **kwargs: Any) -> Any:
+            output = original_forward(*args, **kwargs)
+            self._forward_hook(system, args, kwargs, output)
+            return output
+
+        system.forward = forward
 
     def _forward_hook(
         self,

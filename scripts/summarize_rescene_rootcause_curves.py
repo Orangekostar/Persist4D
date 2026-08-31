@@ -37,7 +37,6 @@ CSV_FIELDS = (
     "train_log_step",
     *METRIC_FIELDS,
     "SpatialStageMean",
-    "val_loss",
     "candidate_id",
     "config_sha256",
     "variant_authorization_sha256",
@@ -139,7 +138,7 @@ def _validation_rows(
                     raise RootCauseEvaluationError(
                         "learning-curve CSV has no header"
                     )
-                required = {"epoch", "step", "val_loss", *METRIC_FIELDS.values()}
+                required = {"epoch", "step", *METRIC_FIELDS.values()}
                 if not required.issubset(reader.fieldnames):
                     raise RootCauseEvaluationError(
                         "learning-curve CSV schema differs"
@@ -228,7 +227,6 @@ def summarize_learning_curves(
                     "train_log_step": train_log_step,
                     **metrics,
                     "SpatialStageMean": spatial,
-                    "val_loss": _number(source, "val_loss", unit_interval=False),
                     "candidate_id": candidate["candidate_id"],
                     "config_sha256": candidate["config_sha256"],
                     "variant_authorization_sha256": candidate[

@@ -78,7 +78,6 @@ def _root_curves(path: Path) -> None:
                     "t_mAP50": 0.28 + epoch / 1000,
                     "t_mAP25": 0.38 + epoch / 1000,
                     "SpatialStageMean": 0.21 + epoch / 1000,
-                    "val_loss": 10.0 - epoch / 100,
                     "candidate_id": "1" * 64,
                     "config_sha256": "2" * 64,
                     "variant_authorization_sha256": "3" * 64,
@@ -178,7 +177,6 @@ def _strong_curve(root: Path, authorization: dict[str, object]) -> Path:
         "val_mean_t-AP",
         "val_mean_t-AP_50",
         "val_mean_t-AP_25",
-        "val_loss",
     )
     with metrics_path.open("w", encoding="ascii", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
@@ -194,7 +192,6 @@ def _strong_curve(root: Path, authorization: dict[str, object]) -> Path:
                     "val_mean_t-AP": 0.195 + epoch / 1000,
                     "val_mean_t-AP_50": 0.295 + epoch / 1000,
                     "val_mean_t-AP_25": 0.395 + epoch / 1000,
-                    "val_loss": 9.0 - epoch / 100,
                 }
             )
     (run / ".rootcause_candidate.json").write_text(

@@ -21,7 +21,6 @@ def _write_metrics(path, epochs) -> None:
     fields = (
         "epoch",
         "step",
-        "val_loss",
         "val_mean_stage1-AP",
         "val_mean_stage2-AP",
         "val_mean_AP",
@@ -38,7 +37,6 @@ def _write_metrics(path, epochs) -> None:
                 {
                     "epoch": completed_epoch - 1,
                     "step": completed_epoch * 66 - 1,
-                    "val_loss": 5.0,
                     "val_mean_stage1-AP": 0.30,
                     "val_mean_stage2-AP": 0.32,
                     "val_mean_AP": 0.36,

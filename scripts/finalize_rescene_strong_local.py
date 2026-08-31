@@ -155,7 +155,6 @@ def _strong_curve_rows(
                 "train_log_step": train_log_step,
                 **metrics,
                 "SpatialStageMean": spatial[completed_epoch],
-                "val_loss": _number(source, "val_loss", unit_interval=False),
                 "candidate_id": candidate["candidate_id"],
                 "config_sha256": candidate["config_sha256"],
                 "variant_authorization_sha256": candidate[
