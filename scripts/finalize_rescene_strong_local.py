@@ -27,6 +27,7 @@ from scripts.summarize_rescene_rootcause_curves import (
 from scripts.summarize_rescene_rootcause_curves import (
     METRIC_FIELDS,
     VALIDATION_EPOCHS,
+    _metrics_version,
     _number,
     _validation_rows,
 )
@@ -122,9 +123,13 @@ def _strong_curve_rows(
     validate_candidate_binding(
         variant=variant, authorization=authorization, candidate=candidate
     )
-    metrics_path = run_directory / "local_metrics/version_0/metrics.csv"
-    validation_rows = _validation_rows(metrics_path)
-    identity = _stable_file_identity(metrics_path)
+    metrics_paths = sorted(
+        run_directory.glob("local_metrics/version_*/metrics.csv"),
+        key=_metrics_version,
+    )
+    validation_rows, identities_by_epoch, metric_sources = _validation_rows(
+        metrics_paths
+    )
     rows = []
     spatial = {}
     for completed_epoch in VALIDATION_EPOCHS:
@@ -156,7 +161,9 @@ def _strong_curve_rows(
                 "variant_authorization_sha256": candidate[
                     "variant_authorization_sha256"
                 ],
-                "metrics_csv_sha256": identity["sha256"],
+                "metrics_csv_sha256": identities_by_epoch[completed_epoch][
+                    "sha256"
+                ],
             }
         )
     return (
@@ -164,7 +171,7 @@ def _strong_curve_rows(
         spatial,
         {
             "candidate": _stable_file_identity(candidate_path),
-            "metrics": identity,
+            "metrics": metric_sources,
         },
     )
 

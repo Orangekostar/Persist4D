@@ -294,6 +294,39 @@ def test_strong_finalization_authorizes_full_run_from_exact_spatial_gate(
     assert outputs["official_like_per_seed.csv"].count(b"\n") == 13
 
 
+def test_strong_finalization_joins_resumed_logger_versions(tmp_path) -> None:
+    authorization, decision, curves, epoch60, epoch90, run, evaluation = _study(
+        tmp_path
+    )
+    original = run / "local_metrics/version_0/metrics.csv"
+    rows = list(csv.DictReader(original.open(encoding="ascii")))
+    fields = tuple(rows[0])
+    original.unlink()
+    for version, selected in enumerate((rows[:2], rows[2:])):
+        path = run / f"local_metrics/version_{version}/metrics.csv"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("w", encoding="ascii", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=fields)
+            writer.writeheader()
+            writer.writerows(selected)
+
+    outputs = build_strong_outputs(
+        authorization_path=authorization,
+        root_decision_path=decision,
+        root_learning_curves_path=curves,
+        root_epoch60_path=epoch60,
+        root_epoch90_path=epoch90,
+        run_directory=run,
+        evaluation_root=evaluation,
+    )
+
+    provenance = json.loads(outputs["STRONG_LOCAL_PROVENANCE.json"])
+    assert set(provenance["strong_curve_sources"]["metrics"]) == {
+        "local_metrics/version_0/metrics.csv",
+        "local_metrics/version_1/metrics.csv",
+    }
+
+
 def test_strong_finalization_rejects_rebound_root_evidence(tmp_path) -> None:
     authorization, decision, curves, epoch60, epoch90, run, evaluation = _study(
         tmp_path

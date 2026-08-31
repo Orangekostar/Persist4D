@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+from pathlib import Path
 
 import pytest
 
@@ -80,6 +81,20 @@ def _write_run(tmp_path, variant: str, *, offset: float = 0.0):
     return run, metrics
 
 
+def _split_metrics(metrics: Path, groups: tuple[tuple[int, ...], ...]) -> None:
+    rows = list(csv.DictReader(metrics.open(encoding="utf-8")))
+    fieldnames = tuple(rows[0])
+    by_epoch = {int(row["epoch"]) + 1: row for row in rows}
+    metrics.unlink()
+    for version, epochs in enumerate(groups):
+        path = metrics.parents[1] / f"version_{version}" / "metrics.csv"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(by_epoch[epoch] for epoch in epochs)
+
+
 def test_learning_curve_summary_requires_exact_standard_checkpoints(tmp_path) -> None:
     authorization = _authorization()
     authorization_path = tmp_path / "authorization.json"
@@ -104,6 +119,58 @@ def test_learning_curve_summary_requires_exact_standard_checkpoints(tmp_path) ->
     assert result["rows"][-1]["SpatialStageMean"] == pytest.approx(0.36)
     assert result["validation_leads"]["R1"] == {75: True, 90: True}
     assert len(result["sources"]["R0"]["metrics_csv_sha256"]) == 64
+
+
+def test_learning_curve_summary_joins_exact_resume_logger_versions(tmp_path) -> None:
+    authorization = _authorization()
+    authorization_path = tmp_path / "authorization.json"
+    authorization_path.write_text(json.dumps(authorization), encoding="utf-8")
+    runs = {}
+    for variant, offset in (("R0", 0.0), ("R1", 0.02)):
+        run, metrics = _write_run(tmp_path, variant, offset=offset)
+        if variant == "R1":
+            _split_metrics(metrics, ((15,), (30,), (45, 60, 75, 90)))
+        (run / ".rootcause_candidate.json").write_text(
+            json.dumps(_candidate(variant, authorization)), encoding="utf-8"
+        )
+        runs[variant] = run
+
+    result = summarize_learning_curves(
+        run_directories=runs,
+        authorization_path=authorization_path,
+    )
+
+    r1_rows = [row for row in result["rows"] if row["variant"] == "R1"]
+    assert [row["completed_epoch"] for row in r1_rows] == list(VALIDATION_EPOCHS)
+    assert len({row["metrics_csv_sha256"] for row in r1_rows}) == 3
+    assert set(result["sources"]["R1"]["metrics_csv_sources"]) == {
+        "local_metrics/version_0/metrics.csv",
+        "local_metrics/version_1/metrics.csv",
+        "local_metrics/version_2/metrics.csv",
+    }
+
+
+def test_learning_curve_summary_rejects_duplicate_resume_boundary(tmp_path) -> None:
+    authorization = _authorization()
+    authorization_path = tmp_path / "authorization.json"
+    authorization_path.write_text(json.dumps(authorization), encoding="utf-8")
+    run, metrics = _write_run(tmp_path, "R0")
+    (run / ".rootcause_candidate.json").write_text(
+        json.dumps(_candidate("R0", authorization)), encoding="utf-8"
+    )
+    duplicate = metrics.parents[1] / "version_1" / "metrics.csv"
+    duplicate.parent.mkdir(parents=True)
+    rows = list(csv.DictReader(metrics.open(encoding="utf-8")))
+    with duplicate.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=tuple(rows[0]))
+        writer.writeheader()
+        writer.writerow(rows[0])
+
+    with pytest.raises(RootCauseEvaluationError, match="duplicate validation"):
+        summarize_learning_curves(
+            run_directories={"R0": run},
+            authorization_path=authorization_path,
+        )
 
 
 def test_learning_curve_summary_rejects_missing_or_stale_rows(tmp_path) -> None:

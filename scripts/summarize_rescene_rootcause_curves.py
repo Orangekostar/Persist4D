@@ -96,34 +96,77 @@ def _number(row: Mapping[str, str], field: str, *, unit_interval: bool) -> float
     return value
 
 
-def _validation_rows(metrics_path: Path) -> dict[int, dict[str, str]]:
+def _metrics_version(path: Path) -> int:
+    name = path.parent.name
+    if not name.startswith("version_"):
+        raise RootCauseEvaluationError("learning-curve logger version is invalid")
     try:
-        with metrics_path.open(encoding="utf-8", newline="") as handle:
-            reader = csv.DictReader(handle)
-            if reader.fieldnames is None:
-                raise RootCauseEvaluationError("learning-curve CSV has no header")
-            required = {"epoch", "step", "val_loss", *METRIC_FIELDS.values()}
-            if not required.issubset(reader.fieldnames):
-                raise RootCauseEvaluationError("learning-curve CSV schema differs")
-            rows = [
-                dict(row)
-                for row in reader
-                if row.get("val_mean_stage1-AP") not in (None, "")
-            ]
-    except OSError as error:
-        raise RootCauseEvaluationError("learning-curve CSV is unreadable") from error
+        version = int(name.removeprefix("version_"))
+    except ValueError as error:
+        raise RootCauseEvaluationError(
+            "learning-curve logger version is invalid"
+        ) from error
+    if version < 0:
+        raise RootCauseEvaluationError("learning-curve logger version is invalid")
+    return version
+
+
+def _validation_rows(
+    metrics_paths: Sequence[Path],
+) -> tuple[
+    dict[int, dict[str, str]],
+    dict[int, dict[str, object]],
+    dict[str, dict[str, object]],
+]:
+    if not metrics_paths:
+        raise RootCauseEvaluationError("learning-curve CSV is unreadable")
     by_epoch: dict[int, dict[str, str]] = {}
-    try:
+    identities_by_epoch: dict[int, dict[str, object]] = {}
+    sources: dict[str, dict[str, object]] = {}
+    versions: set[int] = set()
+    for metrics_path in metrics_paths:
+        version = _metrics_version(metrics_path)
+        if version in versions:
+            raise RootCauseEvaluationError("duplicate learning-curve logger version")
+        versions.add(version)
+        identity = _file_identity(metrics_path)
+        source_name = Path(*metrics_path.parts[-3:]).as_posix()
+        sources[source_name] = identity
+        try:
+            with metrics_path.open(encoding="utf-8", newline="") as handle:
+                reader = csv.DictReader(handle)
+                if reader.fieldnames is None:
+                    raise RootCauseEvaluationError(
+                        "learning-curve CSV has no header"
+                    )
+                required = {"epoch", "step", "val_loss", *METRIC_FIELDS.values()}
+                if not required.issubset(reader.fieldnames):
+                    raise RootCauseEvaluationError(
+                        "learning-curve CSV schema differs"
+                    )
+                rows = [
+                    dict(row)
+                    for row in reader
+                    if row.get("val_mean_stage1-AP") not in (None, "")
+                ]
+        except OSError as error:
+            raise RootCauseEvaluationError(
+                "learning-curve CSV is unreadable"
+            ) from error
         for row in rows:
-            completed_epoch = int(row["epoch"]) + 1
+            try:
+                completed_epoch = int(row["epoch"]) + 1
+            except (TypeError, ValueError) as error:
+                raise RootCauseEvaluationError(
+                    "validation epoch is invalid"
+                ) from error
             if completed_epoch in by_epoch:
                 raise RootCauseEvaluationError("duplicate validation checkpoint")
             by_epoch[completed_epoch] = row
-    except (TypeError, ValueError) as error:
-        raise RootCauseEvaluationError("validation epoch is invalid") from error
+            identities_by_epoch[completed_epoch] = identity
     if set(by_epoch) != set(VALIDATION_EPOCHS):
         raise RootCauseEvaluationError("standard validation checkpoints differ")
-    return by_epoch
+    return by_epoch, identities_by_epoch, sources
 
 
 def summarize_learning_curves(
@@ -154,9 +197,13 @@ def summarize_learning_curves(
         validate_candidate_binding(
             variant=variant, authorization=authorization, candidate=candidate
         )
-        metrics_path = run_directory / "local_metrics/version_0/metrics.csv"
-        identity = _file_identity(metrics_path)
-        validation_rows = _validation_rows(metrics_path)
+        metrics_paths = sorted(
+            run_directory.glob("local_metrics/version_*/metrics.csv"),
+            key=_metrics_version,
+        )
+        validation_rows, identities_by_epoch, metric_sources = _validation_rows(
+            metrics_paths
+        )
         spatial_by_variant[variant] = {}
         for completed_epoch in VALIDATION_EPOCHS:
             source = validation_rows[completed_epoch]
@@ -187,13 +234,23 @@ def summarize_learning_curves(
                     "variant_authorization_sha256": candidate[
                         "variant_authorization_sha256"
                     ],
-                    "metrics_csv_sha256": identity["sha256"],
+                    "metrics_csv_sha256": identities_by_epoch[completed_epoch][
+                        "sha256"
+                    ],
                 }
             )
+        aggregate_sha256 = (
+            next(iter(metric_sources.values()))["sha256"]
+            if len(metric_sources) == 1
+            else canonical_sha256(metric_sources)
+        )
         sources[variant] = {
             "candidate_id": candidate["candidate_id"],
-            "metrics_csv_bytes": identity["bytes"],
-            "metrics_csv_sha256": identity["sha256"],
+            "metrics_csv_bytes": sum(
+                int(identity["bytes"]) for identity in metric_sources.values()
+            ),
+            "metrics_csv_sha256": aggregate_sha256,
+            "metrics_csv_sources": metric_sources,
         }
     control = spatial_by_variant["R0"]
     validation_leads = {
