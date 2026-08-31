@@ -32,6 +32,7 @@ from utils.rescene_rootcause_evaluation import (
     RootCauseEvaluationError,
     decide_full_candidate,
     summarize_epoch_runs,
+    validate_candidate_binding,
     validate_checkpoint_manifest_binding,
 )
 from utils.rescene_rootcause_preflight import canonical_sha256
@@ -201,7 +202,104 @@ def _decision_markdown(decision: Mapping[str, Any]) -> bytes:
                 "",
             ]
         )
+    if decision["infeasible_variants"]:
+        lines.extend(["## Runtime-Infeasible Variants", ""])
+        for variant, record in decision["infeasible_variants"].items():
+            lines.append(f"- `{variant}`: `{record['reason_code']}`")
+        lines.append("")
     return ("\n".join(lines).rstrip() + "\n").encode("ascii")
+
+
+def _validate_infeasible_variants(
+    *,
+    infeasible_variants: Mapping[str, Path],
+    authorization: Mapping[str, Any],
+) -> tuple[dict[str, dict[str, str]], dict[str, dict[str, object]]]:
+    records: dict[str, dict[str, str]] = {}
+    sources: dict[str, dict[str, object]] = {}
+    variants = authorization["variants"]
+    initialization = authorization["initialization"]
+    for variant, path in infeasible_variants.items():
+        payload = _load_json(path, name="runtime infeasibility record")
+        expected = {
+            "status": "infeasible",
+            "variant": variant,
+            "reason_code": "full_dataset_cuda_oom",
+            "variant_authorization_sha256": authorization["authorization_sha256"],
+            "config_sha256": variants[variant]["config_sha256"],
+            "common_initialization_sha256": initialization["common_state"]["sha256"],
+            "replacement_variant": None,
+        }
+        if any(payload.get(key) != value for key, value in expected.items()):
+            raise RootCauseEvaluationError("runtime infeasibility binding differs")
+        candidate_id = payload.get("candidate_id")
+        failed_batch_index = payload.get("failed_batch_index")
+        attempts = payload.get("attempts")
+        if (
+            not isinstance(candidate_id, str)
+            or len(candidate_id) != 64
+            or not isinstance(failed_batch_index, int)
+            or failed_batch_index < 0
+            or not isinstance(attempts, list)
+            or len(attempts) < 2
+        ):
+            raise RootCauseEvaluationError("runtime infeasibility record is incomplete")
+        sources[f"{variant}/INFEASIBLE.json"] = _file_identity(path)
+        evidence_root = path.resolve().parent.parent
+        allocators: set[str] = set()
+        for index, attempt in enumerate(attempts, start=1):
+            if not isinstance(attempt, Mapping):
+                raise RootCauseEvaluationError("runtime infeasibility attempt is invalid")
+            allocator = attempt.get("allocator")
+            relative = attempt.get("evidence")
+            if (
+                not isinstance(allocator, str)
+                or allocator in allocators
+                or not isinstance(relative, str)
+            ):
+                raise RootCauseEvaluationError("runtime infeasibility attempt is invalid")
+            allocators.add(allocator)
+            evidence = (evidence_root / relative).resolve()
+            try:
+                evidence.relative_to(evidence_root)
+            except ValueError as error:
+                raise RootCauseEvaluationError(
+                    "runtime infeasibility evidence escapes its root"
+                ) from error
+            failure = _load_json(evidence, name="runtime failure evidence")
+            candidate_path = evidence.parent / ".rootcause_candidate.json"
+            candidate = _load_json(candidate_path, name="failed candidate record")
+            validate_candidate_binding(
+                variant=variant, authorization=authorization, candidate=candidate
+            )
+            launch_log = evidence.parent / f"{variant}.launch.log"
+            launch_identity = _file_identity(launch_log)
+            if (
+                failure.get("status") != "failed"
+                or failure.get("variant") != variant
+                or failure.get("candidate_id") != candidate_id
+                or failure.get("candidate_id") != candidate.get("candidate_id")
+                or failure.get("config_sha256") != expected["config_sha256"]
+                or failure.get("common_initialization_sha256")
+                != expected["common_initialization_sha256"]
+                or failure.get("failed_batch_index") != failed_batch_index
+                or failure.get("launch_log_sha256") != launch_identity["sha256"]
+                or attempt.get("launch_log_sha256") != launch_identity["sha256"]
+            ):
+                raise RootCauseEvaluationError(
+                    "runtime infeasibility evidence binding differs"
+                )
+            prefix = f"{variant}/attempt{index}"
+            sources[f"{prefix}/FAILURE.json"] = _file_identity(evidence)
+            sources[f"{prefix}/.rootcause_candidate.json"] = _file_identity(
+                candidate_path
+            )
+            sources[f"{prefix}/{variant}.launch.log"] = launch_identity
+        records[variant] = {
+            "candidate_id": candidate_id,
+            "reason_code": expected["reason_code"],
+        }
+    return records, sources
 
 
 def _evaluation_matrix(
@@ -263,18 +361,35 @@ def _evaluation_matrix(
 def build_short_curve_outputs(
     *,
     run_directories: Mapping[str, Path],
+    infeasible_variants: Mapping[str, Path] | None = None,
     authorization_path: Path,
     evaluation_root: Path,
 ) -> dict[str, bytes]:
     """Validate all RC3 evidence and render immutable compact outputs."""
 
     variants = tuple(run_directories)
+    infeasible_variants = infeasible_variants or {}
     if not variants or variants[0] != "R0" or len(variants) != len(set(variants)):
         raise RootCauseEvaluationError("variants must be unique and start with R0")
     authorization = _load_json(authorization_path, name="variant authorization")
     _validate_authorization(authorization)
-    if list(variants) != authorization.get("selected_variants"):
+    authorized_variants = authorization.get("selected_variants")
+    if not isinstance(authorized_variants, list):
+        raise RootCauseEvaluationError("variant authorization is invalid")
+    resolved_variants = set(variants) | set(infeasible_variants)
+    if (
+        set(variants) & set(infeasible_variants)
+        or resolved_variants != set(authorized_variants)
+        or [variant for variant in authorized_variants if variant in run_directories]
+        != list(variants)
+        or "R0" in infeasible_variants
+    ):
         raise RootCauseEvaluationError("finalized variants differ from authorization")
+
+    infeasible_records, infeasible_sources = _validate_infeasible_variants(
+        infeasible_variants=infeasible_variants,
+        authorization=authorization,
+    )
 
     curves = summarize_learning_curves(
         run_directories=run_directories,
@@ -302,6 +417,8 @@ def build_short_curve_outputs(
         if selected is not None
         else "gate_skipped",
         "validation_leads": curves["validation_leads"],
+        "completed_variants": list(variants),
+        "infeasible_variants": infeasible_records,
         "contract_integrity": contract_integrity,
         "epoch60_summary": summaries[60],
         "epoch90_summary": summaries[90],
@@ -328,6 +445,7 @@ def build_short_curve_outputs(
         "variant_authorization_sha256": authorization["authorization_sha256"],
         "learning_curve_sources": curves["sources"],
         "evaluation_sources": evaluation_sources,
+        "infeasible_sources": infeasible_sources,
         "decision_content_sha256": decision["content_sha256"],
     }
     provenance["content_sha256"] = canonical_sha256(provenance)
@@ -377,15 +495,20 @@ def _run_argument(value: str) -> tuple[str, Path]:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", action="append", type=_run_argument, required=True)
+    parser.add_argument("--infeasible", action="append", type=_run_argument, default=[])
     parser.add_argument("--authorization", type=Path, required=True)
     parser.add_argument("--evaluation-root", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     arguments = parser.parse_args(argv)
     run_directories = dict(arguments.run)
+    infeasible_variants = dict(arguments.infeasible)
     if len(run_directories) != len(arguments.run):
         raise RootCauseEvaluationError("run variants must be unique")
+    if len(infeasible_variants) != len(arguments.infeasible):
+        raise RootCauseEvaluationError("infeasible variants must be unique")
     outputs = build_short_curve_outputs(
         run_directories=run_directories,
+        infeasible_variants=infeasible_variants,
         authorization_path=arguments.authorization,
         evaluation_root=arguments.evaluation_root,
     )

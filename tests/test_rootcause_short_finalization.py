@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 from pathlib import Path
 
 import pytest
 
-from scripts.finalize_rescene_rootcause_training import build_short_curve_outputs
+from scripts.finalize_rescene_rootcause_training import (
+    _validate_infeasible_variants,
+    build_short_curve_outputs,
+)
 from utils.rescene_rootcause_evaluation import (
     EVALUATION_SEEDS,
     RootCauseEvaluationError,
@@ -18,14 +22,14 @@ VARIANTS = ("R0", "R1")
 VALIDATION_EPOCHS = (15, 30, 45, 60, 75, 90)
 
 
-def _authorization() -> dict[str, object]:
+def _authorization(variants: tuple[str, ...] = VARIANTS) -> dict[str, object]:
     payload = {
         "status": "authorized",
         "source_commit": "1" * 40,
-        "selected_variants": list(VARIANTS),
+        "selected_variants": list(variants),
         "variants": {
             variant: {"config_sha256": str(index + 2) * 64}
-            for index, variant in enumerate(VARIANTS)
+            for index, variant in enumerate(variants)
         },
         "initialization": {
             "common_state": {"sha256": "4" * 64},
@@ -180,6 +184,65 @@ def _study(tmp_path: Path, *, gain: float = 0.015):
     return authorization_path, runs, evaluation_root
 
 
+def _write_infeasible(
+    root: Path,
+    variant: str,
+    authorization: dict[str, object],
+) -> Path:
+    candidate = _candidate(variant, authorization)
+    attempts = []
+    for index, allocator in enumerate(("default", "expandable_segments"), start=1):
+        relative = Path("failed_attempts") / f"{variant}_attempt{index}"
+        attempt_root = root / relative
+        attempt_root.mkdir(parents=True)
+        log = f"{variant} {allocator} CUDA out of memory\n".encode("ascii")
+        (attempt_root / f"{variant}.launch.log").write_bytes(log)
+        (attempt_root / ".rootcause_candidate.json").write_text(
+            json.dumps(candidate), encoding="utf-8"
+        )
+        failure = {
+            "schema_version": 1,
+            "status": "failed",
+            "variant": variant,
+            "candidate_id": candidate["candidate_id"],
+            "config_sha256": candidate["config_sha256"],
+            "common_initialization_sha256": candidate[
+                "common_initialization_sha256"
+            ],
+            "failed_batch_index": 254,
+            "failure": "CUDA out of memory",
+            "launch_log_sha256": hashlib.sha256(log).hexdigest(),
+        }
+        evidence = attempt_root / "FAILURE.json"
+        evidence.write_text(json.dumps(failure), encoding="utf-8")
+        attempts.append(
+            {
+                "allocator": allocator,
+                "evidence": relative.joinpath("FAILURE.json").as_posix(),
+                "launch_log_sha256": failure["launch_log_sha256"],
+            }
+        )
+    payload = {
+        "schema_version": 1,
+        "status": "infeasible",
+        "variant": variant,
+        "reason_code": "full_dataset_cuda_oom",
+        "variant_authorization_sha256": authorization["authorization_sha256"],
+        "candidate_id": candidate["candidate_id"],
+        "config_sha256": candidate["config_sha256"],
+        "common_initialization_sha256": candidate["common_initialization_sha256"],
+        "physical_global_batch": 8,
+        "effective_global_batch": 32,
+        "failed_batch_index": 254,
+        "attempts": attempts,
+        "replacement_variant": None,
+    }
+    path = root / variant / "INFEASIBLE.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
 def test_short_finalization_builds_required_outputs_and_selects_one(tmp_path) -> None:
     authorization, runs, evaluation_root = _study(tmp_path)
 
@@ -205,6 +268,76 @@ def test_short_finalization_builds_required_outputs_and_selects_one(tmp_path) ->
     assert decision["full_training_authorized"] is True
     assert outputs["rootcause_per_seed.csv"].decode("ascii").count("\n") == 13
     assert outputs["rootcause_summary.csv"].decode("ascii").count("\n") == 5
+
+
+def test_short_finalization_excludes_authorized_runtime_infeasible_variant(
+    tmp_path,
+) -> None:
+    variants = ("R0", "R1", "R2")
+    authorization = _authorization(variants)
+    authorization_path = tmp_path / "authorization.json"
+    authorization_path.write_text(json.dumps(authorization), encoding="utf-8")
+    runs = {
+        "R0": _write_curve(tmp_path, "R0", authorization, offset=0.0),
+        "R1": _write_curve(tmp_path, "R1", authorization, offset=0.015),
+    }
+    evaluation_root = tmp_path / "evaluation"
+    for epoch in (60, 90):
+        _write_evaluation(
+            evaluation_root, "R0", epoch, authorization, spatial_offset=0.0
+        )
+        _write_evaluation(
+            evaluation_root, "R1", epoch, authorization, spatial_offset=0.015
+        )
+    infeasible = {"R2": _write_infeasible(tmp_path, "R2", authorization)}
+
+    outputs = build_short_curve_outputs(
+        run_directories=runs,
+        infeasible_variants=infeasible,
+        authorization_path=authorization_path,
+        evaluation_root=evaluation_root,
+    )
+
+    decision = json.loads(outputs["ROOTCAUSE_SHORT_DECISION.json"])
+    provenance = json.loads(outputs["ROOTCAUSE_SHORT_PROVENANCE.json"])
+    assert decision["selected_variant"] == "R1"
+    assert decision["completed_variants"] == ["R0", "R1"]
+    assert decision["infeasible_variants"] == {
+        "R2": {
+            "candidate_id": _candidate("R2", authorization)["candidate_id"],
+            "reason_code": "full_dataset_cuda_oom",
+        }
+    }
+    assert set(provenance["infeasible_sources"]) == {
+        "R2/INFEASIBLE.json",
+        "R2/attempt1/FAILURE.json",
+        "R2/attempt1/.rootcause_candidate.json",
+        "R2/attempt1/R2.launch.log",
+        "R2/attempt2/FAILURE.json",
+        "R2/attempt2/.rootcause_candidate.json",
+        "R2/attempt2/R2.launch.log",
+    }
+    assert outputs["rootcause_per_seed.csv"].decode("ascii").count("\n") == 13
+    assert outputs["rootcause_summary.csv"].decode("ascii").count("\n") == 5
+
+
+def test_runtime_infeasible_evidence_resolves_from_symlinked_variant_root(
+    tmp_path,
+) -> None:
+    authorization = _authorization(("R0", "R1", "R2"))
+    live_root = tmp_path / "live"
+    live_record = _write_infeasible(live_root, "R2", authorization)
+    shared_root = tmp_path / "shared"
+    shared_root.mkdir()
+    (shared_root / "R2").symlink_to(live_record.parent, target_is_directory=True)
+
+    records, sources = _validate_infeasible_variants(
+        infeasible_variants={"R2": shared_root / "R2/INFEASIBLE.json"},
+        authorization=authorization,
+    )
+
+    assert records["R2"]["reason_code"] == "full_dataset_cuda_oom"
+    assert len(sources) == 7
 
 
 def test_short_finalization_rejects_manifest_or_run_rebinding(tmp_path) -> None:
