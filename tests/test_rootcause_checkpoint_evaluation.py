@@ -51,18 +51,22 @@ def test_evaluation_config_is_shared_and_portable(tmp_path) -> None:
     assert len(contract["sha256"]) == 64
 
 
+@pytest.mark.parametrize(
+    ("variant", "output_namespace"),
+    (("R1", "rootcause_short"), ("A1", "rescene_strong_local")),
+)
 def test_checkpoint_config_resolves_only_authorized_training_environment(
-    monkeypatch,
+    monkeypatch, variant: str, output_namespace: str
 ) -> None:
     pretrained_reference = "external:checkpoint/concerto/" + "a" * 64
     common_reference = "external:checkpoint/rootcause_common/" + "b" * 64
     common_sha256 = "b" * 64
-    output_reference = "external:checkpoint/rootcause_short/R1"
+    output_reference = f"external:checkpoint/{output_namespace}/{variant}"
     expected = {
         "backbone": {"name": pretrained_reference},
         "model": {"config": {"backbone": {"name": pretrained_reference}}},
         "general": {
-            "experiment_name": "R1",
+            "experiment_name": variant,
             "rootcause_objective_mode": "raw_sum",
             "rootcause_common_initialization": common_reference,
             "rootcause_common_initialization_sha256": common_sha256,
@@ -100,6 +104,7 @@ def test_checkpoint_config_resolves_only_authorized_training_environment(
         {"save_dir": "${oc.env:RESCENE_ROOTCAUSE_OUTPUT_DIR,missing}"}
     ]
     authorization = {
+        "checkpoint_namespace": output_namespace,
         "initialization": {
             "pretrained": {"reference": pretrained_reference},
             "common_state": {
@@ -108,7 +113,7 @@ def test_checkpoint_config_resolves_only_authorized_training_environment(
             },
         },
         "variants": {
-            "R1": {
+            variant: {
                 "resolved_config": expected,
                 "config_sha256": canonical_sha256(expected),
             }
@@ -127,7 +132,7 @@ def test_checkpoint_config_resolves_only_authorized_training_environment(
 
     observed = _checkpoint_training_config(
         {"hyper_parameters": OmegaConf.create(raw)},
-        variant="R1",
+        variant=variant,
         authorization=authorization,
     )
 

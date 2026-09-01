@@ -158,9 +158,9 @@ def _checkpoint_training_environment(
         "RESCENE_ROOTCAUSE_COMMON_SHA256": initialization["common_state"][
             "sha256"
         ],
-        "RESCENE_ROOTCAUSE_OBJECTIVE_MODE": (
-            "raw_sum" if variant == "R1" else "weighted"
-        ),
+        "RESCENE_ROOTCAUSE_OBJECTIVE_MODE": authorization["variants"][variant][
+            "resolved_config"
+        ]["general"]["rootcause_objective_mode"],
     }
     previous = {name: os.environ.get(name) for name in values}
     os.environ.update(values)
