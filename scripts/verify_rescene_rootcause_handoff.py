@@ -105,7 +105,7 @@ FULL_CANDIDATE_ARTIFACTS = frozenset(
     path for path in REQUIRED_ARTIFACTS if path.startswith("full_candidate/")
 )
 PRIVATE_PATTERNS = (
-    (re.compile(r"(?:^|[\s`\"'=])/(?:home|mnt/shared)/"), "private path"),
+    (re.compile(r"(?:^|[\s`\"'=])/(?:home|mnt)/"), "private path"),
     (re.compile(r"\bww@[\w.-]+\b"), "private username or host"),
     (re.compile(r"\b[\w.-]+@(?:192\.168\.|10\.|172\.(?:1[6-9]|2\d|3[01])\d*\.)"), "private host"),
     (re.compile(r"\bhf_[A-Za-z0-9]{10,}\b"), "Hugging Face token"),

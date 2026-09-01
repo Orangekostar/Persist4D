@@ -1005,6 +1005,19 @@ def test_final_artifact_verifier_rejects_private_paths(tmp_path: Path) -> None:
         verify_final_artifacts(root)
 
 
+def test_final_artifact_verifier_rejects_private_mnt_paths(
+    tmp_path: Path,
+) -> None:
+    root = _artifact_tree(tmp_path)
+    _write_manifest(root)
+    (root / "CODE_AUDIT.md").write_text(
+        "checkpoint: /mnt/node8-persist4d/run/model.ckpt\n", encoding="ascii"
+    )
+
+    with pytest.raises(FinalArtifactError, match="private path"):
+        verify_final_artifacts(root)
+
+
 def test_final_artifact_verifier_rejects_changed_artifact(tmp_path: Path) -> None:
     root = _artifact_tree(tmp_path)
     _write_manifest(root)
