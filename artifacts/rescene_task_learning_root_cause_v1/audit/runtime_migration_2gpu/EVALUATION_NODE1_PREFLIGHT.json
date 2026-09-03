@@ -1,5 +1,5 @@
 {
-  "content_sha256": "98bd8b1dc91d5b01dc5ad69469a9d6ff25ed941e310d2e9d4e4a4667fd565968",
+  "content_sha256": "942117e08895cb34d653c354857bfc2cd86b5aecaa18916e2508d0f9e16c3817",
   "evaluation_contract": {
     "metrics": [
       "t_mAP",
@@ -78,6 +78,14 @@
     "source_commit": "d9e70d99b4ed7487fa9f6743c8e22176ae22781b",
     "worktree_clean": true
   },
+  "real_initialization": {
+    "model_state_dict_entries": 802,
+    "scatter_type": "mean",
+    "status": "pass",
+    "use_np_features": true,
+    "validation_sequence_count": 154,
+    "variant": "A1"
+  },
   "runtime": {
     "cuda": "12.6",
     "gpu_count": 2,
@@ -86,6 +94,12 @@
       "NVIDIA A40"
     ],
     "hydra": "1.3.4",
+    "module_search_path_contract": [
+      "repo:third_party/concerto",
+      "repo:third_party/detectron2",
+      "repo:third_party/sonata",
+      "repo:third_party/stmetrics"
+    ],
     "python": "3.10.20",
     "pytorch_lightning": "2.6.5",
     "torch": "2.6.0+cu126"
@@ -106,5 +120,5 @@
       "test_rescene_strong_local_finalization.py"
     ]
   },
-  "validated_at_utc": "2026-09-03T18:53:35Z"
+  "validated_at_utc": "2026-09-03T19:06:59Z"
 }
