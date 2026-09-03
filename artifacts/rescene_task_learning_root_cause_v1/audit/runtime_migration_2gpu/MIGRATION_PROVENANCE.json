@@ -44,6 +44,32 @@
   "schema_version": 1,
   "scientific_config_changed": false,
   "status": "pass",
+  "storage_capacity_mitigation": {
+    "a1_process_interrupted": false,
+    "after": {
+      "available_bytes": 1090949926912,
+      "filesystem_bytes": 1884068257792,
+      "logical_volume_bytes": 1914720747520
+    },
+    "before": {
+      "available_bytes": 296802746368,
+      "filesystem_bytes": 1056281419776,
+      "logical_volume_bytes": 1073741824000,
+      "volume_group_free_bytes": 840978923520
+    },
+    "filesystem": "ext4",
+    "host": "node3",
+    "independent_writer_evidence": {
+      "bytes": 112954641434,
+      "files": 9,
+      "root_label": "oviovo_baseline_runs"
+    },
+    "kernel_io_error_observed": false,
+    "mountpoint": "/",
+    "online_resize_completed_at_utc": "2026-09-03T11:19:02Z",
+    "persist4d_tree_bytes": 28710584320,
+    "scientific_config_changed": false
+  },
   "training_devices": [
     0,
     1

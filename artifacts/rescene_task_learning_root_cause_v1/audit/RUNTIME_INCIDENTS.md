@@ -33,6 +33,14 @@ This record separates infrastructure availability from scientific outcomes. Neit
 - Both A40 pairs use a 220 W power limit and one-minute temperature monitoring. The first sustained Epoch 0 observation covered 57--68 degrees Celsius with no new runtime error.
 - R1 and A1 checkpoints are configured for cross-host replication after each stable `last.ckpt` update.
 
+## Node3 root-volume expansion on 2026-09-03
+
+- At `2026-09-03T11:15:10Z`, node3 had 296,802,746,368 bytes available on its root filesystem. The migrated A1 tree occupied only 28,710,584,320 bytes and contained no recently created file larger than 100 MB.
+- Root-cause evidence attributed the concurrent capacity loss to a separate workload tree named `oviovo_baseline_runs`: nine recently written `.4dmap` files totaled 112,954,641,434 bytes on node3. The A1 training output was not the source of the growth.
+- The existing `ubuntu-vg` physical volume had 840,978,923,520 bytes unallocated. At `2026-09-03T11:19:02Z`, `/dev/ubuntu-vg/ubuntu-lv` and its ext4 filesystem were expanded online from 1,073,741,824,000 bytes to 1,914,720,747,520 bytes.
+- After expansion, the mounted filesystem reported 1,884,068,257,792 bytes total and 1,090,949,926,912 bytes available. Kernel logs recorded a successful ext4 resize and no ext4 or block-I/O error.
+- A1 rank processes remained live throughout the resize. No training code, scientific configuration, dataset, initialization, optimizer, scheduler, or metric contract changed.
+
 ## Integrity rule
 
 After node25 recovers, record its boot identity and uptime, container restart/OOM state, checkpoint inventory, metric-file continuity, NFS recovery evidence, and training-process state before resuming finalization. If a process did not survive, resume only from a checkpoint whose full-state and provenance contracts pass the existing validators.
