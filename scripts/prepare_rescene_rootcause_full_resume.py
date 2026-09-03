@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import os
@@ -77,6 +78,71 @@ def _validate_hash(payload: Mapping[str, Any], field: str, *, name: str) -> None
         raise RootCauseEvaluationError(f"{name} hash differs")
 
 
+def _validate_runtime_migration_bridge(
+    *,
+    variant: str,
+    runtime_authorization: Mapping[str, Any],
+    decision_authorization_path: Path,
+    runtime_migration_provenance_path: Path,
+) -> dict[str, object]:
+    decision_authorization = _load_json(
+        decision_authorization_path, name="decision variant authorization"
+    )
+    _validate_hash(
+        decision_authorization,
+        "authorization_sha256",
+        name="decision variant authorization",
+    )
+    provenance = _load_json(
+        runtime_migration_provenance_path, name="runtime migration provenance"
+    )
+    expected_fields = ["runtime.gpu_count", "runtime.gpu_models"]
+    if (
+        variant != "R1"
+        or decision_authorization.get("status") != "authorized"
+        or variant not in decision_authorization.get("selected_variants", ())
+        or provenance.get("status") != "pass"
+        or provenance.get("scientific_config_changed") is not False
+        or provenance.get("changed_fields") != expected_fields
+        or provenance.get("original_root_authorization_sha256")
+        != decision_authorization["authorization_sha256"]
+        or provenance.get("adapted_root_authorization_sha256")
+        != runtime_authorization["authorization_sha256"]
+        or provenance.get("original_runtime") != decision_authorization.get("runtime")
+        or provenance.get("adapted_runtime") != runtime_authorization.get("runtime")
+    ):
+        raise RootCauseEvaluationError("runtime migration provenance differs")
+
+    original = copy.deepcopy(dict(decision_authorization))
+    adapted = copy.deepcopy(dict(runtime_authorization))
+    original.pop("authorization_sha256", None)
+    adapted.pop("authorization_sha256", None)
+    try:
+        original_runtime = original["runtime"]
+        adapted_runtime = adapted["runtime"]
+        if any(
+            original_runtime[field] == adapted_runtime[field]
+            for field in ("gpu_count", "gpu_models")
+        ):
+            raise RootCauseEvaluationError("runtime migration fields did not change")
+        for field in ("gpu_count", "gpu_models"):
+            adapted_runtime[field] = original_runtime[field]
+    except (KeyError, TypeError) as error:
+        raise RootCauseEvaluationError(
+            "runtime migration fields are invalid"
+        ) from error
+    if adapted != original:
+        raise RootCauseEvaluationError(
+            "runtime migration changed more than GPU inventory"
+        )
+    return {
+        "changed_fields": expected_fields,
+        "decision_authorization_sha256": decision_authorization["authorization_sha256"],
+        "runtime_authorization_sha256": runtime_authorization["authorization_sha256"],
+        "provenance": _file_identity(runtime_migration_provenance_path),
+    }
+
+
 def _core_resume_plan(
     *,
     variant: str,
@@ -85,6 +151,8 @@ def _core_resume_plan(
     decision_path: Path,
     checkpoint_manifest_path: Path,
     exact_checkpoint_path: Path,
+    decision_authorization_path: Path | None = None,
+    runtime_migration_provenance_path: Path | None = None,
 ) -> dict[str, object]:
     authorization = _load_json(authorization_path, name="variant authorization")
     _validate_hash(authorization, "authorization_sha256", name="variant authorization")
@@ -94,13 +162,28 @@ def _core_resume_plan(
     )
     decision = _load_json(decision_path, name="short-curve decision")
     _validate_hash(decision, "content_sha256", name="short-curve decision")
+    if (decision_authorization_path is None) != (
+        runtime_migration_provenance_path is None
+    ):
+        raise RootCauseEvaluationError("runtime migration bridge is incomplete")
+    decision_authorization_sha256 = authorization["authorization_sha256"]
+    runtime_migration = None
+    if decision_authorization_path is not None:
+        runtime_migration = _validate_runtime_migration_bridge(
+            variant=variant,
+            runtime_authorization=authorization,
+            decision_authorization_path=decision_authorization_path,
+            runtime_migration_provenance_path=runtime_migration_provenance_path,
+        )
+        decision_authorization_sha256 = runtime_migration[
+            "decision_authorization_sha256"
+        ]
     if (
         decision.get("status") != "pass"
         or decision.get("selected_variant") != variant
         or decision.get("full_training_authorized") is not True
         or decision.get("full_training_status") != "authorized"
-        or decision.get("variant_authorization_sha256")
-        != authorization["authorization_sha256"]
+        or decision.get("variant_authorization_sha256") != decision_authorization_sha256
     ):
         raise RootCauseEvaluationError("full candidate is not authorized")
 
@@ -126,7 +209,7 @@ def _core_resume_plan(
         _expected_state_dict_entries,
     )
 
-    return {
+    plan = {
         "schema_version": 1,
         "status": "pass",
         "experiment": authorization.get(
@@ -152,6 +235,10 @@ def _core_resume_plan(
             authorization, variant
         ),
     }
+    if runtime_migration is not None:
+        plan["decision_authorization_sha256"] = decision_authorization_sha256
+        plan["runtime_migration"] = runtime_migration
+    return plan
 
 
 def validate_exact_resume_evidence(
@@ -163,6 +250,8 @@ def validate_exact_resume_evidence(
     checkpoint_manifest_path: Path,
     exact_checkpoint_path: Path,
     selected_resume_checkpoint: Path,
+    decision_authorization_path: Path | None = None,
+    runtime_migration_provenance_path: Path | None = None,
 ) -> dict[str, object]:
     """Return a signed plan only when the runtime selector chooses epoch=090."""
 
@@ -173,6 +262,8 @@ def validate_exact_resume_evidence(
         decision_path=decision_path,
         checkpoint_manifest_path=checkpoint_manifest_path,
         exact_checkpoint_path=exact_checkpoint_path,
+        decision_authorization_path=decision_authorization_path,
+        runtime_migration_provenance_path=runtime_migration_provenance_path,
     )
     try:
         exact = exact_checkpoint_path.resolve(strict=True)
@@ -304,6 +395,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--checkpoint-manifest", type=Path, required=True)
     parser.add_argument("--exact-checkpoint", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--decision-authorization", type=Path)
+    parser.add_argument("--runtime-migration-provenance", type=Path)
     parser.add_argument("--stage-conflicting-last", action="store_true")
     arguments = parser.parse_args(argv)
 
@@ -315,6 +408,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         decision_path=arguments.decision,
         checkpoint_manifest_path=arguments.checkpoint_manifest,
         exact_checkpoint_path=exact,
+        decision_authorization_path=arguments.decision_authorization,
+        runtime_migration_provenance_path=arguments.runtime_migration_provenance,
     )
     selected = _runtime_selected_checkpoint(exact.parent)
     archived = []
@@ -346,6 +441,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         checkpoint_manifest_path=arguments.checkpoint_manifest,
         exact_checkpoint_path=exact,
         selected_resume_checkpoint=selected,
+        decision_authorization_path=arguments.decision_authorization,
+        runtime_migration_provenance_path=arguments.runtime_migration_provenance,
     )
     plan["archived_conflicts"] = archived
     plan.pop("content_sha256")

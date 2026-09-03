@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 
@@ -92,6 +93,80 @@ def _evidence(tmp_path):
     return paths, exact
 
 
+def _migrated_evidence(tmp_path):
+    original = _authorization()
+    adapted = copy.deepcopy(original)
+    adapted["runtime"] = {
+        "gpu_count": 2,
+        "gpu_models": ["NVIDIA A40", "NVIDIA A40"],
+        "torch": "2.6.0+cu126",
+    }
+    original["runtime"] = {
+        "gpu_count": 3,
+        "gpu_models": ["NVIDIA A40", "NVIDIA A40", "NVIDIA A40"],
+        "torch": "2.6.0+cu126",
+    }
+    original["authorization_sha256"] = canonical_sha256(
+        {key: value for key, value in original.items() if key != "authorization_sha256"}
+    )
+    adapted["authorization_sha256"] = canonical_sha256(
+        {key: value for key, value in adapted.items() if key != "authorization_sha256"}
+    )
+    candidate = _candidate(adapted)
+    run = tmp_path / "R1"
+    run.mkdir()
+    exact = run / "epoch=090.ckpt"
+    exact.write_bytes(b"migrated-exact-epoch-90")
+    identity = {
+        "bytes": exact.stat().st_size,
+        "sha256": hashlib.sha256(exact.read_bytes()).hexdigest(),
+    }
+    manifest = build_checkpoint_manifest(
+        variant="R1",
+        completed_epoch=90,
+        authorization=adapted,
+        candidate=candidate,
+        file_identity=identity,
+        checkpoint_facts={
+            "selected_epoch": 90,
+            "selected_step": 5940,
+            "training_config_sha256": adapted["variants"]["R1"]["config_sha256"],
+        },
+    )
+    decision = {
+        "schema_version": 1,
+        "status": "pass",
+        "selected_variant": "R1",
+        "full_training_authorized": True,
+        "full_training_status": "authorized",
+        "variant_authorization_sha256": original["authorization_sha256"],
+    }
+    decision["content_sha256"] = canonical_sha256(decision)
+    migration = {
+        "schema_version": 1,
+        "status": "pass",
+        "scientific_config_changed": False,
+        "changed_fields": ["runtime.gpu_count", "runtime.gpu_models"],
+        "original_root_authorization_sha256": original["authorization_sha256"],
+        "adapted_root_authorization_sha256": adapted["authorization_sha256"],
+        "original_runtime": original["runtime"],
+        "adapted_runtime": adapted["runtime"],
+    }
+    paths = {}
+    for name, value in (
+        ("authorization", adapted),
+        ("decision_authorization", original),
+        ("candidate", candidate),
+        ("manifest", manifest),
+        ("decision", decision),
+        ("migration", migration),
+    ):
+        path = tmp_path / f"{name}.json"
+        path.write_text(json.dumps(value), encoding="utf-8")
+        paths[name] = path
+    return paths, exact
+
+
 def test_exact_epoch90_resume_preflight_binds_selected_checkpoint(tmp_path) -> None:
     paths, exact = _evidence(tmp_path)
 
@@ -115,6 +190,107 @@ def test_exact_epoch90_resume_preflight_binds_selected_checkpoint(tmp_path) -> N
         == hashlib.sha256(exact.read_bytes()).hexdigest()
     )
     assert len(plan["content_sha256"]) == 64
+
+
+def test_exact_resume_accepts_runtime_only_migration_of_authorization(tmp_path) -> None:
+    paths, exact = _migrated_evidence(tmp_path)
+
+    plan = validate_exact_resume_evidence(
+        variant="R1",
+        authorization_path=paths["authorization"],
+        candidate_path=paths["candidate"],
+        decision_path=paths["decision"],
+        checkpoint_manifest_path=paths["manifest"],
+        exact_checkpoint_path=exact,
+        selected_resume_checkpoint=exact,
+        decision_authorization_path=paths["decision_authorization"],
+        runtime_migration_provenance_path=paths["migration"],
+    )
+
+    assert plan["status"] == "pass"
+    assert (
+        plan["variant_authorization_sha256"]
+        == json.loads(paths["authorization"].read_text())["authorization_sha256"]
+    )
+    assert (
+        plan["decision_authorization_sha256"]
+        == json.loads(paths["decision_authorization"].read_text())[
+            "authorization_sha256"
+        ]
+    )
+    assert plan["runtime_migration"]["changed_fields"] == [
+        "runtime.gpu_count",
+        "runtime.gpu_models",
+    ]
+
+
+def test_exact_resume_rejects_incomplete_runtime_migration_bridge(tmp_path) -> None:
+    paths, exact = _migrated_evidence(tmp_path)
+
+    with pytest.raises(RootCauseEvaluationError, match="bridge is incomplete"):
+        validate_exact_resume_evidence(
+            variant="R1",
+            authorization_path=paths["authorization"],
+            candidate_path=paths["candidate"],
+            decision_path=paths["decision"],
+            checkpoint_manifest_path=paths["manifest"],
+            exact_checkpoint_path=exact,
+            selected_resume_checkpoint=exact,
+            decision_authorization_path=paths["decision_authorization"],
+        )
+
+
+def test_exact_resume_rejects_scientific_change_in_runtime_migration(tmp_path) -> None:
+    paths, exact = _migrated_evidence(tmp_path)
+    authorization = json.loads(paths["authorization"].read_text())
+    authorization["variants"]["R1"]["config_sha256"] = "9" * 64
+    authorization["authorization_sha256"] = canonical_sha256(
+        {
+            key: value
+            for key, value in authorization.items()
+            if key != "authorization_sha256"
+        }
+    )
+    paths["authorization"].write_text(json.dumps(authorization), encoding="utf-8")
+    candidate = _candidate(authorization)
+    paths["candidate"].write_text(json.dumps(candidate), encoding="utf-8")
+    manifest = build_checkpoint_manifest(
+        variant="R1",
+        completed_epoch=90,
+        authorization=authorization,
+        candidate=candidate,
+        file_identity={
+            "bytes": exact.stat().st_size,
+            "sha256": hashlib.sha256(exact.read_bytes()).hexdigest(),
+        },
+        checkpoint_facts={
+            "selected_epoch": 90,
+            "selected_step": 5940,
+            "training_config_sha256": "9" * 64,
+        },
+    )
+    paths["manifest"].write_text(json.dumps(manifest), encoding="utf-8")
+    provenance = json.loads(paths["migration"].read_text())
+    provenance["adapted_root_authorization_sha256"] = authorization[
+        "authorization_sha256"
+    ]
+    provenance["adapted_runtime"] = authorization["runtime"]
+    paths["migration"].write_text(json.dumps(provenance), encoding="utf-8")
+
+    with pytest.raises(
+        RootCauseEvaluationError, match="changed more than GPU inventory"
+    ):
+        validate_exact_resume_evidence(
+            variant="R1",
+            authorization_path=paths["authorization"],
+            candidate_path=paths["candidate"],
+            decision_path=paths["decision"],
+            checkpoint_manifest_path=paths["manifest"],
+            exact_checkpoint_path=exact,
+            selected_resume_checkpoint=exact,
+            decision_authorization_path=paths["decision_authorization"],
+            runtime_migration_provenance_path=paths["migration"],
+        )
 
 
 def test_exact_epoch90_resume_preflight_rejects_last_checkpoint_selection(
