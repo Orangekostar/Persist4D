@@ -1,0 +1,52 @@
+{
+  "adapted_a1_authorization_sha256": "969f42e7debcc8de259f5327fd144bb04f9f3dbd3d81bfd534ddd8f371cd8d3b",
+  "adapted_a1_file": {
+    "bytes": 20529,
+    "sha256": "ceb6507601d77968ce4d837155d8a2024d542e03e4ca95fd51a8e38a7ddc4418"
+  },
+  "adapted_root_authorization_sha256": "ee988e908f9b0cf0cd869cbfa104bd630290eb3643851d7dc3eb316f064063ad",
+  "adapted_root_file": {
+    "bytes": 70542,
+    "sha256": "aa7605936f3d3e0bc390104f56044f5034857c571f8a9f9212b568317d68f280"
+  },
+  "adapted_runtime": {
+    "cuda": "12.6",
+    "gpu_count": 2,
+    "gpu_models": [
+      "NVIDIA A40",
+      "NVIDIA A40"
+    ],
+    "hydra": "1.3.4",
+    "python": "3.10.20",
+    "pytorch_lightning": "2.6.5",
+    "torch": "2.6.0+cu126"
+  },
+  "changed_fields": [
+    "runtime.gpu_count",
+    "runtime.gpu_models"
+  ],
+  "original_a1_authorization_sha256": "fd981971cab69e22e3231037d4e9324aa43aa849cf4b6405b0984754debeb5cc",
+  "original_root_authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191",
+  "original_runtime": {
+    "cuda": "12.6",
+    "gpu_count": 3,
+    "gpu_models": [
+      "NVIDIA A40",
+      "NVIDIA A40",
+      "NVIDIA A40"
+    ],
+    "hydra": "1.3.4",
+    "python": "3.10.20",
+    "pytorch_lightning": "2.6.5",
+    "torch": "2.6.0+cu126"
+  },
+  "reason": "authorized host migration from a three-GPU host to two-GPU hosts",
+  "schema_version": 1,
+  "scientific_config_changed": false,
+  "status": "pass",
+  "training_devices": [
+    0,
+    1
+  ],
+  "training_world_size": 2
+}
