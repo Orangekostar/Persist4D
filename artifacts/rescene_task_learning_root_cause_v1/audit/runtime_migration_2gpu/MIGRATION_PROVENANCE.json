@@ -76,6 +76,13 @@
     "torch": "2.6.0+cu126"
   },
   "reason": "authorized host migration from a three-GPU host to two-GPU hosts",
+  "r1_epoch60_checkpoint_audit": {
+    "bytes": 5632,
+    "content_sha256": "e1f9eca7e9cd7ad11211e744eea643d2a81b87230b9c79653ce1ad0e51d1f11f",
+    "file": "audit/runtime_migration_2gpu/R1_EPOCH60_CHECKPOINT_AUDIT.json",
+    "sha256": "b558b986b0ed4221d16559ac1552778baa79ca03637c17041da6b5493b4bc3e2",
+    "status": "pass"
+  },
   "recovery_phase": {
     "automatic_stop_completed_epoch": 90,
     "checkpoint_boundaries": [

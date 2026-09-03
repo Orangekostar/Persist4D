@@ -1,0 +1,137 @@
+{
+  "checkpoint": {
+    "bytes": 754813672,
+    "completed_epoch": 60,
+    "config_sha256": "3846415b6de3ea12b7b08d39ea20398916dd685c99ce7ad33e42df17d9ac6536",
+    "global_step": 3960,
+    "reference": "external:checkpoint/runtime_migration_2gpu/R1/epoch060/130812d76bf0224f9d19641a444c48b0c578b3338bebe464ef444b64a1c9a39a",
+    "replica_host": "node3",
+    "resume_state": {
+      "dataloader_prefetch_state_checkpointed": false,
+      "mid_epoch_resume_supported": false,
+      "optimizer_state_count": 1,
+      "sampler_generator_state_sha256": "1491c76aa47295b20d1b9f60dee537eb99aaeb6d2900e7a3becaeb6e5f02541c",
+      "sampler_resume_scope": "completed_epoch_boundary_only",
+      "scheduler_state_count": 1,
+      "state_dict_entry_count": 798
+    },
+    "sha256": "130812d76bf0224f9d19641a444c48b0c578b3338bebe464ef444b64a1c9a39a",
+    "source_host": "node2",
+    "source_replica_hash_equality": true,
+    "source_replica_mtime_equality": true,
+    "stable_observations": [
+      {
+        "bytes": 754813672,
+        "observed_at_utc": "2026-09-03T21:37:40Z",
+        "source_mtime_utc": "2026-09-03T21:36:55.901789961Z"
+      },
+      {
+        "bytes": 754813672,
+        "observed_at_utc": "2026-09-03T21:39:06Z",
+        "source_mtime_utc": "2026-09-03T21:36:55.901789961Z"
+      },
+      {
+        "bytes": 754813672,
+        "observed_at_utc": "2026-09-03T21:40:58Z",
+        "source_mtime_utc": "2026-09-03T21:36:55.901789961Z"
+      }
+    ]
+  },
+  "content_sha256": "e1f9eca7e9cd7ad11211e744eea643d2a81b87230b9c79653ce1ad0e51d1f11f",
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "limitations": [
+    "The migrated run is a recovery reconstruction from the frozen common initialization, not a continuation of the inaccessible node25 process.",
+    "The standard-validation comparison is descriptive because no trajectory-equivalence threshold was preregistered.",
+    "The committed R1 official-like epoch-60 evidence remains authoritative; duplicate official-like evaluation of this recovery reconstruction was not used for selection.",
+    "The standard-validation CSV identity was observed while the append-only training logger remained active.",
+    "No Persist4D or Protocol-B result was used."
+  ],
+  "purpose": "R1 epoch-60 recovery checkpoint durability and trajectory audit",
+  "reference_trajectory_comparison": {
+    "direction": "migrated_R1_minus_committed_RC3_R1",
+    "migrated_minus_reference": {
+      "SpatialStageMean": 0.005868598818778992,
+      "overall_mAP": 0.004351556301116943,
+      "stage1_mAP": 0.018397748470306396,
+      "stage2_mAP": -0.006660550832748413,
+      "t_mAP": 0.0020380616188049316,
+      "t_mAP25": -0.02950596809387207,
+      "t_mAP50": 0.0489860475063324
+    },
+    "percentage_points": {
+      "SpatialStageMean": 0.5868598818778992,
+      "overall_mAP": 0.43515563011169434,
+      "stage1_mAP": 1.8397748470306396,
+      "stage2_mAP": -0.6660550832748413,
+      "t_mAP": 0.20380616188049316,
+      "t_mAP25": -2.950596809387207,
+      "t_mAP50": 4.89860475063324
+    },
+    "reference_file": "short_curves/learning_curves.csv",
+    "reference_file_bytes": 5152,
+    "reference_file_sha256": "0949d5e345c9d8faad354c114e7e73cf4f528916a30554ad5f6da9a026d51a38",
+    "reference_standard_validation": {
+      "SpatialStageMean": 0.30777503550052643,
+      "overall_mAP": 0.27505043148994446,
+      "stage1_mAP": 0.3002795875072479,
+      "stage2_mAP": 0.31527048349380493,
+      "t_mAP": 0.20152173936367035,
+      "t_mAP25": 0.5944536924362183,
+      "t_mAP50": 0.3327942192554474
+    },
+    "reference_variant_authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191"
+  },
+  "runtime": {
+    "automatic_last_checkpoint": {
+      "bytes": 754813672,
+      "replica_host": "node3",
+      "sha256": "8a8a3859577238389f39fc51b2e0beb6def4ab4b4b32dbcb7d6244535b28427c",
+      "source_host": "node2",
+      "source_replica_hash_equality": true
+    },
+    "candidate": {
+      "bytes": 1092,
+      "candidate_id": "0f90b41f0ee06a888237c02cf1a08d0b8d14633bf68beed770bbb86b9d8fcab4",
+      "file_sha256": "99b692dfb3f5e989d112cafb938fbd16be5a53db2786c01ea4df2e34144bc4b4",
+      "source_commit": "84f4c97dae5e2f0671c92ac20ab264b36fc66488"
+    },
+    "scientific_config_changed": false,
+    "training_continued_after_checkpoint": true,
+    "training_host": "node2",
+    "training_world_size": 2,
+    "variant_authorization": {
+      "authorization_sha256": "ee988e908f9b0cf0cd869cbfa104bd630290eb3643851d7dc3eb316f064063ad",
+      "bytes": 70542,
+      "file_sha256": "aa7605936f3d3e0bc390104f56044f5034857c571f8a9f9212b568317d68f280"
+    }
+  },
+  "schema_version": 1,
+  "standard_validation": {
+    "completed_epoch": 60,
+    "metrics": {
+      "SpatialStageMean": 0.3136436343193054,
+      "overall_mAP": 0.2794019877910614,
+      "stage1_mAP": 0.3186773359775543,
+      "stage2_mAP": 0.3086099326610565,
+      "t_mAP": 0.20355980098247528,
+      "t_mAP25": 0.5649477243423462,
+      "t_mAP50": 0.3817802667617798
+    },
+    "optimizer_step": 3960,
+    "source_observation": {
+      "append_only_logger_active": true,
+      "bytes": 1250162,
+      "logical_file": "local_metrics/version_1/metrics.csv",
+      "sha256": "5e2fd40a2287ba6753d5d67c2a9e8e0fc71233d864718812cff441110fd6fe6f"
+    },
+    "train_log_step": 3959
+  },
+  "status": "pass",
+  "validated_at_utc": "2026-09-03T21:43:11Z",
+  "validator": {
+    "file": "utils/rescene_rootcause_evaluation.py",
+    "file_sha256": "6d24a68b0a521266e5cad573d7a91049a9fbd6640cefd3a78fbe96ea1e13dfa9",
+    "source_commit": "799f7f673ee107771c40e15eadb6e04b3eb08e27"
+  },
+  "variant": "R1"
+}
