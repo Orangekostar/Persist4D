@@ -77,7 +77,7 @@
       450
     ],
     "current_phase": "short_horizon_reconstruction",
-    "full_resume_invariant": "resume the validated epoch-90 full state with the horizon callback removed and preserve optimizer, scheduler, sampler, model, data, and initialization contracts",
+    "full_resume_invariant": "resume the validated epoch-90 full state with the unchanged one-shot horizon callback and preserve optimizer, scheduler, sampler, model, data, and initialization contracts; after resume the next completed boundary is 91 so the equality-only epoch-90 stop condition remains inactive",
     "full_resume_required": true,
     "inspected_at_utc": "2026-09-03T19:01:01Z",
     "variants": {
