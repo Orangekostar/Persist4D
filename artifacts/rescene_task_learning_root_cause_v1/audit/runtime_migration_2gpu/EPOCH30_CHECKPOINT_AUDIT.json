@@ -1,0 +1,141 @@
+{
+  "checkpoint_boundary": {
+    "completed_epoch": 30,
+    "global_step": 1980,
+    "logged_validation_epoch_index": 29,
+    "logged_validation_step": 1979
+  },
+  "content_sha256": "891e487fec112b9d453f39f29c8e8b37cc4ad03d04a47d3f37a16c8e59425ea8",
+  "cross_host_replication": {
+    "method": "rsync with partial transfer and delayed atomic update",
+    "source_replica_hash_equality": true,
+    "status": "pass"
+  },
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "limitations": [
+    "The metrics are the second standard validation point, not the preregistered three-seed official-like evaluation.",
+    "The epoch-30 comparison and its change from epoch 15 are trajectory health observations and are not authorized for final checkpoint or model selection.",
+    "No Persist4D or Protocol-B result was used."
+  ],
+  "paired_delta_change_since_epoch15": {
+    "direction": "A1_minus_R1_at_epoch30_minus_A1_minus_R1_at_epoch15",
+    "mean_AP": -0.05330360680818558,
+    "mean_stage1_AP": -0.05032123439013958,
+    "mean_stage2_AP": -0.04955415055155754,
+    "mean_t_AP": -0.04171043075621128,
+    "percentage_points": {
+      "mean_AP": -5.330360680818558,
+      "mean_stage1_AP": -5.032123439013958,
+      "mean_stage2_AP": -4.955415055155754,
+      "mean_t_AP": -4.171043075621128,
+      "spatial_stage_mean": -4.993769247084856
+    },
+    "spatial_stage_mean": -0.04993769247084856
+  },
+  "paired_standard_validation_delta": {
+    "direction": "A1_minus_R1",
+    "mean_AP": -0.006981551647186279,
+    "mean_stage1_AP": -0.004235491156578064,
+    "mean_stage2_AP": 0.002543628215789795,
+    "mean_t_AP": -0.007201112806797028,
+    "mean_t_AP_25": 0.041898876428604126,
+    "mean_t_AP_50": 0.008243337273597717,
+    "percentage_points": {
+      "mean_AP": -0.6981551647186279,
+      "mean_stage1_AP": -0.4235491156578064,
+      "mean_stage2_AP": 0.2543628215789795,
+      "mean_t_AP": -0.7201112806797028,
+      "mean_t_AP_25": 4.189887642860413,
+      "mean_t_AP_50": 0.8243337273597717,
+      "spatial_stage_mean": -0.08459314703941345
+    },
+    "spatial_stage_mean": -0.0008459314703941345
+  },
+  "purpose": "epoch-30 post-migration checkpoint durability and trajectory health audit",
+  "schema_version": 1,
+  "status": "pass",
+  "validated_at_utc": "2026-09-03T16:09:59Z",
+  "validator": {
+    "file": "utils/rescene_rootcause_evaluation.py",
+    "file_sha256": "6d24a68b0a521266e5cad573d7a91049a9fbd6640cefd3a78fbe96ea1e13dfa9",
+    "source_commit": "1e5c2f942e454ee22ccf414516704c238d74d506"
+  },
+  "variants": {
+    "A1": {
+      "best_checkpoint_filename": "epoch=029-val_mean_t-AP=0.111.ckpt",
+      "checkpoint": {
+        "bytes": 755165656,
+        "reference": "external:checkpoint/runtime_migration_2gpu/A1/last.ckpt",
+        "replicated_at_utc": "2026-09-03T14:54:31Z",
+        "sha256": "b2cd0066443f11cb814dee20c2764fb993076b2163afd298272e01b24e3d4f14",
+        "source_host": "node3",
+        "source_published_at_utc": "2026-09-03T14:53:30Z",
+        "verified_replica_host": "node2"
+      },
+      "epoch15_to_epoch30_change": {
+        "mean_AP": 0.07200588285923004,
+        "mean_stage1_AP": 0.0855221077799797,
+        "mean_stage2_AP": 0.08307351171970367,
+        "mean_t_AP": 0.05600180849432945,
+        "spatial_stage_mean": 0.08429780974984169
+      },
+      "resume_state": {
+        "dataloader_prefetch_state_checkpointed": false,
+        "mid_epoch_resume_supported": false,
+        "optimizer_state_count": 1,
+        "sampler_generator_state_sha256": "8934d4f4dd4ae1a8042f3e65973759e5b5c2b5c48f306a4eb38a910f7906ca5e",
+        "sampler_resume_scope": "completed_epoch_boundary_only",
+        "scheduler_state_count": 1,
+        "state_dict_entry_count": 802
+      },
+      "role": "rescene_strong",
+      "standard_validation": {
+        "mean_AP": 0.14577597379684448,
+        "mean_stage1_AP": 0.16269636154174805,
+        "mean_stage2_AP": 0.16731396317481995,
+        "mean_t_AP": 0.11117871850728989,
+        "mean_t_AP_25": 0.413912832736969,
+        "mean_t_AP_50": 0.2163187712430954,
+        "spatial_stage_mean": 0.165005162358284
+      }
+    },
+    "R1": {
+      "best_checkpoint_filename": "epoch=029-val_mean_t-AP=0.118.ckpt",
+      "checkpoint": {
+        "bytes": 754813672,
+        "reference": "external:checkpoint/runtime_migration_2gpu/R1/last.ckpt",
+        "replicated_at_utc": "2026-09-03T15:19:12Z",
+        "sha256": "d17ed63c96c53616c130c12b65ac892c30a37fd48f561764a250e7c7e07919b3",
+        "source_host": "node2",
+        "source_published_at_utc": "2026-09-03T15:18:03Z",
+        "verified_replica_host": "node3"
+      },
+      "epoch15_to_epoch30_change": {
+        "mean_AP": 0.12530948966741562,
+        "mean_stage1_AP": 0.13584334217011929,
+        "mean_stage2_AP": 0.13262766227126122,
+        "mean_t_AP": 0.09771223925054073,
+        "spatial_stage_mean": 0.13423550222069025
+      },
+      "resume_state": {
+        "dataloader_prefetch_state_checkpointed": false,
+        "mid_epoch_resume_supported": false,
+        "optimizer_state_count": 1,
+        "sampler_generator_state_sha256": "8934d4f4dd4ae1a8042f3e65973759e5b5c2b5c48f306a4eb38a910f7906ca5e",
+        "sampler_resume_scope": "completed_epoch_boundary_only",
+        "scheduler_state_count": 1,
+        "state_dict_entry_count": 798
+      },
+      "role": "root_cause_full_candidate",
+      "standard_validation": {
+        "mean_AP": 0.15275752544403076,
+        "mean_stage1_AP": 0.1669318526983261,
+        "mean_stage2_AP": 0.16477033495903015,
+        "mean_t_AP": 0.11837983131408691,
+        "mean_t_AP_25": 0.37201395630836487,
+        "mean_t_AP_50": 0.20807543396949768,
+        "spatial_stage_mean": 0.16585109382867813
+      }
+    }
+  }
+}

@@ -34,6 +34,7 @@ This record separates infrastructure availability from scientific outcomes. Neit
 - R1 and A1 checkpoints are configured for cross-host replication after each stable `last.ckpt` update.
 - The first post-migration epoch-15 checkpoints passed full-state validation at optimizer step 990. R1 contained 798 model-state entries and A1 contained 802; each contained one optimizer state, one scheduler state, and an epoch-boundary sampler-generator state. Both source files matched their cross-host replicas by SHA256.
 - At the first standard validation point, A1 led R1 by 4.909 percentage points in `SpatialStageMean`. This is a trajectory health observation only, not the preregistered three-seed official-like evaluation and not an authorized final-selection result. Exact values and checkpoint identities are recorded in `runtime_migration_2gpu/FIRST_CHECKPOINT_AUDIT.json`.
+- The epoch-30 checkpoints passed the same full-state and cross-host replica checks at optimizer step 1,980. At this second standard validation point, R1 led A1 by 0.085 percentage points in `SpatialStageMean`; the earlier A1 lead was therefore not sustained through epoch 30. This remains a trajectory health observation only and is not an authorized final-selection result. Exact values and checkpoint identities are recorded in `runtime_migration_2gpu/EPOCH30_CHECKPOINT_AUDIT.json`.
 
 ## Node3 root-volume expansion on 2026-09-03
 
