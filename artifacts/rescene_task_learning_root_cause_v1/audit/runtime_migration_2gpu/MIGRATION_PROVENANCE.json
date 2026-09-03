@@ -21,6 +21,13 @@
     "pytorch_lightning": "2.6.5",
     "torch": "2.6.0+cu126"
   },
+  "a1_epoch60_official_like_audit": {
+    "bytes": 9468,
+    "content_sha256": "d22f00c783a4af76d20593e8309694faa34bcd9893d91ebf498d19a44a8d1eac",
+    "file": "audit/runtime_migration_2gpu/A1_EPOCH60_OFFICIAL_LIKE_AUDIT.json",
+    "sha256": "c33240fcc5d36a4184c8589e91471e1fc20ef4d3b3499da7fab90bf8972f6d3b",
+    "status": "pass"
+  },
   "changed_fields": [
     "runtime.gpu_count",
     "runtime.gpu_models"

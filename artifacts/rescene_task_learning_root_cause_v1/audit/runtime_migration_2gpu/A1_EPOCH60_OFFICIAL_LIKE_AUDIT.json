@@ -1,0 +1,246 @@
+{
+  "checkpoint": {
+    "bytes": 755165656,
+    "completed_epoch": 60,
+    "config_sha256": "4b193162acc5c3a54ea57c5b14b6c9909745e68d16fe7f92687462fadb283d9c",
+    "creating_commit": "e02b7b6e02fc74e147505deafd3ed02d00b1c7ee",
+    "global_step": 3960,
+    "manifest": {
+      "bytes": 1770,
+      "content_sha256": "360a2d8fc955c0b867b960ff878ffdfed6d71d13f9c70d0ede01a7a23ccb28a1",
+      "file_sha256": "703787e4f5c128e6a0e79ebf4350c171a55b21178cd1aa701494b870c21e536c"
+    },
+    "reference": "external:checkpoint/rootcause_short/a1/epoch060/b031d97d2de5e0841852ce5559593088f8570a2398e9cd7f240870a310bd48fd",
+    "replica_host": "node1",
+    "resume_state": {
+      "dataloader_prefetch_state_checkpointed": false,
+      "mid_epoch_resume_supported": false,
+      "optimizer_state_count": 1,
+      "sampler_generator_state_sha256": "1491c76aa47295b20d1b9f60dee537eb99aaeb6d2900e7a3becaeb6e5f02541c",
+      "sampler_resume_scope": "completed_epoch_boundary_only",
+      "scheduler_state_count": 1,
+      "state_dict_entry_count": 802
+    },
+    "sha256": "b031d97d2de5e0841852ce5559593088f8570a2398e9cd7f240870a310bd48fd",
+    "source_host": "node3",
+    "source_replica_hash_equality": true,
+    "stable_observations": [
+      {
+        "bytes": 755165656,
+        "observed_at_utc": "2026-09-03T20:51:37Z",
+        "source_mtime_utc": "2026-09-03T20:50:52.608354233Z"
+      },
+      {
+        "bytes": 755165656,
+        "observed_at_utc": "2026-09-03T20:52:23Z",
+        "source_mtime_utc": "2026-09-03T20:50:52.608354233Z"
+      }
+    ]
+  },
+  "content_sha256": "d22f00c783a4af76d20593e8309694faa34bcd9893d91ebf498d19a44a8d1eac",
+  "contract_bindings": {
+    "candidate_id": "f9b660495ca07dcbe9eb331ad3e52cbb3724caca6b1f68abc0e6c7ad0b1438c0",
+    "common_initialization_sha256": "d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+    "pretrained_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+    "variant_authorization_sha256": "969f42e7debcc8de259f5327fd144bb04f9f3dbd3d81bfd534ddd8f371cd8d3b"
+  },
+  "contract_routing": {
+    "a1_only_generic_summary": {
+      "error": "RootCauseEvaluationError: R0 is required for paired summaries",
+      "interpretation": "expected fail-closed rejection",
+      "status": "rejected"
+    },
+    "authoritative_finalizer": {
+      "file": "scripts/finalize_rescene_strong_local.py",
+      "sha256": "e9d96b4695d88fde19a093c6ec43c40a91015f8717ac2c9815138d321afddeec"
+    }
+  },
+  "evaluation": {
+    "contract_sha256": "5ac1b1bf34188a7ad2a249da0da0cfbd3e8a601ff991943df1e9724f10d4a840",
+    "evaluator": {
+      "file": "scripts/evaluate_rescene_rootcause_checkpoint.py",
+      "sha256": "1aa95127318b01f9d7055d368d4dc2c6cf365037fde213185ed0d25a0be5d834",
+      "source_commit": "d9e70d99b4ed7487fa9f6743c8e22176ae22781b"
+    },
+    "host": "node1",
+    "per_seed": {
+      "45": {
+        "device_index": 0,
+        "elapsed_seconds": 345.24378683045506,
+        "file": {
+          "bytes": 1328,
+          "sha256": "721cd75030c109c22357ff1cc88f0a1d6eac7be45e7459dd0297a344823a3f3b"
+        },
+        "metrics": {
+          "SpatialStageMean": 0.3234376460313797,
+          "overall_mAP": 0.2890715003013611,
+          "stage1_mAP": 0.32718613743782043,
+          "stage2_mAP": 0.31968915462493896,
+          "t_mAP": 0.21815365552902222,
+          "t_mAP25": 0.6030333638191223,
+          "t_mAP50": 0.4050356447696686
+        },
+        "validation_sequence_count": 154
+      },
+      "46": {
+        "device_index": 1,
+        "elapsed_seconds": 341.4656643792987,
+        "file": {
+          "bytes": 1328,
+          "sha256": "4ca09d968115458afbbe9ba56b96bf42b0dc064a8396a9165a864d629ac21d0e"
+        },
+        "metrics": {
+          "SpatialStageMean": 0.32263366878032684,
+          "overall_mAP": 0.2879907190799713,
+          "stage1_mAP": 0.31827905774116516,
+          "stage2_mAP": 0.3269882798194885,
+          "t_mAP": 0.20866017043590546,
+          "t_mAP25": 0.6068270206451416,
+          "t_mAP50": 0.39382702112197876
+        },
+        "validation_sequence_count": 154
+      },
+      "47": {
+        "device_index": 0,
+        "elapsed_seconds": 337.3848048010841,
+        "file": {
+          "bytes": 1326,
+          "sha256": "6fb90c8ee5123774e186a832ea9591b036a108bc1eb76885b605e202b8d56d51"
+        },
+        "metrics": {
+          "SpatialStageMean": 0.3260959982872009,
+          "overall_mAP": 0.2883746325969696,
+          "stage1_mAP": 0.3241434693336487,
+          "stage2_mAP": 0.3280485272407532,
+          "t_mAP": 0.21138827502727509,
+          "t_mAP25": 0.6054837107658386,
+          "t_mAP50": 0.39843469858169556
+        },
+        "validation_sequence_count": 154
+      }
+    },
+    "scope": "official_like_t2",
+    "strict_load": {
+      "state_dict_entry_count": 802,
+      "strict": true
+    },
+    "summary": {
+      "SpatialStageMean_mean": 0.3240557710329692,
+      "SpatialStageMean_std": 0.0018120403670269629,
+      "overall_mAP_mean": 0.288478950659434,
+      "overall_mAP_std": 0.0005478902314738193,
+      "seed_count": 3,
+      "stage1_mAP_mean": 0.3232028881708781,
+      "stage1_mAP_std": 0.004527420554075057,
+      "stage2_mAP_mean": 0.32490865389506024,
+      "stage2_mAP_std": 0.004551198811486028,
+      "t_mAP25_mean": 0.6051146984100342,
+      "t_mAP25_std": 0.001923560661235549,
+      "t_mAP50_mean": 0.3990991214911143,
+      "t_mAP50_std": 0.005633773546283895,
+      "t_mAP_mean": 0.2127340336640676,
+      "t_mAP_std": 0.004887725906255766
+    }
+  },
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "interim_strong_comparison": {
+    "all_gates_pass": false,
+    "base_summary": {
+      "SpatialStageMean_mean": 0.314528947075208,
+      "SpatialStageMean_std": 0.00603366728318469,
+      "overall_mAP_mean": 0.28228097160657245,
+      "overall_mAP_std": 0.005824932146869171,
+      "seed_count": 3,
+      "stage1_mAP_mean": 0.3134452899297078,
+      "stage1_mAP_std": 0.007053374790085177,
+      "stage2_mAP_mean": 0.3156126042207082,
+      "stage2_mAP_std": 0.005096421407389651,
+      "t_mAP25_mean": 0.5781651735305786,
+      "t_mAP25_std": 0.009594274285565009,
+      "t_mAP50_mean": 0.35711010297139484,
+      "t_mAP50_std": 0.027543551923479948,
+      "t_mAP_mean": 0.20248334109783173,
+      "t_mAP_std": 0.009187956619029328
+    },
+    "base_variant": "R1",
+    "full_training_authorized": false,
+    "gates": {
+      "contract_integrity": true,
+      "leads_validation_at_75_and_90": false,
+      "mean_spatial_gain_at_least_one_point": false,
+      "overall_map_not_lower_than_base": true,
+      "positive_for_all_paired_seeds": true
+    },
+    "paired_spatial_delta_mean": 0.00952682395776113,
+    "paired_spatial_delta_mean_percentage_points": 0.952682395776113,
+    "paired_spatial_deltas": [
+      0.004265740513801575,
+      0.014924794435501099,
+      0.009389936923980713
+    ],
+    "paired_spatial_positive_seed_count": 3,
+    "selection_status": "pending_epoch90",
+    "threshold_shortfall_percentage_points": 0.04731760422388703
+  },
+  "limitations": [
+    "Epoch 60 is an intermediate gate observation; epoch-75 and epoch-90 standard validation evidence is pending.",
+    "The mean paired spatial gain is below the preregistered one-percentage-point threshold at epoch 60.",
+    "No full-training authorization or final model selection is permitted from this audit.",
+    "The standard-validation CSV identity was observed while the append-only training logger remained active.",
+    "No Persist4D or Protocol-B result was used."
+  ],
+  "purpose": "A1 epoch-60 post-migration checkpoint and three-seed official-like evaluation audit",
+  "reference_evidence": {
+    "root_decision": {
+      "bytes": 5013,
+      "file": "short_curves/ROOTCAUSE_SHORT_DECISION.json",
+      "sha256": "1faba69c51613a8851981da2f17c8ea060b31599707b3f6995ca03c1f02da483"
+    },
+    "root_epoch60_official_like": {
+      "bytes": 1549,
+      "file": "short_curves/official_like_epoch60.csv",
+      "sha256": "4b25314bdf58f5309538402f43a2bf8b48298d92e3aaea02f3c5358787591dda"
+    },
+    "root_learning_curves": {
+      "bytes": 5152,
+      "file": "short_curves/learning_curves.csv",
+      "sha256": "0949d5e345c9d8faad354c114e7e73cf4f528916a30554ad5f6da9a026d51a38"
+    }
+  },
+  "runtime_migration": {
+    "evaluation_host": "node1",
+    "node25_status": "unreachable_no_route_to_host",
+    "scientific_config_changed": false,
+    "training_host": "node3",
+    "training_world_size": 2
+  },
+  "schema_version": 1,
+  "standard_validation": {
+    "completed_epoch": 60,
+    "metrics": {
+      "SpatialStageMean": 0.31923870742321014,
+      "overall_mAP": 0.28287577629089355,
+      "stage1_mAP": 0.32279229164123535,
+      "stage2_mAP": 0.31568512320518494,
+      "t_mAP": 0.2073969691991806,
+      "t_mAP25": 0.6046708822250366,
+      "t_mAP50": 0.3983558416366577
+    },
+    "optimizer_step": 3960,
+    "source_observation": {
+      "append_only_logger_active": true,
+      "bytes": 1287816,
+      "logical_file": "local_metrics/version_1/metrics.csv",
+      "sha256": "edfbc14757923a4e71fca9e72a048ff9a62535fec78d1d572f396fffbaf25037"
+    },
+    "train_log_step": 3959
+  },
+  "status": "pass",
+  "validated_at_utc": "2026-09-03T21:14:09Z",
+  "validator": {
+    "comparison_file": "utils/rescene_strong_local.py",
+    "comparison_file_sha256": "280973831a75ec544469d3c138b6a7e016b8d90d908e3f7e17b00d8044f67f0c",
+    "source_commit": "01067b4aa9c349ea196ace93962385ff15471fba"
+  },
+  "variant": "A1"
+}
