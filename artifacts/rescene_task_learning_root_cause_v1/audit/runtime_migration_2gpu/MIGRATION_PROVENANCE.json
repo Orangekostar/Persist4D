@@ -25,6 +25,13 @@
     "runtime.gpu_count",
     "runtime.gpu_models"
   ],
+  "evaluation_node_preflight": {
+    "bytes": 3918,
+    "content_sha256": "98bd8b1dc91d5b01dc5ad69469a9d6ff25ed941e310d2e9d4e4a4667fd565968",
+    "file": "audit/runtime_migration_2gpu/EVALUATION_NODE1_PREFLIGHT.json",
+    "sha256": "8b867ce9d2ded03d257bd3adfd03607e46468860448627bc3ff81e68b49d7aaa",
+    "status": "pass"
+  },
   "epoch30_checkpoint_audit": {
     "bytes": 8432,
     "content_sha256": "2fd7b756c48aaaf8fbc96931833c720fe5a606bf2410d85964fcd3c9385ce94a",
