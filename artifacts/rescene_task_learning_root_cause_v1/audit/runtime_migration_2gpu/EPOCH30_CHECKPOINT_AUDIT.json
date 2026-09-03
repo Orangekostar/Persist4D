@@ -5,7 +5,7 @@
     "logged_validation_epoch_index": 29,
     "logged_validation_step": 1979
   },
-  "content_sha256": "891e487fec112b9d453f39f29c8e8b37cc4ad03d04a47d3f37a16c8e59425ea8",
+  "content_sha256": "2fd7b756c48aaaf8fbc96931833c720fe5a606bf2410d85964fcd3c9385ce94a",
   "cross_host_replication": {
     "method": "rsync with partial transfer and delayed atomic update",
     "source_replica_hash_equality": true,
@@ -15,6 +15,8 @@
   "limitations": [
     "The metrics are the second standard validation point, not the preregistered three-seed official-like evaluation.",
     "The epoch-30 comparison and its change from epoch 15 are trajectory health observations and are not authorized for final checkpoint or model selection.",
+    "The committed RC3 comparison is descriptive because no trajectory-equivalence threshold was preregistered.",
+    "Only R1 has a committed pre-migration RC3 reference curve; the pre-outage A1 runtime data remain inaccessible with node25.",
     "No Persist4D or Protocol-B result was used."
   ],
   "paired_delta_change_since_epoch15": {
@@ -52,6 +54,67 @@
     "spatial_stage_mean": -0.0008459314703941345
   },
   "purpose": "epoch-30 post-migration checkpoint durability and trajectory health audit",
+  "reference_trajectory_comparison": {
+    "direction": "migrated_R1_minus_committed_RC3_R1",
+    "epochs": {
+      "15": {
+        "migrated_minus_reference": {
+          "mean_AP": -0.004067674279212952,
+          "mean_stage1_AP": -0.0031395386904478073,
+          "mean_stage2_AP": -0.0012171678245067596,
+          "mean_t_AP": -0.0017339829355478287,
+          "spatial_stage_mean": -0.0021783532574772835
+        },
+        "percentage_points": {
+          "mean_AP": -0.40676742792129517,
+          "mean_stage1_AP": -0.31395386904478073,
+          "mean_stage2_AP": -0.12171678245067596,
+          "mean_t_AP": -0.17339829355478287,
+          "spatial_stage_mean": -0.21783532574772835
+        },
+        "reference_standard_validation": {
+          "mean_AP": 0.031515710055828094,
+          "mean_stage1_AP": 0.03422804921865463,
+          "mean_stage2_AP": 0.033359840512275696,
+          "mean_t_AP": 0.02240157499909401,
+          "spatial_stage_mean": 0.033793944865465164
+        }
+      },
+      "30": {
+        "migrated_minus_reference": {
+          "mean_AP": 0.0029539167881011963,
+          "mean_stage1_AP": 0.009066089987754822,
+          "mean_stage2_AP": -0.0069328248500823975,
+          "mean_t_AP": -0.00154191255569458,
+          "mean_t_AP_25": 0.0046873390674591064,
+          "mean_t_AP_50": -0.0033435076475143433,
+          "spatial_stage_mean": 0.0010666325688362122
+        },
+        "percentage_points": {
+          "mean_AP": 0.29539167881011963,
+          "mean_stage1_AP": 0.9066089987754822,
+          "mean_stage2_AP": -0.6932824850082397,
+          "mean_t_AP": -0.154191255569458,
+          "mean_t_AP_25": 0.46873390674591064,
+          "mean_t_AP_50": -0.3343507647514343,
+          "spatial_stage_mean": 0.10666325688362122
+        },
+        "reference_standard_validation": {
+          "mean_AP": 0.14980360865592957,
+          "mean_stage1_AP": 0.1578657627105713,
+          "mean_stage2_AP": 0.17170315980911255,
+          "mean_t_AP": 0.1199217438697815,
+          "mean_t_AP_25": 0.36732661724090576,
+          "mean_t_AP_50": 0.21141894161701202,
+          "spatial_stage_mean": 0.16478446125984192
+        }
+      }
+    },
+    "reference_file": "short_curves/learning_curves.csv",
+    "reference_file_bytes": 5152,
+    "reference_file_sha256": "0949d5e345c9d8faad354c114e7e73cf4f528916a30554ad5f6da9a026d51a38",
+    "reference_variant_authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191"
+  },
   "schema_version": 1,
   "status": "pass",
   "validated_at_utc": "2026-09-03T16:09:59Z",
