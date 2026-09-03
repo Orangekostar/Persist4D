@@ -69,6 +69,36 @@
     "torch": "2.6.0+cu126"
   },
   "reason": "authorized host migration from a three-GPU host to two-GPU hosts",
+  "recovery_phase": {
+    "automatic_stop_completed_epoch": 90,
+    "checkpoint_boundaries": [
+      60,
+      90,
+      450
+    ],
+    "current_phase": "short_horizon_reconstruction",
+    "full_resume_invariant": "resume the validated epoch-90 full state with the horizon callback removed and preserve optimizer, scheduler, sampler, model, data, and initialization contracts",
+    "full_resume_required": true,
+    "inspected_at_utc": "2026-09-03T19:01:01Z",
+    "variants": {
+      "A1": {
+        "candidate_file_sha256": "6f0780136244ef4dd491bf32759129087aa0f48db44ab54002f0279e00e0b09b",
+        "candidate_id": "f9b660495ca07dcbe9eb331ad3e52cbb3724caca6b1f68abc0e6c7ad0b1438c0",
+        "config_sha256": "4b193162acc5c3a54ea57c5b14b6c9909745e68d16fe7f92687462fadb283d9c",
+        "full_resume_authorization": "pending_regenerated_epoch90_strong_local_gate",
+        "runtime_hydra_config_sha256": "5c4a016c4db1e0b63123eea850ab79d9194621d986f049f03ca375ae7700431b",
+        "runtime_hydra_overrides_sha256": "9d48f016e79101f32197ba9d57856c5423d74028002069d0e7878731a94da720"
+      },
+      "R1": {
+        "candidate_file_sha256": "99b692dfb3f5e989d112cafb938fbd16be5a53db2786c01ea4df2e34144bc4b4",
+        "candidate_id": "0f90b41f0ee06a888237c02cf1a08d0b8d14633bf68beed770bbb86b9d8fcab4",
+        "config_sha256": "3846415b6de3ea12b7b08d39ea20398916dd685c99ce7ad33e42df17d9ac6536",
+        "full_resume_authorization": "committed_RC3_gate_pass",
+        "runtime_hydra_config_sha256": "ef933bdb03a8344e04df88c65d603203b29b6fd508521c9d9d46aa2caf4ce0e1",
+        "runtime_hydra_overrides_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      }
+    }
+  },
   "schema_version": 1,
   "scientific_config_changed": false,
   "status": "pass",
