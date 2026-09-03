@@ -32,6 +32,8 @@ This record separates infrastructure availability from scientific outcomes. Neit
 - ScanNet was copied to each host-local filesystem after initial observation showed that concurrent reads saturated the shared storage device. The post-copy content hashes passed the same frozen data contract.
 - Both A40 pairs use a 220 W power limit and one-minute temperature monitoring. The first sustained Epoch 0 observation covered 57--68 degrees Celsius with no new runtime error.
 - R1 and A1 checkpoints are configured for cross-host replication after each stable `last.ckpt` update.
+- The first post-migration epoch-15 checkpoints passed full-state validation at optimizer step 990. R1 contained 798 model-state entries and A1 contained 802; each contained one optimizer state, one scheduler state, and an epoch-boundary sampler-generator state. Both source files matched their cross-host replicas by SHA256.
+- At the first standard validation point, A1 led R1 by 4.909 percentage points in `SpatialStageMean`. This is a trajectory health observation only, not the preregistered three-seed official-like evaluation and not an authorized final-selection result. Exact values and checkpoint identities are recorded in `runtime_migration_2gpu/FIRST_CHECKPOINT_AUDIT.json`.
 
 ## Node3 root-volume expansion on 2026-09-03
 

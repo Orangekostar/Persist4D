@@ -25,6 +25,13 @@
     "runtime.gpu_count",
     "runtime.gpu_models"
   ],
+  "first_checkpoint_audit": {
+    "bytes": 4180,
+    "content_sha256": "4773f35063fbf11cc1778c1797f69156c590c76ec681191646e41cd573d42cd4",
+    "file": "audit/runtime_migration_2gpu/FIRST_CHECKPOINT_AUDIT.json",
+    "sha256": "cbec2c74b49e3361049ef6533923d6e5b86a23cbfa4fc65552a7c44b9860517e",
+    "status": "pass"
+  },
   "original_a1_authorization_sha256": "fd981971cab69e22e3231037d4e9324aa43aa849cf4b6405b0984754debeb5cc",
   "original_root_authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191",
   "original_runtime": {

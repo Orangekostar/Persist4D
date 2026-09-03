@@ -1,0 +1,104 @@
+{
+  "checkpoint_boundary": {
+    "completed_epoch": 15,
+    "global_step": 990,
+    "logged_validation_epoch_index": 14,
+    "logged_validation_step": 989
+  },
+  "content_sha256": "4773f35063fbf11cc1778c1797f69156c590c76ec681191646e41cd573d42cd4",
+  "cross_host_replication": {
+    "method": "rsync with partial transfer and delayed atomic update",
+    "source_replica_hash_equality": true,
+    "status": "pass"
+  },
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "limitations": [
+    "The metrics are one standard validation point, not the preregistered three-seed official-like evaluation.",
+    "The epoch-15 comparison is a trajectory health check and is not authorized for final checkpoint or model selection.",
+    "No Persist4D or Protocol-B result was used."
+  ],
+  "paired_standard_validation_delta": {
+    "direction": "A1_minus_R1",
+    "mean_AP": 0.0463220551609993,
+    "mean_stage1_AP": 0.046085743233561516,
+    "mean_stage2_AP": 0.052097778767347336,
+    "mean_t_AP": 0.03450931794941425,
+    "percentage_points": {
+      "mean_AP": 4.63220551609993,
+      "mean_stage1_AP": 4.608574323356152,
+      "mean_stage2_AP": 5.209777876734734,
+      "mean_t_AP": 3.4509317949414253,
+      "spatial_stage_mean": 4.909176100045443
+    },
+    "spatial_stage_mean": 0.049091761000454426
+  },
+  "purpose": "first post-migration checkpoint durability and trajectory health audit",
+  "schema_version": 1,
+  "status": "pass",
+  "validated_at_utc": "2026-09-03T12:10:19Z",
+  "validator": {
+    "file": "utils/rescene_rootcause_evaluation.py",
+    "file_sha256": "6d24a68b0a521266e5cad573d7a91049a9fbd6640cefd3a78fbe96ea1e13dfa9",
+    "source_commit": "faae6d92669fbade4198264fcc4eac6af36bb8c1"
+  },
+  "variants": {
+    "A1": {
+      "best_checkpoint_filename": "epoch=014-val_mean_t-AP=0.055.ckpt",
+      "checkpoint": {
+        "bytes": 755165656,
+        "reference": "external:checkpoint/runtime_migration_2gpu/A1/last.ckpt",
+        "replicated_at_utc": "2026-09-03T11:55:01Z",
+        "sha256": "06617fd7844a735d4356e81a0361f8392d29bed63d9f7be259a7a3b6f0a07c16",
+        "source_host": "node3",
+        "source_published_at_utc": "2026-09-03T11:54:22Z",
+        "verified_replica_host": "node2"
+      },
+      "resume_state": {
+        "dataloader_prefetch_state_checkpointed": false,
+        "mid_epoch_resume_supported": false,
+        "optimizer_state_count": 1,
+        "sampler_generator_state_sha256": "f14a1f1b3560a1b494174ba8ed1e2bdd2524358d810ce34c31a8285642a49392",
+        "sampler_resume_scope": "completed_epoch_boundary_only",
+        "scheduler_state_count": 1,
+        "state_dict_entry_count": 802
+      },
+      "role": "rescene_strong",
+      "standard_validation": {
+        "mean_AP": 0.07377009093761444,
+        "mean_stage1_AP": 0.07717425376176834,
+        "mean_stage2_AP": 0.08424045145511627,
+        "mean_t_AP": 0.055176910012960434,
+        "spatial_stage_mean": 0.0807073526084423
+      }
+    },
+    "R1": {
+      "best_checkpoint_filename": "epoch=014-val_mean_t-AP=0.021.ckpt",
+      "checkpoint": {
+        "bytes": 754813672,
+        "reference": "external:checkpoint/runtime_migration_2gpu/R1/last.ckpt",
+        "replicated_at_utc": "2026-09-03T12:09:41Z",
+        "sha256": "2add45628f10f871799b348e5746d91af45d6770f7bc5d053885c1fe4f1b10a7",
+        "source_host": "node2",
+        "source_published_at_utc": "2026-09-03T12:08:37Z",
+        "verified_replica_host": "node3"
+      },
+      "resume_state": {
+        "dataloader_prefetch_state_checkpointed": false,
+        "mid_epoch_resume_supported": false,
+        "optimizer_state_count": 1,
+        "sampler_generator_state_sha256": "f14a1f1b3560a1b494174ba8ed1e2bdd2524358d810ce34c31a8285642a49392",
+        "sampler_resume_scope": "completed_epoch_boundary_only",
+        "scheduler_state_count": 1,
+        "state_dict_entry_count": 798
+      },
+      "role": "root_cause_full_candidate",
+      "standard_validation": {
+        "mean_AP": 0.027448035776615143,
+        "mean_stage1_AP": 0.031088510528206825,
+        "mean_stage2_AP": 0.032142672687768936,
+        "mean_t_AP": 0.02066759206354618,
+        "spatial_stage_mean": 0.03161559160798788
+      }
+    }
+  }
+}
