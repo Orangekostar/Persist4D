@@ -1,0 +1,209 @@
+{
+  "checkpoint_boundary": {
+    "completed_epoch": 45,
+    "global_step": 2970,
+    "logged_validation_epoch_index": 44,
+    "logged_validation_step": 2969
+  },
+  "content_sha256": "6c7bdc94f7a20dfee00162703187c855be2af3c19aa5307fe882f7c434e438a8",
+  "cross_host_replication": {
+    "method": "rsync with partial transfer and delayed atomic update",
+    "source_replica_hash_equality": true,
+    "status": "pass"
+  },
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "limitations": [
+    "The metrics are the third standard validation point, not the preregistered three-seed official-like evaluation.",
+    "The epoch-45 comparison and its changes from prior validation points are trajectory health observations and are not authorized for final checkpoint or model selection.",
+    "The committed RC3 comparison is descriptive because no trajectory-equivalence threshold was preregistered.",
+    "Only R1 has a committed pre-migration RC3 reference curve; the pre-outage A1 runtime data remain inaccessible with node25.",
+    "No Persist4D or Protocol-B result was used."
+  ],
+  "paired_delta_change_since_epoch30": {
+    "direction": "A1_minus_R1_at_epoch45_minus_A1_minus_R1_at_epoch30",
+    "mean_AP": -0.007550910115242004,
+    "mean_stage1_AP": -0.005571618676185608,
+    "mean_stage2_AP": -0.007730275392532349,
+    "mean_t_AP": -0.015225805342197418,
+    "mean_t_AP_25": -0.023413091897964478,
+    "mean_t_AP_50": -0.036597058176994324,
+    "percentage_points": {
+      "mean_AP": -0.7550910115242004,
+      "mean_stage1_AP": -0.5571618676185608,
+      "mean_stage2_AP": -0.7730275392532349,
+      "mean_t_AP": -1.5225805342197418,
+      "mean_t_AP_25": -2.3413091897964478,
+      "mean_t_AP_50": -3.6597058176994324,
+      "spatial_stage_mean": -0.6650947034358978
+    },
+    "spatial_stage_mean": -0.006650947034358978
+  },
+  "paired_standard_validation_delta": {
+    "direction": "A1_minus_R1",
+    "mean_AP": -0.014532461762428284,
+    "mean_stage1_AP": -0.009807109832763672,
+    "mean_stage2_AP": -0.005186647176742554,
+    "mean_t_AP": -0.022426918148994446,
+    "mean_t_AP_25": 0.01848578453063965,
+    "mean_t_AP_50": -0.028353720903396606,
+    "percentage_points": {
+      "mean_AP": -1.4532461762428284,
+      "mean_stage1_AP": -0.9807109832763672,
+      "mean_stage2_AP": -0.5186647176742554,
+      "mean_t_AP": -2.2426918148994446,
+      "mean_t_AP_25": 1.8485784530639648,
+      "mean_t_AP_50": -2.8353720903396606,
+      "spatial_stage_mean": -0.7496878504753113
+    },
+    "spatial_stage_mean": -0.007496878504753113
+  },
+  "purpose": "epoch-45 post-migration checkpoint durability and trajectory health audit",
+  "reference_trajectory_comparison": {
+    "direction": "migrated_R1_minus_committed_RC3_R1",
+    "epoch": 45,
+    "migrated_minus_reference": {
+      "mean_AP": -0.008174866437911987,
+      "mean_stage1_AP": -0.0020365118980407715,
+      "mean_stage2_AP": -0.01050993800163269,
+      "mean_t_AP": -0.00514790415763855,
+      "mean_t_AP_25": -0.0020598173141479492,
+      "mean_t_AP_50": 0.01962563395500183,
+      "spatial_stage_mean": -0.006273224949836731
+    },
+    "percentage_points": {
+      "mean_AP": -0.8174866437911987,
+      "mean_stage1_AP": -0.20365118980407715,
+      "mean_stage2_AP": -1.050993800163269,
+      "mean_t_AP": -0.514790415763855,
+      "mean_t_AP_25": -0.20598173141479492,
+      "mean_t_AP_50": 1.962563395500183,
+      "spatial_stage_mean": -0.6273224949836731
+    },
+    "reference_file": "short_curves/learning_curves.csv",
+    "reference_file_bytes": 5152,
+    "reference_file_sha256": "0949d5e345c9d8faad354c114e7e73cf4f528916a30554ad5f6da9a026d51a38",
+    "reference_standard_validation": {
+      "mean_AP": 0.25528669357299805,
+      "mean_stage1_AP": 0.27251026034355164,
+      "mean_stage2_AP": 0.2787869870662689,
+      "mean_t_AP": 0.185026615858078,
+      "mean_t_AP_25": 0.5442582368850708,
+      "mean_t_AP_50": 0.33119335770606995,
+      "spatial_stage_mean": 0.2756486237049103
+    },
+    "reference_variant_authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191"
+  },
+  "schema_version": 1,
+  "status": "pass",
+  "trajectory_standard_validation": {
+    "direction": "A1_minus_R1",
+    "epochs": {
+      "15": {
+        "A1_spatial_stage_mean": 0.0807073526084423,
+        "R1_spatial_stage_mean": 0.03161559160798788,
+        "paired_delta_spatial_stage_mean": 0.049091761000454426,
+        "paired_delta_spatial_stage_mean_percentage_points": 4.909176100045443
+      },
+      "30": {
+        "A1_spatial_stage_mean": 0.165005162358284,
+        "R1_spatial_stage_mean": 0.16585109382867813,
+        "paired_delta_spatial_stage_mean": -0.0008459314703941345,
+        "paired_delta_spatial_stage_mean_percentage_points": -0.08459314703941345
+      },
+      "45": {
+        "A1_spatial_stage_mean": 0.26187852025032043,
+        "R1_spatial_stage_mean": 0.26937539875507355,
+        "paired_delta_spatial_stage_mean": -0.007496878504753113,
+        "paired_delta_spatial_stage_mean_percentage_points": -0.7496878504753113
+      }
+    }
+  },
+  "validated_at_utc": "2026-09-03T18:31:30Z",
+  "validator": {
+    "file": "utils/rescene_rootcause_evaluation.py",
+    "file_sha256": "6d24a68b0a521266e5cad573d7a91049a9fbd6640cefd3a78fbe96ea1e13dfa9",
+    "source_commit": "126d5bd791ec73c623fee698a78e5349a409ee46"
+  },
+  "variants": {
+    "A1": {
+      "best_checkpoint_filename": "epoch=044-val_mean_t-AP=0.157.ckpt",
+      "checkpoint": {
+        "bytes": 755165656,
+        "reference": "external:checkpoint/runtime_migration_2gpu/A1/last.ckpt",
+        "replicated_at_utc": "2026-09-03T17:53:56Z",
+        "sha256": "05fa8d7b77473d3600038625283c91aa88061fc0506e1806e3e8b754c00c63f6",
+        "source_host": "node3",
+        "source_published_at_utc": "2026-09-03T17:52:35Z",
+        "verified_replica_host": "node2"
+      },
+      "epoch30_to_epoch45_change": {
+        "mean_AP": 0.0868033915758133,
+        "mean_stage1_AP": 0.09797027707099915,
+        "mean_stage2_AP": 0.09577643871307373,
+        "mean_t_AP": 0.04627307504415512,
+        "mean_t_AP_25": 0.1467713713645935,
+        "mean_t_AP_50": 0.10614649951457977,
+        "spatial_stage_mean": 0.09687335789203644
+      },
+      "resume_state": {
+        "dataloader_prefetch_state_checkpointed": false,
+        "mid_epoch_resume_supported": false,
+        "optimizer_state_count": 1,
+        "sampler_generator_state_sha256": "ce0fdb3e84ab060047058227e77939b8eb39c7fdecf6c1c52bae19e0af3da836",
+        "sampler_resume_scope": "completed_epoch_boundary_only",
+        "scheduler_state_count": 1,
+        "state_dict_entry_count": 802
+      },
+      "role": "rescene_strong",
+      "standard_validation": {
+        "mean_AP": 0.23257936537265778,
+        "mean_stage1_AP": 0.2606666386127472,
+        "mean_stage2_AP": 0.2630904018878937,
+        "mean_t_AP": 0.157451793551445,
+        "mean_t_AP_25": 0.5606842041015625,
+        "mean_t_AP_50": 0.32246527075767517,
+        "spatial_stage_mean": 0.26187852025032043
+      }
+    },
+    "R1": {
+      "best_checkpoint_filename": "epoch=044-val_mean_t-AP=0.180.ckpt",
+      "checkpoint": {
+        "bytes": 754813672,
+        "reference": "external:checkpoint/runtime_migration_2gpu/R1/last.ckpt",
+        "replicated_at_utc": "2026-09-03T18:28:39Z",
+        "sha256": "b022e350a2f9f72f61b6d94f496c5a9af02c3b6bfae55b70eb592d56c1889845",
+        "source_host": "node2",
+        "source_published_at_utc": "2026-09-03T18:27:35Z",
+        "verified_replica_host": "node3"
+      },
+      "epoch30_to_epoch45_change": {
+        "mean_AP": 0.0943543016910553,
+        "mean_stage1_AP": 0.10354189574718475,
+        "mean_stage2_AP": 0.10350671410560608,
+        "mean_t_AP": 0.06149888038635254,
+        "mean_t_AP_25": 0.17018446326255798,
+        "mean_t_AP_50": 0.1427435576915741,
+        "spatial_stage_mean": 0.10352430492639542
+      },
+      "resume_state": {
+        "dataloader_prefetch_state_checkpointed": false,
+        "mid_epoch_resume_supported": false,
+        "optimizer_state_count": 1,
+        "sampler_generator_state_sha256": "ce0fdb3e84ab060047058227e77939b8eb39c7fdecf6c1c52bae19e0af3da836",
+        "sampler_resume_scope": "completed_epoch_boundary_only",
+        "scheduler_state_count": 1,
+        "state_dict_entry_count": 798
+      },
+      "role": "root_cause_full_candidate",
+      "standard_validation": {
+        "mean_AP": 0.24711182713508606,
+        "mean_stage1_AP": 0.27047374844551086,
+        "mean_stage2_AP": 0.26827704906463623,
+        "mean_t_AP": 0.17987871170043945,
+        "mean_t_AP_25": 0.5421984195709229,
+        "mean_t_AP_50": 0.3508189916610718,
+        "spatial_stage_mean": 0.26937539875507355
+      }
+    }
+  }
+}

@@ -32,6 +32,13 @@
     "sha256": "f5e820d27e5907ae897b2f00bfcbb6010769bd308357988e82dca9de2f1e4c1e",
     "status": "pass"
   },
+  "epoch45_checkpoint_audit": {
+    "bytes": 8696,
+    "content_sha256": "6c7bdc94f7a20dfee00162703187c855be2af3c19aa5307fe882f7c434e438a8",
+    "file": "audit/runtime_migration_2gpu/EPOCH45_CHECKPOINT_AUDIT.json",
+    "sha256": "e4c8fb966792999361934b4050e95282ea233704319c6301a79366ebf6d79cb5",
+    "status": "pass"
+  },
   "first_checkpoint_audit": {
     "bytes": 4180,
     "content_sha256": "4773f35063fbf11cc1778c1797f69156c590c76ec681191646e41cd573d42cd4",
