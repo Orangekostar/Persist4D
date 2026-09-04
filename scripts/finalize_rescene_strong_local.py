@@ -384,6 +384,7 @@ def build_strong_outputs(
             variant if comparisons[90]["full_training_authorized"] else None
         ),
         "variant_authorization_sha256": authorization["authorization_sha256"],
+        "selection_used_persist4d": False,
         "validation_leads": validation_leads,
         "epoch60_comparison": comparisons[60],
         "epoch90_comparison": comparisons[90],

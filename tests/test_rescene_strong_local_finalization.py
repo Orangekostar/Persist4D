@@ -287,6 +287,7 @@ def test_strong_finalization_authorizes_full_run_from_exact_spatial_gate(
     assert verdict["base_variant"] == "R1"
     assert verdict["all_gates_pass"] is True
     assert verdict["full_training_status"] == "authorized"
+    assert verdict["selection_used_persist4d"] is False
     assert outputs["learning_curves.csv"].count(b"\n") == 13
     assert outputs["official_like_per_seed.csv"].count(b"\n") == 13
 
