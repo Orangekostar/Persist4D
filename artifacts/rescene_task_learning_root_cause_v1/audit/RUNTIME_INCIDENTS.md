@@ -53,6 +53,20 @@ This record separates infrastructure availability from scientific outcomes. Neit
 - After expansion, the mounted filesystem reported 1,884,068,257,792 bytes total and 1,090,949,926,912 bytes available. Kernel logs recorded a successful ext4 resize and no ext4 or block-I/O error.
 - A1 rank processes remained live throughout the resize. No training code, scientific configuration, dataset, initialization, optimizer, scheduler, or metric contract changed.
 
+## Allocator-fragmentation recovery on 2026-09-06
+
+- A1 and R1 independently failed on rank 1 at logger epoch 407, batch 21, while forwarding the same large training sample. Both failures requested an additional 970 MiB while several GiB remained reserved but unallocated; no competing GPU process was present.
+- A1 resumed from its fully resumable completed-epoch-405 checkpoint. R1 resumed from its latest fully resumable completed-epoch-390 checkpoint. Each checkpoint retained model, optimizer, scheduler, callback, and epoch-boundary sampler state.
+- The only runtime change was `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`. Model, data, objective, optimizer, scheduler, device mapping, selection rule, and evaluation contract were unchanged.
+- A1 completed epoch 450 without another allocator failure. R1 replayed the completed-epoch-405 validation boundary and continued beyond the former failure point without another allocator error.
+- R1 replay metrics differ from the discarded version-2 epoch-405 row, so the replay is treated as a new stochastic continuation rather than silently merged with the abandoned branch. The signed recovery lineage selects logger version 3 after completed epoch 390 and preserves version 2 as a superseded source.
+
+## Isolated evaluator import binding on 2026-09-07
+
+- Two A1 evaluation attempts stopped before model or GPU execution because the isolated environment could not import first Concerto and then Detectron2.
+- The successful attempt restored the exact four training source roots for Concerto, Detectron2, Sonata, and stmetrics. No evaluator, checkpoint, dataset, seed, or metric setting changed.
+- Only the three successful 154-sequence seed runs enter the signed full-evaluation verdict; the two import failures contribute no numerical result.
+
 ## Integrity rule
 
 After node25 recovers, record its boot identity and uptime, container restart/OOM state, checkpoint inventory, metric-file continuity, NFS recovery evidence, and training-process state before resuming finalization. If a process did not survive, resume only from a checkpoint whose full-state and provenance contracts pass the existing validators.

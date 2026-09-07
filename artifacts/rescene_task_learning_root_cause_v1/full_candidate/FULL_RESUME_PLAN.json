@@ -1,0 +1,46 @@
+{
+  "archived_conflicts": [
+    {
+      "archive_name": "pre_full_resume_checkpoints/last.ckpt",
+      "bytes": 754813672,
+      "original_name": "last.ckpt",
+      "recoverable": true,
+      "selected_epoch": 90,
+      "selected_step": 5940,
+      "sha256": "058c6b3f4f24a44317a0be69a4442b626af0fd4c26289eee7d6dc17140c3f115"
+    }
+  ],
+  "candidate_id": "0f90b41f0ee06a888237c02cf1a08d0b8d14633bf68beed770bbb86b9d8fcab4",
+  "checkpoint_manifest_sha256": "2da6d0c7aa0cb23d22dfdf2f3f407f268db7e113883946cd0d2c1e48837e05c7",
+  "common_initialization_sha256": "d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+  "completed_epoch": 90,
+  "config_sha256": "3846415b6de3ea12b7b08d39ea20398916dd685c99ce7ad33e42df17d9ac6536",
+  "content_sha256": "344705186748255b8d4997b9029b508d0f7a244a6ea992f08cece0e2f1faa828",
+  "decision_authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191",
+  "exact_checkpoint_bytes": 754813672,
+  "exact_checkpoint_name": "epoch=090.ckpt",
+  "exact_checkpoint_sha256": "a46f5a24650a8bc0016ab54d96cb9dde6dda04656de35ecf5c7e4d8234bfce94",
+  "expected_state_dict_entries": 798,
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "pretrained_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+  "resume_scope": "completed_epoch_boundary_only",
+  "runtime_migration": {
+    "changed_fields": [
+      "runtime.gpu_count",
+      "runtime.gpu_models"
+    ],
+    "decision_authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191",
+    "provenance": {
+      "bytes": 6069,
+      "sha256": "ead47fcdbdf223752a15b93ad2d72897b28ed5190853ed49d018f5b0099d20e1"
+    },
+    "runtime_authorization_sha256": "ee988e908f9b0cf0cd869cbfa104bd630290eb3643851d7dc3eb316f064063ad"
+  },
+  "runtime_selector_exact_match": true,
+  "schema_version": 1,
+  "selected_step": 5940,
+  "short_decision_sha256": "c71d7f770fe72dbeb3816fc1bb2e910dd73f46f5b6fbb18b522f12603f4b3def",
+  "status": "pass",
+  "variant": "R1",
+  "variant_authorization_sha256": "ee988e908f9b0cf0cd869cbfa104bd630290eb3643851d7dc3eb316f064063ad"
+}

@@ -1,0 +1,15 @@
+{
+  "authoritative_source": "local_metrics/version_3/metrics.csv",
+  "content_sha256": "02e41e619fbe7817c994289a579f3d4d74562006c61cb21c72219c27beba5f5b",
+  "reason": "cuda_allocator_fragmentation_recovery",
+  "resume_checkpoint": {
+    "completed_epoch": 390,
+    "optimizer_step": 25740,
+    "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+  },
+  "schema_version": 1,
+  "status": "pass",
+  "superseded_sources": [
+    "local_metrics/version_2/metrics.csv"
+  ]
+}
