@@ -58,7 +58,7 @@ This record separates infrastructure availability from scientific outcomes. Neit
 - A1 and R1 independently failed on rank 1 at logger epoch 407, batch 21, while forwarding the same large training sample. Both failures requested an additional 970 MiB while several GiB remained reserved but unallocated; no competing GPU process was present.
 - A1 resumed from its fully resumable completed-epoch-405 checkpoint. R1 resumed from its latest fully resumable completed-epoch-390 checkpoint. Each checkpoint retained model, optimizer, scheduler, callback, and epoch-boundary sampler state.
 - The only runtime change was `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`. Model, data, objective, optimizer, scheduler, device mapping, selection rule, and evaluation contract were unchanged.
-- A1 completed epoch 450 without another allocator failure. R1 replayed the completed-epoch-405 validation boundary and continued beyond the former failure point without another allocator error.
+- A1 and R1 both completed epoch 450 without another allocator failure. R1 replayed the completed-epoch-405 validation boundary and continued through the final boundary without another allocator error.
 - R1 replay metrics differ from the discarded version-2 epoch-405 row, so the replay is treated as a new stochastic continuation rather than silently merged with the abandoned branch. The signed recovery lineage selects logger version 3 after completed epoch 390 and preserves version 2 as a superseded source.
 
 ## Isolated evaluator import binding on 2026-09-07
@@ -66,6 +66,7 @@ This record separates infrastructure availability from scientific outcomes. Neit
 - Two A1 evaluation attempts stopped before model or GPU execution because the isolated environment could not import first Concerto and then Detectron2.
 - The successful attempt restored the exact four training source roots for Concerto, Detectron2, Sonata, and stmetrics. No evaluator, checkpoint, dataset, seed, or metric setting changed.
 - Only the three successful 154-sequence seed runs enter the signed full-evaluation verdict; the two import failures contribute no numerical result.
+- The first R1 evaluation launch likewise stopped before model or GPU execution because its `PYTHONPATH` omitted the migration repository layer. The corrected launch restored the same four source roots, and only its three successful 154-sequence seed runs enter the signed verdict.
 
 ## Integrity rule
 
