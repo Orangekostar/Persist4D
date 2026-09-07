@@ -1,0 +1,51 @@
+{
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "config_sha256": "34d10651643d1d01993a0b735f590fc555489462beda85b9dd215fc20823213d",
+  "pair_count": 3,
+  "pairs": [
+    {
+      "fingerprints": {
+        "full_prediction": "47ec7e02968762d0a6768c66b9c87589eb15357fd20c721b29f86e2594859868",
+        "local_observation": "73e8e195a38199325ba4af6d73a93f6a746d7db899c5f4b789b68f4ef26856fd",
+        "local_task_sidecar": "d2264a738769501b618e30972df2139c07ac741d427280b70e77ea6415681f86"
+      },
+      "horizon": 2,
+      "master_sequence_id": "scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01",
+      "order_id": "canonical",
+      "reference_scene_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "repeat_count": 3,
+      "t2_observation_parity": "pass"
+    },
+    {
+      "fingerprints": {
+        "full_prediction": "c253e3f7c86580ce17f2b2d55a42993834f335ffafc074a59ce869245b46fec2",
+        "local_observation": "234dd304fc53d67f1c7ee337b8d084537780f77fbf1b70f7060cc2e2c6083c9b",
+        "local_task_sidecar": "8fb8554dc4655f72a72d03f31e9353232be05a69a5447c91c1cde3928a16d30a"
+      },
+      "horizon": 2,
+      "master_sequence_id": "scene0079_00-scene0079_09-scene0079_05-scene0079_04-scene0079_03",
+      "order_id": "canonical",
+      "reference_scene_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "repeat_count": 3,
+      "t2_observation_parity": "pass"
+    },
+    {
+      "fingerprints": {
+        "full_prediction": "28094215951acdcacf9efae56d877396defbcefa5bff286dc7728a52f80d0e64",
+        "local_observation": "d6493d0043c54f14859b7c8f0cc688fb85e71350e099e00d073ff744f99737a6",
+        "local_task_sidecar": "3029c14ecddf4f93a38a108e5527a17d672488a238ae762c14ce9a9ae31232a5"
+      },
+      "horizon": 2,
+      "master_sequence_id": "scene0119_00-scene0119_02-scene0119_03-scene0119_01-scene0119_04",
+      "order_id": "canonical",
+      "reference_scene_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "repeat_count": 3,
+      "t2_observation_parity": "pass"
+    }
+  ],
+  "protocol_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "repeat_count": 3,
+  "schema_version": 1,
+  "source_commit": "5a0bb90ed726cc21ac9a5d97f672cfa833a8bdb6",
+  "status": "pass"
+}
