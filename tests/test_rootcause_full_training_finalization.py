@@ -210,11 +210,14 @@ def test_full_training_manifest_binds_resume_decision_and_selection() -> None:
         "experiment": "rescene_strong_local_v1",
         "selected_variant": "R1",
         "full_training_authorized": True,
+        "variant_authorization_sha256": "6" * 64,
     }
     resume = {
         "content_sha256": "2" * 64,
         "variant": "R1",
         "candidate_id": "3" * 64,
+        "short_decision_sha256": "1" * 64,
+        "variant_authorization_sha256": "6" * 64,
         "runtime_selector_exact_match": True,
         "completed_epoch": 90,
         "selected_step": 5_940,
@@ -247,6 +250,8 @@ def test_full_training_manifest_binds_resume_decision_and_selection() -> None:
     assert manifest["budget"]["completed_epoch"] == 450
     assert manifest["budget"]["optimizer_steps"] == 29_700
     assert manifest["selection"]["selected_epoch"] == 315
+    assert manifest["decision_authorization_sha256"] == "6" * 64
+    assert "runtime_migration" not in manifest
     assert manifest["content_sha256"] == canonical_sha256(
         {key: value for key, value in manifest.items() if key != "content_sha256"}
     )
@@ -325,4 +330,72 @@ def test_full_training_manifest_binds_resume_decision_and_selection() -> None:
             resume_plan=broken,
             selection=selection,
             validation_sources={"metrics.csv": {"bytes": 10, "sha256": "8" * 64}},
+        )
+
+
+def test_full_training_manifest_binds_runtime_only_authorization_migration() -> None:
+    decision = {
+        "content_sha256": "1" * 64,
+        "selected_variant": "R1",
+        "full_training_authorized": True,
+        "variant_authorization_sha256": "5" * 64,
+    }
+    runtime_migration = {
+        "changed_fields": ["runtime.gpu_count", "runtime.gpu_models"],
+        "decision_authorization_sha256": "5" * 64,
+        "runtime_authorization_sha256": "6" * 64,
+        "provenance": {"bytes": 100, "sha256": "9" * 64},
+    }
+    resume = {
+        "content_sha256": "2" * 64,
+        "variant": "R1",
+        "candidate_id": "3" * 64,
+        "short_decision_sha256": "1" * 64,
+        "variant_authorization_sha256": "6" * 64,
+        "decision_authorization_sha256": "5" * 64,
+        "runtime_migration": runtime_migration,
+        "runtime_selector_exact_match": True,
+        "completed_epoch": 90,
+        "selected_step": 5_940,
+    }
+    selection = {
+        "monitor": "val_mean_t-AP",
+        "mode": "max",
+        "validation_event_count": 30,
+        "selected_epoch": 315,
+        "selected_step": 20_790,
+        "selection_metric_exact": 0.40,
+        "selected_checkpoint_sha256": "4" * 64,
+        "selected_checkpoint_bytes": 100,
+        "full_budget_checkpoint_sha256": "7" * 64,
+        "full_budget_checkpoint_bytes": 101,
+    }
+
+    manifest = build_full_training_manifest(
+        variant="R1",
+        candidate_id="3" * 64,
+        authorization_sha256="6" * 64,
+        config_sha256="8" * 64,
+        decision=decision,
+        resume_plan=resume,
+        selection=selection,
+        validation_sources={"metrics.csv": {"bytes": 10, "sha256": "a" * 64}},
+    )
+
+    assert manifest["decision_authorization_sha256"] == "5" * 64
+    assert manifest["runtime_migration"] == runtime_migration
+
+    resume["runtime_migration"]["changed_fields"] = ["runtime.gpu_count"]
+    with pytest.raises(RootCauseEvaluationError, match="authorization migration"):
+        build_full_training_manifest(
+            variant="R1",
+            candidate_id="3" * 64,
+            authorization_sha256="6" * 64,
+            config_sha256="8" * 64,
+            decision=decision,
+            resume_plan=resume,
+            selection=selection,
+            validation_sources={
+                "metrics.csv": {"bytes": 10, "sha256": "a" * 64}
+            },
         )

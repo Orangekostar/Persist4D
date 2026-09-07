@@ -68,6 +68,7 @@ STRONG_FULL_EVALUATION_FILES = (
     "STRONG_LOCAL_FULL_VERDICT.md",
     "STRONG_LOCAL_FULL_PROVENANCE.json",
 )
+RUNTIME_MIGRATION_FIELDS = ["runtime.gpu_count", "runtime.gpu_models"]
 
 
 class FinalizationError(RuntimeError):
@@ -153,6 +154,59 @@ def _validate_signed(payload: Mapping[str, Any], *, field: str, name: str) -> No
     unsigned.pop(field, None)
     if not isinstance(expected, str) or canonical_sha256(unsigned) != expected:
         raise FinalizationError(f"{name} content hash differs")
+
+
+def _full_runtime_authorization(
+    *,
+    short_decision: Mapping[str, Any],
+    training_manifest: Mapping[str, Any],
+) -> str:
+    decision_authorization = short_decision.get("variant_authorization_sha256")
+    runtime_authorization = training_manifest.get("variant_authorization_sha256")
+    recorded_decision_authorization = training_manifest.get(
+        "decision_authorization_sha256"
+    )
+    runtime_migration = training_manifest.get("runtime_migration")
+    if (
+        not isinstance(decision_authorization, str)
+        or not isinstance(runtime_authorization, str)
+        or recorded_decision_authorization != decision_authorization
+    ):
+        raise FinalizationError("full authorization migration differs")
+    if runtime_authorization == decision_authorization:
+        if runtime_migration is not None:
+            raise FinalizationError("full authorization migration differs")
+        return runtime_authorization
+
+    provenance = (
+        runtime_migration.get("provenance")
+        if isinstance(runtime_migration, Mapping)
+        else None
+    )
+    if (
+        not isinstance(runtime_migration, Mapping)
+        or set(runtime_migration)
+        != {
+            "changed_fields",
+            "decision_authorization_sha256",
+            "runtime_authorization_sha256",
+            "provenance",
+        }
+        or runtime_migration.get("changed_fields") != RUNTIME_MIGRATION_FIELDS
+        or runtime_migration.get("decision_authorization_sha256")
+        != decision_authorization
+        or runtime_migration.get("runtime_authorization_sha256")
+        != runtime_authorization
+        or not isinstance(provenance, Mapping)
+        or not isinstance(provenance.get("bytes"), int)
+        or isinstance(provenance.get("bytes"), bool)
+        or provenance["bytes"] <= 0
+        or not isinstance(provenance.get("sha256"), str)
+        or len(provenance["sha256"]) != 64
+        or any(character not in "0123456789abcdef" for character in provenance["sha256"])
+    ):
+        raise FinalizationError("full authorization migration differs")
+    return runtime_authorization
 
 
 def _file_identity(path: Path) -> dict[str, object]:
@@ -394,7 +448,10 @@ def publish_final_package(inputs: FinalPackageInputs) -> dict[str, object]:
         selected_full_training = selected_manifest.get("full_training")
         training_selection = training_manifest.get("selection")
         budget = training_manifest.get("budget")
-        authorization_sha256 = short_decision.get("variant_authorization_sha256")
+        authorization_sha256 = _full_runtime_authorization(
+            short_decision=short_decision,
+            training_manifest=training_manifest,
+        )
         if (
             selected_manifest.get("status") != "pass"
             or selected_manifest.get("stage") != "full_candidate"
@@ -412,8 +469,6 @@ def publish_final_package(inputs: FinalPackageInputs) -> dict[str, object]:
         if (
             training_manifest.get("status") != "pass"
             or training_manifest.get("variant") != selected
-            or training_manifest.get("variant_authorization_sha256")
-            != authorization_sha256
             or not isinstance(training_selection, Mapping)
             or not isinstance(budget, Mapping)
             or budget.get("completed_epoch") != 450

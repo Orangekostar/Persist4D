@@ -51,6 +51,7 @@ LEARNING_CURVE_FIELDS = (
     "SpatialStageMean",
     "metrics_csv_sha256",
 )
+RUNTIME_MIGRATION_FIELDS = ["runtime.gpu_count", "runtime.gpu_models"]
 BEST_CHECKPOINT = re.compile(
     r"^epoch=(?P<epoch>\d+)-val_mean_t-AP="
     r"(?P<score>[+-]?(?:\d+(?:\.\d+)?|\.\d+))(?:-v\d+)?\.ckpt$"
@@ -374,6 +375,63 @@ def select_full_checkpoint(
     }
 
 
+def _resume_authorization_lineage(
+    *,
+    authorization_sha256: str,
+    decision: Mapping[str, Any],
+    resume_plan: Mapping[str, Any],
+) -> tuple[str, dict[str, object] | None]:
+    decision_authorization = decision.get("variant_authorization_sha256")
+    runtime_migration = resume_plan.get("runtime_migration")
+    if (
+        not _is_sha256(decision_authorization)
+        or resume_plan.get("short_decision_sha256")
+        != decision.get("content_sha256")
+        or resume_plan.get("variant_authorization_sha256")
+        != authorization_sha256
+    ):
+        raise RootCauseEvaluationError("full-training authorization migration differs")
+    if decision_authorization == authorization_sha256:
+        if (
+            resume_plan.get("decision_authorization_sha256") is not None
+            or runtime_migration is not None
+        ):
+            raise RootCauseEvaluationError(
+                "full-training authorization migration differs"
+            )
+        return decision_authorization, None
+
+    provenance = (
+        runtime_migration.get("provenance")
+        if isinstance(runtime_migration, Mapping)
+        else None
+    )
+    if (
+        resume_plan.get("decision_authorization_sha256")
+        != decision_authorization
+        or not isinstance(runtime_migration, Mapping)
+        or set(runtime_migration)
+        != {
+            "changed_fields",
+            "decision_authorization_sha256",
+            "runtime_authorization_sha256",
+            "provenance",
+        }
+        or runtime_migration.get("changed_fields") != RUNTIME_MIGRATION_FIELDS
+        or runtime_migration.get("decision_authorization_sha256")
+        != decision_authorization
+        or runtime_migration.get("runtime_authorization_sha256")
+        != authorization_sha256
+        or not isinstance(provenance, Mapping)
+        or not isinstance(provenance.get("bytes"), int)
+        or isinstance(provenance.get("bytes"), bool)
+        or provenance["bytes"] <= 0
+        or not _is_sha256(provenance.get("sha256"))
+    ):
+        raise RootCauseEvaluationError("full-training authorization migration differs")
+    return decision_authorization, dict(runtime_migration)
+
+
 def build_full_training_manifest(
     *,
     variant: str,
@@ -438,6 +496,11 @@ def build_full_training_manifest(
         for source in validation_sources.values()
     ):
         raise RootCauseEvaluationError("full-training validation sources differ")
+    decision_authorization, runtime_migration = _resume_authorization_lineage(
+        authorization_sha256=authorization_sha256,
+        decision=decision,
+        resume_plan=resume_plan,
+    )
     if validation_lineage is not None:
         policy = validation_lineage.get("policy")
         superseded_rows = validation_lineage.get("superseded_validation_rows")
@@ -493,6 +556,7 @@ def build_full_training_manifest(
         "variant": variant,
         "candidate_id": candidate_id,
         "variant_authorization_sha256": authorization_sha256,
+        "decision_authorization_sha256": decision_authorization,
         "config_sha256": config_sha256,
         "short_decision_sha256": decision["content_sha256"],
         "resume_plan_sha256": resume_plan["content_sha256"],
@@ -509,6 +573,8 @@ def build_full_training_manifest(
         },
         "selection_used_persist4d": False,
     }
+    if runtime_migration is not None:
+        payload["runtime_migration"] = runtime_migration
     if validation_lineage is not None:
         payload["validation_lineage"] = {
             "policy": dict(validation_lineage["policy"]),

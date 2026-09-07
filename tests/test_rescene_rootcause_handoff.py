@@ -699,6 +699,7 @@ def _authorized_full_inputs(
     verdict_checkpoint_sha256: str = "a" * 64,
     verdict_training_sha256: str | None = None,
     provenance_verdict_sha256: str | None = None,
+    runtime_authorization_sha256: str | None = None,
 ) -> FinalPackageInputs:
     inputs = _finalization_inputs(tmp_path)
     decision_path = inputs.short_directory / "ROOTCAUSE_SHORT_DECISION.json"
@@ -737,12 +738,29 @@ def _authorized_full_inputs(
     (training / "FULL_TRAINING_REPORT.md").write_text(
         "# Full Training\n", encoding="ascii"
     )
+    runtime_authorization = runtime_authorization_sha256 or "6" * 64
     training_manifest = _signed(
         {
             "schema_version": 1,
             "status": "pass",
             "variant": "R1",
-            "variant_authorization_sha256": "6" * 64,
+            "variant_authorization_sha256": runtime_authorization,
+            "decision_authorization_sha256": "6" * 64,
+            **(
+                {
+                    "runtime_migration": {
+                        "changed_fields": [
+                            "runtime.gpu_count",
+                            "runtime.gpu_models",
+                        ],
+                        "decision_authorization_sha256": "6" * 64,
+                        "runtime_authorization_sha256": runtime_authorization,
+                        "provenance": {"bytes": 100, "sha256": "9" * 64},
+                    }
+                }
+                if runtime_authorization != "6" * 64
+                else {}
+            ),
             "budget": {"completed_epoch": 450, "optimizer_steps": 29_700},
             "selection": {"selected_checkpoint_sha256": "a" * 64},
         },
@@ -764,7 +782,9 @@ def _authorized_full_inputs(
             "stage": "full_candidate",
             "variant": "R1",
             "checkpoint": {"sha256": "a" * 64},
-            "bindings": {"variant_authorization_sha256": "6" * 64},
+            "bindings": {
+                "variant_authorization_sha256": runtime_authorization
+            },
             "full_training": {
                 "completed_epoch": 450,
                 "manifest_sha256": training_manifest["content_sha256"],
@@ -865,6 +885,36 @@ def test_finalizer_publishes_completed_full_candidate(tmp_path: Path) -> None:
     assert (
         inputs.artifact_root / "full_candidate/FULL_EVALUATION_PROVENANCE.json"
     ).is_file()
+
+
+def test_finalizer_accepts_signed_runtime_only_authorization_migration(
+    tmp_path: Path,
+) -> None:
+    inputs = _authorized_full_inputs(
+        tmp_path, runtime_authorization_sha256="7" * 64
+    )
+
+    result = publish_final_package(inputs)
+
+    assert result["full_candidate_status"] == "completed"
+
+
+def test_finalizer_rejects_incomplete_runtime_authorization_migration(
+    tmp_path: Path,
+) -> None:
+    inputs = _authorized_full_inputs(
+        tmp_path, runtime_authorization_sha256="7" * 64
+    )
+    manifest_path = inputs.full_training_directory / "FULL_TRAINING_MANIFEST.json"
+    manifest = json.loads(manifest_path.read_text(encoding="ascii"))
+    manifest.pop("content_sha256")
+    manifest["runtime_migration"]["changed_fields"] = ["runtime.gpu_count"]
+    manifest_path.write_text(
+        json.dumps(_signed(manifest, "content_sha256")), encoding="ascii"
+    )
+
+    with pytest.raises(FinalizationError, match="authorization migration"):
+        publish_final_package(inputs)
 
 
 def _finalization_spec(inputs: FinalPackageInputs) -> dict[str, object]:
