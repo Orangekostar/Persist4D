@@ -1,0 +1,52 @@
+{
+  "checkpoint": {
+    "bytes": 754813672,
+    "completed_epoch": 390,
+    "completed_step": 25740,
+    "reference": "external:checkpoint/rootcause_full/r1/epoch390/629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "state_dict_entries": 798,
+    "training_config_sha256": "3846415b6de3ea12b7b08d39ea20398916dd685c99ce7ad33e42df17d9ac6536"
+  },
+  "checkpoint_sha256_verification": "preverified_once_before_execution_and_bound_by_digest_filename_and_bytes",
+  "experiment": "persist4d_r1_downstream_validation_v1",
+  "metadata": {
+    "bytes": 3155995,
+    "reference": "external:3RScan/3RScan.json",
+    "sha256": "674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64"
+  },
+  "pretrained": {
+    "bytes": 433987358,
+    "reference": "external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+    "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+  },
+  "protocol": {
+    "cache_entry_count": 645,
+    "master_count": 43,
+    "order_count": 3,
+    "reference_scene_cluster_count": 6,
+    "sequence_count": 129,
+    "sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+    "status": "pass"
+  },
+  "runtime": {
+    "batch_size": 1,
+    "device": "cuda:0",
+    "device_count": 1,
+    "precision": "float32",
+    "seed": 45
+  },
+  "schema_version": 1,
+  "source": {
+    "algorithm_semantic_hash": "3950865866acbfef88e28ed1a1448b8edd625ea6ded1cd49c23d55408551691e",
+    "code_commit_at_audit": "ab5559b726a28b70a88783677d6751cb45a0fb73",
+    "source_sha256": {
+      "conf/p6a/default.yaml": "dd7a9fccc098fc7e5faecc059d6202ca7f8a762aaee3e7182738a2d7f800aac2",
+      "models/persistent_memory.py": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8",
+      "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
+      "scripts/system_comparison_v2_inference.py": "49787b1babff24b4f2892538e3bcf6694f3b9a1c003da36aadec67c273b2381b",
+      "scripts/system_comparison_v3_identity.py": "6ad16bb5ad0abf1370b383f56934e402340b64a8d224b2edde1cff2fb84108c6"
+    }
+  },
+  "status": "pass"
+}
