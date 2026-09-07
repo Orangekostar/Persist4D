@@ -1,0 +1,53 @@
+{
+  "authorized_claims": [
+    "The frozen R1 checkpoint was evaluated on all 129 Protocol-B sequence-order units.",
+    "B4 satisfies the preregistered R1 gap-recovery rule against B2 at T4 and T5.",
+    "The six-unit A40 resource profile is descriptive for this frozen implementation."
+  ],
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "content_sha256": "d1851f1cae6b6a5befd8c5b2ca7e7b8f5b8d7ab6fb53bf6d419f427448e09e39",
+  "experiment": "persist4d_r1_downstream_validation_v1",
+  "forbidden_claims": [
+    "causal attribution of old-versus-R1 downstream differences without historical raw replay",
+    "generalization beyond the frozen Protocol-B data and implementation",
+    "state-of-the-art or production deployment readiness"
+  ],
+  "output_sha256": {
+    "FINAL_REPORT.md": "53ff1487544d89a89a73d464efc61fe15019a4131c011f7e7ce89273f1aa73bf",
+    "HANDOFF.md": "279c87ea7a311424ec7841e332155c9a542b594d19335572d4f03f94aea1557b"
+  },
+  "protocol_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "schema_version": 1,
+  "source_commit": "43d72c518ab94b71985a9b7a28f45174054fdca8",
+  "status": "complete",
+  "statuses": {
+    "candidate_semantics": "PASS",
+    "execution_status": "COMPLETE",
+    "old_new_comparability": "HISTORICAL_REFERENCE_ONLY",
+    "publication_status": "PUSH_VERIFIED",
+    "recovery_evidence": "SUPPORTED",
+    "resource_evidence": "SUPPORTED_IN_PROFILE",
+    "temporal_task_result": "B2_AND_FULLHISTORY_REPORTED_WITH_REDUCER_SENSITIVITY"
+  },
+  "upstream_sha256": {
+    "CODE_MAP.md": "b71bf0dab38aedfb9e87d1d54622b5a33a03042abe779faa91763a9d827ffcb8",
+    "EXPERIMENT_CONTRACT.md": "0676ad867aa5735fea9a56cd0a7af1c1fcb3b8c92e10269ef8752ba8d0b4bc1e",
+    "cache_manifest.json": "d31cb21e3a1f2114e088409622845cbbb74d0c56b1dde97ffe066f444cb54d19",
+    "historical_replay_status.json": "194bc982b39bd5a9177ada9e9ec1a9bc8d72b4f340993578c511484d96cd08fb",
+    "input_manifest.json": "0812f6b0936d89231585874529d0086a0b655a4ed77c5780888f6b6f8a58426d",
+    "metrics/checkpoint_regime_comparison.csv": "bc5836b6441ecb4dadb425a4d21461e8747ca68deb710546c63ede4b24b88f8c",
+    "metrics/gap_event_ledger.csv": "839b288838fbabf157605dd4e334143fdd246b21ffca095ac6ef5a0ae9fd84aa",
+    "metrics/identity_aggregate.csv": "840870d78aa2ffe3230642305eff7424876839fdbae8bbfce13ff0f44724637f",
+    "metrics/identity_per_cluster.csv": "312ed80712237c8ea35cbcfe63d21f7a00bc2077f3d6c8e08080af947a43d4d3",
+    "metrics/identity_per_sequence.csv": "76858d633e5fbdf57e0f1687f1489ff84d9cb110387f826367ddb4d555d57033",
+    "metrics/local_current.csv": "d9983c5463f64d134692dddd1fc2824244e0c7d6ee86a33901859a65a37b690c",
+    "metrics/score_sensitivity.csv": "cbcdcdfe607466459e26009244dd2dedbdbdb30121cead5aa3184eee4ddb2b1a",
+    "metrics/task_aggregate.csv": "cf5402885d1ab2afad8c0f4382eaf4ee07422c4e64cfea8b64c22e87a93d101b",
+    "metrics/task_per_cluster.csv": "8e37ccf3638f695ad4895406e59b2a3bc1d0521d9db75fb7a30094ebb65e5b1b",
+    "metrics/task_per_sequence.csv": "d9dd16a4b1332c61b6b621a1927478c16f2743ebca2d536ff8681e17c24a4e23",
+    "profile/samples.csv": "9c9557849f334282a0905127f497891dcf1d728e107c597be9cb9344ed00e7ce",
+    "profile/summary.csv": "f5b337e500dee12c8b4e962013f6dbed64cfaf87c9fdc36b42498098f58ae2cf",
+    "runtime_config.yaml": "a82c93453eb41e0a5ed9ccf551f569774c05e8e5f2be760add9a96a9f35e0e6a",
+    "smoke_and_parity.json": "ed1898cfad827085bb7a7dd24ff4e488cd944433158d31e1bcf229a24fab43d2"
+  }
+}
