@@ -42,6 +42,7 @@ def test_identity_aggregation_derives_attempt_coverage_from_pooled_counts() -> N
                 gap_opportunities=3,
                 recovery_attempts=2,
                 correct_recoveries=1,
+                max_occupied_slots=12,
             ),
             _identity_counts(
                 deployment_id_switches=2,
@@ -49,6 +50,7 @@ def test_identity_aggregation_derives_attempt_coverage_from_pooled_counts() -> N
                 gap_opportunities=2,
                 recovery_attempts=2,
                 correct_recoveries=2,
+                max_occupied_slots=17,
             ),
         ]
     )
@@ -59,6 +61,7 @@ def test_identity_aggregation_derives_attempt_coverage_from_pooled_counts() -> N
     assert result["gap_opportunities"] == 5
     assert result["recovery_attempts"] == 4
     assert result["correct_recoveries"] == 3
+    assert result["max_occupied_slots"] == 17
     assert result["recovery_attempt_coverage"] == pytest.approx(0.8)
     assert result["gap_recovery_accuracy"] == pytest.approx(0.75)
     assert result["gap_recovery_recall"] == pytest.approx(0.6)
@@ -99,7 +102,42 @@ def test_recovery_decision_requires_positive_pooled_and_four_clusters_at_t4_t5()
     clusters[-6]["gap_recovery_recall"] = 0.25
     clusters[-5]["gap_recovery_recall"] = 0.2
     assert analysis.classify_recovery(aggregate, clusters)["status"] == (
+        "RECOVERY_MIXED"
+    )
+
+
+def test_recovery_decision_distinguishes_mixed_and_not_supported() -> None:
+    analysis = _analysis()
+    aggregate = []
+    clusters = []
+    for horizon in (4, 5):
+        aggregate.extend(
+            [
+                {"method": "B2", "order_id": "all", "horizon": horizon,
+                 "gap_recovery_recall": 0.3},
+                {"method": "B4", "order_id": "all", "horizon": horizon,
+                 "gap_recovery_recall": 0.2},
+            ]
+        )
+        for index in range(6):
+            reference = f"cluster-{index}"
+            clusters.extend(
+                [
+                    {"method": "B2", "order_id": "all", "horizon": horizon,
+                     "reference_scene_id": reference,
+                     "gap_recovery_recall": 0.3},
+                    {"method": "B4", "order_id": "all", "horizon": horizon,
+                     "reference_scene_id": reference,
+                     "gap_recovery_recall": 0.2},
+                ]
+            )
+
+    assert analysis.classify_recovery(aggregate, clusters)["status"] == (
         "RECOVERY_NOT_SUPPORTED"
+    )
+    clusters[1]["gap_recovery_recall"] = None
+    assert analysis.classify_recovery(aggregate, clusters)["status"] == (
+        "RECOVERY_MIXED"
     )
 
 

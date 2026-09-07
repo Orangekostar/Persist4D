@@ -241,6 +241,22 @@ def test_cpu_setup_assembles_exact_protocol_without_loading_model(
     assert setup.runtime_config.backbone.name == str(CONCERTO_PRETRAIN.resolve())
 
 
+def test_algorithm_semantic_identity_is_separate_from_checkpoint() -> None:
+    context = _context_module()
+
+    identity = context.build_algorithm_semantic_identity(REPO_ROOT)
+
+    assert len(identity["algorithm_semantic_hash"]) == 64
+    assert set(identity["source_sha256"]) == {
+        "conf/p6a/default.yaml",
+        "models/persistent_memory.py",
+        "scripts/evaluate_persist4d_p6a.py",
+        "scripts/system_comparison_v2_inference.py",
+        "scripts/system_comparison_v3_identity.py",
+    }
+    assert "checkpoint" not in identity["algorithm_semantic_hash"]
+
+
 def test_data_working_directory_must_equal_explicit_data_root(tmp_path: Path) -> None:
     context = _context_module()
     data_root = tmp_path / "data-repository"

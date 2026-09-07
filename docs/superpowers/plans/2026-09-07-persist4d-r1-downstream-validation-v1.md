@@ -25,7 +25,8 @@ worktree. Large caches live under `/mnt/shared/ww`; compact evidence is committe
   FullHistory coverage, manifest provenance, and tamper rejection.
 - Implement one-GPU `cuda:0`, FP32, seed-45 cache commands. Write all tensor data
   externally; publish only compact manifests in Git.
-- Run three-cluster smoke/parity and record deterministic fingerprints.
+- Run six-cluster smoke/parity, repeat only two selected inputs once, and record
+  deterministic fingerprints. Verify all 129 T2 pairs from completed caches.
 - Commit code before full cache generation, then materialize 645 local raw+
   sidecar entries and 645 FullHistory entries on shared storage.
 

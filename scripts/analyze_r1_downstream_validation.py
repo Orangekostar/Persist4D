@@ -133,8 +133,14 @@ def aggregate_identity_rows(
         field: sum(_non_negative_count(row.get(field), field=field) for row in rows)
         for field in (*IDENTITY_COUNT_FIELDS, *EVENT_COUNT_FIELDS)
     }
+    occupied_values = [
+        _non_negative_count(value, field="max_occupied_slots")
+        for row in rows
+        if (value := row.get("max_occupied_slots")) not in {None, ""}
+    ]
     return {
         **totals,
+        "max_occupied_slots": max(occupied_values) if occupied_values else None,
         "normalized_id_switch_rate": _rate(
             totals["deployment_id_switches"],
             totals["identity_transition_opportunities"],
@@ -284,6 +290,8 @@ def classify_recovery(
 
     decision: dict[str, object] = {}
     supported = True
+    has_missing_cluster = False
+    pooled_deltas = []
     for horizon in RECOVERY_HORIZONS:
         aggregate = _unique_index(
             aggregate_rows, horizon=horizon, include_cluster=False
@@ -311,19 +319,47 @@ def classify_recovery(
                 f"T{horizon} recovery decision requires six paired clusters"
             )
         deltas = []
+        cluster_deltas = []
         for reference in references:
+            baseline_value = clusters[(reference, "B2")].get(
+                "gap_recovery_recall"
+            )
+            candidate_value = clusters[(reference, "B4")].get(
+                "gap_recovery_recall"
+            )
+            if baseline_value is None or candidate_value is None:
+                cluster_deltas.append(
+                    {
+                        "reference_scene_id": reference,
+                        "b2": baseline_value,
+                        "b4": candidate_value,
+                        "b4_minus_b2": None,
+                    }
+                )
+                continue
             baseline = _finite_metric(
-                clusters[(reference, "B2")].get("gap_recovery_recall"),
-                field="gap_recovery_recall",
+                baseline_value, field="gap_recovery_recall"
             )
             candidate = _finite_metric(
-                clusters[(reference, "B4")].get("gap_recovery_recall"),
-                field="gap_recovery_recall",
+                candidate_value, field="gap_recovery_recall"
             )
-            deltas.append(candidate - baseline)
+            delta = candidate - baseline
+            deltas.append(delta)
+            cluster_deltas.append(
+                {
+                    "reference_scene_id": reference,
+                    "b2": baseline,
+                    "b4": candidate,
+                    "b4_minus_b2": delta,
+                }
+            )
         pooled_delta = b4 - b2
+        pooled_deltas.append(pooled_delta)
         positive_count = sum(delta > 0.0 for delta in deltas)
-        horizon_supported = pooled_delta > 0.0 and positive_count >= 4
+        has_missing_cluster = has_missing_cluster or len(deltas) != 6
+        horizon_supported = (
+            len(deltas) == 6 and pooled_delta > 0.0 and positive_count >= 4
+        )
         supported = supported and horizon_supported
         decision[f"T{horizon}"] = {
             "pooled_b2": b2,
@@ -331,12 +367,48 @@ def classify_recovery(
             "pooled_b4_minus_b2": pooled_delta,
             "positive_cluster_count": positive_count,
             "valid_cluster_count": len(deltas),
+            "equal_weight_cluster_delta": (
+                sum(deltas) / len(deltas) if deltas else None
+            ),
+            "cluster_deltas": cluster_deltas,
             "supported": horizon_supported,
         }
-    decision["status"] = (
-        "RECOVERY_SUPPORTED" if supported else "RECOVERY_NOT_SUPPORTED"
-    )
+    if supported:
+        decision["status"] = "RECOVERY_SUPPORTED"
+    elif has_missing_cluster or any(delta > 0.0 for delta in pooled_deltas):
+        decision["status"] = "RECOVERY_MIXED"
+    else:
+        decision["status"] = "RECOVERY_NOT_SUPPORTED"
     return decision
+
+
+def _max_occupied_slots(steps: Sequence[object]) -> int | None:
+    import torch
+    from torch import Tensor
+
+    values = []
+    for step in steps:
+        state = (
+            step.get("state_snapshot")
+            if isinstance(step, Mapping)
+            else getattr(step, "state_snapshot", None)
+        )
+        occupied = (
+            state.get("occupied")
+            if isinstance(state, Mapping)
+            else getattr(state, "occupied", None)
+        )
+        if occupied is None:
+            continue
+        if (
+            not isinstance(occupied, Tensor)
+            or occupied.dtype != torch.bool
+            or occupied.ndim != 2
+            or occupied.shape[0] != 1
+        ):
+            raise R1AnalysisError("tracker occupied state differs")
+        values.append(int(occupied[0].sum().item()))
+    return max(values) if values else None
 
 
 def paired_cluster_bootstrap(
@@ -1332,6 +1404,9 @@ def run_analysis(
                         "horizon": horizon,
                         **metrics,
                         **_event_counts(events, horizon=horizon),
+                        "max_occupied_slots": _max_occupied_slots(
+                            steps[:horizon]
+                        ),
                         "tracker_input": "frozen_query_observation_no_gt",
                         "identity_matching": "post_prediction_hungarian_iou_0.5",
                         "cache_digest": cache_digest,

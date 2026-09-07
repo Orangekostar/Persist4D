@@ -54,6 +54,55 @@ def _cell(row: Mapping[str, object]) -> tuple[str, str, str, str, int]:
     return result
 
 
+def _non_negative_integer(value: object, *, name: str) -> int:
+    if isinstance(value, str):
+        try:
+            value = int(value)
+        except ValueError as error:
+            raise R1ProfileError(f"{name} state evidence is invalid") from error
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise R1ProfileError(f"{name} state evidence is invalid")
+    return value
+
+
+def summarize_b4_state(
+    steps: Sequence[object],
+) -> dict[str, int]:
+    """Summarize actual B4 state after one fresh causal prefix."""
+
+    if not steps:
+        raise R1ProfileError("B4 state evidence is empty")
+    rejected_births = 0
+    occupied_slots = None
+    for step in steps:
+        state = _field(step, "state_snapshot")
+        occupied = _field(state, "occupied")
+        rejected = _field(step, "rejected_births")
+        if (
+            not isinstance(occupied, Tensor)
+            or occupied.dtype != torch.bool
+            or occupied.ndim != 2
+            or occupied.shape[0] != 1
+        ):
+            raise R1ProfileError("B4 state evidence differs")
+        if isinstance(rejected, Tensor):
+            if rejected.dtype != torch.bool:
+                raise R1ProfileError("B4 state evidence differs")
+            rejected_count = int(rejected.sum().item())
+        elif isinstance(rejected, Sequence) and not isinstance(
+            rejected, (str, bytes)
+        ) and all(type(value) is bool for value in rejected):
+            rejected_count = sum(rejected)
+        else:
+            raise R1ProfileError("B4 state evidence differs")
+        occupied_slots = int(occupied[0].sum().item())
+        rejected_births += rejected_count
+    return {
+        "occupied_slots": int(occupied_slots),
+        "rejected_births": rejected_births,
+    }
+
+
 def validate_profile_coverage(
     *,
     sample_rows: Sequence[Mapping[str, object]],
@@ -80,6 +129,18 @@ def validate_profile_coverage(
         or set(summary_cells) != expected_cells
     ):
         raise R1ProfileError("profile summary coverage differs")
+    for row in summary_rows:
+        if row.get("method") == "B4":
+            _non_negative_integer(
+                row.get("occupied_slots"), name="occupied_slots"
+            )
+            _non_negative_integer(
+                row.get("rejected_births"), name="rejected_births"
+            )
+        elif row.get("occupied_slots") not in {None, ""} or row.get(
+            "rejected_births"
+        ) not in {None, ""}:
+            raise R1ProfileError("FullHistory state evidence must be N/A")
     sample_cells = []
     for row in sample_rows:
         cell = _cell(row)
@@ -327,6 +388,10 @@ def run_profile(
                                 return operation
 
                             persistent_bytes = None
+                            state_evidence = {
+                                "occupied_slots": None,
+                                "rejected_births": None,
+                            }
                             explicit_history_bytes = prepared.input_bytes
                             update_scan_count = horizon
                         else:
@@ -374,13 +439,19 @@ def run_profile(
                             state_tracker = tracker_factory(
                                 f"r1-profile-state:{unit.master_sequence_id}"
                             )
+                            state_steps = []
                             for stage, observation in enumerate(cached[:horizon]):
-                                state_tracker.step(observation, stage_id=stage)
+                                state_steps.append(
+                                    state_tracker.step(
+                                        observation, stage_id=stage
+                                    )
+                                )
                             if state_tracker.state is None:
                                 raise R1ProfileError("B4 profile state is unavailable")
                             persistent_bytes = persistent_state_storage_bytes(
                                 state_tracker.state
                             )
+                            state_evidence = summarize_b4_state(state_steps)
                             explicit_history_bytes = None
                             update_scan_count = 2
                         profile = measure_cuda_repeats(
@@ -444,6 +515,7 @@ def run_profile(
                                 "model_input_bytes": prepared.input_bytes,
                                 "cumulative_model_input_bytes": cumulative_bytes,
                                 "persistent_state_bytes": persistent_bytes,
+                                **state_evidence,
                                 "explicit_history_input_bytes": explicit_history_bytes,
                                 "measurement_boundary": (
                                     "cuda_synchronized_model_forward_plus_cpu_tracker"

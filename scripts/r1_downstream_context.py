@@ -16,6 +16,15 @@ class R1ContextError(ValueError):
     """Raised when an R1 downstream input differs from the frozen contract."""
 
 
+ALGORITHM_SEMANTIC_PATHS = (
+    "conf/p6a/default.yaml",
+    "models/persistent_memory.py",
+    "scripts/evaluate_persist4d_p6a.py",
+    "scripts/system_comparison_v2_inference.py",
+    "scripts/system_comparison_v3_identity.py",
+)
+
+
 @dataclass
 class R1Setup:
     contract: dict[str, Any]
@@ -40,6 +49,27 @@ def _sha256_file(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def build_algorithm_semantic_identity(project_root: Path) -> dict[str, object]:
+    root = project_root.resolve(strict=True)
+    source_sha256 = {}
+    for relative in ALGORITHM_SEMANTIC_PATHS:
+        path = root / relative
+        if path.is_symlink() or not path.is_file():
+            raise R1ContextError(f"algorithm source is unavailable: {relative}")
+        source_sha256[relative] = _sha256_file(path)
+    payload = json.dumps(
+        source_sha256,
+        allow_nan=False,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("ascii")
+    return {
+        "algorithm_semantic_hash": hashlib.sha256(payload).hexdigest(),
+        "source_sha256": source_sha256,
+    }
 
 
 def _mapping(value: object, *, name: str) -> dict[str, Any]:

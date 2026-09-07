@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
+import torch
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -157,7 +158,7 @@ def test_generation_is_single_process_cuda_zero_only() -> None:
             runner.validate_cache_execution(device)
 
 
-def test_smoke_pairs_are_three_cluster_distinct_canonical_t2_prefixes() -> None:
+def test_smoke_pairs_are_six_cluster_distinct_canonical_t2_prefixes() -> None:
     runner = _runner()
     from scripts.system_comparison_inference import full_history_cache_keys
 
@@ -168,15 +169,56 @@ def test_smoke_pairs_are_three_cluster_distinct_canonical_t2_prefixes() -> None:
         runner.local_cache_keys(manifest),
         full_history_cache_keys(manifest),
     )
+    from scripts.profile_system_comparison import build_profile_subset
 
-    assert len(pairs) == 3
-    assert len({local["reference_scene_id"] for local, _full in pairs}) == 3
+    assert len(pairs) == 6
+    assert len({local["reference_scene_id"] for local, _full in pairs}) == 6
+    assert [local["master_sequence_id"] for local, _full in pairs] == [
+        unit.master_sequence_id for unit in build_profile_subset(manifest)
+    ]
     for local, full in pairs:
         assert local["order_id"] == full["order_id"] == "canonical"
         assert local["stage_index"] == 1
         assert full["horizon"] == 2
         assert local["master_sequence_id"] == full["master_sequence_id"]
         assert local["history_scan_ids"] == full["history_scan_ids"]
+
+
+def test_smoke_repeat_plan_adds_one_forward_to_only_two_inputs() -> None:
+    runner = _runner()
+
+    assert [runner.smoke_repeat_count(index) for index in range(6)] == [
+        2,
+        2,
+        1,
+        1,
+        1,
+        1,
+    ]
+
+
+def test_query_feature_export_parity_preserves_nonfeature_outputs() -> None:
+    runner = _runner()
+    disabled = {
+        "pred_logits": torch.tensor([[[1.0, 2.0]]]),
+        "pred_masks": [torch.tensor([[3.0]])],
+        "aux_outputs": [{"pred_logits": torch.tensor([[[4.0, 5.0]]])}],
+    }
+    enabled = {
+        **disabled,
+        "query_features": torch.ones(1, 1, 128),
+    }
+
+    assert runner.validate_query_feature_export_parity(
+        disabled, enabled
+    ) == {
+        "status": "pass",
+        "legacy_predictions_unchanged": True,
+        "query_feature_shape": [1, 1, 128],
+    }
+    changed = {**enabled, "pred_logits": torch.tensor([[[1.0, 3.0]]])}
+    with pytest.raises(runner.R1RunError, match="query feature export"):
+        runner.validate_query_feature_export_parity(disabled, changed)
 
 
 def test_resumable_materializer_publishes_each_record_once(tmp_path: Path) -> None:
@@ -235,6 +277,9 @@ def test_cli_defaults_to_registered_single_a40_and_shared_cache() -> None:
         "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd.ckpt"
     )
     assert runner.argument_parser().parse_args(["smoke"]).stage == "smoke"
+    assert runner.argument_parser().parse_args(["cache-parity"]).stage == (
+        "cache-parity"
+    )
     assert runner.argument_parser().parse_args(["cache-full"]).stage == "cache-full"
     assert runner.argument_parser().parse_args(["finalize-cache"]).stage == (
         "finalize-cache"

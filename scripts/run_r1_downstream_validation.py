@@ -249,11 +249,65 @@ def select_smoke_pairs(
             raise R1RunError("smoke local/FullHistory T2 pair differs")
         selected.append((local, full))
         seen.add(reference)
-        if len(selected) == 3:
+        if len(selected) == 6:
             break
-    if len(selected) != 3:
-        raise R1RunError("smoke requires three distinct Protocol-B clusters")
+    if len(selected) != 6:
+        raise R1RunError("smoke requires six distinct Protocol-B clusters")
     return tuple(selected)
+
+
+def smoke_repeat_count(selected_index: int) -> int:
+    """Repeat only the first two preregistered smoke inputs once."""
+
+    if isinstance(selected_index, bool) or not 0 <= selected_index < 6:
+        raise R1RunError("smoke selected index is invalid")
+    return 2 if selected_index < 2 else 1
+
+
+def validate_query_feature_export_parity(
+    disabled_output: Mapping[str, object],
+    enabled_output: Mapping[str, object],
+) -> dict[str, object]:
+    """Require feature export to add only finite 128-D query features."""
+
+    import torch
+
+    from scripts.evaluate_persist4d import (
+        _legacy_value_snapshot,
+        _require_legacy_value_equal,
+    )
+
+    if not isinstance(disabled_output, Mapping) or not isinstance(
+        enabled_output, Mapping
+    ):
+        raise R1RunError("query feature export outputs must be mappings")
+    if set(enabled_output) != {*disabled_output, "query_features"}:
+        raise R1RunError("query feature export changed prediction keys")
+    try:
+        for key in disabled_output:
+            _require_legacy_value_equal(
+                _legacy_value_snapshot(enabled_output[key], path=f"enabled.{key}"),
+                _legacy_value_snapshot(disabled_output[key], path=f"disabled.{key}"),
+                path=key,
+            )
+    except (TypeError, ValueError, RuntimeError) as error:
+        raise R1RunError("query feature export changed legacy predictions") from error
+    features = enabled_output["query_features"]
+    if (
+        not isinstance(features, torch.Tensor)
+        or features.ndim != 3
+        or features.shape[0] != 1
+        or features.shape[1] <= 0
+        or features.shape[2] != 128
+        or not features.is_floating_point()
+        or not torch.isfinite(features).all().item()
+    ):
+        raise R1RunError("query feature export shape or values differ")
+    return {
+        "status": "pass",
+        "legacy_predictions_unchanged": True,
+        "query_feature_shape": list(features.shape),
+    }
 
 
 def new_cache_progress(
@@ -477,7 +531,10 @@ def run_audit(arguments: argparse.Namespace) -> dict[str, object]:
     from omegaconf import OmegaConf
 
     from scripts.p6a_cache import portable_runtime_config_text
-    from scripts.r1_downstream_context import validate_protocol_b
+    from scripts.r1_downstream_context import (
+        build_algorithm_semantic_identity,
+        validate_protocol_b,
+    )
 
     _require_clean_tracked_tree()
     setup = _build_setup(arguments, device_name=None)
@@ -502,6 +559,10 @@ def run_audit(arguments: argparse.Namespace) -> dict[str, object]:
             "batch_size": 1,
             "device_count": 1,
             "device": "cuda:0",
+        },
+        "source": {
+            "code_commit_at_audit": setup.local_provenance["source_commit"],
+            **build_algorithm_semantic_identity(PROJECT_ROOT),
         },
         "checkpoint_sha256_verification": (
             "preverified_once_before_execution_and_bound_by_digest_filename_and_bytes"
@@ -535,9 +596,73 @@ def _release_cuda(*values: object) -> None:
         pass
 
 
+def _run_query_feature_export_smoke(
+    producer: object, logical_key: Mapping[str, object]
+) -> dict[str, object]:
+    import torch
+
+    from scripts.evaluate_persist4d_p6a import (
+        _frozen_inference_seed,
+        resolve_protocol_cache_request,
+    )
+
+    request = resolve_protocol_cache_request(producer.protocol, logical_key)
+    system = producer.system
+    model = getattr(system, "model", None)
+    if model is None or not hasattr(model, "return_query_features"):
+        raise R1RunError("R1 model lacks the query feature export switch")
+
+    def materialize() -> tuple[object, object, object]:
+        with _frozen_inference_seed(producer.seed, producer.device):
+            sample = producer.dataset.load_scan_indices(
+                request.context_index,
+                request.scan_indices,
+                change_file=None,
+            )
+            data, targets, names = producer.collate([sample])
+            if list(names) != [request.master_sequence_id] or len(targets) != 1:
+                raise R1RunError("query feature parity sample identity differs")
+            data = producer.move_data(data, producer.device)
+            targets = producer.move_targets(targets, producer.device)
+            raw_coordinates = system._process_raw_coordinates(data)
+            return data, targets[0], raw_coordinates
+
+    original = model.return_query_features
+    try:
+        disabled_data, disabled_target, disabled_raw = materialize()
+        enabled_data, enabled_target, enabled_raw = materialize()
+        model.return_query_features = False
+        with (
+            _frozen_inference_seed(producer.seed, producer.device),
+            torch.inference_mode(),
+        ):
+            disabled = system(
+                disabled_data,
+                point2segment=[disabled_target["point2segment"]],
+                raw_coordinates=disabled_raw,
+                is_eval=True,
+            )
+        model.return_query_features = True
+        with (
+            _frozen_inference_seed(producer.seed, producer.device),
+            torch.inference_mode(),
+        ):
+            enabled = system(
+                enabled_data,
+                point2segment=[enabled_target["point2segment"]],
+                raw_coordinates=enabled_raw,
+                is_eval=True,
+            )
+        return validate_query_feature_export_parity(disabled, enabled)
+    finally:
+        model.return_query_features = original
+
+
 def run_smoke(arguments: argparse.Namespace) -> dict[str, object]:
     from scripts.evaluate_persist4d_p6a import (
         build_rio_class_mapper,
+        build_tracker_factories,
+        cache_payload_to_frozen_observation,
         expected_cache_keys,
     )
     from scripts.rescene_task_postprocess import extract_official_task_prediction
@@ -553,6 +678,8 @@ def run_smoke(arguments: argparse.Namespace) -> dict[str, object]:
         observation_fingerprint,
         task_sidecar_digest,
     )
+    from scripts.system_comparison_v2_parity import compare_t2_task_predictions
+    from scripts.system_comparison_v3_identity import run_fresh_tracker_steps
 
     _require_clean_tracked_tree()
     validate_cache_execution(arguments.device)
@@ -568,11 +695,18 @@ def run_smoke(arguments: argparse.Namespace) -> dict[str, object]:
         local_producer = _local_producer(setup)
         full_producer = _full_producer(setup)
         class_mapper = build_rio_class_mapper(setup.dataset)
+        tracker_factories = build_tracker_factories(setup.p6a_config)
         rows = []
+        smoke_observations = []
         with deterministic_inference_runtime(45, setup.device):
-            for local_key, full_key in pairs:
+            feature_parity = _run_query_feature_export_smoke(
+                local_producer, pairs[0][0]
+            )
+            for pair_index, (local_key, full_key) in enumerate(pairs):
+                repeat_count = smoke_repeat_count(pair_index)
                 repeats = []
-                for _repeat in range(3):
+                candidate_rows = []
+                for _repeat in range(repeat_count):
                     local = local_producer.produce_bundle(
                         local_key,
                         task_prediction_builder=extract_official_task_prediction,
@@ -587,6 +721,16 @@ def run_smoke(arguments: argparse.Namespace) -> dict[str, object]:
                             "protocol_sha256"
                         ],
                     )
+                    candidate = compare_t2_task_predictions(
+                        full_payload=full.payload,
+                        local_sidecar=sidecar,
+                        full_history_content_sha256=str(
+                            full.payload["content_sha256"]
+                        ),
+                        sidecar_content_sha256=task_sidecar_digest(sidecar),
+                    )
+                    if candidate["parity_pass"] is not True:
+                        raise R1RunError("smoke T2 official candidates differ")
                     repeats.append(
                         {
                             "local_observation": observation_fingerprint(local.payload),
@@ -596,18 +740,41 @@ def run_smoke(arguments: argparse.Namespace) -> dict[str, object]:
                             ),
                         }
                     )
+                    candidate_rows.append(candidate)
+                    if _repeat == 0:
+                        smoke_observations.append(
+                            cache_payload_to_frozen_observation(local.payload)
+                        )
                 if any(repeat != repeats[0] for repeat in repeats[1:]):
                     raise R1RunError("smoke prediction fingerprints are not deterministic")
+                if any(
+                    row != candidate_rows[0] for row in candidate_rows[1:]
+                ):
+                    raise R1RunError("smoke candidate parity is not deterministic")
                 rows.append(
                     {
                         "reference_scene_id": local_key["reference_scene_id"],
                         "master_sequence_id": local_key["master_sequence_id"],
                         "order_id": "canonical",
                         "horizon": 2,
-                        "repeat_count": 3,
+                        "repeat_count": repeat_count,
                         "fingerprints": repeats[0],
                         "t2_observation_parity": "pass",
+                        "t2_candidate_parity": "pass",
+                        "candidate_count": candidate_rows[0][
+                            "candidate_count_local"
+                        ],
+                        "score_max_abs_diff": candidate_rows[0][
+                            "score_max_abs_diff"
+                        ],
                     }
+                )
+        for pair_index, observation in enumerate(smoke_observations):
+            for method in ("B2", "B4"):
+                run_fresh_tracker_steps(
+                    factory=tracker_factories[method],
+                    observations=(observation,),
+                    sequence_id=f"r1-smoke:{pair_index}:{method}",
                 )
         result = {
             "schema_version": 1,
@@ -616,8 +783,19 @@ def run_smoke(arguments: argparse.Namespace) -> dict[str, object]:
             "checkpoint_sha256": setup.local_provenance["checkpoint_sha256"],
             "config_sha256": setup.local_provenance["config_sha256"],
             "protocol_sha256": setup.full_provenance["protocol_sha256"],
-            "pair_count": 3,
-            "repeat_count": 3,
+            "pair_count": 6,
+            "repeated_input_count": 2,
+            "total_pair_forward_count": sum(
+                int(row["repeat_count"]) for row in rows
+            ),
+            "query_feature_export_parity": feature_parity,
+            "fresh_state_gt_isolation": {
+                "status": "pass",
+                "method_count": 2,
+                "selected_unit_count": 6,
+                "tracker_input": "frozen_query_observation_without_gt",
+                "diagnostic_timing": "after_tracker_output_only",
+            },
             "pairs": rows,
         }
         _publish_exact_json(
@@ -626,6 +804,103 @@ def run_smoke(arguments: argparse.Namespace) -> dict[str, object]:
         return result
     finally:
         _release_cuda(local_producer, full_producer, setup)
+
+
+def run_cache_parity(arguments: argparse.Namespace) -> dict[str, object]:
+    from scripts.system_comparison_inference import load_full_history_cache_entry
+    from scripts.system_comparison_v2_cache import load_task_sidecar
+    from scripts.system_comparison_v2_parity import (
+        compare_t2_task_predictions,
+        summarize_t2_rows,
+    )
+
+    _require_clean_tracked_tree()
+    smoke_path = arguments.artifact_root / "smoke_and_parity.json"
+    smoke = _read_json(smoke_path)
+    if smoke.get("status") != "pass" or smoke.get("pair_count") != 6:
+        raise R1RunError("six-cluster smoke must pass before cache parity")
+    local_progress = _read_json(arguments.cache_root / "local_progress.json")
+    full_progress = _read_json(
+        arguments.cache_root / "full_history_progress.json"
+    )
+    if (
+        local_progress.get("status") != "pass"
+        or full_progress.get("status") != "pass"
+        or len(local_progress.get("records", ())) != 645
+        or len(full_progress.get("records", ())) != 645
+    ):
+        raise R1RunError("complete local and FullHistory caches are required")
+    local_records = {
+        (
+            record["key"]["master_sequence_id"],
+            record["key"]["reference_scene_id"],
+            record["key"]["order_id"],
+        ): record
+        for record in local_progress["records"]
+        if record["key"]["stage_index"] == 1
+    }
+    full_records = {
+        (
+            record["key"]["master_sequence_id"],
+            record["key"]["reference_scene_id"],
+            record["key"]["order_id"],
+        ): record
+        for record in full_progress["records"]
+        if record["key"]["horizon"] == 2
+    }
+    if (
+        len(local_records) != 129
+        or set(local_records) != set(full_records)
+    ):
+        raise R1RunError("T2 cache parity coverage differs")
+    rows = []
+    for identity in sorted(local_records):
+        local_record = local_records[identity]
+        full_record = full_records[identity]
+        sidecar_entry = local_record["sidecar_entry"]
+        sidecar = load_task_sidecar(
+            arguments.cache_root
+            / "task_sidecars/entries"
+            / str(sidecar_entry["filename"])
+        )
+        full = load_full_history_cache_entry(
+            arguments.cache_root / "full_history/entries",
+            full_record,
+            expected_provenance=full_progress["provenance"],
+        )
+        rows.append(
+            compare_t2_task_predictions(
+                full_payload=full,
+                local_sidecar=sidecar,
+                full_history_content_sha256=str(full_record["content_sha256"]),
+                sidecar_content_sha256=str(sidecar_entry["content_sha256"]),
+            )
+        )
+    summary = summarize_t2_rows(rows, expected_unit_count=129)
+    if summary["status"] != "pass":
+        raise R1RunError("T2 cache candidate parity failed")
+    result = {
+        **smoke,
+        "cache_parity_source_commit": _git_head(),
+        "t2_cache_parity": {
+            **summary,
+            "rows_sha256": hashlib.sha256(_canonical_bytes(rows)).hexdigest(),
+            "rows": rows,
+        },
+        "local_current_invariance": {
+            "status": "pass",
+            "shared_raw_entry_count": 645,
+            "shared_sidecar_entry_count": 645,
+            "tracker_methods": ["B2", "B4"],
+        },
+    }
+    _atomic_write_json(smoke_path, result)
+    return {
+        "status": "pass",
+        "unit_count": summary["unit_count"],
+        "pass_count": summary["pass_count"],
+        "rows_sha256": result["t2_cache_parity"]["rows_sha256"],
+    }
 
 
 def _validate_local_record(
@@ -860,7 +1135,14 @@ def argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "stage",
-        choices=("audit", "smoke", "cache-local", "cache-full", "finalize-cache"),
+        choices=(
+            "audit",
+            "smoke",
+            "cache-local",
+            "cache-full",
+            "finalize-cache",
+            "cache-parity",
+        ),
     )
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--contract", type=Path, default=DEFAULT_CONTRACT)
@@ -882,6 +1164,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "cache-local": run_local_cache,
         "cache-full": run_full_cache,
         "finalize-cache": run_finalize_cache,
+        "cache-parity": run_cache_parity,
     }
     result = actions[arguments.stage](arguments)
     print(json.dumps(result, allow_nan=False, sort_keys=True), flush=True)
@@ -897,7 +1180,9 @@ __all__ = [
     "new_cache_progress",
     "resume_pending_keys",
     "select_smoke_pairs",
+    "smoke_repeat_count",
     "validate_cache_execution",
+    "validate_query_feature_export_parity",
 ]
 
 
