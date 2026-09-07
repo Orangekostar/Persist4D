@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 import yaml
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = REPO_ROOT / "configs/r1_downstream_validation/default.yaml"
 PROTOCOL_PATH = REPO_ROOT / "artifacts/P6A/protocol_b_manifest.json"

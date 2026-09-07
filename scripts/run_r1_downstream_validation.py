@@ -12,7 +12,6 @@ import tempfile
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONTRACT = PROJECT_ROOT / "configs/r1_downstream_validation/default.yaml"
 DEFAULT_PROTOCOL = PROJECT_ROOT / "artifacts/P6A/protocol_b_manifest.json"

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Analyze frozen R1 downstream validation caches."""
 
 from __future__ import annotations
@@ -669,7 +668,7 @@ def _single_task_accumulator(pair: object, *, dataset_spec: Path) -> object:
 def _event_counts(events: Sequence[object], *, horizon: int) -> dict[str, int]:
     selected = []
     for event in events:
-        stage = event.get("stage_id") if isinstance(event, Mapping) else getattr(event, "stage_id")
+        stage = event.get("stage_id") if isinstance(event, Mapping) else event.stage_id
         if int(stage) < horizon:
             selected.append(event)
 
@@ -1133,8 +1132,8 @@ def run_analysis(
         sequence: object,
         horizon: int,
     ) -> None:
-        reference = str(getattr(sequence, "reference_scene_id"))
-        order = str(getattr(sequence, "order_id"))
+        reference = str(sequence.reference_scene_id)
+        order = str(sequence.order_id)
         for scope_order in (order, "all"):
             key = (method, reducer, scope_order, horizon)
             accumulator = _task_accumulator(
