@@ -133,14 +133,58 @@ def _source_name(path: Path) -> str:
     return path.name
 
 
+def _recovery_cutover(
+    payload: Mapping[str, Any],
+) -> tuple[int, str, set[str]]:
+    _validate_hash(payload, "content_sha256", name="recovery lineage")
+    checkpoint = payload.get("resume_checkpoint")
+    authoritative = payload.get("authoritative_source")
+    superseded = payload.get("superseded_sources")
+    completed_epoch = (
+        checkpoint.get("completed_epoch") if isinstance(checkpoint, Mapping) else None
+    )
+    if (
+        payload.get("schema_version") != 1
+        or payload.get("status") != "pass"
+        or not isinstance(payload.get("reason"), str)
+        or not payload["reason"]
+        or not isinstance(completed_epoch, int)
+        or isinstance(completed_epoch, bool)
+        or completed_epoch not in VALIDATION_EPOCHS
+        or completed_epoch >= 450
+        or checkpoint.get("optimizer_step") != completed_epoch * 66
+        or not _is_sha256(checkpoint.get("sha256"))
+        or not isinstance(authoritative, str)
+        or not authoritative.startswith("local_metrics/version_")
+        or not authoritative.endswith("/metrics.csv")
+        or not isinstance(superseded, list)
+        or not superseded
+        or any(
+            not isinstance(source, str)
+            or not source.startswith("local_metrics/version_")
+            or not source.endswith("/metrics.csv")
+            for source in superseded
+        )
+        or len(superseded) != len(set(superseded))
+        or authoritative in superseded
+    ):
+        raise RootCauseEvaluationError("recovery lineage contract differs")
+    return completed_epoch, authoritative, set(superseded)
+
+
 def read_full_validation_trajectory(
     metrics_paths: Sequence[Path],
+    *,
+    recovery_lineage: Mapping[str, Any] | None = None,
 ) -> dict[str, object]:
     """Join resumed CSVLogger versions into the exact 30-point trajectory."""
 
     if not metrics_paths:
         raise RootCauseEvaluationError("full validation metrics are missing")
-    by_epoch: dict[int, dict[str, object]] = {}
+    cutover = (
+        _recovery_cutover(recovery_lineage) if recovery_lineage is not None else None
+    )
+    candidates_by_epoch: dict[int, list[dict[str, object]]] = {}
     sources: dict[str, dict[str, object]] = {}
     for path in metrics_paths:
         identity = _file_identity(path)
@@ -173,8 +217,6 @@ def read_full_validation_trajectory(
                 raise RootCauseEvaluationError(
                     "full validation boundary is invalid"
                 ) from error
-            if completed_epoch in by_epoch:
-                raise RootCauseEvaluationError("duplicate full validation boundary")
             if completed_epoch not in VALIDATION_EPOCHS:
                 raise RootCauseEvaluationError("unexpected full validation boundary")
             if train_log_step != completed_epoch * 66 - 1:
@@ -183,23 +225,81 @@ def read_full_validation_trajectory(
                 output: _number(source, input_name, unit_interval=True)
                 for output, input_name in METRIC_FIELDS.items()
             }
-            by_epoch[completed_epoch] = {
-                "completed_epoch": completed_epoch,
-                "optimizer_step": completed_epoch * 66,
-                "train_log_step": train_log_step,
-                **metrics,
-                "SpatialStageMean": (metrics["stage1_mAP"] + metrics["stage2_mAP"])
-                / 2.0,
-                "metrics_csv_sha256": identity["sha256"],
-            }
+            candidates_by_epoch.setdefault(completed_epoch, []).append(
+                {
+                    "completed_epoch": completed_epoch,
+                    "optimizer_step": completed_epoch * 66,
+                    "train_log_step": train_log_step,
+                    **metrics,
+                    "SpatialStageMean": (metrics["stage1_mAP"] + metrics["stage2_mAP"])
+                    / 2.0,
+                    "metrics_csv_sha256": identity["sha256"],
+                    "source": source_name,
+                }
+            )
+    by_epoch: dict[int, dict[str, object]] = {}
+    superseded_rows: list[dict[str, object]] = []
+    used_superseded_sources: set[str] = set()
+    for completed_epoch, candidates in candidates_by_epoch.items():
+        if cutover is None:
+            if len(candidates) != 1:
+                raise RootCauseEvaluationError("duplicate full validation boundary")
+            selected = candidates[0]
+        else:
+            checkpoint_epoch, authoritative_source, superseded_sources = cutover
+            if completed_epoch <= checkpoint_epoch:
+                if len(candidates) != 1:
+                    raise RootCauseEvaluationError(
+                        "duplicate full validation boundary before recovery cutover"
+                    )
+                selected = candidates[0]
+                if selected["source"] == authoritative_source:
+                    raise RootCauseEvaluationError(
+                        "recovery lineage authoritative source crosses cutover"
+                    )
+            else:
+                authoritative_rows = [
+                    candidate
+                    for candidate in candidates
+                    if candidate["source"] == authoritative_source
+                ]
+                if len(authoritative_rows) != 1:
+                    raise RootCauseEvaluationError(
+                        "recovery lineage lacks one authoritative boundary"
+                    )
+                selected = authoritative_rows[0]
+                for candidate in candidates:
+                    if candidate is selected:
+                        continue
+                    source_name = str(candidate["source"])
+                    if source_name not in superseded_sources:
+                        raise RootCauseEvaluationError(
+                            "recovery lineage contains an undeclared superseded source"
+                        )
+                    used_superseded_sources.add(source_name)
+                    superseded_rows.append(dict(candidate))
+        selected = dict(selected)
+        selected.pop("source")
+        by_epoch[completed_epoch] = selected
+    if cutover is not None and used_superseded_sources != cutover[2]:
+        raise RootCauseEvaluationError("recovery lineage superseded source is unused")
     if set(by_epoch) != set(VALIDATION_EPOCHS):
         raise RootCauseEvaluationError(
             "full run requires exactly 30 validation boundaries"
         )
-    return {
+    result: dict[str, object] = {
         "rows": [by_epoch[epoch] for epoch in VALIDATION_EPOCHS],
         "sources": sources,
     }
+    if recovery_lineage is not None:
+        result["recovery_lineage"] = {
+            "policy": dict(recovery_lineage),
+            "superseded_validation_rows": sorted(
+                superseded_rows,
+                key=lambda row: (int(row["completed_epoch"]), str(row["source"])),
+            ),
+        }
+    return result
 
 
 def select_full_checkpoint(
@@ -284,6 +384,7 @@ def build_full_training_manifest(
     resume_plan: Mapping[str, Any],
     selection: Mapping[str, Any],
     validation_sources: Mapping[str, Mapping[str, object]],
+    validation_lineage: Mapping[str, Any] | None = None,
 ) -> dict[str, object]:
     """Bind authorization, exact resume, complete budget, and local selection."""
 
@@ -337,6 +438,53 @@ def build_full_training_manifest(
         for source in validation_sources.values()
     ):
         raise RootCauseEvaluationError("full-training validation sources differ")
+    if validation_lineage is not None:
+        policy = validation_lineage.get("policy")
+        superseded_rows = validation_lineage.get("superseded_validation_rows")
+        if not isinstance(policy, Mapping) or not isinstance(superseded_rows, list):
+            raise RootCauseEvaluationError("full-training validation lineage differs")
+        checkpoint_epoch, authoritative_source, superseded_sources = _recovery_cutover(
+            policy
+        )
+        if (
+            authoritative_source not in validation_sources
+            or not superseded_sources.issubset(validation_sources)
+            or not superseded_rows
+            or {
+                row.get("source") for row in superseded_rows if isinstance(row, Mapping)
+            }
+            != superseded_sources
+        ):
+            raise RootCauseEvaluationError("full-training validation lineage differs")
+        for row in superseded_rows:
+            if not isinstance(row, Mapping):
+                raise RootCauseEvaluationError(
+                    "full-training validation lineage differs"
+                )
+            completed_epoch = row.get("completed_epoch")
+            source_name = row.get("source")
+            if (
+                not isinstance(completed_epoch, int)
+                or isinstance(completed_epoch, bool)
+                or completed_epoch <= checkpoint_epoch
+                or completed_epoch not in VALIDATION_EPOCHS
+                or row.get("optimizer_step") != completed_epoch * 66
+                or row.get("train_log_step") != completed_epoch * 66 - 1
+                or not isinstance(source_name, str)
+                or source_name not in superseded_sources
+                or row.get("metrics_csv_sha256")
+                != validation_sources[source_name]["sha256"]
+                or any(
+                    isinstance(row.get(field), bool)
+                    or not isinstance(row.get(field), (int, float))
+                    or not math.isfinite(float(row[field]))
+                    or not 0.0 <= float(row[field]) <= 1.0
+                    for field in (*METRIC_NAMES, "SpatialStageMean")
+                )
+            ):
+                raise RootCauseEvaluationError(
+                    "full-training validation lineage differs"
+                )
     payload: dict[str, object] = {
         "schema_version": 1,
         "status": "pass",
@@ -361,6 +509,13 @@ def build_full_training_manifest(
         },
         "selection_used_persist4d": False,
     }
+    if validation_lineage is not None:
+        payload["validation_lineage"] = {
+            "policy": dict(validation_lineage["policy"]),
+            "superseded_validation_rows": [
+                dict(row) for row in validation_lineage["superseded_validation_rows"]
+            ],
+        }
     payload["content_sha256"] = canonical_sha256(payload)
     return payload
 
@@ -542,6 +697,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--authorization", type=Path, required=True)
     parser.add_argument("--decision", type=Path, required=True)
     parser.add_argument("--resume-plan", type=Path, required=True)
+    parser.add_argument("--recovery-lineage", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     arguments = parser.parse_args(argv)
 
@@ -560,10 +716,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     _validate_hash(decision, "content_sha256", name="short-curve decision")
     resume_plan = _load_json(arguments.resume_plan, name="full-resume plan")
     _validate_hash(resume_plan, "content_sha256", name="full-resume plan")
+    recovery_lineage = (
+        _load_json(arguments.recovery_lineage, name="recovery lineage")
+        if arguments.recovery_lineage is not None
+        else None
+    )
     metrics_paths = sorted(
         arguments.run_directory.glob("local_metrics/version_*/metrics.csv")
     )
-    trajectory = read_full_validation_trajectory(metrics_paths)
+    trajectory = read_full_validation_trajectory(
+        metrics_paths,
+        recovery_lineage=recovery_lineage,
+    )
     records, facts = inspect_full_checkpoints(
         run_directory=arguments.run_directory,
         variant=arguments.variant,
@@ -582,6 +746,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         resume_plan=resume_plan,
         selection=selection,
         validation_sources=trajectory["sources"],
+        validation_lineage=trajectory.get("recovery_lineage"),
     )
     selected_record = next(
         record for record in records if record["role"] == "best_validation"
