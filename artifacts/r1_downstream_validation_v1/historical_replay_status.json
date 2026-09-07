@@ -1,0 +1,22 @@
+{
+  "analysis_source_commit": "398d675d4a6ef6b1bfe8689ed442a6f887601f49",
+  "checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+  "frozen_summary_comparison": {
+    "identity_aggregate_sha256": "d4bf1550528e739d9cafc45657543c352f97d0f27913baf02af1414be8655966",
+    "status": "available",
+    "task_aggregate_sha256": "aeb8eb86933e608af79713f057a91bf47f1573d1713d8a470bc516454025e3b9"
+  },
+  "non_blocking_for_r1": true,
+  "progress_metadata_status": "pass_exact",
+  "protocol_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "raw_cache": {
+    "available_raw_entries": 0,
+    "available_sidecar_entries": 0,
+    "expected_raw_entries": 645,
+    "expected_sidecar_entries": 645,
+    "status": "unavailable"
+  },
+  "reason": "progress metadata remains, but referenced raw/sidecar files are absent",
+  "schema_version": 1,
+  "status": "HISTORICAL_REPLAY_UNAVAILABLE"
+}
