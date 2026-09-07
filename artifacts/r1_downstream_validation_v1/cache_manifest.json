@@ -1,0 +1,20 @@
+{
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "config_sha256": "34d10651643d1d01993a0b735f590fc555489462beda85b9dd215fc20823213d",
+  "external_cache_reference": "external:r1_downstream_validation_v1/cache",
+  "full_history": {
+    "content_sha256": "9cc4a2ef580af9f3cef582696c629c3b70c07d0a4362b3caaca4156c567c6489",
+    "entries_sha256": "1322549b37ee54a3ea105f5b22c74439a9ba6c936bf62df5068791f77c6bf191",
+    "entry_count": 645,
+    "records_sha256": "65db7989fb489d611a50aa1c72b557af194a9b8fe618881178502e76986314e2"
+  },
+  "local": {
+    "entry_count": 645,
+    "raw_entries_sha256": "dc69d6ce263cbe912c55054153adfd2e7ef399c9b6d71b1a4beae33502c4faa0",
+    "records_sha256": "0e5cd8bd8a860737fa182cf7363a80e30efd96f1132144c42b8dfd4efc3bb9a9"
+  },
+  "protocol_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "schema_version": 1,
+  "source_commit": "841af365ab1f9121a366270a7d6810a6a9399110",
+  "status": "pass"
+}
