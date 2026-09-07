@@ -4,6 +4,7 @@ import importlib
 from pathlib import Path
 
 import pytest
+import torch
 
 
 def _analysis():
@@ -240,3 +241,40 @@ def test_metric_dataset_spec_is_resolved_from_explicit_data_root(
     expected.unlink()
     with pytest.raises(analysis.R1AnalysisError, match="metric dataset spec"):
         analysis.resolve_metric_dataset_spec(tmp_path)
+
+
+def test_metric_sufficient_states_merge_by_registered_reduction() -> None:
+    analysis = _analysis()
+
+    class Head:
+        def __init__(self, items, total):
+            self.items = items
+            self.total = total
+            self.metric_state = {"items": items, "total": total}
+            self._update_count = 0
+
+    class Metric:
+        def __init__(self, head):
+            self.heads = [head]
+            self._update_count = 0
+
+    class Accumulator:
+        mode = "strict_online"
+
+        def __init__(self, items, total, updates):
+            self._metric = Metric(Head(items, total))
+            self._updates = updates
+
+    target = Accumulator([], torch.tensor(0), 0)
+    source = Accumulator(
+        [torch.tensor([1, 2]), torch.tensor([3])], torch.tensor(4), 2
+    )
+
+    analysis.merge_official_metric_accumulators(target, source)
+
+    head = target._metric.heads[0]
+    assert [value.tolist() for value in head.items] == [[1, 2], [3]]
+    assert head.total.item() == 4
+    assert target._updates == 2
+    assert target._metric._update_count == 2
+    assert head._update_count == 2

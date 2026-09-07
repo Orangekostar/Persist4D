@@ -572,7 +572,88 @@ def _local_accumulator(
     return values[key]
 
 
-def _single_task_metrics(pair: object, *, dataset_spec: Path) -> dict[str, float]:
+def merge_official_metric_accumulators(target: object, source: object) -> None:
+    """Merge frozen stmetrics states without repeating instance matching."""
+
+    import torch
+
+    if getattr(target, "mode", None) != getattr(source, "mode", None):
+        raise R1AnalysisError("metric accumulator modes differ")
+    target_metric = getattr(target, "_metric", None)
+    source_metric = getattr(source, "_metric", None)
+    target_heads = getattr(target_metric, "heads", ())
+    source_heads = getattr(source_metric, "heads", ())
+    source_updates = getattr(source, "_updates", None)
+    target_updates = getattr(target, "_updates", None)
+    if (
+        len(target_heads) != 1
+        or len(source_heads) != 1
+        or isinstance(source_updates, bool)
+        or not isinstance(source_updates, int)
+        or source_updates <= 0
+        or isinstance(target_updates, bool)
+        or not isinstance(target_updates, int)
+        or target_updates < 0
+    ):
+        raise R1AnalysisError("metric accumulator state is invalid")
+    target_head = target_heads[0]
+    source_head = source_heads[0]
+    target_state = getattr(target_head, "metric_state", {})
+    source_state = getattr(source_head, "metric_state", {})
+    if set(target_state) != set(source_state) or not target_state:
+        raise R1AnalysisError("metric accumulator state fields differ")
+    for name in sorted(target_state):
+        current = getattr(target_head, name)
+        incoming = getattr(source_head, name)
+        if isinstance(current, list) and isinstance(incoming, list):
+            current.extend(
+                value.detach().cpu().clone()
+                if isinstance(value, torch.Tensor)
+                else value
+                for value in incoming
+            )
+        elif isinstance(current, torch.Tensor) and isinstance(
+            incoming, torch.Tensor
+        ):
+            if current.shape != incoming.shape or current.dtype != incoming.dtype:
+                raise R1AnalysisError("metric accumulator tensor state differs")
+            setattr(target_head, name, current + incoming.detach().cpu())
+        else:
+            raise R1AnalysisError("metric accumulator reduction type differs")
+    merged_updates = target_updates + source_updates
+    target._updates = merged_updates
+    target_metric._update_count = merged_updates
+    target_head._update_count = merged_updates
+
+
+def _merge_causal_task_accumulators(target: object, source: object) -> None:
+    source_horizon = getattr(source, "_horizon", None)
+    target_horizon = getattr(target, "_horizon", None)
+    source_count = getattr(source, "_count", None)
+    target_count = getattr(target, "_count", None)
+    if (
+        isinstance(source_horizon, bool)
+        or not isinstance(source_horizon, int)
+        or isinstance(source_count, bool)
+        or not isinstance(source_count, int)
+        or source_count <= 0
+        or isinstance(target_count, bool)
+        or not isinstance(target_count, int)
+        or target_count < 0
+        or (target_horizon is not None and target_horizon != source_horizon)
+    ):
+        raise R1AnalysisError("causal task accumulator state differs")
+    merge_official_metric_accumulators(
+        target._prefix_metric, source._prefix_metric
+    )
+    merge_official_metric_accumulators(
+        target._current_metric, source._current_metric
+    )
+    target._horizon = source_horizon
+    target._count = target_count + source_count
+
+
+def _single_task_accumulator(pair: object, *, dataset_spec: Path) -> object:
     from scripts.p6a_metrics import OfficialMetricAccumulator
     from scripts.system_comparison_metrics import CausalTaskAccumulator
 
@@ -582,7 +663,7 @@ def _single_task_metrics(pair: object, *, dataset_spec: Path) -> dict[str, float
         )
     )
     accumulator.update(pair)
-    return _task_metric_block(accumulator)
+    return accumulator
 
 
 def _event_counts(events: Sequence[object], *, horizon: int) -> dict[str, int]:
@@ -1046,7 +1127,7 @@ def run_analysis(
 
     def update_task(
         *,
-        pair: object,
+        source_accumulator: object,
         method: str,
         reducer: str,
         sequence: object,
@@ -1059,13 +1140,15 @@ def run_analysis(
             accumulator = _task_accumulator(
                 task_aggregate, key, dataset_spec=metric_dataset_spec
             )
-            accumulator.update(pair)
+            _merge_causal_task_accumulators(accumulator, source_accumulator)
             task_counts[key] += 1
             cluster_key = (method, reducer, scope_order, horizon, reference)
             cluster_accumulator = _task_accumulator(
                 task_cluster, cluster_key, dataset_spec=metric_dataset_spec
             )
-            cluster_accumulator.update(pair)
+            _merge_causal_task_accumulators(
+                cluster_accumulator, source_accumulator
+            )
             task_cluster_counts[cluster_key] += 1
 
     for sequence_index, sequence in enumerate(sequences, start=1):
@@ -1139,7 +1222,7 @@ def run_analysis(
                     local_key,
                     dataset_spec=metric_dataset_spec,
                 )
-                local_acc.update(local_pair.prediction, local_pair.target)
+                merge_official_metric_accumulators(local_acc, one_local)
                 local_counts[local_key] += 1
                 cluster_key = (
                     scope_order,
@@ -1151,7 +1234,7 @@ def run_analysis(
                     cluster_key,
                     dataset_spec=metric_dataset_spec,
                 )
-                cluster_acc.update(local_pair.prediction, local_pair.target)
+                merge_official_metric_accumulators(cluster_acc, one_local)
                 local_cluster_counts[cluster_key] += 1
 
             full_entry = full_entries[
@@ -1163,9 +1246,10 @@ def run_analysis(
                 expected_provenance=full_progress["provenance"],
             )
             full_pair = causal_prefix_pair_from_payload(full_payload)
-            full_values = _single_task_metrics(
+            full_accumulator = _single_task_accumulator(
                 full_pair, dataset_spec=metric_dataset_spec
             )
+            full_values = _task_metric_block(full_accumulator)
             task_per_sequence.append(
                 {
                     "method": "FullHistory",
@@ -1178,7 +1262,7 @@ def run_analysis(
                 }
             )
             update_task(
-                pair=full_pair,
+                source_accumulator=full_accumulator,
                 method="FullHistory",
                 reducer="official",
                 sequence=sequence,
@@ -1193,9 +1277,10 @@ def run_analysis(
                         raw_payloads=sequence.raw_payloads[:horizon],
                         class_mapper=class_mapper,
                     )
-                    values = _single_task_metrics(
+                    single_accumulator = _single_task_accumulator(
                         pair, dataset_spec=metric_dataset_spec
                     )
+                    values = _task_metric_block(single_accumulator)
                     task_per_sequence.append(
                         {
                             "method": method,
@@ -1208,7 +1293,7 @@ def run_analysis(
                         }
                     )
                     update_task(
-                        pair=pair,
+                        source_accumulator=single_accumulator,
                         method=method,
                         reducer=reducer,
                         sequence=sequence,
