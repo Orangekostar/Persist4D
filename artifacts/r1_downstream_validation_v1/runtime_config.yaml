@@ -1,0 +1,406 @@
+aux_metric: null
+backbone:
+  _target_: models.PointceptBackbone
+  custom_config:
+    enc_mode: false
+  decoder_serializations:
+  - standard
+  - temporal_overlay
+  model_lib: concerto
+  name: external:concerto/concerto_base.pth
+  repo_id: Pointcept/Concerto
+callbacks:
+- _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  auto_insert_metric_name: false
+  dirpath: checkpoints/rescene4d_concerto_t2_repro
+  every_n_epochs: 1
+  filename: epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}
+  mode: max
+  monitor: val_mean_t-AP
+  save_last: true
+  save_on_train_epoch_end: true
+  save_top_k: 1
+  save_weights_only: false
+- _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  auto_insert_metric_name: false
+  dirpath: checkpoints/rescene4d_concerto_t2_repro
+  every_n_epochs: 25
+  filename: periodic-epoch={epoch:03d}
+  monitor: null
+  save_last: false
+  save_on_train_epoch_end: true
+  save_top_k: -1
+  save_weights_only: false
+- _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  auto_insert_metric_name: false
+  dirpath: checkpoints
+  enable_version_counter: false
+  every_n_epochs: 450
+  filename: rescene4d_concerto_t2_repro
+  monitor: null
+  save_last: false
+  save_on_train_epoch_end: true
+  save_top_k: -1
+  save_weights_only: false
+- _target_: pytorch_lightning.callbacks.LearningRateMonitor
+data:
+  add_colors: true
+  add_instance: true
+  add_normals: false
+  add_raw_coordinates: true
+  batch_size: 2
+  ignore_label: 255
+  in_channels: 3
+  num_changes: 6
+  num_labels: 20
+  num_workers: 4
+  pin_memory: false
+  temporal_window: 2
+  test_batch_size: 1
+  test_collation:
+    _target_: datasets.auto_collate.create_auto_collate
+    backbone_target: models.PointceptBackbone
+    batch_instance: false
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    ignore_class_threshold: 100
+    ignore_label: 255
+    label_offset: 2
+    mode: validation
+    num_queries: 100
+    probing: false
+    voxel_size: 0.02
+  test_dataloader:
+    _target_: torch.utils.data.DataLoader
+    batch_size: 1
+    num_workers: 4
+    pin_memory: false
+    shuffle: false
+  test_dataset:
+    _target_: datasets.semseg.SemanticSegmentationDataset
+    add_colors: true
+    add_instance: true
+    add_normals: false
+    add_raw_coordinates: true
+    color_mean_std: data/processed/rio/color_mean_std.yaml
+    data_dir: data/processed/rio
+    dataset_name: rio
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    ignore_label: 255
+    image_augmentations_path: null
+    known_empty_scan_policy: official_substitute
+    label_db_filepath: data/processed/rio/label_database.yaml
+    label_offset: 2
+    mode: validation
+    num_labels: 20
+    temporal_window: 2
+    volume_augmentations_path: null
+  test_mode: validation
+  train_collation:
+    _target_: datasets.auto_collate.create_auto_collate
+    backbone_target: models.PointceptBackbone
+    batch_instance: false
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    ignore_class_threshold: 100
+    ignore_label: 255
+    label_offset: 2
+    mode: train
+    num_queries: 100
+    probing: false
+    small_crops: false
+    very_small_crops: false
+    voxel_size: 0.02
+  train_dataloader:
+    _target_: torch.utils.data.DataLoader
+    batch_size: 2
+    num_workers: 4
+    pin_memory: false
+    shuffle: true
+  train_dataset:
+    _target_: datasets.multi_dataset.MultiDataset.from_config
+    add_colors: true
+    add_instance: true
+    add_normals: false
+    add_raw_coordinates: true
+    datasets:
+    - color_mean_std: data/processed/rio/color_mean_std.yaml
+      data_dir: data/processed/rio
+      dataset_name: rio
+      label_db_filepath: data/processed/rio/label_database.yaml
+      target: datasets.semseg.SemanticSegmentationDataset
+      temporal_window: 2
+    - color_mean_std: data/processed/scannet/color_mean_std.yaml
+      data_dir: data/processed/scannet
+      dataset_name: scannet
+      label_db_filepath: data/processed/scannet/label_database.yaml
+      target: datasets.semseg.SemanticSegmentationDataset
+      temporal_window: 1
+    epoch_sample_multiple: 32
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    ignore_label: 255
+    image_augmentations_path: conf/augmentation/albumentations_aug.yaml
+    known_empty_scan_policy: official_substitute
+    label_offset: 2
+    mode: train
+    num_labels: 20
+    sampler_seed: 45
+    volume_augmentations_path: conf/augmentation/volumentations_aug.yaml
+    weights:
+    - 1.0
+    - 0.8
+  train_mode: train
+  validation_collation:
+    _target_: datasets.auto_collate.create_auto_collate
+    backbone_target: models.PointceptBackbone
+    batch_instance: false
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    ignore_class_threshold: 100
+    ignore_label: 255
+    label_offset: 2
+    mode: validation
+    num_queries: 100
+    probing: false
+    voxel_size: 0.02
+  validation_dataloader:
+    _target_: torch.utils.data.DataLoader
+    batch_size: 1
+    num_workers: 4
+    pin_memory: false
+    shuffle: false
+  validation_dataset:
+    _target_: datasets.semseg.SemanticSegmentationDataset
+    add_colors: true
+    add_instance: true
+    add_normals: false
+    add_raw_coordinates: true
+    color_mean_std: data/processed/rio/color_mean_std.yaml
+    data_dir: data/processed/rio
+    dataset_name: rio
+    exclude_unsupervised_sequences: true
+    fail_closed: true
+    filter_out_classes:
+    - 0
+    - 1
+    - 255
+    ignore_label: 255
+    image_augmentations_path: null
+    known_empty_scan_policy: official_substitute
+    label_db_filepath: data/processed/rio/label_database.yaml
+    label_offset: 2
+    mode: validation
+    num_labels: 20
+    temporal_window: 2
+    volume_augmentations_path: null
+  validation_mode: validation
+  voxel_size: 0.02
+general:
+  add_instance: true
+  backbone_checkpoint: null
+  checkpoint: null
+  compile_model: false
+  dbscan_eps: 0.95
+  dbscan_min_points: 1
+  decoder_id: -1
+  eval_on_segments: true
+  experiment_name: rescene4d_concerto_t2_repro
+  export: false
+  export_threshold: 0.0001
+  filter_out_instances: false
+  freeze: backbone_encoder
+  gpus: 1
+  ignore_class_threshold: 100
+  ignore_mask_idx: []
+  iou_threshold: 1.0
+  linear_probing_backbone: false
+  matmul_precision: high
+  max_batch_size: 99999999
+  num_changes: 6
+  num_targets: 19
+  p2_fail_closed_runtime: true
+  p2_weighted_objective: true
+  postprocessing_export: false
+  project_name: rescene4d_concerto_t2_repro
+  save_dir: checkpoints/rescene4d_concerto_t2_repro
+  save_features: false
+  save_segment_info: false
+  save_visualizations: false
+  scores_threshold: 0.0
+  seed: 45
+  topk_per_image: 100
+  train_mode: false
+  train_on_segments: true
+  use_dbscan: false
+  version: 0
+  visualization_point_size: 20
+  workspace: null
+instance_metric:
+  _target_: stmetrics.InstanceMetrics
+  dataset: data/processed/rio/rio.yaml
+  heads:
+  - _target_: stmetrics.TemporalEvaluator
+    aux: changes
+    recall: true
+  - _target_: stmetrics.LegacyAPEvaluator
+  - _target_: stmetrics.instances.SelectTimestepEvaluator
+    timesteps:
+    - 0
+  - _target_: stmetrics.instances.SelectTimestepEvaluator
+    timesteps:
+    - 1
+  log_prefix: val
+  timestep_key: temporal_stages
+logging:
+- _target_: pytorch_lightning.loggers.CSVLogger
+  name: local_metrics
+  save_dir: checkpoints/rescene4d_concerto_t2_repro
+loss:
+  _target_: models.criterion.SetCriterion
+  change_weights:
+  - 0.1
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  chunk_size: 2048
+  class_weights: -1
+  contrastive_loss: true
+  contrastive_loss_type: infoNCE
+  contrastive_loss_weight: 1.0
+  eos_coef: 0.2
+  importance_sample_ratio: 0.75
+  initial_bias: 0.0
+  initial_temperature: 0.5
+  learnable_bias: false
+  learnable_temperature: false
+  losses:
+  - labels
+  - masks
+  max_points: 5000
+  norm_type: log_odds
+  num_changes: 6
+  num_classes: 19
+  num_negatives: 256
+  num_points: -1
+  oversample_ratio: 3.0
+  scale_contrastive_loss: false
+  temporal_positive_weight: 1.0
+  use_chunked_loss: true
+  weight_temporal_stages: true
+matcher:
+  _target_: models.matcher.HungarianMatcher
+  cost_class: 2.0
+  cost_dice: 2.0
+  cost_mask: 5.0
+  num_points: -1
+model:
+  D: 4
+  _target_: models.ReScene
+  config:
+    backbone:
+      _target_: models.PointceptBackbone
+      custom_config:
+        enc_mode: false
+      decoder_serializations:
+      - standard
+      - temporal_overlay
+      model_lib: concerto
+      name: external:concerto/concerto_base.pth
+      repo_id: Pointcept/Concerto
+    backbone_wrapper: true
+    temporal_window: 2
+  dim_feedforward: 1024
+  dropout: 0.0
+  gauss_scale: 1.0
+  hidden_dim: 128
+  hlevels:
+  - 0
+  - 1
+  - 2
+  - 3
+  max_sample_size: false
+  non_parametric_queries: true
+  normalize_pos_enc: true
+  num_changes: 6
+  num_classes: 19
+  num_decoders: 3
+  num_heads: 8
+  num_queries: 100
+  positional_encoding_type: fourier
+  pre_norm: false
+  random_normal: false
+  random_queries: false
+  random_query_both: false
+  return_query_features: true
+  sample_sizes:
+  - 200
+  - 800
+  - 3200
+  - 12800
+  - 51200
+  save_segment_info: false
+  scatter_type: mean
+  shared_decoder: true
+  temporal_masking: false
+  train_on_segments: true
+  use_changes_loss: false
+  use_level_embed: false
+  use_np_features: false
+  voxel_size: 0.02
+optimizer:
+  _target_: torch.optim.AdamW
+  amsgrad: false
+  betas:
+  - 0.9
+  - 0.999
+  eps: 1.0e-08
+  lr: 0.0005
+  weight_decay: 0.01
+p2_preflight:
+  artifact_path: artifacts/P2/scannet_preflight.json
+  target: rescene4d_concerto_t2
+scheduler:
+  pytorch_lightning_params:
+    interval: step
+  scheduler:
+    _target_: torch.optim.lr_scheduler.OneCycleLR
+    anneal_strategy: cos
+    base_momentum: 0.85
+    cycle_momentum: true
+    div_factor: 25.0
+    epochs: 450
+    final_div_factor: 10000.0
+    last_epoch: -1
+    max_lr: 0.0005
+    max_momentum: 0.95
+    pct_start: 0.3
+    three_phase: false
+    total_steps: -1
+trainer:
+  accumulate_grad_batches: 8
+  check_val_every_n_epoch: 15
+  deterministic: false
+  gradient_clip_val: 1.0
+  max_epochs: 450
+  min_epochs: 1
+  num_sanity_val_steps: 2
+  precision: 32-true
+  strategy: ddp_find_unused_parameters_true
