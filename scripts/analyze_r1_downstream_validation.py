@@ -96,6 +96,14 @@ class R1AnalysisError(ValueError):
     """Raised when analysis inputs violate the frozen R1 contract."""
 
 
+def resolve_metric_dataset_spec(data_root: Path) -> Path:
+    root = data_root.expanduser().resolve(strict=True)
+    specification = root / "data/processed/rio/rio.yaml"
+    if not specification.is_file():
+        raise R1AnalysisError("metric dataset spec is unavailable under data root")
+    return specification.resolve(strict=True)
+
+
 def _non_negative_count(value: object, *, field: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value < 0:
         raise R1AnalysisError(f"{field} must be a non-negative integer")
@@ -532,23 +540,49 @@ def _local_metric_block(accumulator: object) -> dict[str, float]:
 
 
 def _task_accumulator(
-    values: dict[tuple[object, ...], object], key: tuple[object, ...]
+    values: dict[tuple[object, ...], object],
+    key: tuple[object, ...],
+    *,
+    dataset_spec: Path,
 ) -> object:
+    from scripts.p6a_metrics import OfficialMetricAccumulator
     from scripts.system_comparison_metrics import CausalTaskAccumulator
 
     if key not in values:
-        values[key] = CausalTaskAccumulator()
+        values[key] = CausalTaskAccumulator(
+            metric_factory=lambda mode: OfficialMetricAccumulator(
+                mode=mode, dataset_spec=dataset_spec
+            )
+        )
     return values[key]
 
 
 def _local_accumulator(
-    values: dict[tuple[object, ...], object], key: tuple[object, ...]
+    values: dict[tuple[object, ...], object],
+    key: tuple[object, ...],
+    *,
+    dataset_spec: Path,
 ) -> object:
     from scripts.p6a_metrics import OfficialMetricAccumulator
 
     if key not in values:
-        values[key] = OfficialMetricAccumulator(mode="raw_local")
+        values[key] = OfficialMetricAccumulator(
+            mode="raw_local", dataset_spec=dataset_spec
+        )
     return values[key]
+
+
+def _single_task_metrics(pair: object, *, dataset_spec: Path) -> dict[str, float]:
+    from scripts.p6a_metrics import OfficialMetricAccumulator
+    from scripts.system_comparison_metrics import CausalTaskAccumulator
+
+    accumulator = CausalTaskAccumulator(
+        metric_factory=lambda mode: OfficialMetricAccumulator(
+            mode=mode, dataset_spec=dataset_spec
+        )
+    )
+    accumulator.update(pair)
+    return _task_metric_block(accumulator)
 
 
 def _event_counts(events: Sequence[object], *, horizon: int) -> dict[str, int]:
@@ -937,7 +971,6 @@ def run_analysis(
     from scripts.system_comparison_inference import load_full_history_cache_entry
     from scripts.system_comparison_metrics import (
         causal_prefix_pair_from_payload,
-        compute_causal_task_metrics,
         compute_deployment_identity_metrics,
     )
     from scripts.system_comparison_v2_analysis import (
@@ -968,6 +1001,7 @@ def run_analysis(
         source_commit=source_commit,
         device_name=None,
     )
+    metric_dataset_spec = resolve_metric_dataset_spec(data_root)
     local_manifest = {**local_progress, "entry_count": 645}
     sequences = load_v2_sequences(
         cache_manifest=local_manifest,
@@ -1022,11 +1056,15 @@ def run_analysis(
         order = str(getattr(sequence, "order_id"))
         for scope_order in (order, "all"):
             key = (method, reducer, scope_order, horizon)
-            accumulator = _task_accumulator(task_aggregate, key)
+            accumulator = _task_accumulator(
+                task_aggregate, key, dataset_spec=metric_dataset_spec
+            )
             accumulator.update(pair)
             task_counts[key] += 1
             cluster_key = (method, reducer, scope_order, horizon, reference)
-            cluster_accumulator = _task_accumulator(task_cluster, cluster_key)
+            cluster_accumulator = _task_accumulator(
+                task_cluster, cluster_key, dataset_spec=metric_dataset_spec
+            )
             cluster_accumulator.update(pair)
             task_cluster_counts[cluster_key] += 1
 
@@ -1077,7 +1115,9 @@ def run_analysis(
                 sidecar=sidecar,
                 class_mapper=class_mapper,
             )
-            one_local = OfficialMetricAccumulator(mode="raw_local")
+            one_local = OfficialMetricAccumulator(
+                mode="raw_local", dataset_spec=metric_dataset_spec
+            )
             one_local.update(local_pair.prediction, local_pair.target)
             local_values = _local_metric_block(one_local)
             local_per_sequence.append(
@@ -1094,7 +1134,11 @@ def run_analysis(
             )
             for scope_order in (sequence.order_id, "all"):
                 local_key = (scope_order, horizon)
-                local_acc = _local_accumulator(local_aggregate, local_key)
+                local_acc = _local_accumulator(
+                    local_aggregate,
+                    local_key,
+                    dataset_spec=metric_dataset_spec,
+                )
                 local_acc.update(local_pair.prediction, local_pair.target)
                 local_counts[local_key] += 1
                 cluster_key = (
@@ -1102,7 +1146,11 @@ def run_analysis(
                     horizon,
                     sequence.reference_scene_id,
                 )
-                cluster_acc = _local_accumulator(local_cluster, cluster_key)
+                cluster_acc = _local_accumulator(
+                    local_cluster,
+                    cluster_key,
+                    dataset_spec=metric_dataset_spec,
+                )
                 cluster_acc.update(local_pair.prediction, local_pair.target)
                 local_cluster_counts[cluster_key] += 1
 
@@ -1115,7 +1163,9 @@ def run_analysis(
                 expected_provenance=full_progress["provenance"],
             )
             full_pair = causal_prefix_pair_from_payload(full_payload)
-            full_values = compute_causal_task_metrics([full_pair])
+            full_values = _single_task_metrics(
+                full_pair, dataset_spec=metric_dataset_spec
+            )
             task_per_sequence.append(
                 {
                     "method": "FullHistory",
@@ -1143,7 +1193,9 @@ def run_analysis(
                         raw_payloads=sequence.raw_payloads[:horizon],
                         class_mapper=class_mapper,
                     )
-                    values = compute_causal_task_metrics([pair])
+                    values = _single_task_metrics(
+                        pair, dataset_spec=metric_dataset_spec
+                    )
                     task_per_sequence.append(
                         {
                             "method": method,

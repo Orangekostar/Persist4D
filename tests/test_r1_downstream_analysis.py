@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+from pathlib import Path
 
 import pytest
 
@@ -225,3 +226,17 @@ def test_per_sequence_coverage_is_exact_for_frozen_protocol() -> None:
             identity_rows=identity_rows,
             local_rows=local_rows,
         )
+
+
+def test_metric_dataset_spec_is_resolved_from_explicit_data_root(
+    tmp_path: Path,
+) -> None:
+    analysis = _analysis()
+    expected = tmp_path / "data/processed/rio/rio.yaml"
+    expected.parent.mkdir(parents=True)
+    expected.write_text("dataset: rio\n", encoding="utf-8")
+
+    assert analysis.resolve_metric_dataset_spec(tmp_path) == expected.resolve()
+    expected.unlink()
+    with pytest.raises(analysis.R1AnalysisError, match="metric dataset spec"):
+        analysis.resolve_metric_dataset_spec(tmp_path)
