@@ -1,0 +1,72 @@
+schema_version: 1
+experiment: persist4d_r1_downstream_validation_v1
+seed: 45
+
+checkpoint:
+  reference: external:checkpoint/rootcause_full/r1/epoch390/629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd
+  sha256: 629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd
+  bytes: 754813672
+  completed_epoch: 390
+  completed_step: 25740
+  state_dict_entries: 798
+  training_config_sha256: 3846415b6de3ea12b7b08d39ea20398916dd685c99ce7ad33e42df17d9ac6536
+
+historical_checkpoint:
+  reference: repo:checkpoints/rescene4d_concerto_t2_repro.ckpt
+  sha256: 85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e
+  bytes: 754917862
+
+pretrained:
+  reference: external:checkpoint/concerto_pretrained/845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07
+  sha256: 845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07
+  bytes: 433987358
+
+protocol:
+  reference: repo:artifacts/P6A/protocol_b_manifest.json
+  sha256: 246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe
+  masters: 43
+  orders: [canonical, reverse, sha256_seed45]
+  sequences: 129
+  reference_scene_clusters: 6
+  cache_entries_per_mode: 645
+
+methods: [FullHistory, B2, B4]
+tracker_methods: [B2, B4]
+state_update_horizons: [1, 2, 3, 4, 5]
+report_horizons: [2, 4, 5]
+score_reducers: [mean, latest, max]
+
+tracker_settings:
+  B2:
+    name: previous_stage_feature_class_hungarian
+    feature_threshold: 0.5
+    class_weight: 0.25
+    background_class: 18
+    class_probability: foreground_renormalized
+  B4:
+    name: frozen_p5_persist4d
+    capacity: 100
+    association_threshold: 0.5
+    class_weight: 0.25
+    background_class: 18
+    update_rate: 0.2
+    confidence_threshold: 0.5
+    mask_threshold: 0.5
+    minimum_mask_support: 1
+
+statistics:
+  cluster_unit: reference_scene_id
+  bootstrap_replicates: 10000
+  seed: 45
+  paired: true
+
+profile:
+  subset_rule: first_master_per_reference_scene_canonical
+  report_horizons: [2, 4, 5]
+  warmup_repeats: 5
+  measured_repeats: 10
+
+recovery_rule:
+  horizons: [4, 5]
+  pooled_b4_minus_b2_strictly_positive: true
+  minimum_positive_clusters_per_horizon: 4
