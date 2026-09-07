@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Profile frozen R1 FullHistory and B4 deployment paths."""
 
 from __future__ import annotations
