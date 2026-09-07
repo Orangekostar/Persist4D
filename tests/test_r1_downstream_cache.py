@@ -221,6 +221,30 @@ def test_query_feature_export_parity_preserves_nonfeature_outputs() -> None:
         runner.validate_query_feature_export_parity(disabled, changed)
 
 
+def test_t2_parity_metric_uses_explicit_data_root(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runner = _runner()
+    specification = tmp_path / "data/processed/rio/rio.yaml"
+    specification.parent.mkdir(parents=True)
+    specification.write_text("dataset: rio\n", encoding="utf-8")
+    captured = {}
+
+    def metric(prediction, target, *, dataset_spec):
+        captured["prediction"] = prediction
+        captured["target"] = target
+        captured["dataset_spec"] = dataset_spec
+        return {"raw_local_AP": 1.0}
+
+    monkeypatch.setattr(
+        "scripts.p6a_metrics.compute_official_raw_local_metrics", metric
+    )
+    function = runner.build_t2_parity_metric(tmp_path)
+
+    assert function("prediction", "target") == {"raw_local_AP": 1.0}
+    assert captured["dataset_spec"] == specification.resolve()
+
+
 def test_resumable_materializer_publishes_each_record_once(tmp_path: Path) -> None:
     runner = _runner()
     keys = [{"key": index} for index in range(3)]

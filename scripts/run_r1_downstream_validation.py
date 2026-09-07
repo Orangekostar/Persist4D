@@ -658,6 +658,20 @@ def _run_query_feature_export_smoke(
         model.return_query_features = original
 
 
+def build_t2_parity_metric(data_root: Path) -> Callable[..., Mapping[str, object]]:
+    """Bind the official raw-local metric to the selected dataset root."""
+
+    from functools import partial
+
+    from scripts.analyze_r1_downstream_validation import resolve_metric_dataset_spec
+    from scripts.p6a_metrics import compute_official_raw_local_metrics
+
+    return partial(
+        compute_official_raw_local_metrics,
+        dataset_spec=resolve_metric_dataset_spec(data_root),
+    )
+
+
 def run_smoke(arguments: argparse.Namespace) -> dict[str, object]:
     from scripts.evaluate_persist4d_p6a import (
         build_rio_class_mapper,
@@ -696,6 +710,7 @@ def run_smoke(arguments: argparse.Namespace) -> dict[str, object]:
         full_producer = _full_producer(setup)
         class_mapper = build_rio_class_mapper(setup.dataset)
         tracker_factories = build_tracker_factories(setup.p6a_config)
+        metric_function = build_t2_parity_metric(arguments.data_root)
         rows = []
         smoke_observations = []
         with deterministic_inference_runtime(45, setup.device):
@@ -728,6 +743,7 @@ def run_smoke(arguments: argparse.Namespace) -> dict[str, object]:
                             full.payload["content_sha256"]
                         ),
                         sidecar_content_sha256=task_sidecar_digest(sidecar),
+                        metric_function=metric_function,
                     )
                     if candidate["parity_pass"] is not True:
                         raise R1RunError("smoke T2 official candidates differ")
@@ -853,6 +869,7 @@ def run_cache_parity(arguments: argparse.Namespace) -> dict[str, object]:
         or set(local_records) != set(full_records)
     ):
         raise R1RunError("T2 cache parity coverage differs")
+    metric_function = build_t2_parity_metric(arguments.data_root)
     rows = []
     for identity in sorted(local_records):
         local_record = local_records[identity]
@@ -874,6 +891,7 @@ def run_cache_parity(arguments: argparse.Namespace) -> dict[str, object]:
                 local_sidecar=sidecar,
                 full_history_content_sha256=str(full_record["content_sha256"]),
                 sidecar_content_sha256=str(sidecar_entry["content_sha256"]),
+                metric_function=metric_function,
             )
         )
     summary = summarize_t2_rows(rows, expected_unit_count=129)
@@ -1174,6 +1192,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 __all__ = [
     "R1RunError",
     "argument_parser",
+    "build_t2_parity_metric",
     "finalize_cache_manifest",
     "local_cache_keys",
     "materialize_records",
