@@ -1,0 +1,94 @@
+{
+  "budget": {
+    "completed_epoch": 450,
+    "optimizer_steps": 29700,
+    "resumed_from_completed_epoch": 90,
+    "resumed_from_optimizer_step": 5940,
+    "validation_event_count": 30
+  },
+  "candidate_id": "0f90b41f0ee06a888237c02cf1a08d0b8d14633bf68beed770bbb86b9d8fcab4",
+  "config_sha256": "3846415b6de3ea12b7b08d39ea20398916dd685c99ce7ad33e42df17d9ac6536",
+  "content_sha256": "65d1122c529eb82e31ce75643d55d637d5e09601e2d92cd9a14f8dc125c3a509",
+  "decision_authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191",
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "resume_plan_sha256": "344705186748255b8d4997b9029b508d0f7a244a6ea992f08cece0e2f1faa828",
+  "runtime_migration": {
+    "changed_fields": [
+      "runtime.gpu_count",
+      "runtime.gpu_models"
+    ],
+    "decision_authorization_sha256": "7c9dee029bf1998d57834757a9d6428582845f81cba70c3ab14370b08c4fa191",
+    "provenance": {
+      "bytes": 6069,
+      "sha256": "ead47fcdbdf223752a15b93ad2d72897b28ed5190853ed49d018f5b0099d20e1"
+    },
+    "runtime_authorization_sha256": "ee988e908f9b0cf0cd869cbfa104bd630290eb3643851d7dc3eb316f064063ad"
+  },
+  "schema_version": 1,
+  "selection": {
+    "full_budget_checkpoint_bytes": 754813672,
+    "full_budget_checkpoint_sha256": "d6fcae9682c6b3af3472671d6e0871240c10a0f86b529f4c31d69ae9f5ad2cbb",
+    "mode": "max",
+    "monitor": "val_mean_t-AP",
+    "selected_checkpoint_bytes": 754813672,
+    "selected_checkpoint_name": "epoch=389-val_mean_t-AP=0.305.ckpt",
+    "selected_checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "selected_epoch": 390,
+    "selected_step": 25740,
+    "selection_metric_exact": 0.3045586943626404,
+    "validation_event_count": 30
+  },
+  "selection_used_persist4d": false,
+  "short_decision_sha256": "c71d7f770fe72dbeb3816fc1bb2e910dd73f46f5b6fbb18b522f12603f4b3def",
+  "stage": "full_candidate",
+  "status": "pass",
+  "validation_lineage": {
+    "policy": {
+      "authoritative_source": "local_metrics/version_3/metrics.csv",
+      "content_sha256": "02e41e619fbe7817c994289a579f3d4d74562006c61cb21c72219c27beba5f5b",
+      "reason": "cuda_allocator_fragmentation_recovery",
+      "resume_checkpoint": {
+        "completed_epoch": 390,
+        "optimizer_step": 25740,
+        "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+      },
+      "schema_version": 1,
+      "status": "pass",
+      "superseded_sources": [
+        "local_metrics/version_2/metrics.csv"
+      ]
+    },
+    "superseded_validation_rows": [
+      {
+        "SpatialStageMean": 0.4303363561630249,
+        "completed_epoch": 405,
+        "metrics_csv_sha256": "9343a4cc8fcfc5486c029314bdb5ca9425703db85201fc6b70997c51855394ee",
+        "optimizer_step": 26730,
+        "overall_mAP": 0.3842439353466034,
+        "source": "local_metrics/version_2/metrics.csv",
+        "stage1_mAP": 0.43253740668296814,
+        "stage2_mAP": 0.42813530564308167,
+        "t_mAP": 0.3008429706096649,
+        "t_mAP25": 0.6512036919593811,
+        "t_mAP50": 0.4934379756450653,
+        "train_log_step": 26729
+      }
+    ]
+  },
+  "validation_sources": {
+    "local_metrics/version_1/metrics.csv": {
+      "bytes": 1854752,
+      "sha256": "93b9ad99eb79e561150c3a353468012bc6890dae02b739866cc90b66cfe5fc1f"
+    },
+    "local_metrics/version_2/metrics.csv": {
+      "bytes": 6508092,
+      "sha256": "9343a4cc8fcfc5486c029314bdb5ca9425703db85201fc6b70997c51855394ee"
+    },
+    "local_metrics/version_3/metrics.csv": {
+      "bytes": 1269424,
+      "sha256": "bde760158974b791f17eda0ecf23e605a609f0b6d1bae8ab6ac56d825ad5f49e"
+    }
+  },
+  "variant": "R1",
+  "variant_authorization_sha256": "ee988e908f9b0cf0cd869cbfa104bd630290eb3643851d7dc3eb316f064063ad"
+}

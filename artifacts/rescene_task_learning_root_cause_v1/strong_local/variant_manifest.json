@@ -1,0 +1,35 @@
+{
+  "authorizations": [
+    {
+      "authorization_sha256": "969f42e7debcc8de259f5327fd144bb04f9f3dbd3d81bfd534ddd8f371cd8d3b",
+      "file": {
+        "bytes": 20529,
+        "sha256": "ceb6507601d77968ce4d837155d8a2024d542e03e4ca95fd51a8e38a7ddc4418"
+      },
+      "provenance_file": {
+        "bytes": 2431,
+        "sha256": "4001f8258382ce21c0153279f2c495c39ae06aee70dc0bd02705d636592e26e1"
+      },
+      "variant": "A1",
+      "verdict_file": {
+        "bytes": 6372,
+        "sha256": "3c6582f40bf5af7c5a0a0121d9dbae845104ce110fe0400ca5e2b9f1d81d31f3"
+      }
+    }
+  ],
+  "content_sha256": "0923f62ba04f85c75fce387276a04e7a2357b6116857168ee3ee56a55f645493",
+  "experiment": "rescene_strong_local_v1",
+  "schema_version": 1,
+  "skips": [
+    {
+      "content_sha256": "c7a0e957a56e249402c66bf36b82dff0dde96c1fe2088119ab987c8d05ce3060",
+      "file": {
+        "bytes": 1518,
+        "sha256": "60e2c08b26454652c02a1e40d4e44ef2c57b0f1c2bef69858d40ba90689d72b7"
+      },
+      "reason": "A1 passed; architecture expansion stopped",
+      "variant": "A2"
+    }
+  ],
+  "status": "pass"
+}

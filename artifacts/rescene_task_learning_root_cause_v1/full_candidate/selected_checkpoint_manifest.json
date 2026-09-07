@@ -1,0 +1,42 @@
+{
+  "bindings": {
+    "candidate_id": "0f90b41f0ee06a888237c02cf1a08d0b8d14633bf68beed770bbb86b9d8fcab4",
+    "common_initialization_sha256": "d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+    "pretrained_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+    "variant_authorization_sha256": "ee988e908f9b0cf0cd869cbfa104bd630290eb3643851d7dc3eb316f064063ad"
+  },
+  "checkpoint": {
+    "bytes": 754813672,
+    "config_sha256": "3846415b6de3ea12b7b08d39ea20398916dd685c99ce7ad33e42df17d9ac6536",
+    "creating_commit": "84f4c97dae5e2f0671c92ac20ab264b36fc66488",
+    "logical_name": "rootcause_r1_full_selected_epoch_390",
+    "reference": "external:checkpoint/rootcause_full/r1/epoch390/629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "selected_epoch": 390,
+    "selected_step": 25740,
+    "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "upstream_checkpoint_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+  },
+  "content_sha256": "4fa7a325f69ca8de674320749de422ff61b20bd26ac608693669531dc6817a71",
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "full_training": {
+    "completed_epoch": 450,
+    "manifest_sha256": "65d1122c529eb82e31ce75643d55d637d5e09601e2d92cd9a14f8dc125c3a509",
+    "selected_by": "highest val_mean_t-AP"
+  },
+  "resume_state": {
+    "dataloader_prefetch_state_checkpointed": false,
+    "mid_epoch_resume_supported": false,
+    "optimizer_state_count": 1,
+    "sampler_generator_state_sha256": "abb3d2175d9175ff06c3290b5a14d25373680ce58119faca7a6845acbf26229f",
+    "sampler_resume_scope": "completed_epoch_boundary_only",
+    "scheduler_state_count": 1,
+    "selected_epoch": 390,
+    "selected_step": 25740,
+    "state_dict_entry_count": 798,
+    "training_config_sha256": "3846415b6de3ea12b7b08d39ea20398916dd685c99ce7ad33e42df17d9ac6536"
+  },
+  "schema_version": 1,
+  "stage": "full_candidate",
+  "status": "pass",
+  "variant": "R1"
+}

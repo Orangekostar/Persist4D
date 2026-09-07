@@ -1,0 +1,76 @@
+{
+  "authorization": {
+    "bytes": 20529,
+    "sha256": "ceb6507601d77968ce4d837155d8a2024d542e03e4ca95fd51a8e38a7ddc4418"
+  },
+  "content_sha256": "35c247bef3e3e6f5cad7705c5df6418c09bfcb8ab0753c18e878b1007cb5d3a9",
+  "decision_content_sha256": "cea4b8879fd4a380982055fd13a2e43db129d8a8dc5b73728161db7260d4a068",
+  "experiment": "rescene_strong_local_v1",
+  "root_decision": {
+    "bytes": 5013,
+    "sha256": "1faba69c51613a8851981da2f17c8ea060b31599707b3f6995ca03c1f02da483"
+  },
+  "root_epoch60": {
+    "bytes": 1549,
+    "sha256": "4b25314bdf58f5309538402f43a2bf8b48298d92e3aaea02f3c5358787591dda"
+  },
+  "root_epoch90": {
+    "bytes": 1557,
+    "sha256": "5c28c99d5d81a14ed704b83324e836706c05a82cb7d49c3ae8a2dadbecabe4d3"
+  },
+  "root_learning_curves": {
+    "bytes": 5152,
+    "sha256": "0949d5e345c9d8faad354c114e7e73cf4f528916a30554ad5f6da9a026d51a38"
+  },
+  "schema_version": 1,
+  "strong_curve_sources": {
+    "candidate": {
+      "bytes": 1204,
+      "sha256": "6f0780136244ef4dd491bf32759129087aa0f48db44ab54002f0279e00e0b09b"
+    },
+    "metrics": {
+      "local_metrics/version_1/metrics.csv": {
+        "bytes": 1866291,
+        "sha256": "3919e85712909fe43869aa36e254b36840bd02958672e77e640b4e798638a373"
+      }
+    }
+  },
+  "strong_evaluation_sources": {
+    "epoch60": {
+      "checkpoint_manifest": {
+        "bytes": 1770,
+        "sha256": "703787e4f5c128e6a0e79ebf4350c171a55b21178cd1aa701494b870c21e536c"
+      },
+      "seed45": {
+        "bytes": 1328,
+        "sha256": "721cd75030c109c22357ff1cc88f0a1d6eac7be45e7459dd0297a344823a3f3b"
+      },
+      "seed46": {
+        "bytes": 1328,
+        "sha256": "4ca09d968115458afbbe9ba56b96bf42b0dc064a8396a9165a864d629ac21d0e"
+      },
+      "seed47": {
+        "bytes": 1326,
+        "sha256": "6fb90c8ee5123774e186a832ea9591b036a108bc1eb76885b605e202b8d56d51"
+      }
+    },
+    "epoch90": {
+      "checkpoint_manifest": {
+        "bytes": 1770,
+        "sha256": "1b2dc839b2c13e6ba91edc0f027209bae891f0e275b2cfff0f02b6ce92f0770c"
+      },
+      "seed45": {
+        "bytes": 1329,
+        "sha256": "a1e9e195af7b88c942ce8f905b112e14ee4e55b42cd190590dfab490bac65fe8"
+      },
+      "seed46": {
+        "bytes": 1326,
+        "sha256": "061429f860b0e001b448f337cd6e27e38f1b612453143faa0006841176a1bf7b"
+      },
+      "seed47": {
+        "bytes": 1328,
+        "sha256": "efcfe16170444c198c2b89a7881b92dc7ac9fc6610b321b0cc6f7febf0a7a8a6"
+      }
+    }
+  }
+}

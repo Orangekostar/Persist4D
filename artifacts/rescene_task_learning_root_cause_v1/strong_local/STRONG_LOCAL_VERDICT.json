@@ -1,0 +1,41 @@
+{
+  "content_sha256": "0889cd5904dccdd091ac7658f7afcfb5ff5bdfb93ee48a4f019e50de7e31bd2e",
+  "experiment": "rescene_strong_local_v1",
+  "full_results": [
+    {
+      "content_sha256": "97d1afe8f664f9c312c6a61a77c7fe4c9eb63d85ea9576ccf26724769395c629",
+      "status": "pass",
+      "variant": "A1",
+      "verdict": "STRONG-LOCAL-PARTIAL"
+    }
+  ],
+  "full_statuses": [],
+  "full_training_authorized_variants": [
+    "A1"
+  ],
+  "results": [
+    {
+      "all_gates_pass": true,
+      "content_sha256": "cea4b8879fd4a380982055fd13a2e43db129d8a8dc5b73728161db7260d4a068",
+      "paired_spatial_delta_mean": 0.013012468814849854,
+      "variant": "A1"
+    }
+  ],
+  "schema_version": 1,
+  "selection_used_persist4d": false,
+  "skipped_variants": [
+    {
+      "content_sha256": "c7a0e957a56e249402c66bf36b82dff0dde96c1fe2088119ab987c8d05ce3060",
+      "reason": "A1 passed; architecture expansion stopped",
+      "variant": "A2"
+    }
+  ],
+  "status": "pass",
+  "variants_considered": [
+    "A1",
+    "A2"
+  ],
+  "variants_run": [
+    "A1"
+  ]
+}

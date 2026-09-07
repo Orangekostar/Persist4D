@@ -1,0 +1,27 @@
+{
+  "baseline_source": {
+    "bytes": 1828,
+    "sha256": "f509ddec3a4eed1ea750c017f6b8e7fcc1a2eff96b86b9530f667da0a6c4b898"
+  },
+  "content_sha256": "d54a1ceefcc5feaeb7b8e855f3e2dbb37ba9321baed900a19e65625b2a48bf9a",
+  "result_content_sha256": "27cebebd7dfdd481a0c596aa717733a50e2258e3a8eb83e1ea84f8f8a989aba9",
+  "run_sources": {
+    "seed45.json": {
+      "bytes": 1331,
+      "sha256": "12feaa24d25db07857a5b7538f80145a04a7557adcebcc830d40ec78eecff544"
+    },
+    "seed46.json": {
+      "bytes": 1325,
+      "sha256": "190b9cdda02e577953c7b1e9e1dd403a0b2db13c9b43d81b29ebbaf7c40e0a21"
+    },
+    "seed47.json": {
+      "bytes": 1329,
+      "sha256": "7431acd57759e1e07755b738970f571562fd0ab50e87cbbeaa7d628554ba8a42"
+    }
+  },
+  "schema_version": 1,
+  "start_state_source": {
+    "bytes": 6881,
+    "sha256": "f00b821ec30091cd6d923a456a5411eb885281f78b56ba2d3b59325034efaba3"
+  }
+}

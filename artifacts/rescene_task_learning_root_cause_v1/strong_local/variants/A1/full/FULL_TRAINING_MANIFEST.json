@@ -1,0 +1,48 @@
+{
+  "budget": {
+    "completed_epoch": 450,
+    "optimizer_steps": 29700,
+    "resumed_from_completed_epoch": 90,
+    "resumed_from_optimizer_step": 5940,
+    "validation_event_count": 30
+  },
+  "candidate_id": "f9b660495ca07dcbe9eb331ad3e52cbb3724caca6b1f68abc0e6c7ad0b1438c0",
+  "config_sha256": "4b193162acc5c3a54ea57c5b14b6c9909745e68d16fe7f92687462fadb283d9c",
+  "content_sha256": "db8c3768d40c97483962740788e6c27fb9088f406abbb2ceae6f6ae5c27799c1",
+  "experiment": "rescene_strong_local_v1",
+  "resume_plan_sha256": "8e621fb8f3e799f22391e5a6bd607b479de12413071443c28bc3c5e241308acd",
+  "schema_version": 1,
+  "selection": {
+    "full_budget_checkpoint_bytes": 755165656,
+    "full_budget_checkpoint_sha256": "e444a4e2b93819e7cd51871915e524e3337f9f19eb6d909f63701375bc8a405a",
+    "mode": "max",
+    "monitor": "val_mean_t-AP",
+    "selected_checkpoint_bytes": 755165656,
+    "selected_checkpoint_name": "epoch=434-val_mean_t-AP=0.313.ckpt",
+    "selected_checkpoint_sha256": "0bf2476a6fc53768f97aad7e14a4ac8779661f302725325993d5b37442a7864f",
+    "selected_epoch": 435,
+    "selected_step": 28710,
+    "selection_metric_exact": 0.31340423226356506,
+    "validation_event_count": 30
+  },
+  "selection_used_persist4d": false,
+  "short_decision_sha256": "cea4b8879fd4a380982055fd13a2e43db129d8a8dc5b73728161db7260d4a068",
+  "stage": "full_candidate",
+  "status": "pass",
+  "validation_sources": {
+    "local_metrics/version_1/metrics.csv": {
+      "bytes": 1866291,
+      "sha256": "3919e85712909fe43869aa36e254b36840bd02958672e77e640b4e798638a373"
+    },
+    "local_metrics/version_2/metrics.csv": {
+      "bytes": 6576843,
+      "sha256": "715d4e2b36c2b4b625aa4cb521e5719d0bc1ed4f2bb486fe17165cdfa45f41e1"
+    },
+    "local_metrics/version_3/metrics.csv": {
+      "bytes": 969326,
+      "sha256": "303a5e5957918166ae125f67b3fa15a544d23c2693a7c3f126428498cf4ac65d"
+    }
+  },
+  "variant": "A1",
+  "variant_authorization_sha256": "969f42e7debcc8de259f5327fd144bb04f9f3dbd3d81bfd534ddd8f371cd8d3b"
+}

@@ -1,0 +1,42 @@
+{
+  "bindings": {
+    "candidate_id": "f9b660495ca07dcbe9eb331ad3e52cbb3724caca6b1f68abc0e6c7ad0b1438c0",
+    "common_initialization_sha256": "d941b59ce95a8bb27bf5627f621cafe7c399a7a66b71ce05460782560fe98d4f",
+    "pretrained_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+    "variant_authorization_sha256": "969f42e7debcc8de259f5327fd144bb04f9f3dbd3d81bfd534ddd8f371cd8d3b"
+  },
+  "checkpoint": {
+    "bytes": 755165656,
+    "config_sha256": "4b193162acc5c3a54ea57c5b14b6c9909745e68d16fe7f92687462fadb283d9c",
+    "creating_commit": "e02b7b6e02fc74e147505deafd3ed02d00b1c7ee",
+    "logical_name": "rootcause_a1_full_selected_epoch_435",
+    "reference": "external:checkpoint/rootcause_full/a1/epoch435/0bf2476a6fc53768f97aad7e14a4ac8779661f302725325993d5b37442a7864f",
+    "selected_epoch": 435,
+    "selected_step": 28710,
+    "sha256": "0bf2476a6fc53768f97aad7e14a4ac8779661f302725325993d5b37442a7864f",
+    "upstream_checkpoint_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+  },
+  "content_sha256": "2bd03b8213f4871fc318c0c30e29671cbb6b25f00c1e7e0d7727a5d3f36e40d7",
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "full_training": {
+    "completed_epoch": 450,
+    "manifest_sha256": "db8c3768d40c97483962740788e6c27fb9088f406abbb2ceae6f6ae5c27799c1",
+    "selected_by": "highest val_mean_t-AP"
+  },
+  "resume_state": {
+    "dataloader_prefetch_state_checkpointed": false,
+    "mid_epoch_resume_supported": false,
+    "optimizer_state_count": 1,
+    "sampler_generator_state_sha256": "ff7992a70874cf8cc6e00c16d7262a2007b418cbe89f143062c98050e72c1fd1",
+    "sampler_resume_scope": "completed_epoch_boundary_only",
+    "scheduler_state_count": 1,
+    "selected_epoch": 435,
+    "selected_step": 28710,
+    "state_dict_entry_count": 802,
+    "training_config_sha256": "4b193162acc5c3a54ea57c5b14b6c9909745e68d16fe7f92687462fadb283d9c"
+  },
+  "schema_version": 1,
+  "stage": "full_candidate",
+  "status": "pass",
+  "variant": "A1"
+}

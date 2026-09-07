@@ -1,0 +1,48 @@
+{
+  "base_variant": "R1",
+  "content_sha256": "c7a0e957a56e249402c66bf36b82dff0dde96c1fe2088119ab987c8d05ce3060",
+  "experiment": "rescene_strong_local_v1",
+  "gate": {
+    "authorized": false,
+    "reason": "A1 passed; architecture expansion stopped",
+    "status": "gate_skipped",
+    "variant": "A2"
+  },
+  "schema_version": 1,
+  "status": "gate_skipped",
+  "upstream_evidence": {
+    "a1_authorization": {
+      "bytes": 20529,
+      "sha256": "ceb6507601d77968ce4d837155d8a2024d542e03e4ca95fd51a8e38a7ddc4418"
+    },
+    "a1_result": {
+      "bytes": 6372,
+      "sha256": "3c6582f40bf5af7c5a0a0121d9dbae845104ce110fe0400ca5e2b9f1d81d31f3"
+    },
+    "diagnostics": {
+      "bytes": 5360,
+      "sha256": "3ac7a34973fa0a545e626ba5593f02d20d197fdf37d4b201a5f7b27959613edc"
+    },
+    "root_authorization": {
+      "bytes": 70562,
+      "sha256": "bff1dcc31ebc1455e4e0b5995166a2006044ff0c111e29fc1ee61c8a95a09dec"
+    },
+    "root_learning_curves": {
+      "bytes": 5152,
+      "sha256": "0949d5e345c9d8faad354c114e7e73cf4f528916a30554ad5f6da9a026d51a38"
+    },
+    "root_official_like_epoch60": {
+      "bytes": 1549,
+      "sha256": "4b25314bdf58f5309538402f43a2bf8b48298d92e3aaea02f3c5358787591dda"
+    },
+    "root_official_like_epoch90": {
+      "bytes": 1557,
+      "sha256": "5c28c99d5d81a14ed704b83324e836706c05a82cb7d49c3ae8a2dadbecabe4d3"
+    },
+    "short_decision": {
+      "bytes": 5013,
+      "sha256": "1faba69c51613a8851981da2f17c8ea060b31599707b3f6995ca03c1f02da483"
+    }
+  },
+  "variant": "A2"
+}

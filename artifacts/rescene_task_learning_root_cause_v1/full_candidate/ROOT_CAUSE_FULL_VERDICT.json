@@ -1,0 +1,63 @@
+{
+  "baseline_checkpoint_sha256": "85ed1aba60320cd19798536b71b91dbc156b7ea60f838832bc0bbbdba131546e",
+  "baseline_summary": {
+    "SpatialStageMean_mean": 0.4254658470551173,
+    "SpatialStageMean_std": 0.005036730531746528,
+    "overall_mAP_mean": 0.3697936435540517,
+    "overall_mAP_std": 0.005891401930320932,
+    "seed_count": 3,
+    "stage1_mAP_mean": 0.4203239579995473,
+    "stage1_mAP_std": 0.004541385578672986,
+    "stage2_mAP_mean": 0.43060773611068726,
+    "stage2_mAP_std": 0.005823041494670711,
+    "t_mAP25_mean": 0.5907804171244303,
+    "t_mAP25_std": 0.01318153000688436,
+    "t_mAP50_mean": 0.4553584059079488,
+    "t_mAP50_std": 0.014396079775189611,
+    "t_mAP_mean": 0.2829008499781291,
+    "t_mAP_std": 0.00945263545486172
+  },
+  "candidate_summary": {
+    "SpatialStageMean_mean": 0.4399757186571757,
+    "SpatialStageMean_std": 0.004456140855218189,
+    "overall_mAP_mean": 0.3963398337364197,
+    "overall_mAP_std": 0.007385972584301605,
+    "seed_count": 3,
+    "stage1_mAP_mean": 0.43476082881291706,
+    "stage1_mAP_std": 0.007171952832922101,
+    "stage2_mAP_mean": 0.4451906085014343,
+    "stage2_mAP_std": 0.00277349487768918,
+    "t_mAP25_mean": 0.6646496256192526,
+    "t_mAP25_std": 0.003592220628623958,
+    "t_mAP50_mean": 0.5010311702887217,
+    "t_mAP50_std": 0.0029397214110816754,
+    "t_mAP_mean": 0.3106326957543691,
+    "t_mAP_std": 0.00274760259904604
+  },
+  "checkpoint_manifest_sha256": "4fa7a325f69ca8de674320749de422ff61b20bd26ac608693669531dc6817a71",
+  "content_sha256": "27cebebd7dfdd481a0c596aa717733a50e2258e3a8eb83e1ea84f8f8a989aba9",
+  "experiment": "rescene_task_learning_root_cause_v1",
+  "full_training_manifest_sha256": "65d1122c529eb82e31ce75643d55d637d5e09601e2d92cd9a14f8dc125c3a509",
+  "gates": {
+    "material_spatial_gain": true,
+    "overall_mean_improved": true,
+    "paired_spatial_positive_all_seeds": true,
+    "stage1_mean_improved": true,
+    "stage2_mean_improved": true,
+    "t_mAP_mean_improved": true
+  },
+  "paired_spatial_delta_mean": 0.01450987160205841,
+  "paired_spatial_deltas": [
+    0.0051354169845581055,
+    0.016216695308685303,
+    0.022177502512931824
+  ],
+  "schema_version": 1,
+  "selected_checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "selected_completed_epoch": 390,
+  "selection_used_persist4d": false,
+  "status": "pass",
+  "variant": "R1",
+  "verdict": "ROOTCAUSE-CONFIRMED",
+  "verdict_prefix": "ROOTCAUSE"
+}
