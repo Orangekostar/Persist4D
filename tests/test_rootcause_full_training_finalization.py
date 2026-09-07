@@ -5,6 +5,8 @@ import json
 
 import pytest
 
+import scripts.evaluate_rescene_rootcause_checkpoint as checkpoint_evaluation
+import scripts.finalize_rescene_rootcause_full_training as full_training
 from scripts.finalize_rescene_rootcause_full_training import (
     build_full_training_manifest,
     main,
@@ -202,6 +204,103 @@ def test_full_checkpoint_selection_matches_exact_validation_maximum(tmp_path) ->
     records[0]["selection_metric_exact"] = 0.39
     with pytest.raises(RootCauseEvaluationError, match="highest validation"):
         select_full_checkpoint(rows, records)
+
+
+def test_full_checkpoint_inspection_uses_final_callback_target_with_stale_file(
+    tmp_path, monkeypatch
+) -> None:
+    stale = tmp_path / "epoch=089-val_mean_t-AP=0.241.ckpt"
+    selected = tmp_path / "epoch=389-val_mean_t-AP=0.305.ckpt"
+    full = tmp_path / "epoch=450.ckpt"
+    for path in (stale, selected, full):
+        path.touch()
+
+    def checkpoint_payload(epoch: int, best_path: str, score: float):
+        return {
+            "epoch": epoch,
+            "callbacks": {
+                "ModelCheckpoint": {
+                    "monitor": "val_mean_t-AP",
+                    "best_model_path": best_path,
+                    "best_model_score": score,
+                }
+            },
+        }
+
+    payloads = {
+        selected.name: checkpoint_payload(389, str(selected), 0.3045587),
+        full.name: checkpoint_payload(449, str(selected), 0.3045587),
+    }
+
+    def checkpoint_facts(payload, **_):
+        return {
+            "selected_epoch": payload["epoch"] + 1,
+            "selected_step": (payload["epoch"] + 1) * 66,
+            "state_dict_entry_count": 798,
+            "optimizer_state_count": 1,
+            "scheduler_state_count": 1,
+        }
+
+    monkeypatch.setattr(
+        full_training.torch,
+        "load",
+        lambda path, **_: payloads[path.name],
+    )
+    monkeypatch.setattr(
+        full_training,
+        "_file_identity",
+        lambda path: {
+            "bytes": 100,
+            "sha256": path.name.encode().hex()[:64].ljust(64, "0"),
+        },
+    )
+    monkeypatch.setattr(
+        full_training,
+        "validate_full_checkpoint_payload",
+        checkpoint_facts,
+    )
+    monkeypatch.setattr(
+        full_training,
+        "validate_checkpoint_payload",
+        checkpoint_facts,
+    )
+    monkeypatch.setattr(
+        checkpoint_evaluation,
+        "_checkpoint_training_config",
+        lambda *_, **__: {},
+    )
+
+    records, _ = full_training.inspect_full_checkpoints(
+        run_directory=tmp_path,
+        variant="R1",
+        authorization={},
+    )
+
+    assert [record["filename"] for record in records] == [selected.name, full.name]
+
+
+def test_final_callback_target_must_be_an_existing_scored_checkpoint(tmp_path) -> None:
+    payload = {
+        "callbacks": {
+            "ModelCheckpoint": {
+                "monitor": "val_mean_t-AP",
+                "best_model_path": str(
+                    tmp_path / "epoch=389-val_mean_t-AP=0.305.ckpt"
+                ),
+                "best_model_score": 0.3045587,
+            }
+        }
+    }
+
+    with pytest.raises(RootCauseEvaluationError, match="callback best path"):
+        full_training._callback_best_path(payload, run_directory=tmp_path)
+
+    (tmp_path / "epoch=450.ckpt").touch()
+    payload["callbacks"]["ModelCheckpoint"]["best_model_path"] = str(
+        tmp_path / "epoch=450.ckpt"
+    )
+    with pytest.raises(RootCauseEvaluationError, match="callback best path"):
+        full_training._callback_best_path(payload, run_directory=tmp_path)
 
 
 def test_full_training_manifest_binds_resume_decision_and_selection() -> None:

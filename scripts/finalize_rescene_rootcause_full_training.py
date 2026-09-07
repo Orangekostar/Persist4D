@@ -586,7 +586,7 @@ def build_full_training_manifest(
     return payload
 
 
-def _callback_score(payload: Mapping[str, Any]) -> float:
+def _checkpoint_callback_state(payload: Mapping[str, Any]) -> Mapping[str, Any]:
     callbacks = payload.get("callbacks")
     states = (
         [
@@ -603,7 +603,11 @@ def _callback_score(payload: Mapping[str, Any]) -> float:
         raise RootCauseEvaluationError(
             "checkpoint lacks one val_mean_t-AP callback state"
         )
-    value = states[0]["best_model_score"]
+    return states[0]
+
+
+def _callback_score(payload: Mapping[str, Any]) -> float:
+    value = _checkpoint_callback_state(payload)["best_model_score"]
     if isinstance(value, torch.Tensor):
         if value.numel() != 1:
             raise RootCauseEvaluationError("checkpoint callback score is invalid")
@@ -617,6 +621,18 @@ def _callback_score(payload: Mapping[str, Any]) -> float:
     return float(value)
 
 
+def _callback_best_path(
+    payload: Mapping[str, Any], *, run_directory: Path
+) -> Path:
+    value = _checkpoint_callback_state(payload).get("best_model_path")
+    if not isinstance(value, str) or not value:
+        raise RootCauseEvaluationError("checkpoint callback best path differs")
+    path = run_directory / Path(value).name
+    if BEST_CHECKPOINT.fullmatch(path.name) is None or not path.is_file():
+        raise RootCauseEvaluationError("checkpoint callback best path differs")
+    return path
+
+
 def inspect_full_checkpoints(
     *,
     run_directory: Path,
@@ -628,25 +644,30 @@ def inspect_full_checkpoints(
         _checkpoint_training_config,
     )
 
-    best_paths = [
-        path
-        for path in run_directory.glob("*.ckpt")
-        if BEST_CHECKPOINT.fullmatch(path.name)
-    ]
     full_path = run_directory / "epoch=450.ckpt"
-    if len(best_paths) != 1 or not full_path.is_file():
+    if not full_path.is_file():
         raise RootCauseEvaluationError("full checkpoint files differ")
+    try:
+        full_payload = torch.load(full_path, map_location="cpu", weights_only=False)
+    except Exception as error:
+        raise RootCauseEvaluationError("full checkpoint is unreadable") from error
+    if not isinstance(full_payload, Mapping):
+        raise RootCauseEvaluationError("full checkpoint payload is invalid")
+    best_path = _callback_best_path(full_payload, run_directory=run_directory)
     records = []
     facts_by_role = {}
     for role, path in (
-        ("best_validation", best_paths[0]),
+        ("best_validation", best_path),
         ("exact_full_boundary", full_path),
     ):
         identity = _file_identity(path)
-        try:
-            payload = torch.load(path, map_location="cpu", weights_only=False)
-        except Exception as error:
-            raise RootCauseEvaluationError("full checkpoint is unreadable") from error
+        if role == "exact_full_boundary":
+            payload = full_payload
+        else:
+            try:
+                payload = torch.load(path, map_location="cpu", weights_only=False)
+            except Exception as error:
+                raise RootCauseEvaluationError("full checkpoint is unreadable") from error
         if not isinstance(payload, Mapping):
             raise RootCauseEvaluationError("full checkpoint payload is invalid")
         completed_epoch = int(payload.get("epoch", -2)) + 1
@@ -680,9 +701,17 @@ def inspect_full_checkpoints(
             match = BEST_CHECKPOINT.fullmatch(path.name)
             assert match is not None
             exact_score = _callback_score(payload)
-            if int(match.group("epoch")) != completed_epoch - 1 or float(
-                match.group("score")
-            ) != float(f"{exact_score:.3f}"):
+            if (
+                _callback_best_path(payload, run_directory=run_directory) != path
+                or not math.isclose(
+                    exact_score,
+                    _callback_score(full_payload),
+                    rel_tol=0.0,
+                    abs_tol=1e-12,
+                )
+                or int(match.group("epoch")) != completed_epoch - 1
+                or float(match.group("score")) != float(f"{exact_score:.3f}")
+            ):
                 raise RootCauseEvaluationError(
                     "best checkpoint filename differs from callback state"
                 )
