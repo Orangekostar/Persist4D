@@ -37,43 +37,6 @@ def connect_all_trainable_parameters(
     return connected
 
 
-def synchronize_trainable_gradients(
-    named_parameters: Iterable[tuple[str, nn.Parameter]],
-) -> None:
-    """Average one fixed dense gradient vector across initialized DDP ranks."""
-    if not torch.distributed.is_available() or not torch.distributed.is_initialized():
-        return
-    world_size = torch.distributed.get_world_size()
-    if world_size <= 1:
-        return
-    parameters = [
-        parameter
-        for _, parameter in named_parameters
-        if parameter.requires_grad and parameter.numel()
-    ]
-    if not parameters:
-        raise RuntimeError("distributed optimizer has no trainable parameters")
-    reference = parameters[0]
-    gradients = []
-    for parameter in parameters:
-        if parameter.device != reference.device or parameter.dtype != reference.dtype:
-            raise RuntimeError("distributed trainable parameters must share device and dtype")
-        if parameter.grad is None:
-            parameter.grad = torch.zeros_like(parameter)
-        if parameter.grad.is_sparse:
-            raise RuntimeError("distributed trainable gradients must be dense")
-        gradients.append(parameter.grad.detach().reshape(-1))
-    flattened = torch.cat(gradients)
-    torch.distributed.all_reduce(flattened)
-    flattened.div_(world_size)
-    offset = 0
-    with torch.no_grad():
-        for parameter in parameters:
-            count = parameter.numel()
-            parameter.grad.copy_(flattened[offset : offset + count].view_as(parameter))
-            offset += count
-
-
 def adapter_gradient_snapshot(
     named_parameters: Iterable[tuple[str, nn.Parameter]],
 ) -> dict[str, object]:
@@ -345,7 +308,8 @@ class Persist4DAllTTrainer(InstanceSegmentation):
             data, targets, _ = stage_batch
             if not isinstance(targets, list) or len(targets) != len(batch.specs):
                 raise ValueError("stage targets differ from episode batch")
-            with self._backward_context(False):
+            synchronize = should_step and stage_index == horizon - 1
+            with self._backward_context(synchronize):
                 raw_coordinates = self._process_raw_coordinates(data)
                 output = self.forward(
                     data,
@@ -378,7 +342,6 @@ class Persist4DAllTTrainer(InstanceSegmentation):
             )
 
         if should_step:
-            synchronize_trainable_gradients(self.named_parameters())
             self.clip_gradients(
                 optimizer,
                 gradient_clip_val=float(self.config.trainer.gradient_clip_val),
@@ -468,6 +431,5 @@ __all__ = [
     "connect_all_trainable_parameters",
     "prefix_balanced_stage_coefficients",
     "segment_stages_from_target",
-    "synchronize_trainable_gradients",
     "update_prediction_memory",
 ]

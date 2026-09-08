@@ -26,6 +26,7 @@ from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import CSVLogger
 from torch.utils.data import DataLoader
+from torch.utils.data.distributed import DistributedSampler
 
 from datasets.persist4d_sequence_dataset import (
     Persist4DEpisodeCollator,
@@ -362,6 +363,29 @@ def _role_by_sequence(split_manifest: Mapping[str, object]) -> dict[str, str]:
     return result
 
 
+def _rank_synchronous_sampler(
+    dataset: object,
+    *,
+    devices: int,
+) -> DistributedSampler | None:
+    if devices == 1:
+        return None
+    try:
+        rank = int(os.environ.get("LOCAL_RANK", "0"))
+        dataset_length = len(dataset)  # type: ignore[arg-type]
+    except (TypeError, ValueError) as error:
+        raise AllTTrainingError("distributed sampler inputs are invalid") from error
+    if devices <= 0 or not 0 <= rank < devices or dataset_length % devices:
+        raise AllTTrainingError("distributed sampler cannot preserve replica groups")
+    return DistributedSampler(
+        dataset,  # type: ignore[arg-type]
+        num_replicas=devices,
+        rank=rank,
+        shuffle=False,
+        drop_last=False,
+    )
+
+
 def _build_train_loader(
     config: Any,
     *,
@@ -436,11 +460,13 @@ def _build_train_loader(
         },
         source_schedule,
     )
+    sampler = _rank_synchronous_sampler(mixed, devices=devices)
     stage_collator = hydra.utils.instantiate(config.data.train_collation)
     loader = DataLoader(
         mixed,
         batch_size=1,
         shuffle=False,
+        sampler=sampler,
         num_workers=int(config.data.num_workers),
         pin_memory=bool(config.data.pin_memory),
         collate_fn=Persist4DEpisodeCollator(stage_collator),

@@ -4,6 +4,7 @@ from scripts.train_persist4d_allt import (
     _adapter_missing_prefixes,
     _checkpoint_interval,
     _compose_config,
+    _rank_synchronous_sampler,
     _summarize_gradient_steps,
     _workload_counts,
 )
@@ -12,6 +13,19 @@ from scripts.train_persist4d_allt import (
 def test_formal_checkpoint_interval_matches_frozen_quarters() -> None:
     assert _checkpoint_interval(400, smoke=False) == 100
     assert _checkpoint_interval(2, smoke=True) == 1
+
+
+def test_rank_synchronous_sampler_preserves_replica_groups(monkeypatch) -> None:
+    dataset = list(range(8))
+    monkeypatch.setenv("LOCAL_RANK", "0")
+    rank_zero = _rank_synchronous_sampler(dataset, devices=2)
+    monkeypatch.setenv("LOCAL_RANK", "1")
+    rank_one = _rank_synchronous_sampler(dataset, devices=2)
+
+    assert list(rank_zero) == [0, 2, 4, 6]
+    assert list(rank_one) == [1, 3, 5, 7]
+    assert rank_zero.shuffle is False
+    assert rank_one.shuffle is False
 
 
 def test_gradient_step_summary_counts_only_observed_nonzero_adapter_grads() -> None:

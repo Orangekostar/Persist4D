@@ -11,7 +11,6 @@ from trainer.persist4d_allt_trainer import (
     build_detached_memory_read_state,
     connect_all_trainable_parameters,
     prefix_balanced_stage_coefficients,
-    synchronize_trainable_gradients,
     update_prediction_memory,
 )
 
@@ -104,37 +103,6 @@ def test_connect_all_trainable_parameters_materializes_zero_gradients() -> None:
     assert used.grad.item() == pytest.approx(4.0)
     assert conditionally_unused.grad is not None
     assert conditionally_unused.grad.item() == 0.0
-    assert frozen.grad is None
-
-
-def test_synchronize_trainable_gradients_averages_a_fixed_dense_vector(
-    monkeypatch,
-) -> None:
-    first = torch.nn.Parameter(torch.tensor([2.0, 4.0]))
-    conditionally_unused = torch.nn.Parameter(torch.tensor([7.0]))
-    frozen = torch.nn.Parameter(torch.tensor([9.0]), requires_grad=False)
-    first.grad = torch.tensor([1.0, 3.0])
-
-    monkeypatch.setattr(torch.distributed, "is_available", lambda: True)
-    monkeypatch.setattr(torch.distributed, "is_initialized", lambda: True)
-    monkeypatch.setattr(torch.distributed, "get_world_size", lambda: 2)
-
-    def fake_all_reduce(flattened) -> None:
-        flattened.add_(torch.tensor([5.0, 7.0, 6.0]))
-
-    monkeypatch.setattr(torch.distributed, "all_reduce", fake_all_reduce)
-
-    synchronize_trainable_gradients(
-        [
-            ("first", first),
-            ("conditionally_unused", conditionally_unused),
-            ("frozen", frozen),
-        ]
-    )
-
-    assert torch.equal(first.grad, torch.tensor([3.0, 5.0]))
-    assert conditionally_unused.grad is not None
-    assert torch.equal(conditionally_unused.grad, torch.tensor([3.0]))
     assert frozen.grad is None
 
 
