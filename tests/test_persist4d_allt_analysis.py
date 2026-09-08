@@ -61,6 +61,22 @@ def test_allt_accumulator_uses_legacy_evaluator_on_the_entire_prefix() -> None:
     assert values["local_current_AP"] == pytest.approx(1.0)
 
 
+def test_allt_accumulator_merges_independent_sequence_states() -> None:
+    first = AllTBaselineAccumulator(
+        dataset_spec=Path("data/processed/rio/rio.yaml"), min_region_size=1
+    )
+    second = AllTBaselineAccumulator(
+        dataset_spec=Path("data/processed/rio/rio.yaml"), min_region_size=1
+    )
+    first.update(_perfect_two_stage_pair())
+    second.update(_perfect_two_stage_pair())
+
+    first.merge(second)
+
+    assert first.sequence_count == 2
+    assert first.compute()["prefix_overall_mAP"] == pytest.approx(1.0)
+
+
 def test_legacy_regression_checks_only_preexisting_horizons() -> None:
     old = [
         {

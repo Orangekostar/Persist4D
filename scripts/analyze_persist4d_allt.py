@@ -11,8 +11,8 @@ import json
 import math
 import sys
 import tempfile
-from collections import defaultdict
 from collections.abc import Hashable, Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -63,14 +63,42 @@ class AllTBaselineError(RuntimeError):
     """Raised when the frozen all-T baseline cannot be proven."""
 
 
+class _PrefixOverallAccumulator:
+    mode = "prefix_overall"
+
+    def __init__(self, *, dataset_spec: Path, min_region_size: int) -> None:
+        from stmetrics import InstanceMetrics, LegacyAPEvaluator
+
+        self._metric = InstanceMetrics(
+            dataset=str(dataset_spec),
+            heads=[LegacyAPEvaluator(recall=True, aux="changes")],
+            log_prefix="val",
+            min_region_size=min_region_size,
+            timestep_key="temporal_stages",
+        )
+        self._updates = 0
+
+    def update(self, pair: CausalPrefixPair) -> None:
+        self._metric.update([pair.prediction], [pair.target])
+        self._updates += 1
+
+    def compute(self) -> float:
+        if not self._updates:
+            raise AllTBaselineError("prefix-overall metric accumulator is empty")
+        value = self._metric.compute()["val_mean_AP"]
+        return float(value.detach().cpu().item() if hasattr(value, "detach") else value)
+
+
 class AllTBaselineAccumulator:
     """Accumulate temporal, current-stage, and full-prefix legacy metrics."""
 
     def __init__(
-        self, *, dataset_spec: str | Path, min_region_size: int = 100
+        self,
+        *,
+        dataset_spec: str | Path,
+        min_region_size: int = 100,
+        include_task: bool = True,
     ) -> None:
-        from stmetrics import InstanceMetrics, LegacyAPEvaluator
-
         specification = Path(dataset_spec)
         if not specification.is_file():
             raise AllTBaselineError("dataset specification is unavailable")
@@ -80,42 +108,66 @@ class AllTBaselineAccumulator:
             or min_region_size <= 0
         ):
             raise AllTBaselineError("min_region_size must be a positive integer")
-        self._task = CausalTaskAccumulator(
-            metric_factory=lambda mode: OfficialMetricAccumulator(
-                mode=mode,
-                dataset_spec=specification,
-                min_region_size=min_region_size,
+        if type(include_task) is not bool:
+            raise AllTBaselineError("include_task must be a boolean")
+        self._task = (
+            CausalTaskAccumulator(
+                metric_factory=lambda mode: OfficialMetricAccumulator(
+                    mode=mode,
+                    dataset_spec=specification,
+                    min_region_size=min_region_size,
+                )
             )
+            if include_task
+            else None
         )
-        self._legacy = InstanceMetrics(
-            dataset=str(specification),
-            heads=[LegacyAPEvaluator(recall=True, aux="changes")],
-            log_prefix="val",
-            min_region_size=min_region_size,
-            timestep_key="temporal_stages",
+        self._legacy = _PrefixOverallAccumulator(
+            dataset_spec=specification, min_region_size=min_region_size
         )
         self._count = 0
 
     def update(self, pair: CausalPrefixPair) -> None:
         if not isinstance(pair, CausalPrefixPair):
             raise AllTBaselineError("all-T metric input must be a causal prefix pair")
-        self._task.update(pair)
-        self._legacy.update([pair.prediction], [pair.target])
+        if self._task is not None:
+            self._task.update(pair)
+        self._legacy.update(pair)
         self._count += 1
+
+    @property
+    def sequence_count(self) -> int:
+        return self._count
+
+    def merge(self, other: AllTBaselineAccumulator) -> None:
+        from scripts.analyze_r1_downstream_validation import (
+            _merge_causal_task_accumulators,
+            merge_official_metric_accumulators,
+        )
+
+        if not isinstance(other, AllTBaselineAccumulator) or (
+            (self._task is None) != (other._task is None)
+        ):
+            raise AllTBaselineError("all-T accumulators are incompatible")
+        if self._task is not None:
+            _merge_causal_task_accumulators(self._task, other._task)
+        merge_official_metric_accumulators(self._legacy, other._legacy)
+        self._count += other._count
 
     def compute(self) -> dict[str, float]:
         if not self._count:
             raise AllTBaselineError("all-T metric accumulator is empty")
-        task = self._task.compute()
-        legacy = self._legacy.compute()
-        values = {
-            "local_current_AP": task["current_stage_AP"],
-            "prefix_overall_mAP": legacy["val_mean_AP"],
-            "t_REC": task["causal_prefix_t_REC"],
-            "t_mAP": task["causal_prefix_t_mAP"],
-            "t_mAP25": task["causal_prefix_t_mAP25"],
-            "t_mAP50": task["causal_prefix_t_mAP50"],
-        }
+        values = {"prefix_overall_mAP": self._legacy.compute()}
+        if self._task is not None:
+            task = self._task.compute()
+            values.update(
+                {
+                    "local_current_AP": task["current_stage_AP"],
+                    "t_REC": task["causal_prefix_t_REC"],
+                    "t_mAP": task["causal_prefix_t_mAP"],
+                    "t_mAP25": task["causal_prefix_t_mAP25"],
+                    "t_mAP50": task["causal_prefix_t_mAP50"],
+                }
+            )
         result = {
             key: float(value.detach().cpu().item() if hasattr(value, "detach") else value)
             for key, value in values.items()
@@ -268,6 +320,7 @@ def run_baseline_analysis(
     checkpoint: Path,
     pretrained: Path,
     metadata: Path,
+    workers: int,
 ) -> dict[str, object]:
     from scripts.analyze_r1_downstream_validation import (
         _validate_new_cache_binding,
@@ -325,20 +378,26 @@ def run_baseline_analysis(
     missing_full = plan_missing_cache_keys(expected_keys, full_keys)
     if missing_local or missing_full:
         raise AllTBaselineError("frozen cache lacks required keys")
+    if isinstance(workers, bool) or not isinstance(workers, int) or not 1 <= workers <= 32:
+        raise AllTBaselineError("workers must be within 1-32")
 
     factories = build_tracker_factories(setup.p6a_config)
     class_mapper = build_rio_class_mapper(setup.dataset)
     accumulators: dict[tuple[str, str, int], AllTBaselineAccumulator] = {}
-    counts: dict[tuple[str, str, int], int] = defaultdict(int)
 
-    def update(method: str, reducer: str, horizon: int, pair: CausalPrefixPair) -> None:
-        key = (method, reducer, horizon)
-        if key not in accumulators:
-            accumulators[key] = AllTBaselineAccumulator(dataset_spec=dataset_spec)
-        accumulators[key].update(pair)
-        counts[key] += 1
+    def process_sequence(sequence: object) -> dict[tuple[str, str, int], AllTBaselineAccumulator]:
+        local: dict[tuple[str, str, int], AllTBaselineAccumulator] = {}
 
-    for sequence_index, sequence in enumerate(sequences, start=1):
+        def update(
+            method: str, reducer: str, horizon: int, pair: CausalPrefixPair
+        ) -> None:
+            key = (method, reducer, horizon)
+            accumulator = AllTBaselineAccumulator(
+                dataset_spec=dataset_spec, include_task=horizon == 3
+            )
+            accumulator.update(pair)
+            local[key] = accumulator
+
         observations = tuple(
             cache_payload_to_frozen_observation(raw) for raw in sequence.raw_payloads
         )
@@ -397,12 +456,29 @@ def run_baseline_analysis(
                             class_mapper=class_mapper,
                         ),
                     )
-        if sequence_index % 10 == 0 or sequence_index == len(sequences):
-            print(
-                f"[allt-baseline] completed {sequence_index}/{len(sequences)} sequences",
-                file=sys.stderr,
-                flush=True,
-            )
+        return local
+
+    import torch
+
+    prior_torch_threads = torch.get_num_threads()
+    torch.set_num_threads(1)
+    try:
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            results = executor.map(process_sequence, sequences)
+            for sequence_index, local in enumerate(results, start=1):
+                for key, incoming in local.items():
+                    if key not in accumulators:
+                        accumulators[key] = incoming
+                    else:
+                        accumulators[key].merge(incoming)
+                if sequence_index % 10 == 0 or sequence_index == len(sequences):
+                    print(
+                        f"[allt-baseline] completed {sequence_index}/{len(sequences)} sequences",
+                        file=sys.stderr,
+                        flush=True,
+                    )
+    finally:
+        torch.set_num_threads(prior_torch_threads)
 
     expected_cells = {
         ("FullHistory", "official", horizon) for horizon in REPORT_HORIZONS
@@ -413,13 +489,38 @@ def run_baseline_analysis(
         for horizon in REPORT_HORIZONS
     }
     if set(accumulators) != expected_cells or any(
-        counts[key] != 129 for key in expected_cells
+        accumulators[key].sequence_count != 129 for key in expected_cells
     ):
         raise AllTBaselineError("all-T aggregate coverage differs")
 
+    old_task_path = R1_ARTIFACT_ROOT / "metrics/task_aggregate.csv"
+    old_rows = _read_csv(old_task_path)
+    old_index = {
+        (
+            str(row["method"]),
+            str(row["score_reducer"]),
+            int(row["horizon"]),
+        ): row
+        for row in old_rows
+        if row["order_id"] == "all"
+    }
     rows = []
     for method, reducer, horizon in sorted(expected_cells):
-        values = accumulators[(method, reducer, horizon)].compute()
+        computed = accumulators[(method, reducer, horizon)].compute()
+        if horizon == 3:
+            values = computed
+        else:
+            old = old_index.get((method, reducer, horizon))
+            if old is None:
+                raise AllTBaselineError("legacy aggregate cell is unavailable")
+            values = {
+                "local_current_AP": float(old["current_stage_AP"]),
+                "prefix_overall_mAP": computed["prefix_overall_mAP"],
+                "t_REC": float(old["causal_prefix_t_REC"]),
+                "t_mAP": float(old["causal_prefix_t_mAP"]),
+                "t_mAP25": float(old["causal_prefix_t_mAP25"]),
+                "t_mAP50": float(old["causal_prefix_t_mAP50"]),
+            }
         rows.append(
             {
                 "population_id": "protocol_b_129_units",
@@ -432,13 +533,14 @@ def run_baseline_analysis(
                 "T": horizon,
                 **values,
                 "num_master": 43,
-                "num_order_units": counts[(method, reducer, horizon)],
+                "num_order_units": accumulators[
+                    (method, reducer, horizon)
+                ].sequence_count,
                 "num_reference_clusters": 6,
             }
         )
 
-    old_task_path = R1_ARTIFACT_ROOT / "metrics/task_aggregate.csv"
-    regression = validate_legacy_regression(rows, _read_csv(old_task_path))
+    regression = validate_legacy_regression(rows, old_rows)
     metrics_bytes = _csv_bytes(rows)
     _atomic_write(output_root / "all_t_metrics.csv", metrics_bytes)
     replay = {
@@ -450,10 +552,13 @@ def run_baseline_analysis(
         "missing_cache_keys": {"full_history": [], "local": []},
         "model_forward_count": 0,
         "new_prediction_count": 0,
+        "newly_computed_cells": {"prefix_overall": 28, "temporal_T3": 7},
         "protocol_sha256": compact["protocol_sha256"],
+        "reused_legacy_temporal_cells": 21,
         "schema_version": 1,
         "source_commit": _git_head(),
         "status": "pass",
+        "worker_count": workers,
     }
     replay["content_sha256"] = canonical_json_sha256(replay)
     _atomic_json(output_root / "replay_status.json", replay)
@@ -472,6 +577,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CHECKPOINT)
     parser.add_argument("--pretrained", type=Path, default=DEFAULT_PRETRAINED)
     parser.add_argument("--metadata", type=Path, default=DEFAULT_METADATA)
+    parser.add_argument("--workers", type=int, default=12)
     return parser
 
 
@@ -483,6 +589,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         checkpoint=args.checkpoint,
         pretrained=args.pretrained,
         metadata=args.metadata,
+        workers=args.workers,
     )
     print(json.dumps(result, allow_nan=False, sort_keys=True), flush=True)
     return 0
