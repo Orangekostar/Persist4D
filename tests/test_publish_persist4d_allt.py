@@ -1,14 +1,25 @@
 from __future__ import annotations
 
+import hashlib
+import json
+import shutil
+
 import pytest
 
 from scripts.publish_persist4d_allt import (
+    COMPLETION_STATUS_KEYS,
     DEFAULT_ARTIFACT_ROOT,
     TASK_METRICS,
     PublicationError,
+    _external_table,
+    build_final_manifest,
     build_learning_curve_rows,
     build_memory_ablation_rows,
     build_variant_matrix,
+    derive_final_statuses,
+    primary_tmap_failure_cells,
+    publish_final_package,
+    validate_completion_inputs,
 )
 
 
@@ -103,3 +114,108 @@ def test_memory_ablation_has_three_diagnostic_policies_at_every_horizon() -> Non
         if row["memory_read_policy"] == "disabled" and row["T"] == 2
     )
     assert disabled_t2["delta_t_mAP_vs_all_occupied"] == pytest.approx(-0.1)
+
+
+def test_completion_statuses_preserve_the_failed_scientific_verdict() -> None:
+    statuses = derive_final_statuses(
+        DEFAULT_ARTIFACT_ROOT, publication_status="NOT_ATTEMPTED"
+    )
+
+    assert tuple(statuses) == COMPLETION_STATUS_KEYS
+    assert statuses == {
+        "execution_status": "COMPLETE",
+        "baseline_comparability": "MATCHED",
+        "tmap_all_t_vs_R1": "FAIL",
+        "tmap_all_t_vs_matched_rescene": "FAIL",
+        "task_metrics_all_t": "FAIL",
+        "seed_confirmation": "NOT_RUN",
+        "independent_generalization": "NOT_ESTABLISHED",
+        "publication_status": "NOT_ATTEMPTED",
+    }
+    assert primary_tmap_failure_cells(DEFAULT_ARTIFACT_ROOT) == {
+        "C2_vs_R1_B4": [4, 5],
+        "C2_vs_FH-adapt": [3, 4, 5],
+    }
+
+
+def test_final_manifest_hashes_reports_without_self_reference(tmp_path) -> None:
+    report = tmp_path / "FINAL_REPORT.md"
+    handoff = tmp_path / "HANDOFF.md"
+    table = tmp_path / "results/all_t_metrics.csv"
+    report.write_bytes(b"report\n")
+    handoff.write_bytes(b"handoff\n")
+    table.parent.mkdir()
+    table.write_bytes(b"metric\n")
+    statuses = {
+        key: "COMPLETE" if key == "execution_status" else "NOT_ATTEMPTED"
+        for key in COMPLETION_STATUS_KEYS
+    }
+
+    manifest = build_final_manifest(
+        tmp_path,
+        artifact_paths=(report, handoff, table),
+        statuses=statuses,
+        code_commit_at_run="a" * 40,
+    )
+
+    by_path = {row["path"]: row for row in manifest["artifacts"]}
+    assert set(by_path) == {
+        "FINAL_REPORT.md",
+        "HANDOFF.md",
+        "results/all_t_metrics.csv",
+    }
+    assert by_path["HANDOFF.md"]["sha256"] == hashlib.sha256(b"handoff\n").hexdigest()
+    assert "FINAL_MANIFEST.json" not in by_path
+    assert manifest["publication_commit"] == "resolve from remote HEAD"
+
+
+def test_completion_validation_rejects_missing_required_artifacts(tmp_path) -> None:
+    with pytest.raises(PublicationError, match="required completion artifact"):
+        validate_completion_inputs(tmp_path)
+
+
+def test_external_table_binds_selected_update_name_and_hash() -> None:
+    table = _external_table(DEFAULT_ARTIFACT_ROOT)
+
+    assert "training/formal/C0/update=0400.ckpt" in table
+    assert "training/formal/C1/update=0100.ckpt" in table
+    assert "training/formal/C2/update=0200.ckpt" in table
+    assert "training/formal/FH-adapt/update=0100.ckpt" in table
+
+
+def test_completion_package_is_deterministic_and_self_contained(tmp_path) -> None:
+    artifact_root = tmp_path / "allt_task_superiority_v1"
+    shutil.copytree(DEFAULT_ARTIFACT_ROOT, artifact_root)
+
+    first = publish_final_package(
+        artifact_root, code_commit_at_run="b" * 40
+    )
+    first_hashes = {row["path"]: row["sha256"] for row in first}
+    second = publish_final_package(
+        artifact_root, code_commit_at_run="b" * 40
+    )
+
+    assert first_hashes == {row["path"]: row["sha256"] for row in second}
+    report = (artifact_root / "FINAL_REPORT.md").read_text(encoding="ascii")
+    handoff = (artifact_root / "HANDOFF.md").read_text(encoding="ascii")
+    manifest = json.loads(
+        (artifact_root / "FINAL_MANIFEST.json").read_text(encoding="ascii")
+    )
+    assert manifest["statuses"] == derive_final_statuses(
+        artifact_root, publication_status="NOT_ATTEMPTED"
+    )
+    assert "T4, T5" in report
+    assert "T3, T4, T5" in report
+    assert "only 5/20" in handoff
+    assert all(f"## {number}." in handoff for number in range(1, 19))
+    assert "training/formal/C2/update=0200.ckpt" in handoff
+    assert "--variant C2" in handoff
+    assert "192.168.100.102:/mnt/data/shared" in handoff
+    listed = {row["path"]: row for row in manifest["artifacts"]}
+    assert "FINAL_REPORT.md" in listed
+    assert "HANDOFF.md" in listed
+    assert "TEST_REPORT.md" in listed
+    assert "FINAL_MANIFEST.json" not in listed
+    assert listed["HANDOFF.md"]["sha256"] == hashlib.sha256(
+        (artifact_root / "HANDOFF.md").read_bytes()
+    ).hexdigest()
