@@ -147,7 +147,7 @@ Preload and transfer each profile cell before timing. For C2, preroll the causal
 
 Run five warmups and ten measured repeats for every cell. Emit exactly 480 sample rows and 48 summary rows. Bind device name, checkpoint, source commit, inclusion/exclusion scope, and population identity.
 
-- [ ] **Step 5: Run profile unit tests and a one-cell GPU smoke**
+- [x] **Step 5: Run profile unit tests and a one-cell GPU smoke**
 
 Run: `python -m pytest -q tests/test_profile_persist4d_allt.py`
 
