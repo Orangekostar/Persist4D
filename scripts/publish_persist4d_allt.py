@@ -910,6 +910,7 @@ The intervals are 1,000 fixed-seed resamples of six equal-weight reference delta
 {_identity_table(artifact_root)}
 
 Identity values are freshly recomputed from T1-T5. A zero denominator is represented as `N/A`; it is never converted to 0 or 1.
+Although C2 has substantially fewer ID switches/fragments and much higher recovery rates than FH-adapt, that identity advantage did not produce all-T task-metric superiority.
 
 ## Bounded Resource Profile
 
@@ -1056,14 +1057,14 @@ RIO adaptation uses 36 references/215 masters; development uses 8 references/47 
 
 ## 5. Implementation Surface
 
-- `models/persist4d_allt.py`: optional L/M interfaces and prediction-only persistent memory.
-- `datasets/persist4d_sequence_dataset.py`: deterministic continuous episode construction.
-- `trainer/persist4d_allt_trainer.py`: all-T training, immediate state commits, and gradient audit.
-- `scripts/train_persist4d_allt.py`: frozen-budget two-GPU training and external checkpoint manifests.
-- `scripts/evaluate_persist4d_allt.py`: continuous T1-T5 inference, official metrics, cache provenance, and diagnostic read policies.
-- `scripts/analyze_persist4d_allt_final.py`: streaming per-reference, identity, and equal-cluster analysis.
-- `scripts/profile_persist4d_allt.py`: bounded real-A40 profile.
-- `scripts/publish_persist4d_allt.py`: fail-closed compact exports, reports, and manifest.
+- `models/persist4d_allt.py`: `Persist4DAllT.after_decoder_stage/forward` implement optional L/M and prediction-only persistent reads.
+- `datasets/persist4d_sequence_dataset.py`: `build_episode_draw_plan/build_episode_masters` provide deterministic continuous episodes.
+- `trainer/persist4d_allt_trainer.py`: `Persist4DAllTTrainer.training_step/on_before_optimizer_step` enforce all-T training, immediate commits, and gradient audits.
+- `scripts/train_persist4d_allt.py`: `main` binds frozen two-GPU budgets and external checkpoint manifests.
+- `scripts/evaluate_persist4d_allt.py`: `apply_memory_read_policy/run_evaluation` implement continuous T1-T5 metrics, cache provenance, and read diagnostics.
+- `scripts/analyze_persist4d_allt_final.py`: `analyze_final_caches` streams per-reference, identity, and equal-cluster analysis.
+- `scripts/profile_persist4d_allt.py`: `run_profile` executes the bounded real-A40 profile.
+- `scripts/publish_persist4d_allt.py`: `validate_completion_inputs/publish_final_package` fail closed and build reports/manifests.
 
 Launch commands are in section 16.
 
@@ -1112,6 +1113,8 @@ Training/adaptation seed 45 is primary. Seed 46 was not run because the first-se
 {_profile_table(artifact_root)}
 
 Scope: 5 warmups + 10 repeats for C2 and FH-adapt on one canonical sequence from each of six references at T2-T5, all sequentially on one NVIDIA A40. Includes forward, C2 memory read, observation extraction, and B4 update; excludes I/O, collation, H2D, metrics, and C2 preroll. It proves only this bounded deployment operation, not end-to-end throughput or multi-GPU scaling, and cannot offset the failed accuracy goal.
+
+C2 also has fewer ID switches/fragments and materially higher gap-recovery rates than FH-adapt in `results/identity_counts.csv`; this identity advantage did not translate into all-T task accuracy.
 
 ## 14. Tests And Real Failures
 
