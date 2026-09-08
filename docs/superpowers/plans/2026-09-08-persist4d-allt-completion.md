@@ -84,25 +84,25 @@ Require status `pass`, source commit equality, one checkpoint across T2-T5, 47 s
 - Consumes: the validated 129 C2 cache bundles, 129 FH-adapt bundles, their manifests, official `AllTBaselineAccumulator`, fresh B4 replay, and official identity matching.
 - Produces: `build_paired_reference_rows`, `aggregate_identity_rows`, `bootstrap_equal_cluster_effect`, and `analyze_final_caches`.
 
-- [ ] **Step 1: Write failing pure-analysis tests**
+- [x] **Step 1: Write failing pure-analysis tests**
 
 Test exact 6-reference by 4-horizon by 5-metric paired coverage, numerator/denominator aggregation with `None` for zero denominators, deterministic 1000-resample equal-cluster intervals at seed 45, and rejection of duplicate or mismatched model/reference cells.
 
-- [ ] **Step 2: Run the new tests and observe missing-interface failures**
+- [x] **Step 2: Run the new tests and observe missing-interface failures**
 
 Run: `python -m pytest -q tests/test_analyze_persist4d_allt_final.py`
 
 Expected: collection failure because the analyzer does not exist.
 
-- [ ] **Step 3: Implement fail-closed streaming analysis**
+- [x] **Step 3: Implement fail-closed streaming analysis**
 
 Load one cache bundle at a time. For C2 use only the frozen `mean` pair for task metrics and fresh B4 replay from raw observations for identity. For FH-adapt use the official pair and official full-history identity payloads. Compute official pooled metrics separately inside each reference cluster; never average sequence AP as pooled AP.
 
-- [ ] **Step 4: Emit explicit descriptive uncertainty**
+- [x] **Step 4: Emit explicit descriptive uncertainty**
 
 Build 1000 fixed-seed bootstrap resamples over six equal-weight reference-cluster deltas and label the output `equal_cluster_effect`, not pooled AP confidence intervals or significance tests.
 
-- [ ] **Step 5: Run unit and adjacent metric tests**
+- [x] **Step 5: Run unit and adjacent metric tests**
 
 Run: `python -m pytest -q tests/test_analyze_persist4d_allt_final.py tests/test_system_comparison_metrics.py tests/test_persist4d_allt_analysis.py`
 
