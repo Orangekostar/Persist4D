@@ -1,0 +1,53 @@
+{
+  "cache_directory": "external:allt_task_superiority_v1/evaluation_cache/smoke_development_train_holdout_47_masters_canonical_1_sequences/C3/6bc6c7ac160c0603a32f641bcd7851c2d5598ff1dcf01d05a33e409513f74e2b",
+  "checkpoint_sha256": "6bc6c7ac160c0603a32f641bcd7851c2d5598ff1dcf01d05a33e409513f74e2b",
+  "content_sha256": "8314c01632588d565743f97a854726c96235a17c5e52c0c89049a8fd592c0816",
+  "entry_count": 1,
+  "evaluation_seed": 45,
+  "module_config": {
+    "adapter_insertion": "after_first_complete_decoder_pass",
+    "local_enhancement": {
+      "kind": "qcl_inspired_current_prediction",
+      "overlap_threshold": 0.25,
+      "support_budget": 4096
+    },
+    "local_enhancement_enabled": true,
+    "memory": {
+      "association_threshold": 0.5,
+      "capacity": 100,
+      "class_weight": 0.25,
+      "confidence_threshold": 0.5,
+      "mask_threshold": 0.5,
+      "maximum_update_rate": 0.2,
+      "minimum_mask_support": 1,
+      "update_rate": 0.2
+    },
+    "memory_read_enabled": true,
+    "postprocess": "official_rescene_candidate_lineage_v1",
+    "score_reducers": [
+      "mean",
+      "latest",
+      "max"
+    ],
+    "variant": "C3",
+    "window_mode": "local_pair"
+  },
+  "module_config_sha256": "f50569816a180ba2caef6fb902a3a80d42fd926f251ffbbbef577b66cbcacfe7",
+  "population_id": "smoke_development_train_holdout_47_masters_canonical_1_sequences",
+  "population_sha256": "d184e31a3739e59d63df863635d3407b26edcad7c4571c50d21c4cf7ee1911e5",
+  "records": [
+    {
+      "bytes": 299180142,
+      "file_sha256": "0d99c2cc60468a2daa45a9e4f732d01f8802dd438d0f0acee162456061f22be2",
+      "filename": "65d77e101ffaa78761793e721586f295a0e5d298043b3fd5dc8c9dbcc4f7e6c4.pt",
+      "key_sha256": "65d77e101ffaa78761793e721586f295a0e5d298043b3fd5dc8c9dbcc4f7e6c4",
+      "master_sequence_id": "scene0007_00-scene0007_01-scene0007_03-scene0007_02-scene0007_04",
+      "order_id": "canonical",
+      "reference_scene_id": "09582244-e2c2-2de1-956c-357092d949d1"
+    }
+  ],
+  "reused_entry_count": 1,
+  "schema_version": 1,
+  "source_commit": "2bb993ea5944805498db97bfd71d53dfcc533e02",
+  "status": "pass"
+}
