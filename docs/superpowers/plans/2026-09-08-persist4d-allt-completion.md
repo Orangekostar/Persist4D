@@ -129,21 +129,21 @@ Require the analysis manifest to bind both checkpoint SHAs, both cache-manifest 
 - Consumes: selected C2 and matched FH-adapt checkpoints, Protocol-B sequence builder, one canonical first-sorted master per reference, CUDA timing, and peak allocated-memory counters.
 - Produces: `select_profile_sequences`, `validate_profile_samples`, `summarize_profile_samples`, and `run_profile`.
 
-- [ ] **Step 1: Write failing profile-contract tests**
+- [x] **Step 1: Write failing profile-contract tests**
 
 Test deterministic selection of exactly one canonical master per each of six references, exact 2-method by 6-reference by 4-horizon by 10-repeat coverage, rejection of missing repeats, and deterministic median/min/max/peak-memory summaries.
 
-- [ ] **Step 2: Run the tests and observe missing-interface failures**
+- [x] **Step 2: Run the tests and observe missing-interface failures**
 
 Run: `python -m pytest -q tests/test_profile_persist4d_allt.py`
 
 Expected: collection failure because the profiler does not exist.
 
-- [ ] **Step 3: Implement the bounded profile scope**
+- [x] **Step 3: Implement the bounded profile scope**
 
 Preload and transfer each profile cell before timing. For C2, preroll the causal state outside the timer and time current model forward, one memory read, and one B4 state update. For FH-adapt, time one full-prefix forward. Exclude file I/O, collation, H2D, metric computation, and preroll. Record window voxel-point and segment counts.
 
-- [ ] **Step 4: Implement warmup, measurement, and summary validation**
+- [x] **Step 4: Implement warmup, measurement, and summary validation**
 
 Run five warmups and ten measured repeats for every cell. Emit exactly 480 sample rows and 48 summary rows. Bind device name, checkpoint, source commit, inclusion/exclusion scope, and population identity.
 
