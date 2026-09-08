@@ -1,0 +1,130 @@
+{
+  "ambiguity_semantics": {
+    "failure_categories": "multi_label_non_additive",
+    "matching": "class_compatible_best_iou_diagnostic_not_official_t_map"
+  },
+  "checkpoint": {
+    "completed_epoch": 390,
+    "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+  },
+  "content_sha256": "8eb864776a23da96fad9e1d91d217e16786866d16763aa6228c44d199a36f33c",
+  "decoder": {
+    "earliest_attention": {
+      "allowed_gt_fraction": 0.023876590774099465,
+      "decoder_prediction_layer": 0,
+      "severe_below_0_25_fraction": 0.964516129032258,
+      "valid_match_count": 310
+    },
+    "l_gate": {
+      "design": "qcl_inspired_current_prediction",
+      "reason": "substantial_query_competition",
+      "status": "JUSTIFIED"
+    },
+    "query_competition": {
+      "competed_active_query_fraction": 0.7685537933312222,
+      "mean_queries_per_gt_iou25": 5.94957008626726,
+      "query_utilization_iou25": 0.622847222222222,
+      "valid_row_count": 288,
+      "valid_scene_count": 24
+    }
+  },
+  "failure_summary": {
+    "category_counts_all": {
+      "class_change": 25,
+      "fragmentation_event": 21,
+      "full_history_success_b4_failure": 112,
+      "mask_insufficient": 324,
+      "merge_event": 29,
+      "no_candidate": 10
+    },
+    "category_counts_official_valid": {
+      "class_change": 25,
+      "fragmentation_event": 21,
+      "full_history_success_b4_failure": 112,
+      "mask_insufficient": 319,
+      "merge_event": 28,
+      "no_candidate": 10
+    },
+    "category_semantics": "multi_label_non_additive",
+    "official_valid_row_count": 827,
+    "row_count": 838,
+    "t1_cold_start_contribution": {
+      "contributed_row_count": 133,
+      "failed_row_count": 350,
+      "fraction": 0.38
+    },
+    "unique_gt_trajectory_count": 220
+  },
+  "l_gate": {
+    "design": "qcl_inspired_current_prediction",
+    "reason": "substantial_query_competition",
+    "status": "JUSTIFIED"
+  },
+  "model_forward_count": 24,
+  "panel": [
+    {
+      "reference_scene_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01"
+    },
+    {
+      "reference_scene_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_06-scene0069_09-scene0069_05-scene0069_08"
+    },
+    {
+      "reference_scene_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_00-scene0079_09-scene0079_05-scene0079_04-scene0079_03"
+    },
+    {
+      "reference_scene_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_01-scene0079_06-scene0079_11-scene0079_10-scene0079_02"
+    },
+    {
+      "reference_scene_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_02-scene0119_03-scene0119_01-scene0119_04"
+    },
+    {
+      "reference_scene_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_01-scene0119_04-scene0119_00-scene0119_02-scene0119_03"
+    },
+    {
+      "reference_scene_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_00-scene0219_03-scene0219_02-scene0219_01-scene0219_04"
+    },
+    {
+      "reference_scene_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_01-scene0219_04-scene0219_00-scene0219_03-scene0219_02"
+    },
+    {
+      "reference_scene_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_00-scene0309_02-scene0309_01-scene0309_04-scene0309_03"
+    },
+    {
+      "reference_scene_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_01-scene0309_04-scene0309_03-scene0309_00-scene0309_02"
+    },
+    {
+      "reference_scene_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_00-scene0449_04-scene0449_05-scene0449_03-scene0449_01"
+    },
+    {
+      "reference_scene_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_01-scene0449_02-scene0449_00-scene0449_04-scene0449_05"
+    }
+  ],
+  "panel_evidence_role": "historical_protocol_b_exploratory_development",
+  "panel_order": "canonical",
+  "protocol_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "schema_version": 1,
+  "source_commit": "1b31ae840fca122b279f384591da70bc295df8b6",
+  "status": "pass",
+  "thresholds": {
+    "attention_allowed_gt_fraction": 0.5,
+    "competition_fraction": 0.25,
+    "competition_queries_per_gt": 2.0,
+    "diagnostic_iou": [
+      0.25,
+      0.5
+    ],
+    "official_min_region_size": 100
+  }
+}
