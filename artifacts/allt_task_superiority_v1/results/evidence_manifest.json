@@ -1,0 +1,80 @@
+{
+  "cache_validation": {
+    "C2": {
+      "bytes": 119209970094,
+      "entry_count": 129,
+      "status": "pass"
+    },
+    "FH-adapt": {
+      "bytes": 14772582818,
+      "entry_count": 129,
+      "status": "pass"
+    },
+    "status": "pass"
+  },
+  "content_sha256": "43262e9ce50338f49b783bfde4dcfce9e58117e19813a6ca93c5cb799432570f",
+  "evaluation_source_commit": "d288af93cefc7cf8aaabb9b541b92539782c019c",
+  "finalizer_sha256": "3c504829aece6eec36a955b662b8cda327df0fe36b3ea5db45504021a2bfe2a6",
+  "inputs": [
+    {
+      "path": "artifacts/allt_task_superiority_v1/selection/FROZEN_SELECTION.json",
+      "sha256": "905bf751de39a95987f19e0083b72c7a74c76de4a1ca9830da3371025ca544c1"
+    },
+    {
+      "path": "artifacts/allt_task_superiority_v1/baseline/all_t_metrics.csv",
+      "sha256": "8938c43d72ac8145ed4992218dfe4151cb168149934521199f9795db8c2e5297"
+    },
+    {
+      "path": "artifacts/allt_task_superiority_v1/baseline/replay_status.json",
+      "sha256": "598288f47210659aa8fc22654982c9a46202a94b5ae0ce0ea7c76ae34eaf43b1"
+    },
+    {
+      "path": "artifacts/allt_task_superiority_v1/evaluation/protocol_b/C2/update=0200/all_t_metrics.csv",
+      "sha256": "a38dfd43cde0c89f4d031e1ff7b69e567dd4288115fe1bdbc3d0bb79a9e54897"
+    },
+    {
+      "path": "artifacts/allt_task_superiority_v1/evaluation/protocol_b/C2/update=0200/cache_manifest.json",
+      "sha256": "73c6c4c66d14f73bab17703ed4f1094c2ddfef066450103e48e606e7544b09a3"
+    },
+    {
+      "path": "artifacts/allt_task_superiority_v1/evaluation/protocol_b/C2/update=0200/run_summary.json",
+      "sha256": "90d7343e9ae364987a2f1a700566acf53c7ff6863699e2ca2e85312389612d57"
+    },
+    {
+      "path": "artifacts/allt_task_superiority_v1/evaluation/protocol_b/FH-adapt/update=0100/all_t_metrics.csv",
+      "sha256": "73b71baca2d5ddddc961e3acc4e5be9ccf3c64ffcfa9ba69490ff5d49cd1c504"
+    },
+    {
+      "path": "artifacts/allt_task_superiority_v1/evaluation/protocol_b/FH-adapt/update=0100/cache_manifest.json",
+      "sha256": "9689890dd160ace21d0d184dc4170d2f8f35e35f8f9f31d52718a8b09279ed2c"
+    },
+    {
+      "path": "artifacts/allt_task_superiority_v1/evaluation/protocol_b/FH-adapt/update=0100/run_summary.json",
+      "sha256": "b80c3994df740eed99542620214775eb84ed7a2023b1984650119ee0764e01ce"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "all_t_metrics.csv",
+      "sha256": "603ecc201502a21e22e66762cf11eb58b98f299eb1fce776e17689635a0d592f"
+    },
+    {
+      "path": "deltas_all_metrics.csv",
+      "sha256": "352611a954a77e81ce1e96325564a542da265c93da866e762399526dbe1c35eb"
+    },
+    {
+      "path": "score_sensitivity.csv",
+      "sha256": "c83deda6c3441850c25cefc0eace21cff4a98690f037d237d1dc356441fffa51"
+    },
+    {
+      "path": "run_confirmation.csv",
+      "sha256": "2f1b8021ada1f06cf5f3a16c7495d53accd55e369a05f6f04c9c7e78b8ce4d58"
+    },
+    {
+      "path": "verdict.json",
+      "sha256": "61f39cd3ee11190b817d6ebc4c485e122c3595dd433a6b97c5ed432f80839699"
+    }
+  ],
+  "schema_version": 1,
+  "status": "pass"
+}

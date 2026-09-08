@@ -1,0 +1,297 @@
+{
+  "comparisons": {
+    "C2_vs_FH-adapt": {
+      "failed_cells": [
+        {
+          "T": 3,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 4,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 2,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 4,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 2,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 3,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 4,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 2,
+          "metric": "t_REC"
+        },
+        {
+          "T": 4,
+          "metric": "t_REC"
+        },
+        {
+          "T": 3,
+          "metric": "prefix_overall_mAP"
+        },
+        {
+          "T": 4,
+          "metric": "prefix_overall_mAP"
+        },
+        {
+          "T": 5,
+          "metric": "prefix_overall_mAP"
+        }
+      ],
+      "minimum_t_map_delta": -0.028985027223825455,
+      "strict_zero_tolerance": true,
+      "t_map_delta_by_horizon": {
+        "2": 0.001425221562385559,
+        "3": -0.0066642165184021,
+        "4": -0.027657195925712585,
+        "5": -0.028985027223825455
+      },
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL"
+    },
+    "C2_vs_R1_B4": {
+      "failed_cells": [
+        {
+          "T": 4,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 2,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 3,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 4,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 4,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP25"
+        }
+      ],
+      "minimum_t_map_delta": -0.007212527096271515,
+      "strict_zero_tolerance": true,
+      "t_map_delta_by_horizon": {
+        "2": 0.005388021469116211,
+        "3": 0.005560442805290222,
+        "4": -0.004158914089202881,
+        "5": -0.007212527096271515
+      },
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL"
+    },
+    "C2_vs_R1_FullHistory": {
+      "failed_cells": [
+        {
+          "T": 2,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 3,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 4,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 2,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 3,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 4,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 2,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 3,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 4,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 4,
+          "metric": "t_REC"
+        },
+        {
+          "T": 5,
+          "metric": "t_REC"
+        },
+        {
+          "T": 2,
+          "metric": "prefix_overall_mAP"
+        },
+        {
+          "T": 3,
+          "metric": "prefix_overall_mAP"
+        },
+        {
+          "T": 4,
+          "metric": "prefix_overall_mAP"
+        },
+        {
+          "T": 5,
+          "metric": "prefix_overall_mAP"
+        }
+      ],
+      "minimum_t_map_delta": -0.030243631452322006,
+      "strict_zero_tolerance": true,
+      "t_map_delta_by_horizon": {
+        "2": -0.0037527084350585938,
+        "3": -0.00724676251411438,
+        "4": -0.026744775474071503,
+        "5": -0.030243631452322006
+      },
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL"
+    },
+    "FH-adapt_vs_R1_FullHistory": {
+      "failed_cells": [
+        {
+          "T": 2,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 3,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP"
+        },
+        {
+          "T": 2,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 3,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 4,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP50"
+        },
+        {
+          "T": 2,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 3,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 4,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 5,
+          "metric": "t_mAP25"
+        },
+        {
+          "T": 3,
+          "metric": "t_REC"
+        },
+        {
+          "T": 4,
+          "metric": "t_REC"
+        },
+        {
+          "T": 5,
+          "metric": "t_REC"
+        },
+        {
+          "T": 2,
+          "metric": "prefix_overall_mAP"
+        },
+        {
+          "T": 3,
+          "metric": "prefix_overall_mAP"
+        }
+      ],
+      "minimum_t_map_delta": -0.005177929997444153,
+      "strict_zero_tolerance": true,
+      "t_map_delta_by_horizon": {
+        "2": -0.005177929997444153,
+        "3": -0.0005825459957122803,
+        "4": 0.0009124204516410828,
+        "5": -0.0012586042284965515
+      },
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL"
+    }
+  },
+  "content_sha256": "4b72848515c95bb1b9de7e440892415d7513bb5752c61434957752a93db83571",
+  "evaluation_source_commit": "d288af93cefc7cf8aaabb9b541b92539782c019c",
+  "goal": "C2 strictly exceeds matched FH-adapt in t_mAP at T2-T5",
+  "goal_status": "FAIL",
+  "independent_generalization": "NOT_ESTABLISHED",
+  "primary_comparison": "C2_vs_FH-adapt",
+  "protocol_b_used_for_selection": false,
+  "schema_version": 1,
+  "strict_zero_tolerance": true
+}
