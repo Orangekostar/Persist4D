@@ -1,0 +1,36 @@
+{
+  "checkpoints": [
+    {
+      "bytes": 756029616,
+      "name": "last.ckpt",
+      "sha256": "81a2dd2fabd3893a6849ced62bb52677a252c30260421ecb1271cb47c3b03730"
+    },
+    {
+      "bytes": 541336986,
+      "name": "update=0000.ckpt",
+      "sha256": "6ba05955dfa4ba793c981d089ec795e6de0131688e2e9b9f4fdd8e504fdcf4d1"
+    },
+    {
+      "bytes": 756029552,
+      "name": "update=0100.ckpt",
+      "sha256": "d94ff38bfbfa8bd0bef04ba45d7b66b6804b6f98ce4c26d0c991ccb5d5a19742"
+    },
+    {
+      "bytes": 756029616,
+      "name": "update=0200.ckpt",
+      "sha256": "a4adb8ae1bc25830934a97926b7910d5f7ecde3b010cf877475cec82bff30724"
+    },
+    {
+      "bytes": 756029616,
+      "name": "update=0300.ckpt",
+      "sha256": "144551fe0c6d94712bb068d4eea90714bd60f227e53a86f9c158f1474d664000"
+    },
+    {
+      "bytes": 756029616,
+      "name": "update=0400.ckpt",
+      "sha256": "81a2dd2fabd3893a6849ced62bb52677a252c30260421ecb1271cb47c3b03730"
+    }
+  ],
+  "external_reference": "external:allt_task_superiority_v1/training/formal/C2",
+  "variant": "C2"
+}
