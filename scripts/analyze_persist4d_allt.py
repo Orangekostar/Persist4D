@@ -10,6 +10,7 @@ import io
 import json
 import math
 import multiprocessing
+import pickle
 import sys
 import tempfile
 from collections.abc import Hashable, Mapping, Sequence
@@ -417,9 +418,29 @@ def _load_worker_sequence(job: Mapping[str, object]) -> object:
     )
 
 
+def _encode_shard_result(value: tuple[int, object]) -> bytes:
+    return pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def _decode_shard_result(value: bytes) -> tuple[int, object]:
+    if type(value) is not bytes:
+        raise AllTBaselineError("encoded shard result must be bytes")
+    result = pickle.loads(value)
+    if (
+        not isinstance(result, tuple)
+        or len(result) != 2
+        or isinstance(result[0], bool)
+        or not isinstance(result[0], int)
+        or result[0] <= 0
+        or not isinstance(result[1], Mapping)
+    ):
+        raise AllTBaselineError("decoded shard result differs")
+    return result
+
+
 def _process_sequence_shard(
     jobs: Sequence[Mapping[str, object]],
-) -> tuple[int, dict[tuple[str, str, int], AllTBaselineAccumulator]]:
+) -> bytes:
     from scripts.evaluate_persist4d_p6a import (
         build_tracker_factories,
         cache_payload_to_frozen_observation,
@@ -521,7 +542,7 @@ def _process_sequence_shard(
                             class_mapper=class_mapper,
                         ),
                     )
-    return len(jobs), accumulators
+    return _encode_shard_result((len(jobs), accumulators))
 
 
 def run_baseline_analysis(
@@ -603,7 +624,8 @@ def run_baseline_analysis(
             rio_class_mapping,
         ),
     ) as executor:
-        for shard_count, local in executor.map(_process_sequence_shard, shards):
+        for encoded in executor.map(_process_sequence_shard, shards):
+            shard_count, local = _decode_shard_result(encoded)
             for key, incoming in local.items():
                 if key not in accumulators:
                     accumulators[key] = incoming

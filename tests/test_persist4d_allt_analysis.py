@@ -7,6 +7,8 @@ from scripts.analyze_persist4d_allt import (
     DEFAULT_R1_CONTRACT,
     AllTBaselineAccumulator,
     AllTBaselineError,
+    _decode_shard_result,
+    _encode_shard_result,
     plan_missing_cache_keys,
     validate_legacy_regression,
 )
@@ -141,3 +143,16 @@ def test_missing_cache_plan_never_requests_existing_keys() -> None:
 def test_default_r1_contract_is_the_decodable_frozen_yaml() -> None:
     contract = load_r1_contract(DEFAULT_R1_CONTRACT)
     assert contract["checkpoint"]["completed_epoch"] == 390
+
+
+def test_shard_result_round_trip_uses_plain_bytes_for_tensor_state() -> None:
+    original = (2, {("B4", "mean", 3): {"state": torch.tensor([1.0, 2.0])}})
+
+    encoded = _encode_shard_result(original)
+    decoded = _decode_shard_result(encoded)
+
+    assert type(encoded) is bytes
+    assert decoded[0] == 2
+    torch.testing.assert_close(
+        decoded[1][("B4", "mean", 3)]["state"], torch.tensor([1.0, 2.0])
+    )
