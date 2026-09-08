@@ -1,0 +1,24 @@
+{
+  "checkpoint_global_step": 200,
+  "checkpoint_sha256": "a4adb8ae1bc25830934a97926b7910d5f7ecde3b010cf877475cec82bff30724",
+  "elapsed_seconds": 817.5956201553345,
+  "evaluation_seed": 45,
+  "memory_read_policy": "disabled",
+  "metric_row_count": 4,
+  "metric_sha256": "aeb3a9bf91dd264aeddb2d3f339648c234d2829a5a92ccf2384208cf9ffb778f",
+  "metric_worker_count": 4,
+  "model": "C2-memory-off",
+  "model_forward_count": 235,
+  "new_sequence_count": 47,
+  "population_id": "development_train_holdout_47_masters_canonical",
+  "reducers": [
+    "mean"
+  ],
+  "reused_sequence_count": 0,
+  "sequence_count": 47,
+  "source_commit": "fe1204c7a2b482184603604d0fbe51675683ed0c",
+  "status": "pass",
+  "training_seed": 45,
+  "variant": "C2",
+  "window_mode": "local_pair"
+}

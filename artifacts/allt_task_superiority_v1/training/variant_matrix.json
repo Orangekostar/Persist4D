@@ -1,0 +1,173 @@
+{
+  "content_sha256": "40f009891f348ff224b058abbca380ac6a48d063575605b273c84580271897d8",
+  "devices": 2,
+  "effective_episode_batch": 8,
+  "evaluation_updates": [
+    0,
+    100,
+    200,
+    300,
+    400
+  ],
+  "gradient_accumulation": 4,
+  "optimizer_updates": 400,
+  "physical_episode_batch_per_gpu": 1,
+  "schema_version": 1,
+  "seed46_reason": "development candidate did not strictly exceed matched FH-adapt at every T",
+  "seed46_training_confirmation": "GATE_SKIPPED",
+  "training_seed": 45,
+  "variants": [
+    {
+      "checkpoint_external_reference": "external:allt_task_superiority_v1/training/formal/C0",
+      "completed_global_step": 400,
+      "elapsed_seconds": 3830.789789199829,
+      "execution_status": "COMPLETE",
+      "gpu_hours": 2.128216549555461,
+      "gradient_audit_status": "pass",
+      "learning_curve": "repo:artifacts/allt_task_superiority_v1/training/formal/C0/learning_curve.csv",
+      "local_enhancement_enabled": false,
+      "memory_read_enabled": false,
+      "selected_checkpoint_global_step": 400,
+      "selected_checkpoint_sha256": "574ea496db467f1208eea934d2aa29595b36057c7bad27dcd5cadc88793cdb25",
+      "total_parameter_count": 135149395,
+      "trainable_parameter_count": 26688019,
+      "training_plan": {
+        "adaptation_reference_count": 36,
+        "development_reference_count": 8,
+        "encoder_scan_count": 12084,
+        "global_episode_count": 3200,
+        "group_count": 1600,
+        "rio_episode_count": 1778,
+        "rio_horizon_counts": {
+          "2": 446,
+          "3": 444,
+          "4": 444,
+          "5": 444
+        },
+        "scannet_episode_count": 1422,
+        "source_schedule_sha256": "abd16a395631098d3961458ebf1079b803472194815e77792f1601ba57b6a37d",
+        "supervised_stage_count": 7642
+      },
+      "variant": "C0",
+      "window_mode": "local_pair"
+    },
+    {
+      "checkpoint_external_reference": "external:allt_task_superiority_v1/training/formal/C1",
+      "completed_global_step": 400,
+      "elapsed_seconds": 4059.8628628253937,
+      "execution_status": "COMPLETE",
+      "gpu_hours": 2.2554793682363297,
+      "gradient_audit_status": "pass",
+      "learning_curve": "repo:artifacts/allt_task_superiority_v1/training/formal/C1/learning_curve.csv",
+      "local_enhancement_enabled": true,
+      "memory_read_enabled": false,
+      "selected_checkpoint_global_step": 100,
+      "selected_checkpoint_sha256": "44afc0faa72d9e4215b8c27b1d6f0b15a94dd5e9d63da34add9a4868e7f6da0d",
+      "total_parameter_count": 135215571,
+      "trainable_parameter_count": 26754195,
+      "training_plan": {
+        "adaptation_reference_count": 36,
+        "development_reference_count": 8,
+        "encoder_scan_count": 12084,
+        "global_episode_count": 3200,
+        "group_count": 1600,
+        "rio_episode_count": 1778,
+        "rio_horizon_counts": {
+          "2": 446,
+          "3": 444,
+          "4": 444,
+          "5": 444
+        },
+        "scannet_episode_count": 1422,
+        "source_schedule_sha256": "abd16a395631098d3961458ebf1079b803472194815e77792f1601ba57b6a37d",
+        "supervised_stage_count": 7642
+      },
+      "variant": "C1",
+      "window_mode": "local_pair"
+    },
+    {
+      "checkpoint_external_reference": "external:allt_task_superiority_v1/training/formal/C2",
+      "completed_global_step": 400,
+      "elapsed_seconds": 4018.095466852188,
+      "execution_status": "COMPLETE",
+      "gpu_hours": 2.2322752593623267,
+      "gradient_audit_status": "pass",
+      "learning_curve": "repo:artifacts/allt_task_superiority_v1/training/formal/C2/learning_curve.csv",
+      "local_enhancement_enabled": false,
+      "memory_read_enabled": true,
+      "selected_checkpoint_global_step": 200,
+      "selected_checkpoint_sha256": "a4adb8ae1bc25830934a97926b7910d5f7ecde3b010cf877475cec82bff30724",
+      "total_parameter_count": 135248851,
+      "trainable_parameter_count": 26787475,
+      "training_plan": {
+        "adaptation_reference_count": 36,
+        "development_reference_count": 8,
+        "encoder_scan_count": 12084,
+        "global_episode_count": 3200,
+        "group_count": 1600,
+        "rio_episode_count": 1778,
+        "rio_horizon_counts": {
+          "2": 446,
+          "3": 444,
+          "4": 444,
+          "5": 444
+        },
+        "scannet_episode_count": 1422,
+        "source_schedule_sha256": "abd16a395631098d3961458ebf1079b803472194815e77792f1601ba57b6a37d",
+        "supervised_stage_count": 7642
+      },
+      "variant": "C2",
+      "window_mode": "local_pair"
+    },
+    {
+      "execution_status": "GATE_SKIPPED",
+      "local_enhancement_enabled": true,
+      "memory_read_enabled": true,
+      "reason": "C1 did not strictly improve both T2 and T3 versus selected C0, so the preregistered complementarity gate failed closed.",
+      "variant": "C3",
+      "window_mode": "local_pair"
+    },
+    {
+      "checkpoint_external_reference": "external:allt_task_superiority_v1/training/formal/FH-adapt",
+      "completed_global_step": 400,
+      "elapsed_seconds": 4591.912266492844,
+      "execution_status": "COMPLETE",
+      "gpu_hours": 2.5510623702738022,
+      "gradient_audit_status": "pass",
+      "learning_curve": "repo:artifacts/allt_task_superiority_v1/training/formal/FH-adapt/learning_curve.csv",
+      "local_enhancement_enabled": false,
+      "memory_read_enabled": false,
+      "selected_checkpoint_global_step": 100,
+      "selected_checkpoint_sha256": "ddfda362673ce081dab8d7f790ffa223c336921ad6f85220aa3e6a78bca1a70c",
+      "total_parameter_count": 135149395,
+      "trainable_parameter_count": 26688019,
+      "training_plan": {
+        "adaptation_reference_count": 36,
+        "development_reference_count": 8,
+        "encoder_scan_count": 16524,
+        "global_episode_count": 3200,
+        "group_count": 1600,
+        "rio_episode_count": 1778,
+        "rio_horizon_counts": {
+          "2": 446,
+          "3": 444,
+          "4": 444,
+          "5": 444
+        },
+        "scannet_episode_count": 1422,
+        "source_schedule_sha256": "abd16a395631098d3961458ebf1079b803472194815e77792f1601ba57b6a37d",
+        "supervised_stage_count": 7642
+      },
+      "variant": "FH-adapt",
+      "window_mode": "full_history"
+    },
+    {
+      "execution_status": "GATE_SKIPPED",
+      "local_enhancement_enabled": true,
+      "memory_read_enabled": false,
+      "reason": "The frozen Persist4D candidate does not use L, so matched FH-L training is not authorized.",
+      "variant": "FH-L",
+      "window_mode": "full_history"
+    }
+  ]
+}

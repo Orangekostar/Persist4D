@@ -62,11 +62,11 @@ Expected: all tests pass.
 
 Run: `git add scripts/evaluate_persist4d_allt.py tests/test_persist4d_allt_evaluation.py docs/superpowers/plans/2026-09-08-persist4d-allt-completion.md && git commit -m 'add frozen memory read diagnostics'`
 
-- [ ] **Step 6: Run both policies on the 47-sequence development population**
+- [x] **Step 6: Run both policies on the 47-sequence development population**
 
 Use the committed source, evaluation seed 45, selected C2 checkpoint, `mean` reducer, and separate external cache roots. Run `disabled` and `active_previous` concurrently only on confirmed-free GPUs. Record all 47 sequences; do not run either policy on Protocol-B.
 
-- [ ] **Step 7: Validate and commit both diagnostic result triplets**
+- [x] **Step 7: Validate and commit both diagnostic result triplets**
 
 Require status `pass`, source commit equality, one checkpoint across T2-T5, 47 sequences, 235 new forwards, four official metric rows, and non-colliding module-config/cache hashes.
 
@@ -174,21 +174,21 @@ Require exact coverage, no nonfinite or nonpositive latency, stable checkpoint i
 - Consumes: frozen selection, training summaries/configs/manifests, development evaluations, memory diagnostics, and existing final results.
 - Produces: deterministic variant matrix, four learning curves, and an ablation table that never promotes diagnostic policies into selected models.
 
-- [ ] **Step 1: Write failing publisher aggregation tests**
+- [x] **Step 1: Write failing publisher aggregation tests**
 
 Test variant states for C0/C1/C2/FH-adapt complete and C3/FH-L gate-skipped, exact five-update learning curves, frozen selected-update flags, and three-policy C2 ablation rows over T2-T5.
 
-- [ ] **Step 2: Run the tests and observe missing-interface failures**
+- [x] **Step 2: Run the tests and observe missing-interface failures**
 
 Run: `python -m pytest -q tests/test_publish_persist4d_allt.py`
 
 Expected: collection failure because the publisher does not exist.
 
-- [ ] **Step 3: Implement deterministic compact exports**
+- [x] **Step 3: Implement deterministic compact exports**
 
 Derive all values from existing manifests and CSV files. Preserve actual `training/formal/<variant>` paths in provenance. Mark C3, FH-L, and seed 46 as gate-skipped with their frozen reasons; never emit numeric rows for unrun variants.
 
-- [ ] **Step 4: Run publisher tests**
+- [x] **Step 4: Run publisher tests**
 
 Run: `python -m pytest -q tests/test_publish_persist4d_allt.py tests/test_persist4d_allt_selection.py tests/test_finalize_persist4d_allt.py`
 
