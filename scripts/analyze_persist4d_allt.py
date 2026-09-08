@@ -273,7 +273,8 @@ def _read_csv(path: Path) -> list[dict[str, str]]:
 def _csv_bytes(rows: Sequence[Mapping[str, object]]) -> bytes:
     if not rows:
         raise AllTBaselineError("CSV output cannot be empty")
-    if any(tuple(row) != OUTPUT_FIELDS for row in rows):
+    expected_fields = set(OUTPUT_FIELDS)
+    if any(set(row) != expected_fields for row in rows):
         raise AllTBaselineError("all-T CSV schema differs")
     buffer = io.StringIO(newline="")
     writer = csv.DictWriter(buffer, fieldnames=OUTPUT_FIELDS, lineterminator="\n")

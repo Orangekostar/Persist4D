@@ -5,8 +5,10 @@ import torch
 
 from scripts.analyze_persist4d_allt import (
     DEFAULT_R1_CONTRACT,
+    OUTPUT_FIELDS,
     AllTBaselineAccumulator,
     AllTBaselineError,
+    _csv_bytes,
     _decode_shard_result,
     _encode_shard_result,
     plan_missing_cache_keys,
@@ -156,3 +158,19 @@ def test_shard_result_round_trip_uses_plain_bytes_for_tensor_state() -> None:
     torch.testing.assert_close(
         decoded[1][("B4", "mean", 3)]["state"], torch.tensor([1.0, 2.0])
     )
+
+
+def test_csv_schema_is_independent_of_mapping_insertion_order() -> None:
+    row = {field: index for index, field in reversed(list(enumerate(OUTPUT_FIELDS)))}
+
+    header = _csv_bytes([row]).decode("utf-8").splitlines()[0]
+
+    assert header == ",".join(OUTPUT_FIELDS)
+
+
+def test_csv_schema_rejects_unknown_fields() -> None:
+    row = {field: index for index, field in enumerate(OUTPUT_FIELDS)}
+    row["unknown"] = 1
+
+    with pytest.raises(AllTBaselineError, match="schema"):
+        _csv_bytes([row])
