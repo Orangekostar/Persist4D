@@ -153,6 +153,7 @@ def validate_profile_samples(
     observed: set[tuple[str, str, int, int]] = set()
     references: set[str] = set()
     masters: dict[str, str] = {}
+    input_shapes: dict[tuple[str, str, int], set[tuple[int, int]]] = defaultdict(set)
     for row in values:
         if not isinstance(row, Mapping):
             raise ProfileError("profile sample must be a mapping")
@@ -183,12 +184,23 @@ def validate_profile_samples(
             "window_segments",
         ):
             _integer(row.get(field), name=field, minimum=int(field.startswith("window_")))
+        input_shapes[(model, reference, horizon)].add(
+            (int(row["window_voxel_points"]), int(row["window_segments"]))
+        )
         if int(row["peak_allocated_bytes"]) < int(row["start_allocated_bytes"]):
             raise ProfileError("profile peak memory is below starting allocation")
         if int(row["incremental_peak_allocated_bytes"]) != (
             int(row["peak_allocated_bytes"]) - int(row["start_allocated_bytes"])
         ):
             raise ProfileError("profile incremental peak memory differs")
+    if 2 in normalized_horizons and set(normalized_models) == set(PROFILE_MODELS):
+        for reference in references:
+            if input_shapes[("C2", reference, 2)] != input_shapes[
+                ("FH-adapt", reference, 2)
+            ]:
+                raise ProfileError("profile T2 input shape differs between methods")
+    if any(len(shapes) != 1 for shapes in input_shapes.values()):
+        raise ProfileError("profile input shape differs within a measured cell")
     expected = {
         (model, reference, horizon, repeat)
         for model in normalized_models
@@ -285,13 +297,21 @@ def _prepare_input(
         _move_targets_to_device,
         _segment_stages,
     )
+    from scripts.evaluate_persist4d_p6a import _frozen_inference_seed
 
-    sample = dataset.load_scan_indices(
-        int(request["context_index"]),
-        tuple(request["inference_scan_indices"]),
-        change_file=None,
+    seed_material = (
+        f"profile-seed45|{request['master_sequence_id']}|{request['stage_index']}"
+    ).encode()
+    preparation_seed = int.from_bytes(
+        hashlib.sha256(seed_material).digest()[:4], byteorder="big"
     )
-    data, targets, names = collate([sample])
+    with _frozen_inference_seed(preparation_seed, device):
+        sample = dataset.load_scan_indices(
+            int(request["context_index"]),
+            tuple(request["inference_scan_indices"]),
+            change_file=None,
+        )
+        data, targets, names = collate([sample])
     if list(names) != [request["master_sequence_id"]] or len(targets) != 1:
         raise ProfileError("profile collator changed the requested sequence")
     data = _move_data_to_device(data, device)
@@ -720,6 +740,9 @@ def run_profile(
         "device_name": device_label,
         "elapsed_seconds": time.time() - started,
         "evaluation_seed": 45,
+        "input_preparation_seed_rule": (
+            "uint32_be(sha256('profile-seed45|<master_sequence_id>|<stage_index>')[:4])"
+        ),
         "excluded_scope": [
             "file_io",
             "collation",

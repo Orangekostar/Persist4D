@@ -81,6 +81,21 @@ def test_profile_samples_require_exact_repeat_coverage() -> None:
         validate_profile_samples(rows[:-1])
 
 
+def test_profile_samples_require_identical_t2_inputs_between_methods() -> None:
+    rows = _samples()
+    changed = next(
+        row
+        for row in rows
+        if row["model"] == "FH-adapt"
+        and row["reference_scene_id"] == "reference-0"
+        and row["T"] == 2
+    )
+    changed["window_segments"] = int(changed["window_segments"]) + 1
+
+    with pytest.raises(ProfileError, match="T2 input"):
+        validate_profile_samples(rows)
+
+
 def test_profile_summary_is_deterministic_and_uses_measured_peaks() -> None:
     rows = _samples()
     first = summarize_profile_samples(rows)
