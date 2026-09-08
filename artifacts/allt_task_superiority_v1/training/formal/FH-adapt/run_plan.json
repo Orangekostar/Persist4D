@@ -1,0 +1,32 @@
+{
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "code_commit_at_run": "aa4ce89f9118c7078bc88801e50d68568ce4610c",
+  "devices": 2,
+  "gradient_accumulation": 4,
+  "load_audit": {
+    "loaded_key_count": 798,
+    "missing_keys": [],
+    "unexpected_keys": []
+  },
+  "optimizer_updates": 400,
+  "plan": {
+    "adaptation_reference_count": 36,
+    "development_reference_count": 8,
+    "encoder_scan_count": 16524,
+    "global_episode_count": 3200,
+    "group_count": 1600,
+    "rio_episode_count": 1778,
+    "rio_horizon_counts": {
+      "2": 446,
+      "3": 444,
+      "4": 444,
+      "5": 444
+    },
+    "scannet_episode_count": 1422,
+    "source_schedule_sha256": "abd16a395631098d3961458ebf1079b803472194815e77792f1601ba57b6a37d",
+    "supervised_stage_count": 7642
+  },
+  "seed": 45,
+  "variant": "FH-adapt",
+  "window_mode": "full_history"
+}

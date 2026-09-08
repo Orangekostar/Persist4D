@@ -1,0 +1,40 @@
+{
+  "completed_global_step": 400,
+  "elapsed_seconds": 4591.912266492844,
+  "execution_status": "COMPLETE",
+  "gpu_hours": 2.5510623702738022,
+  "gradient_audit": {
+    "frozen_gradient_names": [],
+    "missing_optimizer_parameters": [],
+    "nonfinite_gradient_names": [],
+    "nonzero_gradient_step_counts": {},
+    "optimizer_step_calls": 400
+  },
+  "optimizer_updates_requested": 400,
+  "parameter_update_audit": {
+    "changed_parameter_count": 0,
+    "changed_parameters": {},
+    "parameter_count": 0
+  },
+  "plan": {
+    "adaptation_reference_count": 36,
+    "development_reference_count": 8,
+    "encoder_scan_count": 16524,
+    "global_episode_count": 3200,
+    "group_count": 1600,
+    "rio_episode_count": 1778,
+    "rio_horizon_counts": {
+      "2": 446,
+      "3": 444,
+      "4": 444,
+      "5": 444
+    },
+    "scannet_episode_count": 1422,
+    "source_schedule_sha256": "abd16a395631098d3961458ebf1079b803472194815e77792f1601ba57b6a37d",
+    "supervised_stage_count": 7642
+  },
+  "smoke": false,
+  "total_parameter_count": 135149395,
+  "trainable_parameter_count": 26688019,
+  "variant": "FH-adapt"
+}
