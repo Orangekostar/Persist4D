@@ -9,10 +9,11 @@ import hashlib
 import io
 import json
 import math
+import multiprocessing
 import sys
 import tempfile
 from collections.abc import Hashable, Mapping, Sequence
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -57,6 +58,7 @@ OUTPUT_FIELDS = (
     "num_order_units",
     "num_reference_clusters",
 )
+_WORKER_CONTEXT: dict[str, object] | None = None
 
 
 class AllTBaselineError(RuntimeError):
@@ -313,31 +315,118 @@ def _cache_key(record: Mapping[str, object], *, local: bool) -> tuple[str, str, 
     return str(key["master_sequence_id"]), str(key["order_id"]), horizon
 
 
-def run_baseline_analysis(
+def _build_sequence_jobs(
     *,
-    cache_root: Path,
-    output_root: Path,
-    checkpoint: Path,
-    pretrained: Path,
-    metadata: Path,
-    workers: int,
-) -> dict[str, object]:
-    from scripts.analyze_r1_downstream_validation import (
-        _validate_new_cache_binding,
-        resolve_metric_dataset_spec,
+    local_records: Sequence[Mapping[str, object]],
+    full_records: Sequence[Mapping[str, object]],
+    expected_keys: Sequence[tuple[str, str, int]],
+) -> list[dict[str, object]]:
+    local_index = {_cache_key(record, local=True): record for record in local_records}
+    full_index = {_cache_key(record, local=False): record for record in full_records}
+    identities = []
+    seen = set()
+    for master, order, _ in expected_keys:
+        identity = (master, order)
+        if identity not in seen:
+            identities.append(identity)
+            seen.add(identity)
+    jobs = []
+    for master, order in identities:
+        local = [local_index[(master, order, horizon)] for horizon in range(1, 6)]
+        full = [full_index[(master, order, horizon)] for horizon in REPORT_HORIZONS]
+        references = {
+            str(record["key"]["reference_scene_id"]) for record in [*local, *full]
+        }
+        if len(references) != 1:
+            raise AllTBaselineError("cache sequence reference identity differs")
+        jobs.append(
+            {
+                "full_records": full,
+                "local_records": local,
+                "master_sequence_id": master,
+                "order_id": order,
+                "reference_scene_id": references.pop(),
+            }
+        )
+    if len(jobs) != 129:
+        raise AllTBaselineError("cache sequence job coverage differs")
+    return jobs
+
+
+def _initialize_worker(
+    cache_root: str,
+    dataset_spec: str,
+    full_provenance: Mapping[str, object],
+    p6a_config: Mapping[str, object],
+    rio_class_mapping: Sequence[int],
+) -> None:
+    import torch
+
+    global _WORKER_CONTEXT
+    torch.set_num_threads(1)
+    _WORKER_CONTEXT = {
+        "cache_root": cache_root,
+        "dataset_spec": dataset_spec,
+        "full_provenance": dict(full_provenance),
+        "p6a_config": dict(p6a_config),
+        "rio_class_mapping": tuple(int(value) for value in rio_class_mapping),
+    }
+
+
+def _load_worker_sequence(job: Mapping[str, object]) -> object:
+    from scripts.p6a_cache import validate_cache_entry
+    from scripts.system_comparison_v2_analysis import CachedV2Sequence
+    from scripts.system_comparison_v2_cache import (
+        load_task_sidecar,
+        observation_fingerprint,
     )
+
+    if _WORKER_CONTEXT is None:
+        raise AllTBaselineError("baseline worker is not initialized")
+    cache_root = Path(str(_WORKER_CONTEXT["cache_root"]))
+    raw_payloads = []
+    sidecars = []
+    for record in job["local_records"]:
+        key = record["key"]
+        raw_entry = record["raw_entry"]
+        sidecar_entry = record["sidecar_entry"]
+        raw = validate_cache_entry(
+            cache_root / "raw_predictions/entries" / str(raw_entry["filename"]),
+            raw_entry,
+        )
+        sidecar = load_task_sidecar(
+            cache_root / "task_sidecars/entries" / str(sidecar_entry["filename"])
+        )
+        fingerprint = observation_fingerprint(raw)
+        if (
+            raw["key"] != key
+            or sidecar["key"] != key
+            or fingerprint != record["raw_observation_fingerprint"]
+            or fingerprint
+            != sidecar["provenance"]["source_raw_observation_fingerprint"]
+        ):
+            raise AllTBaselineError("worker raw/sidecar cache binding differs")
+        raw_payloads.append(raw)
+        sidecars.append(sidecar)
+    return CachedV2Sequence(
+        reference_scene_id=str(job["reference_scene_id"]),
+        master_sequence_id=str(job["master_sequence_id"]),
+        order_id=str(job["order_id"]),
+        raw_payloads=tuple(raw_payloads),
+        sidecars=tuple(sidecars),
+    )
+
+
+def _process_sequence_shard(
+    jobs: Sequence[Mapping[str, object]],
+) -> tuple[int, dict[tuple[str, str, int], AllTBaselineAccumulator]]:
     from scripts.evaluate_persist4d_p6a import (
-        build_rio_class_mapper,
         build_tracker_factories,
         cache_payload_to_frozen_observation,
     )
-    from scripts.r1_downstream_context import build_r1_setup
     from scripts.system_comparison_inference import load_full_history_cache_entry
     from scripts.system_comparison_metrics import causal_prefix_pair_from_payload
-    from scripts.system_comparison_v2_analysis import (
-        build_v2_causal_pair,
-        load_v2_sequences,
-    )
+    from scripts.system_comparison_v2_analysis import build_v2_causal_pair
     from scripts.system_comparison_v2_inference import (
         OfficialCandidateTrajectoryAccumulator,
     )
@@ -346,58 +435,34 @@ def run_baseline_analysis(
         assert_score_only_snapshots,
     )
 
-    compact, local_progress, full_progress = _validate_new_cache_binding(
-        cache_root=cache_root, artifact_root=R1_ARTIFACT_ROOT
-    )
-    setup = build_r1_setup(
-        contract_path=DEFAULT_R1_CONTRACT,
-        protocol_path=PROJECT_ROOT / "artifacts/P6A/protocol_b_manifest.json",
-        checkpoint_path=checkpoint,
-        pretrained_path=pretrained,
-        metadata_path=metadata,
-        data_root=PROJECT_ROOT,
-        source_commit=_git_head(),
-        device_name=None,
-    )
-    dataset_spec = resolve_metric_dataset_spec(PROJECT_ROOT)
-    sequences = load_v2_sequences(
-        cache_manifest={**local_progress, "entry_count": 645},
-        cache_root=cache_root,
-    )
-    full_entries = {
-        _cache_key(record, local=False): record for record in full_progress["records"]
-    }
-    local_keys = [_cache_key(record, local=True) for record in local_progress["records"]]
-    full_keys = list(full_entries)
-    expected_keys = [
-        (sequence.master_sequence_id, sequence.order_id, horizon)
-        for sequence in sequences
-        for horizon in range(1, 6)
-    ]
-    missing_local = plan_missing_cache_keys(expected_keys, local_keys)
-    missing_full = plan_missing_cache_keys(expected_keys, full_keys)
-    if missing_local or missing_full:
-        raise AllTBaselineError("frozen cache lacks required keys")
-    if isinstance(workers, bool) or not isinstance(workers, int) or not 1 <= workers <= 32:
-        raise AllTBaselineError("workers must be within 1-32")
+    if _WORKER_CONTEXT is None:
+        raise AllTBaselineError("baseline worker is not initialized")
+    cache_root = Path(str(_WORKER_CONTEXT["cache_root"]))
+    dataset_spec = Path(str(_WORKER_CONTEXT["dataset_spec"]))
+    full_provenance = _WORKER_CONTEXT["full_provenance"]
+    factories = build_tracker_factories(_WORKER_CONTEXT["p6a_config"])
+    rio_class_mapping = _WORKER_CONTEXT["rio_class_mapping"]
 
-    factories = build_tracker_factories(setup.p6a_config)
-    class_mapper = build_rio_class_mapper(setup.dataset)
+    def class_mapper(model_class: int) -> int:
+        if not 0 <= model_class < len(rio_class_mapping):
+            raise AllTBaselineError("model class is outside RIO mapping")
+        return int(rio_class_mapping[model_class])
+
     accumulators: dict[tuple[str, str, int], AllTBaselineAccumulator] = {}
 
-    def process_sequence(sequence: object) -> dict[tuple[str, str, int], AllTBaselineAccumulator]:
-        local: dict[tuple[str, str, int], AllTBaselineAccumulator] = {}
+    def update(method: str, reducer: str, horizon: int, pair: CausalPrefixPair) -> None:
+        key = (method, reducer, horizon)
+        incoming = AllTBaselineAccumulator(
+            dataset_spec=dataset_spec, include_task=horizon == 3
+        )
+        incoming.update(pair)
+        if key not in accumulators:
+            accumulators[key] = incoming
+        else:
+            accumulators[key].merge(incoming)
 
-        def update(
-            method: str, reducer: str, horizon: int, pair: CausalPrefixPair
-        ) -> None:
-            key = (method, reducer, horizon)
-            accumulator = AllTBaselineAccumulator(
-                dataset_spec=dataset_spec, include_task=horizon == 3
-            )
-            accumulator.update(pair)
-            local[key] = accumulator
-
+    for job in jobs:
+        sequence = _load_worker_sequence(job)
         observations = tuple(
             cache_payload_to_frozen_observation(raw) for raw in sequence.raw_payloads
         )
@@ -416,6 +481,10 @@ def run_baseline_analysis(
             }
             for method in ("B2", "B4")
         }
+        full_by_horizon = {
+            _cache_key(record, local=False)[2]: record
+            for record in job["full_records"]
+        }
         for stage, sidecar in enumerate(sequence.sidecars):
             horizon = stage + 1
             snapshots = {}
@@ -429,14 +498,10 @@ def run_baseline_analysis(
                 snapshots[method] = method_snapshots
             if horizon not in REPORT_HORIZONS:
                 continue
-
-            full_record = full_entries[
-                (sequence.master_sequence_id, sequence.order_id, horizon)
-            ]
             full_payload = load_full_history_cache_entry(
                 cache_root / "full_history/entries",
-                full_record,
-                expected_provenance=full_progress["provenance"],
+                full_by_horizon[horizon],
+                expected_provenance=full_provenance,
             )
             update(
                 "FullHistory",
@@ -456,29 +521,100 @@ def run_baseline_analysis(
                             class_mapper=class_mapper,
                         ),
                     )
-        return local
+    return len(jobs), accumulators
 
-    import torch
 
-    prior_torch_threads = torch.get_num_threads()
-    torch.set_num_threads(1)
-    try:
-        with ThreadPoolExecutor(max_workers=workers) as executor:
-            results = executor.map(process_sequence, sequences)
-            for sequence_index, local in enumerate(results, start=1):
-                for key, incoming in local.items():
-                    if key not in accumulators:
-                        accumulators[key] = incoming
-                    else:
-                        accumulators[key].merge(incoming)
-                if sequence_index % 10 == 0 or sequence_index == len(sequences):
-                    print(
-                        f"[allt-baseline] completed {sequence_index}/{len(sequences)} sequences",
-                        file=sys.stderr,
-                        flush=True,
-                    )
-    finally:
-        torch.set_num_threads(prior_torch_threads)
+def run_baseline_analysis(
+    *,
+    cache_root: Path,
+    output_root: Path,
+    checkpoint: Path,
+    pretrained: Path,
+    metadata: Path,
+    workers: int,
+) -> dict[str, object]:
+    from scripts.analyze_r1_downstream_validation import (
+        _validate_new_cache_binding,
+        resolve_metric_dataset_spec,
+    )
+    from scripts.evaluate_persist4d_p6a import (
+        build_rio_class_mapper,
+        expected_cache_keys,
+    )
+    from scripts.r1_downstream_context import build_r1_setup
+
+    compact, local_progress, full_progress = _validate_new_cache_binding(
+        cache_root=cache_root, artifact_root=R1_ARTIFACT_ROOT
+    )
+    setup = build_r1_setup(
+        contract_path=DEFAULT_R1_CONTRACT,
+        protocol_path=PROJECT_ROOT / "artifacts/P6A/protocol_b_manifest.json",
+        checkpoint_path=checkpoint,
+        pretrained_path=pretrained,
+        metadata_path=metadata,
+        data_root=PROJECT_ROOT,
+        source_commit=_git_head(),
+        device_name=None,
+    )
+    dataset_spec = resolve_metric_dataset_spec(PROJECT_ROOT)
+    local_keys = [_cache_key(record, local=True) for record in local_progress["records"]]
+    full_keys = [
+        _cache_key(record, local=False) for record in full_progress["records"]
+    ]
+    expected_keys = [
+        (
+            str(key["master_sequence_id"]),
+            str(key["order_id"]),
+            int(key["stage_index"]) + 1,
+        )
+        for key in expected_cache_keys(setup.protocol)
+    ]
+    missing_local = plan_missing_cache_keys(expected_keys, local_keys)
+    missing_full = plan_missing_cache_keys(expected_keys, full_keys)
+    if missing_local or missing_full:
+        raise AllTBaselineError("frozen cache lacks required keys")
+    if isinstance(workers, bool) or not isinstance(workers, int) or not 1 <= workers <= 32:
+        raise AllTBaselineError("workers must be within 1-32")
+
+    class_mapper = build_rio_class_mapper(setup.dataset)
+    rio_class_mapping = tuple(class_mapper(index) for index in range(18))
+    jobs = _build_sequence_jobs(
+        local_records=local_progress["records"],
+        full_records=full_progress["records"],
+        expected_keys=expected_keys,
+    )
+    chunk_size = math.ceil(len(jobs) / workers)
+    shards = [
+        jobs[start : start + chunk_size]
+        for start in range(0, len(jobs), chunk_size)
+    ]
+    accumulators: dict[tuple[str, str, int], AllTBaselineAccumulator] = {}
+    completed = 0
+    context = multiprocessing.get_context("spawn")
+    with ProcessPoolExecutor(
+        max_workers=len(shards),
+        mp_context=context,
+        initializer=_initialize_worker,
+        initargs=(
+            str(cache_root.resolve()),
+            str(dataset_spec),
+            dict(full_progress["provenance"]),
+            dict(setup.p6a_config),
+            rio_class_mapping,
+        ),
+    ) as executor:
+        for shard_count, local in executor.map(_process_sequence_shard, shards):
+            for key, incoming in local.items():
+                if key not in accumulators:
+                    accumulators[key] = incoming
+                else:
+                    accumulators[key].merge(incoming)
+            completed += shard_count
+            print(
+                f"[allt-baseline] completed {completed}/{len(jobs)} sequences",
+                file=sys.stderr,
+                flush=True,
+            )
 
     expected_cells = {
         ("FullHistory", "official", horizon) for horizon in REPORT_HORIZONS
