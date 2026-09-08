@@ -1,0 +1,14 @@
+{
+  "evidence": {
+    "c1_checkpoint_sha256": "44afc0faa72d9e4215b8c27b1d6f0b15a94dd5e9d63da34add9a4868e7f6da0d",
+    "c1_short_horizon_positive": false,
+    "c2_checkpoint_sha256": "a4adb8ae1bc25830934a97926b7910d5f7ecde3b010cf877475cec82bff30724",
+    "c2_long_horizon_positive": true,
+    "status": "gate_skipped",
+    "strict_zero_tolerance": true
+  },
+  "reason": "C1 did not strictly improve both T2 and T3 versus selected C0, so the preregistered complementarity gate failed closed.",
+  "schema_version": 1,
+  "status": "gate_skipped",
+  "variant": "C3"
+}

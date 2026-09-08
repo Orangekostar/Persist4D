@@ -1,0 +1,359 @@
+{
+  "conditional_variants": {
+    "C3": "gate_skipped",
+    "FH-L": "gate_skipped"
+  },
+  "content_sha256": "fb805d98d508f5b7e00ebb3da6df0320b721d32e7beea874311ad664f8e0a244",
+  "development_candidate_vs_matched_rescene": {
+    "all_t_positive": false,
+    "baseline_checkpoint_sha256": "ddfda362673ce081dab8d7f790ffa223c336921ad6f85220aa3e6a78bca1a70c",
+    "baseline_variant": "FH-adapt",
+    "candidate_variant": "C2",
+    "checkpoint_sha256": "a4adb8ae1bc25830934a97926b7910d5f7ecde3b010cf877475cec82bff30724",
+    "mean_t_map": 0.4082611948251724,
+    "minimum_t_map_delta": -0.056134581565856934,
+    "t_map_delta_by_horizon": {
+      "2": 0.00397038459777832,
+      "3": -0.056134581565856934,
+      "4": -0.024745255708694458,
+      "5": -0.03675934672355652
+    }
+  },
+  "development_population_id": "development_train_holdout_47_masters_canonical",
+  "evaluation_seed": 45,
+  "input_evidence": [
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/budget_and_schedule.json",
+      "sha256": "3cf9feb1faf2031879678b6945813a7dfacfef26d0b6113747612918f917cec5"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0000/all_t_metrics.csv",
+      "sha256": "44add22a5d1d0f54ffd55de94ec84cf60bd2d827c3bf5174eaa2492b54407967"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0000/cache_manifest.json",
+      "sha256": "8452e9118b3e92f949b07308915645effc7ded0cb9d82dfde945314ae1231049"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0000/run_summary.json",
+      "sha256": "0ef924eab9cee8d68cdf90c8af5e2f5552bd51030548ee3ad770afb80b599c66"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0100/all_t_metrics.csv",
+      "sha256": "c5bd32538b1d5b2ca378967fe8f15b42d2fc3d015da8371eea23d8785f995703"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0100/cache_manifest.json",
+      "sha256": "7913c8e7ffa57d36d1a180dc71a0a3348ab04f6745cf10ef4d8c3dc3cee9a58a"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0100/run_summary.json",
+      "sha256": "23a036cc9abbcf2672bcdc68296cf7ec16002b6833d8b51da4a8212947e9347c"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0200/all_t_metrics.csv",
+      "sha256": "8144cd601b4f74aa0badbd2e1eee9c8b20f5454c48ad298666cafb541dccc7af"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0200/cache_manifest.json",
+      "sha256": "3e977b78b56d9651ddda4f86612ea5a46d1bf7ad98bf63295087bb9760431b23"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0200/run_summary.json",
+      "sha256": "71a4bc7aa30c3b8010c9e9697b4596fe30abcc25540f3f41a2936fa091e3547a"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0300/all_t_metrics.csv",
+      "sha256": "f249325d8b7d514b037c8a2e7cd73b0530ba58bc2a87d934e48c3c11fb66ca25"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0300/cache_manifest.json",
+      "sha256": "7657ec0ba50ee31758ec298e983ce31f97875ca40e0e6727191aae09481c8912"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0300/run_summary.json",
+      "sha256": "f87108adc3b7473acd4a53069bfa3714bdf8a800dd0781b37c2ebd53ba27d15c"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0400/all_t_metrics.csv",
+      "sha256": "c221022b0726819f792c62cb5c36808ad68d764b8f14ed4f6bc20906c6663c33"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0400/cache_manifest.json",
+      "sha256": "d065f0192be005c6f127306d9a31ce06e521cc1c658cc54262044a8fdd6f1922"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C0/update=0400/run_summary.json",
+      "sha256": "b8262b69e5277cab633cb80a187bfdcbb18e25da725f0af3c738c7bc1c57bef0"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0000/all_t_metrics.csv",
+      "sha256": "57ffcab783cbfa1033f53596dde5642968ff4eb4d9582f1954d7574a7ac1c1ba"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0000/cache_manifest.json",
+      "sha256": "c01bf5fd5116b968044313959f3012036ad50e7b60d95cf5401e54894f5e33fb"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0000/run_summary.json",
+      "sha256": "1ab28bb640a40c8ba6c9f15b6b917603e65c5586a29be73bb32078dac6c047ef"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0100/all_t_metrics.csv",
+      "sha256": "6e1b67265344bd9ac224acf932951ee42a00346bad291befba1e98589b467559"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0100/cache_manifest.json",
+      "sha256": "5f581416ba4bd3cd861e1348fd4181104a315212fc31ec2bb22b263ef89e6dc5"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0100/run_summary.json",
+      "sha256": "e66350dd67f6c722041011e9665527d8bd05a2328b9b829b78288010d75b7444"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0200/all_t_metrics.csv",
+      "sha256": "89cf26c387f071450ab27fe3c6857f392e7732a66dc061af5917ff899ccf6c1b"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0200/cache_manifest.json",
+      "sha256": "d4bf5e0340eb773f51c54e2f910cc3fe20e8c2a08be81f6eb55b2aa5cbb04ee9"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0200/run_summary.json",
+      "sha256": "4f9b366cd5d7eb677f5ec9001f89746cb9395d7ae5c1f3610696e4e66fd498dc"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0300/all_t_metrics.csv",
+      "sha256": "b46f6f4887d9de2c60543ab0b99bdc64476a57c826ebfacba8531deb989405bf"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0300/cache_manifest.json",
+      "sha256": "7b365bff4f45d6a53dc0efa6653ce8680125b89d57a0efc257664a4b90349f08"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0300/run_summary.json",
+      "sha256": "941869fe55ee1be14fc295ed2ead683874ac17b3f13d06fbe119efd6f17b0fcb"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0400/all_t_metrics.csv",
+      "sha256": "7a885c27d14bf2e4236233d8dbb264f47f0c6d923c8dbb07e4cf631904d9d7a0"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0400/cache_manifest.json",
+      "sha256": "539e569fcb89a01f337a0c243a0b4e5be4cd398c72430f2cad5bfdce95e42557"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C1/update=0400/run_summary.json",
+      "sha256": "b1f84416792fbcff2bf9f8ac772b5f2be30e8a2ac920a24086b31c36e6e0f3ab"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0000/all_t_metrics.csv",
+      "sha256": "3ff2ca61188936ed49123cd8c2288a036fed5b39f216876f3c5f3e1f99000fa0"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0000/cache_manifest.json",
+      "sha256": "de5cd2b99b8e68c651bef0b22098cceda860e2d8f377c7fed8ac7b5532f7c671"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0000/run_summary.json",
+      "sha256": "0e6a86401b22a2d982d1e5aa5f3adae8afd05563a3d1a6f3da25018160c1d4d1"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0100/all_t_metrics.csv",
+      "sha256": "886674fcf22302e40bcd461cb536e3a0fae2aa89c876250c2c9683a535bb3e69"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0100/cache_manifest.json",
+      "sha256": "fc39c04a12355ebbd3ffc83df011d654b9a8ec4206e5e9f75838d29088d791a9"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0100/run_summary.json",
+      "sha256": "12fa662d4d064c1a9ca4b157f3c226d77671a08816cbfdad917d61beb2f2a0b2"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0200/all_t_metrics.csv",
+      "sha256": "2230491c9120f2f131a53155f7f5013ba316bb9522dfed607735c17f4b734e42"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0200/cache_manifest.json",
+      "sha256": "a61cc6582fce3a891638447c4ed5726e4e81d3825b96668e3aeb22630830f81b"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0200/run_summary.json",
+      "sha256": "fb4ecedec8f89ac96f2b57ed11dedbb302ebc679f85a21fda55338f0d802e9ac"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0300/all_t_metrics.csv",
+      "sha256": "742985733e850fc55a5e3556176dfb708a1b9a63af15c085d0e3a565d90cc8a1"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0300/cache_manifest.json",
+      "sha256": "5fe7fce64cd5c6810ff6290455c9308acbfdb6aa19808820113eccf70dfbbeb3"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0300/run_summary.json",
+      "sha256": "00203948400e8deac3c3eadbaa4853b263ae1a1e529ed449a81774d314678e1b"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0400/all_t_metrics.csv",
+      "sha256": "fd84680d3e7a57ba0f6bfad8a562eb0ce576c7d05b558be704536f2eb61ac01b"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0400/cache_manifest.json",
+      "sha256": "3fff33dc148a0870b084e3e5fabb71b01a243a2320fa978b83646850d93057cc"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/C2/update=0400/run_summary.json",
+      "sha256": "b2329c2affce6be9c5e0aaa1a534dc781b6aa16bd3aacab4299e022c4c4be56c"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0000/all_t_metrics.csv",
+      "sha256": "599ca89473185960f27fe783289cb415a4be0c7c7caa14c3c177c67948bec4ca"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0000/cache_manifest.json",
+      "sha256": "ee9468b0e6beca9dabd820281e0067566776abc27b223313bb093bcd2cdff5c8"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0000/run_summary.json",
+      "sha256": "49e54561dfce706079ce00635699b406c07630948093c7780e704a0174f41feb"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0100/all_t_metrics.csv",
+      "sha256": "a0b01efe44f84f813ca992e98546e8794b7bbd8ff13436d3cfbef7f40159f04d"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0100/cache_manifest.json",
+      "sha256": "45c0f65a8d226b3a565eec3715f7fbca34b9919680df8067d0671698d48cadb1"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0100/run_summary.json",
+      "sha256": "07a24d30ec63adc3cd0d1477abfa40b6a2dafbe1ec36ab8da24366bec00b4d8a"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0200/all_t_metrics.csv",
+      "sha256": "094c84d48235c9d935a1fce37b34f5017960720b939ea1f45355d54d4a6344d8"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0200/cache_manifest.json",
+      "sha256": "e0864c07046085da1e10b95737333d5f21b48dc7c71acb0e0cac2e444358195a"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0200/run_summary.json",
+      "sha256": "1cd9068409b17593963b49dfdf17deb042ff402e01259c7e37a9861620156856"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0300/all_t_metrics.csv",
+      "sha256": "a195dc48c926a1d7951905c5ad1d5ed40be92616f81a5b9f8287fe3433d7dfb0"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0300/cache_manifest.json",
+      "sha256": "997a618f0cb7210423b749044a9b77c87fa126217c4364acf0cd6fc24cbb9be2"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0300/run_summary.json",
+      "sha256": "193c7b3bdd51d0acfa7a2d5bc2a8504a240262fcb29bfafc13e79e9a3cd344bc"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0400/all_t_metrics.csv",
+      "sha256": "ac64cf80620d34cd235caa8d813a312ca9329d455890cb6017f14c786f7123f5"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0400/cache_manifest.json",
+      "sha256": "83ea2ae0f760b5f11ef3c2b435ee7bde53c1aa0de86c2a02c6f125f2bdde70d3"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/evaluation/development/FH-adapt/update=0400/run_summary.json",
+      "sha256": "53730fcd2ad2d942b7ae46fa2eb6d68b5d44d9b1fce1df59221a5916c5bd3026"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/training/formal/C0/checkpoint_manifest.json",
+      "sha256": "f3537fea154bafef2e1479347812ea88f9953b4907c4d4b381b745d33f3b7fb3"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/training/formal/C0/run_summary.json",
+      "sha256": "b2709948f312b684556cd2e04cb3a4370177d8564cd445494d65247eb5858c92"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/training/formal/C1/checkpoint_manifest.json",
+      "sha256": "f6c937761fc52a18db201e15ebe7370d93f6b76bbcfaac49254131b4ee2c5ffb"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/training/formal/C1/run_summary.json",
+      "sha256": "31893e60542b203fe8dc2ade42e96868ed1e123d3228bdd9680d848911240601"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/training/formal/C2/checkpoint_manifest.json",
+      "sha256": "4d637ab5cee6b2a5274e4fac4d5ba117676fc2d5cbc4bc024498ae1119e135eb"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/training/formal/C2/run_summary.json",
+      "sha256": "c0e0344f0812b7d737fa03440c13335cf38e0cb59c64b083db8a08d8ccc587b6"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/training/formal/FH-adapt/checkpoint_manifest.json",
+      "sha256": "6208c0878b14ab73cf871583124dc4ad11bbf22fe0fb9d1111ae341248f23601"
+    },
+    {
+      "ref": "repo:artifacts/allt_task_superiority_v1/training/formal/FH-adapt/run_summary.json",
+      "sha256": "6c61ab1a82cf9813e0c020ede2821de81fee3b217bb41a6dcb0d37208570df3f"
+    }
+  ],
+  "primary_metric": "causal_prefix_t_mAP",
+  "protocol_b_evaluation": "authorized_after_selection_freeze",
+  "protocol_b_used_for_selection": false,
+  "ranking": [
+    "maximum minimum T2-T5 t-mAP delta",
+    "maximum mean T2-T5 t-mAP",
+    "checkpoint SHA256 lexical order"
+  ],
+  "schema_version": 1,
+  "seed46_training_confirmation": "gate_skipped",
+  "selected_candidate": {
+    "all_t_positive": true,
+    "checkpoint_global_step": 200,
+    "checkpoint_sha256": "a4adb8ae1bc25830934a97926b7910d5f7ecde3b010cf877475cec82bff30724",
+    "mean_t_map": 0.4082611948251724,
+    "minimum_t_map_delta": 0.011942774057388306,
+    "t_map_by_horizon": {
+      "2": 0.5127690434455872,
+      "3": 0.3959709405899048,
+      "4": 0.3761521875858307,
+      "5": 0.34815260767936707
+    },
+    "t_map_delta_by_horizon": {
+      "2": 0.020404517650604248,
+      "3": 0.013458549976348877,
+      "4": 0.011942774057388306,
+      "5": 0.012799769639968872
+    },
+    "variant": "C2"
+  },
+  "selected_matched_rescene": {
+    "all_t_positive": true,
+    "checkpoint_global_step": 100,
+    "checkpoint_sha256": "ddfda362673ce081dab8d7f790ffa223c336921ad6f85220aa3e6a78bca1a70c",
+    "mean_t_map": 0.4366783946752548,
+    "minimum_t_map_delta": 0.003535538911819458,
+    "t_map_by_horizon": {
+      "2": 0.5087986588478088,
+      "3": 0.4521055221557617,
+      "4": 0.40089744329452515,
+      "5": 0.3849119544029236
+    },
+    "t_map_delta_by_horizon": {
+      "2": 0.016520828008651733,
+      "3": 0.003535538911819458,
+      "4": 0.0076708197593688965,
+      "5": 0.010990560054779053
+    },
+    "variant": "FH-adapt"
+  },
+  "selection_trace": {
+    "ref": "repo:artifacts/allt_task_superiority_v1/selection/selection_trace.csv",
+    "sha256": "6cc0355c231d701415c105ef15dc7756423a08698a5156376918f2c6b26afcd4"
+  },
+  "status": "frozen",
+  "strict_zero_tolerance": true,
+  "training_seed": 45
+}

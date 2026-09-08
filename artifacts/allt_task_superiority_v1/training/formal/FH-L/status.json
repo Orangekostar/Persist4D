@@ -1,0 +1,9 @@
+{
+  "evidence": {
+    "selected_candidate_variant": "C2"
+  },
+  "reason": "The frozen Persist4D candidate does not use L, so matched FH-L training is not authorized.",
+  "schema_version": 1,
+  "status": "gate_skipped",
+  "variant": "FH-L"
+}
