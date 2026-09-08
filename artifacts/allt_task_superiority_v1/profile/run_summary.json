@@ -1,0 +1,75 @@
+{
+  "accuracy_role": "diagnostic_only_cannot_rescue_the_failed_accuracy_verdict",
+  "checkpoints": {
+    "C2": "a4adb8ae1bc25830934a97926b7910d5f7ecde3b010cf877475cec82bff30724",
+    "FH-adapt": "ddfda362673ce081dab8d7f790ffa223c336921ad6f85220aa3e6a78bca1a70c"
+  },
+  "device_index": 0,
+  "device_name": "NVIDIA A40",
+  "elapsed_seconds": 556.1859924793243,
+  "evaluation_seed": 45,
+  "excluded_scope": [
+    "file_io",
+    "collation",
+    "host_to_device_transfer",
+    "metric_computation",
+    "C2_causal_preroll"
+  ],
+  "horizons": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "included_scope": {
+    "C2": "current model forward including memory read, observation extraction, and one B4 update",
+    "FH-adapt": "one current full-prefix model forward"
+  },
+  "input_preparation_seed_rule": "uint32_be(sha256('profile-seed45|<master_sequence_id>|<stage_index>')[:4])",
+  "measured_repeats": 10,
+  "population_id": "protocol_b_profile_6_reference_canonical",
+  "protocol_b_population_sha256": {
+    "C2": "0696d52255edac9d83b71e27fe2b0937edc6bf3645df22706748056b2ddb12cb",
+    "FH-adapt": "fb0ab6d5ba45ca9c14dadcd720bcce6df07479aa925cb833f44a1412b4605f8e"
+  },
+  "sample_row_count": 480,
+  "samples_sha256": "54415bff47854bdfee35bd4bd52a7d5ce18bfc851684ef04c3ac018afd18ec88",
+  "schema_version": 1,
+  "selected_sequences": [
+    {
+      "master_sequence_id": "scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01",
+      "order_id": "canonical",
+      "reference_scene_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+    },
+    {
+      "master_sequence_id": "scene0079_00-scene0079_09-scene0079_05-scene0079_04-scene0079_03",
+      "order_id": "canonical",
+      "reference_scene_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+    },
+    {
+      "master_sequence_id": "scene0119_00-scene0119_02-scene0119_03-scene0119_01-scene0119_04",
+      "order_id": "canonical",
+      "reference_scene_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+    },
+    {
+      "master_sequence_id": "scene0219_00-scene0219_03-scene0219_02-scene0219_01-scene0219_04",
+      "order_id": "canonical",
+      "reference_scene_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+    },
+    {
+      "master_sequence_id": "scene0309_00-scene0309_02-scene0309_01-scene0309_04-scene0309_03",
+      "order_id": "canonical",
+      "reference_scene_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+    },
+    {
+      "master_sequence_id": "scene0449_00-scene0449_04-scene0449_05-scene0449_03-scene0449_01",
+      "order_id": "canonical",
+      "reference_scene_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+    }
+  ],
+  "source_commit": "4931840a874c895f5798582b8fb4e8c7f3b861ac",
+  "status": "pass",
+  "summary_row_count": 48,
+  "summary_sha256": "27643e90cb2d0800783a1f769e061608560e8136091224d7e55671c231691ed5",
+  "warmup_repeats": 5
+}

@@ -58,7 +58,7 @@ Run: `python -m pytest -q tests/test_persist4d_allt_evaluation.py tests/test_per
 
 Expected: all tests pass.
 
-- [ ] **Step 5: Commit the evaluator change before generating diagnostic predictions**
+- [x] **Step 5: Commit the evaluator change before generating diagnostic predictions**
 
 Run: `git add scripts/evaluate_persist4d_allt.py tests/test_persist4d_allt_evaluation.py docs/superpowers/plans/2026-09-08-persist4d-allt-completion.md && git commit -m 'add frozen memory read diagnostics'`
 
@@ -153,11 +153,11 @@ Run: `python -m pytest -q tests/test_profile_persist4d_allt.py`
 
 Then run the profiler's smoke mode with one reference, one horizon, one warmup, and one measured repeat; require finite positive latency and memory values.
 
-- [ ] **Step 6: Run the formal profile on one otherwise-idle A40**
+- [x] **Step 6: Run the formal profile on one otherwise-idle A40**
 
 Use the same physical GPU sequentially for both methods. Do not run competing work on that node. Require five warmups and ten repeats for all 48 cells.
 
-- [ ] **Step 7: Validate and commit profile artifacts**
+- [x] **Step 7: Validate and commit profile artifacts**
 
 Require exact coverage, no nonfinite or nonpositive latency, stable checkpoint identities, and an explicit statement that speed does not alter the failed accuracy verdict.
 
@@ -208,11 +208,11 @@ Expected: all tests pass.
 - Consumes: every required compact artifact and status JSON under `artifacts/allt_task_superiority_v1`.
 - Produces: `validate_completion_inputs` and `publish_final_package` with a non-self-referential manifest.
 
-- [ ] **Step 1: Write failing completion-gate tests**
+- [x] **Step 1: Write failing completion-gate tests**
 
 Test the eight required status fields, exact failed t-mAP cells, absence of fake numeric evidence for unrun stages, report/HANDOFF hashes in the manifest, external checkpoint/cache references, executable reproduction commands, and rejection of missing required artifacts.
 
-- [ ] **Step 2: Run the completion tests and observe expected failures**
+- [x] **Step 2: Run the completion tests and observe expected failures**
 
 Run: `python -m pytest -q tests/test_publish_persist4d_allt.py -k 'completion or handoff or manifest'`
 
