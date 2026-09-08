@@ -108,11 +108,11 @@ Run: `python -m pytest -q tests/test_analyze_persist4d_allt_final.py tests/test_
 
 Expected: all tests pass.
 
-- [ ] **Step 6: Run the analyzer on a high-memory CPU node**
+- [x] **Step 6: Run the analyzer on a high-memory CPU node**
 
 Use the two frozen Protocol-B cache manifests and external cache directories. Require 129 distinct units per model, six references, exact T1-T5 identity updates, 120 paired reference task rows, eight identity aggregate rows, and 20 equal-cluster effect rows.
 
-- [ ] **Step 7: Validate result hashes and commit compact outputs**
+- [x] **Step 7: Validate result hashes and commit compact outputs**
 
 Require the analysis manifest to bind both checkpoint SHAs, both cache-manifest hashes, output hashes, source commit, row counts, and `status=pass`.
 
@@ -218,7 +218,7 @@ Run: `python -m pytest -q tests/test_publish_persist4d_allt.py -k 'completion or
 
 Expected: failures until all report contracts are implemented.
 
-- [ ] **Step 3: Implement the report and handoff from structured evidence**
+- [x] **Step 3: Implement the report and handoff from structured evidence**
 
 Report `execution_status=COMPLETE`, `baseline_comparability=MATCHED`, both t-mAP verdicts, all-task verdict, seed status, independent-generalization limit, publication state, every variant's run/gate state, full training exposure, all four T values, memory diagnostic interpretation, per-reference effects, identity counts, profile scope, direct tests, external storage reconstruction, and exactly one next-round bottleneck recommendation.
 

@@ -1,0 +1,58 @@
+{
+  "analysis_scope": {
+    "cluster_uncertainty": "1000 fixed-seed bootstrap resamples of six equal-weight reference deltas; descriptive only, not a pooled-AP confidence interval",
+    "identity": "fresh T1-T5 recomputation; C2 replays prediction-only B4 with model-index class labels and FH-adapt uses frozen full-history IDs",
+    "task_metrics": "official metrics pooled within each reference; sequence AP values are never averaged to represent pooled AP"
+  },
+  "content_sha256": "92eab6ed3c60895240accdd636a2b07572e22ca54511480ab3413af5a1c209d6",
+  "coverage": {
+    "cluster_effect_rows": 20,
+    "identity_rows": 8,
+    "models": [
+      "C2",
+      "FH-adapt"
+    ],
+    "order_units_per_model": 129,
+    "per_reference_rows": 120,
+    "reference_clusters": 6
+  },
+  "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+  "models": {
+    "C2": {
+      "cache_directory": "external:allt_task_superiority_v1/evaluation_cache/protocol_b_43_masters_3_orders/C2/a4adb8ae1bc25830934a97926b7910d5f7ecde3b010cf877475cec82bff30724",
+      "cache_manifest_content_sha256": "a620e2e17d3f9b3f874254f032f6919c88daabc4fc792259f64b0c2f10e5be8c",
+      "cache_manifest_sha256": "73c6c4c66d14f73bab17703ed4f1094c2ddfef066450103e48e606e7544b09a3",
+      "checkpoint_sha256": "a4adb8ae1bc25830934a97926b7910d5f7ecde3b010cf877475cec82bff30724",
+      "entry_count": 129,
+      "reducer": "mean",
+      "source_commit_at_inference": "d288af93cefc7cf8aaabb9b541b92539782c019c"
+    },
+    "FH-adapt": {
+      "cache_directory": "external:allt_task_superiority_v1/evaluation_cache/protocol_b_43_masters_3_orders/FH-adapt/ddfda362673ce081dab8d7f790ffa223c336921ad6f85220aa3e6a78bca1a70c",
+      "cache_manifest_content_sha256": "bafb8a16d6b53d3dce8ce5afe73fe1f0ea83eb57476c2e681513d5d9a213c90f",
+      "cache_manifest_sha256": "9689890dd160ace21d0d184dc4170d2f8f35e35f8f9f31d52718a8b09279ed2c",
+      "checkpoint_sha256": "ddfda362673ce081dab8d7f790ffa223c336921ad6f85220aa3e6a78bca1a70c",
+      "entry_count": 129,
+      "reducer": "official",
+      "source_commit_at_inference": "d288af93cefc7cf8aaabb9b541b92539782c019c"
+    }
+  },
+  "outputs": [
+    {
+      "path": "per_reference.csv",
+      "sha256": "3f11ffd1f67eb7b0e9cca58933e8b1eb6ddbbebcb931b19c91cc203b93fe5ed3"
+    },
+    {
+      "path": "identity_counts.csv",
+      "sha256": "e2578b385252b7109b813ebc69a3ba8c3ff763b382e0ca1dfeebec4a932b987e"
+    },
+    {
+      "path": "cluster_effects.csv",
+      "sha256": "59efa63d580a90f44954e055e1061a560d845d6928c6a1fa26b55f2cb9825628"
+    }
+  ],
+  "population_id": "protocol_b_43_masters_3_orders",
+  "schema_version": 1,
+  "source_commit": "a4c8744323f2c039c3a89dd0dcc7040b6e7a7215",
+  "status": "pass"
+}
