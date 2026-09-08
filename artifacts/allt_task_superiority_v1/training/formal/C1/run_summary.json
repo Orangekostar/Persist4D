@@ -1,0 +1,82 @@
+{
+  "completed_global_step": 400,
+  "elapsed_seconds": 4059.8628628253937,
+  "execution_status": "COMPLETE",
+  "gpu_hours": 2.2554793682363297,
+  "gradient_audit": {
+    "frozen_gradient_names": [],
+    "missing_optimizer_parameters": [],
+    "nonfinite_gradient_names": [],
+    "nonzero_gradient_step_counts": {
+      "model.local_enhancement.gate_projection.bias": 399,
+      "model.local_enhancement.gate_projection.weight": 399,
+      "model.local_enhancement.message_projection.bias": 399,
+      "model.local_enhancement.message_projection.weight": 399,
+      "model.local_enhancement.output_projection.bias": 400,
+      "model.local_enhancement.output_projection.weight": 400,
+      "model.local_enhancement.query_norm.bias": 399,
+      "model.local_enhancement.query_norm.weight": 399
+    },
+    "optimizer_step_calls": 400
+  },
+  "optimizer_updates_requested": 400,
+  "parameter_update_audit": {
+    "changed_parameter_count": 8,
+    "changed_parameters": {
+      "model.local_enhancement.gate_projection.bias": {
+        "max_abs_delta": 0.011862844228744507,
+        "norm_delta": 0.07003937661647797
+      },
+      "model.local_enhancement.gate_projection.weight": {
+        "max_abs_delta": 0.01335257850587368,
+        "norm_delta": 0.6389046311378479
+      },
+      "model.local_enhancement.message_projection.bias": {
+        "max_abs_delta": 0.0119924396276474,
+        "norm_delta": 0.10709598660469055
+      },
+      "model.local_enhancement.message_projection.weight": {
+        "max_abs_delta": 0.01273415982723236,
+        "norm_delta": 0.6499162316322327
+      },
+      "model.local_enhancement.output_projection.bias": {
+        "max_abs_delta": 0.00859447568655014,
+        "norm_delta": 0.047171615064144135
+      },
+      "model.local_enhancement.output_projection.weight": {
+        "max_abs_delta": 0.009607247076928616,
+        "norm_delta": 0.4023462235927582
+      },
+      "model.local_enhancement.query_norm.bias": {
+        "max_abs_delta": 0.012430248782038689,
+        "norm_delta": 0.10335034132003784
+      },
+      "model.local_enhancement.query_norm.weight": {
+        "max_abs_delta": 0.011654376983642578,
+        "norm_delta": 0.05763113498687744
+      }
+    },
+    "parameter_count": 8
+  },
+  "plan": {
+    "adaptation_reference_count": 36,
+    "development_reference_count": 8,
+    "encoder_scan_count": 12084,
+    "global_episode_count": 3200,
+    "group_count": 1600,
+    "rio_episode_count": 1778,
+    "rio_horizon_counts": {
+      "2": 446,
+      "3": 444,
+      "4": 444,
+      "5": 444
+    },
+    "scannet_episode_count": 1422,
+    "source_schedule_sha256": "abd16a395631098d3961458ebf1079b803472194815e77792f1601ba57b6a37d",
+    "supervised_stage_count": 7642
+  },
+  "smoke": false,
+  "total_parameter_count": 135215571,
+  "trainable_parameter_count": 26754195,
+  "variant": "C1"
+}

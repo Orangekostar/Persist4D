@@ -1,0 +1,36 @@
+{
+  "checkpoints": [
+    {
+      "bytes": 755623880,
+      "name": "last.ckpt",
+      "sha256": "b186bb45114fb2a2cbfdbb4cc05b7459a354738fdf2458506486b28f00a1f948"
+    },
+    {
+      "bytes": 541201934,
+      "name": "update=0000.ckpt",
+      "sha256": "30bd7c9defcfa6c7f5109c2478e897e69bf3481b23c34574c3af68fcf63af7b8"
+    },
+    {
+      "bytes": 755623752,
+      "name": "update=0100.ckpt",
+      "sha256": "44afc0faa72d9e4215b8c27b1d6f0b15a94dd5e9d63da34add9a4868e7f6da0d"
+    },
+    {
+      "bytes": 755623880,
+      "name": "update=0200.ckpt",
+      "sha256": "889a14367cb8f505276ea780debdeb1bef4c3c6a6ee70c95e775f2b13d1a5af1"
+    },
+    {
+      "bytes": 755623880,
+      "name": "update=0300.ckpt",
+      "sha256": "99aa6da5d9750546c8dd73b079a0a43cc77b51fc642990a64d297e72644c5f98"
+    },
+    {
+      "bytes": 755623880,
+      "name": "update=0400.ckpt",
+      "sha256": "b186bb45114fb2a2cbfdbb4cc05b7459a354738fdf2458506486b28f00a1f948"
+    }
+  ],
+  "external_reference": "external:allt_task_superiority_v1/training/formal/C1",
+  "variant": "C1"
+}
