@@ -1,18 +1,32 @@
 {
-  "amendment_count": 0,
-  "content_sha256": "a78324cd365235e17485d4a01051232eae97f265145bf4c0af0838a722cde67c",
+  "amendment": {
+    "after": {
+      "optimizer_updates": 400
+    },
+    "before": {
+      "optimizer_updates": 4000
+    },
+    "reason": "Two real T1/T3 GPU smokes made the original four-model 4000-update matrix resource-infeasible; preserve the optimizer and effective-batch contract at one tenth of the provisional updates.",
+    "throughput": {
+      "c1_two_update_elapsed_seconds": 125.89462780952454,
+      "c2_two_update_elapsed_seconds": 109.16882920265198,
+      "optimizer_updates_per_smoke": 2
+    }
+  },
+  "amendment_count": 1,
+  "content_sha256": "5697a2c4bf816514c13798018415440a253a3ad247e9748848d01504b1f50eb8",
   "devices": 2,
   "effective_episode_batch": 8,
   "evaluation_updates": [
     0,
-    1000,
-    2000,
-    3000,
-    4000
+    100,
+    200,
+    300,
+    400
   ],
   "formal_training_started": false,
   "gradient_accumulation": 4,
-  "optimizer_updates": 4000,
+  "optimizer_updates": 400,
   "physical_episode_batch_per_gpu": 1,
   "scheduler": {
     "kind": "cosine",
@@ -20,5 +34,5 @@
     "warmup_fraction": 0.05
   },
   "schema_version": 1,
-  "status": "provisional_pre_throughput"
+  "status": "frozen_before_formal_training"
 }

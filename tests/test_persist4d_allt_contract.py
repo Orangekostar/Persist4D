@@ -122,7 +122,11 @@ def test_budget_can_be_amended_once_before_formal_training() -> None:
     }
     frozen = apply_budget_amendment(
         provisional,
-        changes={"gradient_accumulation": 8, "devices": 1},
+        changes={
+            "gradient_accumulation": 8,
+            "devices": 1,
+            "optimizer_updates": 3000,
+        },
         reason="one-GPU throughput preflight",
         throughput={"episodes_per_hour": 72.0, "peak_allocated_bytes": 1234},
     )
@@ -130,6 +134,7 @@ def test_budget_can_be_amended_once_before_formal_training() -> None:
     assert frozen["status"] == "frozen_before_formal_training"
     assert frozen["amendment_count"] == 1
     assert frozen["effective_episode_batch"] == 8
+    assert frozen["evaluation_updates"] == [0, 750, 1500, 2250, 3000]
     assert frozen["amendment"]["before"]["devices"] == 2
     assert frozen["amendment"]["after"]["devices"] == 1
 

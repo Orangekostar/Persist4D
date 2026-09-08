@@ -8,12 +8,12 @@ from __future__ import annotations
 import importlib
 import logging
 import sys
-from typing import Dict, Iterable, List
+from collections.abc import Iterable
 
 logger = logging.getLogger(__name__)
 
-_MODELS: Dict[str, type] = {}
-_DISABLED: Dict[str, str] = {}
+_MODELS: dict[str, type] = {}
+_DISABLED: dict[str, str] = {}
 
 
 def _try_import(path: str):
@@ -24,11 +24,11 @@ def _try_import(path: str):
         return None, str(e)
 
 
-def _load_family(modules: Iterable[str], explicit: Dict[str, str], hint: str) -> None:
+def _load_family(modules: Iterable[str], explicit: dict[str, str], hint: str) -> None:
     """Import modules in this family; on first ImportError, disable every class
     name listed in ``explicit`` with the given hint. ``explicit`` maps class
     name -> attribute path on one of the family's modules."""
-    loaded: Dict[str, object] = {}
+    loaded: dict[str, object] = {}
     for path in modules:
         mod, err = _try_import(path)
         if mod is None:
@@ -46,8 +46,11 @@ def _load_family(modules: Iterable[str], explicit: Dict[str, str], hint: str) ->
 
 # Always-available
 _load_family(
-    modules=["models.rescene"],
-    explicit={"ReScene": "models.rescene.ReScene"},
+    modules=["models.rescene", "models.persist4d_allt"],
+    explicit={
+        "Persist4DAllT": "models.persist4d_allt.Persist4DAllT",
+        "ReScene": "models.rescene.ReScene",
+    },
     hint="",
 )
 
@@ -84,15 +87,15 @@ for _n, _r in _DISABLED.items():
         setattr(_pkg, _n, _stub(_n, _r))
 
 
-def get_models() -> List[type]:
+def get_models() -> list[type]:
     return list(_MODELS.values())
 
 
-def available_backbones() -> List[str]:
+def available_backbones() -> list[str]:
     return sorted(_MODELS)
 
 
-def disabled_backbones() -> Dict[str, str]:
+def disabled_backbones() -> dict[str, str]:
     return dict(_DISABLED)
 
 

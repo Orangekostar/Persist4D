@@ -1,0 +1,20 @@
+experiment: persist4d_allt_task_superiority_v1
+training_seed: 45
+report_horizons: [2, 3, 4, 5]
+primary_reducer: mean
+optimizer_updates: 400
+evaluation_updates: [0, 100, 200, 300, 400]
+devices: 2
+physical_episode_batch_per_gpu: 1
+gradient_accumulation: 4
+effective_episode_batch: 8
+rio_to_scannet_episode_weight: [1.0, 0.8]
+rio_horizons: [2, 3, 4, 5]
+window_size: 2
+memory_capacity: 100
+inherited_lr: 5.0e-5
+adapter_lr: 1.0e-4
+warmup_fraction: 0.05
+minimum_lr_fraction: 0.01
+r1_objective_mode: raw_sum
+r1_checkpoint_sha256: 629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd

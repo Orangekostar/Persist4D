@@ -241,6 +241,44 @@ def test_query_features_follow_a_non_identity_decoder_update():
     assert not torch.allclose(query_features, initial_query_features)
 
 
+def test_decoder_stage_hook_runs_after_ffn_with_execution_and_parameter_indices():
+    model = _build_model(return_query_features=True, num_decoders=2)
+    captured = []
+
+    def hook(
+        queries,
+        *,
+        execution_stage_idx,
+        shared_parameter_idx,
+        **context,
+    ):
+        captured.append(
+            (
+                queries.detach().clone(),
+                execution_stage_idx,
+                shared_parameter_idx,
+                context,
+            )
+        )
+        return queries
+
+    model.after_decoder_stage = hook
+
+    _forward(model)
+
+    assert len(captured) == 2
+    initial = _initial_queries(model)
+    offset = model.ffn_attention[0][0].offset
+    torch.testing.assert_close(captured[0][0], initial + offset)
+    torch.testing.assert_close(captured[1][0], initial + 2 * offset)
+    assert [row[1:3] for row in captured] == [(0, 0), (1, 0)]
+    assert all(
+        set(row[3])
+        == {"decoder_features", "decoder_padding_mask", "point2segment"}
+        for row in captured
+    )
+
+
 def test_query_features_preserve_gradient_flow():
     model = _build_model(return_query_features=True)
 

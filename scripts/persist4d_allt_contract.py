@@ -279,6 +279,13 @@ def apply_budget_amendment(
     )
     if after["effective_episode_batch"] != 8:
         raise AllTContractError("effective episode batch must remain 8")
+    optimizer_updates = int(after["optimizer_updates"])
+    if optimizer_updates % 4:
+        raise AllTContractError("optimizer updates must preserve quarter evaluations")
+    evaluation_interval = optimizer_updates // 4
+    after["evaluation_updates"] = [
+        evaluation_interval * index for index in range(5)
+    ]
     after["status"] = "frozen_before_formal_training"
     after["amendment_count"] = 1
     after["amendment"] = {

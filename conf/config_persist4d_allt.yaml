@@ -1,0 +1,79 @@
+defaults:
+  - config_rescene4d_concerto_rootcause
+  - _self_
+
+aux_metric: null
+
+general:
+  train_mode: true
+  seed: 45
+  freeze: backbone_encoder
+  frozen_encoder_eval: false
+  gpus: 2
+  project_name: persist4d_allt_task_superiority_v1
+  experiment_name: ${oc.env:ALLT_VARIANT,C2}
+  save_dir: ${oc.env:ALLT_RUN_DIR,/mnt/shared/ww/persist4d-allt-task-superiority-v1/training/${general.experiment_name}}
+  rootcause_objective_mode: raw_sum
+  rootcause_fail_closed_runtime: true
+  rootcause_common_initialization: null
+  rootcause_common_initialization_sha256: null
+
+data:
+  batch_size: 1
+  num_workers: 2
+  train_dataloader:
+    shuffle: false
+    batch_size: 1
+    num_workers: ${data.num_workers}
+
+backbone:
+  name: ${oc.env:CONCERTO_PRETRAINED,/home/ww/.cache/persist4d/concerto/concerto_base.pth}
+
+model:
+  _target_: models.Persist4DAllT
+  return_query_features: true
+  memory_read_enabled: ${allt_training.memory_read_enabled}
+  local_enhancement: null
+
+persist4d:
+  capacity: 100
+  class_weight: 0.25
+  association_threshold: 0.5
+  update_rate: 0.2
+  max_update_rate: 0.2
+  confidence_threshold: 0.5
+  mask_threshold: 0.5
+  minimum_mask_support: 1
+  background_class: 18
+
+allt_training:
+  variant: ${general.experiment_name}
+  window_mode: local_pair
+  memory_read_enabled: true
+  optimizer_updates: 400
+  gradient_accumulation: 4
+  physical_episode_batch_per_gpu: 1
+  effective_episode_batch: 8
+  inherited_lr: 5.0e-5
+  adapter_lr: 1.0e-4
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.01
+  amsgrad: false
+  warmup_fraction: 0.05
+  minimum_lr_fraction: 0.01
+  rio_weight: 1.0
+  scannet_weight: 0.8
+
+trainer:
+  max_epochs: 1
+  max_steps: ${allt_training.optimizer_updates}
+  min_epochs: 1
+  accumulate_grad_batches: 1
+  check_val_every_n_epoch: null
+  num_sanity_val_steps: 0
+  limit_val_batches: 0
+  gradient_clip_val: 1.0
+  precision: 32-true
+  deterministic: false
+  strategy: ddp_find_unused_parameters_true

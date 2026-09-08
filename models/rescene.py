@@ -1,12 +1,12 @@
 import torch
-import torch.nn as nn
+from torch import nn
+from torch.amp import autocast
 
-from models.position_embedding import PositionEmbeddingCoordsSine, PositionalEncoding3D
-from models.layers import SelfAttentionLayer, CrossAttentionLayer, FFNLayer
+from models.layers import CrossAttentionLayer, FFNLayer, SelfAttentionLayer
+from models.modules.helpers_3detr import GenericMLP
+from models.position_embedding import PositionalEncoding3D, PositionEmbeddingCoordsSine
 from models.scatter import AdaptiveScatter
 from third_party.pointnet2.pointnet2_utils import furthest_point_sample
-from models.modules.helpers_3detr import GenericMLP
-from torch.amp import autocast
 
 
 class ReScene(nn.Module):
@@ -314,9 +314,12 @@ class ReScene(nn.Module):
 
         return queries, query_pos, sampled_coords
 
-    def sample_and_batch_features(self, decomposed_feat, curr_sample_max=None, is_eval=False, extra = []):
+    def sample_and_batch_features(
+        self, decomposed_feat, curr_sample_max=None, is_eval=False, extra=None
+    ):
         # stack and sample features 
         device = decomposed_feat[0].device
+        extra = [] if extra is None else extra
 
         curr_sample_size = max(
             [pcd.shape[0] for pcd in decomposed_feat]
@@ -417,6 +420,19 @@ class ReScene(nn.Module):
 
         return pos_encodings_pcd
 
+    def after_decoder_stage(
+        self,
+        queries,
+        *,
+        execution_stage_idx,
+        shared_parameter_idx,
+        decoder_features=None,
+        decoder_padding_mask=None,
+        point2segment=None,
+    ):
+        """Protected parameter-free extension point after each decoder FFN."""
+        return queries
+
     def forward(
         self, x, point2segment=None, raw_coordinates=None, is_eval=False
     ):  
@@ -431,7 +447,7 @@ class ReScene(nn.Module):
         pos_encodings_pcd = self.get_pos_encs(coords)
         
         # mask feature head and aggregation to segments if needed
-        agg_feat, agg_coords = self.aggregate_features(pcd_features, point2segment)
+        agg_feat, _agg_coords = self.aggregate_features(pcd_features, point2segment)
         batched_features, batch_map = self.sample_and_batch_features(agg_feat)
 
         # query initialization
@@ -445,9 +461,9 @@ class ReScene(nn.Module):
         predictions_mask = []
         segment_features = [agg_feat]
 
-        for decoder_counter in range(self.num_decoders):
-            if self.shared_decoder:
-                decoder_counter = 0
+        execution_stage_idx = 0
+        for decoder_execution_idx in range(self.num_decoders):
+            decoder_counter = 0 if self.shared_decoder else decoder_execution_idx
             for i, hlevel in enumerate(self.hlevels):
                 output_class, output_change, output_logits = self.mask_module(queries, batched_features)
                 output_mask = self.unstack_batched(output_logits, batch_map)
@@ -499,6 +515,15 @@ class ReScene(nn.Module):
                 queries = self.ffn_attention[decoder_counter][i](
                     output
                 ) 
+                queries = self.after_decoder_stage(
+                    queries,
+                    execution_stage_idx=execution_stage_idx,
+                    shared_parameter_idx=decoder_counter,
+                    decoder_features=batched_features,
+                    decoder_padding_mask=batch_map,
+                    point2segment=point2segment,
+                )
+                execution_stage_idx += 1
 
                 predictions_class.append(output_class)
                 predictions_changes.append(output_change)
@@ -552,7 +577,6 @@ class ReScene(nn.Module):
                 seg_temporal_stages.append(self.scatter_fn.max_scatter(ts, p2s))
 
                 gm_bool = gm > 0.5
-                has_inst = gm_bool.any(dim=0)
                 inst_idx = gm_bool.to(torch.float32).argmax(dim=0).to(torch.long)
 
                 point_cls = gl[inst_idx]
@@ -651,4 +675,3 @@ class ReScene(nn.Module):
             {"pred_logits": a, "pred_masks": b, "pred_changes": c}
             for a, b, c in zip(outputs_class[:-1], outputs_seg_masks[:-1], outputs_change[:-1])
         ]
-
