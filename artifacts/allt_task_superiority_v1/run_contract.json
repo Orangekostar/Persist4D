@@ -1,0 +1,61 @@
+{
+  "baseline_commit": "2c7494b982eff84886aef3a7274bae43752a1485",
+  "cache_counts": {
+    "full_history": 645,
+    "local": 645
+  },
+  "conditional_variants": [
+    "C3",
+    "FH-L"
+  ],
+  "content_sha256": "0b6a7acf004460f4db7c1b5c422835ea7a5bbafeb2ac324654702c1b2ad3398c",
+  "development_evidence": "rio_train_reference_holdout_r1_base_exposed",
+  "evaluation_seeds": [
+    45,
+    46,
+    47
+  ],
+  "experiment": "persist4d_allt_task_superiority_v1",
+  "final_population": "protocol_b_43_masters_3_orders_6_references",
+  "formal_candidate_metrics_started": false,
+  "independent_generalization": "NOT_ESTABLISHED",
+  "input_identities": {
+    "concerto_pretrained": {
+      "bytes": 433987358,
+      "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+      "status": "pass"
+    },
+    "protocol_b": {
+      "bytes": 468179,
+      "sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+      "status": "pass"
+    },
+    "r1_checkpoint": {
+      "bytes": 754813672,
+      "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "status": "pass"
+    },
+    "rio_metadata": {
+      "bytes": 3155995,
+      "sha256": "674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64",
+      "status": "pass"
+    }
+  },
+  "primary_metric": "causal_prefix_t_mAP",
+  "primary_reducer": "mean",
+  "report_horizons": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "required_variants": [
+    "C0",
+    "C1",
+    "C2",
+    "FH-adapt"
+  ],
+  "schema_version": 1,
+  "split_manifest_sha256": "d01e94e32b6e07ea6092840d9165000c73a4b5c5b79661a656e8b5bdf38bad98",
+  "training_seed": 45
+}

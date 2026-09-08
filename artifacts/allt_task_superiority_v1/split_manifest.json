@@ -1,0 +1,1178 @@
+{
+  "content_sha256": "d01e94e32b6e07ea6092840d9165000c73a4b5c5b79661a656e8b5bdf38bad98",
+  "data_roles": {
+    "adaptation": "rio_train_reference_partition",
+    "development": "rio_train_reference_holdout_r1_base_exposed",
+    "processed_test": "unavailable",
+    "protocol_b": "final_evaluation_only_historical_benchmark_exposed"
+  },
+  "independent_generalization": "NOT_ESTABLISHED",
+  "master_assignments": [
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0004_00-scene0004_01-scene0004_03-scene0004_04-scene0004_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0004_01-scene0004_03-scene0004_04-scene0004_02-scene0004_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0004_02-scene0004_00-scene0004_01-scene0004_03-scene0004_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0004_03-scene0004_04-scene0004_02-scene0004_00-scene0004_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0004_04-scene0004_02-scene0004_00-scene0004_01-scene0004_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0005_00-scene0005_03-scene0005_01-scene0005_04-scene0005_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0005_01-scene0005_04-scene0005_02-scene0005_00-scene0005_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0005_02-scene0005_00-scene0005_03-scene0005_01-scene0005_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0005_03-scene0005_01-scene0005_04-scene0005_02-scene0005_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0005_04-scene0005_02-scene0005_00-scene0005_03-scene0005_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0006_00-scene0006_02-scene0006_01-scene0006_03-scene0006_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0006_01-scene0006_03-scene0006_04-scene0006_00-scene0006_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0006_02-scene0006_01-scene0006_03-scene0006_04-scene0006_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0006_03-scene0006_04-scene0006_00-scene0006_02-scene0006_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0006_04-scene0006_00-scene0006_02-scene0006_01-scene0006_03"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0007_00-scene0007_01-scene0007_03-scene0007_02-scene0007_04"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0007_01-scene0007_03-scene0007_02-scene0007_04-scene0007_00"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0007_02-scene0007_04-scene0007_00-scene0007_01-scene0007_03"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0007_03-scene0007_02-scene0007_04-scene0007_00-scene0007_01"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0007_04-scene0007_00-scene0007_01-scene0007_03-scene0007_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0008_00-scene0008_01-scene0008_02-scene0008_04-scene0008_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0008_01-scene0008_02-scene0008_04-scene0008_03-scene0008_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0008_02-scene0008_04-scene0008_03-scene0008_00-scene0008_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0008_03-scene0008_00-scene0008_01-scene0008_02-scene0008_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0008_04-scene0008_03-scene0008_00-scene0008_01-scene0008_02"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0066_00-scene0066_02-scene0066_03-scene0066_04-scene0066_01"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0066_01-scene0066_00-scene0066_02-scene0066_03-scene0066_04"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0066_02-scene0066_03-scene0066_04-scene0066_01-scene0066_00"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0066_03-scene0066_04-scene0066_01-scene0066_00-scene0066_02"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0066_04-scene0066_01-scene0066_00-scene0066_02-scene0066_03"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0068_00-scene0068_05-scene0068_03-scene0068_02-scene0068_04"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0068_01-scene0068_00-scene0068_05-scene0068_03-scene0068_02"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0068_02-scene0068_04-scene0068_01-scene0068_00-scene0068_05"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0068_03-scene0068_02-scene0068_04-scene0068_01-scene0068_00"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0068_04-scene0068_01-scene0068_00-scene0068_05-scene0068_03"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0068_05-scene0068_03-scene0068_02-scene0068_04-scene0068_01"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0083_00-scene0083_03-scene0083_01-scene0083_02-scene0083_04"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0083_01-scene0083_02-scene0083_04-scene0083_00-scene0083_03"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0083_02-scene0083_04-scene0083_00-scene0083_03-scene0083_01"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0083_03-scene0083_01-scene0083_02-scene0083_04-scene0083_00"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0083_04-scene0083_00-scene0083_03-scene0083_01-scene0083_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0116_00-scene0116_01-scene0116_03-scene0116_05-scene0116_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0116_01-scene0116_03-scene0116_05-scene0116_02-scene0116_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0116_02-scene0116_04-scene0116_00-scene0116_01-scene0116_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0116_03-scene0116_05-scene0116_02-scene0116_04-scene0116_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0116_04-scene0116_00-scene0116_01-scene0116_03-scene0116_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0116_05-scene0116_02-scene0116_04-scene0116_00-scene0116_01"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0123_00-scene0123_03-scene0123_02-scene0123_04-scene0123_01"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0123_01-scene0123_00-scene0123_03-scene0123_02-scene0123_04"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0123_02-scene0123_04-scene0123_01-scene0123_00-scene0123_03"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0123_03-scene0123_02-scene0123_04-scene0123_01-scene0123_00"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0123_04-scene0123_01-scene0123_00-scene0123_03-scene0123_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0158_00-scene0158_02-scene0158_03-scene0158_04-scene0158_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0158_01-scene0158_00-scene0158_02-scene0158_03-scene0158_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0158_02-scene0158_03-scene0158_04-scene0158_01-scene0158_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0158_03-scene0158_04-scene0158_01-scene0158_00-scene0158_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0158_04-scene0158_01-scene0158_00-scene0158_02-scene0158_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0164_00-scene0164_04-scene0164_02-scene0164_01-scene0164_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0164_01-scene0164_03-scene0164_00-scene0164_04-scene0164_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0164_02-scene0164_01-scene0164_03-scene0164_00-scene0164_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0164_03-scene0164_00-scene0164_04-scene0164_02-scene0164_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0164_04-scene0164_02-scene0164_01-scene0164_03-scene0164_00"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0174_00-scene0174_06-scene0174_01-scene0174_05-scene0174_04"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0174_01-scene0174_05-scene0174_04-scene0174_02-scene0174_03"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0174_02-scene0174_03-scene0174_00-scene0174_06-scene0174_01"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0174_03-scene0174_00-scene0174_06-scene0174_01-scene0174_05"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0174_04-scene0174_02-scene0174_03-scene0174_00-scene0174_06"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0174_05-scene0174_04-scene0174_02-scene0174_03-scene0174_00"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0174_06-scene0174_01-scene0174_05-scene0174_04-scene0174_02"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0175_00-scene0175_04-scene0175_02-scene0175_03-scene0175_07"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0175_01-scene0175_06-scene0175_05-scene0175_00-scene0175_04"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0175_02-scene0175_03-scene0175_07-scene0175_01-scene0175_06"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0175_03-scene0175_07-scene0175_01-scene0175_06-scene0175_05"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0175_04-scene0175_02-scene0175_03-scene0175_07-scene0175_01"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0175_05-scene0175_00-scene0175_04-scene0175_02-scene0175_03"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0175_06-scene0175_05-scene0175_00-scene0175_04-scene0175_02"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0175_07-scene0175_01-scene0175_06-scene0175_05-scene0175_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0176_00-scene0176_04-scene0176_05-scene0176_01-scene0176_07"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0176_01-scene0176_07-scene0176_02-scene0176_06-scene0176_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0176_02-scene0176_06-scene0176_03-scene0176_00-scene0176_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0176_03-scene0176_00-scene0176_04-scene0176_05-scene0176_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0176_04-scene0176_05-scene0176_01-scene0176_07-scene0176_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0176_05-scene0176_01-scene0176_07-scene0176_02-scene0176_06"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0176_06-scene0176_03-scene0176_00-scene0176_04-scene0176_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0176_07-scene0176_02-scene0176_06-scene0176_03-scene0176_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0186_00-scene0186_04-scene0186_02-scene0186_01-scene0186_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0186_01-scene0186_03-scene0186_00-scene0186_04-scene0186_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0186_02-scene0186_01-scene0186_03-scene0186_00-scene0186_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0186_03-scene0186_00-scene0186_04-scene0186_02-scene0186_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0186_04-scene0186_02-scene0186_01-scene0186_03-scene0186_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0187_00-scene0187_01-scene0187_03-scene0187_02-scene0187_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0187_01-scene0187_03-scene0187_02-scene0187_04-scene0187_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0187_02-scene0187_04-scene0187_00-scene0187_01-scene0187_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0187_03-scene0187_02-scene0187_04-scene0187_00-scene0187_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0187_04-scene0187_00-scene0187_01-scene0187_03-scene0187_02"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0194_00-scene0194_01-scene0194_03-scene0194_05-scene0194_02"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0194_01-scene0194_03-scene0194_05-scene0194_02-scene0194_04"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0194_02-scene0194_04-scene0194_00-scene0194_01-scene0194_03"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0194_03-scene0194_05-scene0194_02-scene0194_04-scene0194_00"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0194_04-scene0194_00-scene0194_01-scene0194_03-scene0194_05"
+    },
+    {
+      "role": "development",
+      "sequence_id": "scene0194_05-scene0194_02-scene0194_04-scene0194_00-scene0194_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0196_00-scene0196_04-scene0196_03-scene0196_01-scene0196_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0196_01-scene0196_02-scene0196_00-scene0196_04-scene0196_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0196_02-scene0196_00-scene0196_04-scene0196_03-scene0196_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0196_03-scene0196_01-scene0196_02-scene0196_00-scene0196_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0196_04-scene0196_03-scene0196_01-scene0196_02-scene0196_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0197_00-scene0197_05-scene0197_02-scene0197_01-scene0197_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0197_01-scene0197_04-scene0197_03-scene0197_06-scene0197_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0197_02-scene0197_01-scene0197_04-scene0197_03-scene0197_06"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0197_03-scene0197_06-scene0197_00-scene0197_05-scene0197_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0197_04-scene0197_03-scene0197_06-scene0197_00-scene0197_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0197_05-scene0197_02-scene0197_01-scene0197_04-scene0197_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0197_06-scene0197_00-scene0197_05-scene0197_02-scene0197_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0198_00-scene0198_02-scene0198_04-scene0198_03-scene0198_07"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0198_01-scene0198_06-scene0198_00-scene0198_02-scene0198_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0198_02-scene0198_04-scene0198_03-scene0198_07-scene0198_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0198_03-scene0198_07-scene0198_05-scene0198_01-scene0198_06"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0198_04-scene0198_03-scene0198_07-scene0198_05-scene0198_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0198_05-scene0198_01-scene0198_06-scene0198_00-scene0198_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0198_06-scene0198_00-scene0198_02-scene0198_04-scene0198_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0198_07-scene0198_05-scene0198_01-scene0198_06-scene0198_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0216_00-scene0216_01-scene0216_04-scene0216_05-scene0216_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0216_01-scene0216_04-scene0216_05-scene0216_02-scene0216_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0216_02-scene0216_03-scene0216_00-scene0216_01-scene0216_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0216_03-scene0216_00-scene0216_01-scene0216_04-scene0216_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0216_04-scene0216_05-scene0216_02-scene0216_03-scene0216_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0216_05-scene0216_02-scene0216_03-scene0216_00-scene0216_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0217_00-scene0217_03-scene0217_01-scene0217_02-scene0217_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0217_01-scene0217_02-scene0217_04-scene0217_05-scene0217_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0217_02-scene0217_04-scene0217_05-scene0217_00-scene0217_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0217_03-scene0217_01-scene0217_02-scene0217_04-scene0217_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0217_04-scene0217_05-scene0217_00-scene0217_03-scene0217_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0217_05-scene0217_00-scene0217_03-scene0217_01-scene0217_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0228_00-scene0228_03-scene0228_05-scene0228_04-scene0228_06"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0228_01-scene0228_00-scene0228_03-scene0228_05-scene0228_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0228_02-scene0228_01-scene0228_00-scene0228_03-scene0228_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0228_03-scene0228_05-scene0228_04-scene0228_06-scene0228_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0228_04-scene0228_06-scene0228_02-scene0228_01-scene0228_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0228_05-scene0228_04-scene0228_06-scene0228_02-scene0228_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0228_06-scene0228_02-scene0228_01-scene0228_00-scene0228_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0234_00-scene0234_06-scene0234_01-scene0234_04-scene0234_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0234_01-scene0234_04-scene0234_05-scene0234_02-scene0234_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0234_02-scene0234_03-scene0234_00-scene0234_06-scene0234_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0234_03-scene0234_00-scene0234_06-scene0234_01-scene0234_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0234_04-scene0234_05-scene0234_02-scene0234_03-scene0234_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0234_05-scene0234_02-scene0234_03-scene0234_00-scene0234_06"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0234_06-scene0234_01-scene0234_04-scene0234_05-scene0234_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0246_00-scene0246_04-scene0246_02-scene0246_03-scene0246_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0246_01-scene0246_00-scene0246_04-scene0246_02-scene0246_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0246_02-scene0246_03-scene0246_05-scene0246_01-scene0246_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0246_03-scene0246_05-scene0246_01-scene0246_00-scene0246_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0246_04-scene0246_02-scene0246_03-scene0246_05-scene0246_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0246_05-scene0246_01-scene0246_00-scene0246_04-scene0246_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0276_00-scene0276_03-scene0276_04-scene0276_02-scene0276_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0276_01-scene0276_00-scene0276_03-scene0276_04-scene0276_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0276_02-scene0276_01-scene0276_00-scene0276_03-scene0276_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0276_03-scene0276_04-scene0276_02-scene0276_01-scene0276_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0276_04-scene0276_02-scene0276_01-scene0276_00-scene0276_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0277_00-scene0277_04-scene0277_01-scene0277_05-scene0277_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0277_01-scene0277_05-scene0277_03-scene0277_06-scene0277_07"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0277_02-scene0277_00-scene0277_04-scene0277_01-scene0277_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0277_03-scene0277_06-scene0277_07-scene0277_02-scene0277_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0277_04-scene0277_01-scene0277_05-scene0277_03-scene0277_06"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0277_05-scene0277_03-scene0277_06-scene0277_07-scene0277_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0277_06-scene0277_07-scene0277_02-scene0277_00-scene0277_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0277_07-scene0277_02-scene0277_00-scene0277_04-scene0277_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0287_00-scene0287_02-scene0287_03-scene0287_04-scene0287_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0287_01-scene0287_00-scene0287_02-scene0287_03-scene0287_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0287_02-scene0287_03-scene0287_04-scene0287_01-scene0287_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0287_03-scene0287_04-scene0287_01-scene0287_00-scene0287_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0287_04-scene0287_01-scene0287_00-scene0287_02-scene0287_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0292_00-scene0292_01-scene0292_03-scene0292_02-scene0292_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0292_01-scene0292_03-scene0292_02-scene0292_04-scene0292_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0292_02-scene0292_04-scene0292_00-scene0292_01-scene0292_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0292_03-scene0292_02-scene0292_04-scene0292_00-scene0292_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0292_04-scene0292_00-scene0292_01-scene0292_03-scene0292_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0314_00-scene0314_02-scene0314_01-scene0314_04-scene0314_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0314_01-scene0314_04-scene0314_03-scene0314_00-scene0314_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0314_02-scene0314_01-scene0314_04-scene0314_03-scene0314_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0314_03-scene0314_00-scene0314_02-scene0314_01-scene0314_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0314_04-scene0314_03-scene0314_00-scene0314_02-scene0314_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0343_00-scene0343_04-scene0343_06-scene0343_03-scene0343_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0343_01-scene0343_02-scene0343_00-scene0343_04-scene0343_06"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0343_02-scene0343_00-scene0343_04-scene0343_06-scene0343_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0343_03-scene0343_05-scene0343_07-scene0343_01-scene0343_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0343_04-scene0343_06-scene0343_03-scene0343_05-scene0343_07"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0343_05-scene0343_07-scene0343_01-scene0343_02-scene0343_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0343_06-scene0343_03-scene0343_05-scene0343_07-scene0343_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0343_07-scene0343_01-scene0343_02-scene0343_00-scene0343_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0361_00-scene0361_02-scene0361_01-scene0361_03-scene0361_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0361_01-scene0361_03-scene0361_04-scene0361_00-scene0361_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0361_02-scene0361_01-scene0361_03-scene0361_04-scene0361_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0361_03-scene0361_04-scene0361_00-scene0361_02-scene0361_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0361_04-scene0361_00-scene0361_02-scene0361_01-scene0361_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0364_00-scene0364_03-scene0364_04-scene0364_01-scene0364_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0364_01-scene0364_02-scene0364_00-scene0364_03-scene0364_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0364_02-scene0364_00-scene0364_03-scene0364_04-scene0364_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0364_03-scene0364_04-scene0364_01-scene0364_02-scene0364_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0364_04-scene0364_01-scene0364_02-scene0364_00-scene0364_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0366_00-scene0366_04-scene0366_03-scene0366_02-scene0366_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0366_01-scene0366_00-scene0366_04-scene0366_03-scene0366_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0366_02-scene0366_01-scene0366_00-scene0366_04-scene0366_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0366_03-scene0366_02-scene0366_01-scene0366_00-scene0366_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0366_04-scene0366_03-scene0366_02-scene0366_01-scene0366_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0403_00-scene0403_02-scene0403_01-scene0403_05-scene0403_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0403_01-scene0403_05-scene0403_04-scene0403_06-scene0403_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0403_02-scene0403_01-scene0403_05-scene0403_04-scene0403_06"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0403_03-scene0403_00-scene0403_02-scene0403_01-scene0403_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0403_04-scene0403_06-scene0403_03-scene0403_00-scene0403_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0403_05-scene0403_04-scene0403_06-scene0403_03-scene0403_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0403_06-scene0403_03-scene0403_00-scene0403_02-scene0403_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_00-scene0423_07-scene0423_05-scene0423_10-scene0423_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_01-scene0423_03-scene0423_06-scene0423_09-scene0423_08"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_02-scene0423_01-scene0423_03-scene0423_06-scene0423_09"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_03-scene0423_06-scene0423_09-scene0423_08-scene0423_11"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_04-scene0423_00-scene0423_07-scene0423_05-scene0423_10"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_05-scene0423_10-scene0423_02-scene0423_01-scene0423_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_06-scene0423_09-scene0423_08-scene0423_11-scene0423_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_07-scene0423_05-scene0423_10-scene0423_02-scene0423_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_08-scene0423_11-scene0423_04-scene0423_00-scene0423_07"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_09-scene0423_08-scene0423_11-scene0423_04-scene0423_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_10-scene0423_02-scene0423_01-scene0423_03-scene0423_06"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0423_11-scene0423_04-scene0423_00-scene0423_07-scene0423_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0424_00-scene0424_04-scene0424_01-scene0424_05-scene0424_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0424_01-scene0424_05-scene0424_02-scene0424_03-scene0424_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0424_02-scene0424_03-scene0424_00-scene0424_04-scene0424_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0424_03-scene0424_00-scene0424_04-scene0424_01-scene0424_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0424_04-scene0424_01-scene0424_05-scene0424_02-scene0424_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0424_05-scene0424_02-scene0424_03-scene0424_00-scene0424_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0426_00-scene0426_02-scene0426_06-scene0426_05-scene0426_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0426_01-scene0426_07-scene0426_00-scene0426_02-scene0426_06"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0426_02-scene0426_06-scene0426_05-scene0426_04-scene0426_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0426_03-scene0426_01-scene0426_07-scene0426_00-scene0426_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0426_04-scene0426_03-scene0426_01-scene0426_07-scene0426_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0426_05-scene0426_04-scene0426_03-scene0426_01-scene0426_07"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0426_06-scene0426_05-scene0426_04-scene0426_03-scene0426_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0426_07-scene0426_00-scene0426_02-scene0426_06-scene0426_05"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0427_00-scene0427_04-scene0427_03-scene0427_02-scene0427_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0427_01-scene0427_00-scene0427_04-scene0427_03-scene0427_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0427_02-scene0427_01-scene0427_00-scene0427_04-scene0427_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0427_03-scene0427_02-scene0427_01-scene0427_00-scene0427_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0427_04-scene0427_03-scene0427_02-scene0427_01-scene0427_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0442_00-scene0442_02-scene0442_01-scene0442_03-scene0442_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0442_01-scene0442_03-scene0442_04-scene0442_00-scene0442_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0442_02-scene0442_01-scene0442_03-scene0442_04-scene0442_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0442_03-scene0442_04-scene0442_00-scene0442_02-scene0442_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0442_04-scene0442_00-scene0442_02-scene0442_01-scene0442_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0444_00-scene0444_02-scene0444_03-scene0444_04-scene0444_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0444_01-scene0444_00-scene0444_02-scene0444_03-scene0444_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0444_02-scene0444_03-scene0444_04-scene0444_01-scene0444_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0444_03-scene0444_04-scene0444_01-scene0444_00-scene0444_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0444_04-scene0444_01-scene0444_00-scene0444_02-scene0444_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0454_00-scene0454_04-scene0454_01-scene0454_03-scene0454_02"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0454_01-scene0454_03-scene0454_02-scene0454_00-scene0454_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0454_02-scene0454_00-scene0454_04-scene0454_01-scene0454_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0454_03-scene0454_02-scene0454_00-scene0454_04-scene0454_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0454_04-scene0454_01-scene0454_03-scene0454_02-scene0454_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0472_00-scene0472_03-scene0472_02-scene0472_04-scene0472_01"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0472_01-scene0472_00-scene0472_03-scene0472_02-scene0472_04"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0472_02-scene0472_04-scene0472_01-scene0472_00-scene0472_03"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0472_03-scene0472_02-scene0472_04-scene0472_01-scene0472_00"
+    },
+    {
+      "role": "adaptation",
+      "sequence_id": "scene0472_04-scene0472_01-scene0472_00-scene0472_03-scene0472_02"
+    }
+  ],
+  "master_counts": {
+    "adaptation": 215,
+    "development": 47
+  },
+  "processed_test_available": false,
+  "protocol_b_reference_ids": [
+    "10b17940-3938-2467-8a7a-958300ba83d3",
+    "137a8158-1db5-2cc0-8003-31c12610471e",
+    "280d8ebb-6cc6-2788-9153-98959a2da801",
+    "5630cfcf-12bf-2860-8784-83d28a611a83",
+    "8eabc45f-5af7-2f32-8528-640861d2a135",
+    "ddc73797-765b-241a-9e2c-097c5989baf6"
+  ],
+  "reference_counts": {
+    "adaptation": 36,
+    "development": 8,
+    "protocol_b_final": 6
+  },
+  "reference_split": {
+    "adaptation_reference_ids": [
+      "0958220d-e2c2-2de1-9710-c37018da1883",
+      "09582212-e2c2-2de1-9700-fa44b14fbded",
+      "09582225-e2c2-2de1-9564-f6681ef5e511",
+      "0958224e-e2c2-2de1-943b-38e36345e2e7",
+      "210cdbab-9e8d-2832-85fa-87d12badb00e",
+      "422885e9-192d-25fc-87a9-7013fe4114f2",
+      "4731976a-f9f7-2a1a-9737-305b709ca37f",
+      "4acaebcc-6c10-2a2a-858b-29c7e4fb410d",
+      "4e858ca1-fd93-2cb4-84b6-490997979830",
+      "4fbad314-465b-2a5d-8445-9d021f278c1e",
+      "531cff02-0021-28f6-8deb-a71f6c628346",
+      "531cff06-0021-28f6-8ce2-e13a4801e5a8",
+      "531cff08-0021-28f6-8e08-ba2eeb945e09",
+      "5630cfc9-12bf-2860-84ed-5bb189f0e94e",
+      "5630cfcb-12bf-2860-87ee-b4e4a5bf0cb0",
+      "634b2181-f5d0-2fb7-8547-fd27b0795137",
+      "68bae76e-3567-2f7c-82bd-a09641695364",
+      "6bde605b-9162-246f-8f73-3a0e3627db01",
+      "752cc57f-920c-26f5-8e8d-1f9d567cffd7",
+      "752cc595-920c-26f5-8d66-d08f8f111c92",
+      "7747a506-9431-24e8-87d9-37a5654d41f4",
+      "77941460-cfdf-29cb-86c7-1f60e2ecd07a",
+      "8f0f1467-55de-28ce-8331-b670a7274af9",
+      "ad408c9d-84db-2095-89c7-8a54f6260252",
+      "b8837e16-57ec-29c6-89c3-0e8b7d668f56",
+      "b8837e3a-57ec-29c6-8b54-d440ca79a11f",
+      "ba6fda9c-a4c1-2dca-8185-456923749a4e",
+      "c12890da-d3df-2d0d-862f-db6f9df19711",
+      "c92fb576-f771-2064-845a-a52a44a9539f",
+      "c92fb586-f771-2064-8678-a16eca03ac79",
+      "c92fb594-f771-2064-879b-cc598a9dabe5",
+      "c92fb59e-f771-2064-8431-6a20d3396067",
+      "d7d40d62-7a5d-2b36-955e-86a394caeabb",
+      "d9725be1-7513-2d91-8723-770169ff5b75",
+      "ddc737b1-765b-241a-9c21-a4e2674b2853",
+      "fcf66da6-622d-291c-8685-46cd96a8af4e"
+    ],
+    "assignment_by_reference": {
+      "0958220d-e2c2-2de1-9710-c37018da1883": "adaptation",
+      "09582212-e2c2-2de1-9700-fa44b14fbded": "adaptation",
+      "09582225-e2c2-2de1-9564-f6681ef5e511": "adaptation",
+      "09582244-e2c2-2de1-956c-357092d949d1": "development",
+      "0958224e-e2c2-2de1-943b-38e36345e2e7": "adaptation",
+      "0f2f2711-b736-2f71-8c6a-245a9d820a8c": "development",
+      "10b17936-3938-2467-88ba-ba5fe2debf14": "development",
+      "1776ad7e-4db7-2333-89e1-66854e82170c": "development",
+      "210cdbab-9e8d-2832-85fa-87d12badb00e": "adaptation",
+      "2e36952b-e133-204c-911e-7644cb34e8b2": "development",
+      "422885e9-192d-25fc-87a9-7013fe4114f2": "adaptation",
+      "4731976a-f9f7-2a1a-9737-305b709ca37f": "adaptation",
+      "4acaebba-6c10-2a2a-8650-34c2f160db99": "development",
+      "4acaebc0-6c10-2a2a-852e-0226d6539299": "development",
+      "4acaebcc-6c10-2a2a-858b-29c7e4fb410d": "adaptation",
+      "4e858ca1-fd93-2cb4-84b6-490997979830": "adaptation",
+      "4fbad314-465b-2a5d-8445-9d021f278c1e": "adaptation",
+      "50e7c0ad-0730-2a5f-8635-252404ee82e0": "development",
+      "531cff02-0021-28f6-8deb-a71f6c628346": "adaptation",
+      "531cff06-0021-28f6-8ce2-e13a4801e5a8": "adaptation",
+      "531cff08-0021-28f6-8e08-ba2eeb945e09": "adaptation",
+      "5630cfc9-12bf-2860-84ed-5bb189f0e94e": "adaptation",
+      "5630cfcb-12bf-2860-87ee-b4e4a5bf0cb0": "adaptation",
+      "634b2181-f5d0-2fb7-8547-fd27b0795137": "adaptation",
+      "68bae76e-3567-2f7c-82bd-a09641695364": "adaptation",
+      "6bde605b-9162-246f-8f73-3a0e3627db01": "adaptation",
+      "752cc57f-920c-26f5-8e8d-1f9d567cffd7": "adaptation",
+      "752cc595-920c-26f5-8d66-d08f8f111c92": "adaptation",
+      "7747a506-9431-24e8-87d9-37a5654d41f4": "adaptation",
+      "77941460-cfdf-29cb-86c7-1f60e2ecd07a": "adaptation",
+      "8f0f1467-55de-28ce-8331-b670a7274af9": "adaptation",
+      "ad408c9d-84db-2095-89c7-8a54f6260252": "adaptation",
+      "b8837e16-57ec-29c6-89c3-0e8b7d668f56": "adaptation",
+      "b8837e3a-57ec-29c6-8b54-d440ca79a11f": "adaptation",
+      "ba6fda9c-a4c1-2dca-8185-456923749a4e": "adaptation",
+      "c12890da-d3df-2d0d-862f-db6f9df19711": "adaptation",
+      "c92fb576-f771-2064-845a-a52a44a9539f": "adaptation",
+      "c92fb586-f771-2064-8678-a16eca03ac79": "adaptation",
+      "c92fb594-f771-2064-879b-cc598a9dabe5": "adaptation",
+      "c92fb59e-f771-2064-8431-6a20d3396067": "adaptation",
+      "d7d40d62-7a5d-2b36-955e-86a394caeabb": "adaptation",
+      "d9725be1-7513-2d91-8723-770169ff5b75": "adaptation",
+      "ddc737b1-765b-241a-9c21-a4e2674b2853": "adaptation",
+      "fcf66da6-622d-291c-8685-46cd96a8af4e": "adaptation"
+    },
+    "development_reference_ids": [
+      "09582244-e2c2-2de1-956c-357092d949d1",
+      "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+      "10b17936-3938-2467-88ba-ba5fe2debf14",
+      "1776ad7e-4db7-2333-89e1-66854e82170c",
+      "2e36952b-e133-204c-911e-7644cb34e8b2",
+      "4acaebba-6c10-2a2a-8650-34c2f160db99",
+      "4acaebc0-6c10-2a2a-852e-0226d6539299",
+      "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+    ],
+    "hash_namespace": "allt-v1:45:",
+    "ranking_sha256": "f966c3c743a5ee17c3b8d483acc106c4e26673586c8fbaf22fdf685ae7e7ad05",
+    "seed": 45
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,24 @@
+{
+  "amendment_count": 0,
+  "content_sha256": "a78324cd365235e17485d4a01051232eae97f265145bf4c0af0838a722cde67c",
+  "devices": 2,
+  "effective_episode_batch": 8,
+  "evaluation_updates": [
+    0,
+    1000,
+    2000,
+    3000,
+    4000
+  ],
+  "formal_training_started": false,
+  "gradient_accumulation": 4,
+  "optimizer_updates": 4000,
+  "physical_episode_batch_per_gpu": 1,
+  "scheduler": {
+    "kind": "cosine",
+    "minimum_lr_fraction": 0.01,
+    "warmup_fraction": 0.05
+  },
+  "schema_version": 1,
+  "status": "provisional_pre_throughput"
+}
