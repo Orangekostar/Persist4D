@@ -278,6 +278,6 @@ Add the derived field to the shared identity aggregation and final-analysis sche
 
 Include contract, dataset sequence/causality, model/read, trainer/training-gradient, evaluation, diagnostics, analysis, profile, selection, publisher, and finalizer tests. Record the exact observed count in `TEST_REPORT.md`.
 
-- [ ] **Step 4: Regenerate, verify, commit, push, and read back**
+- [x] **Step 4: Regenerate, verify, commit, push, and read back**
 
 Run the publisher twice with byte-identical outputs; run Ruff, `git diff --check`, artifact hash validation, then push and verify the remote HEAD plus final artifact bytes.
