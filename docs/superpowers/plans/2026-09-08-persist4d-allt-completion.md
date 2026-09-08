@@ -247,7 +247,7 @@ Check required filenames, row counts, checkpoint identities, all status fields, 
 
 Run direct pytest suites, Ruff on changed Python, `git diff --check`, artifact hash validation, and compact path/privacy scans that reject credentials and machine-specific paths in published docs.
 
-- [ ] **Step 3: Commit only explicit task files and push**
+- [x] **Step 3: Commit only explicit task files and push**
 
 Use staged file lists, commit the final package, push `research/persist4d-allt-task-superiority-v1`, and require local HEAD equality with remote HEAD.
 
