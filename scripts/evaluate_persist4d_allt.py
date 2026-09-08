@@ -15,6 +15,7 @@ import sys
 import tempfile
 import time
 from collections.abc import Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -154,6 +155,52 @@ def _checkpoint_identity(
     if training_seed is None:
         raise AllTEvaluationError("checkpoint lacks bound training seed metadata")
     return step, _integer(training_seed, name="training seed")
+
+
+def _compute_metric_values(
+    accumulators: Mapping[tuple[str, int], object],
+    *,
+    keys: Sequence[tuple[str, int]],
+    workers: int,
+) -> dict[tuple[str, int], Mapping[str, float]]:
+    if (
+        isinstance(workers, bool)
+        or not isinstance(workers, int)
+        or not 1 <= workers <= 32
+    ):
+        raise AllTEvaluationError("metric workers must be within 1-32")
+    ordered_keys = tuple(keys)
+    if not ordered_keys or len(set(ordered_keys)) != len(ordered_keys):
+        raise AllTEvaluationError("metric compute keys must be non-empty and unique")
+    if any(key not in accumulators for key in ordered_keys):
+        raise AllTEvaluationError("metric compute key lacks an accumulator")
+
+    def compute(key: tuple[str, int]) -> tuple[tuple[str, int], Mapping[str, float]]:
+        values = accumulators[key].compute()
+        if not isinstance(values, Mapping):
+            raise AllTEvaluationError("metric accumulator result must be a mapping")
+        return key, values
+
+    with ThreadPoolExecutor(max_workers=min(workers, len(ordered_keys))) as executor:
+        return dict(executor.map(compute, ordered_keys))
+
+
+def _compact_metric_bundle(
+    value: Mapping[str, object], *, reducers: Sequence[str]
+) -> dict[str, object]:
+    key = value.get("key")
+    pairs = value.get("pairs")
+    selected = tuple(reducers)
+    if not isinstance(key, Mapping) or not isinstance(pairs, Mapping):
+        raise AllTEvaluationError("metric bundle lacks its key or pairs")
+    if not selected or len(set(selected)) != len(selected):
+        raise AllTEvaluationError("metric bundle reducers must be non-empty and unique")
+    if any(reducer not in pairs for reducer in selected):
+        raise AllTEvaluationError("metric bundle lacks a requested reducer")
+    return {
+        "key": key,
+        "pairs": {reducer: pairs[reducer] for reducer in selected},
+    }
 
 
 def _string_list(value: object, *, name: str) -> list[str]:
@@ -1303,6 +1350,7 @@ def _metric_rows(
     evaluation_seed: int,
     window_mode: str,
     requested_reducers: Sequence[str] | None = None,
+    metric_workers: int = 4,
 ) -> list[dict[str, object]]:
     from scripts.analyze_persist4d_allt import AllTBaselineAccumulator
     from scripts.analyze_r1_downstream_validation import resolve_metric_dataset_spec
@@ -1329,32 +1377,41 @@ def _metric_rows(
                 accumulators[(reducer, horizon)].update(
                     _unpack_pair(bundle["pairs"][reducer][str(horizon)])
                 )
+    metric_keys = tuple(
+        (reducer, horizon)
+        for reducer in reducers
+        for horizon in REPORT_HORIZONS
+    )
+    computed = _compute_metric_values(
+        accumulators,
+        keys=metric_keys,
+        workers=metric_workers,
+    )
     rows = []
     method = "FullHistory" if window_mode == "full_history" else "B4"
-    for reducer in reducers:
-        for horizon in REPORT_HORIZONS:
-            values = accumulators[(reducer, horizon)].compute()
-            rows.append(
-                {
-                    "population_id": population_id,
-                    "model": model,
-                    "checkpoint_sha256": checkpoint_sha256,
-                    "training_seed": training_seed,
-                    "evaluation_seed": evaluation_seed,
-                    "method": method,
-                    "reducer": reducer,
-                    "T": horizon,
-                    "t_mAP": values["t_mAP"],
-                    "t_mAP50": values["t_mAP50"],
-                    "t_mAP25": values["t_mAP25"],
-                    "t_REC": values["t_REC"],
-                    "prefix_overall_mAP": values["prefix_overall_mAP"],
-                    "local_current_AP": values["local_current_AP"],
-                    "num_master": len(masters),
-                    "num_order_units": len(bundles),
-                    "num_reference_clusters": len(references),
-                }
-            )
+    for reducer, horizon in metric_keys:
+        values = computed[(reducer, horizon)]
+        rows.append(
+            {
+                "population_id": population_id,
+                "model": model,
+                "checkpoint_sha256": checkpoint_sha256,
+                "training_seed": training_seed,
+                "evaluation_seed": evaluation_seed,
+                "method": method,
+                "reducer": reducer,
+                "T": horizon,
+                "t_mAP": values["t_mAP"],
+                "t_mAP50": values["t_mAP50"],
+                "t_mAP25": values["t_mAP25"],
+                "t_REC": values["t_REC"],
+                "prefix_overall_mAP": values["prefix_overall_mAP"],
+                "local_current_AP": values["local_current_AP"],
+                "num_master": len(masters),
+                "num_order_units": len(bundles),
+                "num_reference_clusters": len(references),
+            }
+        )
     validate_result_rows(rows)
     return rows
 
@@ -1375,6 +1432,7 @@ def run_evaluation(
     maximum_sequences: int | None = None,
     model_name: str | None = None,
     reducers: Sequence[str] | None = None,
+    metric_workers: int = 4,
 ) -> dict[str, object]:
     import torch
 
@@ -1416,6 +1474,12 @@ def run_evaluation(
     selected_reducers = _resolve_metric_reducers(
         window_mode=window_mode, requested=reducers
     )
+    if (
+        isinstance(metric_workers, bool)
+        or not isinstance(metric_workers, int)
+        or not 1 <= metric_workers <= 32
+    ):
+        raise AllTEvaluationError("metric workers must be within 1-32")
     result_model = variant if model_name is None else _nonempty(model_name, name="model")
     system, config, checkpoint_step, training_seed = _load_system(
         variant=variant,
@@ -1506,7 +1570,9 @@ def run_evaluation(
                 raise AllTEvaluationError("cache reuse accounting differs")
             reused_count += int(reused)
             cache_records.append(record)
-            bundles.append(bundle)
+            bundles.append(
+                _compact_metric_bundle(bundle, reducers=selected_reducers)
+            )
             if position % 5 == 0 or position == len(sequences):
                 print(
                     f"[allt-eval] {variant}/{population_id} "
@@ -1514,6 +1580,8 @@ def run_evaluation(
                     file=sys.stderr,
                     flush=True,
                 )
+    del system
+    torch.cuda.empty_cache()
     rows = _metric_rows(
         bundles=bundles,
         population_id=population_id,
@@ -1523,6 +1591,7 @@ def run_evaluation(
         evaluation_seed=evaluation_seed,
         window_mode=window_mode,
         requested_reducers=selected_reducers,
+        metric_workers=metric_workers,
     )
     csv_content = _csv_bytes(rows)
     _atomic_write(output_root / "all_t_metrics.csv", csv_content)
@@ -1553,6 +1622,7 @@ def run_evaluation(
         "evaluation_seed": evaluation_seed,
         "metric_row_count": len(rows),
         "metric_sha256": hashlib.sha256(csv_content).hexdigest(),
+        "metric_worker_count": min(metric_workers, len(rows)),
         "model_forward_count": _new_model_forward_count(
             window_mode=window_mode,
             sequence_count=len(sequences),
@@ -1598,6 +1668,7 @@ def _parser() -> argparse.ArgumentParser:
         nargs="+",
         choices=("mean", "latest", "max", "official"),
     )
+    parser.add_argument("--metric-workers", type=int, default=4)
     return parser
 
 
@@ -1618,6 +1689,7 @@ def main() -> int:
         maximum_sequences=args.maximum_sequences,
         model_name=args.model_name,
         reducers=args.reducers,
+        metric_workers=args.metric_workers,
     )
     print(json.dumps(result, allow_nan=False, sort_keys=True))
     return 0
@@ -1628,6 +1700,8 @@ __all__ = [
     "AllTEvaluationError",
     "EvaluationSequence",
     "_checkpoint_identity",
+    "_compact_metric_bundle",
+    "_compute_metric_values",
     "_resolve_metric_reducers",
     "build_sequence_cache_key",
     "build_stage_requests",

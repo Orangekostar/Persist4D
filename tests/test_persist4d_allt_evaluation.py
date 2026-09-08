@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import copy
+import threading
 
 import pytest
 
 from scripts.evaluate_persist4d_allt import (
     AllTEvaluationError,
     _checkpoint_identity,
+    _compact_metric_bundle,
+    _compute_metric_values,
     _new_model_forward_count,
     _resolve_metric_reducers,
     build_sequence_cache_key,
@@ -225,3 +228,52 @@ def test_checkpoint_identity_uses_bound_training_metadata() -> None:
             },
             variant="C1",
         )
+
+
+def test_metric_accumulators_compute_concurrently_in_stable_order() -> None:
+    barrier = threading.Barrier(2)
+
+    class Accumulator:
+        def __init__(self, value: float) -> None:
+            self.value = value
+
+        def compute(self) -> dict[str, float]:
+            barrier.wait(timeout=5.0)
+            return {"t_mAP": self.value}
+
+    accumulators = {
+        ("mean", 2): Accumulator(0.2),
+        ("mean", 3): Accumulator(0.3),
+    }
+    values = _compute_metric_values(
+        accumulators,
+        keys=(("mean", 3), ("mean", 2)),
+        workers=2,
+    )
+    assert list(values) == [("mean", 3), ("mean", 2)]
+    assert values[("mean", 2)] == {"t_mAP": 0.2}
+    with pytest.raises(AllTEvaluationError, match="workers"):
+        _compute_metric_values(
+            accumulators,
+            keys=(("mean", 2),),
+            workers=0,
+        )
+
+
+def test_metric_bundle_retains_only_requested_reducers() -> None:
+    key = {"master_sequence_id": "master-0"}
+    mean_pairs = {"2": {"prediction": "mean"}}
+    compact = _compact_metric_bundle(
+        {
+            "key": key,
+            "pairs": {
+                "mean": mean_pairs,
+                "latest": {"2": {"prediction": "latest"}},
+                "max": {"2": {"prediction": "max"}},
+            },
+            "raw_payloads": ["large"],
+            "sidecars": ["large"],
+        },
+        reducers=("mean",),
+    )
+    assert compact == {"key": key, "pairs": {"mean": mean_pairs}}
