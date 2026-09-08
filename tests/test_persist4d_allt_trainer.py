@@ -9,6 +9,7 @@ from trainer.persist4d_allt_trainer import (
     adapter_gradient_snapshot,
     bounded_warmup_steps,
     build_detached_memory_read_state,
+    connect_all_trainable_parameters,
     prefix_balanced_stage_coefficients,
     update_prediction_memory,
 )
@@ -81,6 +82,28 @@ def test_adapter_gradient_snapshot_separates_real_gradients_from_frozen_state() 
     ]
     assert snapshot["frozen_gradient_names"] == []
     assert snapshot["nonfinite_gradient_names"] == []
+
+
+def test_connect_all_trainable_parameters_materializes_zero_gradients() -> None:
+    used = torch.nn.Parameter(torch.tensor(2.0))
+    conditionally_unused = torch.nn.Parameter(torch.tensor(3.0))
+    frozen = torch.nn.Parameter(torch.tensor(4.0), requires_grad=False)
+
+    connected = connect_all_trainable_parameters(
+        used.square(),
+        [
+            ("used", used),
+            ("conditionally_unused", conditionally_unused),
+            ("frozen", frozen),
+        ],
+    )
+    connected.backward()
+
+    assert used.grad is not None
+    assert used.grad.item() == pytest.approx(4.0)
+    assert conditionally_unused.grad is not None
+    assert conditionally_unused.grad.item() == 0.0
+    assert frozen.grad is None
 
 
 @pytest.mark.parametrize(

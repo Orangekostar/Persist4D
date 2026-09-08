@@ -23,6 +23,20 @@ from trainer.trainer import InstanceSegmentation, _configured_objective_loss
 _ADAPTER_PREFIXES = ("model.memory_read.", "model.local_enhancement.")
 
 
+def connect_all_trainable_parameters(
+    loss: Tensor,
+    named_parameters: Iterable[tuple[str, nn.Parameter]],
+) -> Tensor:
+    """Attach zero-valued gradients for conditionally unused DDP parameters."""
+    if not isinstance(loss, Tensor) or loss.ndim != 0:
+        raise ValueError("connected loss must be a scalar tensor")
+    connected = loss
+    for _, parameter in named_parameters:
+        if parameter.requires_grad and parameter.numel():
+            connected = connected + parameter.reshape(-1)[0] * 0.0
+    return connected
+
+
 def adapter_gradient_snapshot(
     named_parameters: Iterable[tuple[str, nn.Parameter]],
 ) -> dict[str, object]:
@@ -311,7 +325,10 @@ class Persist4DAllTTrainer(InstanceSegmentation):
                 stage_loss = _configured_objective_loss(self, losses)
                 if not torch.isfinite(stage_loss).item():
                     raise RuntimeError("All-T stage loss is non-finite")
-                weighted_loss = stage_loss * coefficient
+                weighted_loss = connect_all_trainable_parameters(
+                    stage_loss * coefficient,
+                    self.named_parameters(),
+                )
                 self.manual_backward(weighted_loss / accumulation)
             detached_episode_loss = detached_episode_loss + weighted_loss.detach()
             stage_logs[f"train_stage_{stage_index + 1}_loss"] = stage_loss.detach()
@@ -411,6 +428,7 @@ __all__ = [
     "adapter_gradient_snapshot",
     "bounded_warmup_steps",
     "build_detached_memory_read_state",
+    "connect_all_trainable_parameters",
     "prefix_balanced_stage_coefficients",
     "segment_stages_from_target",
     "update_prediction_memory",

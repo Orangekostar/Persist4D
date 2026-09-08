@@ -76,4 +76,4 @@ trainer:
   gradient_clip_val: 1.0
   precision: 32-true
   deterministic: false
-  strategy: ddp_find_unused_parameters_true
+  strategy: ddp_find_unused_parameters_false

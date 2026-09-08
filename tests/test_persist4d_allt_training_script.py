@@ -70,6 +70,7 @@ def test_c1_config_enables_only_the_frozen_qcl_inspired_adapter() -> None:
         "models.query_competition_adapter.QueryCompetitionAdapter"
     )
     assert config.allt_training.window_mode == "local_pair"
+    assert config.trainer.strategy == "ddp_find_unused_parameters_false"
     assert _adapter_missing_prefixes("C1") == ("model.local_enhancement.",)
 
 

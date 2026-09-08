@@ -295,7 +295,7 @@ def _compose_config(
         )
         config.trainer.max_steps = optimizer_updates
         config.trainer.strategy = (
-            "ddp_find_unused_parameters_true" if devices > 1 else "auto"
+            "ddp_find_unused_parameters_false" if devices > 1 else "auto"
         )
     return config
 
@@ -617,7 +617,7 @@ def main() -> int:
     trainer = Trainer(
         accelerator="gpu",
         devices=args.devices,
-        strategy=("ddp_find_unused_parameters_true" if args.devices > 1 else "auto"),
+        strategy=("ddp_find_unused_parameters_false" if args.devices > 1 else "auto"),
         max_epochs=1,
         max_steps=args.optimizer_updates,
         accumulate_grad_batches=1,
