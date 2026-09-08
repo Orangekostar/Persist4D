@@ -251,6 +251,6 @@ Run direct pytest suites, Ruff on changed Python, `git diff --check`, artifact h
 
 Use staged file lists, commit the final package, push `research/persist4d-allt-task-superiority-v1`, and require local HEAD equality with remote HEAD.
 
-- [ ] **Step 4: Read back HANDOFF and FINAL_MANIFEST from the final Git commit**
+- [x] **Step 4: Read back HANDOFF and FINAL_MANIFEST from the final Git commit**
 
 Use `git show <remote-head>:<path>` for both files, compare bytes and hashes with local files, and report `publication_status=PUSH_VERIFIED` only after both comparisons pass.
