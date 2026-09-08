@@ -1,0 +1,31 @@
+{
+  "cache_reads": {
+    "full_history": 645,
+    "local": 645
+  },
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "content_sha256": "34860038415c0e957061999bd28852ba0f92eb9dad779e7e8c9a6a26287919c4",
+  "derived_metric_rows": 28,
+  "legacy_metric_source_sha256": "cf5402885d1ab2afad8c0f4382eaf4ee07422c4e64cfea8b64c22e87a93d101b",
+  "legacy_regression": {
+    "checked_cells": 21,
+    "checked_values": 105,
+    "status": "pass"
+  },
+  "missing_cache_keys": {
+    "full_history": [],
+    "local": []
+  },
+  "model_forward_count": 0,
+  "new_prediction_count": 0,
+  "newly_computed_cells": {
+    "prefix_overall": 28,
+    "temporal_T3": 7
+  },
+  "protocol_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "reused_legacy_temporal_cells": 21,
+  "schema_version": 1,
+  "source_commit": "2ce0565474f0fbd8f1fc36e927ac0bdc03a88225",
+  "status": "pass",
+  "worker_count": 12
+}
