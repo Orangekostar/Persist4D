@@ -25,6 +25,7 @@ from scripts.persist4d_allt_contract import canonical_json_sha256
 from scripts.system_comparison_metrics import CausalPrefixPair, CausalTaskAccumulator
 
 R1_ARTIFACT_ROOT = PROJECT_ROOT / "artifacts/r1_downstream_validation_v1"
+DEFAULT_R1_CONTRACT = PROJECT_ROOT / "configs/r1_downstream_validation/default.yaml"
 DEFAULT_OUTPUT_ROOT = PROJECT_ROOT / "artifacts/allt_task_superiority_v1/baseline"
 DEFAULT_CACHE_ROOT = Path("/mnt/shared/ww/persist4d-r1-downstream-validation-v1/cache")
 DEFAULT_CHECKPOINT = Path(
@@ -296,7 +297,7 @@ def run_baseline_analysis(
         cache_root=cache_root, artifact_root=R1_ARTIFACT_ROOT
     )
     setup = build_r1_setup(
-        contract_path=R1_ARTIFACT_ROOT / "EXPERIMENT_CONTRACT.md",
+        contract_path=DEFAULT_R1_CONTRACT,
         protocol_path=PROJECT_ROOT / "artifacts/P6A/protocol_b_manifest.json",
         checkpoint_path=checkpoint,
         pretrained_path=pretrained,

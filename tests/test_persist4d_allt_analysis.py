@@ -4,11 +4,13 @@ import pytest
 import torch
 
 from scripts.analyze_persist4d_allt import (
+    DEFAULT_R1_CONTRACT,
     AllTBaselineAccumulator,
     AllTBaselineError,
     plan_missing_cache_keys,
     validate_legacy_regression,
 )
+from scripts.r1_downstream_context import load_r1_contract
 from scripts.system_comparison_metrics import validate_causal_prefix_pair
 
 
@@ -118,3 +120,8 @@ def test_missing_cache_plan_never_requests_existing_keys() -> None:
 
     with pytest.raises(AllTBaselineError, match="unexpected"):
         plan_missing_cache_keys(expected, [*observed, ("other", "canonical", 1)])
+
+
+def test_default_r1_contract_is_the_decodable_frozen_yaml() -> None:
+    contract = load_r1_contract(DEFAULT_R1_CONTRACT)
+    assert contract["checkpoint"]["completed_epoch"] == 390
