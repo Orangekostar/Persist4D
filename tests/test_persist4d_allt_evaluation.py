@@ -78,7 +78,10 @@ def test_sequence_cache_key_binds_checkpoint_modules_seed_and_prefixes() -> None
         evaluation_seed=45,
         postprocess_version="official-rescene-v1",
         stage_requests=_stage_requests(),
+        score_reducers=("mean",),
     )
+    assert key["schema_version"] == 2
+    assert key["score_reducers"] == ["mean"]
     original = sequence_cache_key_sha256(key)
     assert len(original) == 64
     for field, value in (
@@ -103,6 +106,9 @@ def test_sequence_cache_key_binds_checkpoint_modules_seed_and_prefixes() -> None
         )
     )
     assert sequence_cache_key_sha256(changed_prefix) != original
+    changed_reducer = copy.deepcopy(key)
+    changed_reducer["score_reducers"] = ["latest"]
+    assert sequence_cache_key_sha256(changed_reducer) != original
 
 
 def _metric_row(checkpoint: str, horizon: int, value: float) -> dict[str, object]:

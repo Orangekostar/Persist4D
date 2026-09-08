@@ -65,6 +65,7 @@ _CACHE_KEY_FIELDS = {
     "population_id",
     "evaluation_seed",
     "postprocess_version",
+    "score_reducers",
     "master_sequence_id",
     "reference_scene_id",
     "order_id",
@@ -371,11 +372,15 @@ def build_sequence_cache_key(
     evaluation_seed: int,
     postprocess_version: str,
     stage_requests: Sequence[Mapping[str, object]],
+    score_reducers: Sequence[str] | None = None,
 ) -> dict[str, object]:
     stages = _validate_stage_requests(stage_requests)
     first = stages[0]
+    reducers = _resolve_metric_reducers(
+        window_mode=str(first["window_mode"]), requested=score_reducers
+    )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "checkpoint_sha256": _sha256(
             checkpoint_sha256, name="checkpoint_sha256"
         ),
@@ -387,6 +392,7 @@ def build_sequence_cache_key(
         "postprocess_version": _nonempty(
             postprocess_version, name="postprocess_version"
         ),
+        "score_reducers": list(reducers),
         "master_sequence_id": first["master_sequence_id"],
         "reference_scene_id": first["reference_scene_id"],
         "order_id": first["order_id"],
@@ -399,7 +405,7 @@ def _validate_sequence_cache_key(value: object) -> dict[str, object]:
     if not isinstance(value, Mapping) or set(value) != _CACHE_KEY_FIELDS:
         raise AllTEvaluationError("sequence cache key fields differ")
     key = dict(value)
-    if key["schema_version"] != 1:
+    if key["schema_version"] != 2:
         raise AllTEvaluationError("sequence cache key version differs")
     stages = _validate_stage_requests(key["stage_requests"])
     first = stages[0]
@@ -408,6 +414,14 @@ def _validate_sequence_cache_key(value: object) -> dict[str, object]:
     _nonempty(key["population_id"], name="population_id")
     _integer(key["evaluation_seed"], name="evaluation_seed")
     _nonempty(key["postprocess_version"], name="postprocess_version")
+    key["score_reducers"] = list(
+        _resolve_metric_reducers(
+            window_mode=str(first["window_mode"]),
+            requested=_string_list(
+                key["score_reducers"], name="score_reducers"
+            ),
+        )
+    )
     for field in ("master_sequence_id", "reference_scene_id", "order_id", "window_mode"):
         if key[field] != first[field]:
             raise AllTEvaluationError("sequence cache identity differs from stage requests")
@@ -1004,15 +1018,13 @@ def _validate_sequence_bundle(
     }:
         raise AllTEvaluationError("sequence cache bundle fields differ")
     bundle = dict(value)
-    if bundle["schema_version"] != 1 or bundle["key"] != dict(expected_key):
+    if bundle["schema_version"] != 2 or bundle["key"] != dict(expected_key):
         raise AllTEvaluationError("sequence cache key differs")
     key = _validate_sequence_cache_key(bundle["key"])
     pairs = bundle["pairs"]
     if not isinstance(pairs, Mapping):
         raise AllTEvaluationError("sequence cache pairs must be a mapping")
-    expected_reducers = (
-        {"official"} if key["window_mode"] == "full_history" else {"mean", "latest", "max"}
-    )
+    expected_reducers = set(key["score_reducers"])
     if set(pairs) != expected_reducers:
         raise AllTEvaluationError("sequence cache reducers differ")
     for by_horizon in pairs.values():
@@ -1128,6 +1140,7 @@ def _produce_local_sequence(
     class_mapper: object,
     evaluation_seed: int,
     device: object,
+    score_reducers: Sequence[str],
 ) -> dict[str, object]:
     import torch
 
@@ -1152,7 +1165,7 @@ def _produce_local_sequence(
 
     trajectories = {
         reducer: OfficialCandidateTrajectoryAccumulator(score_reducer=reducer)
-        for reducer in ("mean", "latest", "max")
+        for reducer in score_reducers
     }
     raw_payloads = []
     sidecars = []
@@ -1265,7 +1278,7 @@ def _produce_local_sequence(
                         )
                     )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "pairs": pairs,
         "raw_payloads": raw_payloads,
         "sidecars": sidecars,
@@ -1332,7 +1345,7 @@ def _produce_full_history_sequence(
                 causal_prefix_pair_from_payload(payload)
             )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "pairs": pairs,
         "raw_payloads": [],
         "sidecars": [],
@@ -1534,6 +1547,7 @@ def run_evaluation(
                 evaluation_seed=evaluation_seed,
                 postprocess_version=postprocess_version,
                 stage_requests=sequence.stage_requests,
+                score_reducers=selected_reducers,
             )
             bundle = _load_sequence_bundle(cache_root=cache_directory, key=key)
             reused = bundle is not None
@@ -1560,6 +1574,7 @@ def run_evaluation(
                         class_mapper=class_mapper,
                         evaluation_seed=evaluation_seed,
                         device=device,
+                        score_reducers=selected_reducers,
                     )
                 )
                 bundle = {**produced, "key": key}
@@ -1608,6 +1623,7 @@ def run_evaluation(
         "population_id": population_id,
         "population_sha256": population_sha256,
         "records": cache_records,
+        "score_reducers": list(selected_reducers),
         "reused_entry_count": reused_count,
         "schema_version": 1,
         "source_commit": source_commit,
