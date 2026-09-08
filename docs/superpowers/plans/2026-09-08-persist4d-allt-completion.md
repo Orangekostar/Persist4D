@@ -254,3 +254,30 @@ Use staged file lists, commit the final package, push `research/persist4d-allt-t
 - [x] **Step 4: Read back HANDOFF and FINAL_MANIFEST from the final Git commit**
 
 Use `git show <remote-head>:<path>` for both files, compare bytes and hashes with local files, and report `publication_status=PUSH_VERIFIED` only after both comparisons pass.
+
+### Task 7: Completion-audit closure
+
+**Files:**
+- Modify: `scripts/system_comparison_analysis.py`
+- Modify: `scripts/analyze_persist4d_allt_final.py`
+- Modify: `scripts/publish_persist4d_allt.py`
+- Modify: `tests/test_system_comparison_analysis.py`
+- Modify: `tests/test_analyze_persist4d_allt_final.py`
+- Modify: `tests/test_publish_persist4d_allt.py`
+- Regenerate: compact identity analysis, final reports, and manifests
+
+- [x] **Step 1: Add failing attempt-coverage contract tests**
+
+Require `gap_recovery_attempt_coverage = recovery_attempts / gap_opportunities`, preserve `N/A` for a zero denominator, and expose the value in the final identity table.
+
+- [x] **Step 2: Implement the metric and regenerate compact identity evidence**
+
+Add the derived field to the shared identity aggregation and final-analysis schema. Recompute the compact CSV and its manifest without changing the frozen underlying counts.
+
+- [x] **Step 3: Run the complete directly relevant test suite**
+
+Include contract, dataset sequence/causality, model/read, trainer/training-gradient, evaluation, diagnostics, analysis, profile, selection, publisher, and finalizer tests. Record the exact observed count in `TEST_REPORT.md`.
+
+- [ ] **Step 4: Regenerate, verify, commit, push, and read back**
+
+Run the publisher twice with byte-identical outputs; run Ruff, `git diff --check`, artifact hash validation, then push and verify the remote HEAD plus final artifact bytes.

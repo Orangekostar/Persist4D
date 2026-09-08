@@ -98,6 +98,9 @@ def test_identity_aggregation_preserves_counts_denominators_and_na() -> None:
     assert c2_t2["fragmentation_rate"] == pytest.approx(0.25)
     assert c2_t2["gap_recovery_accuracy"] is None
     assert c2_t2["gap_recovery_recall"] is None
+    assert c2_t2["gap_recovery_attempt_coverage"] is None
+    c2_t3 = next(row for row in aggregated if row["model"] == "C2" and row["T"] == 3)
+    assert c2_t3["gap_recovery_attempt_coverage"] == pytest.approx(0.5)
 
 
 def test_equal_cluster_bootstrap_is_fixed_seed_and_descriptive() -> None:

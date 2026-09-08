@@ -170,6 +170,7 @@ def test_identity_aggregation_uses_explicit_denominators() -> None:
     assert result["merge_rate"] == pytest.approx(0.25)
     assert result["gap_recovery_accuracy"] == pytest.approx(2 / 3)
     assert result["gap_recovery_recall"] == pytest.approx(0.4)
+    assert result["gap_recovery_attempt_coverage"] == pytest.approx(0.6)
 
 
 def test_statistical_tables_include_task_identity_gap_and_latency() -> None:

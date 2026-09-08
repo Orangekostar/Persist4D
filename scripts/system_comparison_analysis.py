@@ -393,6 +393,9 @@ def aggregate_identity_metrics(
         "gap_recovery_recall": _rate(
             totals["correct_recoveries"], totals["gap_opportunities"]
         ),
+        "gap_recovery_attempt_coverage": _rate(
+            totals["recovery_attempts"], totals["gap_opportunities"]
+        ),
     }
 
 

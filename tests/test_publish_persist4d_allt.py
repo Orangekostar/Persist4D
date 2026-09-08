@@ -206,6 +206,7 @@ def test_completion_package_is_deterministic_and_self_contained(tmp_path) -> Non
     )
     assert "T4, T5" in report
     assert "T3, T4, T5" in report
+    assert "Attempt coverage" in report
     assert "only 5/20" in handoff
     assert all(f"## {number}." in handoff for number in range(1, 19))
     assert "training/formal/C2/update=0200.ckpt" in handoff

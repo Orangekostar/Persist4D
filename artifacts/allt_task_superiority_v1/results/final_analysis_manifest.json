@@ -1,10 +1,10 @@
 {
   "analysis_scope": {
     "cluster_uncertainty": "1000 fixed-seed bootstrap resamples of six equal-weight reference deltas; descriptive only, not a pooled-AP confidence interval",
-    "identity": "fresh T1-T5 recomputation; C2 replays prediction-only B4 with model-index class labels and FH-adapt uses frozen full-history IDs",
+    "identity": "fresh T1-T5 recomputation; C2 replays prediction-only B4 with model-index class labels and FH-adapt uses frozen full-history IDs; attempt coverage is recovery_attempts / gap_opportunities",
     "task_metrics": "official metrics pooled within each reference; sequence AP values are never averaged to represent pooled AP"
   },
-  "content_sha256": "92eab6ed3c60895240accdd636a2b07572e22ca54511480ab3413af5a1c209d6",
+  "content_sha256": "cf67b07ed205c3e22fe70082ee6b00d0bd1a1adc7d24669bf1bcc680f5c01fcc",
   "coverage": {
     "cluster_effect_rows": 20,
     "identity_rows": 8,
@@ -44,7 +44,7 @@
     },
     {
       "path": "identity_counts.csv",
-      "sha256": "e2578b385252b7109b813ebc69a3ba8c3ff763b382e0ca1dfeebec4a932b987e"
+      "sha256": "ea8eb9fccf8eaad632c08d8f3741f7c13c4e0afc98e6e579ce5389fc99243f10"
     },
     {
       "path": "cluster_effects.csv",

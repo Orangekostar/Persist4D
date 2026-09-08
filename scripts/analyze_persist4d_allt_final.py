@@ -51,6 +51,7 @@ IDENTITY_RATE_FIELDS = (
     "merge_rate",
     "gap_recovery_accuracy",
     "gap_recovery_recall",
+    "gap_recovery_attempt_coverage",
 )
 FROZEN_MODELS = {
     "C2": {
