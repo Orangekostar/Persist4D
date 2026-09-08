@@ -108,6 +108,54 @@ def _integer(value: object, *, name: str, minimum: int = 0) -> int:
     return value
 
 
+def _resolve_metric_reducers(
+    *, window_mode: str, requested: Sequence[str] | None
+) -> tuple[str, ...]:
+    available = (
+        ("official",)
+        if window_mode == "full_history"
+        else ("mean", "latest", "max")
+    )
+    if requested is None:
+        return available
+    if isinstance(requested, (str, bytes)) or not requested:
+        raise AllTEvaluationError("metric reducers must be a non-empty sequence")
+    reducers = tuple(_nonempty(value, name="metric reducer") for value in requested)
+    if len(set(reducers)) != len(reducers):
+        raise AllTEvaluationError("metric reducers must be unique")
+    if any(reducer not in available for reducer in reducers):
+        raise AllTEvaluationError(
+            f"requested metric reducer is not available for {window_mode}"
+        )
+    return reducers
+
+
+def _checkpoint_identity(
+    payload: Mapping[str, object], *, variant: str
+) -> tuple[int, int]:
+    expected_variant = _nonempty(variant, name="variant")
+    step = _integer(payload.get("global_step", 0), name="checkpoint global_step")
+    metadata = payload.get("allt_metadata")
+    hparams = payload.get("hyper_parameters")
+    training_seed: object | None = None
+    checkpoint_variant: object | None = None
+    if isinstance(metadata, Mapping):
+        training_seed = metadata.get("training_seed")
+        checkpoint_variant = metadata.get("variant")
+    if isinstance(hparams, Mapping):
+        general = hparams.get("general")
+        allt_training = hparams.get("allt_training")
+        if training_seed is None and isinstance(general, Mapping):
+            training_seed = general.get("seed")
+        if checkpoint_variant is None and isinstance(allt_training, Mapping):
+            checkpoint_variant = allt_training.get("variant")
+    if checkpoint_variant is not None and checkpoint_variant != expected_variant:
+        raise AllTEvaluationError("checkpoint variant metadata differs")
+    if training_seed is None:
+        raise AllTEvaluationError("checkpoint lacks bound training seed metadata")
+    return step, _integer(training_seed, name="training seed")
+
+
 def _string_list(value: object, *, name: str) -> list[str]:
     if isinstance(value, (str, bytes)) or not isinstance(value, Sequence) or not value:
         raise AllTEvaluationError(f"{name} must be a non-empty sequence")
@@ -832,7 +880,7 @@ def _module_config(variant: str) -> tuple[dict[str, object], str]:
 
 def _load_system(
     *, variant: str, checkpoint: Path, pretrained: Path, device: object, scratch: Path
-) -> tuple[object, Any, int]:
+) -> tuple[object, Any, int, int]:
     import torch
 
     from scripts.train_persist4d_allt import _compose_config
@@ -851,16 +899,14 @@ def _load_system(
         payload.get("state_dict"), Mapping
     ):
         raise AllTEvaluationError("checkpoint lacks a Lightning state_dict")
-    metadata = payload.get("allt_metadata")
-    if isinstance(metadata, Mapping) and metadata.get("variant") != variant:
-        raise AllTEvaluationError("checkpoint variant metadata differs")
+    checkpoint_step, training_seed = _checkpoint_identity(payload, variant=variant)
     system = Persist4DAllTTrainer(config)
     incompatible = system.load_state_dict(payload["state_dict"], strict=True)
     if incompatible.missing_keys or incompatible.unexpected_keys:
         raise AllTEvaluationError("checkpoint state differs from the variant model")
     system.to(device)
     system.eval()
-    return system, config, int(payload.get("global_step", 0))
+    return system, config, checkpoint_step, training_seed
 
 
 def _pack_pair(pair: object) -> dict[str, object]:
@@ -1256,14 +1302,14 @@ def _metric_rows(
     training_seed: int,
     evaluation_seed: int,
     window_mode: str,
+    requested_reducers: Sequence[str] | None = None,
 ) -> list[dict[str, object]]:
     from scripts.analyze_persist4d_allt import AllTBaselineAccumulator
     from scripts.analyze_r1_downstream_validation import resolve_metric_dataset_spec
 
-    reducers = ("official",) if window_mode == "full_history" else (
-        "mean",
-        "latest",
-        "max",
+    reducers = _resolve_metric_reducers(
+        window_mode=window_mode,
+        requested=requested_reducers,
     )
     accumulators = {
         (reducer, horizon): AllTBaselineAccumulator(
@@ -1327,6 +1373,8 @@ def run_evaluation(
     cache_root: Path,
     output_root: Path,
     maximum_sequences: int | None = None,
+    model_name: str | None = None,
+    reducers: Sequence[str] | None = None,
 ) -> dict[str, object]:
     import torch
 
@@ -1365,7 +1413,11 @@ def run_evaluation(
     checkpoint_sha256 = _file_sha256(checkpoint)
     module_document, module_sha256 = _module_config(variant)
     window_mode = str(VARIANTS[variant]["window_mode"])
-    system, config, checkpoint_step = _load_system(
+    selected_reducers = _resolve_metric_reducers(
+        window_mode=window_mode, requested=reducers
+    )
+    result_model = variant if model_name is None else _nonempty(model_name, name="model")
+    system, config, checkpoint_step, training_seed = _load_system(
         variant=variant,
         checkpoint=checkpoint,
         pretrained=pretrained,
@@ -1465,11 +1517,12 @@ def run_evaluation(
     rows = _metric_rows(
         bundles=bundles,
         population_id=population_id,
-        model=variant,
+        model=result_model,
         checkpoint_sha256=checkpoint_sha256,
-        training_seed=45,
+        training_seed=training_seed,
         evaluation_seed=evaluation_seed,
         window_mode=window_mode,
+        requested_reducers=selected_reducers,
     )
     csv_content = _csv_bytes(rows)
     _atomic_write(output_root / "all_t_metrics.csv", csv_content)
@@ -1506,11 +1559,14 @@ def run_evaluation(
             reused_count=reused_count,
         ),
         "new_sequence_count": len(sequences) - reused_count,
+        "model": result_model,
         "population_id": population_id,
+        "reducers": list(selected_reducers),
         "reused_sequence_count": reused_count,
         "sequence_count": len(sequences),
         "source_commit": source_commit,
         "status": "pass",
+        "training_seed": training_seed,
         "variant": variant,
         "window_mode": window_mode,
     }
@@ -1536,6 +1592,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--maximum-sequences", type=int)
+    parser.add_argument("--model-name")
+    parser.add_argument(
+        "--reducers",
+        nargs="+",
+        choices=("mean", "latest", "max", "official"),
+    )
     return parser
 
 
@@ -1554,6 +1616,8 @@ def main() -> int:
         cache_root=args.cache_root,
         output_root=args.output_root,
         maximum_sequences=args.maximum_sequences,
+        model_name=args.model_name,
+        reducers=args.reducers,
     )
     print(json.dumps(result, allow_nan=False, sort_keys=True))
     return 0
@@ -1563,6 +1627,8 @@ __all__ = [
     "RESULT_FIELDS",
     "AllTEvaluationError",
     "EvaluationSequence",
+    "_checkpoint_identity",
+    "_resolve_metric_reducers",
     "build_sequence_cache_key",
     "build_stage_requests",
     "rank_development_checkpoints",

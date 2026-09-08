@@ -6,7 +6,9 @@ import pytest
 
 from scripts.evaluate_persist4d_allt import (
     AllTEvaluationError,
+    _checkpoint_identity,
     _new_model_forward_count,
+    _resolve_metric_reducers,
     build_sequence_cache_key,
     build_stage_requests,
     rank_development_checkpoints,
@@ -170,3 +172,56 @@ def test_forward_count_reports_only_new_method_specific_work() -> None:
     assert _new_model_forward_count(
         window_mode="local_pair", sequence_count=3, reused_count=3
     ) == 0
+
+
+def test_metric_reducers_can_limit_intermediate_checkpoint_work() -> None:
+    assert _resolve_metric_reducers(window_mode="local_pair", requested=None) == (
+        "mean",
+        "latest",
+        "max",
+    )
+    assert _resolve_metric_reducers(
+        window_mode="local_pair", requested=("mean",)
+    ) == ("mean",)
+    assert _resolve_metric_reducers(
+        window_mode="full_history", requested=None
+    ) == ("official",)
+    with pytest.raises(AllTEvaluationError, match="not available"):
+        _resolve_metric_reducers(
+            window_mode="full_history", requested=("mean",)
+        )
+    with pytest.raises(AllTEvaluationError, match="unique"):
+        _resolve_metric_reducers(
+            window_mode="local_pair", requested=("mean", "mean")
+        )
+
+
+def test_checkpoint_identity_uses_bound_training_metadata() -> None:
+    assert _checkpoint_identity(
+        {
+            "global_step": 0,
+            "allt_metadata": {"training_seed": 45, "variant": "C0"},
+        },
+        variant="C0",
+    ) == (0, 45)
+    assert _checkpoint_identity(
+        {
+            "global_step": 100,
+            "hyper_parameters": {
+                "general": {"seed": 46},
+                "allt_training": {"variant": "C1"},
+            },
+        },
+        variant="C1",
+    ) == (100, 46)
+    with pytest.raises(AllTEvaluationError, match="variant metadata differs"):
+        _checkpoint_identity(
+            {
+                "global_step": 100,
+                "hyper_parameters": {
+                    "general": {"seed": 45},
+                    "allt_training": {"variant": "C2"},
+                },
+            },
+            variant="C1",
+        )
