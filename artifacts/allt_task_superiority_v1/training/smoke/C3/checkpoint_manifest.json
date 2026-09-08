@@ -1,0 +1,26 @@
+{
+  "checkpoints": [
+    {
+      "bytes": 756834128,
+      "name": "last.ckpt",
+      "sha256": "6bc6c7ac160c0603a32f641bcd7851c2d5598ff1dcf01d05a33e409513f74e2b"
+    },
+    {
+      "bytes": 541604586,
+      "name": "update=0000.ckpt",
+      "sha256": "171c3f85d3f83732c3262c71e1a659213ef646b469f1bcc2fe3d003dbe556341"
+    },
+    {
+      "bytes": 756834000,
+      "name": "update=0001.ckpt",
+      "sha256": "fe266f215d67260687651ae094120184a8acdb6b85c9efe42838907ef703bffe"
+    },
+    {
+      "bytes": 756834128,
+      "name": "update=0002.ckpt",
+      "sha256": "6bc6c7ac160c0603a32f641bcd7851c2d5598ff1dcf01d05a33e409513f74e2b"
+    }
+  ],
+  "external_reference": "external:allt_task_superiority_v1/training/smoke/C3",
+  "variant": "C3"
+}

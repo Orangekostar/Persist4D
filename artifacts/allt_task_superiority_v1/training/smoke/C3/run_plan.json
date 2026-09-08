@@ -1,0 +1,55 @@
+{
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "code_commit_at_run": "c9ca141fb0c2d5e6d87b4dfae2c68dbe284960d6",
+  "devices": 2,
+  "gradient_accumulation": 1,
+  "load_audit": {
+    "loaded_key_count": 798,
+    "missing_keys": [
+      "model.local_enhancement.gate_projection.bias",
+      "model.local_enhancement.gate_projection.weight",
+      "model.local_enhancement.message_projection.bias",
+      "model.local_enhancement.message_projection.weight",
+      "model.local_enhancement.output_projection.bias",
+      "model.local_enhancement.output_projection.weight",
+      "model.local_enhancement.query_norm.bias",
+      "model.local_enhancement.query_norm.weight",
+      "model.memory_read.gate_projection.bias",
+      "model.memory_read.gate_projection.weight",
+      "model.memory_read.key_projection.bias",
+      "model.memory_read.key_projection.weight",
+      "model.memory_read.null_key",
+      "model.memory_read.null_value",
+      "model.memory_read.output_projection.bias",
+      "model.memory_read.output_projection.weight",
+      "model.memory_read.query_norm.bias",
+      "model.memory_read.query_norm.weight",
+      "model.memory_read.query_projection.bias",
+      "model.memory_read.query_projection.weight",
+      "model.memory_read.value_projection.bias",
+      "model.memory_read.value_projection.weight"
+    ],
+    "unexpected_keys": []
+  },
+  "optimizer_updates": 2,
+  "plan": {
+    "adaptation_reference_count": 36,
+    "development_reference_count": 8,
+    "encoder_scan_count": 12,
+    "global_episode_count": 4,
+    "group_count": 2,
+    "rio_episode_count": 2,
+    "rio_horizon_counts": {
+      "2": 0,
+      "3": 2,
+      "4": 0,
+      "5": 0
+    },
+    "scannet_episode_count": 2,
+    "source_schedule_sha256": "8ff4bcaadf6518b634da215d42028fae11876b798841c0e1be8abed2bf0458c7",
+    "supervised_stage_count": 8
+  },
+  "seed": 45,
+  "variant": "C3",
+  "window_mode": "local_pair"
+}

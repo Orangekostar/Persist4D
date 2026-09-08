@@ -1,0 +1,136 @@
+{
+  "completed_global_step": 2,
+  "elapsed_seconds": 90.79582381248474,
+  "execution_status": "COMPLETE",
+  "gpu_hours": 0.050442124340269304,
+  "gradient_audit": {
+    "frozen_gradient_names": [],
+    "missing_optimizer_parameters": [],
+    "nonfinite_gradient_names": [],
+    "nonzero_gradient_step_counts": {
+      "model.local_enhancement.gate_projection.bias": 1,
+      "model.local_enhancement.gate_projection.weight": 1,
+      "model.local_enhancement.message_projection.bias": 1,
+      "model.local_enhancement.message_projection.weight": 1,
+      "model.local_enhancement.output_projection.bias": 2,
+      "model.local_enhancement.output_projection.weight": 2,
+      "model.local_enhancement.query_norm.bias": 1,
+      "model.local_enhancement.query_norm.weight": 1,
+      "model.memory_read.output_projection.bias": 1,
+      "model.memory_read.output_projection.weight": 1
+    },
+    "optimizer_step_calls": 2
+  },
+  "optimizer_updates_requested": 2,
+  "parameter_update_audit": {
+    "changed_parameter_count": 21,
+    "changed_parameters": {
+      "model.local_enhancement.gate_projection.bias": {
+        "max_abs_delta": 7.0180743932724e-05,
+        "norm_delta": 0.000549168384168297
+      },
+      "model.local_enhancement.gate_projection.weight": {
+        "max_abs_delta": 7.35502690076828e-05,
+        "norm_delta": 0.008354753255844116
+      },
+      "model.local_enhancement.message_projection.bias": {
+        "max_abs_delta": 7.257144898176193e-05,
+        "norm_delta": 0.0007865278166718781
+      },
+      "model.local_enhancement.message_projection.weight": {
+        "max_abs_delta": 7.381290197372437e-05,
+        "norm_delta": 0.00819065235555172
+      },
+      "model.local_enhancement.output_projection.bias": {
+        "max_abs_delta": 0.00020000514632556587,
+        "norm_delta": 0.0013702338328585029
+      },
+      "model.local_enhancement.output_projection.weight": {
+        "max_abs_delta": 0.0002000675449380651,
+        "norm_delta": 0.0181918665766716
+      },
+      "model.local_enhancement.query_norm.bias": {
+        "max_abs_delta": 7.291664951480925e-05,
+        "norm_delta": 0.000751119980122894
+      },
+      "model.local_enhancement.query_norm.weight": {
+        "max_abs_delta": 7.522106170654297e-05,
+        "norm_delta": 0.0006730839377269149
+      },
+      "model.memory_read.gate_projection.bias": {
+        "max_abs_delta": 1.2665987014770508e-07,
+        "norm_delta": 8.092394523373514e-07
+      },
+      "model.memory_read.gate_projection.weight": {
+        "max_abs_delta": 1.2665987014770508e-07,
+        "norm_delta": 1.3251173186290544e-05
+      },
+      "model.memory_read.key_projection.bias": {
+        "max_abs_delta": 1.7881393432617188e-07,
+        "norm_delta": 1.2397505315675517e-06
+      },
+      "model.memory_read.key_projection.weight": {
+        "max_abs_delta": 1.7881393432617188e-07,
+        "norm_delta": 1.3316778677108232e-05
+      },
+      "model.memory_read.null_key": {
+        "max_abs_delta": 5.960464477539062e-07,
+        "norm_delta": 2.138828222086886e-06
+      },
+      "model.memory_read.null_value": {
+        "max_abs_delta": 4.76837158203125e-07,
+        "norm_delta": 1.9194851574866334e-06
+      },
+      "model.memory_read.output_projection.bias": {
+        "max_abs_delta": 7.440594345098361e-05,
+        "norm_delta": 0.0008398490026593208
+      },
+      "model.memory_read.output_projection.weight": {
+        "max_abs_delta": 7.436913438141346e-05,
+        "norm_delta": 0.009139000438153744
+      },
+      "model.memory_read.query_norm.weight": {
+        "max_abs_delta": 2.0265579223632812e-06,
+        "norm_delta": 2.2927884856471792e-05
+      },
+      "model.memory_read.query_projection.bias": {
+        "max_abs_delta": 1.7881393432617188e-07,
+        "norm_delta": 1.218526790580654e-06
+      },
+      "model.memory_read.query_projection.weight": {
+        "max_abs_delta": 1.7881393432617188e-07,
+        "norm_delta": 1.331364364887122e-05
+      },
+      "model.memory_read.value_projection.bias": {
+        "max_abs_delta": 1.7881393432617188e-07,
+        "norm_delta": 1.2303636367505533e-06
+      },
+      "model.memory_read.value_projection.weight": {
+        "max_abs_delta": 1.7881393432617188e-07,
+        "norm_delta": 1.320137562288437e-05
+      }
+    },
+    "parameter_count": 22
+  },
+  "plan": {
+    "adaptation_reference_count": 36,
+    "development_reference_count": 8,
+    "encoder_scan_count": 12,
+    "global_episode_count": 4,
+    "group_count": 2,
+    "rio_episode_count": 2,
+    "rio_horizon_counts": {
+      "2": 0,
+      "3": 2,
+      "4": 0,
+      "5": 0
+    },
+    "scannet_episode_count": 2,
+    "source_schedule_sha256": "8ff4bcaadf6518b634da215d42028fae11876b798841c0e1be8abed2bf0458c7",
+    "supervised_stage_count": 8
+  },
+  "smoke": true,
+  "total_parameter_count": 135315027,
+  "trainable_parameter_count": 26853651,
+  "variant": "C3"
+}
