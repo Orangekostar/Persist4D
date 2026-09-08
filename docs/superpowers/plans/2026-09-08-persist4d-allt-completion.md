@@ -222,11 +222,11 @@ Expected: failures until all report contracts are implemented.
 
 Report `execution_status=COMPLETE`, `baseline_comparability=MATCHED`, both t-mAP verdicts, all-task verdict, seed status, independent-generalization limit, publication state, every variant's run/gate state, full training exposure, all four T values, memory diagnostic interpretation, per-reference effects, identity counts, profile scope, direct tests, external storage reconstruction, and exactly one next-round bottleneck recommendation.
 
-- [ ] **Step 4: Generate FINAL_MANIFEST after report and HANDOFF**
+- [x] **Step 4: Generate FINAL_MANIFEST after report and HANDOFF**
 
 Hash every required compact artifact except `FINAL_MANIFEST.json` itself. Record `code_commit_at_run`, use `publication_commit=resolve from remote HEAD`, and avoid embedding a self-invalidating final commit SHA.
 
-- [ ] **Step 5: Run the publisher twice and require byte-identical outputs**
+- [x] **Step 5: Run the publisher twice and require byte-identical outputs**
 
 Run the publisher, hash all generated files, run it again, and require identical hashes. Then run all new and directly adjacent tests plus Ruff only on changed Python files.
 
@@ -239,11 +239,11 @@ Run the publisher, hash all generated files, run it again, and require identical
 - Consumes: the full spec checklist, final compact artifacts, test output, Git state, and remote GitHub branch.
 - Produces: verified remote publication receipt in the final user response.
 
-- [ ] **Step 1: Audit every explicit spec deliverable against authoritative files**
+- [x] **Step 1: Audit every explicit spec deliverable against authoritative files**
 
 Check required filenames, row counts, checkpoint identities, all status fields, negative-result preservation, diagnostic labels, external storage bindings, and commands.
 
-- [ ] **Step 2: Run final verification**
+- [x] **Step 2: Run final verification**
 
 Run direct pytest suites, Ruff on changed Python, `git diff --check`, artifact hash validation, and compact path/privacy scans that reject credentials and machine-specific paths in published docs.
 
