@@ -4,14 +4,18 @@ import copy
 import threading
 
 import pytest
+import torch
 
+from models.persistent_memory_read import DetachedMemoryReadState
 from scripts.evaluate_persist4d_allt import (
     AllTEvaluationError,
     _checkpoint_identity,
     _compact_metric_bundle,
     _compute_metric_values,
+    _module_config,
     _new_model_forward_count,
     _resolve_metric_reducers,
+    apply_memory_read_policy,
     build_sequence_cache_key,
     build_stage_requests,
     rank_development_checkpoints,
@@ -22,6 +26,60 @@ from scripts.evaluate_persist4d_allt import (
 SHA_A = "a" * 64
 SHA_B = "b" * 64
 SHA_C = "c" * 64
+
+
+def _memory_read_state() -> DetachedMemoryReadState:
+    return DetachedMemoryReadState(
+        embeddings=torch.arange(24, dtype=torch.float32).reshape(1, 3, 8),
+        occupied_mask=torch.tensor([[True, True, False]]),
+        active_mask=torch.tensor([[False, True, False]]),
+        confidence=torch.tensor([[0.9, 0.7, 0.0]]),
+        last_seen=torch.tensor([[0, 1, -1]], dtype=torch.long),
+    )
+
+
+def test_memory_read_policy_disables_all_slots_without_mutating_metadata() -> None:
+    original = _memory_read_state()
+    transformed = apply_memory_read_policy(original, "disabled")
+
+    assert transformed is not None
+    assert not transformed.occupied_mask.any()
+    assert not transformed.active_mask.any()
+    assert torch.equal(transformed.embeddings, original.embeddings)
+    assert torch.equal(transformed.confidence, original.confidence)
+    assert torch.equal(transformed.last_seen, original.last_seen)
+    assert transformed.embeddings.data_ptr() != original.embeddings.data_ptr()
+    assert original.occupied_mask.tolist() == [[True, True, False]]
+
+
+def test_memory_read_policy_exposes_only_previous_active_slots() -> None:
+    original = _memory_read_state()
+    transformed = apply_memory_read_policy(original, "active_previous")
+
+    assert transformed is not None
+    assert transformed.occupied_mask.tolist() == [[False, True, False]]
+    assert transformed.active_mask.tolist() == [[False, True, False]]
+    assert torch.equal(transformed.embeddings, original.embeddings)
+    assert apply_memory_read_policy(None, "active_previous") is None
+
+
+def test_memory_read_policy_rejects_unknown_policy() -> None:
+    with pytest.raises(AllTEvaluationError, match="memory read policy"):
+        apply_memory_read_policy(_memory_read_state(), "future_only")
+
+
+def test_memory_read_policy_binds_nondefault_config_without_changing_default() -> None:
+    default_document, default_sha256 = _module_config("C2")
+    disabled_document, disabled_sha256 = _module_config(
+        "C2", memory_read_policy="disabled"
+    )
+
+    assert default_sha256 == (
+        "5a6faa3fcde50d05b541c4992f3194a776316e81bcb4890d424137e815fcb8c7"
+    )
+    assert "evaluation_memory_read_policy" not in default_document
+    assert disabled_document["evaluation_memory_read_policy"] == "disabled"
+    assert disabled_sha256 != default_sha256
 
 
 def _stage_requests(window_mode: str = "local_pair") -> tuple[dict[str, object], ...]:

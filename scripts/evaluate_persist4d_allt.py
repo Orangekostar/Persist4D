@@ -39,6 +39,7 @@ DEFAULT_CACHE_ROOT = Path(
 REPORT_HORIZONS = (2, 3, 4, 5)
 ORDER_IDS = ("canonical", "reverse", "sha256_seed45")
 WINDOW_MODES = ("local_pair", "full_history")
+MEMORY_READ_POLICIES = ("all_occupied", "disabled", "active_previous")
 RESULT_FIELDS = (
     "population_id",
     "model",
@@ -900,12 +901,56 @@ def _population(
     return dataset, collate, sequences, population_id, population_sha256
 
 
-def _module_config(variant: str) -> tuple[dict[str, object], str]:
+def _validate_memory_read_policy(policy: str) -> str:
+    if policy not in MEMORY_READ_POLICIES:
+        raise AllTEvaluationError(
+            f"memory read policy must be one of {MEMORY_READ_POLICIES}"
+        )
+    return policy
+
+
+def apply_memory_read_policy(state: object, policy: str) -> object:
+    """Return the inference-only memory view for a diagnostic read policy."""
+    import torch
+
+    from models.persistent_memory_read import DetachedMemoryReadState
+
+    policy = _validate_memory_read_policy(policy)
+    if state is None:
+        return None
+    if not isinstance(state, DetachedMemoryReadState):
+        raise AllTEvaluationError("memory read state has an unexpected type")
+    if policy == "all_occupied":
+        return state
+    visible = (
+        torch.zeros_like(state.occupied_mask)
+        if policy == "disabled"
+        else state.active_mask
+    )
+    return DetachedMemoryReadState(
+        embeddings=state.embeddings,
+        occupied_mask=visible,
+        active_mask=visible,
+        confidence=state.confidence,
+        last_seen=state.last_seen,
+    )
+
+
+def _module_config(
+    variant: str, *, memory_read_policy: str = "all_occupied"
+) -> tuple[dict[str, object], str]:
     from scripts.train_persist4d_allt import VARIANTS
 
     if variant not in VARIANTS:
         raise AllTEvaluationError("variant is not an All-T model")
+    memory_read_policy = _validate_memory_read_policy(memory_read_policy)
     specification = dict(VARIANTS[variant])
+    if memory_read_policy != "all_occupied" and not specification[
+        "memory_read_enabled"
+    ]:
+        raise AllTEvaluationError(
+            "non-default memory read policy requires a memory-enabled variant"
+        )
     document = {
         "adapter_insertion": "after_first_complete_decoder_pass",
         "local_enhancement": (
@@ -936,6 +981,8 @@ def _module_config(variant: str) -> tuple[dict[str, object], str]:
         "variant": variant,
         **specification,
     }
+    if memory_read_policy != "all_occupied":
+        document["evaluation_memory_read_policy"] = memory_read_policy
     return document, _canonical_json_sha256(document)
 
 
@@ -1141,6 +1188,7 @@ def _produce_local_sequence(
     evaluation_seed: int,
     device: object,
     score_reducers: Sequence[str],
+    memory_read_policy: str,
 ) -> dict[str, object]:
     import torch
 
@@ -1199,7 +1247,7 @@ def _produce_local_sequence(
                     raw_coordinates=raw_coordinates,
                     is_eval=True,
                     memory_read_state=(
-                        read_state
+                        apply_memory_read_policy(read_state, memory_read_policy)
                         if getattr(system.model, "memory_read_enabled", False)
                         else None
                     ),
@@ -1446,6 +1494,7 @@ def run_evaluation(
     model_name: str | None = None,
     reducers: Sequence[str] | None = None,
     metric_workers: int = 4,
+    memory_read_policy: str = "all_occupied",
 ) -> dict[str, object]:
     import torch
 
@@ -1482,7 +1531,14 @@ def run_evaluation(
     if device.type != "cuda" or device.index is None or device.index >= torch.cuda.device_count():
         raise AllTEvaluationError("evaluation device is unavailable")
     checkpoint_sha256 = _file_sha256(checkpoint)
-    module_document, module_sha256 = _module_config(variant)
+    memory_read_policy = _validate_memory_read_policy(memory_read_policy)
+    if memory_read_policy != "all_occupied" and population != "development":
+        raise AllTEvaluationError(
+            "diagnostic memory read policies are restricted to development"
+        )
+    module_document, module_sha256 = _module_config(
+        variant, memory_read_policy=memory_read_policy
+    )
     window_mode = str(VARIANTS[variant]["window_mode"])
     selected_reducers = _resolve_metric_reducers(
         window_mode=window_mode, requested=reducers
@@ -1534,7 +1590,12 @@ def run_evaluation(
         "config_sha256": module_sha256,
         "protocol_sha256": population_sha256,
     }
-    cache_directory = cache_root / population_id / variant / checkpoint_sha256
+    cache_namespace = (
+        variant
+        if memory_read_policy == "all_occupied"
+        else f"{variant}--memory-read-{memory_read_policy}"
+    )
+    cache_directory = cache_root / population_id / cache_namespace / checkpoint_sha256
     bundles = []
     cache_records = []
     reused_count = 0
@@ -1575,6 +1636,7 @@ def run_evaluation(
                         evaluation_seed=evaluation_seed,
                         device=device,
                         score_reducers=selected_reducers,
+                        memory_read_policy=memory_read_policy,
                     )
                 )
                 bundle = {**produced, "key": key}
@@ -1613,13 +1675,14 @@ def run_evaluation(
     cache_manifest = {
         "cache_directory": (
             f"external:allt_task_superiority_v1/evaluation_cache/{population_id}/"
-            f"{variant}/{checkpoint_sha256}"
+            f"{cache_namespace}/{checkpoint_sha256}"
         ),
         "checkpoint_sha256": checkpoint_sha256,
         "entry_count": len(cache_records),
         "evaluation_seed": evaluation_seed,
         "module_config": module_document,
         "module_config_sha256": module_sha256,
+        "memory_read_policy": memory_read_policy,
         "population_id": population_id,
         "population_sha256": population_sha256,
         "records": cache_records,
@@ -1639,6 +1702,7 @@ def run_evaluation(
         "metric_row_count": len(rows),
         "metric_sha256": hashlib.sha256(csv_content).hexdigest(),
         "metric_worker_count": min(metric_workers, len(rows)),
+        "memory_read_policy": memory_read_policy,
         "model_forward_count": _new_model_forward_count(
             window_mode=window_mode,
             sequence_count=len(sequences),
@@ -1685,6 +1749,11 @@ def _parser() -> argparse.ArgumentParser:
         choices=("mean", "latest", "max", "official"),
     )
     parser.add_argument("--metric-workers", type=int, default=4)
+    parser.add_argument(
+        "--memory-read-policy",
+        choices=MEMORY_READ_POLICIES,
+        default="all_occupied",
+    )
     return parser
 
 
@@ -1706,12 +1775,14 @@ def main() -> int:
         model_name=args.model_name,
         reducers=args.reducers,
         metric_workers=args.metric_workers,
+        memory_read_policy=args.memory_read_policy,
     )
     print(json.dumps(result, allow_nan=False, sort_keys=True))
     return 0
 
 
 __all__ = [
+    "MEMORY_READ_POLICIES",
     "RESULT_FIELDS",
     "AllTEvaluationError",
     "EvaluationSequence",
@@ -1719,6 +1790,7 @@ __all__ = [
     "_compact_metric_bundle",
     "_compute_metric_values",
     "_resolve_metric_reducers",
+    "apply_memory_read_policy",
     "build_sequence_cache_key",
     "build_stage_requests",
     "rank_development_checkpoints",
