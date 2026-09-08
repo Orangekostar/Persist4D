@@ -20,7 +20,7 @@ The goal was one frozen Persist4D checkpoint that strictly exceeds matched ReSce
 - Repository: `Orangekostar/Persist4D`
 - Branch: `research/persist4d-allt-task-superiority-v1`
 - Start SHA: `2c7494b982eff84886aef3a7274bae43752a1485`
-- Publication-code SHA: `b35701fb276ef47e2d0111e49385a584d657ce4d`
+- Publication-code SHA: `b0c384aa0c02b5e5325c5630ca4bf1c8731e4d56`
 - Formal evaluation SHA: `d288af93cefc7cf8aaabb9b541b92539782c019c`
 - Final cache-analysis SHA: `a4c8744323f2c039c3a89dd0dcc7040b6e7a7215`
 - Resource-profile SHA: `4931840a874c895f5798582b8fb4e8c7f3b861ac`

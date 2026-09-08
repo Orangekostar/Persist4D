@@ -15,7 +15,7 @@
 
 Execution completed, but the scientific all-T superiority goal failed. C2 did not strictly exceed R1 B4 at T4, T5, nor matched FH-adapt at T3, T4, T5. Protocol-B was final-only and did not change selection.
 
-Code commit used by this publisher: `b35701fb276ef47e2d0111e49385a584d657ce4d`. Publication commit: resolve from remote HEAD.
+Code commit used by this publisher: `b0c384aa0c02b5e5325c5630ca4bf1c8731e4d56`. Publication commit: resolve from remote HEAD.
 
 ## Frozen Protocol-B Results
 
@@ -119,18 +119,18 @@ The intervals are 1,000 fixed-seed resamples of six equal-weight reference delta
 
 ## Identity Evidence
 
-| Model | Horizon | ID switches | Fragments | Merges | Correct recovery | Attempts | Gap opp. | Accuracy | Recall |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| C2 | T2 | 39 | 39 | 77 | 0 | 0 | 0 | N/A | N/A |
-| C2 | T3 | 77 | 100 | 142 | 84 | 96 | 272 | 0.875 | 0.3088235294117647 |
-| C2 | T4 | 117 | 172 | 223 | 218 | 260 | 696 | 0.8384615384615385 | 0.3132183908045977 |
-| C2 | T5 | 155 | 243 | 285 | 348 | 422 | 1093 | 0.8246445497630331 | 0.3183897529734675 |
-| FH-adapt | T2 | 469 | 469 | 51 | 0 | 0 | 0 | N/A | N/A |
-| FH-adapt | T3 | 946 | 1115 | 172 | 0 | 100 | 275 | 0.0 | 0.0 |
-| FH-adapt | T4 | 1440 | 1874 | 346 | 2 | 289 | 705 | 0.006920415224913495 | 0.0028368794326241137 |
-| FH-adapt | T5 | 1969 | 2691 | 598 | 3 | 465 | 1101 | 0.0064516129032258064 | 0.0027247956403269754 |
+| Model | Horizon | ID switches | Fragments | Merges | Correct recovery | Attempts | Gap opp. | Accuracy | Recall | Attempt coverage |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| C2 | T2 | 39 | 39 | 77 | 0 | 0 | 0 | N/A | N/A | N/A |
+| C2 | T3 | 77 | 100 | 142 | 84 | 96 | 272 | 0.875 | 0.3088235294117647 | 0.35294117647058826 |
+| C2 | T4 | 117 | 172 | 223 | 218 | 260 | 696 | 0.8384615384615385 | 0.3132183908045977 | 0.3735632183908046 |
+| C2 | T5 | 155 | 243 | 285 | 348 | 422 | 1093 | 0.8246445497630331 | 0.3183897529734675 | 0.38609332113449224 |
+| FH-adapt | T2 | 469 | 469 | 51 | 0 | 0 | 0 | N/A | N/A | N/A |
+| FH-adapt | T3 | 946 | 1115 | 172 | 0 | 100 | 275 | 0.0 | 0.0 | 0.36363636363636365 |
+| FH-adapt | T4 | 1440 | 1874 | 346 | 2 | 289 | 705 | 0.006920415224913495 | 0.0028368794326241137 | 0.4099290780141844 |
+| FH-adapt | T5 | 1969 | 2691 | 598 | 3 | 465 | 1101 | 0.0064516129032258064 | 0.0027247956403269754 | 0.4223433242506812 |
 
-Identity values are freshly recomputed from T1-T5. A zero denominator is represented as `N/A`; it is never converted to 0 or 1.
+Identity values are freshly recomputed from T1-T5. Attempt coverage is recovery attempts divided by gap opportunities. A zero denominator is represented as `N/A`; it is never converted to 0 or 1.
 Although C2 has substantially fewer ID switches/fragments and much higher recovery rates than FH-adapt, that identity advantage did not produce all-T task-metric superiority.
 
 ## Bounded Resource Profile
