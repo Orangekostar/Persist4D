@@ -189,8 +189,12 @@ def _atomic_text(path: Path, value: str) -> None:
 
 
 def _require_hex_digest(value: str, *, length: int, name: str) -> None:
-    if len(value) != length or any(character not in "0123456789abcdef" for character in value):
-        raise TaskMemoryTrainingError(f"{name} must be {length} lowercase hex characters")
+    if len(value) != length or any(
+        character not in "0123456789abcdef" for character in value
+    ):
+        raise TaskMemoryTrainingError(
+            f"{name} must be {length} lowercase hex characters"
+        )
 
 
 def _formal_training_command(variant: str, *, updates: int, resume: bool) -> str:
@@ -275,6 +279,8 @@ def _formal_exposure_row(variant: str, config: DictConfig) -> dict[str, object]:
         "actual_gpu_hours": "",
         "campaign_training_gpu_hour_cap": TRAINING_GPU_HOUR_CAP,
     }
+
+
 def materialize_training_contracts(
     *,
     output_root: Path,
@@ -398,7 +404,11 @@ def materialize_training_contracts(
     ]
     exposure_path = output_root / "costs_and_exposure.csv"
     buffer = io.StringIO(newline="")
-    writer = csv.DictWriter(buffer, fieldnames=list(exposure_rows[0]))
+    writer = csv.DictWriter(
+        buffer,
+        fieldnames=list(exposure_rows[0]),
+        lineterminator="\n",
+    )
     writer.writeheader()
     writer.writerows(exposure_rows)
     _atomic_text(exposure_path, buffer.getvalue())
