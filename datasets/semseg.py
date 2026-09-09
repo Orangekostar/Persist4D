@@ -60,9 +60,14 @@ class SemanticSegmentationDataset(Dataset):
         exclude_unsupervised_sequences: bool = False,
     ):
 
-        if known_empty_scan_policy not in {"official_substitute", "error"}:
+        if known_empty_scan_policy not in {
+            "allow_actual",
+            "official_substitute",
+            "error",
+        }:
             raise ValueError(
-                "known_empty_scan_policy must be 'official_substitute' or 'error', "
+                "known_empty_scan_policy must be 'allow_actual', "
+                "'official_substitute', or 'error', "
                 f"got {known_empty_scan_policy!r}"
             )
         if type(exclude_unsupervised_sequences) is not bool:
@@ -504,7 +509,10 @@ class SemanticSegmentationDataset(Dataset):
             known_empty_context = self._known_empty_scan_context(
                 context_idx, int(scan_idx)
             )
-            if known_empty_context is not None:
+            if (
+                known_empty_context is not None
+                and self.known_empty_scan_policy != "allow_actual"
+            ):
                 if self.known_empty_scan_policy == "error":
                     raise ValueError(
                         self._known_empty_scan_error(known_empty_context)

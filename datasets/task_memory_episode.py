@@ -503,11 +503,18 @@ def _legacy_raw_mode(base_dataset: object):
     mode = getattr(base_dataset, "mode", None)
     if not isinstance(mode, str):
         raise TaskMemoryEpisodeError("base dataset lacks a string mode")
+    known_empty_policy = getattr(base_dataset, "known_empty_scan_policy", None)
+    if known_empty_policy is not None and not isinstance(known_empty_policy, str):
+        raise TaskMemoryEpisodeError("base dataset known-empty policy is invalid")
     base_dataset.mode = "task_memory_raw"
+    if known_empty_policy is not None:
+        base_dataset.known_empty_scan_policy = "allow_actual"
     try:
         yield
     finally:
         base_dataset.mode = mode
+        if known_empty_policy is not None:
+            base_dataset.known_empty_scan_policy = known_empty_policy
 
 
 def _apply_transform(sample: object, transform: EpisodeTransform) -> tuple[Any, ...]:

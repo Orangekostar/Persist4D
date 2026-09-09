@@ -265,6 +265,31 @@ def test_episode_loading_is_causal_and_reuses_scan_vertex_alignment() -> None:
     assert t2.local_stage_ids.tolist() == [0, 0, 0, 0, 1, 1, 1, 1]
 
 
+def test_episode_loader_temporarily_allows_actual_known_empty_scan() -> None:
+    class KnownEmptyBase(_FakeBaseDataset):
+        def __init__(self) -> None:
+            super().__init__()
+            self.known_empty_scan_policy = "official_substitute"
+            self.known_empty_scan_substitution_count = 0
+            self.observed_policies: list[str] = []
+
+        def load_scan_indices(self, context_index, scan_indices, *, change_file):
+            self.observed_policies.append(self.known_empty_scan_policy)
+            if tuple(scan_indices) == (1,) and self.known_empty_scan_policy != "allow_actual":
+                self.known_empty_scan_substitution_count += 1
+            return super().load_scan_indices(
+                context_index, scan_indices, change_file=change_file
+            )
+
+    base = KnownEmptyBase()
+
+    TaskMemoryEpisodeDataset(base, (_spec(_master()),))[0]
+
+    assert base.observed_policies == ["allow_actual"] * 3
+    assert base.known_empty_scan_policy == "official_substitute"
+    assert base.known_empty_scan_substitution_count == 0
+
+
 def test_full_history_window_exposes_entire_causal_prefix() -> None:
     episode = TaskMemoryEpisodeDataset(
         _FakeBaseDataset(),

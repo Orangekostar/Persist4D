@@ -402,6 +402,25 @@ def test_official_known_empty_scan_substitution_is_observable(
     assert record.substitution_count == 1
 
 
+def test_known_empty_allow_actual_policy_preserves_requested_sequence(
+    tmp_path: Path,
+) -> None:
+    processed_dir = _make_known_empty_rio_fixture(tmp_path)
+    problem_sequence = "scene0000_01-scene0171_01"
+    dataset = _make_dataset(
+        processed_dir,
+        fail_closed=True,
+        temporal_window=2,
+        known_empty_scan_policy="allow_actual",
+    )
+
+    result = dataset[1]
+
+    assert result[3] == problem_sequence
+    assert result[7] == 1
+    assert dataset.known_empty_scan_substitution_count == 0
+
+
 @pytest.mark.parametrize("invalid_database", [{}, [], None, [{"type": "validation"}]])
 def test_temporal_sequence_database_requires_a_non_empty_mapping(
     tmp_path: Path,
