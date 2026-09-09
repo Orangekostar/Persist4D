@@ -1,0 +1,68 @@
+{
+  "comparators": [
+    {
+      "name": "B2",
+      "policies": [
+        "commit0",
+        "lag1"
+      ]
+    },
+    {
+      "name": "B4",
+      "policies": [
+        "commit0",
+        "lag1"
+      ]
+    },
+    {
+      "name": "D-LAST",
+      "policies": [
+        "commit0",
+        "lag1"
+      ]
+    },
+    {
+      "name": "D-EMA",
+      "policies": [
+        "commit0",
+        "lag1"
+      ]
+    },
+    {
+      "name": "FH-R1-native",
+      "policies": [
+        "FH-native"
+      ]
+    },
+    {
+      "name": "FH-R1-lag1",
+      "policies": [
+        "lag1"
+      ]
+    }
+  ],
+  "content_sha256": "097f39979a5888b0f8297ef07edbf0a7d726911edcaeaf348702dfeedaff08eb",
+  "frozen_observed_t_map_percent": {
+    "B4": {
+      "T2": 21.964,
+      "T3": 13.55,
+      "T4": 8.016,
+      "T5": 5.854
+    },
+    "FH-R1": {
+      "T2": 22.878,
+      "T3": 14.831,
+      "T4": 10.275,
+      "T5": 8.157
+    },
+    "old-C2": {
+      "T2": 22.503,
+      "T3": 14.106,
+      "T4": 7.6,
+      "T5": 5.132
+    }
+  },
+  "primary_policy": "lag1",
+  "primary_reducer": "mean",
+  "schema_version": "task-memory-baseline-v2"
+}

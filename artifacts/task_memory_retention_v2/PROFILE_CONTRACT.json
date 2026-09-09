@@ -1,0 +1,16 @@
+{
+  "content_sha256": "4d197fd05e575273cb1a932e3f2b193be7e25380a5f512920095839655fec963",
+  "device_count": 1,
+  "device_type": "A40",
+  "reference_units": 6,
+  "repeats": 10,
+  "restore_cloned_state_each_repeat": true,
+  "schema_version": "task-memory-profile-v2",
+  "time_scopes": [
+    "model_update",
+    "end_to_end_update",
+    "output_materialization",
+    "cumulative_T1_to_T"
+  ],
+  "warmups": 5
+}

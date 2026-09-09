@@ -1,0 +1,24 @@
+{
+  "all_t_epsilon": 1e-06,
+  "checkpoint_policy_reducer_fixed_across_horizons": true,
+  "cluster_unit": "reference_id",
+  "content_sha256": "2d3daba60d6173dd7bd408f75784c68d3909aa53f48e92df6ae0554c8715540a",
+  "horizons": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "identity_zero_denominator": "N/A",
+  "metrics": [
+    "t_mAP",
+    "t_mAP50",
+    "t_mAP25",
+    "t_REC",
+    "prefix_overall_mAP"
+  ],
+  "primary_policy": "lag1",
+  "primary_reducer": "mean",
+  "protocol_b_order_units_are_correlated": true,
+  "schema_version": "task-memory-evaluation-v2"
+}

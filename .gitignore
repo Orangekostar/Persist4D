@@ -194,3 +194,6 @@ artifacts/system_comparison/full_history_predictions/*
 !artifacts/system_comparison/full_history_predictions/manifest.json
 artifacts/system_comparison/persistent_predictions/*
 !artifacts/system_comparison/persistent_predictions/manifest.json
+
+# Runtime-only TaskMemory V2 asset bindings contain machine-local paths.
+artifacts/task_memory_retention_v2/external_assets.local.json

@@ -1,0 +1,53 @@
+{
+  "amendment_count": 0,
+  "amendment_policy": "once_before_formal_run_from_measured_throughput_only",
+  "caps": {
+    "evaluation_cache_bytes": 42949672960,
+    "evaluation_gpu_hours": 30,
+    "permanent_state_bytes": 2097152,
+    "training_gpu_hours": 120
+  },
+  "content_sha256": "a8ab1a329b852270f6fc5fd2bcfad61aed02353e115854bc4400ad8384ad77ef",
+  "episode_buckets": [
+    {
+      "fraction": 0.2,
+      "name": "single_scan"
+    },
+    {
+      "fraction": 0.2,
+      "name": "T2"
+    },
+    {
+      "fraction": 0.2,
+      "name": "T3"
+    },
+    {
+      "fraction": 0.2,
+      "name": "T4"
+    },
+    {
+      "fraction": 0.2,
+      "name": "T5"
+    }
+  ],
+  "pilot_is_exact_schedule_prefix": true,
+  "schema_version": "task-memory-budget-v2",
+  "status": "FROZEN_INITIAL",
+  "training": {
+    "devices": 2,
+    "effective_episode_batch": 8,
+    "evaluation_updates": [
+      0,
+      750,
+      1500,
+      2250,
+      3000
+    ],
+    "gradient_accumulation": 4,
+    "optimizer_updates": 3000,
+    "physical_episode_batch_per_gpu": 1,
+    "pilot_updates": 300,
+    "precision": "32-true",
+    "seed": 45
+  }
+}

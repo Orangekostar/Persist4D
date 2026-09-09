@@ -1,0 +1,65 @@
+schema_version: task-memory-retention-v2-config-v1
+experiment: task_memory_retention_v2
+
+repository:
+  branch: research/persist4d-task-memory-retention-v2
+  reviewed_parent: 32a51e11b51043ec5a5825215669ef7b0ea03bc2
+
+sources:
+  evidence_map:
+    reference: repo:docs/task_memory_v2/01_EVIDENCE_AND_CODE_MAP.md
+    sha256: 56a6859904eb27f611b0a10dfe235843ce2fc2a397427f7bdf69d73ad6fc0d87
+  task_prompt:
+    reference: repo:docs/task_memory_v2/Persist4D_Codex_TaskMemory_Retention_V2.md
+    sha256: f48e559c16463e7eb4e9ed27ae1683120d18c22f20ed97cbdd71b656dab0ded5
+  old_handoff:
+    reference: repo:artifacts/allt_task_superiority_v1/HANDOFF.md
+    sha256: b9bf7742b383751fbaee4f4c8b7005490504ded7a793cdea111842a234e47dfa
+  frozen_split:
+    reference: repo:artifacts/allt_task_superiority_v1/split_manifest.json
+    sha256: 3b0244bbf5e5f95ee5802ebb91e1cd526d36d9232b9ee067878d0e123a0fe274
+  protocol_b:
+    reference: repo:artifacts/P6A/protocol_b_manifest.json
+    sha256: 246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe
+
+data:
+  metadata_reference: external:rio_metadata
+  train_database_reference: external:data_root/processed/rio/train_database.yaml
+  validation_database_reference: external:data_root/processed/rio/validation_database.yaml
+  expected_protocol_masters: 43
+  expected_protocol_order_units: 129
+  expected_protocol_references: 6
+
+assets:
+  r1_checkpoint:
+    bytes: 754813672
+    sha256: 629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd
+  concerto_pretrained:
+    bytes: 433987358
+    sha256: 845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07
+
+training:
+  seed: 45
+  devices: 2
+  physical_episode_batch_per_gpu: 1
+  gradient_accumulation: 4
+  optimizer_updates: 3000
+  pilot_updates: 300
+  evaluation_updates: [0, 750, 1500, 2250, 3000]
+  precision: 32-true
+  episode_buckets:
+    single_scan: 0.2
+    T2: 0.2
+    T3: 0.2
+    T4: 0.2
+    T5: 0.2
+
+budgets:
+  training_gpu_hours: 120
+  evaluation_gpu_hours: 30
+  evaluation_cache_bytes: 42949672960
+  permanent_state_bytes: 2097152
+
+output:
+  primary_policy: lag1
+  control_policy: commit0

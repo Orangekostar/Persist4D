@@ -1,0 +1,95 @@
+{
+  "assets": {
+    "concerto_pretrained": {
+      "bytes": 433987358,
+      "logical_reference": "external:concerto_pretrained",
+      "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+      "status": "VERIFIED"
+    },
+    "r1_checkpoint": {
+      "bytes": 754813672,
+      "logical_reference": "external:r1_checkpoint",
+      "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "status": "VERIFIED"
+    },
+    "rio_metadata": {
+      "bytes": 3155995,
+      "logical_reference": "external:rio_metadata",
+      "sha256": "674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64",
+      "status": "VERIFIED"
+    }
+  },
+  "content_sha256": "9b210e9472fc9d0284fd7a49d28390df60fddd884843e71d6466230fc05c5d95",
+  "environment": {
+    "gpu_inventory": [
+      {
+        "index": 0,
+        "memory_free_mib": 45490,
+        "memory_total_mib": 46068,
+        "name": "NVIDIA A40",
+        "utilization_percent": 0
+      },
+      {
+        "index": 1,
+        "memory_free_mib": 45490,
+        "memory_total_mib": 46068,
+        "name": "NVIDIA A40",
+        "utilization_percent": 0
+      },
+      {
+        "index": 2,
+        "memory_free_mib": 45490,
+        "memory_total_mib": 46068,
+        "name": "NVIDIA A40",
+        "utilization_percent": 0
+      }
+    ],
+    "python": "3.10.20",
+    "storage": {
+      "data_root": {
+        "free_bytes": 89553498112,
+        "logical_reference": "external:data_root"
+      },
+      "run_root": {
+        "free_bytes": 518893076480,
+        "logical_reference": "external:run_root"
+      }
+    }
+  },
+  "experiment": "task_memory_retention_v2",
+  "legacy_inputs": {
+    "allt_cache_root": "external:allt_task_superiority_v1/evaluation_cache",
+    "allt_handoff": "repo:artifacts/allt_task_superiority_v1/HANDOFF.md",
+    "allt_handoff_sha256": "b9bf7742b383751fbaee4f4c8b7005490504ded7a793cdea111842a234e47dfa",
+    "policy": "read_only"
+  },
+  "repository": {
+    "branch": "research/persist4d-task-memory-retention-v2",
+    "reviewed_parent": "32a51e11b51043ec5a5825215669ef7b0ea03bc2",
+    "reviewed_parent_is_ancestor": true,
+    "start_head": "32a51e11b51043ec5a5825215669ef7b0ea03bc2"
+  },
+  "schema_version": "task-memory-start-v2",
+  "source_documents": {
+    "evidence_map": {
+      "logical_reference": "repo:docs/task_memory_v2/01_EVIDENCE_AND_CODE_MAP.md",
+      "sha256": "56a6859904eb27f611b0a10dfe235843ce2fc2a397427f7bdf69d73ad6fc0d87"
+    },
+    "frozen_split": {
+      "logical_reference": "repo:artifacts/allt_task_superiority_v1/split_manifest.json",
+      "sha256": "3b0244bbf5e5f95ee5802ebb91e1cd526d36d9232b9ee067878d0e123a0fe274"
+    },
+    "old_handoff": {
+      "logical_reference": "repo:artifacts/allt_task_superiority_v1/HANDOFF.md",
+      "sha256": "b9bf7742b383751fbaee4f4c8b7005490504ded7a793cdea111842a234e47dfa"
+    },
+    "protocol_b": {
+      "logical_reference": "repo:artifacts/P6A/protocol_b_manifest.json",
+      "sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe"
+    },
+    "task_prompt": {
+      "logical_reference": "repo:docs/task_memory_v2/Persist4D_Codex_TaskMemory_Retention_V2.md",
+      "sha256": "f48e559c16463e7eb4e9ed27ae1683120d18c22f20ed97cbdd71b656dab0ded5"
+    }
+  }
+}
