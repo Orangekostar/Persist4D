@@ -560,11 +560,10 @@ def _apply_transform(sample: object, transform: EpisodeTransform) -> tuple[Any, 
 def _renumber_segments(labels: np.ndarray, start: int) -> tuple[np.ndarray, int]:
     result = labels.copy()
     segments = result[:, -1]
-    unique = np.unique(segments)
+    unique, inverse = np.unique(segments, return_inverse=True)
     if unique.size and unique[0] < 0:
         raise TaskMemoryEpisodeError("legacy segment IDs must be non-negative")
-    for position, segment in enumerate(unique):
-        result[segments == segment, -1] = start + position
+    result[:, -1] = start + inverse
     return result, start + len(unique)
 
 
@@ -762,12 +761,14 @@ def _segment_stage_ids(point2segment: Tensor, temporal_stages: Tensor) -> Tensor
     temporal_stages = temporal_stages.long().cpu()
     if point2segment.min().item() < 0:
         raise TaskMemoryEpisodeError("segment IDs must be non-negative")
-    result = torch.empty(point2segment.max().item() + 1, dtype=torch.long)
-    for segment in range(result.numel()):
-        stages = temporal_stages[point2segment == segment].unique()
-        if stages.numel() != 1:
-            raise TaskMemoryEpisodeError("one segment spans multiple stages")
-        result[segment] = stages[0]
+    segment_count = point2segment.max().item() + 1
+    counts = torch.bincount(point2segment, minlength=segment_count)
+    if torch.any(counts == 0).item():
+        raise TaskMemoryEpisodeError("segment IDs must be contiguous")
+    result = torch.empty(segment_count, dtype=torch.long)
+    result.scatter_(0, point2segment, temporal_stages)
+    if not torch.equal(result[point2segment], temporal_stages):
+        raise TaskMemoryEpisodeError("one segment spans multiple stages")
     return result
 
 

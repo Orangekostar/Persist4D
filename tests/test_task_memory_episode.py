@@ -14,6 +14,8 @@ from datasets.task_memory_episode import (
     TaskMemoryEpisodeDataset,
     TaskMemoryEpisodeError,
     TaskMemoryEpisodeSpec,
+    _renumber_segments,
+    _segment_stage_ids,
     build_native_episode_masters,
     build_task_memory_draw_plan,
 )
@@ -72,6 +74,48 @@ class _FakeBaseDataset:
             context_index,
             [],
         )
+
+
+def test_segment_remapping_uses_vectorized_inverse_without_changing_semantics(
+    monkeypatch,
+) -> None:
+    labels = np.column_stack(
+        (
+            np.zeros(6, dtype=np.int32),
+            np.zeros(6, dtype=np.int32),
+            np.zeros(6, dtype=np.int32),
+            np.asarray([10, 3, 10, 7, 3, 7], dtype=np.int32),
+        )
+    )
+    original = labels.copy()
+    numpy_unique = np.unique
+
+    def require_inverse(*args, **kwargs):
+        assert kwargs.get("return_inverse") is True
+        return numpy_unique(*args, **kwargs)
+
+    monkeypatch.setattr(np, "unique", require_inverse)
+    remapped, next_id = _renumber_segments(labels, 5)
+
+    assert remapped[:, -1].tolist() == [7, 5, 7, 6, 5, 6]
+    assert next_id == 8
+    np.testing.assert_array_equal(labels, original)
+
+
+def test_segment_stage_lookup_is_linear_and_rejects_invalid_groups(monkeypatch) -> None:
+    def forbid_per_segment_unique(*args, **kwargs):
+        raise AssertionError("per-segment unique is quadratic")
+
+    monkeypatch.setattr(torch.Tensor, "unique", forbid_per_segment_unique)
+    assert _segment_stage_ids(
+        torch.tensor([0, 0, 1, 1, 2]),
+        torch.tensor([0, 0, 1, 1, 1]),
+    ).tolist() == [0, 1, 1]
+
+    with pytest.raises(TaskMemoryEpisodeError, match="multiple stages"):
+        _segment_stage_ids(torch.tensor([0, 0]), torch.tensor([0, 1]))
+    with pytest.raises(TaskMemoryEpisodeError, match="segment IDs"):
+        _segment_stage_ids(torch.tensor([0, 2]), torch.tensor([0, 0]))
 
 
 def _master(
