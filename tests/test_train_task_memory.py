@@ -42,6 +42,7 @@ def test_each_m2_variant_resolves_frozen_training_budget(variant: str) -> None:
     assert config.task_memory_training.devices == 2
     assert config.task_memory_training.gradient_accumulation == 4
     assert config.task_memory_training.effective_episode_batch == 8
+    assert config.data.train_collation.preserve_empty_targets is True
     assert dict(config.task_memory_training.episode_buckets) == {
         "single_scan": 0.2,
         "T2": 0.2,

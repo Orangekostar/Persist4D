@@ -7,6 +7,7 @@ import pytest
 import torch
 
 import datasets
+from datasets.pointcept_utils import get_instance_masks
 from datasets.task_memory_episode import (
     NativeEpisodeMaster,
     StageMeta,
@@ -416,6 +417,40 @@ def test_collator_builds_label_free_stage_meta_and_canonical_identity_keys() -> 
         for field in fields(StageMeta)
         for forbidden in ("label", "target", "ground_truth", "instance_id")
     )
+
+
+def test_pointcept_targets_preserve_empty_sample_beside_nonempty_sample() -> None:
+    empty_labels = torch.tensor(
+        [[1, 4, 0, 0], [255, 7, 0, 1]], dtype=torch.long
+    )
+    populated_labels = torch.tensor(
+        [[2, 9, 0, 0], [2, 9, 0, 1]], dtype=torch.long
+    )
+    segments = [labels.clone() for labels in (empty_labels, populated_labels)]
+
+    assert (
+        get_instance_masks(
+            [empty_labels, populated_labels],
+            list_segments=segments,
+            filter_out_classes=[0, 1, 255],
+            label_offset=2,
+        )
+        == []
+    )
+    targets = get_instance_masks(
+        [empty_labels, populated_labels],
+        list_segments=segments,
+        filter_out_classes=[0, 1, 255],
+        label_offset=2,
+        preserve_empty_targets=True,
+    )
+
+    assert len(targets) == 2
+    assert targets[0]["labels"].shape == (0,)
+    assert targets[0]["masks"].shape == (0, 2)
+    assert targets[0]["segment_mask"].shape == (0, 2)
+    assert targets[1]["labels"].tolist() == [0]
+    assert targets[1]["ids"].tolist() == [9]
 
 
 def test_collator_cannot_mutate_frozen_episode_samples() -> None:

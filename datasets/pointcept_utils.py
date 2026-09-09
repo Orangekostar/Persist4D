@@ -18,6 +18,7 @@ class VoxelizeCollate:
         filter_out_classes=[],
         label_offset=0,
         num_queries=None,
+        preserve_empty_targets=False,
     ):
         self.filter_out_classes = filter_out_classes
         self.label_offset = label_offset
@@ -29,6 +30,7 @@ class VoxelizeCollate:
         self.very_small_crops = very_small_crops
         self.probing = probing
         self.ignore_class_threshold = ignore_class_threshold
+        self.preserve_empty_targets = preserve_empty_targets
 
         self.num_queries = num_queries
         
@@ -73,6 +75,7 @@ class VoxelizeCollate:
             ignore_class_threshold=self.ignore_class_threshold,
             filter_out_classes=self.filter_out_classes,
             label_offset=self.label_offset,
+            preserve_empty_targets=self.preserve_empty_targets,
             transform = self.transform
         )
         
@@ -83,6 +86,7 @@ def voxelize(
     ignore_class_threshold,
     filter_out_classes,
     label_offset,
+    preserve_empty_targets,
     transform,
 ):
     (
@@ -252,6 +256,7 @@ def voxelize(
                     ignore_class_threshold=ignore_class_threshold,
                     filter_out_classes=filter_out_classes,
                     label_offset=label_offset,
+                    preserve_empty_targets=preserve_empty_targets,
                 )
                 for i in range(len(target)):
                     target[i]["point2segment"] = point["labels"][i][:, -1]
@@ -262,6 +267,7 @@ def voxelize(
                         ignore_class_threshold=ignore_class_threshold,
                         filter_out_classes=filter_out_classes,
                         label_offset=label_offset,
+                        preserve_empty_targets=preserve_empty_targets,
                     )
                     for i in range(len(target_full)):
                         target_full[i]["point2segment"] = torch.from_numpy(
@@ -300,6 +306,7 @@ def get_instance_masks(
     ignore_class_threshold=100,
     filter_out_classes=[],
     label_offset=0,
+    preserve_empty_targets=False,
 ):
     target = []
 
@@ -353,7 +360,27 @@ def get_instance_masks(
                 segment_masks.append(segment_mask)
 
         if len(label_ids) == 0:
-            return list()
+            if not preserve_empty_targets:
+                return list()
+            empty = torch.empty(0, dtype=torch.long, device=list_labels[batch_id].device)
+            empty_target = {
+                "labels": empty,
+                "changes": empty.clone(),
+                "ids": empty.clone(),
+                "masks": torch.empty(
+                    (0, list_labels[batch_id].shape[0]),
+                    dtype=torch.bool,
+                    device=list_labels[batch_id].device,
+                ),
+            }
+            if list_segments:
+                empty_target["segment_mask"] = torch.empty(
+                    (0, list_segments[batch_id].shape[0]),
+                    dtype=torch.bool,
+                    device=list_labels[batch_id].device,
+                )
+            target.append(empty_target)
+            continue
 
         label_ids = torch.stack(label_ids)
         change_ids = torch.stack(change_ids)
