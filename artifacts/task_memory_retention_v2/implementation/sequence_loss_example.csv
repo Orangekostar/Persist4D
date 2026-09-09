@@ -1,0 +1,17 @@
+sequence_case,stage,layer,matcher_mode,query_target_pairs,fixed_pairs,residual_pairs,inherited_visibility,ambiguity_exclusions,component_origin,loss_component,loss_value
+previous_only,T2,aux_0,independent,q3->gt101;q2->gt202,,q3->gt101;q2->gt202,previous_only_pre_conditioning,0,R1_SetCriterion,loss_ce,0.5640426874
+previous_only,T2,aux_0,independent,q3->gt101;q2->gt202,,q3->gt101;q2->gt202,previous_only_pre_conditioning,0,R1_SetCriterion,loss_mask,0.9740769863
+previous_only,T2,aux_0,independent,q3->gt101;q2->gt202,,q3->gt101;q2->gt202,previous_only_pre_conditioning,0,R1_SetCriterion,loss_dice,0.4149728417
+previous_only,T2,aux_0,independent,q3->gt101;q2->gt202,,q3->gt101;q2->gt202,previous_only_pre_conditioning,0,TaskMemory_TALA,loss_tala_empty_current,0.0000000000
+previous_only,T2,aux_1,tala,q0->gt101;q2->gt202,q0->gt101,q2->gt202,previous_only,0,R1_SetCriterion,loss_ce,5.1094970703
+previous_only,T2,aux_1,tala,q0->gt101;q2->gt202,q0->gt101,q2->gt202,previous_only,0,R1_SetCriterion,loss_mask,1.2809174061
+previous_only,T2,aux_1,tala,q0->gt101;q2->gt202,q0->gt101,q2->gt202,previous_only,0,R1_SetCriterion,loss_dice,0.3472820520
+previous_only,T2,aux_1,tala,q0->gt101;q2->gt202,q0->gt101,q2->gt202,previous_only,0,TaskMemory_TALA,loss_tala_empty_current,3.0485873222
+previous_only,T2,final,tala,q0->gt101;q2->gt202,q0->gt101,q2->gt202,previous_only,0,R1_SetCriterion,loss_ce,5.1094970703
+previous_only,T2,final,tala,q0->gt101;q2->gt202,q0->gt101,q2->gt202,previous_only,0,R1_SetCriterion,loss_mask,1.2809174061
+previous_only,T2,final,tala,q0->gt101;q2->gt202,q0->gt101,q2->gt202,previous_only,0,R1_SetCriterion,loss_dice,0.3472820520
+previous_only,T2,final,tala,q0->gt101;q2->gt202,q0->gt101,q2->gt202,previous_only,0,TaskMemory_TALA,loss_tala_empty_current,3.0485873222
+ambiguous,T2,final,tala,q3->gt101;q2->gt202,,q3->gt101;q2->gt202,ambiguous_excluded,1,R1_SetCriterion,loss_ce,0.5640426874
+ambiguous,T2,final,tala,q3->gt101;q2->gt202,,q3->gt101;q2->gt202,ambiguous_excluded,1,R1_SetCriterion,loss_mask,0.8490769863
+ambiguous,T2,final,tala,q3->gt101;q2->gt202,,q3->gt101;q2->gt202,ambiguous_excluded,1,R1_SetCriterion,loss_dice,0.3324864209
+ambiguous,T2,final,tala,q3->gt101;q2->gt202,,q3->gt101;q2->gt202,ambiguous_excluded,1,TaskMemory_TALA,loss_tala_empty_current,0.0000000000

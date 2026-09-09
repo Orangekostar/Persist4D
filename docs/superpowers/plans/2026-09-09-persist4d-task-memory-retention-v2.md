@@ -265,6 +265,8 @@ Run new tests plus `tests/test_rescene_query_features.py` and `tests/test_rescen
 
 ### Task 6: Implement Q-INDEP and tracklet-aware TALA supervision
 
+**Status:** Complete
+
 **Files:**
 - Create: `models/task_memory_supervision.py`
 - Create: `models/task_memory_criterion.py`
@@ -275,23 +277,23 @@ Run new tests plus `tests/test_rescene_query_features.py` and `tests/test_rescen
 - Consumes: route/commit lineage, target `ids`, canonical reference identity, ambiguity metadata, original SetCriterion matcher/losses, and post-conditioning aux boundary.
 - Produces: `TrainingIdentityLedger`, `build_tala_assignment`, and `TaskMemoryCriterion.compute_with_assignments(...) -> TaskMemoryLossResult`.
 
-- [ ] **Step 1: Write supervision tests**
+- [x] **Step 1: Write supervision tests**
 
 Cover inherited-query fixed GT assignment, newborn-only residual Hungarian matching, Q-INDEP full independent matching, wrong-route penalty without GT route repair, duplicate predicted slots selecting one positive training item, ambiguity exclusion counts, previous-only positive class/mask, fully absent inherited no-object plus differentiable empty-current-mask loss, one empty sample beside a nonempty sample, and post-conditioning aux inheritance while pre-conditioning aux stays independent.
 
-- [ ] **Step 2: Run the tests and confirm RED**
+- [x] **Step 2: Run the tests and confirm RED**
 
 Run: `/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q tests/test_task_memory_criterion.py`
 
-- [ ] **Step 3: Implement ledger and assignment composition**
+- [x] **Step 3: Implement ledger and assignment composition**
 
 The ledger maps `(logical_id,generation)` to qualified `(reference_id,canonical_instance_id)` only after a real predicted birth intersects a normal Hungarian match. It never changes route/state. Reuse existing `SetCriterion.get_loss`; compose per-layer indices without modifying the old criterion.
 
-- [ ] **Step 4: Implement empty-target-safe losses**
+- [x] **Step 4: Implement empty-target-safe losses**
 
 Return graph-connected zero mask/dice/KD terms for empty positives, retain classification negatives, and add explicit current-stage empty-mask supervision for inherited absent entities. Preserve class-head final-index no-object and ignore label 253.
 
-- [ ] **Step 5: Validate and commit supervision**
+- [x] **Step 5: Validate and commit supervision**
 
 Run new tests plus `tests/test_objective_semantics.py`; export one hand-checkable sequence loss table separating R1 components, inherited visibility, ambiguity exclusions, and layer assignments.
 
