@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from copy import deepcopy
 from pathlib import Path
 from types import SimpleNamespace
@@ -8,6 +9,7 @@ from typing import ClassVar
 import pytest
 import torch
 
+import scripts.evaluate_task_memory as evaluation_module
 from datasets.task_memory_episode import StageMeta
 from models.task_memory_state import TaskMemoryConfig
 from scripts.evaluate_task_memory import _csv_bytes, _state_contract_sha256
@@ -134,6 +136,30 @@ def test_evaluation_csv_writes_zero_denominators_as_na() -> None:
     encoded = _csv_bytes([{"count": 0, "rate": None}]).decode("utf-8")
 
     assert encoded == "count,rate\n0,N/A\n"
+
+
+def test_evaluation_runtime_applies_the_frozen_seed_and_device(monkeypatch) -> None:
+    events = []
+
+    @contextmanager
+    def fake_runtime(seed, device):
+        events.append(("enter", seed, device))
+        yield
+        events.append(("exit", seed, device))
+
+    monkeypatch.setattr(
+        evaluation_module, "deterministic_inference_runtime", fake_runtime
+    )
+    device = torch.device("cuda:0")
+
+    with evaluation_module._evaluation_runtime(device):
+        events.append(("body",))
+
+    assert events == [
+        ("enter", 45, device),
+        ("body",),
+        ("exit", 45, device),
+    ]
 
 
 def _episode(horizon: int) -> dict[str, object]:

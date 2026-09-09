@@ -14,6 +14,7 @@ import sys
 import tempfile
 import time
 from collections.abc import Callable, Mapping, Sequence
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -51,6 +52,7 @@ from scripts.preflight_task_memory_episode import (
 )
 from scripts.rescene_task_postprocess import extract_official_task_prediction
 from scripts.run_task_memory_policy_baseline import select_diagnostic_masters
+from scripts.system_comparison_inference import deterministic_inference_runtime
 from scripts.task_memory_cache import (
     CACHE_LIMIT_BYTES,
     build_episode_cache_payload,
@@ -97,6 +99,12 @@ REDUCERS = ("mean", "latest", "max")
 
 class TaskMemoryEvaluationError(RuntimeError):
     """Raised when real evaluation violates a frozen identity or budget."""
+
+
+@contextmanager
+def _evaluation_runtime(device: torch.device):
+    with deterministic_inference_runtime(EVALUATION_SEED, device):
+        yield
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -631,20 +639,21 @@ def run_evaluation(
                 "key_sha256": cache_key_sha256(key),
             }
         else:
-            episode = TaskMemoryEpisodeDataset(
-                base,
-                (spec,),
-                apply_augmentation=False,
-                window_mode=str(config.task_memory_training.window_mode),
-            )[0]
-            payload = _produce_episode(
-                episode=episode,
-                collator=collator,
-                system=system,
-                class_mapper=class_mapper,
-                device=device,
-                key=key,
-            )
+            with _evaluation_runtime(device):
+                episode = TaskMemoryEpisodeDataset(
+                    base,
+                    (spec,),
+                    apply_augmentation=False,
+                    window_mode=str(config.task_memory_training.window_mode),
+                )[0]
+                payload = _produce_episode(
+                    episode=episode,
+                    collator=collator,
+                    system=system,
+                    class_mapper=class_mapper,
+                    device=device,
+                    key=key,
+                )
             record = write_task_memory_cache(
                 cache_root, payload, max_total_bytes=CACHE_LIMIT_BYTES
             )
@@ -684,6 +693,12 @@ def run_evaluation(
         "population_id": POPULATION_ID,
         "variant": variant,
         "checkpoint_sha256": checkpoint_sha256,
+        "determinism": {
+            "cudnn_deterministic": True,
+            "episode_seed_reset": True,
+            "tf32": False,
+            "torch_deterministic_algorithms": True,
+        },
         "training_seed": 45,
         "evaluation_seed": EVALUATION_SEED,
     }
