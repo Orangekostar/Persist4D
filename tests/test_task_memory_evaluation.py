@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
+from types import SimpleNamespace
 from typing import ClassVar
 
 import pytest
 import torch
 
 from datasets.task_memory_episode import StageMeta
+from models.task_memory_state import TaskMemoryConfig
+from scripts.evaluate_task_memory import _state_contract_sha256
 from scripts.rescene_task_postprocess import OfficialTaskPrediction
 from scripts.task_memory_cache import (
     CACHE_LIMIT_BYTES,
@@ -99,6 +102,30 @@ def _key(horizon: int) -> dict[str, object]:
         postprocess_sha256="5" * 64,
         evaluation_seed=45,
     )
+
+
+def test_state_contract_hash_uses_the_runtime_task_memory_config() -> None:
+    system = SimpleNamespace(
+        config=SimpleNamespace(
+            task_memory_training=SimpleNamespace(state_enabled=True)
+        ),
+        model=SimpleNamespace(
+            task_memory_capacity=100,
+            task_memory_config=TaskMemoryConfig(
+                association_threshold=0.55,
+                class_weight=0.25,
+                max_update_rate=0.2,
+                update_rate=0.2,
+            ),
+        ),
+    )
+
+    observed = _state_contract_sha256(system)
+
+    assert isinstance(observed, str)
+    assert len(observed) == 64
+    system.model.task_memory_config = TaskMemoryConfig(update_mode="last")
+    assert _state_contract_sha256(system) != observed
 
 
 def _episode(horizon: int) -> dict[str, object]:

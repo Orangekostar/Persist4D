@@ -243,15 +243,17 @@ def current_stage_target(
 
 def _state_contract_sha256(system: TaskMemoryTrainer) -> str:
     model = system.model
+    state_config = model.task_memory_config
     return canonical_json_sha256(
         {
-            "association_threshold": float(model.task_association_threshold),
+            "association_threshold": float(state_config.association_threshold),
             "capacity": int(model.task_memory_capacity),
-            "class_weight": float(model.task_class_weight),
+            "class_weight": float(state_config.class_weight),
             "enabled": bool(system.config.task_memory_training.state_enabled),
-            "max_update_rate": float(model.task_max_update_rate),
+            "max_update_rate": float(state_config.max_update_rate),
             "schema_version": "prediction-only-task-state-v1",
-            "update_rate": float(model.task_update_rate),
+            "update_mode": str(state_config.update_mode),
+            "update_rate": float(state_config.update_rate),
         }
     )
 
