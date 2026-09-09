@@ -63,6 +63,8 @@ from scripts.task_memory_cache import (
 from scripts.task_memory_contracts import canonical_json_sha256
 from scripts.task_memory_metrics import (
     aggregate_identity_event_diagnostics,
+    build_retention_rows,
+    compute_cached_identity_metrics,
     compute_cached_task_metrics,
 )
 from scripts.train_task_memory import (
@@ -167,8 +169,29 @@ def _csv_bytes(rows: Sequence[Mapping[str, object]]) -> bytes:
     buffer = io.StringIO(newline="")
     writer = csv.DictWriter(buffer, fieldnames=fields, lineterminator="\n")
     writer.writeheader()
-    writer.writerows(rows)
+    writer.writerows(
+        {
+            field: "N/A" if value is None else value
+            for field, value in row.items()
+        }
+        for row in rows
+    )
     return buffer.getvalue().encode("utf-8")
+
+
+def _artifact_record(path: Path, *, row_count: int) -> dict[str, object]:
+    try:
+        relative = path.relative_to(PROJECT_ROOT)
+    except ValueError as error:
+        raise TaskMemoryEvaluationError(
+            "public evaluation tables must remain under the repository root"
+        ) from error
+    return {
+        "file_bytes": path.stat().st_size,
+        "file_sha256": _file_sha256(path),
+        "logical_reference": f"repo:{relative}",
+        "row_count": row_count,
+    }
 
 
 def _validated_content_hash(payload: Mapping[str, object], *, name: str) -> str:
@@ -653,21 +676,50 @@ def run_evaluation(
         reducers=reducers,
         class_mapper=class_mapper,
     )
-    rows = [
+    identity_metric_rows = compute_cached_identity_metrics(
+        payloads, class_mapper=class_mapper
+    )
+    retention_metric_rows = build_retention_rows(metric_rows)
+    common_columns = {
+        "population_id": POPULATION_ID,
+        "variant": variant,
+        "checkpoint_sha256": checkpoint_sha256,
+        "training_seed": 45,
+        "evaluation_seed": EVALUATION_SEED,
+    }
+    task_rows = [
         {
-            "population_id": POPULATION_ID,
-            "variant": variant,
-            "checkpoint_sha256": checkpoint_sha256,
-            "training_seed": 45,
-            "evaluation_seed": EVALUATION_SEED,
+            **common_columns,
             **row,
             "reference_count": len({master.reference_id for master in selected}),
             "master_count": len(selected),
         }
         for row in metric_rows
     ]
+    identity_rows = [
+        {
+            **common_columns,
+            **row,
+            "reference_count": len({master.reference_id for master in selected}),
+            "master_count": len(selected),
+        }
+        for row in identity_metric_rows
+    ]
+    retention_rows = [
+        {
+            **common_columns,
+            **row,
+            "reference_count": len({master.reference_id for master in selected}),
+            "master_count": len(selected),
+        }
+        for row in retention_metric_rows
+    ]
     metrics_path = output_root / "metrics.csv"
-    _atomic_bytes(metrics_path, _csv_bytes(rows))
+    identity_path = output_root / "identity_metrics.csv"
+    retention_path = output_root / "retention.csv"
+    _atomic_bytes(metrics_path, _csv_bytes(task_rows))
+    _atomic_bytes(identity_path, _csv_bytes(identity_rows))
+    _atomic_bytes(retention_path, _csv_bytes(retention_rows))
     event_records = [
         stage["event_diagnostics"]
         for payload in payloads
@@ -685,12 +737,10 @@ def run_evaluation(
         "evaluation_seed": EVALUATION_SEED,
         "identity_events": aggregate_identity_event_diagnostics(event_records),
         "load_audit": load_audit,
-        "metrics": {
-            "file_bytes": metrics_path.stat().st_size,
-            "file_sha256": _file_sha256(metrics_path),
-            "logical_reference": f"repo:{metrics_path.relative_to(PROJECT_ROOT)}",
-            "row_count": len(rows),
-        },
+        "identity_metrics": _artifact_record(
+            identity_path, row_count=len(identity_rows)
+        ),
+        "metrics": _artifact_record(metrics_path, row_count=len(task_rows)),
         "population": {
             "id": POPULATION_ID,
             "master_count": len(selected),
@@ -700,8 +750,11 @@ def run_evaluation(
         "postprocess_sha256": postprocess_sha256,
         "produced": produced,
         "reducers": list(reducers),
+        "retention": _artifact_record(
+            retention_path, row_count=len(retention_rows)
+        ),
         "reused": reused,
-        "schema_version": "task-memory-evaluation-run-v1",
+        "schema_version": "task-memory-evaluation-run-v2",
         "source_commit": source_commit,
         "state_contract_sha256": state_contract_sha256,
         "status": "PASS",

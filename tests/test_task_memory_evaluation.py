@@ -10,7 +10,7 @@ import torch
 
 from datasets.task_memory_episode import StageMeta
 from models.task_memory_state import TaskMemoryConfig
-from scripts.evaluate_task_memory import _state_contract_sha256
+from scripts.evaluate_task_memory import _csv_bytes, _state_contract_sha256
 from scripts.rescene_task_postprocess import OfficialTaskPrediction
 from scripts.task_memory_cache import (
     CACHE_LIMIT_BYTES,
@@ -25,6 +25,8 @@ from scripts.task_memory_cache import (
 )
 from scripts.task_memory_metrics import (
     aggregate_identity_event_diagnostics,
+    build_retention_rows,
+    compute_cached_identity_metrics,
     compute_cached_task_metrics,
     replay_lag1_prefixes,
 )
@@ -126,6 +128,12 @@ def test_state_contract_hash_uses_the_runtime_task_memory_config() -> None:
     assert len(observed) == 64
     system.model.task_memory_config = TaskMemoryConfig(update_mode="last")
     assert _state_contract_sha256(system) != observed
+
+
+def test_evaluation_csv_writes_zero_denominators_as_na() -> None:
+    encoded = _csv_bytes([{"count": 0, "rate": None}]).decode("utf-8")
+
+    assert encoded == "count,rate\n0,N/A\n"
 
 
 def _episode(horizon: int) -> dict[str, object]:
@@ -417,3 +425,45 @@ def test_identity_event_diagnostics_keep_na_denominators_and_error_counts() -> N
     assert result["false_reactivation_count"] == 1
     assert result["false_reactivation_rate"] == pytest.approx(0.5)
     assert result["rejected_birth_count"] == 5
+
+
+def test_cached_identity_metrics_reuse_published_ids_and_keep_na_rates() -> None:
+    rows = compute_cached_identity_metrics(
+        [_episode(5)], class_mapper=lambda value: value
+    )
+
+    assert [row["T"] for row in rows] == [2, 3, 4, 5]
+    assert rows[0]["identity_transition_opportunities"] == 1
+    assert rows[-1]["identity_transition_opportunities"] == 4
+    assert all(row["deployment_id_switches"] == 0 for row in rows)
+    assert all(row["normalized_id_switch_rate"] == 0.0 for row in rows)
+    assert all(row["gap_recovery_accuracy"] is None for row in rows)
+    assert all(row["gap_recovery_attempt_coverage"] is None for row in rows)
+
+
+def test_retention_uses_each_reducer_t2_and_keeps_zero_denominator_na() -> None:
+    rows = []
+    for reducer, values in {
+        "mean": (0.5, 0.4, 0.3, 0.25),
+        "max": (0.0, 0.1, 0.2, 0.3),
+    }.items():
+        for horizon, value in zip((2, 3, 4, 5), values, strict=True):
+            rows.append(
+                {
+                    "T": horizon,
+                    "policy": "lag1",
+                    "reducer": reducer,
+                    "t_mAP": value,
+                }
+            )
+
+    retention = build_retention_rows(rows)
+
+    mean_t5 = next(
+        row for row in retention if row["reducer"] == "mean" and row["T"] == 5
+    )
+    max_t5 = next(
+        row for row in retention if row["reducer"] == "max" and row["T"] == 5
+    )
+    assert mean_t5["relative_t_mAP_retention"] == pytest.approx(0.5)
+    assert max_t5["relative_t_mAP_retention"] is None

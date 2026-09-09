@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
@@ -13,6 +14,9 @@ from datasets.task_memory_episode import StageMeta
 from scripts.rescene_task_postprocess import OfficialTaskPrediction
 from scripts.system_comparison_metrics import (
     CausalPrefixPair,
+    compute_deployment_identity_metrics,
+    current_stage_pair,
+    match_identity_update,
     validate_causal_prefix_pair,
 )
 from scripts.task_memory_cache import (
@@ -39,6 +43,7 @@ class TaskMemoryMetricError(ValueError):
 class CachedPrefixResult:
     pair: CausalPrefixPair
     accounting: PublicationAccounting
+    published_identities: tuple[PublishedIdentity, ...]
     revision_versions: dict[str, int]
     score_reducer: str
 
@@ -186,6 +191,7 @@ def replay_lag1_prefixes(
                 CachedPrefixResult(
                     pair=pair,
                     accounting=prefix.accounting,
+                    published_identities=prefix.keys,
                     revision_versions=versions,
                     score_reducer=reducer,
                 )
@@ -256,6 +262,173 @@ def compute_cached_task_metrics(
     return rows
 
 
+_IDENTITY_COUNT_FIELDS = (
+    "correct_recoveries",
+    "deployment_id_switches",
+    "fragmentation_count",
+    "fragmentation_opportunities",
+    "gap_opportunities",
+    "identity_transition_opportunities",
+    "merge_count",
+    "merge_opportunities",
+    "recovery_attempts",
+)
+
+
+def _rate(numerator: int, denominator: int) -> float | None:
+    return numerator / denominator if denominator else None
+
+
+def _aggregate_identity_metrics(
+    records: Sequence[Mapping[str, object]],
+) -> dict[str, int | float | None]:
+    totals = {}
+    for field in _IDENTITY_COUNT_FIELDS:
+        values = [record.get(field) for record in records]
+        if any(
+            isinstance(value, bool) or not isinstance(value, int) or value < 0
+            for value in values
+        ):
+            raise TaskMemoryMetricError("deployment identity counts are invalid")
+        totals[field] = sum(values)
+    return {
+        **totals,
+        "fragmentation_rate": _rate(
+            totals["fragmentation_count"],
+            totals["fragmentation_opportunities"],
+        ),
+        "gap_recovery_accuracy": _rate(
+            totals["correct_recoveries"], totals["recovery_attempts"]
+        ),
+        "gap_recovery_attempt_coverage": _rate(
+            totals["recovery_attempts"], totals["gap_opportunities"]
+        ),
+        "gap_recovery_recall": _rate(
+            totals["correct_recoveries"], totals["gap_opportunities"]
+        ),
+        "merge_rate": _rate(
+            totals["merge_count"], totals["merge_opportunities"]
+        ),
+        "normalized_id_switch_rate": _rate(
+            totals["deployment_id_switches"],
+            totals["identity_transition_opportunities"],
+        ),
+    }
+
+
+def compute_cached_identity_metrics(
+    payloads: Sequence[Mapping[str, object]],
+    *,
+    class_mapper: Callable[[int], int],
+) -> list[dict[str, object]]:
+    if (
+        isinstance(payloads, (str, bytes))
+        or not isinstance(payloads, Sequence)
+        or not payloads
+        or not callable(class_mapper)
+    ):
+        raise TaskMemoryMetricError("cached identity metrics require episodes")
+    by_horizon: dict[int, list[Mapping[str, object]]] = defaultdict(list)
+    for payload in payloads:
+        prefixes = replay_lag1_prefixes(
+            payload, reducers=("mean",), class_mapper=class_mapper
+        )["mean"]
+        issued_identity: dict[PublishedIdentity, int] = {}
+        updates = []
+        for prefix in prefixes:
+            for identity in prefix.published_identities:
+                if identity not in issued_identity:
+                    issued_identity[identity] = len(issued_identity)
+            issued_ids = torch.tensor(
+                [issued_identity[value] for value in prefix.published_identities],
+                dtype=torch.long,
+            )
+            current = current_stage_pair(prefix.pair)
+            updates.append(
+                match_identity_update(
+                    horizon=prefix.pair.horizon,
+                    gt_ids=current.target["ids"],
+                    gt_classes=current.target["labels"],
+                    gt_masks=current.target["masks"],
+                    issued_ids=issued_ids,
+                    pred_classes=current.prediction["pred_classes"],
+                    pred_masks=current.prediction["pred_masks"],
+                    minimum_iou=0.5,
+                )
+            )
+        for horizon in range(2, len(updates) + 1):
+            by_horizon[horizon].append(
+                compute_deployment_identity_metrics(updates[:horizon])
+            )
+    return [
+        {
+            "T": horizon,
+            "episode_count": len(records),
+            "identity_linker": "lag1-route-then-class-iou-v1",
+            "policy": "lag1",
+            **_aggregate_identity_metrics(records),
+        }
+        for horizon, records in sorted(by_horizon.items())
+    ]
+
+
+def build_retention_rows(
+    metric_rows: Sequence[Mapping[str, object]],
+) -> list[dict[str, object]]:
+    from scripts.p6a_metrics import relative_retention
+
+    if (
+        isinstance(metric_rows, (str, bytes))
+        or not isinstance(metric_rows, Sequence)
+        or not metric_rows
+    ):
+        raise TaskMemoryMetricError("retention requires task metric rows")
+    grouped: dict[tuple[str, str], dict[int, float]] = defaultdict(dict)
+    for row in metric_rows:
+        if not isinstance(row, Mapping):
+            raise TaskMemoryMetricError("retention metric row must be a mapping")
+        policy = row.get("policy")
+        reducer = row.get("reducer")
+        horizon = row.get("T")
+        value = row.get("t_mAP")
+        if (
+            not isinstance(policy, str)
+            or not policy
+            or not isinstance(reducer, str)
+            or not reducer
+            or isinstance(horizon, bool)
+            or not isinstance(horizon, int)
+            or horizon not in {2, 3, 4, 5}
+            or isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(float(value))
+            or not 0.0 <= float(value) <= 1.0
+            or horizon in grouped[(policy, reducer)]
+        ):
+            raise TaskMemoryMetricError("retention metric cells are invalid")
+        grouped[(policy, reducer)][horizon] = float(value)
+    expected = {2, 3, 4, 5}
+    if any(set(values) != expected for values in grouped.values()):
+        raise TaskMemoryMetricError("retention requires exact T2-T5 coverage")
+    rows = []
+    for (policy, reducer), values in sorted(grouped.items()):
+        denominator = values[2]
+        for horizon in sorted(values):
+            rows.append(
+                {
+                    "T": horizon,
+                    "policy": policy,
+                    "reducer": reducer,
+                    "relative_t_mAP_retention": relative_retention(
+                        values[horizon], denominator
+                    ),
+                    "t2_t_mAP": denominator,
+                    "t_mAP": values[horizon],
+                }
+            )
+    return rows
+
+
 def aggregate_identity_event_diagnostics(
     records: Sequence[Mapping[str, object]],
 ) -> dict[str, object]:
@@ -305,6 +478,8 @@ __all__ = [
     "CachedPrefixResult",
     "TaskMemoryMetricError",
     "aggregate_identity_event_diagnostics",
+    "build_retention_rows",
+    "compute_cached_identity_metrics",
     "compute_cached_task_metrics",
     "replay_lag1_prefixes",
 ]
