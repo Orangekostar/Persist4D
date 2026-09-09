@@ -9,11 +9,11 @@ Status: `PASS`
 | Evaluation population | 47 canonical development masters from 8 references |
 | Stages | 235 |
 | R1 forward count | 235 shared forwards |
-| Source commit | `a5d06b35129f673023ec667745f244854a2f130d` |
+| Source commit | `f654aadce76630d88dc9e5ebd88a4089107e9da0` |
 | R1 checkpoint SHA256 | `629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd` |
 | Base cache manifest SHA256 | `489577a52e462d43042e1945d4c27dc5a71b65aabb84deb6d93d7c3d75314851` |
-| Observation manifest SHA256 | `517cc0a45977827bab3324f6c40f914bb94f66cecbbdfa068823843f1c19c482` |
-| Control configuration SHA256 | `802950c3ad5d45bf36c67ed80267033d04d16f71f8b55557732dc377076655bb` |
+| Observation manifest SHA256 | `8a398794052083d9727e71aed27e2459962faf85ef18a27ee859c00c52c6faa9` |
+| Control configuration SHA256 | `08bfffc333854f90f470e0a0559f64954a107bffcf575cb494d3c142e531534d` |
 
 The deployment path accepts predictions and unlabeled `StageMeta` only. Ground-truth
 targets are loaded separately by the evaluator and are not serialized in the control
@@ -96,30 +96,30 @@ stored in `baseline/long_memory_controls.csv`.
 
 | Method | Policy | T2 t-mAP / t-REC | T3 | T4 | T5 |
 |---|---|---:|---:|---:|---:|
-| D-LAST | commit0 | .528284 / .598535 | .471122 / .540660 | .432058 / .496431 | .397051 / .461815 |
-| D-LAST | lag1 | .529546 / .612759 | .480408 / .562524 | .433891 / .519463 | .401098 / .476856 |
-| D-EMA | commit0 | .528284 / .598535 | .471632 / .541311 | .430812 / .495609 | .396180 / .460832 |
-| D-EMA | lag1 | .529546 / .612759 | .480408 / .562524 | .433585 / .519463 | .400927 / .475631 |
+| D-LAST | commit0 | .523079 / .594350 | .464077 / .536784 | .427783 / .495038 | .389650 / .458323 |
+| D-LAST | lag1 | .529823 / .612966 | .485382 / .564107 | .439720 / .523675 | .407856 / .479322 |
+| D-EMA | commit0 | .523079 / .594350 | .464085 / .536784 | .427829 / .495038 | .389711 / .458425 |
+| D-EMA | lag1 | .529823 / .612966 | .485382 / .564107 | .439720 / .523675 | .407757 / .479424 |
 
 The two update rules are nearly tied and neither dominates across the full metric
-grid. Lag1 consistently improves t-REC and slightly improves t-mAP, while reducing
-mAP50/mAP25 at several horizons. These are controls, not a learned-memory success
-claim.
+grid. Lag1 improves t-mAP, t-REC, mAP25, and direct current AP at every horizon. It
+reduces mAP50 at T2 and very slightly at T4, so the output policy does not dominate
+the complete metric grid. These are controls, not a learned-memory success claim.
 
 ## Router and Cache Diagnostics
 
-| Method | Valid queries | Inherited | Coverage | Births | Rejected | Peak slots | State bytes |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| D-LAST | 1,924 | 1,489 | .773909 | 435 | 0 | 19 | 62,616 |
-| D-EMA | 1,924 | 1,492 | .775468 | 432 | 0 | 18 | 62,616 |
+| Method | Valid queries | Inherited | Coverage | Dormant | Births | Rejected | Peak slots | State bytes |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| D-LAST | 2,029 | 1,577 | .777230 | 101 | 449 | 0 | 21 | 62,616 |
+| D-EMA | 2,029 | 1,577 | .777230 | 100 | 448 | 0 | 21 | 62,616 |
 
 The prediction supplement occupies 3,430,928,601 bytes. Combined with the immutable
 base cache, evaluation cache use is 7,748,592,299 bytes, below the 40 GiB cap.
 
 Sparse CUDA inference is not bitwise repeatable across independent processes. Of 235
-replayed stages, 136 exactly match the older base candidates. Both runs retain 100
-candidates per stage; their mean common candidate count is 80.1106 (range 21-100),
-mean aligned-mask IoU is .819894, and mean maximum aligned-score difference is
-.329907. D-LAST and D-EMA are therefore compared only within their shared replay.
+replayed stages, 139 exactly match the older base candidates. Both runs retain 100
+candidates per stage; their mean common candidate count is 80.3915 (range 21-100),
+mean aligned-mask IoU is .822454, and mean maximum aligned-score difference is
+.321427. D-LAST and D-EMA are therefore compared only within their shared replay.
 Numeric differences against an older B4 replay must not be described as matched
 per-observation effects.
