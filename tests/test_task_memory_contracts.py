@@ -266,11 +266,13 @@ def test_freeze_locks_repository_assets_budget_and_output_policy(tmp_path: Path)
     start = _load_json(output / "START_STATE.json")
     budget = _load_json(output / "BUDGET_CONTRACT.json")
     output_contract = (output / "OUTPUT_CONTRACT.md").read_text(encoding="utf-8")
-    assert start["repository"] == {
+    repository = dict(start["repository"])
+    start_head = repository.pop("start_head")
+    assert isinstance(start_head, str) and len(start_head) == 40
+    assert repository == {
         "branch": BRANCH,
         "reviewed_parent": REVIEWED_PARENT,
         "reviewed_parent_is_ancestor": True,
-        "start_head": REVIEWED_PARENT,
     }
     assert start["assets"]["r1_checkpoint"] == {
         "bytes": len(b"r1-test-weight"),

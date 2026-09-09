@@ -5,13 +5,31 @@ This package contains various dataset implementations and utilities for 3D insta
 """
 
 # Import key classes for easier access
-from .auto_collate import create_auto_collate, AutoCollate
-from .semseg import SemanticSegmentationDataset
+from .auto_collate import AutoCollate, create_auto_collate
 from .multi_dataset import MultiDataset
+from .semseg import SemanticSegmentationDataset
+from .task_memory_episode import (
+    NativeEpisodeMaster,
+    StageMeta,
+    TaskMemoryEpisodeBatch,
+    TaskMemoryEpisodeCollator,
+    TaskMemoryEpisodeDataset,
+    TaskMemoryEpisodeSpec,
+    build_native_episode_masters,
+    build_task_memory_draw_plan,
+)
 
 __all__ = [
-    'create_auto_collate',
     'AutoCollate',
+    'MultiDataset',
+    'NativeEpisodeMaster',
     'SemanticSegmentationDataset',
-    'MultiDataset'
+    'StageMeta',
+    'TaskMemoryEpisodeBatch',
+    'TaskMemoryEpisodeCollator',
+    'TaskMemoryEpisodeDataset',
+    'TaskMemoryEpisodeSpec',
+    'build_native_episode_masters',
+    'build_task_memory_draw_plan',
+    'create_auto_collate',
 ]

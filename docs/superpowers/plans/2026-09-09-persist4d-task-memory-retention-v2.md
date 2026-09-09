@@ -84,9 +84,12 @@ Require all public JSON self-hashes, readable data counts, frozen role separatio
 
 ### Task 2: Add native-length causal episodes and StageMeta
 
+**Status:** Complete
+
 **Files:**
 - Create: `datasets/task_memory_episode.py`
 - Modify: `datasets/__init__.py`
+- Create: `scripts/preflight_task_memory_episode.py`
 - Create: `tests/test_task_memory_episode.py`
 - Generate: `artifacts/task_memory_retention_v2/implementation/preflight_real_sequence.json`
 
@@ -94,17 +97,17 @@ Require all public JSON self-hashes, readable data counts, frozen role separatio
 - Consumes: `DATA_CONTRACT.json`, existing `SemanticSegmentationDataset.load_scan_indices`, and existing Pointcept collator outputs.
 - Produces: `NativeEpisodeMaster`, `TaskMemoryEpisodeSpec`, `StageMeta`, `TaskMemoryEpisodeBatch`, `build_task_memory_draw_plan`, and `TaskMemoryEpisodeDataset` for native H1-H5.
 
-- [ ] **Step 1: Write causal data tests**
+- [x] **Step 1: Write causal data tests**
 
 Cover real H2/H3/H4 masters, same-reference unique scans, no prefix dependence on unseen future scans, rank-synchronous equal-H groups, 20% bucket schedule, scan-local original vertex IDs, full-resolution/voxel inverse alignment, canonical `(reference_id, instance_id)` supervision identity, and one empty-current-stage target in a mixed batch.
 
-- [ ] **Step 2: Run the tests and confirm RED**
+- [x] **Step 2: Run the tests and confirm RED**
 
 Run: `/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q tests/test_task_memory_episode.py`
 
 Expected: import failure because `datasets.task_memory_episode` does not exist.
 
-- [ ] **Step 3: Implement the sibling episode loader**
+- [x] **Step 3: Implement the sibling episode loader**
 
 ```python
 @dataclass(frozen=True)
@@ -126,11 +129,11 @@ class StageMeta:
 
 Configure the legacy dataset without its window-dependent train augmentation, then apply one explicit seed-derived episode transform to each loaded stage. Keep elastic distortion disabled. Build metadata independently of labels and keep GT classes/IDs/masks in training targets.
 
-- [ ] **Step 4: Run a real-sequence preflight**
+- [x] **Step 4: Run a real-sequence preflight**
 
 Load one repeated scan through two legal windows, verify vertex/label identity and inverse maps, mutate a future scan choice, and prove the earlier commit0 input/output preparation is unchanged.
 
-- [ ] **Step 5: Validate and commit the data path**
+- [x] **Step 5: Validate and commit the data path**
 
 Run the new tests plus `tests/test_persist4d_sequence_dataset.py` and the directly used Pointcept collation tests. Record the exact real-sequence sample identities and hashes in `preflight_real_sequence.json`.
 

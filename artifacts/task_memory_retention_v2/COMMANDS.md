@@ -15,4 +15,10 @@ python -m scripts.prepare_task_memory_v2 \
   --concerto-pretrained "$PERSIST4D_CONCERTO_PRETRAINED" \
   --run-root "$PERSIST4D_RUN_ROOT" \
   --output artifacts/task_memory_retention_v2
+
+python -m scripts.preflight_task_memory_episode \
+  --data-root "$PERSIST4D_DATA_ROOT" \
+  --rio-metadata "$PERSIST4D_RIO_METADATA" \
+  --data-contract artifacts/task_memory_retention_v2/DATA_CONTRACT.json \
+  --output artifacts/task_memory_retention_v2/implementation/preflight_real_sequence.json
 ```

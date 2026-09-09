@@ -1,0 +1,85 @@
+{
+  "collation": {
+    "full_resolution_points": [
+      18952,
+      37428,
+      34092,
+      32612,
+      31162
+    ],
+    "inverse_alignment": true,
+    "voxel_points": [
+      12627,
+      26007,
+      24914,
+      23331,
+      22125
+    ]
+  },
+  "content_sha256": "924632a730ddfced56d4949c60377abc06d49143c9d8b5bdcbd01f11b5361659",
+  "episode": {
+    "episode_id": "tmv2-5d2466503c0c95a8",
+    "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+    "scan_ids": [
+      "scene0007_00",
+      "scene0007_01",
+      "scene0007_03",
+      "scene0007_02",
+      "scene0007_04"
+    ],
+    "stage_full_resolution_points": [
+      18952,
+      37428,
+      34092,
+      32612,
+      31162
+    ]
+  },
+  "future_mutation": {
+    "episode_id_unchanged": true,
+    "mutated_scan_ids": [
+      "scene0007_00",
+      "scene0007_01",
+      "scene0007_02",
+      "scene0007_03",
+      "scene0007_04"
+    ],
+    "t1_input_unchanged": true
+  },
+  "native_horizons": {
+    "H2": {
+      "development_masters": 47,
+      "master_count": 1174,
+      "reference_count": 384
+    },
+    "H3": {
+      "development_masters": 47,
+      "master_count": 855,
+      "reference_count": 224
+    },
+    "H4": {
+      "development_masters": 47,
+      "master_count": 474,
+      "reference_count": 97
+    },
+    "H5": {
+      "development_masters": 47,
+      "master_count": 262,
+      "reference_count": 44
+    }
+  },
+  "repeated_scan": {
+    "coordinates_unchanged": true,
+    "labels_sha256": "1228cd629473c878165cf8424626f32cd048a3865a3183645abedfeb0a1e967d",
+    "labels_unchanged": true,
+    "vertex_ids_unchanged": true
+  },
+  "schema_version": "task-memory-real-sequence-preflight-v2",
+  "sources": {
+    "data_contract": "repo:artifacts/task_memory_retention_v2/DATA_CONTRACT.json",
+    "rio_data": "external:data_root/processed/rio",
+    "rio_metadata": "external:rio_metadata"
+  },
+  "stage_meta_has_supervision_fields": false,
+  "status": "PASS"
+}
