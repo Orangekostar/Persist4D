@@ -221,6 +221,23 @@ def test_episode_loading_is_causal_and_reuses_scan_vertex_alignment() -> None:
     assert t2.local_stage_ids.tolist() == [0, 0, 0, 0, 1, 1, 1, 1]
 
 
+def test_episode_evaluation_mode_preserves_unaugmented_scan_values() -> None:
+    base = _FakeBaseDataset()
+    expected = base.load_scan_indices(0, (0,), change_file=None)
+    base.calls.clear()
+
+    episode = TaskMemoryEpisodeDataset(
+        base,
+        (_spec(_master()),),
+        apply_augmentation=False,
+    )[0]
+    observed = episode.stage_samples[0].model_sample
+
+    for index in (0, 1, 2, 4, 5, 6):
+        np.testing.assert_array_equal(observed[index], expected[index])
+    assert episode.stage_samples[0].augmentation_transform_id == "identity-v1"
+
+
 def _pointcept_like_collator(samples):
     voxel_labels = []
     inverse_maps = []

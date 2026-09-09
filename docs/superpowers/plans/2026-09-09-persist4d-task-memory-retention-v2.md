@@ -139,24 +139,30 @@ Run the new tests plus `tests/test_persist4d_sequence_dataset.py` and the direct
 
 ### Task 3: Implement commit0 and lag1 output policies
 
+**Status:** In progress
+
 **Files:**
 - Create: `scripts/task_memory_output.py`
+- Create: `scripts/run_task_memory_policy_baseline.py`
 - Create: `tests/test_task_memory_output.py`
+- Create: `tests/test_task_memory_policy_baseline.py`
+- Generate: `artifacts/task_memory_retention_v2/baseline/diagnostic_panel.json`
 - Generate: `artifacts/task_memory_retention_v2/baseline/{policy_comparison.csv,gap_event_strata.csv}`
+- Generate: `artifacts/task_memory_retention_v2/baseline/cache_manifest.json`
 
 **Interfaces:**
 - Consumes: `OfficialTaskPrediction`, prediction lineage, route logical IDs, and current `StageMeta`.
 - Produces: `LagOnePublisher.update(prediction, identity_map) -> PublishedPrefix`, an append-only archive, one-scan revision log, and accounting bytes.
 
-- [ ] **Step 1: Write output-policy tests**
+- [x] **Step 1: Write output-policy tests**
 
 Test that lag1 revises only the previous scan from the current W2 output, freezes older scans, keeps previous-only candidates, uses route before same-scan class-compatible IoU matching, applies threshold 0.5 and stable query-index ties, never chooses per-object old/new versions by GT, preserves `(logical_id,generation,class_id)`, and reports the unflushed final scan as provisional.
 
-- [ ] **Step 2: Run the tests and confirm RED**
+- [x] **Step 2: Run the tests and confirm RED**
 
 Run: `/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q tests/test_task_memory_output.py`
 
-- [ ] **Step 3: Implement bounded publication state**
+- [x] **Step 3: Implement bounded publication state**
 
 Store only the prior scan's revisable masks/vertex map plus compact frozen output rows. Reuse existing stable assignment primitives; do not perform another model forward and do not expose GT to the publisher.
 

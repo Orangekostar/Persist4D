@@ -473,6 +473,15 @@ def _episode_transform(seed: int) -> EpisodeTransform:
     )
 
 
+def _identity_episode_transform() -> EpisodeTransform:
+    return EpisodeTransform(
+        matrix=np.eye(3, dtype=np.float32),
+        color_gain=np.ones(3, dtype=np.float32),
+        color_offset=np.zeros(3, dtype=np.float32),
+        transform_id="identity-v1",
+    )
+
+
 @contextmanager
 def _frozen_random_seed(seed: int):
     python_state = random.getstate()
@@ -630,6 +639,8 @@ class TaskMemoryEpisodeDataset(Dataset):
         self,
         base_dataset: object,
         draw_plan: Sequence[TaskMemoryEpisodeSpec],
+        *,
+        apply_augmentation: bool = True,
     ) -> None:
         if isinstance(draw_plan, (str, bytes)) or not isinstance(draw_plan, Sequence) or not draw_plan or any(
             not isinstance(spec, TaskMemoryEpisodeSpec) for spec in draw_plan
@@ -654,15 +665,22 @@ class TaskMemoryEpisodeDataset(Dataset):
                 raise TaskMemoryEpisodeError("base sequence context is unavailable") from error
             if base_name != spec.source_sequence_id or base_indices[: spec.horizon] != spec.scan_indices:
                 raise TaskMemoryEpisodeError("draw plan differs from base sequence context")
+        if not isinstance(apply_augmentation, bool):
+            raise TaskMemoryEpisodeError("apply_augmentation must be boolean")
         self.base_dataset = base_dataset
         self.draw_plan = tuple(draw_plan)
+        self.apply_augmentation = apply_augmentation
 
     def __len__(self) -> int:
         return len(self.draw_plan)
 
     def __getitem__(self, index: int) -> TaskMemoryEpisode:
         spec = self.draw_plan[index]
-        transform = _episode_transform(spec.augmentation_seed)
+        transform = (
+            _episode_transform(spec.augmentation_seed)
+            if self.apply_augmentation
+            else _identity_episode_transform()
+        )
         transformed_scans = {}
         for scan_position, (scan_id, scan_index) in enumerate(
             zip(spec.scan_ids, spec.scan_indices)
