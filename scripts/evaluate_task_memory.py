@@ -8,6 +8,7 @@ import csv
 import hashlib
 import io
 import json
+import math
 import os
 import subprocess
 import sys
@@ -174,6 +175,17 @@ def _csv_bytes(rows: Sequence[Mapping[str, object]]) -> bytes:
     fields = list(rows[0])
     if any(list(row) != fields for row in rows):
         raise TaskMemoryEvaluationError("metric rows have inconsistent fields")
+    if any(
+        value is not None
+        and (
+            not isinstance(value, (str, int, float, bool))
+            or isinstance(value, float)
+            and not math.isfinite(value)
+        )
+        for row in rows
+        for value in row.values()
+    ):
+        raise TaskMemoryEvaluationError("metric CSV values must be finite scalars")
     buffer = io.StringIO(newline="")
     writer = csv.DictWriter(buffer, fieldnames=fields, lineterminator="\n")
     writer.writeheader()
@@ -693,12 +705,6 @@ def run_evaluation(
         "population_id": POPULATION_ID,
         "variant": variant,
         "checkpoint_sha256": checkpoint_sha256,
-        "determinism": {
-            "cudnn_deterministic": True,
-            "episode_seed_reset": True,
-            "tf32": False,
-            "torch_deterministic_algorithms": True,
-        },
         "training_seed": 45,
         "evaluation_seed": EVALUATION_SEED,
     }
@@ -748,6 +754,12 @@ def run_evaluation(
             "records": cache_records,
         },
         "checkpoint_sha256": checkpoint_sha256,
+        "determinism": {
+            "cudnn_deterministic": True,
+            "episode_seed_reset": True,
+            "tf32": False,
+            "torch_deterministic_algorithms": True,
+        },
         "elapsed_seconds": elapsed_seconds,
         "evaluation_seed": EVALUATION_SEED,
         "identity_events": aggregate_identity_event_diagnostics(event_records),

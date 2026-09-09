@@ -136,6 +136,8 @@ def test_evaluation_csv_writes_zero_denominators_as_na() -> None:
     encoded = _csv_bytes([{"count": 0, "rate": None}]).decode("utf-8")
 
     assert encoded == "count,rate\n0,N/A\n"
+    with pytest.raises(Exception, match="scalar"):
+        _csv_bytes([{"invalid": {"nested": True}}])
 
 
 def test_evaluation_runtime_applies_the_frozen_seed_and_device(monkeypatch) -> None:
