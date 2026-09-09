@@ -1,0 +1,16 @@
+# @package _global_
+defaults:
+  - common
+  - _self_
+
+general:
+  experiment_name: W-BASE
+
+model:
+  task_memory_enabled: false
+
+task_memory_training:
+  variant: W-BASE
+  state_enabled: false
+  matcher_mode: independent
+  window_mode: local_pair

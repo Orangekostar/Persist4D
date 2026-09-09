@@ -265,6 +265,45 @@ def test_episode_loading_is_causal_and_reuses_scan_vertex_alignment() -> None:
     assert t2.local_stage_ids.tolist() == [0, 0, 0, 0, 1, 1, 1, 1]
 
 
+def test_full_history_window_exposes_entire_causal_prefix() -> None:
+    episode = TaskMemoryEpisodeDataset(
+        _FakeBaseDataset(),
+        (_spec(_master()),),
+        window_mode="full_history",
+    )[0]
+
+    assert tuple(
+        stage.scan_ids_in_window for stage in episode.stage_samples
+    ) == (
+        ("scene0001_00",),
+        ("scene0001_00", "scene0001_01"),
+        ("scene0001_00", "scene0001_01", "scene0001_02"),
+    )
+    assert episode.stage_samples[2].local_stage_ids.tolist() == [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+    ]
+
+
+def test_episode_dataset_rejects_unknown_window_mode() -> None:
+    with pytest.raises(TaskMemoryEpisodeError, match="window_mode"):
+        TaskMemoryEpisodeDataset(
+            _FakeBaseDataset(),
+            (_spec(_master()),),
+            window_mode="future_context",
+        )
+
+
 def test_episode_evaluation_mode_preserves_unaugmented_scan_values() -> None:
     base = _FakeBaseDataset()
     expected = base.load_scan_indices(0, (0,), change_file=None)

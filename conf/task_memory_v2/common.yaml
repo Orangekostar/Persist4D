@@ -1,0 +1,88 @@
+# @package _global_
+defaults:
+  - /config_rescene4d_concerto_rootcause
+  - _self_
+
+aux_metric: null
+
+general:
+  train_mode: true
+  seed: 45
+  freeze: backbone_encoder
+  frozen_encoder_eval: false
+  gpus: ${task_memory_training.devices}
+  project_name: persist4d_task_memory_retention_v2
+  experiment_name: task-memory-common
+  save_dir: ${oc.env:PERSIST4D_RUN_ROOT,runs/task_memory_retention_v2}/${general.experiment_name}
+  rootcause_objective_mode: raw_sum
+  rootcause_fail_closed_runtime: true
+  rootcause_common_initialization: null
+  rootcause_common_initialization_sha256: null
+
+data:
+  batch_size: 1
+  num_workers: 2
+  train_dataloader:
+    shuffle: false
+    batch_size: 1
+    num_workers: ${data.num_workers}
+
+backbone:
+  name: ${oc.env:PERSIST4D_CONCERTO_PRETRAINED,concerto_base.pth}
+
+model:
+  _target_: models.Persist4DTaskMemory
+  return_query_features: true
+  task_memory_enabled: false
+  task_memory_capacity: 100
+  task_background_class: 18
+  task_confidence_threshold: 0.5
+  task_mask_threshold: 0.5
+  task_minimum_mask_support: 1
+  task_class_weight: 0.25
+  task_association_threshold: 0.5
+  task_update_rate: 0.2
+  task_max_update_rate: 0.2
+
+task_memory_training:
+  variant: task-memory-common
+  state_enabled: false
+  smoke_audit: false
+  matcher_mode: independent
+  window_mode: local_pair
+  optimizer_updates: 3000
+  scheduler_total_updates: 3000
+  devices: 2
+  physical_episode_batch_per_gpu: 1
+  gradient_accumulation: 4
+  effective_episode_batch: 8
+  tbptt_steps: 2
+  post_conditioning_aux_start: 4
+  empty_current_weight: 1.0
+  inherited_lr: 1.0e-5
+  adapter_lr: 1.0e-4
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.01
+  amsgrad: false
+  warmup_fraction: 0.05
+  minimum_lr_fraction: 0.1
+  episode_buckets:
+    single_scan: 0.2
+    T2: 0.2
+    T3: 0.2
+    T4: 0.2
+    T5: 0.2
+
+trainer:
+  max_epochs: 1
+  max_steps: ${task_memory_training.optimizer_updates}
+  min_epochs: 1
+  accumulate_grad_batches: 1
+  check_val_every_n_epoch: null
+  num_sanity_val_steps: 0
+  limit_val_batches: 0
+  gradient_clip_val: 1.0
+  precision: 32-true
+  deterministic: false
+  strategy: ddp_find_unused_parameters_false

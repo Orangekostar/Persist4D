@@ -1,0 +1,16 @@
+# @package _global_
+defaults:
+  - common
+  - _self_
+
+general:
+  experiment_name: Q-INDEP
+
+model:
+  task_memory_enabled: true
+
+task_memory_training:
+  variant: Q-INDEP
+  state_enabled: true
+  matcher_mode: independent
+  window_mode: local_pair

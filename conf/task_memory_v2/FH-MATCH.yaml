@@ -1,0 +1,16 @@
+# @package _global_
+defaults:
+  - common
+  - _self_
+
+general:
+  experiment_name: FH-MATCH
+
+model:
+  task_memory_enabled: false
+
+task_memory_training:
+  variant: FH-MATCH
+  state_enabled: false
+  matcher_mode: independent
+  window_mode: full_history

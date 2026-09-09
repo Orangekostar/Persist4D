@@ -299,6 +299,8 @@ Run new tests plus `tests/test_objective_semantics.py`; export one hand-checkabl
 
 ### Task 7: Add TaskMemoryTrainer, exact resume, and M2 configs
 
+**Status:** In progress
+
 **Files:**
 - Create: `trainer/task_memory_trainer.py`
 - Modify: `trainer/__init__.py`

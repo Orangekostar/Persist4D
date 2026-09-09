@@ -218,8 +218,8 @@ class StageMeta:
         _nonempty(self.augmentation_transform_id, label="augmentation_transform_id")
         _nonempty(self.coordinate_frame_id, label="coordinate_frame_id")
         _positive_index(self.absolute_stage_index, label="absolute_stage_index")
-        if not self.scan_ids_in_window or len(self.scan_ids_in_window) > 2:
-            raise TaskMemoryEpisodeError("stage window must contain one or two scans")
+        if not 1 <= len(self.scan_ids_in_window) <= max(HORIZONS):
+            raise TaskMemoryEpisodeError("stage window must contain one to five scans")
         if len(self.original_vertex_ids) != len(self.scan_ids_in_window):
             raise TaskMemoryEpisodeError("vertex identity groups differ from stage scans")
         tensor_fields = (
@@ -632,7 +632,7 @@ def _compose_stage_sample(
 
 
 class TaskMemoryEpisodeDataset(Dataset):
-    """Load each scan once, then construct causal T1/W2 stage windows."""
+    """Load each scan once, then construct causal local-pair or prefix windows."""
 
     def __init__(
         self,
@@ -640,6 +640,7 @@ class TaskMemoryEpisodeDataset(Dataset):
         draw_plan: Sequence[TaskMemoryEpisodeSpec],
         *,
         apply_augmentation: bool = True,
+        window_mode: str = "local_pair",
     ) -> None:
         if isinstance(draw_plan, (str, bytes)) or not isinstance(draw_plan, Sequence) or not draw_plan or any(
             not isinstance(spec, TaskMemoryEpisodeSpec) for spec in draw_plan
@@ -666,9 +667,14 @@ class TaskMemoryEpisodeDataset(Dataset):
                 raise TaskMemoryEpisodeError("draw plan differs from base sequence context")
         if not isinstance(apply_augmentation, bool):
             raise TaskMemoryEpisodeError("apply_augmentation must be boolean")
+        if window_mode not in {"local_pair", "full_history"}:
+            raise TaskMemoryEpisodeError(
+                "window_mode must be 'local_pair' or 'full_history'"
+            )
         self.base_dataset = base_dataset
         self.draw_plan = tuple(draw_plan)
         self.apply_augmentation = apply_augmentation
+        self.window_mode = window_mode
 
     def __len__(self) -> int:
         return len(self.draw_plan)
@@ -705,7 +711,13 @@ class TaskMemoryEpisodeDataset(Dataset):
             transformed_scans[scan_position] = _apply_transform(sample, transform)
         stage_samples = []
         for stage_index in range(spec.horizon):
-            positions = (0,) if stage_index == 0 else (stage_index - 1, stage_index)
+            positions = (
+                tuple(range(stage_index + 1))
+                if self.window_mode == "full_history"
+                else (0,)
+                if stage_index == 0
+                else (stage_index - 1, stage_index)
+            )
             stage_samples.append(
                 _compose_stage_sample(
                     spec=spec,
