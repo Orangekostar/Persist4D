@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 import torch
 from omegaconf import OmegaConf
+from pytorch_lightning import LightningModule
 
 from datasets.task_memory_episode import (
     StageMeta,
@@ -77,7 +78,7 @@ class _CountingSGD(torch.optim.SGD):
 
 class _TrainingStepHarness(TaskMemoryTrainer):
     def __init__(self) -> None:
-        torch.nn.Module.__init__(self)
+        LightningModule.__init__(self)
         self.weight = torch.nn.Parameter(torch.tensor(1.0))
         self.config = OmegaConf.create(
             {
@@ -103,18 +104,11 @@ class _TrainingStepHarness(TaskMemoryTrainer):
         )
         self.logged = []
         self.backward_calls = 0
+        self._trainer = SimpleNamespace(global_rank=0, world_size=1)
 
     @property
     def device(self) -> torch.device:
         return self.weight.device
-
-    @property
-    def world_size(self) -> int:
-        return 1
-
-    @property
-    def global_rank(self) -> int:
-        return 0
 
     def optimizers(self):
         return self.optimizer
@@ -426,6 +420,18 @@ def test_training_step_means_stages_and_steps_once_per_effective_batch() -> None
         False,
         True,
     ]
+    assert trainer.progress.completed_global_episodes == 2
+    assert trainer.progress.completed_global_stages == 4
+    assert trainer.progress.next_draw_index == 2
+
+
+def test_training_step_reads_ddp_world_size_from_attached_trainer() -> None:
+    trainer = _TrainingStepHarness()
+    trainer._trainer = SimpleNamespace(global_rank=1, world_size=2)
+
+    trainer.training_step(_training_batch(1), 0)
+
+    assert trainer.progress.completed_local_episodes == 1
     assert trainer.progress.completed_global_episodes == 2
     assert trainer.progress.completed_global_stages == 4
     assert trainer.progress.next_draw_index == 2

@@ -778,8 +778,8 @@ class TaskMemoryTrainer(InstanceSegmentation):
                     )
                 )
 
-        world_size = int(getattr(self, "world_size", 1))
-        global_rank = int(getattr(self, "global_rank", 0))
+        world_size = int(self.trainer.world_size)
+        global_rank = int(self.trainer.global_rank)
         self.progress = self.progress.advance(
             local_draw_indices=tuple(spec.draw_index for spec in batch.specs),
             horizon=horizon,
