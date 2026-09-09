@@ -1,0 +1,318 @@
+{
+  "checkpoints": [
+    {
+      "bytes": 756032503,
+      "name": "last.ckpt",
+      "sha256": "e6d8acc707763698df13d9de4f5f4eede3f2e0e221a25a4154758379475bb944"
+    },
+    {
+      "bytes": 756032439,
+      "name": "update=0001.ckpt",
+      "sha256": "bd32ce04b721c4d707929212f1f4a6e05242da434047998cac0474c5edf8d029"
+    },
+    {
+      "bytes": 756032503,
+      "name": "update=0002.ckpt",
+      "sha256": "e6d8acc707763698df13d9de4f5f4eede3f2e0e221a25a4154758379475bb944"
+    }
+  ],
+  "completed_global_step": 2,
+  "elapsed_seconds": 59.04394769668579,
+  "gpu_hours": 0.01640109658241272,
+  "progress": {
+    "completed_global_episodes": 2,
+    "completed_global_stages": 10,
+    "completed_local_episodes": 2,
+    "next_draw_index": 2,
+    "schema_version": "task-memory-exact-resume-v1"
+  },
+  "status": "COMPLETE",
+  "training_audit": [
+    {
+      "births": {
+        "ambiguous_births_excluded": 3,
+        "bound_births": 3,
+        "ignored_births_excluded": 0,
+        "unmatched_births": 0
+      },
+      "chunk_boundary_state_detached": [
+        true,
+        true,
+        true
+      ],
+      "chunk_state_gradients": [
+        {
+          "chunk": 1,
+          "gradient_norm": 0.0,
+          "source_stage": 1
+        },
+        {
+          "chunk": 2,
+          "gradient_norm": 0.0,
+          "source_stage": 3
+        }
+      ],
+      "commit_calls": 5,
+      "draw_cursor": 1,
+      "horizon": 5,
+      "optimizer_step": true,
+      "route_calls": 5,
+      "stage_lineage": [
+        {
+          "birth_count": 5,
+          "birth_logical_ids": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "inherited_logical_ids": [],
+          "matched_query_count": 0,
+          "stage": 1
+        },
+        {
+          "birth_count": 1,
+          "birth_logical_ids": [
+            5
+          ],
+          "inherited_logical_ids": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "matched_query_count": 5,
+          "stage": 2
+        },
+        {
+          "birth_count": 0,
+          "birth_logical_ids": [],
+          "inherited_logical_ids": [
+            0,
+            1,
+            4,
+            5
+          ],
+          "matched_query_count": 4,
+          "stage": 3
+        },
+        {
+          "birth_count": 0,
+          "birth_logical_ids": [],
+          "inherited_logical_ids": [
+            0,
+            1,
+            4,
+            5
+          ],
+          "matched_query_count": 4,
+          "stage": 4
+        },
+        {
+          "birth_count": 0,
+          "birth_logical_ids": [],
+          "inherited_logical_ids": [
+            0,
+            1,
+            3,
+            4
+          ],
+          "matched_query_count": 4,
+          "stage": 5
+        }
+      ],
+      "state_parity_max_abs": 0.0,
+      "task_read_gradient": {
+        "missing_gradient_names": [],
+        "nonfinite_gradient_names": [],
+        "output_projection_gradient_norm": 0.009336828423658,
+        "parameter_gradient_norms": {
+          "model.task_read.attention_scale": 0.0,
+          "model.task_read.gate_projection.bias": 0.0,
+          "model.task_read.gate_projection.weight": 0.0,
+          "model.task_read.key_projection.bias": 0.0,
+          "model.task_read.key_projection.weight": 0.0,
+          "model.task_read.null_key": 0.0,
+          "model.task_read.output_projection.bias": 0.007629506755620241,
+          "model.task_read.output_projection.weight": 0.005382099188864231,
+          "model.task_read.query_projection.bias": 0.0,
+          "model.task_read.query_projection.weight": 0.0,
+          "model.task_read.value_projection.bias": 0.0,
+          "model.task_read.value_projection.weight": 0.0
+        },
+        "upstream_gradient_norm": 0.0
+      },
+      "task_read_parameter_change": {
+        "changed_parameter_names": [
+          "model.task_read.output_projection.bias",
+          "model.task_read.output_projection.weight"
+        ],
+        "parameter_change_norms": {
+          "model.task_read.attention_scale": 0.0,
+          "model.task_read.gate_projection.bias": 0.0,
+          "model.task_read.gate_projection.weight": 0.0,
+          "model.task_read.key_projection.bias": 0.0,
+          "model.task_read.key_projection.weight": 0.0,
+          "model.task_read.null_key": 0.0,
+          "model.task_read.output_projection.bias": 7.527924481109949e-06,
+          "model.task_read.output_projection.weight": 8.191323286155239e-05,
+          "model.task_read.query_projection.bias": 0.0,
+          "model.task_read.query_projection.weight": 0.0,
+          "model.task_read.value_projection.bias": 0.0,
+          "model.task_read.value_projection.weight": 0.0
+        },
+        "total_change_norm": 8.225841820035321e-05
+      }
+    },
+    {
+      "births": {
+        "ambiguous_births_excluded": 2,
+        "bound_births": 3,
+        "ignored_births_excluded": 0,
+        "unmatched_births": 1
+      },
+      "chunk_boundary_state_detached": [
+        true,
+        true,
+        true
+      ],
+      "chunk_state_gradients": [
+        {
+          "chunk": 1,
+          "gradient_norm": 6.111575601153163e-08,
+          "source_stage": 1
+        },
+        {
+          "chunk": 2,
+          "gradient_norm": 2.0052461024988588e-07,
+          "source_stage": 3
+        }
+      ],
+      "commit_calls": 5,
+      "draw_cursor": 2,
+      "horizon": 5,
+      "optimizer_step": true,
+      "route_calls": 5,
+      "stage_lineage": [
+        {
+          "birth_count": 5,
+          "birth_logical_ids": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "inherited_logical_ids": [],
+          "matched_query_count": 0,
+          "stage": 1
+        },
+        {
+          "birth_count": 1,
+          "birth_logical_ids": [
+            5
+          ],
+          "inherited_logical_ids": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "matched_query_count": 5,
+          "stage": 2
+        },
+        {
+          "birth_count": 0,
+          "birth_logical_ids": [],
+          "inherited_logical_ids": [
+            0,
+            1,
+            4,
+            5
+          ],
+          "matched_query_count": 4,
+          "stage": 3
+        },
+        {
+          "birth_count": 0,
+          "birth_logical_ids": [],
+          "inherited_logical_ids": [
+            0,
+            1,
+            4,
+            5
+          ],
+          "matched_query_count": 4,
+          "stage": 4
+        },
+        {
+          "birth_count": 0,
+          "birth_logical_ids": [],
+          "inherited_logical_ids": [
+            0,
+            1,
+            3,
+            4
+          ],
+          "matched_query_count": 4,
+          "stage": 5
+        }
+      ],
+      "state_parity_max_abs": 0.0,
+      "task_read_gradient": {
+        "missing_gradient_names": [],
+        "nonfinite_gradient_names": [],
+        "output_projection_gradient_norm": 0.014749922488651358,
+        "parameter_gradient_norms": {
+          "model.task_read.attention_scale": 2.3376531821384106e-09,
+          "model.task_read.gate_projection.bias": 1.7322344447734395e-08,
+          "model.task_read.gate_projection.weight": 2.614224570152146e-07,
+          "model.task_read.key_projection.bias": 5.570686880673748e-07,
+          "model.task_read.key_projection.weight": 5.083496148472477e-07,
+          "model.task_read.null_key": 4.170586578311486e-07,
+          "model.task_read.output_projection.bias": 0.01285319123417139,
+          "model.task_read.output_projection.weight": 0.007235723081976175,
+          "model.task_read.query_projection.bias": 1.038954167142947e-07,
+          "model.task_read.query_projection.weight": 1.1970882951573003e-06,
+          "model.task_read.value_projection.bias": 1.7208307667715417e-07,
+          "model.task_read.value_projection.weight": 1.534368010425169e-07
+        },
+        "upstream_gradient_norm": 1.51930908267327e-06
+      },
+      "task_read_parameter_change": {
+        "changed_parameter_names": [
+          "model.task_read.gate_projection.bias",
+          "model.task_read.gate_projection.weight",
+          "model.task_read.key_projection.bias",
+          "model.task_read.key_projection.weight",
+          "model.task_read.null_key",
+          "model.task_read.output_projection.bias",
+          "model.task_read.output_projection.weight",
+          "model.task_read.query_projection.bias",
+          "model.task_read.query_projection.weight",
+          "model.task_read.value_projection.bias",
+          "model.task_read.value_projection.weight"
+        ],
+        "parameter_change_norms": {
+          "model.task_read.attention_scale": 0.0,
+          "model.task_read.gate_projection.bias": 3.350683996927728e-08,
+          "model.task_read.gate_projection.weight": 4.892806373391068e-07,
+          "model.task_read.key_projection.bias": 9.013621706799313e-07,
+          "model.task_read.key_projection.weight": 9.43316535995109e-07,
+          "model.task_read.null_key": 6.982103286645724e-07,
+          "model.task_read.output_projection.bias": 1.2431258255674038e-05,
+          "model.task_read.output_projection.weight": 0.00012828133185394108,
+          "model.task_read.query_projection.bias": 1.897948891382839e-07,
+          "model.task_read.query_projection.weight": 2.1499199647223577e-06,
+          "model.task_read.value_projection.bias": 3.0659333560834057e-07,
+          "model.task_read.value_projection.weight": 2.95063330213452e-07
+        },
+        "total_change_norm": 0.00012891045667284102
+      }
+    }
+  ],
+  "variant": "Q-TALA"
+}

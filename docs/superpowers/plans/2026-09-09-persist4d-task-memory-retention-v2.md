@@ -299,7 +299,7 @@ Run new tests plus `tests/test_objective_semantics.py`; export one hand-checkabl
 
 ### Task 7: Add TaskMemoryTrainer, exact resume, and M2 configs
 
-**Status:** In progress
+**Status:** Complete
 
 **Files:**
 - Create: `trainer/task_memory_trainer.py`
@@ -315,23 +315,23 @@ Run new tests plus `tests/test_objective_semantics.py`; export one hand-checkabl
 - Consumes: frozen contracts, task-memory episodes, model, criterion, R1 init, common adapter initialization, and an external run root.
 - Produces: stage/chunk training, 2-stage TBPTT graph shadow, exact draw cursor resume, checkpoint manifests, learning logs, and four controlled M2 launch commands.
 
-- [ ] **Step 1: Write trainer/resume tests**
+- [x] **Step 1: Write trainer/resume tests**
 
 Test stage-mean loss, one optimizer step per effective episode batch, two-stage backward before detach, value parity between runtime and graph shadow, no gradient beyond chunk boundary, one route/commit per stage, predicted births feeding the ledger, rank-synchronous H, scheduler defined for all 3,000 updates, and resume restoring optimizer/scheduler/RNG/global episode/draw cursor.
 
-- [ ] **Step 2: Run the tests and confirm RED**
+- [x] **Step 2: Run the tests and confirm RED**
 
 Run: `/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q tests/test_task_memory_trainer.py tests/test_train_task_memory.py`
 
-- [ ] **Step 3: Implement the common training engine**
+- [x] **Step 3: Implement the common training engine**
 
 Use base-subtree LR `1e-5`, new-module LR `1e-4`, AdamW with frozen R1 weight decay/betas, 5% warmup, cosine to 10%, existing gradient clip, and identical H1/T2/T3/T4/T5 20% episode buckets. W-BASE/FH-MATCH share stage supervision and budget but have no state gradient.
 
-- [ ] **Step 4: Run the two-update real GPU smoke**
+- [x] **Step 4: Run the two-update real GPU smoke**
 
 Use an episode with inherited entity, absence, reappearance, and newborn. Prove initial R1 subtree identity, expected zero-init first-step behavior, second-step nonzero adapter gradient/weight change, intended within-chunk gradient, detach boundary, and prediction-only route/birth lineage.
 
-- [ ] **Step 5: Freeze configs and commit training path**
+- [x] **Step 5: Freeze configs and commit training path**
 
 Require W-BASE to Q-INDEP diffs only in model/routing, and Q-INDEP to Q-TALA diffs only in supervision mode. Save resolved configs and shared initialization tensor hashes, then commit.
 

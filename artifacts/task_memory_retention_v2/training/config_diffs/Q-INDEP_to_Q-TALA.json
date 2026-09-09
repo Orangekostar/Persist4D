@@ -1,0 +1,117 @@
+{
+  "all_differences": {
+    "callbacks": {
+      "left": [
+        {
+          "_target_": "pytorch_lightning.callbacks.ModelCheckpoint",
+          "auto_insert_metric_name": false,
+          "dirpath": "external:run_root/training/formal/Q-INDEP",
+          "every_n_epochs": 1,
+          "filename": "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}",
+          "mode": "max",
+          "monitor": "val_mean_t-AP",
+          "save_last": true,
+          "save_on_train_epoch_end": true,
+          "save_top_k": 1,
+          "save_weights_only": false
+        },
+        {
+          "_target_": "utils.rescene_rootcause_callbacks.EpochSetCheckpointCallback",
+          "completed_epochs": [
+            60,
+            90,
+            450
+          ],
+          "output_dir": "external:run_root/training/formal/Q-INDEP"
+        },
+        {
+          "_target_": "utils.rescene_rootcause_callbacks.RootCauseHorizonCallback",
+          "completed_epoch": 90
+        },
+        {
+          "_target_": "pytorch_lightning.callbacks.LearningRateMonitor"
+        }
+      ],
+      "right": [
+        {
+          "_target_": "pytorch_lightning.callbacks.ModelCheckpoint",
+          "auto_insert_metric_name": false,
+          "dirpath": "external:run_root/training/formal/Q-TALA",
+          "every_n_epochs": 1,
+          "filename": "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}",
+          "mode": "max",
+          "monitor": "val_mean_t-AP",
+          "save_last": true,
+          "save_on_train_epoch_end": true,
+          "save_top_k": 1,
+          "save_weights_only": false
+        },
+        {
+          "_target_": "utils.rescene_rootcause_callbacks.EpochSetCheckpointCallback",
+          "completed_epochs": [
+            60,
+            90,
+            450
+          ],
+          "output_dir": "external:run_root/training/formal/Q-TALA"
+        },
+        {
+          "_target_": "utils.rescene_rootcause_callbacks.RootCauseHorizonCallback",
+          "completed_epoch": 90
+        },
+        {
+          "_target_": "pytorch_lightning.callbacks.LearningRateMonitor"
+        }
+      ]
+    },
+    "general.experiment_name": {
+      "left": "Q-INDEP",
+      "right": "Q-TALA"
+    },
+    "general.save_dir": {
+      "left": "external:run_root/training/formal/Q-INDEP",
+      "right": "external:run_root/training/formal/Q-TALA"
+    },
+    "logging": {
+      "left": [
+        {
+          "_target_": "pytorch_lightning.loggers.CSVLogger",
+          "name": "local_metrics",
+          "save_dir": "external:run_root/training/formal/Q-INDEP"
+        }
+      ],
+      "right": [
+        {
+          "_target_": "pytorch_lightning.loggers.CSVLogger",
+          "name": "local_metrics",
+          "save_dir": "external:run_root/training/formal/Q-TALA"
+        }
+      ]
+    },
+    "task_memory_training.matcher_mode": {
+      "left": "independent",
+      "right": "tala"
+    },
+    "task_memory_training.variant": {
+      "left": "Q-INDEP",
+      "right": "Q-TALA"
+    }
+  },
+  "content_sha256": "73b66e2fbd7ea6130ebdb766c4850e074af83fabacbf018793779fb7246d9087",
+  "controlled_differences": {
+    "task_memory_training.matcher_mode": {
+      "left": "independent",
+      "right": "tala"
+    }
+  },
+  "ignored_identity_paths": [
+    "callbacks",
+    "general.experiment_name",
+    "general.save_dir",
+    "logging",
+    "task_memory_training.variant"
+  ],
+  "left_variant": "Q-INDEP",
+  "right_variant": "Q-TALA",
+  "schema_version": "task-memory-config-diff-v1"
+}

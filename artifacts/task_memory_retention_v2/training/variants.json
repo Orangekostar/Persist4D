@@ -1,0 +1,98 @@
+{
+  "budget": {
+    "devices": 2,
+    "effective_episode_batch": 8,
+    "gradient_accumulation": 4,
+    "optimizer_updates": 3000,
+    "pilot_updates": 300,
+    "scheduler_total_updates": 3000,
+    "seed": 45,
+    "training_gpu_hour_cap": 120
+  },
+  "common_task_read_initialization": {
+    "applies_to": [
+      "Q-INDEP",
+      "Q-TALA"
+    ],
+    "logical_reference": "external:run_root/training/common/task_read_init.pt",
+    "sha256": "df543c697e502d866d4157c65011def05dc4d5a785dd1e5b981973f41b2612e9"
+  },
+  "config_diffs": {
+    "Q-INDEP_to_Q-TALA": {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/config_diffs/Q-INDEP_to_Q-TALA.json",
+      "sha256": "ca7aaa130c70b93e99b37e4c2a8bc5efe7ca38176b2028500aa68c425c0f230d"
+    },
+    "W-BASE_to_FH-MATCH": {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/config_diffs/W-BASE_to_FH-MATCH.json",
+      "sha256": "ab9b1372a43ff8dbbd03d9cfc33c0abc4318a79d12b9dd3906b92bad3a87fe99"
+    },
+    "W-BASE_to_Q-INDEP": {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/config_diffs/W-BASE_to_Q-INDEP.json",
+      "sha256": "2202ddd1629b18e282f1bc07594d1f90f2672c098e1d127768e21a8af49297b9"
+    }
+  },
+  "content_sha256": "aa551b75b64913c4aa98fe4499e4d99302093341fa0e97317e9e11ea41fe8553",
+  "costs_and_exposure": {
+    "logical_reference": "repo:artifacts/task_memory_retention_v2/training/costs_and_exposure.csv",
+    "sha256": "6721ad96f0d77bb2125c35d1a974128552a0f61fe65332596f425b4d75ffe281"
+  },
+  "r1_initialization": {
+    "bytes": 754813672,
+    "logical_reference": "external:r1_checkpoint",
+    "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+  },
+  "schema_version": "task-memory-training-variants-v1",
+  "smoke_evidence": "repo:artifacts/task_memory_retention_v2/implementation/real_gradient_smoke.json",
+  "source_commit": "e167888032132b5f94a6cd914b29074a6e92eddb",
+  "status": "FROZEN_READY_FOR_M2_PREFIX",
+  "variants": {
+    "FH-MATCH": {
+      "commands": {
+        "formal_fresh_3000": "python -m scripts.train_task_memory --variant FH-MATCH --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000",
+        "pilot_300": "python -m scripts.train_task_memory --variant FH-MATCH --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 300",
+        "resume_pilot_to_3000": "python -m scripts.train_task_memory --variant FH-MATCH --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000 --resume \"$PERSIST4D_RUN_ROOT/training/formal/FH-MATCH/last.ckpt\""
+      },
+      "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/FH-MATCH.yaml",
+      "resolved_config_sha256": "c048e008fbe62ddec6bbc725db5bc29319fa5681c31966fac30a51d860c9add4",
+      "role": "matched full-history training control without task state",
+      "state": "FROZEN_NOT_RUN",
+      "task_read_initialization_sha256": null
+    },
+    "Q-INDEP": {
+      "commands": {
+        "formal_fresh_3000": "python -m scripts.train_task_memory --variant Q-INDEP --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000",
+        "pilot_300": "python -m scripts.train_task_memory --variant Q-INDEP --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 300",
+        "resume_pilot_to_3000": "python -m scripts.train_task_memory --variant Q-INDEP --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000 --resume \"$PERSIST4D_RUN_ROOT/training/formal/Q-INDEP/last.ckpt\""
+      },
+      "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/Q-INDEP.yaml",
+      "resolved_config_sha256": "3c339a6c4cf659a633044ecbcce962ff4d5308fffc3c57abf0f5aea363c6194b",
+      "role": "task-state model with independent set matching",
+      "state": "FROZEN_NOT_RUN",
+      "task_read_initialization_sha256": "df543c697e502d866d4157c65011def05dc4d5a785dd1e5b981973f41b2612e9"
+    },
+    "Q-TALA": {
+      "commands": {
+        "formal_fresh_3000": "python -m scripts.train_task_memory --variant Q-TALA --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000",
+        "pilot_300": "python -m scripts.train_task_memory --variant Q-TALA --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 300",
+        "resume_pilot_to_3000": "python -m scripts.train_task_memory --variant Q-TALA --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000 --resume \"$PERSIST4D_RUN_ROOT/training/formal/Q-TALA/last.ckpt\""
+      },
+      "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/Q-TALA.yaml",
+      "resolved_config_sha256": "54dd930d6625f45bf97ca8bac4ba5fc91247b42c0be3a72a907765311a3f84c3",
+      "role": "task-state model with tracklet-aware lineage assignment",
+      "state": "FROZEN_NOT_RUN",
+      "task_read_initialization_sha256": "df543c697e502d866d4157c65011def05dc4d5a785dd1e5b981973f41b2612e9"
+    },
+    "W-BASE": {
+      "commands": {
+        "formal_fresh_3000": "python -m scripts.train_task_memory --variant W-BASE --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000",
+        "pilot_300": "python -m scripts.train_task_memory --variant W-BASE --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 300",
+        "resume_pilot_to_3000": "python -m scripts.train_task_memory --variant W-BASE --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000 --resume \"$PERSIST4D_RUN_ROOT/training/formal/W-BASE/last.ckpt\""
+      },
+      "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/W-BASE.yaml",
+      "resolved_config_sha256": "caa430c356b5f4d4504dce0e8d9bbe8eac734cadab82e293e720d58abbac4470",
+      "role": "adapted local-window training control without task state",
+      "state": "FROZEN_NOT_RUN",
+      "task_read_initialization_sha256": null
+    }
+  }
+}

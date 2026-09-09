@@ -1,0 +1,117 @@
+{
+  "all_differences": {
+    "callbacks": {
+      "left": [
+        {
+          "_target_": "pytorch_lightning.callbacks.ModelCheckpoint",
+          "auto_insert_metric_name": false,
+          "dirpath": "external:run_root/training/formal/W-BASE",
+          "every_n_epochs": 1,
+          "filename": "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}",
+          "mode": "max",
+          "monitor": "val_mean_t-AP",
+          "save_last": true,
+          "save_on_train_epoch_end": true,
+          "save_top_k": 1,
+          "save_weights_only": false
+        },
+        {
+          "_target_": "utils.rescene_rootcause_callbacks.EpochSetCheckpointCallback",
+          "completed_epochs": [
+            60,
+            90,
+            450
+          ],
+          "output_dir": "external:run_root/training/formal/W-BASE"
+        },
+        {
+          "_target_": "utils.rescene_rootcause_callbacks.RootCauseHorizonCallback",
+          "completed_epoch": 90
+        },
+        {
+          "_target_": "pytorch_lightning.callbacks.LearningRateMonitor"
+        }
+      ],
+      "right": [
+        {
+          "_target_": "pytorch_lightning.callbacks.ModelCheckpoint",
+          "auto_insert_metric_name": false,
+          "dirpath": "external:run_root/training/formal/FH-MATCH",
+          "every_n_epochs": 1,
+          "filename": "epoch={epoch:03d}-val_mean_t-AP={val_mean_t-AP:.3f}",
+          "mode": "max",
+          "monitor": "val_mean_t-AP",
+          "save_last": true,
+          "save_on_train_epoch_end": true,
+          "save_top_k": 1,
+          "save_weights_only": false
+        },
+        {
+          "_target_": "utils.rescene_rootcause_callbacks.EpochSetCheckpointCallback",
+          "completed_epochs": [
+            60,
+            90,
+            450
+          ],
+          "output_dir": "external:run_root/training/formal/FH-MATCH"
+        },
+        {
+          "_target_": "utils.rescene_rootcause_callbacks.RootCauseHorizonCallback",
+          "completed_epoch": 90
+        },
+        {
+          "_target_": "pytorch_lightning.callbacks.LearningRateMonitor"
+        }
+      ]
+    },
+    "general.experiment_name": {
+      "left": "W-BASE",
+      "right": "FH-MATCH"
+    },
+    "general.save_dir": {
+      "left": "external:run_root/training/formal/W-BASE",
+      "right": "external:run_root/training/formal/FH-MATCH"
+    },
+    "logging": {
+      "left": [
+        {
+          "_target_": "pytorch_lightning.loggers.CSVLogger",
+          "name": "local_metrics",
+          "save_dir": "external:run_root/training/formal/W-BASE"
+        }
+      ],
+      "right": [
+        {
+          "_target_": "pytorch_lightning.loggers.CSVLogger",
+          "name": "local_metrics",
+          "save_dir": "external:run_root/training/formal/FH-MATCH"
+        }
+      ]
+    },
+    "task_memory_training.variant": {
+      "left": "W-BASE",
+      "right": "FH-MATCH"
+    },
+    "task_memory_training.window_mode": {
+      "left": "local_pair",
+      "right": "full_history"
+    }
+  },
+  "content_sha256": "5110bc5ac97da4ff742e17b139135a35f54c28b5832ecc77587c327dca6db30d",
+  "controlled_differences": {
+    "task_memory_training.window_mode": {
+      "left": "local_pair",
+      "right": "full_history"
+    }
+  },
+  "ignored_identity_paths": [
+    "callbacks",
+    "general.experiment_name",
+    "general.save_dir",
+    "logging",
+    "task_memory_training.variant"
+  ],
+  "left_variant": "W-BASE",
+  "right_variant": "FH-MATCH",
+  "schema_version": "task-memory-config-diff-v1"
+}
