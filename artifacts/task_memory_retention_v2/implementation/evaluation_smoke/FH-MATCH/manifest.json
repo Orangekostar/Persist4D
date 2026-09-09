@@ -1,0 +1,94 @@
+{
+  "cache": {
+    "bytes": 99544406,
+    "cap_bytes": 42949672960,
+    "entry_count": 2,
+    "records": [
+      {
+        "content_sha256": "58de5cc816e2431f1820e186255d9fcecf7d49249dc4d9261918e798095f1477",
+        "file_bytes": 15492107,
+        "file_sha256": "3d4ab9d642181f4b8a18a336cadae3a7437aa374fb80e4f7480f8d73837cd773",
+        "filename": "af9fc01009ab475a8664cabdf9d217561242e278a2b73b22b97d17f611d622b8.pt",
+        "key_sha256": "af9fc01009ab475a8664cabdf9d217561242e278a2b73b22b97d17f611d622b8",
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+        "sequence_id": "scene0007_00-scene0007_01-scene0007_03-scene0007_02-scene0007_04"
+      },
+      {
+        "content_sha256": "c78cfb075ee778040a99e612e5af5281d57bd798e8469ab2b2a50e55a3954290",
+        "file_bytes": 84052299,
+        "file_sha256": "f5bf19b10f7346658e69a593367439b60f976ad336f721731bb6d2983de6b3b9",
+        "filename": "9157fe95c9a987e6a88f959fb69a927eb3bdb439f1c30fedb6b5d7bd08130f09.pt",
+        "key_sha256": "9157fe95c9a987e6a88f959fb69a927eb3bdb439f1c30fedb6b5d7bd08130f09",
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+        "sequence_id": "scene0066_00-scene0066_02-scene0066_03-scene0066_04-scene0066_01"
+      }
+    ]
+  },
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "content_sha256": "e7c06d7d8bfcbfd95c953b6a488469eb25d62d2ab4a1356a59826c194c95c344",
+  "determinism": {
+    "cudnn_deterministic": true,
+    "episode_seed_reset": true,
+    "tf32": false,
+    "torch_deterministic_algorithms": true
+  },
+  "elapsed_seconds": 18.92860198020935,
+  "evaluation_seed": 45,
+  "identity_events": {
+    "birth_count": 0,
+    "false_birth_count": 0,
+    "false_birth_rate": null,
+    "false_reactivation_count": 0,
+    "false_reactivation_rate": null,
+    "reactivation_count": 0,
+    "rejected_birth_count": 0
+  },
+  "identity_metrics": {
+    "file_bytes": 1393,
+    "file_sha256": "ea27652219e65a44f1cc645e2ed4596b1c51b5de85bf0973872918e475829bd5",
+    "logical_reference": "repo:artifacts/task_memory_retention_v2/implementation/evaluation_smoke/FH-MATCH/identity_metrics.csv",
+    "row_count": 4
+  },
+  "load_audit": {
+    "loaded_key_count": 798,
+    "missing_keys": [],
+    "r1_key_aliases": {
+      "criterion.change_weights": "criterion.base_criterion.change_weights",
+      "criterion.empty_weight": "criterion.base_criterion.empty_weight"
+    },
+    "r1_subtree_exact": true,
+    "r1_subtree_mismatches": [],
+    "unexpected_keys": []
+  },
+  "metrics": {
+    "file_bytes": 3138,
+    "file_sha256": "7c5fa593a25f25c8d3d2c0739a77de77ebbe2931e544acb4ab85ea79c7be82d6",
+    "logical_reference": "repo:artifacts/task_memory_retention_v2/implementation/evaluation_smoke/FH-MATCH/metrics.csv",
+    "row_count": 12
+  },
+  "population": {
+    "id": "development_common_h5_canonical",
+    "master_count": 2,
+    "reference_count": 2,
+    "smoke": true
+  },
+  "postprocess_sha256": "fececc4f4144af80290cc2432c747a84556d641247b014c8464f7decc94db334",
+  "produced": 2,
+  "reducers": [
+    "mean",
+    "latest",
+    "max"
+  ],
+  "retention": {
+    "file_bytes": 2355,
+    "file_sha256": "0c1aa2995d0ce17c8527c1c5d6ed2fdfec8a1f6785f78f360aa20618c22b1438",
+    "logical_reference": "repo:artifacts/task_memory_retention_v2/implementation/evaluation_smoke/FH-MATCH/retention.csv",
+    "row_count": 12
+  },
+  "reused": 0,
+  "schema_version": "task-memory-evaluation-run-v2",
+  "source_commit": "0d2d133727bf7ba0d2c5872d6861b99151ec1e60",
+  "state_contract_sha256": "9b65e91e8152d98771a065541aa2e0c23c04564a7c50b231e57e7fb7b7e63846",
+  "status": "PASS",
+  "variant": "FH-MATCH"
+}

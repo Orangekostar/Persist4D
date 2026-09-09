@@ -1,0 +1,88 @@
+{
+  "cache": {
+    "bytes": 57659058,
+    "cap_bytes": 42949672960,
+    "entry_count": 2,
+    "records": [
+      {
+        "content_sha256": "c67cbacd849b677efb793ecd5d02f0eb001dee88ac2180de6ecd26941ddaf711",
+        "file_bytes": 9105721,
+        "file_sha256": "4617d2b2e1e5091753dd5644d5ae0892c030215e9408dda8e856fbd53cf8413a",
+        "filename": "f4d3c6e7356592d9f531b85112261f0089b491e404f847b04d1f25e7465744aa.pt",
+        "key_sha256": "f4d3c6e7356592d9f531b85112261f0089b491e404f847b04d1f25e7465744aa",
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+        "sequence_id": "scene0007_00-scene0007_01-scene0007_03-scene0007_02-scene0007_04"
+      },
+      {
+        "content_sha256": "a571979990d966cc2c174189f3eb78fbbedabcebeed7392129060e27efc406ed",
+        "file_bytes": 48553337,
+        "file_sha256": "6f7fe51888a0a6e1dd99728f36db94723591a8e3129ca113b7b639b8d5ea63a6",
+        "filename": "378f358ac1cdf94a925c53d343132b4e5a717330cb2a39136b39cfd194973fe2.pt",
+        "key_sha256": "378f358ac1cdf94a925c53d343132b4e5a717330cb2a39136b39cfd194973fe2",
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+        "sequence_id": "scene0066_00-scene0066_02-scene0066_03-scene0066_04-scene0066_01"
+      }
+    ]
+  },
+  "checkpoint_sha256": "e6d8acc707763698df13d9de4f5f4eede3f2e0e221a25a4154758379475bb944",
+  "content_sha256": "e49a0a6985dcbe66876405baf1627a834c8f6685c5705e71f9f68a9b8a2cecb5",
+  "determinism": {
+    "cudnn_deterministic": true,
+    "episode_seed_reset": true,
+    "tf32": false,
+    "torch_deterministic_algorithms": true
+  },
+  "elapsed_seconds": 12.90735411643982,
+  "evaluation_seed": 45,
+  "identity_events": {
+    "birth_count": 31,
+    "false_birth_count": 10,
+    "false_birth_rate": 0.3225806451612903,
+    "false_reactivation_count": 9,
+    "false_reactivation_rate": 0.6428571428571429,
+    "reactivation_count": 14,
+    "rejected_birth_count": 0
+  },
+  "identity_metrics": {
+    "file_bytes": 1420,
+    "file_sha256": "04f7cb7080347de50696e7084e2143462e774b9d28a87351ce2d8f4a488a606d",
+    "logical_reference": "repo:artifacts/task_memory_retention_v2/implementation/evaluation_smoke/Q-TALA/identity_metrics.csv",
+    "row_count": 4
+  },
+  "load_audit": {
+    "loaded_key_count": 810,
+    "missing_keys": [],
+    "unexpected_keys": []
+  },
+  "metrics": {
+    "file_bytes": 3074,
+    "file_sha256": "5cd9aa2d9c98c8270e72782817a15090c665b59f85d7e6f6452415d9e0514df1",
+    "logical_reference": "repo:artifacts/task_memory_retention_v2/implementation/evaluation_smoke/Q-TALA/metrics.csv",
+    "row_count": 12
+  },
+  "population": {
+    "id": "development_common_h5_canonical",
+    "master_count": 2,
+    "reference_count": 2,
+    "smoke": true
+  },
+  "postprocess_sha256": "fececc4f4144af80290cc2432c747a84556d641247b014c8464f7decc94db334",
+  "produced": 2,
+  "reducers": [
+    "mean",
+    "latest",
+    "max"
+  ],
+  "retention": {
+    "file_bytes": 2330,
+    "file_sha256": "adf98c866bd0fb9383671b32ab92cfdfda40b518e3ccc76a5fb77c2f93163b88",
+    "logical_reference": "repo:artifacts/task_memory_retention_v2/implementation/evaluation_smoke/Q-TALA/retention.csv",
+    "row_count": 12
+  },
+  "reused": 0,
+  "schema_version": "task-memory-evaluation-run-v2",
+  "source_commit": "0d2d133727bf7ba0d2c5872d6861b99151ec1e60",
+  "state_contract_sha256": "a3c4bdfb2c0c5dffe780de007580c10b4bc458f34fc60111d507949c976f203b",
+  "status": "PASS",
+  "variant": "Q-TALA"
+}

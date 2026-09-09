@@ -1,0 +1,43 @@
+{
+  "content_sha256": "f124de1028c37c915371a038a2549c983bc73bd9a875591ca2a1853b2994eee1",
+  "determinism_verification": {
+    "csv_numeric_columns_identical": true,
+    "final_source_commit": "0d2d133727bf7ba0d2c5872d6861b99151ec1e60",
+    "intervening_change_scope": "csv scalar validation and manifest field placement only",
+    "reference_stage_payload_sha256": {
+      "09582244-e2c2-2de1-956c-357092d949d1": "5a7d389c7bebd0c75b0e85dfd5f7d1faa24ad3f86916fef0ce48de2df441c9f2",
+      "0f2f2711-b736-2f71-8c6a-245a9d820a8c": "f6250a13dd8ea6385641503ba5b4e02cfa3a39d8fe7bf0162ed7b19f6410e851"
+    },
+    "repeat_source_commit": "bff08c3e084a2c7e0b71bcd1b5e5a4a3cd1d49d5",
+    "repeated_system": "Q-TALA",
+    "stage_payloads_identical": true,
+    "temporary_repeat_cache_removed": true
+  },
+  "population": {
+    "evaluation_seed": 45,
+    "id": "development_common_h5_canonical",
+    "master_count": 2,
+    "reference_count": 2
+  },
+  "schema_version": "task-memory-evaluation-smoke-summary-v1",
+  "source_commit": "0d2d133727bf7ba0d2c5872d6861b99151ec1e60",
+  "status": "PASS",
+  "systems": {
+    "FH-MATCH": {
+      "cache_bytes": 99544406,
+      "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "manifest_content_sha256": "e7c06d7d8bfcbfd95c953b6a488469eb25d62d2ab4a1356a59826c194c95c344",
+      "manifest_file_sha256": "d66ba2c13630a1689648ef5e80eab21b8374a78e3963e25305d19537a3701e4e",
+      "manifest_logical_reference": "repo:artifacts/task_memory_retention_v2/implementation/evaluation_smoke/FH-MATCH/manifest.json",
+      "status": "PASS"
+    },
+    "Q-TALA": {
+      "cache_bytes": 57659058,
+      "checkpoint_sha256": "e6d8acc707763698df13d9de4f5f4eede3f2e0e221a25a4154758379475bb944",
+      "manifest_content_sha256": "e49a0a6985dcbe66876405baf1627a834c8f6685c5705e71f9f68a9b8a2cecb5",
+      "manifest_file_sha256": "bc8746dd7464672f521ec2f371b3b23df201949ffaa165c146439e072d2148b0",
+      "manifest_logical_reference": "repo:artifacts/task_memory_retention_v2/implementation/evaluation_smoke/Q-TALA/manifest.json",
+      "status": "PASS"
+    }
+  }
+}

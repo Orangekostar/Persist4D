@@ -337,6 +337,8 @@ Require W-BASE to Q-INDEP diffs only in model/routing, and Q-INDEP to Q-TALA dif
 
 ### Task 8: Implement compact evaluation, baseline metrics, and selection
 
+**Status:** Complete (evaluation path and real smoke; formal M2 tables remain Task 9 outputs)
+
 **Files:**
 - Create: `scripts/task_memory_cache.py`
 - Create: `scripts/task_memory_metrics.py`
@@ -350,23 +352,23 @@ Require W-BASE to Q-INDEP diffs only in model/routing, and Q-INDEP to Q-TALA dif
 - Consumes: native/common populations, model checkpoint, fixed output policy/reducer, official post-processing/stmetrics, identity publisher, and compact cache root.
 - Produces: one forward mask payload per stage, reducer-independent lineage tables, five task metrics, direct current AP, identity/error strata, retention, and frozen dev selection.
 
-- [ ] **Step 1: Write evaluation/cache tests**
+- [x] **Step 1: Write evaluation/cache tests**
 
 Cover native H1-H5, continuous empty-state T1..H execution, one lossless mask encoding shared by reducers, cache key binding full causal history/model/config/state/policy/postprocess, lag1 revision versioning, full-prefix Legacy AP, class-preserving trajectories, identity N/A denominators, false birth/reactivation/rejected birth, and cache cap rejection.
 
-- [ ] **Step 2: Write selection tests**
+- [x] **Step 2: Write selection tests**
 
 Require checkpoints 0/750/1500/2250/3000; maximize minimum unrounded delta across named baselines, then mean delta, lower latency, earlier update; prohibit horizon-specific checkpoint/policy/reducer selection; emit both terminal-update and selected-best comparisons.
 
-- [ ] **Step 3: Run tests and confirm RED**
+- [x] **Step 3: Run tests and confirm RED**
 
 Run: `/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q tests/test_task_memory_evaluation.py tests/test_task_memory_selection.py`
 
-- [ ] **Step 4: Implement thin wrappers over official metrics**
+- [x] **Step 4: Implement thin wrappers over official metrics**
 
 Reuse `extract_official_task_prediction`, stmetrics accumulators, and existing identity event code. Stream by reference, release tensors after each unit, and keep diagnostic float logits only for preregistered samples.
 
-- [ ] **Step 5: Validate and commit evaluation path**
+- [x] **Step 5: Validate and commit evaluation path**
 
 Run new tests plus direct official-postprocess/system-metric tests. Execute one real two-master smoke for student and FH before formal M2.
 

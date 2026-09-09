@@ -35,6 +35,30 @@ CUDA_VISIBLE_DEVICES=0 python -m scripts.train_task_memory \
 python -m scripts.train_task_memory --materialize-contracts
 ```
 
+## Verified Task 8 commands
+
+The compact evaluator was tested on two development H5 masters for Q-TALA and
+FH-MATCH. Dense cache payloads stay under the external run root.
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python -m scripts.evaluate_task_memory \
+  --variant Q-TALA --checkpoint "$PERSIST4D_Q_TALA_CHECKPOINT" \
+  --device cuda:0 --smoke-masters 2 \
+  --cache-root "$PERSIST4D_RUN_ROOT/evaluation_cache/smoke/Q-TALA" \
+  --output artifacts/task_memory_retention_v2/implementation/evaluation_smoke/Q-TALA
+
+CUDA_VISIBLE_DEVICES=1 python -m scripts.evaluate_task_memory \
+  --variant FH-MATCH --checkpoint "$PERSIST4D_R1_CHECKPOINT" \
+  --device cuda:0 --smoke-masters 2 \
+  --cache-root "$PERSIST4D_RUN_ROOT/evaluation_cache/smoke/FH-MATCH" \
+  --output artifacts/task_memory_retention_v2/implementation/evaluation_smoke/FH-MATCH
+
+/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q \
+  tests/test_task_memory_evaluation.py tests/test_task_memory_selection.py \
+  tests/test_rescene_task_postprocess.py tests/test_system_comparison_metrics.py \
+  tests/test_task_memory_output.py
+```
+
 ## Frozen M2 commands (not yet run)
 
 Run each 300-update exact-schedule prefix in an isolated directory:
