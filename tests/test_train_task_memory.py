@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import csv
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
 import torch
+from omegaconf import OmegaConf
 
 from datasets.task_memory_episode import NativeEpisodeMaster
 from scripts.train_task_memory import (
@@ -17,6 +21,7 @@ from scripts.train_task_memory import (
     checkpoint_interval,
     classify_smoke_identity_events,
     compose_variant_config,
+    materialize_training_contracts,
     remap_r1_training_state,
     resolved_variant_diff,
     validate_run_budget,
@@ -290,3 +295,92 @@ def test_task_read_state_hash_supports_scalar_parameters() -> None:
 
     assert first == second
     assert len(first) == 64
+
+
+def test_materialized_training_contracts_freeze_four_controlled_arms(
+    tmp_path: Path,
+) -> None:
+    source_commit = "a" * 40
+    common_initialization = "b" * 64
+
+    materialize_training_contracts(
+        output_root=tmp_path,
+        source_commit=source_commit,
+        common_initialization_sha256=common_initialization,
+    )
+
+    manifest = json.loads((tmp_path / "variants.json").read_text())
+    assert manifest["status"] == "FROZEN_READY_FOR_M2_PREFIX"
+    assert manifest["source_commit"] == source_commit
+    assert manifest["common_task_read_initialization"]["sha256"] == (
+        common_initialization
+    )
+    assert set(manifest["variants"]) == set(VARIANTS)
+    assert all(
+        record["state"] == "FROZEN_NOT_RUN"
+        for record in manifest["variants"].values()
+    )
+    assert all(
+        "$PERSIST4D_RUN_ROOT" in record["commands"]["pilot_300"]
+        for record in manifest["variants"].values()
+    )
+
+    for variant in VARIANTS:
+        path = tmp_path / "resolved_configs" / f"{variant}.yaml"
+        config = OmegaConf.load(path)
+        assert config.backbone.name == "external:concerto_pretrained"
+        assert config.general.save_dir == (
+            f"external:run_root/training/formal/{variant}"
+        )
+        assert config.task_memory_training.optimizer_updates == 3000
+        assert manifest["variants"][variant]["resolved_config_sha256"] == (
+            hashlib.sha256(path.read_bytes()).hexdigest()
+        )
+
+    comparisons = {
+        "W-BASE_to_Q-INDEP.json": {
+            "model.task_memory_enabled",
+            "task_memory_training.state_enabled",
+        },
+        "Q-INDEP_to_Q-TALA.json": {"task_memory_training.matcher_mode"},
+        "W-BASE_to_FH-MATCH.json": {"task_memory_training.window_mode"},
+    }
+    for filename, expected in comparisons.items():
+        payload = json.loads((tmp_path / "config_diffs" / filename).read_text())
+        assert set(payload["controlled_differences"]) == expected
+
+
+def test_materialized_training_exposure_and_public_paths_are_exact(
+    tmp_path: Path,
+) -> None:
+    materialize_training_contracts(
+        output_root=tmp_path,
+        source_commit="a" * 40,
+        common_initialization_sha256="b" * 64,
+    )
+
+    with (tmp_path / "costs_and_exposure.csv").open(newline="") as handle:
+        rows = {row["variant"]: row for row in csv.DictReader(handle)}
+
+    assert set(rows) == set(VARIANTS)
+    for variant, row in rows.items():
+        assert row["status"] == "NOT_RUN"
+        assert row["optimizer_updates"] == "3000"
+        assert row["global_episode_draws"] == "24000"
+        assert row["single_scan_episodes"] == "4800"
+        assert row["T2_episodes"] == "4800"
+        assert row["T3_episodes"] == "4800"
+        assert row["T4_episodes"] == "4800"
+        assert row["T5_episodes"] == "4800"
+        assert row["loss_evaluated_stages"] == "72000"
+        assert row["actual_gpu_hours"] == ""
+        expected_inputs = "168000" if variant == "FH-MATCH" else "120000"
+        assert row["encoder_scan_inputs"] == expected_inputs
+
+    public_text = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in sorted(tmp_path.rglob("*"))
+        if path.is_file()
+    )
+    for forbidden in ("/home/", "/mnt/", "192.168.", "node107", "ww@"):
+        assert forbidden not in public_text

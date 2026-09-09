@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
+import io
 import json
 import os
 import subprocess
@@ -50,6 +52,7 @@ R1_SHA256 = "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
 R1_BYTES = 754_813_672
 FORMAL_OPTIMIZER_UPDATES = 3000
 PILOT_OPTIMIZER_UPDATES = 300
+TRAINING_GPU_HOUR_CAP = 120
 DEFAULT_DATA_ROOT = PROJECT_ROOT / "data"
 DEFAULT_DATA_CONTRACT = (
     PROJECT_ROOT / "artifacts/task_memory_retention_v2/DATA_CONTRACT.json"
@@ -176,6 +179,265 @@ def _json_content_sha256(value: Mapping[str, object]) -> str:
         sort_keys=True,
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _atomic_text(path: Path, value: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(f"{path.suffix}.tmp")
+    temporary.write_text(value, encoding="utf-8")
+    temporary.replace(path)
+
+
+def _require_hex_digest(value: str, *, length: int, name: str) -> None:
+    if len(value) != length or any(character not in "0123456789abcdef" for character in value):
+        raise TaskMemoryTrainingError(f"{name} must be {length} lowercase hex characters")
+
+
+def _formal_training_command(variant: str, *, updates: int, resume: bool) -> str:
+    command = (
+        "python -m scripts.train_task_memory "
+        f"--variant {variant} "
+        '--external-root "$PERSIST4D_RUN_ROOT" '
+        "--devices 2 --gradient-accumulation 4 "
+        f"--stop-after-updates {updates}"
+    )
+    if resume:
+        command += (
+            " --resume "
+            f'"$PERSIST4D_RUN_ROOT/training/formal/{variant}/last.ckpt"'
+        )
+    return command
+
+
+def _formal_exposure_row(variant: str, config: DictConfig) -> dict[str, object]:
+    updates = int(config.task_memory_training.optimizer_updates)
+    effective_batch = int(config.task_memory_training.effective_episode_batch)
+    global_episodes = updates * effective_batch
+    bucket_fractions = {
+        str(name): float(fraction)
+        for name, fraction in config.task_memory_training.episode_buckets.items()
+    }
+    expected_buckets = {"single_scan", "T2", "T3", "T4", "T5"}
+    if (
+        set(bucket_fractions) != expected_buckets
+        or abs(sum(bucket_fractions.values()) - 1.0) > 1e-12
+    ):
+        raise TaskMemoryTrainingError("episode buckets differ from the frozen H1-H5 plan")
+    bucket_counts = {
+        name: int(global_episodes * fraction)
+        for name, fraction in bucket_fractions.items()
+    }
+    if any(
+        count != global_episodes * bucket_fractions[name]
+        for name, count in bucket_counts.items()
+    ):
+        raise TaskMemoryTrainingError("episode bucket exposure is not integral")
+    horizon_counts = {
+        1: bucket_counts["single_scan"],
+        2: bucket_counts["T2"],
+        3: bucket_counts["T3"],
+        4: bucket_counts["T4"],
+        5: bucket_counts["T5"],
+    }
+    loss_stages = sum(horizon * count for horizon, count in horizon_counts.items())
+    window_mode = str(config.task_memory_training.window_mode)
+    if window_mode == "local_pair":
+        encoder_inputs = sum(
+            (1 + 2 * (horizon - 1)) * count
+            for horizon, count in horizon_counts.items()
+        )
+    elif window_mode == "full_history":
+        encoder_inputs = sum(
+            (horizon * (horizon + 1) // 2) * count
+            for horizon, count in horizon_counts.items()
+        )
+    else:
+        raise TaskMemoryTrainingError(f"unsupported window mode: {window_mode}")
+    return {
+        "run_phase": "M2_FORMAL",
+        "variant": variant,
+        "status": "NOT_RUN",
+        "optimizer_updates": updates,
+        "devices": int(config.task_memory_training.devices),
+        "gradient_accumulation": int(
+            config.task_memory_training.gradient_accumulation
+        ),
+        "effective_episode_batch": effective_batch,
+        "global_episode_draws": global_episodes,
+        "single_scan_episodes": horizon_counts[1],
+        "T2_episodes": horizon_counts[2],
+        "T3_episodes": horizon_counts[3],
+        "T4_episodes": horizon_counts[4],
+        "T5_episodes": horizon_counts[5],
+        "loss_evaluated_stages": loss_stages,
+        "encoder_scan_inputs": encoder_inputs,
+        "actual_elapsed_seconds": "",
+        "actual_gpu_hours": "",
+        "campaign_training_gpu_hour_cap": TRAINING_GPU_HOUR_CAP,
+    }
+def materialize_training_contracts(
+    *,
+    output_root: Path,
+    source_commit: str,
+    common_initialization_sha256: str,
+) -> dict[str, object]:
+    """Freeze portable M2 configs, controlled diffs, and planned exposure."""
+    _require_hex_digest(source_commit, length=40, name="source_commit")
+    _require_hex_digest(
+        common_initialization_sha256,
+        length=64,
+        name="common_initialization_sha256",
+    )
+    output_root = output_root.resolve()
+    resolved_root = output_root / "resolved_configs"
+    diff_root = output_root / "config_diffs"
+    configs: dict[str, DictConfig] = {}
+    config_records: dict[str, dict[str, object]] = {}
+    roles = {
+        "W-BASE": "adapted local-window training control without task state",
+        "Q-INDEP": "task-state model with independent set matching",
+        "Q-TALA": "task-state model with tracklet-aware lineage assignment",
+        "FH-MATCH": "matched full-history training control without task state",
+    }
+    for variant in VARIANTS:
+        config = compose_variant_config(
+            variant,
+            pretrained=Path("external:concerto_pretrained"),
+            run_dir=Path(f"external:run_root/training/formal/{variant}"),
+        )
+        config_path = resolved_root / f"{variant}.yaml"
+        _atomic_text(
+            config_path,
+            OmegaConf.to_yaml(config, resolve=True, sort_keys=True),
+        )
+        configs[variant] = config
+        config_records[variant] = {
+            "commands": {
+                "formal_fresh_3000": _formal_training_command(
+                    variant, updates=FORMAL_OPTIMIZER_UPDATES, resume=False
+                ),
+                "pilot_300": _formal_training_command(
+                    variant, updates=PILOT_OPTIMIZER_UPDATES, resume=False
+                ),
+                "resume_pilot_to_3000": _formal_training_command(
+                    variant, updates=FORMAL_OPTIMIZER_UPDATES, resume=True
+                ),
+            },
+            "resolved_config": f"repo:artifacts/task_memory_retention_v2/training/resolved_configs/{variant}.yaml",
+            "resolved_config_sha256": _sha256(config_path),
+            "role": roles[variant],
+            "state": "FROZEN_NOT_RUN",
+            "task_read_initialization_sha256": (
+                common_initialization_sha256
+                if variant in {"Q-INDEP", "Q-TALA"}
+                else None
+            ),
+        }
+
+    identity_paths = {
+        "callbacks",
+        "general.experiment_name",
+        "general.save_dir",
+        "logging",
+        "task_memory_training.variant",
+    }
+    comparisons = (
+        (
+            "W-BASE",
+            "Q-INDEP",
+            {
+                "model.task_memory_enabled",
+                "task_memory_training.state_enabled",
+            },
+        ),
+        (
+            "Q-INDEP",
+            "Q-TALA",
+            {"task_memory_training.matcher_mode"},
+        ),
+        (
+            "W-BASE",
+            "FH-MATCH",
+            {"task_memory_training.window_mode"},
+        ),
+    )
+    diff_records = {}
+    for left_name, right_name, expected_paths in comparisons:
+        all_differences = resolved_variant_diff(configs[left_name], configs[right_name])
+        controlled_differences = {
+            path: value
+            for path, value in all_differences.items()
+            if path not in identity_paths
+        }
+        if set(controlled_differences) != expected_paths:
+            raise TaskMemoryTrainingError(
+                f"{left_name} to {right_name} differs outside the frozen contract"
+            )
+        payload: dict[str, object] = {
+            "all_differences": all_differences,
+            "controlled_differences": controlled_differences,
+            "ignored_identity_paths": sorted(identity_paths & set(all_differences)),
+            "left_variant": left_name,
+            "right_variant": right_name,
+            "schema_version": "task-memory-config-diff-v1",
+        }
+        payload["content_sha256"] = _json_content_sha256(payload)
+        filename = f"{left_name}_to_{right_name}.json"
+        path = diff_root / filename
+        _atomic_json(path, payload)
+        diff_records[f"{left_name}_to_{right_name}"] = {
+            "logical_reference": (
+                "repo:artifacts/task_memory_retention_v2/training/config_diffs/"
+                f"{filename}"
+            ),
+            "sha256": _sha256(path),
+        }
+
+    exposure_rows = [
+        _formal_exposure_row(variant, configs[variant]) for variant in VARIANTS
+    ]
+    exposure_path = output_root / "costs_and_exposure.csv"
+    buffer = io.StringIO(newline="")
+    writer = csv.DictWriter(buffer, fieldnames=list(exposure_rows[0]))
+    writer.writeheader()
+    writer.writerows(exposure_rows)
+    _atomic_text(exposure_path, buffer.getvalue())
+
+    manifest: dict[str, object] = {
+        "budget": {
+            "devices": 2,
+            "effective_episode_batch": 8,
+            "gradient_accumulation": 4,
+            "optimizer_updates": FORMAL_OPTIMIZER_UPDATES,
+            "pilot_updates": PILOT_OPTIMIZER_UPDATES,
+            "scheduler_total_updates": FORMAL_OPTIMIZER_UPDATES,
+            "seed": 45,
+            "training_gpu_hour_cap": TRAINING_GPU_HOUR_CAP,
+        },
+        "common_task_read_initialization": {
+            "applies_to": ["Q-INDEP", "Q-TALA"],
+            "logical_reference": "external:run_root/training/common/task_read_init.pt",
+            "sha256": common_initialization_sha256,
+        },
+        "config_diffs": diff_records,
+        "costs_and_exposure": {
+            "logical_reference": "repo:artifacts/task_memory_retention_v2/training/costs_and_exposure.csv",
+            "sha256": _sha256(exposure_path),
+        },
+        "r1_initialization": {
+            "bytes": R1_BYTES,
+            "logical_reference": "external:r1_checkpoint",
+            "sha256": R1_SHA256,
+        },
+        "schema_version": "task-memory-training-variants-v1",
+        "smoke_evidence": "repo:artifacts/task_memory_retention_v2/implementation/real_gradient_smoke.json",
+        "source_commit": source_commit,
+        "status": "FROZEN_READY_FOR_M2_PREFIX",
+        "variants": config_records,
+    }
+    manifest["content_sha256"] = _json_content_sha256(manifest)
+    _atomic_json(output_root / "variants.json", manifest)
+    return manifest
 
 
 def _git_head() -> str:
@@ -748,7 +1010,9 @@ def _parser() -> argparse.ArgumentParser:
         return Path(value) if value else None
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--variant", choices=VARIANTS, required=True)
+    parser.add_argument("--variant", choices=VARIANTS)
+    parser.add_argument("--materialize-contracts", action="store_true")
+    parser.add_argument("--common-initialization-sha256")
     parser.add_argument(
         "--checkpoint",
         type=Path,
@@ -799,6 +1063,27 @@ def _parser() -> argparse.ArgumentParser:
 def main() -> int:
     parser = _parser()
     args = parser.parse_args()
+    if args.materialize_contracts:
+        if args.variant is not None or args.smoke or args.resume is not None:
+            parser.error("contract materialization cannot be combined with a run")
+        common_initialization = args.common_initialization_sha256
+        if common_initialization is None:
+            smoke_plan = _load_json(
+                args.artifact_root.resolve()
+                / "smoke/Q-TALA/run_plan.json"
+            )
+            value = smoke_plan.get("common_task_read_initialization_sha256")
+            common_initialization = value if isinstance(value, str) else None
+        if common_initialization is None:
+            parser.error("common task-read initialization SHA256 is unavailable")
+        materialize_training_contracts(
+            output_root=args.artifact_root,
+            source_commit=_git_head(),
+            common_initialization_sha256=common_initialization,
+        )
+        return 0
+    if args.variant is None:
+        parser.error("--variant is required for training")
     missing = [
         option
         for option, value in (
