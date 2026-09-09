@@ -22,6 +22,7 @@ from scripts.train_task_memory import (
     classify_smoke_identity_events,
     compose_variant_config,
     lightning_fit_kwargs,
+    lightning_loop_limits,
     materialize_training_contracts,
     remap_r1_training_state,
     resolved_variant_diff,
@@ -40,6 +41,13 @@ def test_lightning_fit_explicitly_loads_full_trusted_resume_state() -> None:
     assert lightning_fit_kwargs(resume) == {
         "ckpt_path": str(resume),
         "weights_only": False,
+    }
+
+
+def test_lightning_loop_is_step_bounded_across_resume_epoch() -> None:
+    assert lightning_loop_limits(3000) == {
+        "max_epochs": -1,
+        "max_steps": 3000,
     }
 
 

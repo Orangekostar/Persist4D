@@ -828,6 +828,13 @@ def lightning_fit_kwargs(resume: Path | None) -> dict[str, object]:
     }
 
 
+def lightning_loop_limits(stop_after_updates: int) -> dict[str, int]:
+    return {
+        "max_epochs": -1,
+        "max_steps": stop_after_updates,
+    }
+
+
 def _resume_progress(path: Path | None) -> TaskMemoryProgress:
     if path is None:
         return TaskMemoryProgress.initial()
@@ -1242,8 +1249,6 @@ def main() -> int:
         accelerator="gpu",
         devices=args.devices,
         strategy=config.trainer.strategy,
-        max_epochs=1,
-        max_steps=args.stop_after_updates,
         accumulate_grad_batches=1,
         precision="32-true",
         deterministic=False,
@@ -1255,6 +1260,7 @@ def main() -> int:
         default_root_dir=run_dir,
         log_every_n_steps=1,
         enable_progress_bar=True,
+        **lightning_loop_limits(args.stop_after_updates),
     )
     started = time.time()
     trainer.fit(system, train_dataloaders=loader, **lightning_fit_kwargs(resume))
