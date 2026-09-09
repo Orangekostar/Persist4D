@@ -1001,7 +1001,7 @@ def run_baseline(
         "source_commit": source_commit,
         "checkpoint_sha256": CHECKPOINT_SHA256,
         "config_sha256": canonical_json_sha256(config_document),
-        "population_sha256": canonical_json_sha256(
+        "dataset_sha256": canonical_json_sha256(
             [
                 {
                     "reference_id": spec.reference_id,
