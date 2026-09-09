@@ -830,7 +830,8 @@ def main() -> int:
     if checkpoint.stat().st_size != R1_BYTES or _sha256(checkpoint) != R1_SHA256:
         raise TaskMemoryTrainingError("R1 checkpoint identity differs")
     namespace = "smoke" if args.smoke else "formal"
-    run_dir = (args.external_root / namespace / args.variant).resolve()
+    training_root = (args.external_root / "training").resolve()
+    run_dir = training_root / namespace / args.variant
     artifact_dir = (args.artifact_root / namespace / args.variant).resolve()
     if resume is None and run_dir.exists() and any(run_dir.iterdir()):
         raise TaskMemoryTrainingError(f"run directory is not empty: {run_dir}")
@@ -869,7 +870,7 @@ def main() -> int:
     load_audit = _load_r1(system, checkpoint)
     common_init_sha = _apply_common_task_read_initialization(
         system,
-        args.external_root / "common/task_read_init.pt",
+        training_root / "common/task_read_init.pt",
     )
     if args.smoke and not bool(config.task_memory_training.state_enabled):
         raise TaskMemoryTrainingError(
