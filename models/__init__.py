@@ -46,9 +46,16 @@ def _load_family(modules: Iterable[str], explicit: dict[str, str], hint: str) ->
 
 # Always-available
 _load_family(
-    modules=["models.rescene", "models.persist4d_allt"],
+    modules=[
+        "models.rescene",
+        "models.persist4d_allt",
+        "models.persist4d_task_memory",
+    ],
     explicit={
         "Persist4DAllT": "models.persist4d_allt.Persist4DAllT",
+        "Persist4DTaskMemory": (
+            "models.persist4d_task_memory.Persist4DTaskMemory"
+        ),
         "ReScene": "models.rescene.ReScene",
     },
     hint="",

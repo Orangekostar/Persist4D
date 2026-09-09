@@ -230,6 +230,8 @@ Run new tests and `tests/test_system_comparison_metrics.py`; inspect state bytes
 
 ### Task 5: Add proposal-anchored entity-conditioned ReScene
 
+**Status:** In progress
+
 **Files:**
 - Create: `models/task_memory_read.py`
 - Create: `models/persist4d_task_memory.py`
@@ -241,15 +243,15 @@ Run new tests and `tests/test_system_comparison_metrics.py`; inspect state bytes
 - Consumes: the first complete ReScene decoder pass, `TaskMemoryState`, `StageMeta`, and prediction-only route.
 - Produces: `Persist4DTaskMemory.forward(..., task_state, stage_meta)` returning original raw outputs plus route/lineage/read diagnostics; state commit remains external.
 
-- [ ] **Step 1: Write model/read tests**
+- [x] **Step 1: Write model/read tests**
 
 Test named-prefix strict R1 loading; empty-state and disabled-module raw parity; one route/read call after `len(hlevels)-1`; normalized QK with scale initialized to `sqrt(128)` and clamped `[1,64]`; matched-slot-plus-null attention; strict zero residual when null wins; zero-initialized output projection; discovery queries unchanged when unassigned; and no second old-C2 read.
 
-- [ ] **Step 2: Run the tests and confirm RED**
+- [x] **Step 2: Run the tests and confirm RED**
 
 Run: `/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q tests/test_persist4d_task_memory.py`
 
-- [ ] **Step 3: Implement one data flow through the existing hook**
+- [x] **Step 3: Implement one data flow through the existing hook**
 
 At the first complete-scale hook, call the original `mask_module` once for routing logits/masks, freeze the discrete route, read only the routed slot plus a zero-value null branch, add the gated residual, and let remaining ReScene stages/heads execute normally. Store route diagnostics only for the duration of forward and clear them in `finally`.
 
