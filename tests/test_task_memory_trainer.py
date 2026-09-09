@@ -462,6 +462,15 @@ def test_forward_stage_sets_sparse_batch_device_before_model_call() -> None:
     assert output == {"ok": True}
 
 
+def test_fit_setup_does_not_instantiate_legacy_datasets() -> None:
+    trainer = _TrainingStepHarness()
+
+    trainer.setup("fit")
+
+    assert not hasattr(trainer, "train_dataset")
+    assert not hasattr(trainer, "validation_dataset")
+
+
 def test_exact_resume_payload_preserves_lightning_states_progress_and_rng() -> None:
     trainer = _TrainingStepHarness()
     trainer.progress = TaskMemoryProgress(

@@ -503,6 +503,10 @@ class TaskMemoryTrainer(InstanceSegmentation):
         }
         return dict(self.smoke_initialization_audit)
 
+    def setup(self, stage: str | None = None) -> None:
+        if stage not in {None, "fit"}:
+            raise TaskMemoryTrainerError("TaskMemoryTrainer supports fit only")
+
     def transfer_batch_to_device(
         self,
         batch: object,
