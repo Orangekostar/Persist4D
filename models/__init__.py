@@ -86,6 +86,17 @@ for _n, _r in _DISABLED.items():
     if _n not in _MODELS:
         setattr(_pkg, _n, _stub(_n, _r))
 
+import models.task_memory_routing as _task_memory_routing
+import models.task_memory_state as _task_memory_state
+
+CommitResult = _task_memory_routing.CommitResult
+EntityRoute = _task_memory_routing.EntityRoute
+PredictionObservation = _task_memory_routing.PredictionObservation
+commit_entities = _task_memory_routing.commit_entities
+route_entities = _task_memory_routing.route_entities
+TaskMemoryConfig = _task_memory_state.TaskMemoryConfig
+TaskMemoryState = _task_memory_state.TaskMemoryState
+
 
 def get_models() -> list[type]:
     return list(_MODELS.values())

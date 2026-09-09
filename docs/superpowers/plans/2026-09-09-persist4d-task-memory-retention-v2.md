@@ -176,6 +176,8 @@ Check one-revision scope, point lineage, class trajectories, output bytes, and f
 
 ### Task 4: Split prediction routing from single-stage commit
 
+**Status:** In progress
+
 **Files:**
 - Create: `models/task_memory_state.py`
 - Create: `models/task_memory_routing.py`
@@ -188,15 +190,15 @@ Check one-revision scope, point lineage, class trajectories, output bytes, and f
 - Consumes: detached query/class/mask predictions, B4 numerical association settings, and unlabeled stage metadata.
 - Produces: `TaskMemoryState`, `EntityRoute`, `CommitResult`, `route_entities`, `commit_entities`, and D-LAST/D-EMA controls.
 
-- [ ] **Step 1: Write route/commit tests**
+- [x] **Step 1: Write route/commit tests**
 
 Exercise route purity, complete-assignment-before-threshold semantics, current/previous support separation, stable route scores, logical ID/generation inheritance, dormant preservation, score-ordered births, reject-birth overflow, one watermark increment, and absence of GT-named fields in deployed state.
 
-- [ ] **Step 2: Run the tests and confirm RED**
+- [x] **Step 2: Run the tests and confirm RED**
 
 Run: `/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q tests/test_task_memory_routing.py`
 
-- [ ] **Step 3: Implement immutable route and writer**
+- [x] **Step 3: Implement immutable route and writer**
 
 ```python
 def route_entities(
