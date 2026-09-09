@@ -152,6 +152,25 @@ def validate_run_budget(
         raise ValueError("run differs from the frozen budget")
 
 
+def validate_run_directory(
+    run_dir: Path,
+    *,
+    resume: Path | None,
+    is_distributed_worker: bool,
+) -> None:
+    if not isinstance(run_dir, Path) or not isinstance(
+        is_distributed_worker, bool
+    ):
+        raise TypeError("run directory guard inputs are invalid")
+    if (
+        resume is None
+        and not is_distributed_worker
+        and run_dir.exists()
+        and any(run_dir.iterdir())
+    ):
+        raise TaskMemoryTrainingError(f"run directory is not empty: {run_dir}")
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -1128,8 +1147,11 @@ def main() -> int:
     training_root = (args.external_root / "training").resolve()
     run_dir = training_root / namespace / args.variant
     artifact_dir = (args.artifact_root / namespace / args.variant).resolve()
-    if resume is None and run_dir.exists() and any(run_dir.iterdir()):
-        raise TaskMemoryTrainingError(f"run directory is not empty: {run_dir}")
+    validate_run_directory(
+        run_dir,
+        resume=resume,
+        is_distributed_worker="LOCAL_RANK" in os.environ,
+    )
     run_dir.mkdir(parents=True, exist_ok=True)
     artifact_dir.mkdir(parents=True, exist_ok=True)
     seed_everything(45, workers=True)

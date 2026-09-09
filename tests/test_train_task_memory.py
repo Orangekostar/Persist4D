@@ -25,6 +25,7 @@ from scripts.train_task_memory import (
     remap_r1_training_state,
     resolved_variant_diff,
     validate_run_budget,
+    validate_run_directory,
 )
 
 
@@ -141,6 +142,26 @@ def test_formal_and_pilot_share_the_same_3000_update_scheduler() -> None:
             gradient_accumulation=4,
             smoke=False,
         )
+
+
+def test_run_directory_guard_distinguishes_parent_worker_and_resume(
+    tmp_path: Path,
+) -> None:
+    run_dir = tmp_path / "formal" / "W-BASE"
+    run_dir.mkdir(parents=True)
+    (run_dir / "run_plan.json").write_text("{}\n")
+
+    with pytest.raises(RuntimeError, match="not empty"):
+        validate_run_directory(
+            run_dir, resume=None, is_distributed_worker=False
+        )
+
+    validate_run_directory(run_dir, resume=None, is_distributed_worker=True)
+    validate_run_directory(
+        run_dir,
+        resume=run_dir / "last.ckpt",
+        is_distributed_worker=False,
+    )
 
 
 def test_real_smoke_draw_plan_repeats_fixed_h5_panel_for_two_updates() -> None:
