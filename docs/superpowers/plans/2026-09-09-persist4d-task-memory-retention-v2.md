@@ -230,7 +230,7 @@ Run new tests and `tests/test_system_comparison_metrics.py`; inspect state bytes
 
 ### Task 5: Add proposal-anchored entity-conditioned ReScene
 
-**Status:** In progress
+**Status:** Complete
 
 **Files:**
 - Create: `models/task_memory_read.py`
@@ -255,11 +255,11 @@ Run: `/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q tests/test_pers
 
 At the first complete-scale hook, call the original `mask_module` once for routing logits/masks, freeze the discrete route, read only the routed slot plus a zero-value null branch, add the gated residual, and let remaining ReScene stages/heads execute normally. Store route diagnostics only for the duration of forward and clear them in `finally`.
 
-- [ ] **Step 4: Execute the real R1 parity gate**
+- [x] **Step 4: Execute the real R1 parity gate**
 
 On fixed real T1/T2 input and RNG, compare new-module-off/empty-state raw tensors and official candidates against R1. Record tolerances, input identity, named missing prefixes, and exactly one read invocation.
 
-- [ ] **Step 5: Validate and commit model adaptation**
+- [x] **Step 5: Validate and commit model adaptation**
 
 Run new tests plus `tests/test_rescene_query_features.py` and `tests/test_rescene_task_postprocess.py`; commit model code and compact parity artifacts.
 

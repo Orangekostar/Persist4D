@@ -1,0 +1,1028 @@
+{
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "content_sha256": "982fff6f096d60d684ac8b40f19f9436b44695948f5451c71a354964204a5e5e",
+  "determinism": {
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true,
+    "seed": 45,
+    "tf32": false,
+    "torch_deterministic_algorithms": true
+  },
+  "model_target": "models.Persist4DTaskMemory",
+  "read_contract": {
+    "attention_branches_per_matched_query": 2,
+    "hook": "after_first_complete_hlevel_pass",
+    "null_value": "exact_zero",
+    "route": "one_entity_slot_or_null"
+  },
+  "samples": [
+    {
+      "matched_queries": 0,
+      "official_parity": {
+        "exact": true,
+        "max_abs_error": 0.0,
+        "tensor_count": 5,
+        "tensors": [
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.pred_classes",
+            "shape": [
+              100
+            ]
+          },
+          {
+            "dtype": "bool",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.pred_masks",
+            "shape": [
+              18952,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.pred_scores",
+            "shape": [
+              100
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.source_class_ids",
+            "shape": [
+              100
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.source_query_ids",
+            "shape": [
+              100
+            ]
+          }
+        ],
+        "tolerance": 0.0,
+        "within_tolerance": true
+      },
+      "query_shape": [
+        1,
+        100,
+        128
+      ],
+      "raw_parity": {
+        "exact": true,
+        "max_abs_error": 0.0,
+        "tensor_count": 40,
+        "tensors": [
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[0].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[0].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[1].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[1].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[2].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[2].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[3].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[3].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[4].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[4].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[5].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[5].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[6].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[6].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[7].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[7].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[8].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[8].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[9].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[9].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[10].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[10].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[11].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[11].pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "int32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.C",
+            "shape": [
+              12464,
+              5
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.F",
+            "shape": [
+              12464,
+              96
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.batch",
+            "shape": [
+              12464
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.coord",
+            "shape": [
+              12464,
+              5
+            ]
+          },
+          {
+            "dtype": "int32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.decomposed_coordinates[0]",
+            "shape": [
+              12464,
+              4
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.decomposed_features[0]",
+            "shape": [
+              12464,
+              96
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.feat",
+            "shape": [
+              12464,
+              96
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.grid_coord",
+            "shape": [
+              12464,
+              3
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.offset",
+            "shape": [
+              1
+            ]
+          },
+          {
+            "dtype": "int32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.t",
+            "shape": [
+              12464
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.true_offsets",
+            "shape": [
+              1
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.pred_masks[0]",
+            "shape": [
+              770,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.query_features",
+            "shape": [
+              1,
+              100,
+              128
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.sampled_coords",
+            "shape": [
+              1,
+              100,
+              4
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.segment_features[0][0]",
+            "shape": [
+              770,
+              128
+            ]
+          }
+        ],
+        "tolerance": 0.0,
+        "within_tolerance": true
+      },
+      "read_invocations": 1,
+      "read_output_norm": 0.0,
+      "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+      "route_shape": [
+        1,
+        100
+      ],
+      "scan_ids_in_window": [
+        "scene0007_00"
+      ],
+      "sequence_id": "scene0007_00-scene0007_01-scene0007_03-scene0007_02-scene0007_04",
+      "stage": "T1",
+      "state_shape": [
+        1,
+        100,
+        128
+      ]
+    },
+    {
+      "matched_queries": 0,
+      "official_parity": {
+        "exact": true,
+        "max_abs_error": 0.0,
+        "tensor_count": 5,
+        "tensors": [
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.pred_classes",
+            "shape": [
+              100
+            ]
+          },
+          {
+            "dtype": "bool",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.pred_masks",
+            "shape": [
+              37428,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.pred_scores",
+            "shape": [
+              100
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.source_class_ids",
+            "shape": [
+              100
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.source_query_ids",
+            "shape": [
+              100
+            ]
+          }
+        ],
+        "tolerance": 0.0,
+        "within_tolerance": true
+      },
+      "query_shape": [
+        1,
+        100,
+        128
+      ],
+      "raw_parity": {
+        "exact": true,
+        "max_abs_error": 0.0,
+        "tensor_count": 40,
+        "tensors": [
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[0].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[0].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[1].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[1].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[2].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[2].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[3].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[3].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[4].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[4].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[5].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[5].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[6].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[6].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[7].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[7].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[8].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[8].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[9].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[9].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[10].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[10].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[11].pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.aux_outputs[11].pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "int32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.C",
+            "shape": [
+              25896,
+              5
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.F",
+            "shape": [
+              25896,
+              96
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.batch",
+            "shape": [
+              25896
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.coord",
+            "shape": [
+              25896,
+              5
+            ]
+          },
+          {
+            "dtype": "int32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.decomposed_coordinates[0]",
+            "shape": [
+              25896,
+              4
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.decomposed_features[0]",
+            "shape": [
+              25896,
+              96
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.feat",
+            "shape": [
+              25896,
+              96
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.grid_coord",
+            "shape": [
+              25896,
+              3
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.offset",
+            "shape": [
+              2
+            ]
+          },
+          {
+            "dtype": "int32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.t",
+            "shape": [
+              25896
+            ]
+          },
+          {
+            "dtype": "int64",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.backbone_features.true_offsets",
+            "shape": [
+              1
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.pred_logits",
+            "shape": [
+              1,
+              100,
+              19
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.pred_masks[0]",
+            "shape": [
+              1338,
+              100
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.query_features",
+            "shape": [
+              1,
+              100,
+              128
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.sampled_coords",
+            "shape": [
+              1,
+              100,
+              4
+            ]
+          },
+          {
+            "dtype": "float32",
+            "exact": true,
+            "max_abs_error": 0.0,
+            "path": "output.segment_features[0][0]",
+            "shape": [
+              1338,
+              128
+            ]
+          }
+        ],
+        "tolerance": 0.0,
+        "within_tolerance": true
+      },
+      "read_invocations": 1,
+      "read_output_norm": 0.0,
+      "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+      "route_shape": [
+        1,
+        100
+      ],
+      "scan_ids_in_window": [
+        "scene0007_00",
+        "scene0007_01"
+      ],
+      "sequence_id": "scene0007_00-scene0007_01-scene0007_03-scene0007_02-scene0007_04",
+      "stage": "T2",
+      "state_shape": [
+        1,
+        100,
+        128
+      ]
+    }
+  ],
+  "schema_version": "task-memory-query-shape-trace-v1",
+  "source_commit": "04ad448c875c568b37ca1855f2d0727061cc90f0",
+  "stages": [
+    "T1",
+    "T2"
+  ],
+  "status": "PASS"
+}

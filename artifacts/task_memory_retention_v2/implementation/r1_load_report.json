@@ -1,0 +1,31 @@
+{
+  "allowed_missing_prefixes": [
+    "model.task_read."
+  ],
+  "checkpoint": {
+    "bytes": 754813672,
+    "reference": "external:r1_checkpoint",
+    "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+  },
+  "content_sha256": "578f80fe7b21a43b8961d5f1faa8ed19ce98cad689186fe9bc1128496b5c2156",
+  "loaded_key_count": 798,
+  "missing_keys": [
+    "model.task_read.attention_scale",
+    "model.task_read.gate_projection.bias",
+    "model.task_read.gate_projection.weight",
+    "model.task_read.key_projection.bias",
+    "model.task_read.key_projection.weight",
+    "model.task_read.null_key",
+    "model.task_read.output_projection.bias",
+    "model.task_read.output_projection.weight",
+    "model.task_read.query_projection.bias",
+    "model.task_read.query_projection.weight",
+    "model.task_read.value_projection.bias",
+    "model.task_read.value_projection.weight"
+  ],
+  "model_target": "models.Persist4DTaskMemory",
+  "schema_version": "task-memory-r1-load-report-v1",
+  "source_commit": "04ad448c875c568b37ca1855f2d0727061cc90f0",
+  "status": "PASS",
+  "unexpected_keys": []
+}
