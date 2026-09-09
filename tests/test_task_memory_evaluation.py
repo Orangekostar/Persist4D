@@ -354,6 +354,41 @@ def test_full_history_cache_replays_only_last_two_scans_into_lag1_publisher() ->
     assert replay[-1].revision_versions["scan-4"] == 0
 
 
+def test_one_query_can_publish_separate_class_preserving_trajectories() -> None:
+    prediction = OfficialTaskPrediction(
+        pred_masks=torch.ones((1, 2), dtype=torch.bool),
+        pred_scores=torch.tensor([0.7, 0.6]),
+        pred_classes=torch.tensor([3, 4]),
+        source_query_ids=torch.tensor([0, 0]),
+        source_class_ids=torch.tensor([3, 4]),
+        temporal_stages=torch.tensor([0]),
+        latest_stage_index=0,
+        latest_stage_masks=torch.ones((1, 2), dtype=torch.bool),
+    )
+    stage = build_stage_cache_record(
+        prediction=prediction,
+        identity_map={0: (7, 0)},
+        stage_meta=_meta(0, ("scan-0",)),
+        target=_target(7),
+        state_before_sha256="0" * 64,
+        state_after_sha256="1" * 64,
+        event_diagnostics={
+            "births": 1,
+            "matched_births": 1,
+            "reactivations": 0,
+            "matched_reactivations": 0,
+            "rejected_births": 0,
+        },
+    )
+    payload = build_episode_cache_payload(key=_key(1), stages=[stage])
+
+    prefix = replay_lag1_prefixes(
+        payload, reducers=("mean",), class_mapper=lambda value: value
+    )["mean"][0]
+
+    assert prefix.pair.prediction["pred_classes"].tolist() == [3, 4]
+
+
 def test_identity_event_diagnostics_keep_na_denominators_and_error_counts() -> None:
     empty = aggregate_identity_event_diagnostics([])
     assert empty["false_birth_rate"] is None

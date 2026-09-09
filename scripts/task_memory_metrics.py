@@ -22,7 +22,11 @@ from scripts.task_memory_cache import (
     target_from_cache_record,
     validate_episode_cache_payload,
 )
-from scripts.task_memory_output import LagOnePublisher, PublicationAccounting
+from scripts.task_memory_output import (
+    LagOnePublisher,
+    PublicationAccounting,
+    PublishedIdentity,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
@@ -115,15 +119,18 @@ def _prefix_target(
 
 
 def _assert_class_preserving(
-    keys: Sequence[object], observed: dict[tuple[object, int], int]
+    keys: Sequence[PublishedIdentity], classes: torch.Tensor
 ) -> None:
-    for key in keys:
-        identity = (key.logical_id, key.generation)
-        previous = observed.setdefault(identity, key.class_id)
-        if previous != key.class_id:
+    if classes.ndim != 1 or classes.numel() != len(keys):
+        raise TaskMemoryMetricError("published identities and class columns differ")
+    identities = set()
+    for index, key in enumerate(keys):
+        identity = (key.logical_id, key.generation, key.class_id)
+        if identity in identities or int(classes[index].item()) != key.class_id:
             raise TaskMemoryMetricError(
-                "one logical identity changed class across its trajectory"
+                "published trajectory does not preserve its class identity"
             )
+        identities.add(identity)
 
 
 def replay_lag1_prefixes(
@@ -149,7 +156,6 @@ def replay_lag1_prefixes(
     for reducer in reducers:
         publisher = LagOnePublisher(score_reducer=reducer, iou_threshold=0.5)
         records = []
-        observed_classes: dict[tuple[object, int], int] = {}
         for stage_index, stage in enumerate(cache["stages"]):
             prediction, meta = _publisher_view(
                 prediction_from_cache_record(stage),
@@ -160,7 +166,9 @@ def replay_lag1_prefixes(
                 identity_map_from_cache_record(stage),
                 meta,
             )
-            _assert_class_preserving(prefix.keys, observed_classes)
+            _assert_class_preserving(
+                prefix.keys, prefix.prediction["pred_classes"]
+            )
             horizon = stage_index + 1
             target = _prefix_target(
                 cache["stages"], horizon=horizon, class_mapper=class_mapper
