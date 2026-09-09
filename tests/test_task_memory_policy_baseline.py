@@ -4,6 +4,7 @@ import torch
 
 from datasets.task_memory_episode import NativeEpisodeMaster
 from scripts.run_task_memory_policy_baseline import (
+    _target_for_prefix,
     _validate_collated_stage_identity,
     classify_gap_event,
     select_diagnostic_masters,
@@ -54,7 +55,9 @@ def _target(ids: list[int]) -> dict[str, object]:
         "gt_masks": torch.ones((len(ids), 2), dtype=torch.bool),
         "changes": torch.zeros(len(ids), dtype=torch.long),
         "change_labels_valid": False,
-        "change_label_semantics": "unavailable_all_static_placeholder",
+        "change_label_semantics": (
+            "unavailable_for_protocol_b_order_stress_test_all_static_placeholder"
+        ),
         "gt_class_semantics": "rescene_model_index_0_based",
     }
 
@@ -79,3 +82,15 @@ def test_collated_stage_identity_uses_the_local_window_name() -> None:
         names=["scene0001_01-scene0001_02"],
         scan_ids_in_window=("scene0001_01", "scene0001_02"),
     )
+
+
+def test_prefix_target_supplies_contiguous_stage_keys() -> None:
+    target = _target_for_prefix(
+        (_target([1]), _target([]), _target([1])),
+        horizon=3,
+        class_mapper=lambda value: value,
+    )
+
+    assert target["temporal_stages"].tolist() == [0, 0, 1, 1, 2, 2]
+    assert target["ids"].tolist() == [1]
+    assert target["masks"].shape == (1, 6)

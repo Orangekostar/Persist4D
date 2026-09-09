@@ -638,7 +638,11 @@ def _target_for_prefix(
 ) -> dict[str, Tensor]:
     from scripts.evaluate_persist4d_p6a import build_temporal_target
 
-    target = build_temporal_target(targets[:horizon])
+    stage_payloads = [
+        {"key": {"stage_index": stage_index}, "target": target}
+        for stage_index, target in enumerate(targets[:horizon])
+    ]
+    target = build_temporal_target(stage_payloads)
     target["labels"] = torch.tensor(
         [class_mapper(int(value)) for value in target["labels"].tolist()],
         dtype=torch.long,
