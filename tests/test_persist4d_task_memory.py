@@ -18,6 +18,11 @@ from models.rescene import ReScene
 from models.task_memory_read import TaskMemoryRead
 from models.task_memory_routing import PredictionObservation, route_entities
 from models.task_memory_state import TaskMemoryConfig, TaskMemoryState
+from scripts.preflight_task_memory_model import (
+    TaskMemoryModelPreflightError,
+    build_model_preflight_payloads,
+    compare_tensor_trees,
+)
 
 
 def _meta(stage: int = 1) -> StageMeta:
@@ -371,3 +376,71 @@ def test_strict_r1_load_allows_only_task_read_prefix() -> None:
     }
     with pytest.raises(TaskMemoryModelError, match="missing keys"):
         strict_load_r1_task_memory(target, {})
+
+
+def test_real_parity_helpers_require_exact_t1_t2_prediction_trees() -> None:
+    disabled = {
+        "pred_logits": torch.tensor([[[1.0, 2.0]]]),
+        "pred_masks": [torch.tensor([[3.0]])],
+        "aux_outputs": [{"pred_logits": torch.tensor([[[4.0]]])}],
+    }
+    exact = compare_tensor_trees(disabled, disabled, tolerance=0.0)
+
+    assert exact["exact"] is True
+    assert exact["max_abs_error"] == 0.0
+    assert exact["tensor_count"] == 3
+    tensors_by_path = {item["path"]: item for item in exact["tensors"]}
+    assert tensors_by_path["output.pred_logits"]["shape"] == [1, 1, 2]
+
+    changed = {
+        **disabled,
+        "pred_masks": [torch.tensor([[3.001]])],
+    }
+    with pytest.raises(TaskMemoryModelPreflightError, match="parity tolerance"):
+        compare_tensor_trees(disabled, changed, tolerance=0.0)
+
+    load_report, shape_trace = build_model_preflight_payloads(
+        source_commit="a" * 40,
+        checkpoint_sha256="b" * 64,
+        checkpoint_bytes=754_813_672,
+        load_audit={
+            "loaded_key_count": 798,
+            "missing_keys": ["model.task_read.null_key"],
+            "unexpected_keys": [],
+        },
+        samples=[
+            {
+                "stage": "T1",
+                "reference_id": "reference-0",
+                "sequence_id": "scan-0-scan-1",
+                "scan_ids_in_window": ["scan-0"],
+                "raw_parity": exact,
+                "official_parity": exact,
+                "query_shape": [1, 100, 128],
+                "route_shape": [1, 100],
+                "state_shape": [1, 100, 128],
+                "read_invocations": 1,
+                "matched_queries": 0,
+                "read_output_norm": 0.0,
+            },
+            {
+                "stage": "T2",
+                "reference_id": "reference-0",
+                "sequence_id": "scan-0-scan-1",
+                "scan_ids_in_window": ["scan-0", "scan-1"],
+                "raw_parity": exact,
+                "official_parity": exact,
+                "query_shape": [1, 100, 128],
+                "route_shape": [1, 100],
+                "state_shape": [1, 100, 128],
+                "read_invocations": 1,
+                "matched_queries": 0,
+                "read_output_norm": 0.0,
+            },
+        ],
+    )
+
+    assert load_report["status"] == shape_trace["status"] == "PASS"
+    assert load_report["allowed_missing_prefixes"] == ["model.task_read."]
+    assert shape_trace["stages"] == ["T1", "T2"]
+    assert "/home/" not in str(load_report)
