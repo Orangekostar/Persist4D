@@ -70,6 +70,23 @@ def tbptt_stage_chunks(
     )
 
 
+def training_stage_chunks(
+    horizon: int,
+    *,
+    state_enabled: bool,
+    window_mode: str,
+    tbptt_steps: int,
+) -> tuple[tuple[int, ...], ...]:
+    if not isinstance(state_enabled, bool):
+        raise TaskMemoryTrainerError("state_enabled must be boolean")
+    if window_mode not in {"full_history", "local_pair"}:
+        raise TaskMemoryTrainerError("window_mode is invalid")
+    chunk_size = (
+        1 if not state_enabled and window_mode == "full_history" else tbptt_steps
+    )
+    return tbptt_stage_chunks(horizon, chunk_size=chunk_size)
+
+
 def task_memory_lr_multiplier(
     step: int,
     *,
@@ -613,8 +630,11 @@ class TaskMemoryTrainer(InstanceSegmentation):
         chunk_state_gradients = []
         chunk_boundary_detached = []
         stage_lineage = []
-        chunks = tbptt_stage_chunks(
-            horizon, chunk_size=int(settings.tbptt_steps)
+        chunks = training_stage_chunks(
+            horizon,
+            state_enabled=state_enabled,
+            window_mode=str(settings.window_mode),
+            tbptt_steps=int(settings.tbptt_steps),
         )
 
         for chunk_index, chunk in enumerate(chunks):
@@ -926,4 +946,5 @@ __all__ = [
     "task_memory_lr_multiplier",
     "task_read_gradient_snapshot",
     "tbptt_stage_chunks",
+    "training_stage_chunks",
 ]

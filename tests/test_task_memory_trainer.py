@@ -33,6 +33,7 @@ from trainer.task_memory_trainer import (
     task_memory_lr_multiplier,
     task_read_gradient_snapshot,
     tbptt_stage_chunks,
+    training_stage_chunks,
 )
 
 
@@ -90,6 +91,7 @@ class _TrainingStepHarness(TaskMemoryTrainer):
                     "gradient_accumulation": 2,
                     "state_enabled": False,
                     "tbptt_steps": 2,
+                    "window_mode": "local_pair",
                 },
                 "trainer": {"gradient_clip_val": 1.0},
             }
@@ -230,6 +232,21 @@ def test_stage_loss_is_an_equal_mean(horizon: int) -> None:
 def test_two_stage_tbptt_chunks_cover_each_stage_once() -> None:
     assert tbptt_stage_chunks(5, chunk_size=2) == ((0, 1), (2, 3), (4,))
     assert tbptt_stage_chunks(1, chunk_size=2) == ((0,),)
+
+
+def test_stateless_full_history_releases_each_stage_graph_before_next_forward() -> None:
+    assert training_stage_chunks(
+        5,
+        state_enabled=False,
+        window_mode="full_history",
+        tbptt_steps=2,
+    ) == ((0,), (1,), (2,), (3,), (4,))
+    assert training_stage_chunks(
+        5,
+        state_enabled=True,
+        window_mode="local_pair",
+        tbptt_steps=2,
+    ) == ((0, 1), (2, 3), (4,))
 
 
 def test_scheduler_covers_frozen_3000_updates_and_reaches_ten_percent() -> None:
@@ -423,6 +440,16 @@ def test_training_step_means_stages_and_steps_once_per_effective_batch() -> None
     assert trainer.progress.completed_global_episodes == 2
     assert trainer.progress.completed_global_stages == 4
     assert trainer.progress.next_draw_index == 2
+
+
+def test_stateless_full_history_backpropagates_after_each_stage() -> None:
+    trainer = _TrainingStepHarness()
+    trainer.config.task_memory_training.window_mode = "full_history"
+
+    trainer.training_step(_training_batch(0), 0)
+
+    assert trainer.backward_calls == 2
+    assert trainer.optimizer.step_calls == 0
 
 
 def test_training_step_reads_ddp_world_size_from_attached_trainer() -> None:
