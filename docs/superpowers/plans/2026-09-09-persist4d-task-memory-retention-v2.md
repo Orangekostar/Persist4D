@@ -176,7 +176,7 @@ Check one-revision scope, point lineage, class trajectories, output bytes, and f
 
 ### Task 4: Split prediction routing from single-stage commit
 
-**Status:** Complete
+**Status:** In progress
 
 **Files:**
 - Create: `models/task_memory_state.py`
@@ -220,11 +220,11 @@ def commit_entities(
 
 Call existing B4 association for route. Writer consumes the frozen route and reproduces B4 confidence-EMA updates without reassociation. Preserve no-reuse generation fields even though v1 uses reject-birth when full.
 
-- [x] **Step 4: Build no-training D-LAST/D-EMA controls**
+- [ ] **Step 4: Build no-training D-LAST/D-EMA controls**
 
 Use the same R1 observations, K=100, B4 assignment/class handling, fixed thresholds, and both output policies. If a control is algebraically equivalent to B4, record equivalence rather than duplicate a result row.
 
-- [x] **Step 5: Validate and commit routing/state**
+- [ ] **Step 5: Validate and commit routing/state**
 
 Run new tests and `tests/test_system_comparison_metrics.py`; inspect state bytes and route coverage on real samples before committing.
 

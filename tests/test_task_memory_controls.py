@@ -6,6 +6,7 @@ import torch
 from datasets.task_memory_episode import StageMeta
 from scripts.run_task_memory_controls import (
     ControlRunnerError,
+    _window_observation,
     observation_payload,
     prediction_observation_from_payload,
     run_control_trajectory,
@@ -181,3 +182,38 @@ def test_previous_only_observation_is_not_promoted_to_active() -> None:
     assert trajectory.diagnostics.dormant_routes == 1
     assert not trajectory.final_state.active.any().item()
     assert trajectory.final_state.last_seen.tolist() == [[0]]
+
+
+def test_window_observation_keeps_confident_previous_only_query_valid() -> None:
+    local = prediction_observation_from_payload(
+        {
+            "features": torch.tensor([[[1.0, 0.0], [0.0, 1.0]]]),
+            "class_prob": torch.tensor([[[0.7, 0.3], [0.2, 0.8]]]),
+            "confidence": torch.tensor([[0.8, 0.4]]),
+            "valid": torch.tensor([[False, False]]),
+            "current_supported": torch.tensor([[False, True]]),
+            "previous_supported": torch.tensor([[True, False]]),
+        }
+    )
+    logits = torch.tensor(
+        [
+            [8.0, -8.0],
+            [8.0, -8.0],
+            [-8.0, 8.0],
+            [-8.0, 8.0],
+        ]
+    )
+
+    observation = _window_observation(
+        local_observation=local,
+        output={"pred_masks": [logits]},
+        segment_stages=torch.tensor([0, 0, 1, 1]),
+        latest_stage=1,
+        confidence_threshold=0.5,
+        mask_threshold=0.5,
+        minimum_mask_support=1,
+    )
+
+    assert observation.current_supported.tolist() == [[False, True]]
+    assert observation.previous_supported.tolist() == [[True, False]]
+    assert observation.valid.tolist() == [[True, False]]

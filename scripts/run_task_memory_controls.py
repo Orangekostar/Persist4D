@@ -490,6 +490,7 @@ def _window_observation(
     output: Mapping[str, object],
     segment_stages: Tensor,
     latest_stage: int,
+    confidence_threshold: float,
     mask_threshold: float,
     minimum_mask_support: int,
 ) -> PredictionObservation:
@@ -513,11 +514,14 @@ def _window_observation(
         )
     else:
         previous = torch.zeros_like(current)
+    valid = (local_observation.confidence >= confidence_threshold) & (
+        current | previous
+    ).unsqueeze(0)
     observation = PredictionObservation(
         features=local_observation.features.detach().clone(),
         class_prob=local_observation.class_prob.detach().clone(),
         confidence=local_observation.confidence.detach().clone(),
-        valid=local_observation.valid.detach().clone(),
+        valid=valid,
         current_supported=current.unsqueeze(0),
         previous_supported=previous.unsqueeze(0),
     )
@@ -584,6 +588,9 @@ def _produce_supplement(
             output=output,
             segment_stages=segment_stages,
             latest_stage=latest_stage,
+            confidence_threshold=float(
+                observation_settings["confidence_threshold"]
+            ),
             mask_threshold=float(observation_settings["mask_threshold"]),
             minimum_mask_support=int(
                 observation_settings["minimum_mask_support"]
