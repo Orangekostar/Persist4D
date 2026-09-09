@@ -821,6 +821,13 @@ class _MultiHorizonEpisodeDataset(Dataset):
         return self._datasets[spec.horizon][self._local_index[index]]
 
 
+def lightning_fit_kwargs(resume: Path | None) -> dict[str, object]:
+    return {
+        "ckpt_path": str(resume) if resume is not None else None,
+        "weights_only": False,
+    }
+
+
 def _resume_progress(path: Path | None) -> TaskMemoryProgress:
     if path is None:
         return TaskMemoryProgress.initial()
@@ -1250,9 +1257,7 @@ def main() -> int:
         enable_progress_bar=True,
     )
     started = time.time()
-    trainer.fit(
-        system, train_dataloaders=loader, ckpt_path=str(resume) if resume else None
-    )
+    trainer.fit(system, train_dataloaders=loader, **lightning_fit_kwargs(resume))
     elapsed = time.time() - started
     if not trainer.is_global_zero:
         return 0

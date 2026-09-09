@@ -21,12 +21,26 @@ from scripts.train_task_memory import (
     checkpoint_interval,
     classify_smoke_identity_events,
     compose_variant_config,
+    lightning_fit_kwargs,
     materialize_training_contracts,
     remap_r1_training_state,
     resolved_variant_diff,
     validate_run_budget,
     validate_run_directory,
 )
+
+
+def test_lightning_fit_explicitly_loads_full_trusted_resume_state() -> None:
+    resume = Path("/tmp/task-memory/last.ckpt")
+
+    assert lightning_fit_kwargs(None) == {
+        "ckpt_path": None,
+        "weights_only": False,
+    }
+    assert lightning_fit_kwargs(resume) == {
+        "ckpt_path": str(resume),
+        "weights_only": False,
+    }
 
 
 @pytest.mark.parametrize("variant", sorted(VARIANTS))
