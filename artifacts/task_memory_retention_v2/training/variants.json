@@ -31,7 +31,7 @@
       "sha256": "2202ddd1629b18e282f1bc07594d1f90f2672c098e1d127768e21a8af49297b9"
     }
   },
-  "content_sha256": "aa551b75b64913c4aa98fe4499e4d99302093341fa0e97317e9e11ea41fe8553",
+  "content_sha256": "71fea1c57d450b14a950ec51f69f4aa275af36cb2ea1b2cf4c51eda790edfbb4",
   "costs_and_exposure": {
     "logical_reference": "repo:artifacts/task_memory_retention_v2/training/costs_and_exposure.csv",
     "sha256": "6721ad96f0d77bb2125c35d1a974128552a0f61fe65332596f425b4d75ffe281"
@@ -43,7 +43,7 @@
   },
   "schema_version": "task-memory-training-variants-v1",
   "smoke_evidence": "repo:artifacts/task_memory_retention_v2/implementation/real_gradient_smoke.json",
-  "source_commit": "e167888032132b5f94a6cd914b29074a6e92eddb",
+  "source_commit": "fede6b73bb524b261cb94ea5255b3f3a9ea13e4d",
   "status": "FROZEN_READY_FOR_M2_PREFIX",
   "variants": {
     "FH-MATCH": {
@@ -53,7 +53,7 @@
         "resume_pilot_to_3000": "python -m scripts.train_task_memory --variant FH-MATCH --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000 --resume \"$PERSIST4D_RUN_ROOT/training/formal/FH-MATCH/last.ckpt\""
       },
       "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/FH-MATCH.yaml",
-      "resolved_config_sha256": "c048e008fbe62ddec6bbc725db5bc29319fa5681c31966fac30a51d860c9add4",
+      "resolved_config_sha256": "78fa49b9ab6237de69d33e5b495f06962ba288040d7918c64db34a3859cf6834",
       "role": "matched full-history training control without task state",
       "state": "FROZEN_NOT_RUN",
       "task_read_initialization_sha256": null
@@ -65,7 +65,7 @@
         "resume_pilot_to_3000": "python -m scripts.train_task_memory --variant Q-INDEP --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000 --resume \"$PERSIST4D_RUN_ROOT/training/formal/Q-INDEP/last.ckpt\""
       },
       "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/Q-INDEP.yaml",
-      "resolved_config_sha256": "3c339a6c4cf659a633044ecbcce962ff4d5308fffc3c57abf0f5aea363c6194b",
+      "resolved_config_sha256": "2aff7d9c45bfa406017e2c27f09c75d58a4ab34cfc939e89ba16a92ecb7793ec",
       "role": "task-state model with independent set matching",
       "state": "FROZEN_NOT_RUN",
       "task_read_initialization_sha256": "df543c697e502d866d4157c65011def05dc4d5a785dd1e5b981973f41b2612e9"
@@ -77,7 +77,7 @@
         "resume_pilot_to_3000": "python -m scripts.train_task_memory --variant Q-TALA --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000 --resume \"$PERSIST4D_RUN_ROOT/training/formal/Q-TALA/last.ckpt\""
       },
       "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/Q-TALA.yaml",
-      "resolved_config_sha256": "54dd930d6625f45bf97ca8bac4ba5fc91247b42c0be3a72a907765311a3f84c3",
+      "resolved_config_sha256": "f2a12f62b1a45740695e5327e6f0ecfef02b1f92934269cd691851a220c3733c",
       "role": "task-state model with tracklet-aware lineage assignment",
       "state": "FROZEN_NOT_RUN",
       "task_read_initialization_sha256": "df543c697e502d866d4157c65011def05dc4d5a785dd1e5b981973f41b2612e9"
@@ -89,7 +89,7 @@
         "resume_pilot_to_3000": "python -m scripts.train_task_memory --variant W-BASE --external-root \"$PERSIST4D_RUN_ROOT\" --devices 2 --gradient-accumulation 4 --stop-after-updates 3000 --resume \"$PERSIST4D_RUN_ROOT/training/formal/W-BASE/last.ckpt\""
       },
       "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/W-BASE.yaml",
-      "resolved_config_sha256": "caa430c356b5f4d4504dce0e8d9bbe8eac734cadab82e293e720d58abbac4470",
+      "resolved_config_sha256": "7e0badd5685ab5808f724e2492bf7f7470bd4bf206578561336f498f771157d9",
       "role": "adapted local-window training control without task state",
       "state": "FROZEN_NOT_RUN",
       "task_read_initialization_sha256": null

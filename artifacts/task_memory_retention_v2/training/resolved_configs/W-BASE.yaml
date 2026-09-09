@@ -103,6 +103,7 @@ data:
     label_offset: 2
     mode: train
     num_queries: 100
+    preserve_empty_targets: true
     probing: false
     small_crops: false
     very_small_crops: false
