@@ -45,6 +45,34 @@ def _payload(feature: tuple[float, float], *, confidence: float = 0.8) -> dict:
     }
 
 
+def _prediction() -> dict:
+    return {
+        "pred_masks": torch.tensor([[True]]),
+        "pred_scores": torch.tensor([0.8]),
+        "pred_classes": torch.tensor([1]),
+        "source_query_ids": torch.tensor([0]),
+        "source_class_ids": torch.tensor([1]),
+        "temporal_stages": torch.tensor([0]),
+        "latest_stage_index": 0,
+        "latest_stage_masks": torch.tensor([[True]]),
+    }
+
+
+def _supplement_stage(feature: tuple[float, float]) -> dict:
+    return {
+        "observation": _payload(feature),
+        "prediction": _prediction(),
+        "base_overlap": {
+            "exact": True,
+            "generated_candidate_count": 1,
+            "base_candidate_count": 1,
+            "common_candidate_count": 1,
+            "score_max_abs": 0.0,
+            "aligned_mask_iou_mean": 1.0,
+        },
+    }
+
+
 def test_observation_payload_is_detached_prediction_only_round_trip() -> None:
     raw = _payload((1.0, 0.0))
     observation = prediction_observation_from_payload(raw)
@@ -59,7 +87,7 @@ def test_observation_payload_is_detached_prediction_only_round_trip() -> None:
 
 def test_observation_supplement_is_bound_to_base_cache_and_has_no_labels() -> None:
     supplement = {
-        "schema_version": "task-memory-control-observations-v1",
+        "schema_version": "task-memory-control-observations-v2",
         "provenance": {"source_commit": "a" * 40},
         "base_cache": {
             "filename": "episode.pt",
@@ -67,8 +95,10 @@ def test_observation_supplement_is_bound_to_base_cache_and_has_no_labels() -> No
             "sequence_id": "scan-0-scan-1",
             "reference_id": "reference-0",
         },
-        "observations": [_payload((1.0, 0.0)), _payload((0.0, 1.0))],
-        "stage_prediction_parity": [True, True],
+        "stages": [
+            _supplement_stage((1.0, 0.0)),
+            _supplement_stage((0.0, 1.0)),
+        ],
     }
     validated = validate_observation_supplement(
         supplement,
@@ -81,7 +111,7 @@ def test_observation_supplement_is_bound_to_base_cache_and_has_no_labels() -> No
         },
         expected_stage_count=2,
     )
-    assert len(validated["observations"]) == 2
+    assert len(validated["stages"]) == 2
 
     wrong = dict(supplement)
     wrong["base_cache"] = dict(supplement["base_cache"], sha256="c" * 64)
@@ -94,8 +124,11 @@ def test_observation_supplement_is_bound_to_base_cache_and_has_no_labels() -> No
         )
 
     labeled = dict(supplement)
-    labeled["observations"] = [dict(_payload((1.0, 0.0)), gt_ids=torch.tensor([1]))]
-    labeled["stage_prediction_parity"] = [True]
+    labeled_stage = _supplement_stage((1.0, 0.0))
+    labeled_stage["observation"] = dict(
+        labeled_stage["observation"], gt_ids=torch.tensor([1])
+    )
+    labeled["stages"] = [labeled_stage]
     with pytest.raises(ControlRunnerError, match="prediction-only"):
         validate_observation_supplement(
             labeled,

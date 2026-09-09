@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import subprocess
 import time
 from collections import defaultdict
@@ -40,6 +41,7 @@ from scripts.run_task_memory_policy_baseline import (
     _load_json,
     _meta_from_payload,
     _prediction_from_payload,
+    _prediction_payload,
     _save_cache,
     _target_for_prefix,
     _validate_cache,
@@ -207,10 +209,9 @@ def validate_observation_supplement(
     if not isinstance(value, Mapping):
         raise ControlRunnerError("observation supplement must be a mapping")
     result = dict(value)
-    observations = result.get("observations")
-    parity = result.get("stage_prediction_parity")
+    stages = result.get("stages")
     if (
-        result.get("schema_version") != "task-memory-control-observations-v1"
+        result.get("schema_version") != "task-memory-control-observations-v2"
         or result.get("provenance") != dict(expected_provenance)
         or result.get("base_cache") != dict(expected_base_cache)
     ):
@@ -219,14 +220,55 @@ def validate_observation_supplement(
         isinstance(expected_stage_count, bool)
         or not isinstance(expected_stage_count, int)
         or expected_stage_count <= 0
-        or not isinstance(observations, list)
-        or len(observations) != expected_stage_count
-        or not isinstance(parity, list)
-        or parity != [True] * expected_stage_count
+        or not isinstance(stages, list)
+        or len(stages) != expected_stage_count
     ):
         raise ControlRunnerError("observation supplement stage lineage differs")
-    for observation in observations:
-        prediction_observation_from_payload(observation)
+    overlap_fields = {
+        "exact",
+        "generated_candidate_count",
+        "base_candidate_count",
+        "common_candidate_count",
+        "score_max_abs",
+        "aligned_mask_iou_mean",
+    }
+    for stage in stages:
+        if not isinstance(stage, Mapping) or set(stage) != {
+            "observation",
+            "prediction",
+            "base_overlap",
+        }:
+            raise ControlRunnerError("supplement stages must be prediction-only")
+        prediction_observation_from_payload(stage["observation"])
+        _prediction_from_payload(stage["prediction"])
+        overlap = stage["base_overlap"]
+        if not isinstance(overlap, Mapping) or set(overlap) != overlap_fields:
+            raise ControlRunnerError("supplement base overlap is invalid")
+        if not isinstance(overlap["exact"], bool):
+            raise ControlRunnerError("supplement base overlap exact flag is invalid")
+        counts = tuple(
+            overlap[name]
+            for name in (
+                "generated_candidate_count",
+                "base_candidate_count",
+                "common_candidate_count",
+            )
+        )
+        if any(
+            isinstance(count, bool) or not isinstance(count, int) or count < 0
+            for count in counts
+        ) or counts[2] > min(counts[:2]):
+            raise ControlRunnerError("supplement base overlap counts are invalid")
+        for name in ("score_max_abs", "aligned_mask_iou_mean"):
+            value = overlap[name]
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(float(value))
+                or float(value) < 0
+                or (name.endswith("iou_mean") and float(value) > 1)
+            ):
+                raise ControlRunnerError("supplement base overlap metrics are invalid")
     return result
 
 
@@ -378,7 +420,42 @@ def _load_base_episode(
     return _validate_cache(raw, provenance=provenance, spec=spec)
 
 
-def _same_prediction(left: object, right: object) -> bool:
+def _prediction_overlap(generated: object, base: object) -> dict[str, object]:
+    generated_keys = list(
+        zip(
+            generated.source_query_ids.detach().cpu().tolist(),
+            generated.source_class_ids.detach().cpu().tolist(),
+            strict=True,
+        )
+    )
+    base_keys = list(
+        zip(
+            base.source_query_ids.detach().cpu().tolist(),
+            base.source_class_ids.detach().cpu().tolist(),
+            strict=True,
+        )
+    )
+    generated_by_key = {key: index for index, key in enumerate(generated_keys)}
+    base_by_key = {key: index for index, key in enumerate(base_keys)}
+    common = sorted(set(generated_by_key) & set(base_by_key))
+    score_differences = []
+    mask_ious = []
+    for key in common:
+        generated_index = generated_by_key[key]
+        base_index = base_by_key[key]
+        score_differences.append(
+            abs(
+                float(generated.pred_scores[generated_index].item())
+                - float(base.pred_scores[base_index].item())
+            )
+        )
+        generated_mask = generated.pred_masks[:, generated_index].detach().cpu()
+        base_mask = base.pred_masks[:, base_index].detach().cpu()
+        if generated_mask.shape != base_mask.shape:
+            raise ControlRunnerError("base and replay mask point lineage differs")
+        union = int((generated_mask | base_mask).sum().item())
+        intersection = int((generated_mask & base_mask).sum().item())
+        mask_ious.append(intersection / union if union else 1.0)
     fields = (
         "pred_masks",
         "pred_scores",
@@ -389,15 +466,22 @@ def _same_prediction(left: object, right: object) -> bool:
         "latest_stage_index",
         "latest_stage_masks",
     )
-    for field in fields:
-        first = getattr(left, field)
-        second = getattr(right, field)
-        if isinstance(first, Tensor):
-            if not isinstance(second, Tensor) or not torch.equal(first.cpu(), second.cpu()):
-                return False
-        elif first != second:
-            return False
-    return True
+    exact = all(
+        torch.equal(getattr(generated, name).cpu(), getattr(base, name).cpu())
+        if isinstance(getattr(generated, name), Tensor)
+        else getattr(generated, name) == getattr(base, name)
+        for name in fields
+    )
+    return {
+        "exact": exact,
+        "generated_candidate_count": len(generated_keys),
+        "base_candidate_count": len(base_keys),
+        "common_candidate_count": len(common),
+        "score_max_abs": max(score_differences, default=0.0),
+        "aligned_mask_iou_mean": (
+            sum(mask_ious) / len(mask_ious) if mask_ious else 0.0
+        ),
+    }
 
 
 def _window_observation(
@@ -464,8 +548,7 @@ def _produce_supplement(
     batch = collator([episode])
     if len(batch.stage_batches) != len(base_cache["stages"]):
         raise ControlRunnerError("base and replay episode stage counts differ")
-    observations = []
-    parity = []
+    stages = []
     for stage_batch, base_stage in zip(
         batch.stage_batches, base_cache["stages"], strict=True
     ):
@@ -516,24 +599,25 @@ def _produce_supplement(
             latest_stage_index=latest_stage,
         )
         base_prediction = _prediction_from_payload(base_stage["prediction"])
-        stage_matches = _same_prediction(generated, base_prediction)
-        if not stage_matches:
-            raise ControlRunnerError("replay prediction differs from frozen base cache")
-        observations.append(observation_payload(window))
-        parity.append(stage_matches)
+        stages.append(
+            {
+                "observation": observation_payload(window),
+                "prediction": _prediction_payload(generated),
+                "base_overlap": _prediction_overlap(generated, base_prediction),
+            }
+        )
         del data, targets, output, local, window, generated
     supplement = {
-        "schema_version": "task-memory-control-observations-v1",
+        "schema_version": "task-memory-control-observations-v2",
         "provenance": dict(provenance),
         "base_cache": dict(base_link),
-        "observations": observations,
-        "stage_prediction_parity": parity,
+        "stages": stages,
     }
     return validate_observation_supplement(
         supplement,
         expected_provenance=provenance,
         expected_base_cache=base_link,
-        expected_stage_count=len(observations),
+        expected_stage_count=len(stages),
     )
 
 
@@ -631,8 +715,8 @@ def _analyze(
             }
         )
         observations = [
-            prediction_observation_from_payload(value)
-            for value in supplement["observations"]
+            prediction_observation_from_payload(value["observation"])
+            for value in supplement["stages"]
         ]
         metas = [
             _meta_from_payload(stage["stage_meta"]) for stage in base["stages"]
@@ -659,7 +743,7 @@ def _analyze(
                 "lag1": LagOnePublisher(score_reducer="mean", iou_threshold=0.5),
             }
             for stage_index, (stage, meta, identity_map) in enumerate(
-                zip(base["stages"], metas, trajectory.identity_maps, strict=True)
+                zip(supplement["stages"], metas, trajectory.identity_maps, strict=True)
             ):
                 prediction = _prediction_from_payload(stage["prediction"])
                 for policy, publisher in publishers.items():
@@ -892,7 +976,7 @@ def run_controls(
     }:
         raise ControlRunnerError("base cache and development population differ")
     config_document = {
-        "schema_version": "task-memory-controls-config-v1",
+        "schema_version": "task-memory-controls-config-v2",
         "source_commit": source_commit,
         "base_cache_manifest_sha256": base_manifest["content_sha256"],
         "checkpoint_sha256": CHECKPOINT_SHA256,
