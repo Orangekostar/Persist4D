@@ -139,7 +139,7 @@ Run the new tests plus `tests/test_persist4d_sequence_dataset.py` and the direct
 
 ### Task 3: Implement commit0 and lag1 output policies
 
-**Status:** In progress
+**Status:** Complete
 
 **Files:**
 - Create: `scripts/task_memory_output.py`
@@ -166,11 +166,11 @@ Run: `/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q tests/test_task
 
 Store only the prior scan's revisable masks/vertex map plus compact frozen output rows. Reuse existing stable assignment primitives; do not perform another model forward and do not expose GT to the publisher.
 
-- [ ] **Step 4: Run policy-only R1+B4 baseline**
+- [x] **Step 4: Run policy-only R1+B4 baseline**
 
 Evaluate commit0 and lag1 on frozen development plus at most 12 preregistered diagnostic masters. Preserve regressions. Attribute the delta to the complete output system whenever identity linking or scoring differs.
 
-- [ ] **Step 5: Validate and commit output policy**
+- [x] **Step 5: Validate and commit output policy**
 
 Check one-revision scope, point lineage, class trajectories, output bytes, and future-label invariance; then commit code, tests, and compact baseline tables.
 

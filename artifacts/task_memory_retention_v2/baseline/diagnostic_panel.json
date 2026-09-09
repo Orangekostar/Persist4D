@@ -1,0 +1,146 @@
+{
+  "contains_model_outcomes": false,
+  "content_sha256": "d7dda4fc5c78209f6ef907836606492b10586c7635c27e57960cc03d4efcd96a",
+  "data_contract_sha256": "2bee76b98cee5788a7760393d4748c01452412518b639fd2bf736df5e0b14c84",
+  "limit": 12,
+  "master_count": 12,
+  "masters": [
+    {
+      "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+      "scan_ids": [
+        "scene0007_00",
+        "scene0007_01",
+        "scene0007_03",
+        "scene0007_02",
+        "scene0007_04"
+      ],
+      "sequence_id": "scene0007_00-scene0007_01-scene0007_03-scene0007_02-scene0007_04"
+    },
+    {
+      "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+      "scan_ids": [
+        "scene0066_00",
+        "scene0066_02",
+        "scene0066_03",
+        "scene0066_04",
+        "scene0066_01"
+      ],
+      "sequence_id": "scene0066_00-scene0066_02-scene0066_03-scene0066_04-scene0066_01"
+    },
+    {
+      "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14",
+      "scan_ids": [
+        "scene0068_00",
+        "scene0068_05",
+        "scene0068_03",
+        "scene0068_02",
+        "scene0068_04"
+      ],
+      "sequence_id": "scene0068_00-scene0068_05-scene0068_03-scene0068_02-scene0068_04"
+    },
+    {
+      "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c",
+      "scan_ids": [
+        "scene0083_00",
+        "scene0083_03",
+        "scene0083_01",
+        "scene0083_02",
+        "scene0083_04"
+      ],
+      "sequence_id": "scene0083_00-scene0083_03-scene0083_01-scene0083_02-scene0083_04"
+    },
+    {
+      "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2",
+      "scan_ids": [
+        "scene0123_00",
+        "scene0123_03",
+        "scene0123_02",
+        "scene0123_04",
+        "scene0123_01"
+      ],
+      "sequence_id": "scene0123_00-scene0123_03-scene0123_02-scene0123_04-scene0123_01"
+    },
+    {
+      "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+      "scan_ids": [
+        "scene0174_00",
+        "scene0174_06",
+        "scene0174_01",
+        "scene0174_05",
+        "scene0174_04"
+      ],
+      "sequence_id": "scene0174_00-scene0174_06-scene0174_01-scene0174_05-scene0174_04"
+    },
+    {
+      "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+      "scan_ids": [
+        "scene0175_00",
+        "scene0175_04",
+        "scene0175_02",
+        "scene0175_03",
+        "scene0175_07"
+      ],
+      "sequence_id": "scene0175_00-scene0175_04-scene0175_02-scene0175_03-scene0175_07"
+    },
+    {
+      "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0",
+      "scan_ids": [
+        "scene0194_00",
+        "scene0194_01",
+        "scene0194_03",
+        "scene0194_05",
+        "scene0194_02"
+      ],
+      "sequence_id": "scene0194_00-scene0194_01-scene0194_03-scene0194_05-scene0194_02"
+    },
+    {
+      "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+      "scan_ids": [
+        "scene0007_01",
+        "scene0007_03",
+        "scene0007_02",
+        "scene0007_04",
+        "scene0007_00"
+      ],
+      "sequence_id": "scene0007_01-scene0007_03-scene0007_02-scene0007_04-scene0007_00"
+    },
+    {
+      "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+      "scan_ids": [
+        "scene0066_01",
+        "scene0066_00",
+        "scene0066_02",
+        "scene0066_03",
+        "scene0066_04"
+      ],
+      "sequence_id": "scene0066_01-scene0066_00-scene0066_02-scene0066_03-scene0066_04"
+    },
+    {
+      "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14",
+      "scan_ids": [
+        "scene0068_01",
+        "scene0068_00",
+        "scene0068_05",
+        "scene0068_03",
+        "scene0068_02"
+      ],
+      "sequence_id": "scene0068_01-scene0068_00-scene0068_05-scene0068_03-scene0068_02"
+    },
+    {
+      "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c",
+      "scan_ids": [
+        "scene0083_01",
+        "scene0083_02",
+        "scene0083_04",
+        "scene0083_00",
+        "scene0083_03"
+      ],
+      "sequence_id": "scene0083_01-scene0083_02-scene0083_04-scene0083_00-scene0083_03"
+    }
+  ],
+  "reference_count": 8,
+  "schema_version": "task-memory-diagnostic-panel-v1",
+  "selection_rule": "reference_id_lexicographic_round_robin_then_sequence_id_lexicographic",
+  "source_commit": "7c80632082263be1519f4edd83225cb6f719a2f4",
+  "status": "PREREGISTERED"
+}
