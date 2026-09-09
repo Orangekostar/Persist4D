@@ -397,6 +397,20 @@ def _stage_target(raw_payload: Mapping[str, object]) -> dict[str, object]:
     }
 
 
+def _validate_collated_stage_identity(
+    *, names: object, scan_ids_in_window: Sequence[str]
+) -> None:
+    expected = "-".join(scan_ids_in_window)
+    if (
+        isinstance(names, (str, bytes))
+        or not isinstance(names, Sequence)
+        or list(names) != [expected]
+    ):
+        raise TaskMemoryPolicyBaselineError(
+            "collator changed the requested local-window identity"
+        )
+
+
 def _produce_episode(
     *,
     episode: object,
@@ -428,8 +442,11 @@ def _produce_episode(
         data, targets, names = stage_batch.model_batch
         meta = stage_batch.stage_meta[0]
         spec = batch.specs[0]
-        if list(names) != [spec.source_sequence_id] or len(targets) != 1:
-            raise TaskMemoryPolicyBaselineError("collator changed episode identity")
+        _validate_collated_stage_identity(
+            names=names, scan_ids_in_window=meta.scan_ids_in_window
+        )
+        if len(targets) != 1:
+            raise TaskMemoryPolicyBaselineError("collator changed episode batch size")
         full_targets = getattr(data, "target_full", None)
         if not isinstance(full_targets, Sequence) or len(full_targets) != 1:
             raise TaskMemoryPolicyBaselineError("collated stage lacks full target")

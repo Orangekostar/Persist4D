@@ -4,6 +4,7 @@ import torch
 
 from datasets.task_memory_episode import NativeEpisodeMaster
 from scripts.run_task_memory_policy_baseline import (
+    _validate_collated_stage_identity,
     classify_gap_event,
     select_diagnostic_masters,
 )
@@ -71,3 +72,10 @@ def test_continuous_or_new_visibility_is_not_a_gap_event() -> None:
 
     assert classify_gap_event(continuous, horizon=3) == "no_gap_event"
     assert classify_gap_event(new_only, horizon=3) == "no_gap_event"
+
+
+def test_collated_stage_identity_uses_the_local_window_name() -> None:
+    _validate_collated_stage_identity(
+        names=["scene0001_01-scene0001_02"],
+        scan_ids_in_window=("scene0001_01", "scene0001_02"),
+    )
