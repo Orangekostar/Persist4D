@@ -182,9 +182,12 @@ Check one-revision scope, point lineage, class trajectories, output bytes, and f
 - Create: `models/task_memory_state.py`
 - Create: `models/task_memory_routing.py`
 - Modify: `models/__init__.py`
+- Create: `scripts/run_task_memory_controls.py`
 - Create: `tests/test_task_memory_routing.py`
+- Create: `tests/test_task_memory_controls.py`
 - Generate: `artifacts/task_memory_retention_v2/implementation/{query_state_contract.md,router_diagnostics.csv}`
 - Generate: `artifacts/task_memory_retention_v2/baseline/long_memory_controls.csv`
+- Generate: `artifacts/task_memory_retention_v2/baseline/control_observation_manifest.json`
 
 **Interfaces:**
 - Consumes: detached query/class/mask predictions, B4 numerical association settings, and unlabeled stage metadata.
