@@ -374,6 +374,8 @@ Run new tests plus direct official-postprocess/system-metric tests. Execute one 
 
 ### Task 9: Execute mandatory M2 and freeze its gate
 
+**Status:** In progress (Step 1 complete; Step 2 running)
+
 **Files:**
 - Update generated M2 training/evaluation artifacts only.
 - Generate external: resumable checkpoints, optimizer/scheduler/RNG/draw cursor, and compact evaluation caches.
@@ -382,7 +384,7 @@ Run new tests plus direct official-postprocess/system-metric tests. Execute one 
 - Consumes: four frozen M2 configs and common draw plan/initialization.
 - Produces: complete 3,000-update W-BASE/Q-INDEP/Q-TALA/FH-MATCH runs, registered checkpoint evaluations, selected M2 parent, matched FH, and M3 authorization status.
 
-- [ ] **Step 1: Measure the 300-update prefixes**
+- [x] **Step 1: Measure the 300-update prefixes**
 
 Run each arm as the first 300 updates of its 3,000-step schedule. Record actual GPU-hours, exposure, nonfinite/OOM status, gradients, and resume cursor; amend the campaign cap once only if measured throughput requires it.
 
