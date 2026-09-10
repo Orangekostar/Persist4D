@@ -536,3 +536,60 @@ def test_exact_resume_payload_preserves_lightning_states_progress_and_rng() -> N
     assert actual[0] == expected[0]
     assert actual[1] == expected[1]
     assert torch.equal(actual[2], expected[2])
+
+
+def test_exact_resume_resets_only_lightning_batch_fast_forward_state() -> None:
+    trainer = _TrainingStepHarness()
+    trainer.progress = TaskMemoryProgress(
+        completed_local_episodes=8,
+        completed_global_episodes=16,
+        completed_global_stages=48,
+        next_draw_index=16,
+    )
+    checkpoint = {
+        "optimizer_states": [{"sentinel": "optimizer"}],
+        "lr_schedulers": [{"sentinel": "scheduler"}],
+        "loops": {
+            "fit_loop": {
+                "epoch_loop.batch_progress": {
+                    "current": {
+                        "completed": 7,
+                        "processed": 8,
+                        "ready": 8,
+                        "started": 8,
+                    },
+                    "is_last_batch": False,
+                    "total": {
+                        "completed": 7,
+                        "processed": 8,
+                        "ready": 8,
+                        "started": 8,
+                    },
+                },
+                "epoch_loop.manual_optimization.optim_step_progress": {
+                    "current": {"completed": 2, "ready": 2},
+                    "total": {"completed": 2, "ready": 2},
+                },
+            }
+        },
+    }
+    trainer.on_save_checkpoint(checkpoint)
+
+    resumed = _TrainingStepHarness()
+    resumed.on_load_checkpoint(checkpoint)
+
+    batch_progress = checkpoint["loops"]["fit_loop"][
+        "epoch_loop.batch_progress"
+    ]
+    assert batch_progress == {
+        "current": {"completed": 0, "processed": 0, "ready": 0, "started": 0},
+        "is_last_batch": False,
+        "total": {"completed": 0, "processed": 0, "ready": 0, "started": 0},
+    }
+    assert checkpoint["loops"]["fit_loop"][
+        "epoch_loop.manual_optimization.optim_step_progress"
+    ] == {
+        "current": {"completed": 2, "ready": 2},
+        "total": {"completed": 2, "ready": 2},
+    }
+    assert resumed.progress == trainer.progress

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 import random
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Iterable, Mapping, MutableMapping, Sequence
 from contextlib import nullcontext
 from dataclasses import dataclass
 from typing import Any
@@ -42,6 +42,45 @@ _TASK_ADAPTER_PREFIX = "model.task_read."
 
 class TaskMemoryTrainerError(RuntimeError):
     """Raised when a training or exact-resume invariant differs."""
+
+
+def _reset_lightning_batch_progress_for_sliced_resume(
+    checkpoint: Mapping[str, object], *, completed_local_episodes: int
+) -> None:
+    loops = checkpoint.get("loops")
+    if loops is None:
+        return
+    if not isinstance(loops, MutableMapping):
+        raise TaskMemoryTrainerError("Lightning resume loop state is invalid")
+    fit_loop = loops.get("fit_loop")
+    if not isinstance(fit_loop, MutableMapping):
+        raise TaskMemoryTrainerError("Lightning fit-loop resume state is invalid")
+    batch_progress = fit_loop.get("epoch_loop.batch_progress")
+    if not isinstance(batch_progress, MutableMapping):
+        raise TaskMemoryTrainerError("Lightning batch resume state is invalid")
+    for scope in ("current", "total"):
+        tracker = batch_progress.get(scope)
+        if not isinstance(tracker, MutableMapping) or set(tracker) != {
+            "completed",
+            "processed",
+            "ready",
+            "started",
+        }:
+            raise TaskMemoryTrainerError("Lightning batch progress schema differs")
+        values = {name: tracker[name] for name in tracker}
+        if (
+            any(isinstance(value, bool) or not isinstance(value, int) for value in values.values())
+            or values["ready"] != completed_local_episodes
+            or values["started"] != completed_local_episodes
+            or values["processed"] != completed_local_episodes
+            or values["completed"]
+            not in {completed_local_episodes - 1, completed_local_episodes}
+        ):
+            raise TaskMemoryTrainerError(
+                "Lightning batch progress differs from the task-memory cursor"
+            )
+        tracker.update({name: 0 for name in tracker})
+    batch_progress["is_last_batch"] = False
 
 
 def stage_mean_coefficients(horizon: int) -> tuple[float, ...]:
@@ -924,6 +963,10 @@ class TaskMemoryTrainer(InstanceSegmentation):
         ):
             raise TaskMemoryTrainerError("exact resume payload is invalid")
         self.progress = TaskMemoryProgress.from_state_dict(payload["progress"])
+        _reset_lightning_batch_progress_for_sliced_resume(
+            checkpoint,
+            completed_local_episodes=self.progress.completed_local_episodes,
+        )
         self._pending_task_memory_rng = payload["rng"]
 
     def on_train_start(self) -> None:
