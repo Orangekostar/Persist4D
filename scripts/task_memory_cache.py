@@ -189,7 +189,11 @@ def validate_evaluation_cache_key(value: object) -> dict[str, object]:
     }
     if result["window_mode"] not in {"local_pair", "full_history"}:
         raise TaskMemoryCacheError("window_mode must be local_pair or full_history")
-    if result["output_policy"] not in {"lag1-v1", "commit0-v1"}:
+    if result["output_policy"] not in {
+        "lag1-v1",
+        "commit0-v1",
+        "commit0+lag1-v1",
+    }:
         raise TaskMemoryCacheError("output_policy version is unsupported")
     return result
 

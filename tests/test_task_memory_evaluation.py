@@ -8,11 +8,23 @@ from typing import ClassVar
 
 import pytest
 import torch
+from omegaconf import OmegaConf
 
 import scripts.evaluate_task_memory as evaluation_module
-from datasets.task_memory_episode import StageMeta
+from datasets.task_memory_episode import NativeEpisodeMaster, StageMeta
 from models.task_memory_state import TaskMemoryConfig
-from scripts.evaluate_task_memory import _csv_bytes, _state_contract_sha256
+from scripts.evaluate_task_memory import (
+    COMMON_POPULATION_ID,
+    NATIVE_POPULATION_ID,
+    _compute_population_rows,
+    _csv_bytes,
+    _episode_spec,
+    _population_horizons,
+    _retention_rows_for_population,
+    _rio_population_base,
+    _state_contract_sha256,
+    select_development_masters,
+)
 from scripts.rescene_task_postprocess import OfficialTaskPrediction
 from scripts.task_memory_cache import (
     CACHE_LIMIT_BYTES,
@@ -30,6 +42,7 @@ from scripts.task_memory_metrics import (
     build_retention_rows,
     compute_cached_identity_metrics,
     compute_cached_task_metrics,
+    replay_commit0_prefixes,
     replay_lag1_prefixes,
 )
 
@@ -90,6 +103,148 @@ def _target(identity: int) -> dict[str, object]:
     }
 
 
+def _master(
+    *, reference_id: str, horizon: int, role: str
+) -> NativeEpisodeMaster:
+    scan_ids = tuple(f"scene0001_{index:02d}" for index in range(horizon))
+    return NativeEpisodeMaster(
+        reference_id=reference_id,
+        sequence_id="-".join(scan_ids),
+        scan_ids=scan_ids,
+        scan_indices=tuple(range(horizon)),
+        role=role,
+        context_index=0,
+    )
+
+
+def test_population_selection_separates_common_h5_and_additional_native_h2_h4() -> None:
+    masters = (
+        _master(reference_id="common", horizon=5, role="development"),
+        _master(reference_id="native-2", horizon=2, role="additional_native_refs"),
+        _master(reference_id="native-3", horizon=3, role="additional_native_refs"),
+        _master(reference_id="native-4", horizon=4, role="additional_native_refs"),
+        _master(reference_id="adaptation", horizon=3, role="adaptation"),
+    )
+
+    common = select_development_masters(
+        masters,
+        population_id=COMMON_POPULATION_ID,
+        smoke_master_count=None,
+    )
+    native = select_development_masters(
+        masters,
+        population_id=NATIVE_POPULATION_ID,
+        smoke_master_count=None,
+    )
+
+    assert [(master.reference_id, len(master.scan_ids)) for master in common] == [
+        ("common", 5)
+    ]
+    assert [(master.reference_id, len(master.scan_ids)) for master in native] == [
+        ("native-2", 2),
+        ("native-3", 3),
+        ("native-4", 4),
+    ]
+
+
+def test_native_episode_spec_uses_the_real_master_horizon() -> None:
+    master = _master(
+        reference_id="native-3", horizon=3, role="additional_native_refs"
+    )
+
+    spec = _episode_spec(master, index=7)
+
+    assert spec.horizon == 3
+    assert spec.bucket == "T3"
+    assert spec.scan_ids == master.scan_ids
+
+
+def test_native_population_does_not_form_a_cross_population_retention_curve() -> None:
+    metric_rows = [
+        {"T": horizon, "policy": "lag1", "reducer": "mean", "t_mAP": value}
+        for horizon, value in ((2, 0.5), (3, 0.4), (4, 0.3))
+    ]
+
+    rows, status = _retention_rows_for_population(
+        metric_rows,
+        population_id=NATIVE_POPULATION_ID,
+    )
+
+    assert rows == []
+    assert status == "NOT_APPLICABLE_VARYING_NATIVE_POPULATION"
+
+
+def test_native_population_loads_each_real_horizon_and_counts_only_terminals() -> None:
+    assert _population_horizons(COMMON_POPULATION_ID) == (5,)
+    assert _population_horizons(NATIVE_POPULATION_ID) == (2, 3, 4)
+
+    task_rows, identity_rows = _compute_population_rows(
+        [_episode(horizon) for horizon in (2, 3, 4)],
+        population_id=NATIVE_POPULATION_ID,
+        reducers=("mean", "latest", "max"),
+        class_mapper=lambda value: value,
+        accumulator_factory=_MetricSpy,
+    )
+
+    assert len(task_rows) == 12
+    assert {(row["T"], row["episode_count"]) for row in task_rows} == {
+        (2, 1),
+        (3, 1),
+        (4, 1),
+    }
+    assert [row["T"] for row in identity_rows] == [2, 3, 4]
+
+
+def test_native_population_uses_the_validation_dataset_source(tmp_path: Path) -> None:
+    config = OmegaConf.create(
+        {
+            "data": {
+                "train_dataset": {"sentinel": "train"},
+                "validation_dataset": {
+                    "_target_": "types.SimpleNamespace",
+                    "data_dir": "data/processed/rio",
+                    "mode": "validation",
+                    "sentinel": "validation",
+                    "temporal_window": 2,
+                },
+            }
+        }
+    )
+
+    dataset = _rio_population_base(
+        config,
+        data_root=tmp_path,
+        horizon=4,
+        population_id=NATIVE_POPULATION_ID,
+    )
+
+    assert dataset.sentinel == "validation"
+    assert dataset.mode == "validation"
+    assert dataset.temporal_window == 4
+    assert dataset.data_dir == str(tmp_path / "processed/rio")
+
+
+def test_native_smoke_panel_covers_h2_h3_h4() -> None:
+    masters = tuple(
+        _master(
+            reference_id=reference_id,
+            horizon=horizon,
+            role="additional_native_refs",
+        )
+        for reference_id in ("native-a", "native-b", "native-c")
+        for horizon in (2, 3, 4)
+    )
+
+    smoke = select_development_masters(
+        masters,
+        population_id=NATIVE_POPULATION_ID,
+        smoke_master_count=3,
+    )
+
+    assert {len(master.scan_ids) for master in smoke} == {2, 3, 4}
+    assert len({master.reference_id for master in smoke}) == 3
+
+
 def _key(horizon: int) -> dict[str, object]:
     return build_evaluation_cache_key(
         population_id="development-smoke",
@@ -102,7 +257,7 @@ def _key(horizon: int) -> dict[str, object]:
         data_contract_sha256="3" * 64,
         state_contract_sha256="4" * 64,
         initial_state_sha256="0" * 64,
-        output_policy="lag1-v1",
+        output_policy="commit0+lag1-v1",
         postprocess_sha256="5" * 64,
         evaluation_seed=45,
     )
@@ -368,6 +523,42 @@ def test_lag1_replay_versions_full_prefix_and_reuses_for_three_reducers() -> Non
     assert len(rows) == 12
     assert set(_MetricSpy.point_counts) == {2, 3, 4, 5}
     assert all(row["prefix_overall_mAP"] == 0.11 for row in rows)
+
+
+def test_shared_forward_cache_adds_commit0_mean_without_repeating_forward() -> None:
+    payload = _episode(5)
+
+    commit0 = replay_commit0_prefixes(
+        payload,
+        reducers=("mean",),
+        class_mapper=lambda value: value,
+    )["mean"]
+    assert commit0[-1].revision_versions == {
+        "scan-0": 0,
+        "scan-1": 0,
+        "scan-2": 0,
+        "scan-3": 0,
+        "scan-4": 0,
+    }
+    assert commit0[-1].accounting.lag1_buffer_bytes == 0
+
+    _MetricSpy.point_counts = []
+    rows = compute_cached_task_metrics(
+        [payload],
+        reducers=("mean", "latest", "max"),
+        include_commit0=True,
+        class_mapper=lambda value: value,
+        accumulator_factory=_MetricSpy,
+    )
+
+    assert len(rows) == 16
+    assert {(row["policy"], row["reducer"]) for row in rows} == {
+        ("commit0", "mean"),
+        ("lag1", "mean"),
+        ("lag1", "latest"),
+        ("lag1", "max"),
+    }
+    assert len(_MetricSpy.point_counts) == 16
 
 
 def test_full_history_cache_replays_only_last_two_scans_into_lag1_publisher() -> None:

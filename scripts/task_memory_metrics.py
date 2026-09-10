@@ -27,12 +27,14 @@ from scripts.task_memory_cache import (
     validate_episode_cache_payload,
 )
 from scripts.task_memory_output import (
+    CommitZeroPublisher,
     LagOnePublisher,
     PublicationAccounting,
     PublishedIdentity,
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+OUTPUT_POLICY_SUITE = "commit0+lag1-v1"
 
 
 class TaskMemoryMetricError(ValueError):
@@ -138,16 +140,19 @@ def _assert_class_preserving(
         identities.add(identity)
 
 
-def replay_lag1_prefixes(
+def _replay_prefixes(
     payload: Mapping[str, object],
     *,
-    reducers: Sequence[str] = ("mean",),
+    policy: str,
+    reducers: Sequence[str],
     class_mapper: Callable[[int], int],
 ) -> dict[str, tuple[CachedPrefixResult, ...]]:
     cache = validate_episode_cache_payload(payload)
     key = cache["key"]
-    if key["output_policy"] != "lag1-v1":
-        raise TaskMemoryMetricError("lag1 replay requires the frozen lag1-v1 policy")
+    if policy not in {"commit0", "lag1"}:
+        raise TaskMemoryMetricError("publication policy is not frozen")
+    if key["output_policy"] not in {"lag1-v1", OUTPUT_POLICY_SUITE}:
+        raise TaskMemoryMetricError("cache lacks the frozen publication policy suite")
     if (
         isinstance(reducers, (str, bytes))
         or not isinstance(reducers, Sequence)
@@ -159,7 +164,11 @@ def replay_lag1_prefixes(
         raise TaskMemoryMetricError("class_mapper must be callable")
     result = {}
     for reducer in reducers:
-        publisher = LagOnePublisher(score_reducer=reducer, iou_threshold=0.5)
+        publisher = (
+            CommitZeroPublisher(score_reducer=reducer)
+            if policy == "commit0"
+            else LagOnePublisher(score_reducer=reducer, iou_threshold=0.5)
+        )
         records = []
         for stage_index, stage in enumerate(cache["stages"]):
             prediction, meta = _publisher_view(
@@ -200,6 +209,34 @@ def replay_lag1_prefixes(
     return result
 
 
+def replay_lag1_prefixes(
+    payload: Mapping[str, object],
+    *,
+    reducers: Sequence[str] = ("mean",),
+    class_mapper: Callable[[int], int],
+) -> dict[str, tuple[CachedPrefixResult, ...]]:
+    return _replay_prefixes(
+        payload,
+        policy="lag1",
+        reducers=reducers,
+        class_mapper=class_mapper,
+    )
+
+
+def replay_commit0_prefixes(
+    payload: Mapping[str, object],
+    *,
+    reducers: Sequence[str] = ("mean",),
+    class_mapper: Callable[[int], int],
+) -> dict[str, tuple[CachedPrefixResult, ...]]:
+    return _replay_prefixes(
+        payload,
+        policy="commit0",
+        reducers=reducers,
+        class_mapper=class_mapper,
+    )
+
+
 def _default_accumulator_factory() -> object:
     from scripts.analyze_persist4d_allt import AllTBaselineAccumulator
     from scripts.analyze_r1_downstream_validation import resolve_metric_dataset_spec
@@ -213,6 +250,7 @@ def compute_cached_task_metrics(
     payloads: Sequence[Mapping[str, object]],
     *,
     reducers: Sequence[str],
+    include_commit0: bool = False,
     class_mapper: Callable[[int], int],
     accumulator_factory: Callable[[], object] = _default_accumulator_factory,
 ) -> list[dict[str, object]]:
@@ -222,28 +260,37 @@ def compute_cached_task_metrics(
         or not payloads
     ):
         raise TaskMemoryMetricError("cached metrics require episode payloads")
-    accumulators: dict[tuple[str, int], object] = {}
-    counts: dict[tuple[str, int], int] = defaultdict(int)
+    if not isinstance(include_commit0, bool):
+        raise TaskMemoryMetricError("include_commit0 must be boolean")
+    accumulators: dict[tuple[str, str, int], object] = {}
+    counts: dict[tuple[str, str, int], int] = defaultdict(int)
     for payload in payloads:
-        replay = replay_lag1_prefixes(
-            payload, reducers=reducers, class_mapper=class_mapper
-        )
-        for reducer, prefixes in replay.items():
-            for prefix in prefixes:
-                horizon = prefix.pair.horizon
-                if horizon < 2:
-                    continue
-                identity = (reducer, horizon)
-                if identity not in accumulators:
-                    accumulators[identity] = accumulator_factory()
-                accumulator = accumulators[identity]
-                update = getattr(accumulator, "update", None)
-                if not callable(update):
-                    raise TaskMemoryMetricError("metric accumulator lacks update")
-                update(prefix.pair)
-                counts[identity] += 1
+        policy_replays = {
+            "lag1": replay_lag1_prefixes(
+                payload, reducers=reducers, class_mapper=class_mapper
+            )
+        }
+        if include_commit0:
+            policy_replays["commit0"] = replay_commit0_prefixes(
+                payload, reducers=("mean",), class_mapper=class_mapper
+            )
+        for policy, replay in policy_replays.items():
+            for reducer, prefixes in replay.items():
+                for prefix in prefixes:
+                    horizon = prefix.pair.horizon
+                    if horizon < 2:
+                        continue
+                    identity = (policy, reducer, horizon)
+                    if identity not in accumulators:
+                        accumulators[identity] = accumulator_factory()
+                    accumulator = accumulators[identity]
+                    update = getattr(accumulator, "update", None)
+                    if not callable(update):
+                        raise TaskMemoryMetricError("metric accumulator lacks update")
+                    update(prefix.pair)
+                    counts[identity] += 1
     rows = []
-    for (reducer, horizon), accumulator in sorted(accumulators.items()):
+    for (policy, reducer, horizon), accumulator in sorted(accumulators.items()):
         compute = getattr(accumulator, "compute", None)
         if not callable(compute):
             raise TaskMemoryMetricError("metric accumulator lacks compute")
@@ -253,8 +300,8 @@ def compute_cached_task_metrics(
         rows.append(
             {
                 "T": horizon,
-                "episode_count": counts[(reducer, horizon)],
-                "policy": "lag1",
+                "episode_count": counts[(policy, reducer, horizon)],
+                "policy": policy,
                 "reducer": reducer,
                 **dict(metrics),
             }
@@ -475,11 +522,13 @@ def aggregate_identity_event_diagnostics(
 
 
 __all__ = [
+    "OUTPUT_POLICY_SUITE",
     "CachedPrefixResult",
     "TaskMemoryMetricError",
     "aggregate_identity_event_diagnostics",
     "build_retention_rows",
     "compute_cached_identity_metrics",
     "compute_cached_task_metrics",
+    "replay_commit0_prefixes",
     "replay_lag1_prefixes",
 ]

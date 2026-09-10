@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Produce compact TaskMemory caches and evaluate frozen lag1 metrics."""
+"""Produce compact TaskMemory caches and evaluate frozen publication policies."""
 
 from __future__ import annotations
 
@@ -25,6 +25,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import hydra
 import torch
+from omegaconf import OmegaConf
 
 from datasets.task_memory_episode import (
     NativeEpisodeMaster,
@@ -47,6 +48,7 @@ from scripts.evaluate_persist4d_p6a import build_rio_class_mapper
 from scripts.p6a_cache import CHANGE_LABEL_SEMANTICS
 from scripts.p6a_metrics import global_hungarian_match
 from scripts.preflight_task_memory_episode import (
+    _resolved_data_path,
     _rio_base_dataset,
     _role_by_reference,
     load_reference_by_scene,
@@ -65,6 +67,7 @@ from scripts.task_memory_cache import (
 )
 from scripts.task_memory_contracts import canonical_json_sha256
 from scripts.task_memory_metrics import (
+    OUTPUT_POLICY_SUITE,
     aggregate_identity_event_diagnostics,
     build_retention_rows,
     compute_cached_identity_metrics,
@@ -94,7 +97,9 @@ DEFAULT_OUTPUT_ROOT = (
     PROJECT_ROOT / "artifacts/task_memory_retention_v2/evaluation"
 )
 EVALUATION_SEED = 45
-POPULATION_ID = "development_common_h5_canonical"
+COMMON_POPULATION_ID = "development_common_h5_canonical"
+NATIVE_POPULATION_ID = "additional_native_refs"
+POPULATION_IDS = (COMMON_POPULATION_ID, NATIVE_POPULATION_ID)
 REDUCERS = ("mean", "latest", "max")
 
 
@@ -223,16 +228,31 @@ def _validated_content_hash(payload: Mapping[str, object], *, name: str) -> str:
 
 
 def select_development_masters(
-    masters: Sequence[NativeEpisodeMaster], *, smoke_master_count: int | None
+    masters: Sequence[NativeEpisodeMaster],
+    *,
+    population_id: str = COMMON_POPULATION_ID,
+    smoke_master_count: int | None,
 ) -> tuple[NativeEpisodeMaster, ...]:
-    selected = tuple(
-        master
-        for master in masters
-        if master.role == "development" and len(master.scan_ids) == 5
-    )
+    if population_id == COMMON_POPULATION_ID:
+        selected = tuple(
+            master
+            for master in masters
+            if master.role == "development" and len(master.scan_ids) == 5
+        )
+        empty_name = "development H5"
+    elif population_id == NATIVE_POPULATION_ID:
+        selected = tuple(
+            master
+            for master in masters
+            if master.role == "additional_native_refs"
+            and len(master.scan_ids) in {2, 3, 4}
+        )
+        empty_name = "additional native H2-H4"
+    else:
+        raise TaskMemoryEvaluationError("evaluation population is not frozen")
     selected = tuple(sorted(selected, key=lambda item: item.sequence_id))
     if not selected:
-        raise TaskMemoryEvaluationError("development H5 population is empty")
+        raise TaskMemoryEvaluationError(f"{empty_name} population is empty")
     if smoke_master_count is None:
         return selected
     if (
@@ -241,13 +261,154 @@ def select_development_masters(
         or not 1 <= smoke_master_count <= 12
     ):
         raise TaskMemoryEvaluationError("smoke master count must be within 1-12")
-    smoke = select_diagnostic_masters(selected, limit=smoke_master_count)
+    if population_id == COMMON_POPULATION_ID:
+        smoke = select_diagnostic_masters(selected, limit=smoke_master_count)
+    else:
+        if smoke_master_count < len(_population_horizons(population_id)):
+            raise TaskMemoryEvaluationError(
+                "native smoke requires at least one H2, H3, and H4 master"
+            )
+        ordered: list[NativeEpisodeMaster] = []
+        used_references = set()
+        for horizon in _population_horizons(population_id):
+            candidates = sorted(
+                (
+                    master
+                    for master in selected
+                    if len(master.scan_ids) == horizon
+                    and master.reference_id not in used_references
+                ),
+                key=lambda item: (item.reference_id, item.sequence_id),
+            )
+            if not candidates:
+                candidates = sorted(
+                    (master for master in selected if len(master.scan_ids) == horizon),
+                    key=lambda item: (item.reference_id, item.sequence_id),
+                )
+            chosen = candidates[0]
+            ordered.append(chosen)
+            used_references.add(chosen.reference_id)
+        for master in sorted(
+            selected, key=lambda item: (item.reference_id, item.sequence_id)
+        ):
+            if len(ordered) == smoke_master_count:
+                break
+            if master not in ordered and master.reference_id not in used_references:
+                ordered.append(master)
+                used_references.add(master.reference_id)
+        for master in selected:
+            if len(ordered) == smoke_master_count:
+                break
+            if master not in ordered:
+                ordered.append(master)
+        smoke = tuple(ordered)
     expected_references = min(
         smoke_master_count, len({master.reference_id for master in selected})
     )
     if len({master.reference_id for master in smoke}) != expected_references:
         raise TaskMemoryEvaluationError("smoke panel did not maximize reference coverage")
     return smoke
+
+
+def _population_horizons(population_id: str) -> tuple[int, ...]:
+    if population_id == COMMON_POPULATION_ID:
+        return (5,)
+    if population_id == NATIVE_POPULATION_ID:
+        return (2, 3, 4)
+    raise TaskMemoryEvaluationError("evaluation population is not frozen")
+
+
+def _rio_population_base(
+    config: Any,
+    *,
+    data_root: Path,
+    horizon: int,
+    population_id: str,
+) -> object:
+    if horizon not in _population_horizons(population_id):
+        raise TaskMemoryEvaluationError("horizon differs from evaluation population")
+    if population_id == COMMON_POPULATION_ID:
+        return _rio_base_dataset(config, data_root=data_root, horizon=horizon)
+
+    dataset_config = OmegaConf.create(
+        OmegaConf.to_container(config.data.validation_dataset, resolve=True)
+    )
+    dataset_config.temporal_window = horizon
+    for key in (
+        "data_dir",
+        "label_db_filepath",
+        "change_label_db_filepath",
+        "color_mean_std",
+    ):
+        if key in dataset_config:
+            dataset_config[key] = _resolved_data_path(dataset_config[key], data_root)
+    return hydra.utils.instantiate(dataset_config)
+
+
+def _compute_population_rows(
+    payloads: Sequence[Mapping[str, object]],
+    *,
+    population_id: str,
+    reducers: Sequence[str],
+    class_mapper: Callable[[int], int],
+    accumulator_factory: Callable[[], object] | None = None,
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    if population_id == COMMON_POPULATION_ID:
+        grouped_payloads = {5: list(payloads)}
+    elif population_id == NATIVE_POPULATION_ID:
+        grouped_payloads: dict[int, list[Mapping[str, object]]] = {
+            horizon: [] for horizon in _population_horizons(population_id)
+        }
+        for payload in payloads:
+            stages = payload.get("stages") if isinstance(payload, Mapping) else None
+            if (
+                isinstance(stages, (str, bytes))
+                or not isinstance(stages, Sequence)
+                or len(stages) not in grouped_payloads
+            ):
+                raise TaskMemoryEvaluationError(
+                    "native cache must contain a complete H2-H4 trajectory"
+                )
+            grouped_payloads[len(stages)].append(payload)
+        if any(not values for values in grouped_payloads.values()):
+            raise TaskMemoryEvaluationError("native cache lacks an H2-H4 population")
+    else:
+        raise TaskMemoryEvaluationError("evaluation population is not frozen")
+
+    task_rows = []
+    identity_rows = []
+    for terminal_horizon, group in sorted(grouped_payloads.items()):
+        metric_arguments: dict[str, object] = {
+            "reducers": reducers,
+            "include_commit0": True,
+            "class_mapper": class_mapper,
+        }
+        if accumulator_factory is not None:
+            metric_arguments["accumulator_factory"] = accumulator_factory
+        group_task_rows = compute_cached_task_metrics(group, **metric_arguments)
+        group_identity_rows = compute_cached_identity_metrics(
+            group, class_mapper=class_mapper
+        )
+        if population_id == NATIVE_POPULATION_ID:
+            group_task_rows = [
+                row for row in group_task_rows if row["T"] == terminal_horizon
+            ]
+            group_identity_rows = [
+                row for row in group_identity_rows if row["T"] == terminal_horizon
+            ]
+        task_rows.extend(group_task_rows)
+        identity_rows.extend(group_identity_rows)
+    return task_rows, identity_rows
+
+
+def _retention_rows_for_population(
+    metric_rows: Sequence[Mapping[str, object]], *, population_id: str
+) -> tuple[list[dict[str, object]], str]:
+    if population_id == COMMON_POPULATION_ID:
+        return build_retention_rows(metric_rows), "MEASURED"
+    if population_id == NATIVE_POPULATION_ID:
+        return [], "NOT_APPLICABLE_VARYING_NATIVE_POPULATION"
+    raise TaskMemoryEvaluationError("evaluation population is not frozen")
 
 
 def current_stage_target(
@@ -523,12 +684,13 @@ def _produce_episode(
 
 
 def _episode_spec(master: NativeEpisodeMaster, *, index: int) -> TaskMemoryEpisodeSpec:
+    horizon = len(master.scan_ids)
     return TaskMemoryEpisodeSpec.from_master(
         master,
-        horizon=5,
+        horizon=horizon,
         augmentation_seed=EVALUATION_SEED,
         draw_index=index,
-        bucket="T5",
+        bucket=f"T{horizon}",
     )
 
 
@@ -545,6 +707,7 @@ def run_evaluation(
     data_contract_path: Path = DEFAULT_DATA_CONTRACT,
     variant_manifest_path: Path = DEFAULT_VARIANT_MANIFEST,
     device_name: str = "cuda:0",
+    population_id: str = COMMON_POPULATION_ID,
     smoke_master_count: int | None = None,
     reducers: Sequence[str] = REDUCERS,
 ) -> dict[str, object]:
@@ -594,15 +757,33 @@ def run_evaluation(
         expected_common_initialization_sha256=common_sha256,
     )
     config = system.config
-    base = _rio_base_dataset(config, data_root=data_root, horizon=5)
-    masters = build_native_episode_masters(
-        base,
-        reference_by_scene=load_reference_by_scene(rio_metadata),
-        role_by_reference=_role_by_reference(data_contract),
+    bases = {
+        horizon: _rio_population_base(
+            config,
+            data_root=data_root,
+            horizon=horizon,
+            population_id=population_id,
+        )
+        for horizon in _population_horizons(population_id)
+    }
+    reference_by_scene = load_reference_by_scene(rio_metadata)
+    role_by_reference = _role_by_reference(data_contract)
+    masters = tuple(
+        master
+        for horizon, base in sorted(bases.items())
+        for master in build_native_episode_masters(
+            base,
+            reference_by_scene=reference_by_scene,
+            role_by_reference=role_by_reference,
+        )
+        if len(master.scan_ids) == horizon
     )
     selected = select_development_masters(
-        masters, smoke_master_count=smoke_master_count
+        masters,
+        population_id=population_id,
+        smoke_master_count=smoke_master_count,
     )
+    base = bases[next(iter(sorted(bases)))]
     class_mapper = build_rio_class_mapper(base)
     collator = TaskMemoryEpisodeCollator(
         hydra.utils.instantiate(config.data.validation_collation)
@@ -625,7 +806,7 @@ def run_evaluation(
     for index, master in enumerate(selected):
         spec = _episode_spec(master, index=index)
         key = build_evaluation_cache_key(
-            population_id=POPULATION_ID,
+            population_id=population_id,
             reference_id=spec.reference_id,
             episode_id=spec.episode_id,
             history_scan_ids=spec.scan_ids,
@@ -635,7 +816,7 @@ def run_evaluation(
             data_contract_sha256=data_contract_sha256,
             state_contract_sha256=state_contract_sha256,
             initial_state_sha256=initial_state_sha256,
-            output_policy="lag1-v1",
+            output_policy=OUTPUT_POLICY_SUITE,
             postprocess_sha256=postprocess_sha256,
             evaluation_seed=EVALUATION_SEED,
         )
@@ -653,7 +834,7 @@ def run_evaluation(
         else:
             with _evaluation_runtime(device):
                 episode = TaskMemoryEpisodeDataset(
-                    base,
+                    bases[spec.horizon],
                     (spec,),
                     apply_augmentation=False,
                     window_mode=str(config.task_memory_training.window_mode),
@@ -692,28 +873,49 @@ def run_evaluation(
             flush=True,
         )
     elapsed_seconds = time.time() - started
-    metric_rows = compute_cached_task_metrics(
+    metric_rows, identity_metric_rows = _compute_population_rows(
         payloads,
+        population_id=population_id,
         reducers=reducers,
         class_mapper=class_mapper,
     )
-    identity_metric_rows = compute_cached_identity_metrics(
-        payloads, class_mapper=class_mapper
+    retention_metric_rows, retention_status = _retention_rows_for_population(
+        metric_rows, population_id=population_id
     )
-    retention_metric_rows = build_retention_rows(metric_rows)
     common_columns = {
-        "population_id": POPULATION_ID,
+        "population_id": population_id,
         "variant": variant,
         "checkpoint_sha256": checkpoint_sha256,
         "training_seed": 45,
         "evaluation_seed": EVALUATION_SEED,
     }
+    masters_by_horizon = {
+        horizon: (
+            selected
+            if population_id == COMMON_POPULATION_ID
+            else tuple(master for master in selected if len(master.scan_ids) == horizon)
+        )
+        for horizon in (
+            (2, 3, 4, 5)
+            if population_id == COMMON_POPULATION_ID
+            else _population_horizons(population_id)
+        )
+    }
+
+    def row_counts(row: Mapping[str, object]) -> dict[str, int]:
+        horizon_masters = masters_by_horizon[int(row["T"])]
+        return {
+            "reference_count": len(
+                {master.reference_id for master in horizon_masters}
+            ),
+            "master_count": len(horizon_masters),
+        }
+
     task_rows = [
         {
             **common_columns,
             **row,
-            "reference_count": len({master.reference_id for master in selected}),
-            "master_count": len(selected),
+            **row_counts(row),
         }
         for row in metric_rows
     ]
@@ -721,8 +923,7 @@ def run_evaluation(
         {
             **common_columns,
             **row,
-            "reference_count": len({master.reference_id for master in selected}),
-            "master_count": len(selected),
+            **row_counts(row),
         }
         for row in identity_metric_rows
     ]
@@ -730,8 +931,7 @@ def run_evaluation(
         {
             **common_columns,
             **row,
-            "reference_count": len({master.reference_id for master in selected}),
-            "master_count": len(selected),
+            **row_counts(row),
         }
         for row in retention_metric_rows
     ]
@@ -740,7 +940,19 @@ def run_evaluation(
     retention_path = output_root / "retention.csv"
     _atomic_bytes(metrics_path, _csv_bytes(task_rows))
     _atomic_bytes(identity_path, _csv_bytes(identity_rows))
-    _atomic_bytes(retention_path, _csv_bytes(retention_rows))
+    if retention_rows:
+        _atomic_bytes(retention_path, _csv_bytes(retention_rows))
+        retention_record = {
+            **_artifact_record(retention_path, row_count=len(retention_rows)),
+            "status": retention_status,
+        }
+    else:
+        retention_path.unlink(missing_ok=True)
+        retention_record = {
+            "logical_reference": None,
+            "row_count": 0,
+            "status": retention_status,
+        }
     event_records = [
         stage["event_diagnostics"]
         for payload in payloads
@@ -769,19 +981,27 @@ def run_evaluation(
         ),
         "metrics": _artifact_record(metrics_path, row_count=len(task_rows)),
         "population": {
-            "id": POPULATION_ID,
+            "horizons": {
+                f"T{horizon}": {
+                    "master_count": len(horizon_masters),
+                    "reference_count": len(
+                        {master.reference_id for master in horizon_masters}
+                    ),
+                }
+                for horizon, horizon_masters in sorted(masters_by_horizon.items())
+            },
+            "id": population_id,
             "master_count": len(selected),
             "reference_count": len({master.reference_id for master in selected}),
             "smoke": smoke_master_count is not None,
         },
         "postprocess_sha256": postprocess_sha256,
         "produced": produced,
+        "policies": ["lag1", "commit0"],
         "reducers": list(reducers),
-        "retention": _artifact_record(
-            retention_path, row_count=len(retention_rows)
-        ),
+        "retention": retention_record,
         "reused": reused,
-        "schema_version": "task-memory-evaluation-run-v2",
+        "schema_version": "task-memory-evaluation-run-v3",
         "source_commit": source_commit,
         "state_contract_sha256": state_contract_sha256,
         "status": "PASS",
@@ -833,6 +1053,9 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--cache-root", type=Path)
     parser.add_argument("--output", "--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument(
+        "--population", choices=POPULATION_IDS, default=COMMON_POPULATION_ID
+    )
     parser.add_argument("--smoke-masters", type=int)
     parser.add_argument("--reducers", nargs="+", default=list(REDUCERS))
     return parser
@@ -868,6 +1091,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         data_contract_path=args.data_contract,
         variant_manifest_path=args.variant_manifest,
         device_name=args.device,
+        population_id=args.population,
         smoke_master_count=args.smoke_masters,
         reducers=args.reducers,
     )
