@@ -1,0 +1,26 @@
+{
+  "error": "trainer.task_memory_trainer.TaskMemoryTrainerError: draw cursor is not rank-synchronous",
+  "failed_source_commit": "f562792750dbfec1382dd1c4aabd66e98bea56ec",
+  "failure_stage": "first batch after the resumed DataLoader epoch boundary",
+  "last_registered_checkpoint": {
+    "bytes": 754829798,
+    "global_step": 2250,
+    "logical_reference": "external:run_root/training/formal/W-BASE/update=2250.ckpt",
+    "next_draw_index": 18000,
+    "sha256": "95a2824e63ef1964c0d09e34f35d3efd0a947399fe6fbc254c3c75ed677079d9"
+  },
+  "observed_terminal_state": {
+    "inferred_global_step": 2700,
+    "metrics_csv_lines": 19202,
+    "metrics_logical_reference": "external:run_root/training/formal/W-BASE/training_metrics/version_2/metrics.csv",
+    "update_3000_checkpoint_present": false
+  },
+  "recovery": {
+    "action": "resume_from_last_registered_checkpoint",
+    "fix_commit": "2385cbba852b45bbda5418fd85b207db9189e802",
+    "resume_global_step": 2250,
+    "resume_next_draw_index": 18000
+  },
+  "schema_version": "task-memory-formal-failure-v1",
+  "status": "FAILED"
+}

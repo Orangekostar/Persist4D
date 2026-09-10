@@ -1,0 +1,101 @@
+{
+  "campaign_training_gpu_hour_cap": 120,
+  "cap_amended": false,
+  "checkpoint_retention": "identity_only_after_exact_resume; 300-step prefixes are not registered evaluation checkpoints",
+  "content_sha256": "dde33bea6a077758918fceffa170fa69c0fe68f4dc167c3841ce6266a6fa7147",
+  "prefix_updates": 300,
+  "runs": {
+    "FH-MATCH": {
+      "checkpoint": {
+        "bytes": 754829734,
+        "role": "resume_parent_identity",
+        "sha256": "479ad23c50dd2ecbd198c6293671eecac93a979d0844091b905d7f67c583a4d6"
+      },
+      "completed_global_step": 300,
+      "elapsed_seconds": 4114.558402299881,
+      "gpu_hours": 2.2858657790554893,
+      "nonfinite_observed": false,
+      "oom_observed_in_valid_run": false,
+      "progress": {
+        "completed_global_episodes": 2400,
+        "completed_global_stages": 7200,
+        "completed_local_episodes": 1200,
+        "next_draw_index": 2400
+      },
+      "source_commit": "3986f6938d3414b44fe98dee87b68434034a93b3",
+      "source_plan_sha256": "46a548c19fefdd78a0651d2ee683432c697f62c3ee0d4401449d57ba1c770b90",
+      "state_parity_max_abs": 0.0,
+      "status": "COMPLETE"
+    },
+    "Q-INDEP": {
+      "checkpoint": {
+        "bytes": 756032950,
+        "role": "resume_parent_identity",
+        "sha256": "6ea434f203c9e9b367e777504d2a0ee9e841b0bcf543dee54060fbf7a5c9d10f"
+      },
+      "common_task_read_initialization_sha256": "df543c697e502d866d4157c65011def05dc4d5a785dd1e5b981973f41b2612e9",
+      "completed_global_step": 300,
+      "elapsed_seconds": 3382.9284529685974,
+      "gpu_hours": 1.8794046960936652,
+      "nonfinite_observed": false,
+      "oom_observed_in_valid_run": false,
+      "progress": {
+        "completed_global_episodes": 2400,
+        "completed_global_stages": 7200,
+        "completed_local_episodes": 1200,
+        "next_draw_index": 2400
+      },
+      "source_commit": "242f76e828f96123000d55e620451a9e13fd981d",
+      "source_plan_sha256": "46a548c19fefdd78a0651d2ee683432c697f62c3ee0d4401449d57ba1c770b90",
+      "state_parity_max_abs": 0.0,
+      "status": "COMPLETE"
+    },
+    "Q-TALA": {
+      "checkpoint": {
+        "bytes": 756032950,
+        "role": "resume_parent_identity",
+        "sha256": "3a45922b18e6463fd83036ed122dcdb7bf6c61a0412b5a566b954c9f988bbe55"
+      },
+      "common_task_read_initialization_sha256": "df543c697e502d866d4157c65011def05dc4d5a785dd1e5b981973f41b2612e9",
+      "completed_global_step": 300,
+      "elapsed_seconds": 3369.1759333610535,
+      "gpu_hours": 1.8717644074228075,
+      "nonfinite_observed": false,
+      "oom_observed_in_valid_run": false,
+      "progress": {
+        "completed_global_episodes": 2400,
+        "completed_global_stages": 7200,
+        "completed_local_episodes": 1200,
+        "next_draw_index": 2400
+      },
+      "source_commit": "242f76e828f96123000d55e620451a9e13fd981d",
+      "source_plan_sha256": "46a548c19fefdd78a0651d2ee683432c697f62c3ee0d4401449d57ba1c770b90",
+      "state_parity_max_abs": 0.0,
+      "status": "COMPLETE"
+    },
+    "W-BASE": {
+      "checkpoint": {
+        "bytes": 754829670,
+        "role": "resume_parent_identity",
+        "sha256": "6c23c89263ccd939cdbfb23c7200e37da3af970b9c2e9e9b3c4f15bcbc5ab240"
+      },
+      "completed_global_step": 300,
+      "elapsed_seconds": 3296.8588493,
+      "gpu_hours": 1.831588249611111,
+      "nonfinite_observed": false,
+      "oom_observed_in_valid_run": false,
+      "progress": {
+        "completed_global_episodes": 2400,
+        "completed_global_stages": 7200,
+        "completed_local_episodes": 1200,
+        "next_draw_index": 2400
+      },
+      "source_commit": "242f76e828f96123000d55e620451a9e13fd981d",
+      "source_plan_sha256": "46a548c19fefdd78a0651d2ee683432c697f62c3ee0d4401449d57ba1c770b90",
+      "state_parity_max_abs": 0.0,
+      "status": "COMPLETE"
+    }
+  },
+  "schema_version": "task-memory-m2-prefixes-v1",
+  "total_gpu_hours": 7.868623132183073
+}
