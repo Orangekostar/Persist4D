@@ -1,0 +1,37 @@
+{
+  "code_commit_at_run": "2385cbba852b45bbda5418fd85b207db9189e802",
+  "common_task_read_initialization_sha256": null,
+  "devices": 2,
+  "gradient_accumulation": 4,
+  "load_audit": {
+    "loaded_key_count": 798,
+    "missing_keys": [],
+    "r1_key_aliases": {
+      "criterion.change_weights": "criterion.base_criterion.change_weights",
+      "criterion.empty_weight": "criterion.base_criterion.empty_weight"
+    },
+    "r1_subtree_exact": true,
+    "r1_subtree_mismatches": [],
+    "unexpected_keys": []
+  },
+  "plan": {
+    "bucket_counts": {
+      "T2": 4800,
+      "T3": 4800,
+      "T4": 4800,
+      "T5": 4800,
+      "single_scan": 4800
+    },
+    "next_draw_index": 18000,
+    "remaining_global_draws": 6000,
+    "smoke_events": null,
+    "source_plan_sha256": "46a548c19fefdd78a0651d2ee683432c697f62c3ee0d4401449d57ba1c770b90",
+    "total_global_draws": 24000
+  },
+  "r1_checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "resume": true,
+  "scheduler_total_updates": 3000,
+  "seed": 45,
+  "stop_after_updates": 3000,
+  "variant": "W-BASE"
+}
