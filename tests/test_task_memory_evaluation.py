@@ -12,7 +12,8 @@ from omegaconf import OmegaConf
 
 import scripts.evaluate_task_memory as evaluation_module
 from datasets.task_memory_episode import NativeEpisodeMaster, StageMeta
-from models.task_memory_state import TaskMemoryConfig
+from models.object_visual_memory import ObjectVisualState
+from models.task_memory_state import TaskMemoryConfig, TaskMemoryState
 from scripts.evaluate_task_memory import (
     COMMON_POPULATION_ID,
     NATIVE_POPULATION_ID,
@@ -20,8 +21,10 @@ from scripts.evaluate_task_memory import (
     _csv_bytes,
     _episode_spec,
     _population_horizons,
+    _resolve_variant_evaluation_identity,
     _retention_rows_for_population,
     _rio_population_base,
+    _runtime_state_sha256,
     _state_contract_sha256,
     select_development_masters,
 )
@@ -266,7 +269,10 @@ def _key(horizon: int) -> dict[str, object]:
 def test_state_contract_hash_uses_the_runtime_task_memory_config() -> None:
     system = SimpleNamespace(
         config=SimpleNamespace(
-            task_memory_training=SimpleNamespace(state_enabled=True)
+            task_memory_training=SimpleNamespace(
+                state_enabled=True,
+                visual_enabled=False,
+            )
         ),
         model=SimpleNamespace(
             task_memory_capacity=100,
@@ -285,6 +291,85 @@ def test_state_contract_hash_uses_the_runtime_task_memory_config() -> None:
     assert len(observed) == 64
     system.model.task_memory_config = TaskMemoryConfig(update_mode="last")
     assert _state_contract_sha256(system) != observed
+
+
+def test_visual_state_and_policy_are_bound_to_evaluation_cache_identity() -> None:
+    settings = SimpleNamespace(state_enabled=True, visual_enabled=False)
+    system = SimpleNamespace(
+        config=SimpleNamespace(task_memory_training=settings),
+        model=SimpleNamespace(
+            mask_dim=128,
+            task_memory_capacity=100,
+            task_memory_config=TaskMemoryConfig(),
+            task_visual_policy="V-LAST",
+        ),
+    )
+    task_state = TaskMemoryState.empty(
+        batch_size=1,
+        capacity=100,
+        feature_dim=128,
+        class_count=25,
+        device="cpu",
+        dtype=torch.float32,
+    )
+    visual_state = ObjectVisualState.empty(
+        batch_size=1,
+        device="cpu",
+        dtype=torch.float32,
+    )
+
+    task_only_contract = _state_contract_sha256(system)
+    task_only_state = _runtime_state_sha256(task_state, None)
+    settings.visual_enabled = True
+    visual_contract = _state_contract_sha256(system)
+    combined_state = _runtime_state_sha256(task_state, visual_state)
+
+    assert visual_contract != task_only_contract
+    assert combined_state != task_only_state
+    generations = visual_state.generations.clone()
+    generations[0, 0] = 0
+    changed_visual_state = ObjectVisualState(
+        visual_state.features,
+        visual_state.valid,
+        visual_state.quality,
+        visual_state.source_stage,
+        visual_state.source_key,
+        generations,
+    )
+    assert _runtime_state_sha256(task_state, changed_visual_state) != combined_state
+    system.model.task_visual_policy = "V-CORE"
+    assert _state_contract_sha256(system) != visual_contract
+
+
+def test_m3_evaluation_identity_uses_the_actual_training_config_and_run_plan(
+    tmp_path: Path,
+) -> None:
+    external_root = tmp_path / "external"
+    artifact_root = tmp_path / "artifacts"
+    config_path = (
+        external_root
+        / "training/formal/M3-V-LAST/resolved_config.local.yaml"
+    )
+    config_path.parent.mkdir(parents=True)
+    config_path.write_text("variant: M3-V-LAST\n", encoding="utf-8")
+    plan_path = artifact_root / "formal/M3-V-LAST/run_plan.json"
+    plan_path.parent.mkdir(parents=True)
+    plan_path.write_text(
+        '{"common_visual_initialization_sha256":"' + "a" * 64
+        + '","variant":"M3-V-LAST"}\n',
+        encoding="utf-8",
+    )
+
+    resolved, common_task, common_visual = _resolve_variant_evaluation_identity(
+        variant="M3-V-LAST",
+        manifest={},
+        external_root=external_root,
+        training_artifact_root=artifact_root,
+    )
+
+    assert resolved == evaluation_module._file_sha256(config_path)
+    assert common_task is None
+    assert common_visual == "a" * 64
 
 
 def test_evaluation_csv_writes_zero_denominators_as_na() -> None:

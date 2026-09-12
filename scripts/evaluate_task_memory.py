@@ -34,6 +34,7 @@ from datasets.task_memory_episode import (
     TaskMemoryEpisodeSpec,
     build_native_episode_masters,
 )
+from models.object_visual_memory import ObjectVisualState, update_visual_state
 from models.task_memory_routing import (
     CommitResult,
     EntityRoute,
@@ -74,16 +75,22 @@ from scripts.task_memory_metrics import (
     compute_cached_task_metrics,
 )
 from scripts.train_task_memory import (
+    ALL_VARIANTS,
     LOCAL_ASSET_RESOLVER,
+    M3_PARENT_SHA256,
+    M3_VARIANTS,
     R1_SHA256,
     VARIANTS,
     _apply_common_task_read_initialization,
+    _apply_common_visual_read_initialization,
+    _load_m3_parent,
     _load_r1,
     compose_variant_config,
 )
 from trainer.task_memory_trainer import (
     TaskMemoryTrainer,
     build_final_prediction_observation,
+    build_visual_slot_candidates,
     commit_task_memory_stage,
 )
 
@@ -92,6 +99,9 @@ DEFAULT_DATA_CONTRACT = (
 )
 DEFAULT_VARIANT_MANIFEST = (
     PROJECT_ROOT / "artifacts/task_memory_retention_v2/training/variants.json"
+)
+DEFAULT_TRAINING_ARTIFACT_ROOT = (
+    PROJECT_ROOT / "artifacts/task_memory_retention_v2/training"
 )
 DEFAULT_OUTPUT_ROOT = (
     PROJECT_ROOT / "artifacts/task_memory_retention_v2/evaluation"
@@ -448,18 +458,118 @@ def current_stage_target(
 def _state_contract_sha256(system: TaskMemoryTrainer) -> str:
     model = system.model
     state_config = model.task_memory_config
-    return canonical_json_sha256(
-        {
-            "association_threshold": float(state_config.association_threshold),
-            "capacity": int(model.task_memory_capacity),
-            "class_weight": float(state_config.class_weight),
-            "enabled": bool(system.config.task_memory_training.state_enabled),
-            "max_update_rate": float(state_config.max_update_rate),
-            "schema_version": "prediction-only-task-state-v1",
-            "update_mode": str(state_config.update_mode),
-            "update_rate": float(state_config.update_rate),
-        }
+    contract: dict[str, object] = {
+        "association_threshold": float(state_config.association_threshold),
+        "capacity": int(model.task_memory_capacity),
+        "class_weight": float(state_config.class_weight),
+        "enabled": bool(system.config.task_memory_training.state_enabled),
+        "max_update_rate": float(state_config.max_update_rate),
+        "schema_version": "prediction-only-task-state-v1",
+        "update_mode": str(state_config.update_mode),
+        "update_rate": float(state_config.update_rate),
+    }
+    visual_enabled = bool(
+        getattr(system.config.task_memory_training, "visual_enabled", False)
     )
+    if visual_enabled:
+        contract.update(
+            {
+                "schema_version": "prediction-only-task-and-visual-state-v2",
+                "visual": {
+                    "candidate_limit": 32,
+                    "feature_dim": int(model.mask_dim),
+                    "policy": str(model.task_visual_policy),
+                    "representatives": 8,
+                    "source": "current-stage-prediction-only",
+                },
+            }
+        )
+    return canonical_json_sha256(contract)
+
+
+def _visual_state_sha256(state: ObjectVisualState) -> str:
+    state.validate()
+    digest = hashlib.sha256()
+    names = (
+        "features",
+        "valid",
+        "quality",
+        "source_stage",
+        "source_key",
+        "generations",
+    )
+    for name, tensor in zip(names, state.tensors(), strict=True):
+        value = tensor.detach().cpu().contiguous()
+        digest.update(name.encode("ascii") + b"\0")
+        digest.update(str(value.dtype).encode("ascii") + b"\0")
+        digest.update(json.dumps(list(value.shape), separators=(",", ":")).encode())
+        digest.update(value.view(torch.uint8).numpy().tobytes())
+    return digest.hexdigest()
+
+
+def _runtime_state_sha256(
+    task_state: object | None,
+    visual_state: ObjectVisualState | None,
+) -> str:
+    if task_state is None:
+        if visual_state is not None:
+            raise TaskMemoryEvaluationError("visual state requires task state")
+        return "0" * 64
+    task_sha256 = _state_sha256(task_state)
+    if visual_state is None:
+        return task_sha256
+    digest = hashlib.sha256()
+    digest.update(b"task-and-visual-runtime-state-v1\0")
+    digest.update(task_sha256.encode("ascii"))
+    digest.update(_visual_state_sha256(visual_state).encode("ascii"))
+    return digest.hexdigest()
+
+
+def _resolve_variant_evaluation_identity(
+    *,
+    variant: str,
+    manifest: Mapping[str, object],
+    external_root: Path,
+    training_artifact_root: Path = DEFAULT_TRAINING_ARTIFACT_ROOT,
+) -> tuple[str, str | None, str | None]:
+    if variant in VARIANTS:
+        variant_record = manifest.get("variants", {}).get(variant)
+        if not isinstance(variant_record, Mapping):
+            raise TaskMemoryEvaluationError("variant manifest lacks the requested arm")
+        resolved = variant_record.get("resolved_config_sha256")
+        common_task = manifest.get("common_task_read_initialization", {}).get(
+            "sha256"
+        )
+        if not isinstance(resolved, str) or not isinstance(common_task, str):
+            raise TaskMemoryEvaluationError(
+                "variant initialization manifest is incomplete"
+            )
+        return resolved, common_task, None
+    if variant not in M3_VARIANTS:
+        raise TaskMemoryEvaluationError("variant is not a frozen M2/M3 arm")
+    config_path = (
+        external_root
+        / "training"
+        / "formal"
+        / variant
+        / "resolved_config.local.yaml"
+    )
+    try:
+        resolved = _file_sha256(config_path)
+    except OSError as error:
+        raise TaskMemoryEvaluationError(
+            f"M3 training config is unavailable: {config_path}"
+        ) from error
+    plan = _load_json(training_artifact_root / "formal" / variant / "run_plan.json")
+    if plan.get("variant") != variant:
+        raise TaskMemoryEvaluationError("M3 training plan variant differs")
+    common_visual = plan.get("common_visual_initialization_sha256")
+    if variant == "M3-BASE-CONT":
+        if common_visual is not None:
+            raise TaskMemoryEvaluationError("M3 base unexpectedly has visual initialization")
+    elif not isinstance(common_visual, str) or len(common_visual) != 64:
+        raise TaskMemoryEvaluationError("M3 visual initialization identity is incomplete")
+    return resolved, None, common_visual
 
 
 def _postprocess_sha256() -> str:
@@ -485,7 +595,8 @@ def _load_evaluation_system(
     pretrained: Path,
     external_root: Path,
     device: torch.device,
-    expected_common_initialization_sha256: str,
+    expected_common_initialization_sha256: str | None,
+    expected_common_visual_initialization_sha256: str | None,
 ) -> tuple[TaskMemoryTrainer, dict[str, object]]:
     config = compose_variant_config(
         variant,
@@ -494,6 +605,8 @@ def _load_evaluation_system(
     )
     system = TaskMemoryTrainer(config)
     if checkpoint_sha256 == R1_SHA256:
+        if not isinstance(expected_common_initialization_sha256, str):
+            raise TaskMemoryEvaluationError("M2 task-read initialization is unavailable")
         load_audit = _load_r1(system, checkpoint)
         common_sha = _apply_common_task_read_initialization(
             system, external_root / "training/common/task_read_init.pt"
@@ -504,6 +617,19 @@ def _load_evaluation_system(
             raise TaskMemoryEvaluationError(
                 "update-0 task-read initialization SHA256 differs"
             )
+    elif checkpoint_sha256 == M3_PARENT_SHA256 and variant in M3_VARIANTS:
+        load_audit = _load_m3_parent(system, checkpoint)
+        common_visual_sha = _apply_common_visual_read_initialization(
+            system, external_root / "training/common/visual_read_init.pt"
+        )
+        if common_visual_sha != expected_common_visual_initialization_sha256:
+            raise TaskMemoryEvaluationError(
+                "update-0 visual-read initialization SHA256 differs"
+            )
+        load_audit = {
+            **load_audit,
+            "common_visual_initialization_sha256": common_visual_sha,
+        }
     else:
         payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
         state = payload.get("state_dict") if isinstance(payload, Mapping) else None
@@ -577,9 +703,14 @@ def _produce_episode(
     if len(batch.specs) != 1:
         raise TaskMemoryEvaluationError("evaluation requires batch size one")
     state_enabled = bool(system.config.task_memory_training.state_enabled)
+    visual_enabled = bool(
+        getattr(system.config.task_memory_training, "visual_enabled", False)
+    )
+    if visual_enabled and not state_enabled:
+        raise TaskMemoryEvaluationError("visual memory requires task state")
     state = system._new_task_state(1) if state_enabled else None
+    visual_state = system._new_visual_state(1) if visual_enabled else None
     stages = []
-    disabled_state_sha256 = "0" * 64
     for stage_batch in batch.stage_batches:
         data, targets, names = stage_batch.model_batch
         meta = stage_batch.stage_meta[0]
@@ -596,9 +727,7 @@ def _produce_episode(
         segment_stages = _segment_stages(target_low)
         latest_local_stage = int(segment_stages.max().item())
         raw_coordinates = system._process_raw_coordinates(data)
-        state_before_sha256 = (
-            _state_sha256(state) if state_enabled else disabled_state_sha256
-        )
+        state_before_sha256 = _runtime_state_sha256(state, visual_state)
         with torch.inference_mode():
             if state_enabled:
                 output = system.model(
@@ -607,6 +736,7 @@ def _produce_episode(
                     raw_coordinates=raw_coordinates,
                     is_eval=True,
                     task_state=state,
+                    task_visual_state=visual_state,
                     stage_meta=stage_batch.stage_meta,
                 )
             else:
@@ -656,8 +786,24 @@ def _produce_episode(
                 stage_index=meta.absolute_stage_index,
             )
             state = transition.runtime_state
+            if visual_enabled:
+                if visual_state is None:
+                    raise TaskMemoryEvaluationError("visual state is unavailable")
+                visual_state = update_visual_state(
+                    visual_state,
+                    slot_candidates=build_visual_slot_candidates(
+                        output,
+                        stage_batch.stage_meta,
+                        query_to_slot=transition.commit.query_to_slot,
+                        background_class=int(system.model.task_background_class),
+                        mask_threshold=float(system.model.task_mask_threshold),
+                        capacity=int(system.model.task_memory_capacity),
+                    ),
+                    slot_generations=transition.commit.state.generations,
+                    policy=str(system.model.task_visual_policy),
+                )
             identity_map = transition.commit.identity_map()
-            state_after_sha256 = _state_sha256(state)
+            state_after_sha256 = _runtime_state_sha256(state, visual_state)
         else:
             identity_map = {}
             events = {
@@ -667,7 +813,7 @@ def _produce_episode(
                 "reactivations": 0,
                 "rejected_births": 0,
             }
-            state_after_sha256 = disabled_state_sha256
+            state_after_sha256 = _runtime_state_sha256(None, None)
         stages.append(
             build_stage_cache_record(
                 prediction=official,
@@ -711,8 +857,8 @@ def run_evaluation(
     smoke_master_count: int | None = None,
     reducers: Sequence[str] = REDUCERS,
 ) -> dict[str, object]:
-    if variant not in VARIANTS:
-        raise TaskMemoryEvaluationError("variant is not one of the frozen M2 arms")
+    if variant not in ALL_VARIANTS:
+        raise TaskMemoryEvaluationError("variant is not a frozen M2/M3 arm")
     source_commit = _git_head()
     checkpoint = checkpoint.expanduser().resolve(strict=True)
     pretrained = pretrained.expanduser().resolve(strict=True)
@@ -724,15 +870,13 @@ def run_evaluation(
     checkpoint_sha256 = _file_sha256(checkpoint)
     manifest = _load_json(variant_manifest_path)
     _validated_content_hash(manifest, name="variant manifest")
-    variant_record = manifest.get("variants", {}).get(variant)
-    if not isinstance(variant_record, Mapping):
-        raise TaskMemoryEvaluationError("variant manifest lacks the requested arm")
-    resolved_config_sha256 = variant_record.get("resolved_config_sha256")
-    common_sha256 = manifest.get("common_task_read_initialization", {}).get("sha256")
-    if not isinstance(resolved_config_sha256, str) or not isinstance(
-        common_sha256, str
-    ):
-        raise TaskMemoryEvaluationError("variant initialization manifest is incomplete")
+    resolved_config_sha256, common_sha256, common_visual_sha256 = (
+        _resolve_variant_evaluation_identity(
+            variant=variant,
+            manifest=manifest,
+            external_root=external_root,
+        )
+    )
     data_contract = _load_json(data_contract_path)
     data_contract_sha256 = _validated_content_hash(
         data_contract, name="data contract"
@@ -755,6 +899,7 @@ def run_evaluation(
         external_root=external_root,
         device=device,
         expected_common_initialization_sha256=common_sha256,
+        expected_common_visual_initialization_sha256=common_visual_sha256,
     )
     config = system.config
     bases = {
@@ -794,8 +939,13 @@ def run_evaluation(
         if bool(config.task_memory_training.state_enabled)
         else None
     )
-    initial_state_sha256 = (
-        _state_sha256(initial_state) if initial_state is not None else "0" * 64
+    initial_visual_state = (
+        system._new_visual_state(1)
+        if bool(getattr(config.task_memory_training, "visual_enabled", False))
+        else None
+    )
+    initial_state_sha256 = _runtime_state_sha256(
+        initial_state, initial_visual_state
     )
     postprocess_sha256 = _postprocess_sha256()
     payloads = []
@@ -1001,11 +1151,14 @@ def run_evaluation(
         "reducers": list(reducers),
         "retention": retention_record,
         "reused": reused,
-        "schema_version": "task-memory-evaluation-run-v3",
+        "schema_version": "task-memory-evaluation-run-v4",
         "source_commit": source_commit,
         "state_contract_sha256": state_contract_sha256,
         "status": "PASS",
         "variant": variant,
+        "visual_state_enabled": bool(
+            getattr(config.task_memory_training, "visual_enabled", False)
+        ),
     }
     result["content_sha256"] = canonical_json_sha256(result)
     _atomic_json(output_root / "manifest.json", result)
@@ -1022,7 +1175,7 @@ def _parser() -> argparse.ArgumentParser:
         return Path(value) if value else None
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--variant", choices=VARIANTS, required=True)
+    parser.add_argument("--variant", choices=ALL_VARIANTS, required=True)
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument(
         "--pretrained",
