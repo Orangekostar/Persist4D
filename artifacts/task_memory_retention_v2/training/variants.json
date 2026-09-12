@@ -31,10 +31,29 @@
       "sha256": "2202ddd1629b18e282f1bc07594d1f90f2672c098e1d127768e21a8af49297b9"
     }
   },
-  "content_sha256": "71fea1c57d450b14a950ec51f69f4aa275af36cb2ea1b2cf4c51eda790edfbb4",
+  "content_sha256": "e4c35ea10089678a3fe0ee052e9bd0222734992027466f3507a1df61cea4fb9a",
   "costs_and_exposure": {
     "logical_reference": "repo:artifacts/task_memory_retention_v2/training/costs_and_exposure.csv",
-    "sha256": "6721ad96f0d77bb2125c35d1a974128552a0f61fe65332596f425b4d75ffe281"
+    "sha256": "c0f22d604834801363f97c2ba337008f462cc3fc26269c170ffbefb8e8f4bdd4"
+  },
+  "m3_gate": {
+    "decision": "AUTHORIZED",
+    "long_horizon_gain_threshold": 0.005,
+    "minimum_delta_threshold": -0.01,
+    "parent_checkpoint": {
+      "bytes": 756033014,
+      "logical_reference": "external:run_root/training/formal/Q-TALA/update=1500.ckpt",
+      "sha256": "a75c3e28b2fa3895414f1c1a1e35b1a9ca8d65ac5cc03e96e609e99511ef2b06",
+      "update": 1500,
+      "variant": "Q-TALA"
+    },
+    "q_tala_minus_q_indep": {
+      "T2": 0.005755245685577393,
+      "T3": 0.00789707899093628,
+      "T4": 0.025240659713745117,
+      "T5": 0.02827930450439453,
+      "minimum": 0.005755245685577393
+    }
   },
   "r1_initialization": {
     "bytes": 754813672,
@@ -44,7 +63,7 @@
   "schema_version": "task-memory-training-variants-v1",
   "smoke_evidence": "repo:artifacts/task_memory_retention_v2/implementation/real_gradient_smoke.json",
   "source_commit": "fede6b73bb524b261cb94ea5255b3f3a9ea13e4d",
-  "status": "FROZEN_READY_FOR_M2_PREFIX",
+  "status": "M2_COMPLETE_M3_AUTHORIZED",
   "variants": {
     "FH-MATCH": {
       "commands": {
@@ -55,7 +74,7 @@
       "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/FH-MATCH.yaml",
       "resolved_config_sha256": "78fa49b9ab6237de69d33e5b495f06962ba288040d7918c64db34a3859cf6834",
       "role": "matched full-history training control without task state",
-      "state": "FROZEN_NOT_RUN",
+      "state": "COMPLETE",
       "task_read_initialization_sha256": null
     },
     "Q-INDEP": {
@@ -67,7 +86,7 @@
       "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/Q-INDEP.yaml",
       "resolved_config_sha256": "2aff7d9c45bfa406017e2c27f09c75d58a4ab34cfc939e89ba16a92ecb7793ec",
       "role": "task-state model with independent set matching",
-      "state": "FROZEN_NOT_RUN",
+      "state": "COMPLETE",
       "task_read_initialization_sha256": "df543c697e502d866d4157c65011def05dc4d5a785dd1e5b981973f41b2612e9"
     },
     "Q-TALA": {
@@ -79,7 +98,7 @@
       "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/Q-TALA.yaml",
       "resolved_config_sha256": "f2a12f62b1a45740695e5327e6f0ecfef02b1f92934269cd691851a220c3733c",
       "role": "task-state model with tracklet-aware lineage assignment",
-      "state": "FROZEN_NOT_RUN",
+      "state": "COMPLETE",
       "task_read_initialization_sha256": "df543c697e502d866d4157c65011def05dc4d5a785dd1e5b981973f41b2612e9"
     },
     "W-BASE": {
@@ -91,7 +110,7 @@
       "resolved_config": "repo:artifacts/task_memory_retention_v2/training/resolved_configs/W-BASE.yaml",
       "resolved_config_sha256": "7e0badd5685ab5808f724e2492bf7f7470bd4bf206578561336f498f771157d9",
       "role": "adapted local-window training control without task state",
-      "state": "FROZEN_NOT_RUN",
+      "state": "COMPLETE",
       "task_read_initialization_sha256": null
     }
   }
