@@ -144,6 +144,17 @@ def _candidate_order(candidates: Sequence[VisualCandidate]) -> list[int]:
     )
 
 
+def _minimum_cosine_distance(
+    feature: Tensor, selected: Sequence[VisualCandidate]
+) -> float:
+    candidate = F.normalize(feature.float(), dim=0, eps=1e-6)
+    references = F.normalize(
+        torch.stack([item.feature.float() for item in selected]), dim=-1, eps=1e-6
+    )
+    distances = ((1.0 - references.mv(candidate)) * 0.5).clamp(0.0, 1.0)
+    return float(distances.min().detach().cpu().item())
+
+
 def select_visual_representatives(
     candidates: Sequence[VisualCandidate],
     *,
@@ -168,12 +179,10 @@ def select_visual_representatives(
         selected = [pool[_candidate_order(pool)[0]]]
         remaining = [item for item in pool if item.source_key != selected[0].source_key]
         while remaining and len(selected) < limit:
-            selected_features = torch.stack([item.feature.float() for item in selected])
             best_index = max(
                 range(len(remaining)),
                 key=lambda index: (
-                    float(remaining[index].quality.detach().cpu().item())
-                    * (0.5 + 0.5 * float(torch.cdist(remaining[index].feature.float().unsqueeze(0), selected_features).min().item())),
+                    _minimum_cosine_distance(remaining[index].feature, selected),
                     float(remaining[index].quality.detach().cpu().item()),
                     -remaining[index].source_stage,
                     -remaining[index].source_key,
@@ -184,7 +193,13 @@ def select_visual_representatives(
 
     recent = recent_keys or set()
     recent_pool = [item for item in pool if item.source_key in recent]
-    recent_pool = [recent_pool[index] for index in _candidate_order(recent_pool)[:2]]
+    recent_pool = (
+        select_visual_representatives(
+            recent_pool, policy="V-LAST", limit=min(2, limit)
+        )
+        if recent_pool
+        else []
+    )
     selected = list(recent_pool)
     selected_keys = {item.source_key for item in selected}
     remaining = [item for item in pool if item.source_key not in selected_keys]
@@ -192,12 +207,17 @@ def select_visual_representatives(
         if not selected:
             index = _candidate_order(remaining)[0]
         else:
-            selected_features = torch.stack([item.feature.float() for item in selected])
             index = max(
                 range(len(remaining)),
                 key=lambda candidate_index: (
                     float(remaining[candidate_index].quality.detach().cpu().item())
-                    * (0.5 + 0.5 * float(torch.cdist(remaining[candidate_index].feature.float().unsqueeze(0), selected_features).min().item())),
+                    * (
+                        0.5
+                        + 0.5
+                        * _minimum_cosine_distance(
+                            remaining[candidate_index].feature, selected
+                        )
+                    ),
                     float(remaining[candidate_index].quality.detach().cpu().item()),
                     -remaining[candidate_index].source_stage,
                     -remaining[candidate_index].source_key,
@@ -297,7 +317,11 @@ class ObjectVisualRead(nn.Module):
         self.value_projection = nn.Linear(self.hidden_dim, self.hidden_dim)
         self.gate_projection = nn.Linear(self.hidden_dim * 2, self.hidden_dim)
         self.output_projection = nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.null_key = nn.Parameter(torch.empty(self.hidden_dim))
         self.attention_scale = nn.Parameter(torch.tensor(math.sqrt(self.hidden_dim), dtype=torch.float32))
+        nn.init.normal_(
+            self.null_key, mean=0.0, std=1.0 / math.sqrt(self.hidden_dim)
+        )
         nn.init.zeros_(self.output_projection.weight)
         nn.init.zeros_(self.output_projection.bias)
         self._last_diagnostics = MappingProxyType({})
@@ -332,20 +356,27 @@ class ObjectVisualRead(nn.Module):
         q = F.normalize(self.query_projection(queries), dim=-1, eps=1e-6)
         k = F.normalize(self.key_projection(gathered), dim=-1, eps=1e-6)
         v = self.value_projection(gathered)
+        null_key = F.normalize(self.null_key, dim=0, eps=1e-6)
         scale = self.attention_scale.clamp(1.0, 64.0).to(dtype=queries.dtype)
         logits = torch.einsum("bqd,bqrd->bqr", q, k) * scale
         logits = logits.masked_fill(~gathered_valid, -torch.inf)
-        weights = torch.softmax(logits, dim=-1)
-        weights = torch.where(gathered_valid, weights, torch.zeros_like(weights))
+        null_logits = torch.einsum("bqd,d->bq", q, null_key) * scale
+        attention = torch.softmax(
+            torch.cat((logits, null_logits.unsqueeze(-1)), dim=-1), dim=-1
+        )
+        weights = attention[..., : self.representatives]
+        visual_wins = eligible & (logits.amax(dim=-1) > null_logits)
         read = torch.sum(weights.unsqueeze(-1) * v, dim=-2)
         gate = torch.sigmoid(self.gate_projection(torch.cat((queries, read), dim=-1)))
         delta = gate * self.output_projection(read)
-        delta = delta * eligible.unsqueeze(-1)
+        delta = delta * visual_wins.unsqueeze(-1)
         output = queries + delta
         self._last_diagnostics = MappingProxyType(
             {
                 "matched_query_count": int(matched.sum().detach().item()),
-                "valid_read_count": int(eligible.sum().detach().item()),
+                "valid_read_count": int(visual_wins.sum().detach().item()),
+                "null_win_count": int((eligible & ~visual_wins).sum().detach().item()),
+                "null_mass_mean": float(attention[..., -1].detach().mean().item()),
                 "generation_mismatch_count": int((matched & ~generation_match).sum().detach().item()),
                 "read_output_norm": float(delta.detach().float().norm(dim=-1).mean().item()),
                 "attention_scale": float(scale.detach().item()),

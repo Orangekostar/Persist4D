@@ -136,6 +136,66 @@ def test_visual_read_has_zero_residual_when_no_valid_representatives() -> None:
     assert read.last_diagnostics["valid_read_count"] == 0
 
 
+def test_visual_read_null_winner_has_strict_zero_residual() -> None:
+    read = ObjectVisualRead()
+    identity = torch.eye(128)
+    with torch.no_grad():
+        for layer in (read.query_projection, read.key_projection, read.value_projection):
+            layer.weight.copy_(identity)
+            layer.bias.zero_()
+        read.output_projection.weight.copy_(identity)
+        read.output_projection.bias.zero_()
+        read.gate_projection.weight.zero_()
+        read.gate_projection.bias.zero_()
+        read.null_key.zero_()
+        read.null_key[0] = 1.0
+    state = ObjectVisualState.empty(
+        batch_size=1,
+        device="cpu",
+        dtype=torch.float32,
+    )
+    features = state.features.clone()
+    valid = state.valid.clone()
+    qualities = state.quality.clone()
+    stages = state.source_stage.clone()
+    keys = state.source_key.clone()
+    generations = state.generations.clone()
+    features[0, 0, 0, 0] = -1.0
+    valid[0, 0, 0] = True
+    qualities[0, 0, 0] = 1.0
+    stages[0, 0, 0] = 0
+    keys[0, 0, 0] = 1
+    generations[0, 0] = 0
+    state = replace(
+        state,
+        features=features,
+        valid=valid,
+        quality=qualities,
+        source_stage=stages,
+        source_key=keys,
+        generations=generations,
+    )
+    queries = torch.zeros(1, 100, 128)
+    queries[0, 0, 0] = 1.0
+    route = torch.full((1, 100), -1, dtype=torch.long)
+    route[0, 0] = 0
+    query_generations = torch.full((1, 100), -1, dtype=torch.long)
+    query_generations[0, 0] = 0
+    output = read(queries, state, route, query_generations)
+    assert torch.equal(output, queries)
+    assert read.last_diagnostics["null_win_count"] == 1
+
+
+def test_v_last_uses_normalized_cosine_coverage_after_first_quality_pick() -> None:
+    candidates = _candidate(
+        [1, 2, 3],
+        [1.0, 0.99, 0.1],
+        [[1.0, 0.0], [10.0, 0.1], [-1.0, 0.0]],
+    )
+    selected = select_visual_representatives(candidates, policy="V-LAST", limit=2)
+    assert [item.source_key for item in selected] == [1, 3]
+
+
 def test_visual_candidates_use_current_prediction_rows_only() -> None:
     features = torch.zeros(1, 3, 128)
     features[0, 0, 0] = 10.0
