@@ -1,0 +1,515 @@
+{
+  "cache": {
+    "bytes": 1234894455,
+    "cap_bytes": 42949672960,
+    "entry_count": 47,
+    "records": [
+      {
+        "content_sha256": "5a93f62a94c6665a80068a4e29353f6d904fa46f5abcd09d6240f3276c45e8b2",
+        "file_bytes": 9105721,
+        "file_sha256": "f20d22f9db2d7fd0d8633cc7b3cc10164aaee7f59d5ecc1f8dcd86805a3fb1eb",
+        "filename": "fb947259f84c7d4519e8b10de6fa1e269ac27dd358484a4713b3d05721fb641e.pt",
+        "key_sha256": "fb947259f84c7d4519e8b10de6fa1e269ac27dd358484a4713b3d05721fb641e",
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+        "sequence_id": "scene0007_00-scene0007_01-scene0007_03-scene0007_02-scene0007_04"
+      },
+      {
+        "content_sha256": "ec029974d9daa870825b1d6cdc993e759ef6cc1d19c23e36d48923a23fa89c53",
+        "file_bytes": 8832889,
+        "file_sha256": "39ff8cb5ff70bf2fcd6af038c5db8c01ce5d8518a1ee3727854cff13513ae1f2",
+        "filename": "1835893d6f4c8b1d9c999a32712296ad14c37b0a5bb03ebe193c365186856d70.pt",
+        "key_sha256": "1835893d6f4c8b1d9c999a32712296ad14c37b0a5bb03ebe193c365186856d70",
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+        "sequence_id": "scene0007_01-scene0007_03-scene0007_02-scene0007_04-scene0007_00"
+      },
+      {
+        "content_sha256": "9e2af9caa311ba777bc42c97cd6c3a89a8aa8958dca343e8ba15e157b84669db",
+        "file_bytes": 9018873,
+        "file_sha256": "da9a5b2dc7807750aaa35e44fdab327637e1b7dd75cad7818f267339e7cc1057",
+        "filename": "e7fa4e8fa5e08865be257011f845e81809cbebdc41bf661e4aac52ff7d807517.pt",
+        "key_sha256": "e7fa4e8fa5e08865be257011f845e81809cbebdc41bf661e4aac52ff7d807517",
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+        "sequence_id": "scene0007_02-scene0007_04-scene0007_00-scene0007_01-scene0007_03"
+      },
+      {
+        "content_sha256": "e4f600bff6377e00e3347381e1e38363145dda3751e8f75851f4e274d7ca74bd",
+        "file_bytes": 8852409,
+        "file_sha256": "f438c8fc81ee9ddbea1fc4c5e0ae8263d147587fbafe387db3e409ed16ce9db3",
+        "filename": "0a7c8aaa7f987feb86e7103e41a7cee3b6c23221776b367672a2fd03f7795e74.pt",
+        "key_sha256": "0a7c8aaa7f987feb86e7103e41a7cee3b6c23221776b367672a2fd03f7795e74",
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+        "sequence_id": "scene0007_03-scene0007_02-scene0007_04-scene0007_00-scene0007_01"
+      },
+      {
+        "content_sha256": "9177c79c0f2ad56edbdf556b58182657f462e20c6a3b403c5ebff6839a1ea302",
+        "file_bytes": 8942329,
+        "file_sha256": "31fbdd6e29a17b69ded7ae28e500c5304ee0ff6654c26baef88b07d7f0c8b310",
+        "filename": "7c32c8400845f94084d3daa5f4708a0e20e44f356d2b3f8d9146e304d271e64b.pt",
+        "key_sha256": "7c32c8400845f94084d3daa5f4708a0e20e44f356d2b3f8d9146e304d271e64b",
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+        "sequence_id": "scene0007_04-scene0007_00-scene0007_01-scene0007_03-scene0007_02"
+      },
+      {
+        "content_sha256": "273d38f612ce591b7cc75c90afa5f3b7f1ca5e0a2968c9df272a28d7848a55ed",
+        "file_bytes": 48553273,
+        "file_sha256": "466e9190d8245545e47396dc7133dc59a20596f675e287d8e3b2b4ef24a0949d",
+        "filename": "001ba3a2b04adba3cee8973f9ac79ddd32bf44db5fe1257107547a1c7378913a.pt",
+        "key_sha256": "001ba3a2b04adba3cee8973f9ac79ddd32bf44db5fe1257107547a1c7378913a",
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+        "sequence_id": "scene0066_00-scene0066_02-scene0066_03-scene0066_04-scene0066_01"
+      },
+      {
+        "content_sha256": "525a3c547908a09111e3c54c6031d2150eaf144e989b43cf108e39988a76a515",
+        "file_bytes": 50863801,
+        "file_sha256": "29c4ee91254aecdc9b66ba4469824403a1729a35929f4115a5429ff619083c66",
+        "filename": "7333e7a534910233759b15e1d473a22db26d612a25db1a3c45fc1d07802550d7.pt",
+        "key_sha256": "7333e7a534910233759b15e1d473a22db26d612a25db1a3c45fc1d07802550d7",
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+        "sequence_id": "scene0066_01-scene0066_00-scene0066_02-scene0066_03-scene0066_04"
+      },
+      {
+        "content_sha256": "2ce3e8550ad944c01244d475ababd7ecc4a2fe33ee10e80e78fe0227067a02b1",
+        "file_bytes": 48469177,
+        "file_sha256": "4296d74f3a9c189573c53a5ac004a3477bcd4ee609990f971b6481f1a5ac5e50",
+        "filename": "63218e51f56561c4223a972af14a02ea5134688e2297b0453cb228a1d5feb041.pt",
+        "key_sha256": "63218e51f56561c4223a972af14a02ea5134688e2297b0453cb228a1d5feb041",
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+        "sequence_id": "scene0066_02-scene0066_03-scene0066_04-scene0066_01-scene0066_00"
+      },
+      {
+        "content_sha256": "e012ee87aaa8c98479e593ccfd5d7a0f3632e11872c722f44f92b0fed5674ce5",
+        "file_bytes": 48897913,
+        "file_sha256": "155e0ea6b93aae52ac66d29a80ea871a8757f307d0e9b795139ccccf37d14097",
+        "filename": "2d502355a96020225e32d5d9ccbb5449284305c1e7afc48983b0bf943c97db5d.pt",
+        "key_sha256": "2d502355a96020225e32d5d9ccbb5449284305c1e7afc48983b0bf943c97db5d",
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+        "sequence_id": "scene0066_03-scene0066_04-scene0066_01-scene0066_00-scene0066_02"
+      },
+      {
+        "content_sha256": "5c4005042db6069b91e4bc6c8c57d0eb78cc3ca38e4aac0070a35007b38fd0fd",
+        "file_bytes": 50954233,
+        "file_sha256": "4b2cea1ad358f9379e53311284feda0083ba69d79000fa1cb6a674c05797a050",
+        "filename": "9be09d710e4c6c825ec1f27176711987c43766b4085d548fde72749ea3f63607.pt",
+        "key_sha256": "9be09d710e4c6c825ec1f27176711987c43766b4085d548fde72749ea3f63607",
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+        "sequence_id": "scene0066_04-scene0066_01-scene0066_00-scene0066_02-scene0066_03"
+      },
+      {
+        "content_sha256": "4d19a46617752e37f714ed70447ec277cd3568a66460f32d52f44b290493ea5d",
+        "file_bytes": 35753401,
+        "file_sha256": "e9dc310400ca4ce317a46d7a851bd7dd6f8ae60e9a2b3b646cf053ebea9c2e6e",
+        "filename": "9503efab0ea8cc54bf27d904d1cac172c3390c49957e111bf43657d1de56478f.pt",
+        "key_sha256": "9503efab0ea8cc54bf27d904d1cac172c3390c49957e111bf43657d1de56478f",
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14",
+        "sequence_id": "scene0068_00-scene0068_05-scene0068_03-scene0068_02-scene0068_04"
+      },
+      {
+        "content_sha256": "cbb54a3a6deb3096caf5675746fecd3f2473337ade8a28f7e942d2a45ddf5587",
+        "file_bytes": 36953785,
+        "file_sha256": "70a79d771ebc8f82903c57621b2f7d030c17ec9b24db6673bd0193c5bb6da899",
+        "filename": "10cd2149aeff7945007915615c3beab50487741c72a8315824aa0bf220d8e889.pt",
+        "key_sha256": "10cd2149aeff7945007915615c3beab50487741c72a8315824aa0bf220d8e889",
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14",
+        "sequence_id": "scene0068_01-scene0068_00-scene0068_05-scene0068_03-scene0068_02"
+      },
+      {
+        "content_sha256": "215a3466c7ae7de74a17a2167c2ee153c2e5a23b6831e43bc8492f2c1a566297",
+        "file_bytes": 33840057,
+        "file_sha256": "3eff8d4a4c499bf4ff530c72ad33b7465249907a1378aa9074724deb29e8a301",
+        "filename": "c3d4b291b8f6539520af2ab1960df056b008cf662a799da04d2505e3d40cbebf.pt",
+        "key_sha256": "c3d4b291b8f6539520af2ab1960df056b008cf662a799da04d2505e3d40cbebf",
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14",
+        "sequence_id": "scene0068_02-scene0068_04-scene0068_01-scene0068_00-scene0068_05"
+      },
+      {
+        "content_sha256": "c0ff02377a10dec9567986c4187316afd9f6fc3917d3456abe37bbf7487a6da4",
+        "file_bytes": 34439097,
+        "file_sha256": "42feb177047b0f2e229de8ea06528366805ae3627ad6e99f2a99c9ad239a80d1",
+        "filename": "03873b526baf16a2bce1ebbdc15e64d8442162f8e33da1ea2926a859d4659e92.pt",
+        "key_sha256": "03873b526baf16a2bce1ebbdc15e64d8442162f8e33da1ea2926a859d4659e92",
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14",
+        "sequence_id": "scene0068_03-scene0068_02-scene0068_04-scene0068_01-scene0068_00"
+      },
+      {
+        "content_sha256": "ccd1cc0dc78109beea30b29e6eb54cce3dbe546801963553ee6bfab3528f39f3",
+        "file_bytes": 39695737,
+        "file_sha256": "bb5f6d0b3d5508d57c235e1f02aa8cbd844bcf53e5d935b9ffc1c9d899532032",
+        "filename": "bcddfea0803806f45b27b0fee410a67ac6a5b46ea880b7a020771592431e19cd.pt",
+        "key_sha256": "bcddfea0803806f45b27b0fee410a67ac6a5b46ea880b7a020771592431e19cd",
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14",
+        "sequence_id": "scene0068_04-scene0068_01-scene0068_00-scene0068_05-scene0068_03"
+      },
+      {
+        "content_sha256": "738fcfa941c36cadfe3c83cb12912ef4fc622211faa3e689acd3c4dbc2280896",
+        "file_bytes": 34561273,
+        "file_sha256": "212b56f00acd74f2533c59e04fb9ff445d8d2313ebd0f7418548f7c6fcea77e7",
+        "filename": "d4b1c75dfb6401f2b489b6d1fd6f62989bcf78d9b02ccda68ac873b51e68225d.pt",
+        "key_sha256": "d4b1c75dfb6401f2b489b6d1fd6f62989bcf78d9b02ccda68ac873b51e68225d",
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14",
+        "sequence_id": "scene0068_05-scene0068_03-scene0068_02-scene0068_04-scene0068_01"
+      },
+      {
+        "content_sha256": "e486ca7e65e46b12d9eb31bec2abdf18ad03ab8d6b0d74481ce4496faaab7978",
+        "file_bytes": 8400697,
+        "file_sha256": "786dd241291d6a1eee53740d19e9715d90618dc53a83fef337178bcd19bb9793",
+        "filename": "7a25fc17ae256a22ae777e7ba2ca7d3efb710d4c73795828a9c96db96aa7949e.pt",
+        "key_sha256": "7a25fc17ae256a22ae777e7ba2ca7d3efb710d4c73795828a9c96db96aa7949e",
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c",
+        "sequence_id": "scene0083_00-scene0083_03-scene0083_01-scene0083_02-scene0083_04"
+      },
+      {
+        "content_sha256": "ee5e4730ebc84465cb55141d05bf65a1a195808f7fbb6b0a713a3c2871ae9094",
+        "file_bytes": 7806201,
+        "file_sha256": "f109fe07c637f5737f1abdd99cdc44ccaa85505e4ccf1b021a3a58922dbc616d",
+        "filename": "524748627afd5b9ba88e1799a53070f8c1eeaa0cc59c72cb7b5eafb8a02c197b.pt",
+        "key_sha256": "524748627afd5b9ba88e1799a53070f8c1eeaa0cc59c72cb7b5eafb8a02c197b",
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c",
+        "sequence_id": "scene0083_01-scene0083_02-scene0083_04-scene0083_00-scene0083_03"
+      },
+      {
+        "content_sha256": "dc4c3d21c9cc59f849cfdaa9802000daad9723e70e300cc5aed7eaadff4b6a92",
+        "file_bytes": 8250361,
+        "file_sha256": "7f2f42af270b3bf05f898435c42386afe81fc6b171e1321bff4396a4e9c2b0f9",
+        "filename": "2d2c243261ffe6682d9cd295bdd1057a6b0a6bc80ce95081ab4a5e3126cef1df.pt",
+        "key_sha256": "2d2c243261ffe6682d9cd295bdd1057a6b0a6bc80ce95081ab4a5e3126cef1df",
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c",
+        "sequence_id": "scene0083_02-scene0083_04-scene0083_00-scene0083_03-scene0083_01"
+      },
+      {
+        "content_sha256": "1f36565eb6a10e1744c2bae0cf74be96cce831f71bd74319d0588789fc9b25d9",
+        "file_bytes": 8377913,
+        "file_sha256": "f63b740fbddc444b6d21434c463098910e3508188b2a67278411d057ab7ca462",
+        "filename": "d386544918576ee87729c495db807b5aaa8036cab6360ec40c53256fdf8dd021.pt",
+        "key_sha256": "d386544918576ee87729c495db807b5aaa8036cab6360ec40c53256fdf8dd021",
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c",
+        "sequence_id": "scene0083_03-scene0083_01-scene0083_02-scene0083_04-scene0083_00"
+      },
+      {
+        "content_sha256": "4018a5bdd4bf58a74a492f205fcdc2c107d2381fd1ec3eef3c3045dc5ebcf7a0",
+        "file_bytes": 8206841,
+        "file_sha256": "bfceb10bba2275c04b0abd55cd7efe0a52f35b38ae17cb5ec872c27c855ba5b3",
+        "filename": "0bd7b30b5123430456e047bb2fa8c2d8d7d6592fd9c108de43a71f1df9a23464.pt",
+        "key_sha256": "0bd7b30b5123430456e047bb2fa8c2d8d7d6592fd9c108de43a71f1df9a23464",
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c",
+        "sequence_id": "scene0083_04-scene0083_00-scene0083_03-scene0083_01-scene0083_02"
+      },
+      {
+        "content_sha256": "6bdbb291776cd25b52296e6dbaeeb3da4664567f6220ff1de91e35c4c7c3148f",
+        "file_bytes": 12203001,
+        "file_sha256": "8fe8230697c0bcecb30cc4b0f62a4449676c10f22c01b98ba50a3915d97696d9",
+        "filename": "b067ad6acd999b1cfd8f2ef5dd8969c441e69e4431490674c93228f08a052e87.pt",
+        "key_sha256": "b067ad6acd999b1cfd8f2ef5dd8969c441e69e4431490674c93228f08a052e87",
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2",
+        "sequence_id": "scene0123_00-scene0123_03-scene0123_02-scene0123_04-scene0123_01"
+      },
+      {
+        "content_sha256": "bbbaa843778d96f71fdd5d7ca279325a8d9b924899eee7c1be2c47ba33c1ff51",
+        "file_bytes": 12011449,
+        "file_sha256": "bc82e56e85cb7eafba777552eedd33dc6704b0b7280133d47a608409f876bfe6",
+        "filename": "0d3ba0f6b42d46b3191a51700254327c35dd0d4d09d7a4dd5a0f4b6e6d52b744.pt",
+        "key_sha256": "0d3ba0f6b42d46b3191a51700254327c35dd0d4d09d7a4dd5a0f4b6e6d52b744",
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2",
+        "sequence_id": "scene0123_01-scene0123_00-scene0123_03-scene0123_02-scene0123_04"
+      },
+      {
+        "content_sha256": "19df732ffee2587bacf1e8f4711d4d501d70d3e8cae35a26e2243e4ea353c9f9",
+        "file_bytes": 12195449,
+        "file_sha256": "a1b9c69568fd0b249408b3b94a1f2b99eccc237f29ea9aa170039bbe969765b5",
+        "filename": "b551424a69a9c42da4c295e7e1e208246d3968111ec5274331dabd6d06c266c6.pt",
+        "key_sha256": "b551424a69a9c42da4c295e7e1e208246d3968111ec5274331dabd6d06c266c6",
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2",
+        "sequence_id": "scene0123_02-scene0123_04-scene0123_01-scene0123_00-scene0123_03"
+      },
+      {
+        "content_sha256": "cd230d609a43f50952e37b4dfafffd11de3e711825fb3d8498d7c0a9c07e90bc",
+        "file_bytes": 11976889,
+        "file_sha256": "28829ef9ea3fe8884efd72abc8fa47f8a3a0278d7a3fd241888b86301a760328",
+        "filename": "c6fca3ea77ed11598915a8b9a4047d0cf54e2decfe32fd87a6050032679c8628.pt",
+        "key_sha256": "c6fca3ea77ed11598915a8b9a4047d0cf54e2decfe32fd87a6050032679c8628",
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2",
+        "sequence_id": "scene0123_03-scene0123_02-scene0123_04-scene0123_01-scene0123_00"
+      },
+      {
+        "content_sha256": "f4710032f5704d8938cb34f970cb43b53a5b8de5e8a4cbdd0742a5e18d0be6de",
+        "file_bytes": 12098233,
+        "file_sha256": "894b357d8dc7b178db48ff3e7cce12fda2bce3e79ccb5c52241fea8ee0f08743",
+        "filename": "81b59002d8fef4366f95cbd5ec60fbb1584065f28f08b245e314932242a17f6b.pt",
+        "key_sha256": "81b59002d8fef4366f95cbd5ec60fbb1584065f28f08b245e314932242a17f6b",
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2",
+        "sequence_id": "scene0123_04-scene0123_01-scene0123_00-scene0123_03-scene0123_02"
+      },
+      {
+        "content_sha256": "1c6a497551dde36cb1e382bcec13ba004d850db1d1ac10bc400d1c5e7b517c1c",
+        "file_bytes": 41071801,
+        "file_sha256": "8ff166c9cd774f2aa197d20aef7373cd32deef0d50301d70567be05c6ae63e66",
+        "filename": "5e752a52b1c202d2f0d9ec5da3af920b7f9ae79bd0be437edc68f8e30c9f8412.pt",
+        "key_sha256": "5e752a52b1c202d2f0d9ec5da3af920b7f9ae79bd0be437edc68f8e30c9f8412",
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+        "sequence_id": "scene0174_00-scene0174_06-scene0174_01-scene0174_05-scene0174_04"
+      },
+      {
+        "content_sha256": "ec6c909742c42cbf66c76ce7e6e068d1ddd5466cdc35b7c13e185e2552e95b48",
+        "file_bytes": 38901881,
+        "file_sha256": "ae4c5787fa1777e2a5e36213f2ccb82c5dc946dcaad83ef77c492d0330d0cb4b",
+        "filename": "7b3d83acf91a216b0553c9695ea41482cdd6871c30cc21e32292ce541ad1b38d.pt",
+        "key_sha256": "7b3d83acf91a216b0553c9695ea41482cdd6871c30cc21e32292ce541ad1b38d",
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+        "sequence_id": "scene0174_01-scene0174_05-scene0174_04-scene0174_02-scene0174_03"
+      },
+      {
+        "content_sha256": "14a3b091221c223466675e65c8a86548bbae18271aa7c441fe2ebf60fccd0fa5",
+        "file_bytes": 42099001,
+        "file_sha256": "e2f6549286d59a8cf69eaddf7242b208bacbfcadeaf69d68a4047e83ca34229b",
+        "filename": "66d4fbbe62ce7ea37d966630862852b11560467ee114e25beb2228c1d87e4ff0.pt",
+        "key_sha256": "66d4fbbe62ce7ea37d966630862852b11560467ee114e25beb2228c1d87e4ff0",
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+        "sequence_id": "scene0174_02-scene0174_03-scene0174_00-scene0174_06-scene0174_01"
+      },
+      {
+        "content_sha256": "142842f25ab6d1aeffbbaf9b2037580d4418f301128bfea3bda4ecd51646033a",
+        "file_bytes": 42311545,
+        "file_sha256": "57228ef22668ca9385a44529d6738f5a913975521cdd80a1e78e4649a2ae935c",
+        "filename": "589bfced832c8aabcb3b60de97ee3177d47072a576c4423e0c8ddf89b7a4b88b.pt",
+        "key_sha256": "589bfced832c8aabcb3b60de97ee3177d47072a576c4423e0c8ddf89b7a4b88b",
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+        "sequence_id": "scene0174_03-scene0174_00-scene0174_06-scene0174_01-scene0174_05"
+      },
+      {
+        "content_sha256": "6c209dec443d8c051c220c11fd5953fd1b6cef6e19a7cd22e68cd3ca90a6e41e",
+        "file_bytes": 41759673,
+        "file_sha256": "cd6d7a350804116364ab69e8794e485abdebfd5b9c2118b70109d39170f9f9fe",
+        "filename": "3364fa60b897e9d442536fc68ee5774ab49480f6d8970c68191dcdea91e682fc.pt",
+        "key_sha256": "3364fa60b897e9d442536fc68ee5774ab49480f6d8970c68191dcdea91e682fc",
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+        "sequence_id": "scene0174_04-scene0174_02-scene0174_03-scene0174_00-scene0174_06"
+      },
+      {
+        "content_sha256": "9615cfd9a2d2278a6135d4dae05c49263de380cad94e95121c32bc1dc7523457",
+        "file_bytes": 39242489,
+        "file_sha256": "e35a5f5b54628080672237c963c93d061cb228bb104a0d9426ddd714e5af877b",
+        "filename": "4994c4aca05574520c5724b1cbd6c34dd08c0b0615cb4dff54064b7135f2f14e.pt",
+        "key_sha256": "4994c4aca05574520c5724b1cbd6c34dd08c0b0615cb4dff54064b7135f2f14e",
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+        "sequence_id": "scene0174_05-scene0174_04-scene0174_02-scene0174_03-scene0174_00"
+      },
+      {
+        "content_sha256": "027313f0ed9453540ec64c5e8030ca307dd3876c991a5075285b7273c68cdf20",
+        "file_bytes": 40388729,
+        "file_sha256": "5b13e5b25d54d54e6b1c5ff4cb481e8dadd70013db6afe48f490364ae17ef3cb",
+        "filename": "0112e6e0beabaf1038478cabfa69b6499924eb1525e6ef21c77f6eb63169e9db.pt",
+        "key_sha256": "0112e6e0beabaf1038478cabfa69b6499924eb1525e6ef21c77f6eb63169e9db",
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+        "sequence_id": "scene0174_06-scene0174_01-scene0174_05-scene0174_04-scene0174_02"
+      },
+      {
+        "content_sha256": "94daa3ece12c2a2cfe2ded716be18a9ba3d5c096485ba4d8af98930b98136cd0",
+        "file_bytes": 19374265,
+        "file_sha256": "43ad0fdab59e51ded46a6c73558af5c275748231f7ac562d0d197c88d72d4266",
+        "filename": "56726f41c0f445422f4f5ccc17ce7c435887d1462ed432f03a4ca65f3674e9e9.pt",
+        "key_sha256": "56726f41c0f445422f4f5ccc17ce7c435887d1462ed432f03a4ca65f3674e9e9",
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+        "sequence_id": "scene0175_00-scene0175_04-scene0175_02-scene0175_03-scene0175_07"
+      },
+      {
+        "content_sha256": "d6d0920215881c2fdc211d4b57c56b4e05a1ad6ae96ebf7b08df6296c2889fae",
+        "file_bytes": 19329593,
+        "file_sha256": "756b629585d1b42a00bf887fd243dc9759c58c85a3c161673ee0dd2b25fda927",
+        "filename": "b9ddb2e345848f3fec4e62804164f861e04c902442536bf38ff84d5b12721002.pt",
+        "key_sha256": "b9ddb2e345848f3fec4e62804164f861e04c902442536bf38ff84d5b12721002",
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+        "sequence_id": "scene0175_01-scene0175_06-scene0175_05-scene0175_00-scene0175_04"
+      },
+      {
+        "content_sha256": "9533e33f46b353abc66594ca2ea2a9cb71f2e339a1f9ef034d60e6026f910d0f",
+        "file_bytes": 19045049,
+        "file_sha256": "902eb195442aa99b4660dd95193851b7d7dbcb291485a5a36c64d26412c34193",
+        "filename": "b6fd53956dc4245704eba3cf028c0a4329217d9e1b33f89cdccfd4408b2678c6.pt",
+        "key_sha256": "b6fd53956dc4245704eba3cf028c0a4329217d9e1b33f89cdccfd4408b2678c6",
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+        "sequence_id": "scene0175_02-scene0175_03-scene0175_07-scene0175_01-scene0175_06"
+      },
+      {
+        "content_sha256": "614653c3dfb99f5adf8f54210cb117b6a35bb0198434acde577bf8e8e6b12af9",
+        "file_bytes": 18716665,
+        "file_sha256": "f30236d793663446bde1e88e78270cab2f7003a6ef80a8e598f9108dfa0076dc",
+        "filename": "3482a5d27c39a6fb6ca6c6c77df791e8940f89479cdb19a335cdba2e96827bb7.pt",
+        "key_sha256": "3482a5d27c39a6fb6ca6c6c77df791e8940f89479cdb19a335cdba2e96827bb7",
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+        "sequence_id": "scene0175_03-scene0175_07-scene0175_01-scene0175_06-scene0175_05"
+      },
+      {
+        "content_sha256": "384ed5a97851e76a5f504fdd8a4cc00ae3c6d17e6608b3d957975709f4caf16a",
+        "file_bytes": 18980217,
+        "file_sha256": "dc0e85aa88acb09729c7ec2f66f5958244bc13ebcf0b9edf7a18c69c74f4391d",
+        "filename": "d65920902f4f8de51cbde1ad058a975400725c52ab154d0ca31318faee95c543.pt",
+        "key_sha256": "d65920902f4f8de51cbde1ad058a975400725c52ab154d0ca31318faee95c543",
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+        "sequence_id": "scene0175_04-scene0175_02-scene0175_03-scene0175_07-scene0175_01"
+      },
+      {
+        "content_sha256": "8ac5fb9e01e6948ebe45b705ea5b948dbdee978cf4b0558aa61529d87802c1e0",
+        "file_bytes": 19744505,
+        "file_sha256": "0cc3c0401e9ad085b95ec28e49a07c75f888e0d16c41b553051325e360a4c86e",
+        "filename": "739ba94c653288e49defcce62e53d2cfed250f9d39f7f306614f32da7b22b367.pt",
+        "key_sha256": "739ba94c653288e49defcce62e53d2cfed250f9d39f7f306614f32da7b22b367",
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+        "sequence_id": "scene0175_05-scene0175_00-scene0175_04-scene0175_02-scene0175_03"
+      },
+      {
+        "content_sha256": "836ea55d7aad2efcc412cee18a450b17b8fbe36a29d248b8979608b77d5349a8",
+        "file_bytes": 19620665,
+        "file_sha256": "d76b5a894a76567ee8914ced54ed2055a412d80a1b5402f7ec4ff871b406a7be",
+        "filename": "196094d1f4c33bae749dfc5faeded73b177d78c50bd69643ec505c427f6721c8.pt",
+        "key_sha256": "196094d1f4c33bae749dfc5faeded73b177d78c50bd69643ec505c427f6721c8",
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+        "sequence_id": "scene0175_06-scene0175_05-scene0175_00-scene0175_04-scene0175_02"
+      },
+      {
+        "content_sha256": "59ddd8d57cc4cc71d86d202a9419add0d89a8147d5dd5fe499f0698fc63b3de1",
+        "file_bytes": 18947321,
+        "file_sha256": "f1dd710ba60f0149dc2c7d2c34f606d7173dfb482c0a3972859edb7fcfad3fb1",
+        "filename": "a9caef03795240cb6ca323faa8aa53d3b85fb807ce2056f2c918405fb1bda80c.pt",
+        "key_sha256": "a9caef03795240cb6ca323faa8aa53d3b85fb807ce2056f2c918405fb1bda80c",
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+        "sequence_id": "scene0175_07-scene0175_01-scene0175_06-scene0175_05-scene0175_00"
+      },
+      {
+        "content_sha256": "9e7bfb4f16f324f7722043580f6750e492cf57239a6055bbc34919c963f85f48",
+        "file_bytes": 30801465,
+        "file_sha256": "bcfba5dd06449e973b093979e1d6fb8a9181e1680662f911b676f3f84957974c",
+        "filename": "4d0e54ad9d959ad2f84781cc5570d102aac7251f3b923fad19e09e088339cbc8.pt",
+        "key_sha256": "4d0e54ad9d959ad2f84781cc5570d102aac7251f3b923fad19e09e088339cbc8",
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0",
+        "sequence_id": "scene0194_00-scene0194_01-scene0194_03-scene0194_05-scene0194_02"
+      },
+      {
+        "content_sha256": "fe26f8a0873d24b188e69e70d93906062e8a46dba401250700b660b8cc7d615c",
+        "file_bytes": 30620665,
+        "file_sha256": "4ec585a7a9e1b674396e41a04a86db7264c339598c5549924d46b30fcf74e334",
+        "filename": "5ead967ee8bc57ffe0b440bb6a3b8c51b4d12ad4ad4ce71bb4166da28ceedb2d.pt",
+        "key_sha256": "5ead967ee8bc57ffe0b440bb6a3b8c51b4d12ad4ad4ce71bb4166da28ceedb2d",
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0",
+        "sequence_id": "scene0194_01-scene0194_03-scene0194_05-scene0194_02-scene0194_04"
+      },
+      {
+        "content_sha256": "415051c389ed03efddebbed5ab7d6940e8dcdd04e8d6be8897e0a829bfc43924",
+        "file_bytes": 31676537,
+        "file_sha256": "bc3a02550205fa722067f27ed54cc068f722ebf3742c03e9e3c8b28924f0ad20",
+        "filename": "b8e8fcb88897bfcb9a2eb6aebd276154c3c93ee4b2548adcfb31d46fb8d61ae7.pt",
+        "key_sha256": "b8e8fcb88897bfcb9a2eb6aebd276154c3c93ee4b2548adcfb31d46fb8d61ae7",
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0",
+        "sequence_id": "scene0194_02-scene0194_04-scene0194_00-scene0194_01-scene0194_03"
+      },
+      {
+        "content_sha256": "632df26cf231600b03d1e95bed7e1275f89c43843b9576f303d6a11e2c0d1c50",
+        "file_bytes": 30636025,
+        "file_sha256": "e92e226692f79cfafcb19b156c78a1724d0035b7583ba4e6c95c38c0ec352279",
+        "filename": "dea54b602193d5f2dde792eeb1315ed6fc6426e4477baa3e4bd1dcf10feccda6.pt",
+        "key_sha256": "dea54b602193d5f2dde792eeb1315ed6fc6426e4477baa3e4bd1dcf10feccda6",
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0",
+        "sequence_id": "scene0194_03-scene0194_05-scene0194_02-scene0194_04-scene0194_00"
+      },
+      {
+        "content_sha256": "149a559121a63e8bfd872675703e8553ecc8c3995b3943a831405d466aeedfbe",
+        "file_bytes": 31690937,
+        "file_sha256": "723acc87251db6f006bf9f5b90fe0acddfd06720e2aa9b765e805178226f9e78",
+        "filename": "4f7bca23109a4e387af5f14b379c82d9a2c684917166d37774221636d85d4cc2.pt",
+        "key_sha256": "4f7bca23109a4e387af5f14b379c82d9a2c684917166d37774221636d85d4cc2",
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0",
+        "sequence_id": "scene0194_04-scene0194_00-scene0194_01-scene0194_03-scene0194_05"
+      },
+      {
+        "content_sha256": "4b058496ad07bcfb7f83c3a68b079330e5c8fef53cb8c944c7960a150cf3f092",
+        "file_bytes": 30674425,
+        "file_sha256": "5736efd1aec95056bb791803114e4ca3f62ea105c69d43055847d3d8d035fec9",
+        "filename": "83bbd2d1309e55728fa4aa85dce386eac3a9caedefe56ec259c78458a9328844.pt",
+        "key_sha256": "83bbd2d1309e55728fa4aa85dce386eac3a9caedefe56ec259c78458a9328844",
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0",
+        "sequence_id": "scene0194_05-scene0194_02-scene0194_04-scene0194_00-scene0194_01"
+      }
+    ]
+  },
+  "checkpoint_sha256": "2cd81e5eaa6767f2c26dfd6da5fef91e2a0b63eee118c0f61f1f10b9473018ae",
+  "content_sha256": "5842616fcf8f72444db323d3359df47b4a065f8550229e4a2fbb28a46633cbe5",
+  "determinism": {
+    "cudnn_deterministic": true,
+    "episode_seed_reset": true,
+    "tf32": false,
+    "torch_deterministic_algorithms": true
+  },
+  "elapsed_seconds": 654.2770035266876,
+  "evaluation_seed": 45,
+  "identity_events": {
+    "birth_count": 487,
+    "false_birth_count": 178,
+    "false_birth_rate": 0.3655030800821355,
+    "false_reactivation_count": 51,
+    "false_reactivation_rate": 0.5666666666666667,
+    "reactivation_count": 90,
+    "rejected_birth_count": 0
+  },
+  "identity_metrics": {
+    "file_bytes": 1605,
+    "file_sha256": "b26cff216fe3acef131224409db98e714134e87ca45d8530f5f778fbcb4fcdcc",
+    "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M3/M3-V-LAST/update=0375/identity_metrics.csv",
+    "row_count": 4
+  },
+  "load_audit": {
+    "loaded_key_count": 822,
+    "missing_keys": [],
+    "unexpected_keys": []
+  },
+  "metrics": {
+    "file_bytes": 2184,
+    "file_sha256": "51b1f978086b015bef05ce411a3ec5052e66c79224723db67aa6bfa32143c2bc",
+    "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M3/M3-V-LAST/update=0375/metrics.csv",
+    "row_count": 8
+  },
+  "policies": [
+    "lag1",
+    "commit0"
+  ],
+  "population": {
+    "horizons": {
+      "T2": {
+        "master_count": 47,
+        "reference_count": 8
+      },
+      "T3": {
+        "master_count": 47,
+        "reference_count": 8
+      },
+      "T4": {
+        "master_count": 47,
+        "reference_count": 8
+      },
+      "T5": {
+        "master_count": 47,
+        "reference_count": 8
+      }
+    },
+    "id": "development_common_h5_canonical",
+    "master_count": 47,
+    "reference_count": 8,
+    "smoke": false
+  },
+  "postprocess_sha256": "039a6290195b9e2f853abf72b60a946fa4f39902622eacba449805e38d3dc209",
+  "produced": 47,
+  "reducers": [
+    "mean"
+  ],
+  "retention": {
+    "file_bytes": 1642,
+    "file_sha256": "ea630ec6f1dfbc1fe3a32499b80da566ae7313eab5205250b21cd565d0012b64",
+    "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M3/M3-V-LAST/update=0375/retention.csv",
+    "row_count": 8,
+    "status": "MEASURED"
+  },
+  "reused": 0,
+  "schema_version": "task-memory-evaluation-run-v4",
+  "source_commit": "fa5a44cfd98bfcf79285635d500ccb8dda3e6b00",
+  "state_contract_sha256": "256bb944ef45080699417724ffd0a49155ef8e63d959a90c47c5207ec37d69c0",
+  "status": "PASS",
+  "variant": "M3-V-LAST",
+  "visual_state_enabled": true
+}
