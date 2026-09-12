@@ -1,0 +1,61 @@
+{
+  "checkpoints": [
+    {
+      "bytes": 757236870,
+      "name": "last.ckpt",
+      "sha256": "32b7485a5b2f4ea0b5c79dcf9c52f36753a2eb6e881faf4e8dbd67023e562c52"
+    },
+    {
+      "bytes": 757236742,
+      "name": "update=0001.ckpt",
+      "sha256": "ac4597c86816d86fa9027992143b6235f32a70f3f37d399ae9a05cb036d96990"
+    },
+    {
+      "bytes": 757236870,
+      "name": "update=0002.ckpt",
+      "sha256": "32b7485a5b2f4ea0b5c79dcf9c52f36753a2eb6e881faf4e8dbd67023e562c52"
+    }
+  ],
+  "completed_global_step": 2,
+  "elapsed_seconds": 79.32566928863525,
+  "gpu_hours": 0.04406981627146403,
+  "progress": {
+    "completed_global_episodes": 4,
+    "completed_global_stages": 20,
+    "completed_local_episodes": 2,
+    "next_draw_index": 4,
+    "schema_version": "task-memory-exact-resume-v1"
+  },
+  "status": "COMPLETE",
+  "training_audit": [
+    {
+      "births": {
+        "ambiguous_births_excluded": 2,
+        "bound_births": 3,
+        "ignored_births_excluded": 0,
+        "unmatched_births": 1
+      },
+      "commit_calls": 5,
+      "draw_cursor": 2,
+      "horizon": 5,
+      "optimizer_step": true,
+      "route_calls": 5,
+      "state_parity_max_abs": 0.0
+    },
+    {
+      "births": {
+        "ambiguous_births_excluded": 3,
+        "bound_births": 3,
+        "ignored_births_excluded": 0,
+        "unmatched_births": 0
+      },
+      "commit_calls": 5,
+      "draw_cursor": 4,
+      "horizon": 5,
+      "optimizer_step": true,
+      "route_calls": 5,
+      "state_parity_max_abs": 0.0
+    }
+  ],
+  "variant": "M3-V-LAST"
+}
