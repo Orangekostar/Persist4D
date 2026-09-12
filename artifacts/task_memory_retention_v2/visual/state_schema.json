@@ -1,0 +1,57 @@
+{
+  "batch_size": 1,
+  "budget_bytes": 2097152,
+  "capacity": 100,
+  "class_count": 19,
+  "combined_state_bytes": 489816,
+  "feature_dim": 128,
+  "representatives_per_entity": 8,
+  "schema_version": "task-memory-visual-state-schema-v1",
+  "status": "PASS",
+  "task_state_bytes": 62616,
+  "visual_state_bytes": 427200,
+  "visual_tensors": [
+    {
+      "bytes": 409600,
+      "dtype": "torch.float32",
+      "name": "features",
+      "numel": 102400,
+      "shape": [1, 100, 8, 128]
+    },
+    {
+      "bytes": 800,
+      "dtype": "torch.bool",
+      "name": "valid",
+      "numel": 800,
+      "shape": [1, 100, 8]
+    },
+    {
+      "bytes": 3200,
+      "dtype": "torch.float32",
+      "name": "quality",
+      "numel": 800,
+      "shape": [1, 100, 8]
+    },
+    {
+      "bytes": 6400,
+      "dtype": "torch.int64",
+      "name": "source_stage",
+      "numel": 800,
+      "shape": [1, 100, 8]
+    },
+    {
+      "bytes": 6400,
+      "dtype": "torch.int64",
+      "name": "source_key",
+      "numel": 800,
+      "shape": [1, 100, 8]
+    },
+    {
+      "bytes": 800,
+      "dtype": "torch.int64",
+      "name": "generations",
+      "numel": 100,
+      "shape": [1, 100]
+    }
+  ]
+}
