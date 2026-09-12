@@ -371,12 +371,17 @@ class ObjectVisualRead(nn.Module):
         delta = gate * self.output_projection(read)
         delta = delta * visual_wins.unsqueeze(-1)
         output = queries + delta
+        eligible_null_mass = attention[..., -1][eligible]
         self._last_diagnostics = MappingProxyType(
             {
                 "matched_query_count": int(matched.sum().detach().item()),
                 "valid_read_count": int(visual_wins.sum().detach().item()),
                 "null_win_count": int((eligible & ~visual_wins).sum().detach().item()),
-                "null_mass_mean": float(attention[..., -1].detach().mean().item()),
+                "null_mass_mean": (
+                    float(eligible_null_mass.detach().mean().item())
+                    if eligible_null_mass.numel()
+                    else 1.0
+                ),
                 "generation_mismatch_count": int((matched & ~generation_match).sum().detach().item()),
                 "read_output_norm": float(delta.detach().float().norm(dim=-1).mean().item()),
                 "attention_scale": float(scale.detach().item()),

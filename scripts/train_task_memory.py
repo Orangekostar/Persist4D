@@ -1335,7 +1335,12 @@ def main() -> int:
             artifact_dir / "run_plan.json",
             {
                 "code_commit_at_run": _git_head(),
-                "common_task_read_initialization_sha256": common_init_sha,
+                "common_task_read_initialization_sha256": (
+                    common_init_sha if args.variant not in M3_VARIANTS else None
+                ),
+                "common_visual_initialization_sha256": (
+                    common_init_sha if args.variant in M3_VARIANTS else None
+                ),
                 "devices": args.devices,
                 "gradient_accumulation": args.gradient_accumulation,
                 "load_audit": load_audit,
