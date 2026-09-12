@@ -1,0 +1,34 @@
+{
+  "code_commit_at_run": "fa027210089f7e0eb7a134526424556bdc760702",
+  "common_task_read_initialization_sha256": null,
+  "devices": 2,
+  "gradient_accumulation": 4,
+  "load_audit": {
+    "loaded_key_count": 810,
+    "missing_keys": [],
+    "parent_checkpoint_sha256": "a75c3e28b2fa3895414f1c1a1e35b1a9ca8d65ac5cc03e96e609e99511ef2b06",
+    "parent_subtree_exact": true,
+    "unexpected_keys": []
+  },
+  "parent_checkpoint_sha256": "a75c3e28b2fa3895414f1c1a1e35b1a9ca8d65ac5cc03e96e609e99511ef2b06",
+  "plan": {
+    "bucket_counts": {
+      "T2": 2400,
+      "T3": 2400,
+      "T4": 2400,
+      "T5": 2400,
+      "single_scan": 2400
+    },
+    "next_draw_index": 0,
+    "remaining_global_draws": 12000,
+    "smoke_events": null,
+    "source_plan_sha256": "c80818b97f74a2062ce3e78246aef40fc7216c90dee2142e9f00d97a6b2977fa",
+    "total_global_draws": 12000
+  },
+  "r1_checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "resume": false,
+  "scheduler_total_updates": 1500,
+  "seed": 45,
+  "stop_after_updates": 1500,
+  "variant": "M3-BASE-CONT"
+}

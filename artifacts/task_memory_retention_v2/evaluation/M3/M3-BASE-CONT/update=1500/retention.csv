@@ -1,0 +1,9 @@
+population_id,variant,checkpoint_sha256,training_seed,evaluation_seed,T,policy,reducer,relative_t_mAP_retention,t2_t_mAP,t_mAP,reference_count,master_count
+development_common_h5_canonical,M3-BASE-CONT,a0aa8f73aac5b27aa0aac972ac72cbf1a7dfb3f6d6a1ba103cbf0a92ba793ed6,45,45,2,commit0,mean,1.0,0.5020789504051208,0.5020789504051208,8,47
+development_common_h5_canonical,M3-BASE-CONT,a0aa8f73aac5b27aa0aac972ac72cbf1a7dfb3f6d6a1ba103cbf0a92ba793ed6,45,45,3,commit0,mean,0.8419534570421964,0.5020789504051208,0.422727108001709,8,47
+development_common_h5_canonical,M3-BASE-CONT,a0aa8f73aac5b27aa0aac972ac72cbf1a7dfb3f6d6a1ba103cbf0a92ba793ed6,45,45,4,commit0,mean,0.7521559658132078,0.5020789504051208,0.3776416778564453,8,47
+development_common_h5_canonical,M3-BASE-CONT,a0aa8f73aac5b27aa0aac972ac72cbf1a7dfb3f6d6a1ba103cbf0a92ba793ed6,45,45,5,commit0,mean,0.6860391664402165,0.5020789504051208,0.3444458246231079,8,47
+development_common_h5_canonical,M3-BASE-CONT,a0aa8f73aac5b27aa0aac972ac72cbf1a7dfb3f6d6a1ba103cbf0a92ba793ed6,45,45,2,lag1,mean,1.0,0.5264289975166321,0.5264289975166321,8,47
+development_common_h5_canonical,M3-BASE-CONT,a0aa8f73aac5b27aa0aac972ac72cbf1a7dfb3f6d6a1ba103cbf0a92ba793ed6,45,45,3,lag1,mean,0.8427287188096304,0.5264289975166321,0.44363683462142944,8,47
+development_common_h5_canonical,M3-BASE-CONT,a0aa8f73aac5b27aa0aac972ac72cbf1a7dfb3f6d6a1ba103cbf0a92ba793ed6,45,45,4,lag1,mean,0.7489165267306559,0.5264289975166321,0.39425137639045715,8,47
+development_common_h5_canonical,M3-BASE-CONT,a0aa8f73aac5b27aa0aac972ac72cbf1a7dfb3f6d6a1ba103cbf0a92ba793ed6,45,45,5,lag1,mean,0.6960381512119604,0.5264289975166321,0.3664146661758423,8,47
