@@ -9,6 +9,7 @@ import torch
 from torch import Tensor, nn
 
 from datasets.task_memory_episode import StageMeta
+from models.object_visual_memory import ObjectVisualRead, ObjectVisualState
 from models.persist4d_allt import (
     Persist4DModelError,
     strict_load_r1_with_named_adapters,
@@ -35,7 +36,21 @@ def strict_load_r1_task_memory(
         return strict_load_r1_with_named_adapters(
             module,
             state_dict,
-            allowed_missing_prefixes=("model.task_read.",),
+            allowed_missing_prefixes=("model.task_read.", "model.visual_read."),
+        )
+    except Persist4DModelError as error:
+        raise TaskMemoryModelError(str(error)) from error
+
+
+def strict_load_task_memory_parent(
+    module: nn.Module, state_dict: Mapping[str, Tensor]
+) -> dict[str, object]:
+    """Load an M2 task-memory parent, allowing only a new visual adapter."""
+    try:
+        return strict_load_r1_with_named_adapters(
+            module,
+            state_dict,
+            allowed_missing_prefixes=("model.visual_read.",),
         )
     except Persist4DModelError as error:
         raise TaskMemoryModelError(str(error)) from error
@@ -68,11 +83,19 @@ class Persist4DTaskMemory(ReScene):
         task_association_threshold: float = 0.5,
         task_update_rate: float = 0.2,
         task_max_update_rate: float = 0.2,
+        task_visual_enabled: bool = False,
+        task_visual_policy: str = "V-LAST",
         **kwargs: object,
     ) -> None:
         super().__init__(*args, **kwargs)
         if type(task_memory_enabled) is not bool:
             raise TaskMemoryModelError("task_memory_enabled must be a boolean")
+        if type(task_visual_enabled) is not bool:
+            raise TaskMemoryModelError("task_visual_enabled must be a boolean")
+        if task_visual_enabled and not task_memory_enabled:
+            raise TaskMemoryModelError("visual memory requires task memory")
+        if task_visual_policy not in {"V-LAST", "V-CORE"}:
+            raise TaskMemoryModelError("task_visual_policy must be V-LAST or V-CORE")
         if (
             isinstance(task_memory_capacity, bool)
             or not isinstance(task_memory_capacity, int)
@@ -112,11 +135,17 @@ class Persist4DTaskMemory(ReScene):
             max_update_rate=task_max_update_rate,
         )
         self.task_read = TaskMemoryRead() if task_memory_enabled else None
+        self.task_visual_enabled = task_visual_enabled
+        self.task_visual_policy = task_visual_policy
+        self.visual_read = ObjectVisualRead() if task_visual_enabled else None
         self._task_state: TaskMemoryState | None = None
+        self._task_visual_state: ObjectVisualState | None = None
         self._task_stage_meta: tuple[StageMeta, ...] | None = None
         self._task_route: EntityRoute | None = None
         self._task_pre_observation: PredictionObservation | None = None
         self._task_read_call_count = 0
+        self._task_visual_features: Tensor | None = None
+        self._task_visual_padding_mask: Tensor | None = None
 
     def _build_pre_observation(
         self,
@@ -221,6 +250,17 @@ class Persist4DTaskMemory(ReScene):
         )
         route = route_entities(observation, self._task_state, self._task_stage_meta)
         queries = self.task_read(queries, self._task_state, route)
+        if getattr(self, "task_visual_enabled", False):
+            if self.visual_read is None or self._task_visual_state is None:
+                raise TaskMemoryModelError("enabled visual read requires visual state")
+            queries = self.visual_read(
+                queries,
+                self._task_visual_state,
+                route.query_to_slot,
+                route.prior_generation,
+            )
+            self._task_visual_features = decoder_features.detach().clone()
+            self._task_visual_padding_mask = decoder_padding_mask.detach().clone()
         self._task_pre_observation = observation
         self._task_route = route
         self._task_read_call_count += 1
@@ -234,10 +274,11 @@ class Persist4DTaskMemory(ReScene):
         is_eval: bool = False,
         *,
         task_state: TaskMemoryState | None = None,
+        task_visual_state: ObjectVisualState | None = None,
         stage_meta: Sequence[StageMeta] | None = None,
     ) -> dict[str, object]:
         if not self.task_memory_enabled:
-            if task_state is not None:
+            if task_state is not None or task_visual_state is not None:
                 raise TaskMemoryModelError(
                     "task state was provided while task memory is disabled"
                 )
@@ -257,11 +298,22 @@ class Persist4DTaskMemory(ReScene):
         ):
             raise TaskMemoryModelError("enabled task memory requires aligned StageMeta")
         task_state.validate()
+        if getattr(self, "task_visual_enabled", False):
+            if not isinstance(task_visual_state, ObjectVisualState):
+                raise TaskMemoryModelError("enabled visual memory requires ObjectVisualState")
+            task_visual_state.validate()
+            if task_visual_state.batch_size != task_state.batch_size:
+                raise TaskMemoryModelError("visual and task state batch sizes differ")
+        elif task_visual_state is not None:
+            raise TaskMemoryModelError("visual state was provided while visual memory is disabled")
         self._task_state = task_state
+        self._task_visual_state = task_visual_state
         self._task_stage_meta = tuple(stage_meta)
         self._task_route = None
         self._task_pre_observation = None
         self._task_read_call_count = 0
+        self._task_visual_features = None
+        self._task_visual_padding_mask = None
         try:
             output = super().forward(
                 x,
@@ -289,16 +341,28 @@ class Persist4DTaskMemory(ReScene):
             result["task_memory_read_diagnostics"] = dict(
                 self.task_read.last_diagnostics
             )
+            if getattr(self, "task_visual_enabled", False):
+                if self._task_visual_features is None or self._task_visual_padding_mask is None or self.visual_read is None:
+                    raise TaskMemoryModelError("visual feature capture did not execute")
+                result["task_memory_visual_features"] = self._task_visual_features
+                result["task_memory_visual_padding_mask"] = self._task_visual_padding_mask
+                result["task_memory_visual_read_diagnostics"] = dict(
+                    self.visual_read.last_diagnostics
+                )
             return result
         finally:
             self._task_state = None
+            self._task_visual_state = None
             self._task_stage_meta = None
             self._task_route = None
             self._task_pre_observation = None
+            self._task_visual_features = None
+            self._task_visual_padding_mask = None
 
 
 __all__ = [
     "Persist4DTaskMemory",
     "TaskMemoryModelError",
     "strict_load_r1_task_memory",
+    "strict_load_task_memory_parent",
 ]

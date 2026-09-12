@@ -1,0 +1,21 @@
+# @package _global_
+defaults:
+  - common
+  - _self_
+
+general:
+  experiment_name: M3-V-CORE
+
+model:
+  task_memory_enabled: true
+  task_visual_enabled: true
+  task_visual_policy: V-CORE
+
+task_memory_training:
+  variant: M3-V-CORE
+  state_enabled: true
+  visual_enabled: true
+  matcher_mode: tala
+  window_mode: local_pair
+  optimizer_updates: 1500
+  scheduler_total_updates: 1500

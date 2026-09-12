@@ -12,6 +12,8 @@ from omegaconf import OmegaConf
 from datasets.task_memory_episode import NativeEpisodeMaster
 from scripts.train_task_memory import (
     FORMAL_OPTIMIZER_UPDATES,
+    M3_OPTIMIZER_UPDATES,
+    M3_VARIANTS,
     SMOKE_REFERENCE_ID,
     SMOKE_SEQUENCE_ID,
     VARIANTS,
@@ -165,6 +167,23 @@ def test_formal_and_pilot_share_the_same_3000_update_scheduler() -> None:
             gradient_accumulation=4,
             smoke=False,
         )
+
+
+@pytest.mark.parametrize("variant", sorted(M3_VARIANTS))
+def test_each_m3_variant_is_a_1500_update_qtala_continuation(variant: str) -> None:
+    config = compose_variant_config(
+        variant,
+        pretrained=Path("/tmp/concerto_base.pth"),
+        run_dir=Path("/tmp/task-memory-run"),
+    )
+    assert config.task_memory_training.optimizer_updates == M3_OPTIMIZER_UPDATES
+    assert config.task_memory_training.scheduler_total_updates == M3_OPTIMIZER_UPDATES
+    assert config.task_memory_training.matcher_mode == "tala"
+    assert config.task_memory_training.state_enabled is True
+    assert config.model.task_memory_enabled is True
+    assert bool(config.model.task_visual_enabled) is bool(
+        config.task_memory_training.visual_enabled
+    )
 
 
 def test_run_directory_guard_distinguishes_parent_worker_and_resume(

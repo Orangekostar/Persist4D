@@ -40,7 +40,10 @@ from datasets.task_memory_episode import (
     TaskMemoryEpisodeSpec,
     build_native_episode_masters,
 )
-from models.persist4d_task_memory import strict_load_r1_task_memory
+from models.persist4d_task_memory import (
+    strict_load_r1_task_memory,
+    strict_load_task_memory_parent,
+)
 from scripts.preflight_task_memory_episode import (
     _rio_base_dataset,
     _role_by_reference,
@@ -51,6 +54,7 @@ from trainer.task_memory_trainer import TaskMemoryProgress, TaskMemoryTrainer
 R1_SHA256 = "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
 R1_BYTES = 754_813_672
 FORMAL_OPTIMIZER_UPDATES = 3000
+M3_OPTIMIZER_UPDATES = 1500
 PILOT_OPTIMIZER_UPDATES = 300
 TRAINING_GPU_HOUR_CAP = 120
 DEFAULT_DATA_ROOT = PROJECT_ROOT / "data"
@@ -62,6 +66,10 @@ LOCAL_ASSET_RESOLVER = (
     PROJECT_ROOT / "artifacts/task_memory_retention_v2/external_assets.local.json"
 )
 VARIANTS = ("W-BASE", "Q-INDEP", "Q-TALA", "FH-MATCH")
+M3_VARIANTS = ("M3-BASE-CONT", "M3-V-LAST", "M3-V-CORE")
+ALL_VARIANTS = (*VARIANTS, *M3_VARIANTS)
+M3_PARENT_BYTES = 756_033_014
+M3_PARENT_SHA256 = "a75c3e28b2fa3895414f1c1a1e35b1a9ca8d65ac5cc03e96e609e99511ef2b06"
 SMOKE_REFERENCE_ID = "09582244-e2c2-2de1-956c-357092d949d1"
 SMOKE_SEQUENCE_ID = (
     "scene0007_00-scene0007_01-scene0007_03-scene0007_02-scene0007_04"
@@ -78,7 +86,7 @@ def compose_variant_config(
     pretrained: Path,
     run_dir: Path,
 ) -> DictConfig:
-    if variant not in VARIANTS:
+    if variant not in ALL_VARIANTS:
         raise ValueError(f"unsupported TaskMemory variant: {variant}")
     with initialize_config_dir(
         config_dir=str((PROJECT_ROOT / "conf").resolve()), version_base="1.2"
@@ -125,8 +133,10 @@ def resolved_variant_diff(
     }
 
 
-def checkpoint_interval(*, smoke: bool) -> int:
-    return 1 if smoke else FORMAL_OPTIMIZER_UPDATES // 4
+def checkpoint_interval(
+    *, smoke: bool, formal_updates: int = FORMAL_OPTIMIZER_UPDATES
+) -> int:
+    return 1 if smoke else formal_updates // 4
 
 
 def validate_run_budget(
@@ -135,6 +145,7 @@ def validate_run_budget(
     devices: int,
     gradient_accumulation: int,
     smoke: bool,
+    formal_updates: int = FORMAL_OPTIMIZER_UPDATES,
 ) -> None:
     if smoke:
         if (
@@ -145,7 +156,7 @@ def validate_run_budget(
             raise ValueError("smoke run must use two updates and no accumulation")
         return
     if (
-        stop_after_updates not in {PILOT_OPTIMIZER_UPDATES, FORMAL_OPTIMIZER_UPDATES}
+        stop_after_updates not in {PILOT_OPTIMIZER_UPDATES, formal_updates}
         or devices != 2
         or gradient_accumulation != 4
     ):
@@ -860,6 +871,7 @@ def _build_loader(
     gradient_accumulation: int,
     next_draw_index: int,
     smoke: bool = False,
+    formal_optimizer_updates: int = FORMAL_OPTIMIZER_UPDATES,
 ) -> tuple[DataLoader, dict[str, object]]:
     contract = _load_json(data_contract)
     reference_by_scene = load_reference_by_scene(metadata)
@@ -878,7 +890,7 @@ def _build_loader(
         for horizon, base in bases.items()
     }
     total_draws = (
-        2 if smoke else FORMAL_OPTIMIZER_UPDATES
+        2 if smoke else formal_optimizer_updates
     ) * gradient_accumulation * devices
     plan = (
         build_real_smoke_draw_plan(
@@ -1017,6 +1029,37 @@ def _load_r1(system: TaskMemoryTrainer, checkpoint: Path) -> dict[str, object]:
     }
 
 
+def _load_m3_parent(system: TaskMemoryTrainer, checkpoint: Path) -> dict[str, object]:
+    payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
+    state = payload.get("state_dict") if isinstance(payload, Mapping) else None
+    if not isinstance(state, Mapping):
+        raise TaskMemoryTrainingError("M3 parent checkpoint lacks a state_dict")
+    if system.model.visual_read is None:
+        incompatible = system.load_state_dict(state, strict=True)
+        audit = {
+            "loaded_key_count": len(state),
+            "missing_keys": list(incompatible.missing_keys),
+            "unexpected_keys": list(incompatible.unexpected_keys),
+        }
+    else:
+        audit = strict_load_task_memory_parent(system, state)
+    observed = system.state_dict()
+    mismatches = sorted(
+        name
+        for name, expected in state.items()
+        if not isinstance(expected, torch.Tensor)
+        or name not in observed
+        or not torch.equal(observed[name].detach().cpu(), expected.detach().cpu())
+    )
+    if mismatches:
+        raise TaskMemoryTrainingError("M3 parent subtree did not load exactly")
+    return {
+        **audit,
+        "parent_checkpoint_sha256": M3_PARENT_SHA256,
+        "parent_subtree_exact": True,
+    }
+
+
 def _apply_common_task_read_initialization(
     system: TaskMemoryTrainer,
     path: Path,
@@ -1045,6 +1088,34 @@ def _apply_common_task_read_initialization(
     return _tensor_state_sha256(state)
 
 
+def _apply_common_visual_read_initialization(
+    system: TaskMemoryTrainer,
+    path: Path,
+) -> str | None:
+    if not bool(getattr(system.config.task_memory_training, "visual_enabled", False)):
+        return None
+    visual_read = system.model.visual_read
+    if visual_read is None:
+        raise TaskMemoryTrainingError("enabled variant lacks visual_read")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = path.with_suffix(f"{path.suffix}.lock")
+    with lock_path.open("a+b") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if path.exists():
+            state = torch.load(path, map_location="cpu", weights_only=True)
+        else:
+            state = {
+                name: tensor.detach().cpu().clone()
+                for name, tensor in visual_read.state_dict().items()
+            }
+            temporary = path.with_suffix(f"{path.suffix}.tmp")
+            torch.save(state, temporary)
+            temporary.replace(path)
+        fcntl.flock(lock, fcntl.LOCK_UN)
+    visual_read.load_state_dict(state, strict=True)
+    return _tensor_state_sha256(state)
+
+
 def _parser() -> argparse.ArgumentParser:
     resolver = _load_json(LOCAL_ASSET_RESOLVER) if LOCAL_ASSET_RESOLVER.exists() else {}
 
@@ -1053,7 +1124,7 @@ def _parser() -> argparse.ArgumentParser:
         return Path(value) if value else None
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--variant", choices=VARIANTS)
+    parser.add_argument("--variant", choices=ALL_VARIANTS)
     parser.add_argument("--materialize-contracts", action="store_true")
     parser.add_argument("--common-initialization-sha256")
     parser.add_argument(
@@ -1094,6 +1165,7 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--artifact-root", type=Path, default=DEFAULT_ARTIFACT_ROOT)
     parser.add_argument("--resume", type=Path)
+    parser.add_argument("--parent-checkpoint", type=Path)
     parser.add_argument("--devices", type=int, default=2)
     parser.add_argument("--gradient-accumulation", type=int, default=4)
     parser.add_argument(
@@ -1148,6 +1220,9 @@ def main() -> int:
         devices=args.devices,
         gradient_accumulation=args.gradient_accumulation,
         smoke=args.smoke,
+        formal_updates=(
+            M3_OPTIMIZER_UPDATES if args.variant in M3_VARIANTS else FORMAL_OPTIMIZER_UPDATES
+        ),
     )
     checkpoint = args.checkpoint.expanduser().resolve(strict=True)
     pretrained = args.pretrained.expanduser().resolve(strict=True)
@@ -1155,6 +1230,17 @@ def main() -> int:
     metadata = args.rio_metadata.expanduser().resolve(strict=True)
     data_contract = args.data_contract.expanduser().resolve(strict=True)
     resume = args.resume.expanduser().resolve(strict=True) if args.resume else None
+    parent_checkpoint = args.parent_checkpoint
+    if args.variant in M3_VARIANTS and parent_checkpoint is None:
+        parent_checkpoint = (
+            args.external_root
+            / "training/formal/Q-TALA/update=1500.ckpt"
+        )
+    parent_checkpoint = (
+        parent_checkpoint.expanduser().resolve(strict=True)
+        if parent_checkpoint is not None
+        else None
+    )
     if checkpoint.stat().st_size != R1_BYTES or _sha256(checkpoint) != R1_SHA256:
         raise TaskMemoryTrainingError("R1 checkpoint identity differs")
     namespace = "smoke" if args.smoke else "formal"
@@ -1180,7 +1266,9 @@ def main() -> int:
         config.task_memory_training.effective_episode_batch = (
             args.devices * args.gradient_accumulation
         )
-        config.task_memory_training.smoke_audit = args.smoke
+        config.task_memory_training.smoke_audit = (
+            args.smoke and args.variant not in M3_VARIANTS
+        )
         config.trainer.max_steps = args.stop_after_updates
         config.trainer.strategy = (
             "ddp_find_unused_parameters_false" if args.devices > 1 else "auto"
@@ -1195,22 +1283,47 @@ def main() -> int:
         gradient_accumulation=args.gradient_accumulation,
         next_draw_index=progress.next_draw_index,
         smoke=args.smoke,
+        formal_optimizer_updates=int(config.task_memory_training.optimizer_updates),
     )
     seed_everything(45, workers=True)
     system = TaskMemoryTrainer(config)
-    load_audit = _load_r1(system, checkpoint)
-    common_init_sha = _apply_common_task_read_initialization(
-        system,
-        training_root / "common/task_read_init.pt",
-    )
+    if args.variant in M3_VARIANTS:
+        if (
+            parent_checkpoint is None
+            or parent_checkpoint.stat().st_size != M3_PARENT_BYTES
+            or _sha256(parent_checkpoint) != M3_PARENT_SHA256
+        ):
+            raise TaskMemoryTrainingError("M3 parent checkpoint identity differs")
+        load_audit = _load_m3_parent(system, parent_checkpoint)
+        common_init_sha = _apply_common_visual_read_initialization(
+            system,
+            training_root / "common/visual_read_init.pt",
+        )
+    else:
+        load_audit = _load_r1(system, checkpoint)
+        common_init_sha = _apply_common_task_read_initialization(
+            system,
+            training_root / "common/task_read_init.pt",
+        )
     if args.smoke and not bool(config.task_memory_training.state_enabled):
         raise TaskMemoryTrainingError(
             "real gradient smoke requires Q-INDEP or Q-TALA"
         )
-    initialization_audit = system.begin_smoke_audit() if args.smoke else None
+    if args.smoke and args.variant in M3_VARIANTS and system.model.visual_read is None:
+        raise TaskMemoryTrainingError("M3 gradient smoke requires a visual arm")
+    initialization_audit = (
+        system.begin_smoke_audit()
+        if args.smoke and args.variant not in M3_VARIANTS
+        else None
+    )
     initial_task_read_sha = (
         _tensor_state_sha256(system.model.task_read.state_dict())
-        if args.smoke
+        if args.smoke and args.variant not in M3_VARIANTS
+        else None
+    )
+    initial_visual_read_sha = (
+        _tensor_state_sha256(system.model.visual_read.state_dict())
+        if args.smoke and args.variant in M3_VARIANTS
         else None
     )
     seed_everything(45, workers=True)
@@ -1229,7 +1342,12 @@ def main() -> int:
                 "plan": plan_summary,
                 "resume": resume is not None,
                 "r1_checkpoint_sha256": R1_SHA256,
-                "scheduler_total_updates": FORMAL_OPTIMIZER_UPDATES,
+                "parent_checkpoint_sha256": (
+                    M3_PARENT_SHA256 if args.variant in M3_VARIANTS else None
+                ),
+                "scheduler_total_updates": int(
+                    config.task_memory_training.scheduler_total_updates
+                ),
                 "seed": 45,
                 "stop_after_updates": args.stop_after_updates,
                 "variant": args.variant,
@@ -1238,7 +1356,10 @@ def main() -> int:
     callback = ModelCheckpoint(
         dirpath=run_dir,
         filename="update={step:04d}",
-        every_n_train_steps=checkpoint_interval(smoke=args.smoke),
+        every_n_train_steps=checkpoint_interval(
+            smoke=args.smoke,
+            formal_updates=int(config.task_memory_training.optimizer_updates),
+        ),
         save_last=True,
         save_on_train_epoch_end=True,
         save_top_k=-1,
@@ -1269,7 +1390,12 @@ def main() -> int:
         return 0
     final_task_read_sha = (
         _tensor_state_sha256(system.model.task_read.state_dict())
-        if args.smoke
+        if args.smoke and args.variant not in M3_VARIANTS
+        else None
+    )
+    final_visual_read_sha = (
+        _tensor_state_sha256(system.model.visual_read.state_dict())
+        if args.smoke and args.variant in M3_VARIANTS
         else None
     )
     checkpoint_paths = sorted(run_dir.glob("*.ckpt"))
@@ -1295,7 +1421,36 @@ def main() -> int:
             "variant": args.variant,
         },
     )
-    if args.smoke:
+    if args.smoke and args.variant in M3_VARIANTS:
+        if (
+            common_init_sha is None
+            or initial_visual_read_sha is None
+            or final_visual_read_sha is None
+            or common_init_sha != initial_visual_read_sha
+            or initial_visual_read_sha == final_visual_read_sha
+            or load_audit.get("parent_subtree_exact") is not True
+        ):
+            raise TaskMemoryTrainingError("M3 visual gradient smoke failed")
+        payload = {
+            "code_commit": _git_head(),
+            "common_visual_initialization_sha256": common_init_sha,
+            "elapsed_seconds": elapsed,
+            "final_visual_read_sha256": final_visual_read_sha,
+            "initial_visual_read_sha256": initial_visual_read_sha,
+            "parent_checkpoint_sha256": M3_PARENT_SHA256,
+            "parent_subtree_exact": True,
+            "progress": system.progress.state_dict(),
+            "schema_version": "task-memory-m3-visual-gradient-smoke-v1",
+            "status": "PASS",
+            "variant": args.variant,
+        }
+        payload["content_sha256"] = _json_content_sha256(payload)
+        _atomic_json(
+            args.artifact_root.resolve().parent
+            / "implementation/m3_visual_gradient_smoke.json",
+            payload,
+        )
+    elif args.smoke:
         if (
             common_init_sha is None
             or initial_task_read_sha is None

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import math
 import random
 from collections.abc import Iterable, Mapping, MutableMapping, Sequence
@@ -18,6 +19,11 @@ from datasets.task_memory_episode import (
     StageMeta,
     TaskMemoryEpisodeBatch,
     TaskMemoryStageBatch,
+)
+from models.object_visual_memory import (
+    ObjectVisualState,
+    VisualCandidate,
+    update_visual_state,
 )
 from models.task_memory_criterion import TaskMemoryCriterion, TaskMemoryLossResult
 from models.task_memory_routing import (
@@ -38,6 +44,8 @@ from trainer.trainer import InstanceSegmentation, _configured_objective_loss
 
 _RESUME_SCHEMA = "task-memory-exact-resume-v1"
 _TASK_ADAPTER_PREFIX = "model.task_read."
+_VISUAL_ADAPTER_PREFIX = "model.visual_read."
+_ADAPTER_PREFIXES = (_TASK_ADAPTER_PREFIX, _VISUAL_ADAPTER_PREFIX)
 
 
 class TaskMemoryTrainerError(RuntimeError):
@@ -520,6 +528,85 @@ def bind_training_births(
     return totals
 
 
+def _visual_source_key(meta: StageMeta, segment_rank: int) -> int:
+    payload = (
+        f"{meta.reference_id}\0{meta.scan_ids_in_window[-1]}\0{segment_rank}"
+    ).encode()
+    return int.from_bytes(hashlib.sha256(payload).digest()[:8], "big") >> 1
+
+
+def build_visual_slot_candidates(
+    output: Mapping[str, object],
+    stage_meta: Sequence[StageMeta],
+    *,
+    query_to_slot: Tensor,
+    background_class: int,
+    mask_threshold: float,
+    capacity: int = 100,
+    maximum_candidates: int = 32,
+) -> list[list[list[VisualCandidate]]]:
+    logits = output.get("pred_logits")
+    masks = output.get("pred_masks")
+    features = output.get("task_memory_visual_features")
+    padding = output.get("task_memory_visual_padding_mask")
+    if (
+        not isinstance(logits, Tensor)
+        or not isinstance(features, Tensor)
+        or not isinstance(padding, Tensor)
+        or not isinstance(masks, Sequence)
+        or isinstance(masks, (str, bytes))
+        or query_to_slot.shape != logits.shape[:2]
+        or features.shape[:2] != padding.shape
+        or features.shape[0] != len(stage_meta)
+        or len(masks) != len(stage_meta)
+        or padding.dtype != torch.bool
+    ):
+        raise TaskMemoryTrainerError("visual candidate tensors are misaligned")
+    if not 0 <= background_class < logits.shape[-1]:
+        raise TaskMemoryTrainerError("visual background class is invalid")
+    class_prob = logits.detach().softmax(dim=-1)
+    foreground = class_prob.clone()
+    foreground[..., background_class] = -torch.inf
+    confidence = foreground.amax(dim=-1)
+    batches: list[list[list[VisualCandidate]]] = []
+    for batch_index, meta in enumerate(stage_meta):
+        mask = masks[batch_index]
+        if not isinstance(mask, Tensor):
+            raise TaskMemoryTrainerError("visual prediction masks must be tensors")
+        unpadded = features[batch_index, ~padding[batch_index]].detach()
+        stages = meta.segment_stage_ids.to(device=unpadded.device)
+        if mask.shape != (unpadded.shape[0], logits.shape[1]) or stages.shape != (unpadded.shape[0],):
+            raise TaskMemoryTrainerError("visual segment rows are misaligned")
+        current_rows = (stages == stages.max()).nonzero(as_tuple=True)[0]
+        slots: list[list[VisualCandidate]] = [[] for _ in range(capacity)]
+        for query_index in range(query_to_slot.shape[1]):
+            slot = int(query_to_slot[batch_index, query_index].item())
+            if slot < 0:
+                continue
+            if slot >= capacity:
+                raise TaskMemoryTrainerError("visual candidate slot exceeds capacity")
+            support = mask[current_rows, query_index].detach().sigmoid()
+            selected = (support >= mask_threshold).nonzero(as_tuple=True)[0]
+            candidates = [
+                VisualCandidate(
+                    feature=unpadded[current_rows[index]].detach().clone(),
+                    quality=(confidence[batch_index, query_index] * support[index]).detach().clone(),
+                    source_stage=meta.absolute_stage_index,
+                    source_key=_visual_source_key(meta, int(index)),
+                )
+                for index in selected.tolist()
+            ]
+            candidates.sort(
+                key=lambda item: (
+                    -float(item.quality.detach().cpu().item()),
+                    item.source_key,
+                )
+            )
+            slots[slot] = candidates[:maximum_candidates]
+        batches.append(slots)
+    return batches
+
+
 class TaskMemoryTrainer(InstanceSegmentation):
     """Optimize one effective episode batch with two-stage state gradients."""
 
@@ -608,10 +695,22 @@ class TaskMemoryTrainer(InstanceSegmentation):
             config=self.model.task_memory_config,
         )
 
+    def _new_visual_state(self, batch_size: int) -> ObjectVisualState:
+        parameter = next(self.model.parameters())
+        return ObjectVisualState.empty(
+            batch_size=batch_size,
+            capacity=int(self.model.task_memory_capacity),
+            representatives=8,
+            feature_dim=int(self.model.mask_dim),
+            device=parameter.device,
+            dtype=parameter.dtype,
+        )
+
     def _forward_stage(
         self,
         stage: TaskMemoryStageBatch,
         state: TaskMemoryState | None,
+        visual_state: ObjectVisualState | None = None,
     ) -> tuple[dict[str, object], list[dict[str, Any]]]:
         data, targets, _ = stage.model_batch
         data.device = self.device
@@ -623,6 +722,7 @@ class TaskMemoryTrainer(InstanceSegmentation):
                 point2segment,
                 raw_coordinates=raw_coordinates,
                 task_state=state,
+                task_visual_state=visual_state,
                 stage_meta=stage.stage_meta,
             )
         else:
@@ -649,7 +749,11 @@ class TaskMemoryTrainer(InstanceSegmentation):
             optimizer.zero_grad()
 
         state_enabled = bool(settings.state_enabled)
+        visual_enabled = bool(getattr(settings, "visual_enabled", False))
+        if visual_enabled and not state_enabled:
+            raise TaskMemoryTrainerError("visual memory requires task state")
         state = self._new_task_state(len(batch.specs)) if state_enabled else None
+        visual_state = self._new_visual_state(len(batch.specs)) if visual_enabled else None
         runtime_state = state
         ledgers = tuple(TrainingIdentityLedger() for _ in batch.specs)
         detached_episode_loss = torch.zeros((), device=self.device)
@@ -682,7 +786,11 @@ class TaskMemoryTrainer(InstanceSegmentation):
             chunk_shadow_stage: int | None = None
             for stage_index in chunk:
                 stage = batch.stage_batches[stage_index]
-                output, targets = self._forward_stage(stage, state)
+                output, targets = (
+                    self._forward_stage(stage, state, visual_state)
+                    if visual_enabled
+                    else self._forward_stage(stage, state)
+                )
                 route = output.get("task_memory_route") if state_enabled else None
                 if state_enabled:
                     if not isinstance(route, EntityRoute) or state is None:
@@ -730,6 +838,22 @@ class TaskMemoryTrainer(InstanceSegmentation):
                     commit_calls += 1
                     state = transition.graph_state
                     runtime_state = transition.runtime_state
+                    if visual_enabled:
+                        if visual_state is None:
+                            raise TaskMemoryTrainerError("visual state is unavailable")
+                        visual_state = update_visual_state(
+                            visual_state,
+                            slot_candidates=build_visual_slot_candidates(
+                                output,
+                                stage.stage_meta,
+                                query_to_slot=transition.commit.query_to_slot,
+                                background_class=int(self.model.task_background_class),
+                                mask_threshold=float(self.model.task_mask_threshold),
+                                capacity=int(self.model.task_memory_capacity),
+                            ),
+                            slot_generations=transition.commit.state.generations,
+                            policy=str(self.model.task_visual_policy),
+                        )
                     parity_max_abs = max(parity_max_abs, transition.parity_max_abs)
                     matched = route.query_to_slot >= 0
                     if smoke_audit:
@@ -889,7 +1013,7 @@ class TaskMemoryTrainer(InstanceSegmentation):
                 continue
             (
                 adapter_parameters
-                if name.startswith(_TASK_ADAPTER_PREFIX)
+                if name.startswith(_ADAPTER_PREFIXES)
                 else base_parameters
             ).append(parameter)
         if not base_parameters:

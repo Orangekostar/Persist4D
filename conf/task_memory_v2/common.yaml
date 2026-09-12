@@ -45,10 +45,13 @@ model:
   task_association_threshold: 0.5
   task_update_rate: 0.2
   task_max_update_rate: 0.2
+  task_visual_enabled: false
+  task_visual_policy: V-LAST
 
 task_memory_training:
   variant: task-memory-common
   state_enabled: false
+  visual_enabled: false
   smoke_audit: false
   matcher_mode: independent
   window_mode: local_pair

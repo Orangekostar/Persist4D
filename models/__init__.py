@@ -97,6 +97,7 @@ import models.task_memory_criterion as _task_memory_criterion
 import models.task_memory_routing as _task_memory_routing
 import models.task_memory_state as _task_memory_state
 import models.task_memory_supervision as _task_memory_supervision
+import models.object_visual_memory as _object_visual_memory
 
 CommitResult = _task_memory_routing.CommitResult
 EntityRoute = _task_memory_routing.EntityRoute
@@ -108,6 +109,8 @@ TaskMemoryState = _task_memory_state.TaskMemoryState
 TaskMemoryCriterion = _task_memory_criterion.TaskMemoryCriterion
 TrainingIdentityLedger = _task_memory_supervision.TrainingIdentityLedger
 build_tala_assignment = _task_memory_supervision.build_tala_assignment
+ObjectVisualRead = _object_visual_memory.ObjectVisualRead
+ObjectVisualState = _object_visual_memory.ObjectVisualState
 
 
 def get_models() -> list[type]:
