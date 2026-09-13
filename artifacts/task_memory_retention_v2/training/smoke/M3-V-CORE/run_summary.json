@@ -1,0 +1,61 @@
+{
+  "checkpoints": [
+    {
+      "bytes": 757236870,
+      "name": "last.ckpt",
+      "sha256": "9b35f9e814aa99ce7cb066eef8179936734043488b33af7396bfaeff30be021f"
+    },
+    {
+      "bytes": 757236742,
+      "name": "update=0001.ckpt",
+      "sha256": "27cae5546bdfbfd40326d14158aa83cca198c59d85c993f865c547f026ed0814"
+    },
+    {
+      "bytes": 757236870,
+      "name": "update=0002.ckpt",
+      "sha256": "9b35f9e814aa99ce7cb066eef8179936734043488b33af7396bfaeff30be021f"
+    }
+  ],
+  "completed_global_step": 2,
+  "elapsed_seconds": 78.20804762840271,
+  "gpu_hours": 0.04344891534911262,
+  "progress": {
+    "completed_global_episodes": 4,
+    "completed_global_stages": 20,
+    "completed_local_episodes": 2,
+    "next_draw_index": 4,
+    "schema_version": "task-memory-exact-resume-v1"
+  },
+  "status": "COMPLETE",
+  "training_audit": [
+    {
+      "births": {
+        "ambiguous_births_excluded": 2,
+        "bound_births": 3,
+        "ignored_births_excluded": 0,
+        "unmatched_births": 1
+      },
+      "commit_calls": 5,
+      "draw_cursor": 2,
+      "horizon": 5,
+      "optimizer_step": true,
+      "route_calls": 5,
+      "state_parity_max_abs": 0.0
+    },
+    {
+      "births": {
+        "ambiguous_births_excluded": 2,
+        "bound_births": 2,
+        "ignored_births_excluded": 0,
+        "unmatched_births": 2
+      },
+      "commit_calls": 5,
+      "draw_cursor": 4,
+      "horizon": 5,
+      "optimizer_step": true,
+      "route_calls": 5,
+      "state_parity_max_abs": 0.0
+    }
+  ],
+  "variant": "M3-V-CORE"
+}

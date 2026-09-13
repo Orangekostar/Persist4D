@@ -1,9 +1,9 @@
 {
-  "code_commit": "dd1a0eb2f36484ed858437fdf5acc1df1f7e2a11",
+  "code_commit": "41e5135becd798adaaadc56f4c0fb8b303ce055c",
   "common_visual_initialization_sha256": "ba6a3d7cf2fdd4f70e49df343d7783197181d8a1fd168476a9378fadb2e0203e",
-  "content_sha256": "67db6e66dc22fb29665f3a7adbbf18f6ab7c5c557795eb9608003e9fcca6d44e",
-  "elapsed_seconds": 79.32566928863525,
-  "final_visual_read_sha256": "16f435eeba7159ffb40c6a4e08d9b6c9532e2212e16a0eea7a8065cf6cfac418",
+  "content_sha256": "9b3a117c97713e7456c073ec64b941cfce37ae2a28900e085300a559667b1c46",
+  "elapsed_seconds": 78.20804762840271,
+  "final_visual_read_sha256": "e836f8978a2c8459087d295588537e748be8721089ee73e7a49d6b990384180f",
   "initial_visual_read_sha256": "ba6a3d7cf2fdd4f70e49df343d7783197181d8a1fd168476a9378fadb2e0203e",
   "parent_checkpoint_sha256": "a75c3e28b2fa3895414f1c1a1e35b1a9ca8d65ac5cc03e96e609e99511ef2b06",
   "parent_subtree_exact": true,
@@ -16,5 +16,5 @@
   },
   "schema_version": "task-memory-m3-visual-gradient-smoke-v1",
   "status": "PASS",
-  "variant": "M3-V-LAST"
+  "variant": "M3-V-CORE"
 }
