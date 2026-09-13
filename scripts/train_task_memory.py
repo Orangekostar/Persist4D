@@ -122,6 +122,16 @@ def continuation_parent_contract(
     raise TaskMemoryTrainingError("variant is not a continuation arm")
 
 
+def smoke_audit_mode(variant: str) -> str:
+    if variant in FH_CONT_VARIANTS:
+        return "training"
+    if variant in {"M3-V-LAST", "M3-V-CORE"}:
+        return "visual"
+    if variant in {"Q-INDEP", "Q-TALA"}:
+        return "task"
+    return "unsupported"
+
+
 def _flatten_config(value: object, *, prefix: str = "") -> dict[str, object]:
     if isinstance(value, Mapping):
         flattened = {}
@@ -1266,6 +1276,11 @@ def main() -> int:
             "missing external inputs (set environment variables or pass flags): "
             + ", ".join(missing)
         )
+    smoke_mode = smoke_audit_mode(args.variant)
+    if args.smoke and smoke_mode == "unsupported":
+        raise TaskMemoryTrainingError(
+            f"{args.variant} does not define a real-gradient smoke contract"
+        )
     validate_run_budget(
         stop_after_updates=args.stop_after_updates,
         devices=args.devices,
@@ -1322,7 +1337,7 @@ def main() -> int:
             args.devices * args.gradient_accumulation
         )
         config.task_memory_training.smoke_audit = (
-            args.smoke and args.variant not in M3_VARIANTS
+            args.smoke and smoke_mode == "task"
         )
         config.trainer.max_steps = args.stop_after_updates
         config.trainer.strategy = (
@@ -1365,25 +1380,29 @@ def main() -> int:
             system,
             training_root / "common/task_read_init.pt",
         )
-    if args.smoke and not bool(config.task_memory_training.state_enabled):
+    if (
+        args.smoke
+        and smoke_mode == "task"
+        and not bool(config.task_memory_training.state_enabled)
+    ):
         raise TaskMemoryTrainingError(
             "real gradient smoke requires Q-INDEP or Q-TALA"
         )
-    if args.smoke and args.variant in M3_VARIANTS and system.model.visual_read is None:
+    if args.smoke and smoke_mode == "visual" and system.model.visual_read is None:
         raise TaskMemoryTrainingError("M3 gradient smoke requires a visual arm")
     initialization_audit = (
         system.begin_smoke_audit()
-        if args.smoke and args.variant not in M3_VARIANTS
+        if args.smoke and smoke_mode == "task"
         else None
     )
     initial_task_read_sha = (
         _tensor_state_sha256(system.model.task_read.state_dict())
-        if args.smoke and args.variant not in M3_VARIANTS
+        if args.smoke and smoke_mode == "task"
         else None
     )
     initial_visual_read_sha = (
         _tensor_state_sha256(system.model.visual_read.state_dict())
-        if args.smoke and args.variant in M3_VARIANTS
+        if args.smoke and smoke_mode == "visual"
         else None
     )
     seed_everything(45, workers=True)
@@ -1457,12 +1476,12 @@ def main() -> int:
         return 0
     final_task_read_sha = (
         _tensor_state_sha256(system.model.task_read.state_dict())
-        if args.smoke and args.variant not in M3_VARIANTS
+        if args.smoke and smoke_mode == "task"
         else None
     )
     final_visual_read_sha = (
         _tensor_state_sha256(system.model.visual_read.state_dict())
-        if args.smoke and args.variant in M3_VARIANTS
+        if args.smoke and smoke_mode == "visual"
         else None
     )
     checkpoint_paths = sorted(run_dir.glob("*.ckpt"))
@@ -1488,7 +1507,7 @@ def main() -> int:
             "variant": args.variant,
         },
     )
-    if args.smoke and args.variant in M3_VARIANTS:
+    if args.smoke and smoke_mode == "visual":
         if (
             common_init_sha is None
             or initial_visual_read_sha is None
@@ -1517,7 +1536,7 @@ def main() -> int:
             / "implementation/m3_visual_gradient_smoke.json",
             payload,
         )
-    elif args.smoke:
+    elif args.smoke and smoke_mode == "task":
         if (
             common_init_sha is None
             or initial_task_read_sha is None

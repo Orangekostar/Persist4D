@@ -194,6 +194,13 @@ def test_fh_cont_parent_contract_binds_selected_fh_match_checkpoint() -> None:
     }
 
 
+def test_fh_cont_uses_training_only_smoke_without_memory_audits() -> None:
+    assert training_module.smoke_audit_mode("FH-CONT") == "training"
+    assert training_module.smoke_audit_mode("Q-TALA") == "task"
+    assert training_module.smoke_audit_mode("M3-V-CORE") == "visual"
+    assert training_module.smoke_audit_mode("FH-MATCH") == "unsupported"
+
+
 def test_formal_and_pilot_share_the_same_3000_update_scheduler() -> None:
     assert FORMAL_OPTIMIZER_UPDATES == 3000
     assert checkpoint_interval(smoke=False) == 750
