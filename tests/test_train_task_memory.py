@@ -10,6 +10,7 @@ import torch
 from omegaconf import OmegaConf
 
 from datasets.task_memory_episode import NativeEpisodeMaster
+import scripts.train_task_memory as training_module
 from scripts.train_task_memory import (
     FORMAL_OPTIMIZER_UPDATES,
     M3_OPTIMIZER_UPDATES,
@@ -147,6 +148,50 @@ def test_full_history_control_changes_only_window_and_variant_identity() -> None
 
     assert set(diff) == {"task_memory_training.window_mode"}
     assert full_history.task_memory_training.window_mode == "full_history"
+
+
+def test_fh_cont_restarts_only_the_frozen_1500_update_stage() -> None:
+    matched = compose_variant_config(
+        "FH-MATCH", pretrained=Path("/tmp/base.pth"), run_dir=Path("/tmp/fh")
+    )
+    continued = compose_variant_config(
+        "FH-CONT", pretrained=Path("/tmp/base.pth"), run_dir=Path("/tmp/fh-cont")
+    )
+
+    diff = resolved_variant_diff(
+        matched,
+        continued,
+        ignore_paths={
+            "callbacks",
+            "general.experiment_name",
+            "general.save_dir",
+            "logging",
+            "task_memory_training.variant",
+        },
+    )
+
+    assert set(diff) == {
+        "task_memory_training.optimizer_updates",
+        "task_memory_training.scheduler_total_updates",
+        "trainer.max_steps",
+    }
+    assert continued.task_memory_training.optimizer_updates == 1500
+    assert continued.task_memory_training.scheduler_total_updates == 1500
+    assert continued.task_memory_training.window_mode == "full_history"
+    assert continued.task_memory_training.state_enabled is False
+    assert continued.model.task_memory_enabled is False
+
+
+def test_fh_cont_parent_contract_binds_selected_fh_match_checkpoint() -> None:
+    contract = training_module.continuation_parent_contract(
+        "FH-CONT", external_root=Path("/run")
+    )
+
+    assert contract == {
+        "bytes": 754829798,
+        "path": Path("/run/training/formal/FH-MATCH/update=0750.ckpt"),
+        "sha256": "42c94da7bfa55f949cd9520201126afbe47223f6f3b5cc8660198e08ffc65c79",
+    }
 
 
 def test_formal_and_pilot_share_the_same_3000_update_scheduler() -> None:

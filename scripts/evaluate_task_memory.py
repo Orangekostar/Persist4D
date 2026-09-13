@@ -76,6 +76,8 @@ from scripts.task_memory_metrics import (
 )
 from scripts.train_task_memory import (
     ALL_VARIANTS,
+    FH_CONT_PARENT_SHA256,
+    FH_CONT_VARIANTS,
     LOCAL_ASSET_RESOLVER,
     M3_PARENT_SHA256,
     M3_VARIANTS,
@@ -680,8 +682,10 @@ def _resolve_variant_evaluation_identity(
                 "variant initialization manifest is incomplete"
             )
         return resolved, common_task, None
-    if variant not in M3_VARIANTS:
-        raise TaskMemoryEvaluationError("variant is not a frozen M2/M3 arm")
+    if variant not in (*M3_VARIANTS, *FH_CONT_VARIANTS):
+        raise TaskMemoryEvaluationError(
+            "variant is not a frozen M2/M3 continuation arm"
+        )
     config_path = (
         external_root
         / "training"
@@ -693,11 +697,15 @@ def _resolve_variant_evaluation_identity(
         resolved = _file_sha256(config_path)
     except OSError as error:
         raise TaskMemoryEvaluationError(
-            f"M3 training config is unavailable: {config_path}"
+            f"continuation training config is unavailable: {config_path}"
         ) from error
     plan = _load_json(training_artifact_root / "formal" / variant / "run_plan.json")
     if plan.get("variant") != variant:
-        raise TaskMemoryEvaluationError("M3 training plan variant differs")
+        raise TaskMemoryEvaluationError("continuation training plan variant differs")
+    if variant in FH_CONT_VARIANTS:
+        if plan.get("parent_checkpoint_sha256") != FH_CONT_PARENT_SHA256:
+            raise TaskMemoryEvaluationError("FH-CONT parent identity differs")
+        return resolved, None, None
     common_visual = plan.get("common_visual_initialization_sha256")
     if variant == "M3-BASE-CONT":
         if common_visual is not None:

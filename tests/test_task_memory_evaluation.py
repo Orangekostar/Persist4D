@@ -594,6 +594,38 @@ def test_m3_evaluation_identity_uses_the_actual_training_config_and_run_plan(
     assert common_visual == "a" * 64
 
 
+def test_fh_cont_evaluation_identity_uses_its_continuation_artifacts(
+    tmp_path: Path,
+) -> None:
+    external_root = tmp_path / "external"
+    artifact_root = tmp_path / "artifacts"
+    config_path = (
+        external_root
+        / "training/formal/FH-CONT/resolved_config.local.yaml"
+    )
+    config_path.parent.mkdir(parents=True)
+    config_path.write_text("variant: FH-CONT\n", encoding="utf-8")
+    plan_path = artifact_root / "formal/FH-CONT/run_plan.json"
+    plan_path.parent.mkdir(parents=True)
+    plan_path.write_text(
+        '{"parent_checkpoint_sha256":"'
+        + "42c94da7bfa55f949cd9520201126afbe47223f6f3b5cc8660198e08ffc65c79"
+        + '","variant":"FH-CONT"}\n',
+        encoding="utf-8",
+    )
+
+    resolved, common_task, common_visual = _resolve_variant_evaluation_identity(
+        variant="FH-CONT",
+        manifest={},
+        external_root=external_root,
+        training_artifact_root=artifact_root,
+    )
+
+    assert resolved == evaluation_module._file_sha256(config_path)
+    assert common_task is None
+    assert common_visual is None
+
+
 def test_evaluation_csv_writes_zero_denominators_as_na() -> None:
     encoded = _csv_bytes([{"count": 0, "rate": None}]).decode("utf-8")
 

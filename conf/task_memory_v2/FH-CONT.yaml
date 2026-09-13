@@ -1,0 +1,12 @@
+# @package _global_
+defaults:
+  - FH-MATCH
+  - _self_
+
+general:
+  experiment_name: FH-CONT
+
+task_memory_training:
+  variant: FH-CONT
+  optimizer_updates: 1500
+  scheduler_total_updates: 1500

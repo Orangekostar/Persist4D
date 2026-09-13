@@ -67,9 +67,13 @@ LOCAL_ASSET_RESOLVER = (
 )
 VARIANTS = ("W-BASE", "Q-INDEP", "Q-TALA", "FH-MATCH")
 M3_VARIANTS = ("M3-BASE-CONT", "M3-V-LAST", "M3-V-CORE")
-ALL_VARIANTS = (*VARIANTS, *M3_VARIANTS)
+FH_CONT_VARIANTS = ("FH-CONT",)
+CONTINUATION_VARIANTS = (*M3_VARIANTS, *FH_CONT_VARIANTS)
+ALL_VARIANTS = (*VARIANTS, *CONTINUATION_VARIANTS)
 M3_PARENT_BYTES = 756_033_014
 M3_PARENT_SHA256 = "a75c3e28b2fa3895414f1c1a1e35b1a9ca8d65ac5cc03e96e609e99511ef2b06"
+FH_CONT_PARENT_BYTES = 754_829_798
+FH_CONT_PARENT_SHA256 = "42c94da7bfa55f949cd9520201126afbe47223f6f3b5cc8660198e08ffc65c79"
 SMOKE_REFERENCE_ID = "09582244-e2c2-2de1-956c-357092d949d1"
 SMOKE_SEQUENCE_ID = (
     "scene0007_00-scene0007_01-scene0007_03-scene0007_02-scene0007_04"
@@ -96,6 +100,26 @@ def compose_variant_config(
         config.backbone.name = str(pretrained)
         config.general.save_dir = str(run_dir)
     return config
+
+
+def continuation_parent_contract(
+    variant: str,
+    *,
+    external_root: Path,
+) -> dict[str, object]:
+    if variant in M3_VARIANTS:
+        return {
+            "bytes": M3_PARENT_BYTES,
+            "path": external_root / "training/formal/Q-TALA/update=1500.ckpt",
+            "sha256": M3_PARENT_SHA256,
+        }
+    if variant in FH_CONT_VARIANTS:
+        return {
+            "bytes": FH_CONT_PARENT_BYTES,
+            "path": external_root / "training/formal/FH-MATCH/update=0750.ckpt",
+            "sha256": FH_CONT_PARENT_SHA256,
+        }
+    raise TaskMemoryTrainingError("variant is not a continuation arm")
 
 
 def _flatten_config(value: object, *, prefix: str = "") -> dict[str, object]:
@@ -1060,6 +1084,33 @@ def _load_m3_parent(system: TaskMemoryTrainer, checkpoint: Path) -> dict[str, ob
     }
 
 
+def _load_fh_cont_parent(
+    system: TaskMemoryTrainer, checkpoint: Path
+) -> dict[str, object]:
+    payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
+    state = payload.get("state_dict") if isinstance(payload, Mapping) else None
+    if not isinstance(state, Mapping):
+        raise TaskMemoryTrainingError("FH-CONT parent checkpoint lacks a state_dict")
+    incompatible = system.load_state_dict(state, strict=True)
+    observed = system.state_dict()
+    mismatches = sorted(
+        name
+        for name, expected in state.items()
+        if not isinstance(expected, torch.Tensor)
+        or name not in observed
+        or not torch.equal(observed[name].detach().cpu(), expected.detach().cpu())
+    )
+    if mismatches:
+        raise TaskMemoryTrainingError("FH-CONT parent subtree did not load exactly")
+    return {
+        "loaded_key_count": len(state),
+        "missing_keys": list(incompatible.missing_keys),
+        "parent_checkpoint_sha256": FH_CONT_PARENT_SHA256,
+        "parent_subtree_exact": True,
+        "unexpected_keys": list(incompatible.unexpected_keys),
+    }
+
+
 def _apply_common_task_read_initialization(
     system: TaskMemoryTrainer,
     path: Path,
@@ -1221,7 +1272,9 @@ def main() -> int:
         gradient_accumulation=args.gradient_accumulation,
         smoke=args.smoke,
         formal_updates=(
-            M3_OPTIMIZER_UPDATES if args.variant in M3_VARIANTS else FORMAL_OPTIMIZER_UPDATES
+            M3_OPTIMIZER_UPDATES
+            if args.variant in CONTINUATION_VARIANTS
+            else FORMAL_OPTIMIZER_UPDATES
         ),
     )
     checkpoint = args.checkpoint.expanduser().resolve(strict=True)
@@ -1231,11 +1284,13 @@ def main() -> int:
     data_contract = args.data_contract.expanduser().resolve(strict=True)
     resume = args.resume.expanduser().resolve(strict=True) if args.resume else None
     parent_checkpoint = args.parent_checkpoint
-    if args.variant in M3_VARIANTS and parent_checkpoint is None:
-        parent_checkpoint = (
-            args.external_root
-            / "training/formal/Q-TALA/update=1500.ckpt"
-        )
+    parent_contract = (
+        continuation_parent_contract(args.variant, external_root=args.external_root)
+        if args.variant in CONTINUATION_VARIANTS
+        else None
+    )
+    if parent_contract is not None and parent_checkpoint is None:
+        parent_checkpoint = parent_contract["path"]
     parent_checkpoint = (
         parent_checkpoint.expanduser().resolve(strict=True)
         if parent_checkpoint is not None
@@ -1287,18 +1342,23 @@ def main() -> int:
     )
     seed_everything(45, workers=True)
     system = TaskMemoryTrainer(config)
-    if args.variant in M3_VARIANTS:
+    if args.variant in CONTINUATION_VARIANTS:
         if (
             parent_checkpoint is None
-            or parent_checkpoint.stat().st_size != M3_PARENT_BYTES
-            or _sha256(parent_checkpoint) != M3_PARENT_SHA256
+            or parent_contract is None
+            or parent_checkpoint.stat().st_size != parent_contract["bytes"]
+            or _sha256(parent_checkpoint) != parent_contract["sha256"]
         ):
-            raise TaskMemoryTrainingError("M3 parent checkpoint identity differs")
-        load_audit = _load_m3_parent(system, parent_checkpoint)
-        common_init_sha = _apply_common_visual_read_initialization(
-            system,
-            training_root / "common/visual_read_init.pt",
-        )
+            raise TaskMemoryTrainingError("continuation parent checkpoint identity differs")
+        if args.variant in M3_VARIANTS:
+            load_audit = _load_m3_parent(system, parent_checkpoint)
+            common_init_sha = _apply_common_visual_read_initialization(
+                system,
+                training_root / "common/visual_read_init.pt",
+            )
+        else:
+            load_audit = _load_fh_cont_parent(system, parent_checkpoint)
+            common_init_sha = None
     else:
         load_audit = _load_r1(system, checkpoint)
         common_init_sha = _apply_common_task_read_initialization(
@@ -1348,7 +1408,9 @@ def main() -> int:
                 "resume": resume is not None,
                 "r1_checkpoint_sha256": R1_SHA256,
                 "parent_checkpoint_sha256": (
-                    M3_PARENT_SHA256 if args.variant in M3_VARIANTS else None
+                    parent_contract["sha256"]
+                    if parent_contract is not None
+                    else None
                 ),
                 "scheduler_total_updates": int(
                     config.task_memory_training.scheduler_total_updates
