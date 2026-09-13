@@ -111,6 +111,7 @@ COMMON_POPULATION_ID = "development_common_h5_canonical"
 NATIVE_POPULATION_ID = "additional_native_refs"
 POPULATION_IDS = (COMMON_POPULATION_ID, NATIVE_POPULATION_ID)
 REDUCERS = ("mean", "latest", "max")
+VISUAL_CONTENT_CONTROLS = ("native", "repeated_mean")
 
 
 class TaskMemoryEvaluationError(RuntimeError):
@@ -455,7 +456,11 @@ def current_stage_target(
     }
 
 
-def _state_contract_sha256(system: TaskMemoryTrainer) -> str:
+def _state_contract_sha256(
+    system: TaskMemoryTrainer,
+    *,
+    visual_content_control: str = "native",
+) -> str:
     model = system.model
     state_config = model.task_memory_config
     contract: dict[str, object] = {
@@ -472,11 +477,14 @@ def _state_contract_sha256(system: TaskMemoryTrainer) -> str:
         getattr(system.config.task_memory_training, "visual_enabled", False)
     )
     if visual_enabled:
+        if visual_content_control not in VISUAL_CONTENT_CONTROLS:
+            raise TaskMemoryEvaluationError("visual content control is invalid")
         contract.update(
             {
                 "schema_version": "prediction-only-task-and-visual-state-v2",
                 "visual": {
                     "candidate_limit": 32,
+                    "content_control": visual_content_control,
                     "feature_dim": int(model.mask_dim),
                     "policy": str(model.task_visual_policy),
                     "representatives": 8,
@@ -485,6 +493,133 @@ def _state_contract_sha256(system: TaskMemoryTrainer) -> str:
             }
         )
     return canonical_json_sha256(contract)
+
+
+def _visual_state_for_read(
+    state: ObjectVisualState,
+    *,
+    content_control: str,
+) -> ObjectVisualState:
+    state.validate()
+    if content_control == "native":
+        return state
+    if content_control != "repeated_mean":
+        raise TaskMemoryEvaluationError("visual content control is invalid")
+
+    features = state.features.clone()
+    valid = state.valid.clone()
+    quality = state.quality.clone()
+    source_stage = state.source_stage.clone()
+    source_key = state.source_key.clone()
+    for batch_index in range(state.batch_size):
+        for slot_index in range(state.capacity):
+            selector = state.valid[batch_index, slot_index]
+            if not selector.any().item():
+                continue
+            mean_feature = state.features[batch_index, slot_index, selector].mean(
+                dim=0
+            )
+            mean_quality = state.quality[batch_index, slot_index, selector].mean()
+            latest_stage = state.source_stage[
+                batch_index, slot_index, selector
+            ].max()
+            first_key = state.source_key[batch_index, slot_index, selector].min()
+            features[batch_index, slot_index] = mean_feature
+            valid[batch_index, slot_index] = True
+            quality[batch_index, slot_index] = mean_quality
+            source_stage[batch_index, slot_index] = latest_stage
+            source_key[batch_index, slot_index] = first_key
+    repeated = ObjectVisualState(
+        features,
+        valid,
+        quality,
+        source_stage,
+        source_key,
+        state.generations.clone(),
+    ).detach()
+    repeated.validate()
+    return repeated
+
+
+def _visual_stage_diagnostics(
+    *,
+    stored_state: ObjectVisualState,
+    read_state: ObjectVisualState,
+    read_diagnostics: Mapping[str, object],
+    absolute_stage_index: int,
+    content_control: str,
+) -> dict[str, object]:
+    stored_state.validate()
+    read_state.validate()
+    if stored_state.batch_size != 1 or read_state.batch_size != 1:
+        raise TaskMemoryEvaluationError("visual diagnostics require batch size one")
+    if content_control not in VISUAL_CONTENT_CONTROLS:
+        raise TaskMemoryEvaluationError("visual content control is invalid")
+    stored_valid = stored_state.valid[0]
+    ages = absolute_stage_index - stored_state.source_stage[0][stored_valid]
+    if ages.numel() and torch.any(ages < 0).item():
+        raise TaskMemoryEvaluationError("visual source stage is in the future")
+    required_read_fields = {
+        "attention_scale",
+        "generation_mismatch_count",
+        "matched_query_count",
+        "null_mass_mean",
+        "null_win_count",
+        "read_output_norm",
+        "valid_read_count",
+    }
+    if set(read_diagnostics) != required_read_fields:
+        raise TaskMemoryEvaluationError("visual read diagnostics are incomplete")
+    return {
+        "attention_scale": float(read_diagnostics["attention_scale"]),
+        "content_control": content_control,
+        "enabled": True,
+        "generation_mismatch_count": int(
+            read_diagnostics["generation_mismatch_count"]
+        ),
+        "matched_query_count": int(read_diagnostics["matched_query_count"]),
+        "max_source_age": int(ages.max().item()) if ages.numel() else None,
+        "mean_source_age": float(ages.float().mean().item()) if ages.numel() else None,
+        "null_mass_mean": float(read_diagnostics["null_mass_mean"]),
+        "null_win_count": int(read_diagnostics["null_win_count"]),
+        "read_output_norm": float(read_diagnostics["read_output_norm"]),
+        "read_valid_tokens": int(read_state.valid.sum().item()),
+        "stored_current_tokens": int((ages == 0).sum().item()),
+        "stored_historical_tokens": int((ages > 0).sum().item()),
+        "stored_occupied_slots": int(stored_valid.any(dim=-1).sum().item()),
+        "stored_valid_tokens": int(stored_valid.sum().item()),
+        "valid_read_count": int(read_diagnostics["valid_read_count"]),
+    }
+
+
+def _visual_diagnostic_rows(
+    payloads: Sequence[Mapping[str, object]],
+    *,
+    population_id: str,
+    variant: str,
+    checkpoint_sha256: str,
+) -> list[dict[str, object]]:
+    rows = []
+    for payload in payloads:
+        key = payload["key"]
+        horizon = len(key["history_scan_ids"])
+        for stage in payload["stages"]:
+            meta = stage["stage_meta"]
+            rows.append(
+                {
+                    "population_id": population_id,
+                    "variant": variant,
+                    "checkpoint_sha256": checkpoint_sha256,
+                    "training_seed": 45,
+                    "evaluation_seed": EVALUATION_SEED,
+                    "reference_id": meta["reference_id"],
+                    "episode_id": meta["episode_id"],
+                    "T": horizon,
+                    "absolute_stage_index": meta["absolute_stage_index"],
+                    **stage["visual_diagnostics"],
+                }
+            )
+    return rows
 
 
 def _visual_state_sha256(state: ObjectVisualState) -> str:
@@ -698,6 +833,7 @@ def _produce_episode(
     class_mapper: Callable[[int], int],
     device: torch.device,
     key: Mapping[str, object],
+    visual_content_control: str,
 ) -> dict[str, object]:
     batch = collator([episode])
     if len(batch.specs) != 1:
@@ -708,6 +844,8 @@ def _produce_episode(
     )
     if visual_enabled and not state_enabled:
         raise TaskMemoryEvaluationError("visual memory requires task state")
+    if visual_enabled and visual_content_control not in VISUAL_CONTENT_CONTROLS:
+        raise TaskMemoryEvaluationError("visual content control is invalid")
     state = system._new_task_state(1) if state_enabled else None
     visual_state = system._new_visual_state(1) if visual_enabled else None
     stages = []
@@ -728,6 +866,14 @@ def _produce_episode(
         latest_local_stage = int(segment_stages.max().item())
         raw_coordinates = system._process_raw_coordinates(data)
         state_before_sha256 = _runtime_state_sha256(state, visual_state)
+        read_visual_state = (
+            _visual_state_for_read(
+                visual_state,
+                content_control=visual_content_control,
+            )
+            if visual_state is not None
+            else None
+        )
         with torch.inference_mode():
             if state_enabled:
                 output = system.model(
@@ -736,7 +882,7 @@ def _produce_episode(
                     raw_coordinates=raw_coordinates,
                     is_eval=True,
                     task_state=state,
-                    task_visual_state=visual_state,
+                    task_visual_state=read_visual_state,
                     stage_meta=stage_batch.stage_meta,
                 )
             else:
@@ -786,9 +932,22 @@ def _produce_episode(
                 stage_index=meta.absolute_stage_index,
             )
             state = transition.runtime_state
+            stage_visual_diagnostics = None
             if visual_enabled:
-                if visual_state is None:
+                if visual_state is None or read_visual_state is None:
                     raise TaskMemoryEvaluationError("visual state is unavailable")
+                read_diagnostics = output.get("task_memory_visual_read_diagnostics")
+                if not isinstance(read_diagnostics, Mapping):
+                    raise TaskMemoryEvaluationError(
+                        "visual read diagnostics are unavailable"
+                    )
+                stage_visual_diagnostics = _visual_stage_diagnostics(
+                    stored_state=visual_state,
+                    read_state=read_visual_state,
+                    read_diagnostics=read_diagnostics,
+                    absolute_stage_index=meta.absolute_stage_index,
+                    content_control=visual_content_control,
+                )
                 visual_state = update_visual_state(
                     visual_state,
                     slot_candidates=build_visual_slot_candidates(
@@ -805,6 +964,7 @@ def _produce_episode(
             identity_map = transition.commit.identity_map()
             state_after_sha256 = _runtime_state_sha256(state, visual_state)
         else:
+            stage_visual_diagnostics = None
             identity_map = {}
             events = {
                 "births": 0,
@@ -823,6 +983,7 @@ def _produce_episode(
                 state_before_sha256=state_before_sha256,
                 state_after_sha256=state_after_sha256,
                 event_diagnostics=events,
+                visual_diagnostics=stage_visual_diagnostics,
             )
         )
         del data, full_target, official, output, target_low, targets
@@ -856,9 +1017,19 @@ def run_evaluation(
     population_id: str = COMMON_POPULATION_ID,
     smoke_master_count: int | None = None,
     reducers: Sequence[str] = REDUCERS,
+    visual_content_control: str = "native",
 ) -> dict[str, object]:
     if variant not in ALL_VARIANTS:
         raise TaskMemoryEvaluationError("variant is not a frozen M2/M3 arm")
+    if visual_content_control not in VISUAL_CONTENT_CONTROLS:
+        raise TaskMemoryEvaluationError("visual content control is invalid")
+    if visual_content_control != "native" and variant not in {
+        "M3-V-LAST",
+        "M3-V-CORE",
+    }:
+        raise TaskMemoryEvaluationError(
+            "visual content controls require a visual M3 arm"
+        )
     source_commit = _git_head()
     checkpoint = checkpoint.expanduser().resolve(strict=True)
     pretrained = pretrained.expanduser().resolve(strict=True)
@@ -933,7 +1104,10 @@ def run_evaluation(
     collator = TaskMemoryEpisodeCollator(
         hydra.utils.instantiate(config.data.validation_collation)
     )
-    state_contract_sha256 = _state_contract_sha256(system)
+    state_contract_sha256 = _state_contract_sha256(
+        system,
+        visual_content_control=visual_content_control,
+    )
     initial_state = (
         system._new_task_state(1)
         if bool(config.task_memory_training.state_enabled)
@@ -996,6 +1170,7 @@ def run_evaluation(
                     class_mapper=class_mapper,
                     device=device,
                     key=key,
+                    visual_content_control=visual_content_control,
                 )
             record = write_task_memory_cache(
                 cache_root, payload, max_total_bytes=CACHE_LIMIT_BYTES
@@ -1038,6 +1213,7 @@ def run_evaluation(
         "checkpoint_sha256": checkpoint_sha256,
         "training_seed": 45,
         "evaluation_seed": EVALUATION_SEED,
+        "visual_content_control": visual_content_control,
     }
     masters_by_horizon = {
         horizon: (
@@ -1088,6 +1264,7 @@ def run_evaluation(
     metrics_path = output_root / "metrics.csv"
     identity_path = output_root / "identity_metrics.csv"
     retention_path = output_root / "retention.csv"
+    visual_diagnostics_path = output_root / "visual_diagnostics.csv"
     _atomic_bytes(metrics_path, _csv_bytes(task_rows))
     _atomic_bytes(identity_path, _csv_bytes(identity_rows))
     if retention_rows:
@@ -1102,6 +1279,31 @@ def run_evaluation(
             "logical_reference": None,
             "row_count": 0,
             "status": retention_status,
+        }
+    visual_diagnostic_rows = _visual_diagnostic_rows(
+        payloads,
+        population_id=population_id,
+        variant=variant,
+        checkpoint_sha256=checkpoint_sha256,
+    )
+    if bool(getattr(config.task_memory_training, "visual_enabled", False)):
+        _atomic_bytes(
+            visual_diagnostics_path,
+            _csv_bytes(visual_diagnostic_rows),
+        )
+        visual_diagnostics_record = {
+            **_artifact_record(
+                visual_diagnostics_path,
+                row_count=len(visual_diagnostic_rows),
+            ),
+            "status": "PASS",
+        }
+    else:
+        visual_diagnostics_path.unlink(missing_ok=True)
+        visual_diagnostics_record = {
+            "logical_reference": None,
+            "row_count": 0,
+            "status": "NOT_APPLICABLE",
         }
     event_records = [
         stage["event_diagnostics"]
@@ -1156,6 +1358,8 @@ def run_evaluation(
         "state_contract_sha256": state_contract_sha256,
         "status": "PASS",
         "variant": variant,
+        "visual_content_control": visual_content_control,
+        "visual_diagnostics": visual_diagnostics_record,
         "visual_state_enabled": bool(
             getattr(config.task_memory_training, "visual_enabled", False)
         ),
@@ -1211,6 +1415,11 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--smoke-masters", type=int)
     parser.add_argument("--reducers", nargs="+", default=list(REDUCERS))
+    parser.add_argument(
+        "--visual-content-control",
+        choices=VISUAL_CONTENT_CONTROLS,
+        default="native",
+    )
     return parser
 
 
@@ -1247,6 +1456,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         population_id=args.population,
         smoke_master_count=args.smoke_masters,
         reducers=args.reducers,
+        visual_content_control=args.visual_content_control,
     )
     return 0
 

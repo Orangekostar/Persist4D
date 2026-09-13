@@ -339,6 +339,228 @@ def test_visual_state_and_policy_are_bound_to_evaluation_cache_identity() -> Non
     assert _runtime_state_sha256(task_state, changed_visual_state) != combined_state
     system.model.task_visual_policy = "V-CORE"
     assert _state_contract_sha256(system) != visual_contract
+    native_contract = _state_contract_sha256(
+        system, visual_content_control="native"
+    )
+    repeated_mean_contract = _state_contract_sha256(
+        system, visual_content_control="repeated_mean"
+    )
+    assert repeated_mean_contract != native_contract
+
+
+def test_repeated_mean_control_changes_only_the_visual_read_copy() -> None:
+    state = ObjectVisualState.empty(
+        batch_size=1,
+        device="cpu",
+        dtype=torch.float32,
+    )
+    state.features[0, 3, 0] = 1.0
+    state.features[0, 3, 1] = 3.0
+    state.valid[0, 3, :2] = True
+    state.quality[0, 3, 0] = 0.25
+    state.quality[0, 3, 1] = 0.75
+    state.source_stage[0, 3, 0] = 1
+    state.source_stage[0, 3, 1] = 2
+    state.source_key[0, 3, 0] = 10
+    state.source_key[0, 3, 1] = 20
+    state.generations[0, 3] = 4
+    state.validate()
+
+    read_state = evaluation_module._visual_state_for_read(
+        state, content_control="repeated_mean"
+    )
+
+    read_state.validate()
+    assert read_state is not state
+    assert int(state.valid.sum().item()) == 2
+    assert int(read_state.valid.sum().item()) == 8
+    assert torch.equal(
+        read_state.features[0, 3],
+        torch.full((8, 128), 2.0),
+    )
+    assert torch.equal(
+        read_state.quality[0, 3],
+        torch.full((8,), 0.5),
+    )
+    assert torch.equal(
+        read_state.source_stage[0, 3],
+        torch.full((8,), 2, dtype=torch.long),
+    )
+    assert torch.equal(
+        read_state.source_key[0, 3],
+        torch.full((8,), 10, dtype=torch.long),
+    )
+    assert evaluation_module._visual_state_for_read(
+        state, content_control="native"
+    ) is state
+
+
+def test_visual_stage_diagnostics_separate_storage_from_read_control() -> None:
+    state = ObjectVisualState.empty(
+        batch_size=1,
+        device="cpu",
+        dtype=torch.float32,
+    )
+    state.features[0, 3, 0] = 1.0
+    state.features[0, 3, 1] = 3.0
+    state.valid[0, 3, :2] = True
+    state.quality[0, 3, :2] = torch.tensor([0.25, 0.75])
+    state.source_stage[0, 3, :2] = torch.tensor([1, 2])
+    state.source_key[0, 3, :2] = torch.tensor([10, 20])
+    state.generations[0, 3] = 4
+    read_state = evaluation_module._visual_state_for_read(
+        state, content_control="repeated_mean"
+    )
+
+    diagnostics = evaluation_module._visual_stage_diagnostics(
+        stored_state=state,
+        read_state=read_state,
+        read_diagnostics={
+            "attention_scale": 8.0,
+            "generation_mismatch_count": 1,
+            "matched_query_count": 3,
+            "null_mass_mean": 0.25,
+            "null_win_count": 1,
+            "read_output_norm": 2.0,
+            "valid_read_count": 2,
+        },
+        absolute_stage_index=3,
+        content_control="repeated_mean",
+    )
+
+    assert diagnostics == {
+        "attention_scale": 8.0,
+        "content_control": "repeated_mean",
+        "enabled": True,
+        "generation_mismatch_count": 1,
+        "matched_query_count": 3,
+        "max_source_age": 2,
+        "mean_source_age": 1.5,
+        "null_mass_mean": 0.25,
+        "null_win_count": 1,
+        "read_output_norm": 2.0,
+        "read_valid_tokens": 8,
+        "stored_current_tokens": 0,
+        "stored_historical_tokens": 2,
+        "stored_occupied_slots": 1,
+        "stored_valid_tokens": 2,
+        "valid_read_count": 2,
+    }
+
+
+def test_stage_cache_preserves_visual_diagnostics() -> None:
+    diagnostics = {
+        "attention_scale": 8.0,
+        "content_control": "native",
+        "enabled": True,
+        "generation_mismatch_count": 0,
+        "matched_query_count": 3,
+        "max_source_age": 2,
+        "mean_source_age": 1.5,
+        "null_mass_mean": 0.25,
+        "null_win_count": 1,
+        "read_output_norm": 2.0,
+        "read_valid_tokens": 2,
+        "stored_current_tokens": 0,
+        "stored_historical_tokens": 2,
+        "stored_occupied_slots": 1,
+        "stored_valid_tokens": 2,
+        "valid_read_count": 2,
+    }
+    stage = build_stage_cache_record(
+        prediction=_prediction(1, 2),
+        identity_map={0: (7, 0)},
+        stage_meta=_meta(1, ("scan-0", "scan-1")),
+        target=_target(7),
+        state_before_sha256="1" * 64,
+        state_after_sha256="2" * 64,
+        event_diagnostics={
+            "births": 0,
+            "matched_births": 0,
+            "reactivations": 0,
+            "matched_reactivations": 0,
+            "rejected_births": 0,
+        },
+        visual_diagnostics=diagnostics,
+    )
+
+    assert stage["visual_diagnostics"] == diagnostics
+
+
+def test_visual_content_control_parser_defaults_native_and_accepts_repeated_mean() -> None:
+    parser = evaluation_module._parser()
+    default = parser.parse_args(
+        ["--variant", "M3-V-CORE", "--checkpoint", "model.ckpt"]
+    )
+    controlled = parser.parse_args(
+        [
+            "--variant",
+            "M3-V-CORE",
+            "--checkpoint",
+            "model.ckpt",
+            "--visual-content-control",
+            "repeated_mean",
+        ]
+    )
+
+    assert default.visual_content_control == "native"
+    assert controlled.visual_content_control == "repeated_mean"
+
+
+def test_visual_diagnostic_rows_bind_episode_horizon_and_checkpoint() -> None:
+    diagnostics = {
+        "attention_scale": 8.0,
+        "content_control": "native",
+        "enabled": True,
+        "generation_mismatch_count": 0,
+        "matched_query_count": 3,
+        "max_source_age": 2,
+        "mean_source_age": 1.5,
+        "null_mass_mean": 0.25,
+        "null_win_count": 1,
+        "read_output_norm": 2.0,
+        "read_valid_tokens": 2,
+        "stored_current_tokens": 0,
+        "stored_historical_tokens": 2,
+        "stored_occupied_slots": 1,
+        "stored_valid_tokens": 2,
+        "valid_read_count": 2,
+    }
+    rows = evaluation_module._visual_diagnostic_rows(
+        [
+            {
+                "key": {"history_scan_ids": ["s0", "s1", "s2"]},
+                "stages": [
+                    {
+                        "stage_meta": {
+                            "absolute_stage_index": 2,
+                            "episode_id": "episode-7",
+                            "reference_id": "reference-4",
+                        },
+                        "visual_diagnostics": diagnostics,
+                    }
+                ],
+            }
+        ],
+        population_id="development",
+        variant="M3-V-CORE",
+        checkpoint_sha256="a" * 64,
+    )
+
+    assert rows == [
+        {
+            "population_id": "development",
+            "variant": "M3-V-CORE",
+            "checkpoint_sha256": "a" * 64,
+            "training_seed": 45,
+            "evaluation_seed": 45,
+            "reference_id": "reference-4",
+            "episode_id": "episode-7",
+            "T": 3,
+            "absolute_stage_index": 2,
+            **diagnostics,
+        }
+    ]
 
 
 def test_m3_evaluation_identity_uses_the_actual_training_config_and_run_plan(

@@ -19,7 +19,7 @@ from scripts.rescene_task_postprocess import OfficialTaskPrediction
 from scripts.system_comparison_inference import pack_bool_matrix, unpack_bool_matrix
 from scripts.task_memory_contracts import canonical_json_sha256
 
-CACHE_SCHEMA_VERSION = "task-memory-evaluation-cache-v1"
+CACHE_SCHEMA_VERSION = "task-memory-evaluation-cache-v2"
 CACHE_LIMIT_BYTES = 40 * 1024**3
 _KEY_FIELDS = {
     "checkpoint_sha256",
@@ -42,6 +42,24 @@ _EVENT_FIELDS = {
     "matched_reactivations",
     "reactivations",
     "rejected_births",
+}
+_VISUAL_DIAGNOSTIC_FIELDS = {
+    "attention_scale",
+    "content_control",
+    "enabled",
+    "generation_mismatch_count",
+    "matched_query_count",
+    "max_source_age",
+    "mean_source_age",
+    "null_mass_mean",
+    "null_win_count",
+    "read_output_norm",
+    "read_valid_tokens",
+    "stored_current_tokens",
+    "stored_historical_tokens",
+    "stored_occupied_slots",
+    "stored_valid_tokens",
+    "valid_read_count",
 }
 
 
@@ -75,6 +93,15 @@ def _nonnegative_integer(value: object, *, name: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value < 0:
         raise TaskMemoryCacheError(f"{name} must be a non-negative integer")
     return value
+
+
+def _finite_float(value: object, *, name: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TaskMemoryCacheError(f"{name} must be a finite number")
+    result = float(value)
+    if not math.isfinite(result):
+        raise TaskMemoryCacheError(f"{name} must be a finite number")
+    return result
 
 
 def _cpu_tensor(
@@ -336,6 +363,94 @@ def _event_payload(value: Mapping[str, object]) -> dict[str, int]:
     return result
 
 
+def _disabled_visual_diagnostics() -> dict[str, object]:
+    return {
+        "attention_scale": 0.0,
+        "content_control": "disabled",
+        "enabled": False,
+        "generation_mismatch_count": 0,
+        "matched_query_count": 0,
+        "max_source_age": None,
+        "mean_source_age": None,
+        "null_mass_mean": 1.0,
+        "null_win_count": 0,
+        "read_output_norm": 0.0,
+        "read_valid_tokens": 0,
+        "stored_current_tokens": 0,
+        "stored_historical_tokens": 0,
+        "stored_occupied_slots": 0,
+        "stored_valid_tokens": 0,
+        "valid_read_count": 0,
+    }
+
+
+def _visual_diagnostic_payload(value: Mapping[str, object]) -> dict[str, object]:
+    diagnostics = _mapping(value, name="visual diagnostics")
+    if set(diagnostics) != _VISUAL_DIAGNOSTIC_FIELDS:
+        raise TaskMemoryCacheError("visual diagnostic fields differ")
+    enabled = diagnostics["enabled"]
+    if type(enabled) is not bool:
+        raise TaskMemoryCacheError("visual diagnostics enabled must be boolean")
+    content_control = _nonempty_string(
+        diagnostics["content_control"], name="content_control"
+    )
+    allowed_controls = {"native", "repeated_mean"} if enabled else {"disabled"}
+    if content_control not in allowed_controls:
+        raise TaskMemoryCacheError("visual diagnostic content control differs")
+    integer_fields = (
+        "generation_mismatch_count",
+        "matched_query_count",
+        "null_win_count",
+        "read_valid_tokens",
+        "stored_current_tokens",
+        "stored_historical_tokens",
+        "stored_occupied_slots",
+        "stored_valid_tokens",
+        "valid_read_count",
+    )
+    result: dict[str, object] = {
+        field: _nonnegative_integer(diagnostics[field], name=field)
+        for field in integer_fields
+    }
+    result.update(
+        {
+            "attention_scale": _finite_float(
+                diagnostics["attention_scale"], name="attention_scale"
+            ),
+            "content_control": content_control,
+            "enabled": enabled,
+            "null_mass_mean": _finite_float(
+                diagnostics["null_mass_mean"], name="null_mass_mean"
+            ),
+            "read_output_norm": _finite_float(
+                diagnostics["read_output_norm"], name="read_output_norm"
+            ),
+        }
+    )
+    max_age = diagnostics["max_source_age"]
+    mean_age = diagnostics["mean_source_age"]
+    result["max_source_age"] = (
+        None
+        if max_age is None
+        else _nonnegative_integer(max_age, name="max_source_age")
+    )
+    result["mean_source_age"] = (
+        None if mean_age is None else _finite_float(mean_age, name="mean_source_age")
+    )
+    if result["stored_valid_tokens"] == 0:
+        if result["max_source_age"] is not None or result["mean_source_age"] is not None:
+            raise TaskMemoryCacheError("empty visual state cannot have source ages")
+    elif result["max_source_age"] is None or result["mean_source_age"] is None:
+        raise TaskMemoryCacheError("non-empty visual state requires source ages")
+    if result["stored_current_tokens"] + result["stored_historical_tokens"] != result["stored_valid_tokens"]:
+        raise TaskMemoryCacheError("visual token age counts differ")
+    if result["valid_read_count"] + result["null_win_count"] > result["matched_query_count"]:
+        raise TaskMemoryCacheError("visual read counts exceed matched queries")
+    if not enabled and result != _disabled_visual_diagnostics():
+        raise TaskMemoryCacheError("disabled visual diagnostics must be empty")
+    return result
+
+
 def build_stage_cache_record(
     *,
     prediction: OfficialTaskPrediction,
@@ -345,6 +460,7 @@ def build_stage_cache_record(
     state_before_sha256: str,
     state_after_sha256: str,
     event_diagnostics: Mapping[str, object],
+    visual_diagnostics: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     if not isinstance(prediction, OfficialTaskPrediction):
         raise TaskMemoryCacheError("prediction must be OfficialTaskPrediction")
@@ -414,6 +530,11 @@ def build_stage_cache_record(
             state_before_sha256, name="state_before_sha256"
         ),
         "target": _target_payload(target, current_points=current_points),
+        "visual_diagnostics": _visual_diagnostic_payload(
+            _disabled_visual_diagnostics()
+            if visual_diagnostics is None
+            else visual_diagnostics
+        ),
     }
 
 
@@ -506,6 +627,7 @@ def build_episode_cache_payload(
         identity_map_from_cache_record(stage)
         target_from_cache_record(stage)
         _event_payload(stage.get("event_diagnostics"))
+        _visual_diagnostic_payload(stage.get("visual_diagnostics"))
         if meta.absolute_stage_index != index:
             raise TaskMemoryCacheError("cache stages must be in causal order")
         expected_scans = (
