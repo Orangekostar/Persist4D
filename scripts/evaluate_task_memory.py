@@ -449,6 +449,33 @@ def _validated_content_hash(payload: Mapping[str, object], *, name: str) -> str:
     return observed
 
 
+def _select_reference_round_robin(
+    masters: Sequence[NativeEpisodeMaster], *, limit: int
+) -> tuple[NativeEpisodeMaster, ...]:
+    grouped: dict[str, list[NativeEpisodeMaster]] = {}
+    for master in masters:
+        grouped.setdefault(master.reference_id, []).append(master)
+    for values in grouped.values():
+        values.sort(key=lambda value: (value.sequence_id, value.context_index))
+
+    selected: list[NativeEpisodeMaster] = []
+    round_index = 0
+    target_count = min(limit, len(masters))
+    while len(selected) < target_count:
+        added = False
+        for reference_id in sorted(grouped):
+            values = grouped[reference_id]
+            if round_index < len(values):
+                selected.append(values[round_index])
+                added = True
+                if len(selected) == target_count:
+                    break
+        if not added:
+            break
+        round_index += 1
+    return tuple(selected)
+
+
 def select_development_masters(
     masters: Sequence[NativeEpisodeMaster],
     *,
@@ -490,8 +517,12 @@ def select_development_masters(
         or not 1 <= smoke_master_count <= 12
     ):
         raise TaskMemoryEvaluationError("smoke master count must be within 1-12")
-    if population_id in {COMMON_POPULATION_ID, PROTOCOL_B_POPULATION_ID}:
+    if population_id == COMMON_POPULATION_ID:
         smoke = select_diagnostic_masters(selected, limit=smoke_master_count)
+    elif population_id == PROTOCOL_B_POPULATION_ID:
+        smoke = _select_reference_round_robin(
+            selected, limit=smoke_master_count
+        )
     else:
         if smoke_master_count < len(_population_horizons(population_id)):
             raise TaskMemoryEvaluationError(

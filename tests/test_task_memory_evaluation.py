@@ -250,6 +250,24 @@ def test_protocol_b_population_uses_continuous_h5_and_reports_clustered_counts()
     ) == {"reference_count": 1, "master_count": 1, "order_count": 3}
 
 
+def test_protocol_b_smoke_panel_maximizes_reference_coverage() -> None:
+    masters = tuple(
+        _master(reference_id=reference_id, horizon=5, role="protocol_b_final")
+        for reference_id in ("reference-z", "reference-a", "reference-m")
+    )
+
+    smoke = select_development_masters(
+        masters,
+        population_id=PROTOCOL_B_POPULATION_ID,
+        smoke_master_count=2,
+    )
+
+    assert [master.reference_id for master in smoke] == [
+        "reference-a",
+        "reference-m",
+    ]
+
+
 def test_native_episode_spec_uses_the_real_master_horizon() -> None:
     master = _master(
         reference_id="native-3", horizon=3, role="additional_native_refs"
