@@ -155,6 +155,7 @@ def test_population_selection_separates_common_h5_and_additional_native_h2_h4() 
 
 class _ProtocolBase:
     def __init__(self) -> None:
+        self.label_offset = 1
         self.sequence_names = (
             "scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01",
         )
@@ -163,6 +164,9 @@ class _ProtocolBase:
         self.mode = "validation"
         self.known_empty_scan_substitution_count = 0
         self.calls: list[tuple[int, tuple[int, ...], object]] = []
+
+    def _remap_model_output(self, values: torch.Tensor) -> torch.Tensor:
+        return values + 10
 
     def load_scan_indices(self, context_index, scan_indices, *, change_file):
         call = (context_index, tuple(scan_indices), change_file)
@@ -222,6 +226,13 @@ def test_protocol_b_population_expands_each_master_into_three_exact_orders() -> 
         None,
     )
     assert base.calls == [(0, (18, 20), None)]
+
+
+def test_protocol_b_dataset_proxies_rio_label_metadata() -> None:
+    wrapped, _ = _build_protocol_b_population(_ProtocolBase(), _protocol_fixture())
+
+    assert wrapped.label_offset == 1
+    assert torch.equal(wrapped._remap_model_output(torch.tensor([2])), torch.tensor([12]))
 
 
 def test_protocol_b_population_uses_continuous_h5_and_reports_clustered_counts() -> None:

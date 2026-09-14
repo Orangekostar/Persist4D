@@ -149,6 +149,9 @@ class _ProtocolOrderDataset:
         self.source_context_indices = tuple(source_context_indices)
         self.max_points_per_sample = getattr(base, "max_points_per_sample", None)
 
+    def __getattr__(self, name: str) -> object:
+        return getattr(self.base, name)
+
     @property
     def mode(self) -> str:
         return self.base.mode
