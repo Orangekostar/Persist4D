@@ -53,7 +53,7 @@ CUDA_VISIBLE_DEVICES=1 python -m scripts.evaluate_task_memory \
   --cache-root "$PERSIST4D_RUN_ROOT/evaluation_cache/smoke/FH-MATCH" \
   --output artifacts/task_memory_retention_v2/implementation/evaluation_smoke/FH-MATCH
 
-/home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q \
+python -m pytest -q \
   tests/test_task_memory_evaluation.py tests/test_task_memory_selection.py \
   tests/test_rescene_task_postprocess.py tests/test_system_comparison_metrics.py \
   tests/test_task_memory_output.py
