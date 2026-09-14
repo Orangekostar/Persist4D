@@ -349,6 +349,7 @@ def build_all_t_comparison(
         for row in output
         if row["metric"] == "t_mAP" and not row["strict_positive"]
     ]
+    tmap_deltas = [float(row["delta"]) for row in output if row["metric"] == "t_mAP"]
     return {
         "comparison": comparison_name,
         "epsilon": epsilon,
@@ -358,6 +359,8 @@ def build_all_t_comparison(
         "tmap_all_t": "PASS" if not failed_tmap else "FAIL",
         "task_metrics_all_t": "PASS" if positive_cells == len(output) else "FAIL",
         "failed_tmap_horizons": failed_tmap,
+        "minimum_tmap_delta": min(tmap_deltas),
+        "mean_tmap_delta": sum(tmap_deltas) / len(tmap_deltas),
     }
 
 

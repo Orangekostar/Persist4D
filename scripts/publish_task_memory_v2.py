@@ -15,6 +15,25 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ARTIFACT_ROOT = PROJECT_ROOT / "artifacts/task_memory_retention_v2"
 
+CORRECTNESS_CLASSES = (
+    "r1_load_and_shutdown_parity",
+    "data_and_supervision_isolation",
+    "route_and_commit",
+    "tala_supervision",
+    "visual_memory",
+    "training_path",
+    "output_and_metric",
+    "publication",
+)
+VERIFICATION_CHECKS = (
+    "correctness_suite",
+    "real_gpu_gate",
+    "ruff_changed_python",
+    "git_diff_check",
+    "manifest_and_hash",
+    "secret_scan",
+)
+
 STATUS_FIELDS = (
     "EXECUTION",
     "TMAP_ALL_T_VS_R1",
@@ -128,11 +147,12 @@ def render_handoff(
     statuses: Mapping[str, object],
     results_commit: str,
     final_manifest_sha256: str,
+    section_bodies: Mapping[int, str] | None = None,
 ) -> str:
     validated = validate_statuses(statuses)
     if len(results_commit) != 40 or len(final_manifest_sha256) != 64:
         raise PublicationError("handoff commit/hash identity differs")
-    sections = (
+    sections = [
         (
             "Goal and verdict",
             "\n".join(f"- {key}: `{value}`" for key, value in validated.items()),
@@ -178,7 +198,20 @@ def render_handoff(
             "GitHub and next exact action",
             f"FINAL_MANIFEST.json SHA256: `{final_manifest_sha256}`.",
         ),
-    )
+    ]
+    if section_bodies is not None:
+        if set(section_bodies) != set(range(2, 16)) or any(
+            not isinstance(body, str) or not body.strip()
+            for body in section_bodies.values()
+        ):
+            raise PublicationError("handoff section bodies differ")
+        sections = [
+            sections[0],
+            *[
+                (sections[index - 1][0], section_bodies[index])
+                for index in range(2, 16)
+            ],
+        ]
     content = ["# TaskMemory Retention V2 Handoff", ""]
     for index, (title, body) in enumerate(sections, start=1):
         content.extend((f"## {index}. {title}", "", body, ""))
@@ -200,6 +233,90 @@ def _validate_content_hash(value: Mapping[str, object], *, name: str) -> None:
     observed = unsigned.pop("content_sha256", None)
     if observed != _canonical_sha256(unsigned):
         raise PublicationError(f"{name} content SHA256 differs")
+
+
+def validate_verification(
+    value: Mapping[str, object], *, results_commit: str
+) -> dict[str, object]:
+    _validate_content_hash(value, name="verification evidence")
+    if (
+        value.get("schema_version") != "task-memory-verification-v2"
+        or value.get("results_commit") != results_commit
+    ):
+        raise PublicationError("verification commit identity differs")
+    classes = value.get("correctness_classes")
+    if not isinstance(classes, Mapping) or set(classes) != set(CORRECTNESS_CLASSES):
+        raise PublicationError("verification correctness classes differ")
+    for name in CORRECTNESS_CLASSES:
+        record = classes[name]
+        if (
+            not isinstance(record, Mapping)
+            or record.get("status") != "PASS"
+            or not isinstance(record.get("evidence"), str)
+            or not str(record["evidence"]).strip()
+        ):
+            raise PublicationError(f"verification correctness class failed: {name}")
+    checks = value.get("checks")
+    if isinstance(checks, (str, bytes)) or not isinstance(checks, Sequence):
+        raise PublicationError("verification checks differ")
+    by_name = {}
+    check_order = []
+    for record in checks:
+        if not isinstance(record, Mapping):
+            raise PublicationError("verification check differs")
+        name = record.get("name")
+        if not isinstance(name, str) or name in by_name:
+            raise PublicationError("verification check identity differs")
+        if (
+            record.get("exit_code") != 0
+            or not isinstance(record.get("command"), str)
+            or not str(record["command"]).strip()
+            or not isinstance(record.get("observed"), str)
+            or not str(record["observed"]).strip()
+        ):
+            raise PublicationError(f"verification check failed: {name}")
+        by_name[name] = dict(record)
+        check_order.append(name)
+    if tuple(check_order) != VERIFICATION_CHECKS:
+        raise PublicationError("verification check coverage differs")
+    return dict(value)
+
+
+def render_test_report(verification: Mapping[str, object]) -> str:
+    results_commit = verification.get("results_commit")
+    if not isinstance(results_commit, str):
+        raise PublicationError("verification results commit differs")
+    validated = validate_verification(verification, results_commit=results_commit)
+    classes = validated["correctness_classes"]
+    checks = validated["checks"]
+    if not isinstance(classes, Mapping) or not isinstance(checks, Sequence):
+        raise PublicationError("verification report evidence differs")
+    class_lines = "\n".join(
+        f"- `{name}`: PASS; {classes[name]['evidence']}"  # type: ignore[index]
+        for name in CORRECTNESS_CLASSES
+    )
+    command_lines = "\n\n".join(
+        f"### `{record['name']}`\n\n"
+        f"```bash\n{record['command']}\n```\n\n"
+        f"Observed: {record['observed']} (exit code 0)."
+        for record in checks
+        if isinstance(record, Mapping)
+    )
+    return f"""# TaskMemory Retention V2 Test Report
+
+Results commit: `{results_commit}`.
+
+## Correctness classes
+
+{class_lines}
+
+## Direct verification
+
+{command_lines}
+
+Passing engineering checks do not change failed or inconclusive scientific
+statuses.
+"""
 
 
 def _read_csv(path: Path) -> list[dict[str, str]]:
@@ -271,9 +388,162 @@ def _comparison_lines(analysis: Mapping[str, object]) -> str:
         lines.append(
             f"- {name}: tMAP `{value.get('tmap_all_t')}`, "
             f"20-cell `{value.get('positive_cells')}/{value.get('total_cells')}`, "
+            f"minimum tMAP delta `{float(value.get('minimum_tmap_delta')):.6f}`, "
             f"failed tMAP horizons `{failed}`."
         )
     return "\n".join(lines)
+
+
+def _profile_panel_lines(
+    rows: Sequence[Mapping[str, str]], resource_status: object
+) -> str:
+    lines = [f"Resource verdict: `{resource_status}`."]
+    for variant in ("M3-V-CORE", "FH-CONT"):
+        for horizon in (4, 5):
+            selected = [
+                row
+                for row in rows
+                if row.get("method") == variant
+                and row.get("scope") == "model_update"
+                and row.get("T") == str(horizon)
+            ]
+            if len(selected) != 6:
+                raise PublicationError("resource profile panel coverage differs")
+            latency = sorted(float(row["median_latency_ms"]) for row in selected)
+            peak = sorted(int(row["absolute_peak_allocated_bytes"]) for row in selected)
+            lines.append(
+                f"- {variant} T{horizon}: panel median model_update "
+                f"{(latency[2] + latency[3]) / 2:.3f} ms; absolute peak "
+                f"{(peak[2] + peak[3]) // 2} bytes."
+            )
+    return "\n".join(lines)
+
+
+def _build_handoff_section_bodies(
+    *,
+    root: Path,
+    statuses: Mapping[str, str],
+    results_commit: str,
+    final_manifest_sha256: str,
+    metrics: Sequence[Mapping[str, str]],
+    analysis: Mapping[str, object],
+    resource: Mapping[str, object],
+    verification: Mapping[str, object],
+) -> dict[int, str]:
+    start = _load_json(root / "START_STATE.json")
+    _validate_content_hash(start, name="start state")
+    repository = start.get("repository")
+    if not isinstance(repository, Mapping):
+        raise PublicationError("start repository identity differs")
+    candidate = [row for row in metrics if row.get("variant") == "M3-V-CORE"]
+    fh = [row for row in metrics if row.get("variant") == "FH-CONT"]
+    if len(candidate) != 4 or len(fh) != 4:
+        raise PublicationError("selected checkpoint coverage differs")
+    candidate_sha = {row["checkpoint_sha256"] for row in candidate}
+    fh_sha = {row["checkpoint_sha256"] for row in fh}
+    if len(candidate_sha) != 1 or len(fh_sha) != 1:
+        raise PublicationError("selected checkpoint identity differs")
+    profile_rows = _read_csv(root / "resources/profile_summary.csv")
+    m4_rows = _read_csv(root / "training/M4_budget_gate.csv")
+    fh_cost_rows = _read_csv(root / "training/FH_CONT_cost_and_exposure.csv")
+    if len(m4_rows) != 1 or len(fh_cost_rows) != 1:
+        raise PublicationError("training budget evidence differs")
+    checks = verification.get("checks")
+    if not isinstance(checks, Sequence):
+        raise PublicationError("verification command evidence differs")
+    verified_commands = "\n".join(
+        f"- `{record['name']}`: `{record['command']}`"
+        for record in checks
+        if isinstance(record, Mapping)
+    )
+    limitations = analysis.get("execution_limitations")
+    if isinstance(limitations, (str, bytes)) or not isinstance(limitations, Sequence):
+        raise PublicationError("execution limitations differ")
+    limitation_lines = "\n".join(f"- {item}" for item in limitations)
+    m4 = m4_rows[0]
+    fh_cost = fh_cost_rows[0]
+    return {
+        2: (
+            f"Parent: `{repository.get('reviewed_parent')}`. Branch: "
+            f"`{repository.get('branch')}`. Results commit E: `{results_commit}`. "
+            "Publication tip is resolved from the remote branch containing this file."
+        ),
+        3: (
+            "Implemented causal TaskMemory route/commit state, TALA sequence "
+            "supervision, bounded visual memory, compact evaluation caches, frozen "
+            "training/evaluation entry points, final analysis, and one-A40 resource "
+            "profiling. Numeric artifacts in FINAL_MANIFEST.json were actually run; "
+            "items named under limitations were not."
+        ),
+        4: (
+            "Upstream code and literature identities, immutable revisions/blobs, and "
+            "license-use boundaries are recorded in EVIDENCE_MAP.md and "
+            "references_inventory.csv. Reviewed parent is fixed above."
+        ),
+        5: (
+            "Primary confirmation population is frozen Protocol-B: 6 physical "
+            "references, 43 masters, and 129 deterministic orders. Primary output "
+            "uses lag1/mean; commit0 is a separate policy control. Development, "
+            "Protocol-B, and independent-native evidence are not pooled."
+        ),
+        6: (
+            "Selected M3-V-CORE uses K=100, r=8 and measured permanent state "
+            f"{resource.get('permanent_state_bytes')} bytes. It was selected at "
+            "update 1500 by the frozen development rule. FH-CONT is the matched "
+            "full-history continuation control; training seed and evaluation seed "
+            "are both 45 and remain distinct fields."
+        ),
+        7: (
+            "Completed M2 W-BASE/Q-INDEP/Q-TALA/FH-MATCH, M3 BASE-CONT/V-LAST/"
+            "V-CORE, FH-CONT, final three-model Protocol-B inference, per-reference "
+            "analysis, and resource profiling. M4 was conditionally skipped as "
+            f"`{m4.get('decision')}` because `{m4.get('reason')}`. Overall execution "
+            "remains PARTIAL for the explicit limitations in section 13."
+        ),
+        8: _metric_table(metrics) + "\n\n" + _comparison_lines(analysis),
+        9: (
+            f"Mechanism verdict is `{statuses['MECHANISM']}`. The final development "
+            "real/read-off/previous/unrelated visual-content comparison is in "
+            "visual/paired_content_ablation.csv; route, gap, birth, reactivation, "
+            "fragmentation, merge, and ID-switch evidence remains separate from "
+            "task AP in final/identity_counts.csv."
+        ),
+        10: (
+            f"Recorded campaign training GPU-hours after FH-CONT: "
+            f"{float(fh_cost['campaign_gpu_hours_after_run']):.6f} / "
+            f"{float(fh_cost['campaign_training_gpu_hour_cap']):.0f}. Permanent "
+            f"state budget: {resource.get('permanent_state_bytes')} / 2097152 bytes.\n\n"
+            + _profile_panel_lines(profile_rows, resource.get("resource_status"))
+        ),
+        11: (
+            f"M3-V-CORE selected checkpoint: `{next(iter(candidate_sha))}`, logical "
+            "location `external:run_root/training/formal/M3-V-CORE/update=1500.ckpt`. "
+            f"FH-CONT selected checkpoint: `{next(iter(fh_sha))}`, logical location "
+            "`external:run_root/training/formal/FH-CONT/update=1500.ckpt`. Selected "
+            "checkpoints are not presented as optimizer-complete resume checkpoints; "
+            "their run directories retain separate `last.ckpt` files."
+        ),
+        12: (
+            "Public environment-variable commands are in COMMANDS.md. Final direct "
+            "verification used:\n" + verified_commands
+        ),
+        13: (
+            "All eight correctness classes and the real A40 gate are detailed in "
+            "TEST_REPORT.md. Remaining limitations:\n" + limitation_lines
+        ),
+        14: (
+            "Supported claims are limited to the exact all-T, retention, mechanism, "
+            "and resource statuses in section 1. Not supported: indefinite-horizon "
+            "retention, replicated training stability, independent generalization, "
+            "or attribution of policy effects to memory content alone."
+        ),
+        15: (
+            f"Results commit E publication status: `{statuses['PUBLICATION']}`. "
+            f"FINAL_MANIFEST.json SHA256: `{final_manifest_sha256}`. Next exact "
+            "action: evaluate this frozen M3-V-CORE checkpoint on the registered "
+            "independent-native population before making a generalization claim."
+        ),
+    }
 
 
 def derive_package_statuses(
@@ -347,17 +617,6 @@ limits remain explicit in `final/status.json` and `training/variants.json`.
 """
 
 
-def _test_report(results_commit: str) -> str:
-    return f"""# TaskMemory Retention V2 Test Report
-
-Results commit: `{results_commit}`.
-
-The direct verification commands and their observed results are recorded in the
-results commit. Passing engineering checks do not change failed or inconclusive
-scientific statuses.
-"""
-
-
 def publish_package(
     artifact_root: Path,
     *,
@@ -367,6 +626,9 @@ def publish_package(
     root = artifact_root.expanduser().resolve()
     analysis = _load_json(root / "final/status.json")
     resource = _load_json(root / "resources/run_summary.json")
+    verification = validate_verification(
+        _load_json(root / "VERIFICATION.json"), results_commit=results_commit
+    )
     statuses = derive_package_statuses(
         analysis, resource, publication_status=publication_status
     )
@@ -384,6 +646,7 @@ def publish_package(
         "EVALUATION_CONTRACT.json",
         "PROFILE_CONTRACT.json",
         "COMMANDS.md",
+        "VERIFICATION.json",
         "references_inventory.csv",
         "implementation/r1_load_report.json",
         "implementation/real_gradient_smoke.json",
@@ -426,7 +689,7 @@ def publish_package(
         resource=resource,
         results_commit=results_commit,
     ).encode("ascii")
-    test_report = _test_report(results_commit).encode("ascii")
+    test_report = render_test_report(verification).encode("ascii")
     report_path = root / "FINAL_REPORT.md"
     test_path = root / "TEST_REPORT.md"
     _atomic_write(report_path, report)
@@ -445,10 +708,21 @@ def publish_package(
         ),
     )
     manifest_sha256 = _file_sha256(manifest_path)
+    section_bodies = _build_handoff_section_bodies(
+        root=root,
+        statuses=statuses,
+        results_commit=results_commit,
+        final_manifest_sha256=manifest_sha256,
+        metrics=metrics,
+        analysis=analysis,
+        resource=resource,
+        verification=verification,
+    )
     handoff = render_handoff(
         statuses=statuses,
         results_commit=results_commit,
         final_manifest_sha256=manifest_sha256,
+        section_bodies=section_bodies,
     ).encode("ascii")
     handoff_path = root / "HANDOFF.md"
     _atomic_write(handoff_path, handoff)
@@ -485,13 +759,17 @@ def main() -> int:
 
 
 __all__ = [
+    "CORRECTNESS_CLASSES",
     "STATUS_FIELDS",
+    "VERIFICATION_CHECKS",
     "PublicationError",
     "build_final_manifest",
     "derive_package_statuses",
     "publish_package",
     "render_handoff",
+    "render_test_report",
     "validate_statuses",
+    "validate_verification",
 ]
 
 

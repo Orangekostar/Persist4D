@@ -6,12 +6,16 @@ import json
 import pytest
 
 from scripts.publish_task_memory_v2 import (
+    CORRECTNESS_CLASSES,
     STATUS_FIELDS,
+    VERIFICATION_CHECKS,
     PublicationError,
     build_final_manifest,
     derive_package_statuses,
     render_handoff,
+    render_test_report,
     validate_statuses,
+    validate_verification,
 )
 
 
@@ -41,6 +45,28 @@ def _with_content_hash(value: dict[str, object]) -> dict[str, object]:
         ).encode("ascii")
     ).hexdigest()
     return result
+
+
+def _verification(results_commit: str = "a" * 40) -> dict[str, object]:
+    return _with_content_hash(
+        {
+            "schema_version": "task-memory-verification-v2",
+            "results_commit": results_commit,
+            "correctness_classes": {
+                name: {"status": "PASS", "evidence": "pytest node selection"}
+                for name in CORRECTNESS_CLASSES
+            },
+            "checks": [
+                {
+                    "name": name,
+                    "command": f"verify-{name}",
+                    "exit_code": 0,
+                    "observed": f"{name} passed",
+                }
+                for name in VERIFICATION_CHECKS
+            ],
+        }
+    )
 
 
 def test_statuses_are_independent_and_closed_vocabularies() -> None:
@@ -125,3 +151,32 @@ def test_status_derivation_does_not_hide_unrun_experiments() -> None:
     )
 
     assert derived["EXECUTION"] == "PARTIAL"
+
+
+def test_verification_and_test_report_require_observed_passing_commands() -> None:
+    verification = validate_verification(_verification(), results_commit="a" * 40)
+    report = render_test_report(verification)
+
+    assert "verify-real_gpu_gate" in report
+    assert "real_gpu_gate passed" in report
+    assert all(name in report for name in CORRECTNESS_CLASSES)
+
+    failed = _verification()
+    failed["checks"][0]["exit_code"] = 1  # type: ignore[index]
+    failed = _with_content_hash(
+        {key: value for key, value in failed.items() if key != "content_sha256"}
+    )
+    with pytest.raises(PublicationError, match="verification check"):
+        validate_verification(failed, results_commit="a" * 40)
+
+
+def test_handoff_accepts_concrete_body_for_every_required_section() -> None:
+    details = {index: f"concrete evidence {index}" for index in range(2, 16)}
+    text = render_handoff(
+        statuses=_statuses(),
+        results_commit="a" * 40,
+        final_manifest_sha256="b" * 64,
+        section_bodies=details,
+    )
+
+    assert all(f"concrete evidence {index}" in text for index in range(2, 16))

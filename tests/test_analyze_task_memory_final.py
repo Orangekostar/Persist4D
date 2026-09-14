@@ -87,6 +87,8 @@ def test_all_t_comparison_counts_all_twenty_cells_and_uses_strict_epsilon() -> N
     assert result["tmap_all_t"] == "FAIL"
     assert result["task_metrics_all_t"] == "FAIL"
     assert result["failed_tmap_horizons"] == [4]
+    assert result["minimum_tmap_delta"] == pytest.approx(1e-6)
+    assert result["mean_tmap_delta"] == pytest.approx(0.07500025)
 
 
 def test_retention_reports_absolute_relative_and_global_drop() -> None:
