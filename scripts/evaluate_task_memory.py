@@ -113,6 +113,9 @@ EVALUATION_SEED = 45
 COMMON_POPULATION_ID = "development_common_h5_canonical"
 NATIVE_POPULATION_ID = "additional_native_refs"
 PROTOCOL_B_POPULATION_ID = "protocol_b_43_masters_3_orders"
+PROTOCOL_B_LEGACY_POSTPROCESS_SHA256 = (
+    "a512eac74e36f0121b1025fd9908e2a4f070165c85b9bfb9a7f26618ff68cdc1"
+)
 POPULATION_IDS = (
     COMMON_POPULATION_ID,
     NATIVE_POPULATION_ID,
@@ -333,7 +336,7 @@ def _population_counts(
         "reference_count": len(references),
         "master_count": len(
             {
-                (master.reference_id, tuple(sorted(master.scan_ids)))
+                (master.reference_id, master.context_index // 3)
                 for master in masters
             }
         ),
@@ -1011,6 +1014,25 @@ def _postprocess_sha256() -> str:
     return digest.hexdigest()
 
 
+def _cache_lookup_keys(
+    key: Mapping[str, object], *, population_id: str
+) -> tuple[dict[str, object], ...]:
+    current = dict(key)
+    if (
+        population_id != PROTOCOL_B_POPULATION_ID
+        or current.get("postprocess_sha256")
+        == PROTOCOL_B_LEGACY_POSTPROCESS_SHA256
+    ):
+        return (current,)
+    return (
+        current,
+        {
+            **current,
+            "postprocess_sha256": PROTOCOL_B_LEGACY_POSTPROCESS_SHA256,
+        },
+    )
+
+
 def _load_evaluation_system(
     *,
     variant: str,
@@ -1430,6 +1452,7 @@ def run_evaluation(
     postprocess_sha256 = _postprocess_sha256()
     payloads = []
     cache_records = []
+    cache_postprocess_sha256s = set()
     produced = 0
     reused = 0
     started = time.time()
@@ -1450,16 +1473,26 @@ def run_evaluation(
             postprocess_sha256=postprocess_sha256,
             evaluation_seed=EVALUATION_SEED,
         )
-        cache_path = cache_root / f"{cache_key_sha256(key)}.pt"
-        if cache_path.is_file():
-            payload = load_task_memory_cache(cache_path, expected_key=key)
+        cached = next(
+            (
+                (candidate_key, cache_root / f"{cache_key_sha256(candidate_key)}.pt")
+                for candidate_key in _cache_lookup_keys(
+                    key, population_id=population_id
+                )
+                if (cache_root / f"{cache_key_sha256(candidate_key)}.pt").is_file()
+            ),
+            None,
+        )
+        if cached is not None:
+            cached_key, cache_path = cached
+            payload = load_task_memory_cache(cache_path, expected_key=cached_key)
             reused += 1
             record = {
                 "content_sha256": payload["content_sha256"],
                 "file_bytes": cache_path.stat().st_size,
                 "file_sha256": _file_sha256(cache_path),
                 "filename": cache_path.name,
-                "key_sha256": cache_key_sha256(key),
+                "key_sha256": cache_key_sha256(cached_key),
             }
         else:
             with _evaluation_runtime(device):
@@ -1482,6 +1515,7 @@ def run_evaluation(
                 cache_root, payload, max_total_bytes=CACHE_LIMIT_BYTES
             )
             produced += 1
+        cache_postprocess_sha256s.add(payload["key"]["postprocess_sha256"])
         payloads.append(payload)
         cache_records.append(
             {
@@ -1612,6 +1646,7 @@ def run_evaluation(
             "bytes": sum(record["file_bytes"] for record in cache_records),
             "cap_bytes": CACHE_LIMIT_BYTES,
             "entry_count": len(cache_records),
+            "postprocess_sha256s": sorted(cache_postprocess_sha256s),
             "records": cache_records,
         },
         "checkpoint_sha256": checkpoint_sha256,
@@ -1655,7 +1690,7 @@ def run_evaluation(
         "reducers": list(reducers),
         "retention": retention_record,
         "reused": reused,
-        "schema_version": "task-memory-evaluation-run-v4",
+        "schema_version": "task-memory-evaluation-run-v5",
         "source_commit": source_commit,
         "state_contract_sha256": state_contract_sha256,
         "status": "PASS",

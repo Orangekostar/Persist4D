@@ -17,8 +17,10 @@ from models.task_memory_state import TaskMemoryConfig, TaskMemoryState
 from scripts.evaluate_task_memory import (
     COMMON_POPULATION_ID,
     NATIVE_POPULATION_ID,
+    PROTOCOL_B_LEGACY_POSTPROCESS_SHA256,
     PROTOCOL_B_POPULATION_ID,
     _build_protocol_b_population,
+    _cache_lookup_keys,
     _compute_population_rows,
     _csv_bytes,
     _episode_spec,
@@ -111,7 +113,7 @@ def _target(identity: int) -> dict[str, object]:
 
 
 def _master(
-    *, reference_id: str, horizon: int, role: str
+    *, reference_id: str, horizon: int, role: str, context_index: int = 0
 ) -> NativeEpisodeMaster:
     scan_ids = tuple(f"scene0001_{index:02d}" for index in range(horizon))
     return NativeEpisodeMaster(
@@ -120,7 +122,7 @@ def _master(
         scan_ids=scan_ids,
         scan_indices=tuple(range(horizon)),
         role=role,
-        context_index=0,
+        context_index=context_index,
     )
 
 
@@ -293,6 +295,33 @@ def test_protocol_b_smoke_panel_maximizes_reference_coverage() -> None:
     ]
 
 
+def test_protocol_b_counts_distinguish_masters_with_the_same_scan_set() -> None:
+    masters = tuple(
+        _master(
+            reference_id="reference-a",
+            horizon=5,
+            role="protocol_b_final",
+            context_index=context_index,
+        )
+        for context_index in range(6)
+    )
+    contract = {
+        "populations": {
+            "protocol_b_common_129": {
+                "master_count": 2,
+                "order_unit_count": 6,
+                "reference_count": 1,
+            }
+        }
+    }
+
+    assert _population_counts(
+        masters,
+        population_id=PROTOCOL_B_POPULATION_ID,
+        data_contract=contract,
+    ) == {"reference_count": 1, "master_count": 2, "order_count": 6}
+
+
 def test_native_episode_spec_uses_the_real_master_horizon() -> None:
     master = _master(
         reference_id="native-3", horizon=3, role="additional_native_refs"
@@ -407,6 +436,20 @@ def _key(horizon: int) -> dict[str, object]:
         postprocess_sha256="5" * 64,
         evaluation_seed=45,
     )
+
+
+def test_protocol_b_cache_lookup_allows_only_the_known_reporting_fix_parent() -> None:
+    key = _key(5)
+
+    protocol_keys = _cache_lookup_keys(key, population_id=PROTOCOL_B_POPULATION_ID)
+    common_keys = _cache_lookup_keys(key, population_id=COMMON_POPULATION_ID)
+
+    assert protocol_keys[0] == key
+    assert protocol_keys[1] == {
+        **key,
+        "postprocess_sha256": PROTOCOL_B_LEGACY_POSTPROCESS_SHA256,
+    }
+    assert common_keys == (key,)
 
 
 def test_state_contract_hash_uses_the_runtime_task_memory_config() -> None:
