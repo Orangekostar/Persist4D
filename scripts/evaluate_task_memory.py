@@ -108,16 +108,225 @@ DEFAULT_TRAINING_ARTIFACT_ROOT = (
 DEFAULT_OUTPUT_ROOT = (
     PROJECT_ROOT / "artifacts/task_memory_retention_v2/evaluation"
 )
+DEFAULT_PROTOCOL_B_MANIFEST = PROJECT_ROOT / "artifacts/P6A/protocol_b_manifest.json"
 EVALUATION_SEED = 45
 COMMON_POPULATION_ID = "development_common_h5_canonical"
 NATIVE_POPULATION_ID = "additional_native_refs"
-POPULATION_IDS = (COMMON_POPULATION_ID, NATIVE_POPULATION_ID)
+PROTOCOL_B_POPULATION_ID = "protocol_b_43_masters_3_orders"
+POPULATION_IDS = (
+    COMMON_POPULATION_ID,
+    NATIVE_POPULATION_ID,
+    PROTOCOL_B_POPULATION_ID,
+)
 REDUCERS = ("mean", "latest", "max")
 VISUAL_CONTENT_CONTROLS = ("native", "repeated_mean")
 
 
 class TaskMemoryEvaluationError(RuntimeError):
     """Raised when real evaluation violates a frozen identity or budget."""
+
+
+class _ProtocolOrderDataset:
+    """Expose frozen Protocol-B orders while delegating scan loading."""
+
+    def __init__(
+        self,
+        base: object,
+        *,
+        sequence_names: Sequence[str],
+        sequence_indices: Sequence[Sequence[int]],
+        source_context_indices: Sequence[int],
+    ) -> None:
+        if not (
+            len(sequence_names)
+            == len(sequence_indices)
+            == len(source_context_indices)
+        ):
+            raise TaskMemoryEvaluationError("Protocol-B order contexts differ")
+        self.base = base
+        self.sequence_names = tuple(sequence_names)
+        self.sequence_indices = tuple(tuple(value) for value in sequence_indices)
+        self.source_context_indices = tuple(source_context_indices)
+        self.max_points_per_sample = getattr(base, "max_points_per_sample", None)
+
+    @property
+    def mode(self) -> str:
+        return self.base.mode
+
+    @mode.setter
+    def mode(self, value: str) -> None:
+        self.base.mode = value
+
+    @property
+    def known_empty_scan_policy(self) -> str | None:
+        return getattr(self.base, "known_empty_scan_policy", None)
+
+    @known_empty_scan_policy.setter
+    def known_empty_scan_policy(self, value: str) -> None:
+        if hasattr(self.base, "known_empty_scan_policy"):
+            self.base.known_empty_scan_policy = value
+
+    @property
+    def known_empty_scan_substitution_count(self) -> int:
+        return int(getattr(self.base, "known_empty_scan_substitution_count", 0))
+
+    def load_scan_indices(
+        self, context_index: int, scan_indices: Sequence[int], *, change_file: object
+    ) -> object:
+        try:
+            source_context_index = self.source_context_indices[context_index]
+        except IndexError as error:
+            raise TaskMemoryEvaluationError(
+                "Protocol-B order context is unavailable"
+            ) from error
+        return self.base.load_scan_indices(
+            source_context_index,
+            scan_indices,
+            change_file=change_file,
+        )
+
+
+def _build_protocol_b_population(
+    base: object, protocol: Mapping[str, object]
+) -> tuple[_ProtocolOrderDataset, tuple[NativeEpisodeMaster, ...]]:
+    if protocol.get("schema_version") != "protocol-b-v1":
+        raise TaskMemoryEvaluationError("Protocol-B schema differs")
+    config = protocol.get("protocol")
+    masters = protocol.get("masters")
+    if not isinstance(config, Mapping) or (
+        isinstance(masters, (str, bytes)) or not isinstance(masters, Sequence)
+    ):
+        raise TaskMemoryEvaluationError("Protocol-B structure differs")
+    order_names = config.get("order_variants")
+    if order_names != ["canonical", "reverse", "sha256_seed45"]:
+        raise TaskMemoryEvaluationError("Protocol-B orders differ")
+    if config.get("horizons") != [2, 3, 4, 5]:
+        raise TaskMemoryEvaluationError("Protocol-B horizons differ")
+
+    base_names = getattr(base, "sequence_names", None)
+    base_indices = getattr(base, "sequence_indices", None)
+    if not isinstance(base_names, (list, tuple)) or base_indices is None:
+        raise TaskMemoryEvaluationError("validation dataset lacks sequence contexts")
+
+    order_sequence_names: list[str] = []
+    order_sequence_indices: list[tuple[int, ...]] = []
+    source_context_indices: list[int] = []
+    population: list[NativeEpisodeMaster] = []
+    for raw_master in masters:
+        if not isinstance(raw_master, Mapping):
+            raise TaskMemoryEvaluationError("Protocol-B master is invalid")
+        master_sequence_id = raw_master.get("master_sequence_id")
+        reference_id = raw_master.get("reference_scene_id")
+        source_context_index = raw_master.get("validation_index")
+        canonical_indices = raw_master.get("scan_indices")
+        orders = raw_master.get("orders")
+        if (
+            not isinstance(master_sequence_id, str)
+            or not master_sequence_id
+            or not isinstance(reference_id, str)
+            or not reference_id
+            or isinstance(source_context_index, bool)
+            or not isinstance(source_context_index, int)
+            or source_context_index < 0
+            or isinstance(canonical_indices, (str, bytes))
+            or not isinstance(canonical_indices, Sequence)
+            or not isinstance(orders, Mapping)
+        ):
+            raise TaskMemoryEvaluationError("Protocol-B master identity differs")
+        try:
+            observed_name = base_names[source_context_index]
+            observed_indices = tuple(
+                int(value) for value in base_indices[source_context_index]
+            )
+        except (IndexError, TypeError, ValueError) as error:
+            raise TaskMemoryEvaluationError(
+                "Protocol-B validation context is unavailable"
+            ) from error
+        if observed_name != master_sequence_id or observed_indices != tuple(
+            int(value) for value in canonical_indices
+        ):
+            raise TaskMemoryEvaluationError(
+                "Protocol-B master differs from validation dataset"
+            )
+        for order_name in order_names:
+            order = orders.get(order_name)
+            if not isinstance(order, Mapping):
+                raise TaskMemoryEvaluationError("Protocol-B order is missing")
+            scan_ids = order.get("visit_order")
+            scan_indices = order.get("scan_indices")
+            if (
+                isinstance(scan_ids, (str, bytes))
+                or not isinstance(scan_ids, Sequence)
+                or isinstance(scan_indices, (str, bytes))
+                or not isinstance(scan_indices, Sequence)
+                or len(scan_ids) != 5
+                or len(scan_indices) != 5
+                or any(not isinstance(value, str) or not value for value in scan_ids)
+                or any(
+                    isinstance(value, bool) or not isinstance(value, int) or value < 0
+                    for value in scan_indices
+                )
+                or len(set(scan_ids)) != 5
+                or len(set(scan_indices)) != 5
+            ):
+                raise TaskMemoryEvaluationError("Protocol-B order rows differ")
+            sequence_id = "-".join(scan_ids)
+            order_context_index = len(order_sequence_names)
+            order_sequence_names.append(sequence_id)
+            order_sequence_indices.append(tuple(scan_indices))
+            source_context_indices.append(source_context_index)
+            population.append(
+                NativeEpisodeMaster(
+                    reference_id=reference_id,
+                    sequence_id=sequence_id,
+                    scan_ids=tuple(scan_ids),
+                    scan_indices=tuple(scan_indices),
+                    role="protocol_b_final",
+                    context_index=order_context_index,
+                )
+            )
+    wrapped = _ProtocolOrderDataset(
+        base,
+        sequence_names=order_sequence_names,
+        sequence_indices=order_sequence_indices,
+        source_context_indices=source_context_indices,
+    )
+    return wrapped, tuple(population)
+
+
+def _population_counts(
+    masters: Sequence[NativeEpisodeMaster],
+    *,
+    population_id: str,
+    data_contract: Mapping[str, object],
+) -> dict[str, int]:
+    references = {master.reference_id for master in masters}
+    if population_id != PROTOCOL_B_POPULATION_ID:
+        return {
+            "reference_count": len(references),
+            "master_count": len(masters),
+            "order_count": len(masters),
+        }
+    populations = data_contract.get("populations")
+    frozen = (
+        populations.get("protocol_b_common_129")
+        if isinstance(populations, Mapping)
+        else None
+    )
+    if not isinstance(frozen, Mapping):
+        raise TaskMemoryEvaluationError("data contract lacks Protocol-B population")
+    result = {
+        "reference_count": frozen.get("reference_count"),
+        "master_count": frozen.get("master_count"),
+        "order_count": frozen.get("order_unit_count"),
+    }
+    if (
+        any(isinstance(value, bool) or not isinstance(value, int) or value <= 0 for value in result.values())
+        or result["reference_count"] != len(references)
+        or result["order_count"] != len(masters)
+    ):
+        raise TaskMemoryEvaluationError("Protocol-B population counts differ")
+    return result
 
 
 @contextmanager
@@ -253,6 +462,13 @@ def select_development_masters(
             if master.role == "development" and len(master.scan_ids) == 5
         )
         empty_name = "development H5"
+    elif population_id == PROTOCOL_B_POPULATION_ID:
+        selected = tuple(
+            master
+            for master in masters
+            if master.role == "protocol_b_final" and len(master.scan_ids) == 5
+        )
+        empty_name = "Protocol-B H5"
     elif population_id == NATIVE_POPULATION_ID:
         selected = tuple(
             master
@@ -274,7 +490,7 @@ def select_development_masters(
         or not 1 <= smoke_master_count <= 12
     ):
         raise TaskMemoryEvaluationError("smoke master count must be within 1-12")
-    if population_id == COMMON_POPULATION_ID:
+    if population_id in {COMMON_POPULATION_ID, PROTOCOL_B_POPULATION_ID}:
         smoke = select_diagnostic_masters(selected, limit=smoke_master_count)
     else:
         if smoke_master_count < len(_population_horizons(population_id)):
@@ -324,7 +540,7 @@ def select_development_masters(
 
 
 def _population_horizons(population_id: str) -> tuple[int, ...]:
-    if population_id == COMMON_POPULATION_ID:
+    if population_id in {COMMON_POPULATION_ID, PROTOCOL_B_POPULATION_ID}:
         return (5,)
     if population_id == NATIVE_POPULATION_ID:
         return (2, 3, 4)
@@ -366,7 +582,7 @@ def _compute_population_rows(
     class_mapper: Callable[[int], int],
     accumulator_factory: Callable[[], object] | None = None,
 ) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
-    if population_id == COMMON_POPULATION_ID:
+    if population_id in {COMMON_POPULATION_ID, PROTOCOL_B_POPULATION_ID}:
         grouped_payloads = {5: list(payloads)}
     elif population_id == NATIVE_POPULATION_ID:
         grouped_payloads: dict[int, list[Mapping[str, object]]] = {
@@ -417,7 +633,7 @@ def _compute_population_rows(
 def _retention_rows_for_population(
     metric_rows: Sequence[Mapping[str, object]], *, population_id: str
 ) -> tuple[list[dict[str, object]], str]:
-    if population_id == COMMON_POPULATION_ID:
+    if population_id in {COMMON_POPULATION_ID, PROTOCOL_B_POPULATION_ID}:
         return build_retention_rows(metric_rows), "MEASURED"
     if population_id == NATIVE_POPULATION_ID:
         return [], "NOT_APPLICABLE_VARYING_NATIVE_POPULATION"
@@ -1021,6 +1237,7 @@ def run_evaluation(
     output_root: Path,
     data_contract_path: Path = DEFAULT_DATA_CONTRACT,
     variant_manifest_path: Path = DEFAULT_VARIANT_MANIFEST,
+    protocol_b_manifest_path: Path = DEFAULT_PROTOCOL_B_MANIFEST,
     device_name: str = "cuda:0",
     population_id: str = COMMON_POPULATION_ID,
     smoke_master_count: int | None = None,
@@ -1092,16 +1309,32 @@ def run_evaluation(
     }
     reference_by_scene = load_reference_by_scene(rio_metadata)
     role_by_reference = _role_by_reference(data_contract)
-    masters = tuple(
-        master
-        for horizon, base in sorted(bases.items())
-        for master in build_native_episode_masters(
-            base,
-            reference_by_scene=reference_by_scene,
-            role_by_reference=role_by_reference,
+    protocol_b_manifest_sha256 = None
+    if population_id == PROTOCOL_B_POPULATION_ID:
+        protocol_b_manifest_path = protocol_b_manifest_path.expanduser().resolve(
+            strict=True
         )
-        if len(master.scan_ids) == horizon
-    )
+        source = data_contract.get("sources", {}).get("protocol_b", {})
+        expected_protocol_sha256 = (
+            source.get("sha256") if isinstance(source, Mapping) else None
+        )
+        protocol_b_manifest_sha256 = _file_sha256(protocol_b_manifest_path)
+        if protocol_b_manifest_sha256 != expected_protocol_sha256:
+            raise TaskMemoryEvaluationError("Protocol-B manifest SHA256 differs")
+        protocol = _load_json(protocol_b_manifest_path)
+        protocol_base, masters = _build_protocol_b_population(bases[5], protocol)
+        bases[5] = protocol_base
+    else:
+        masters = tuple(
+            master
+            for horizon, base in sorted(bases.items())
+            for master in build_native_episode_masters(
+                base,
+                reference_by_scene=reference_by_scene,
+                role_by_reference=role_by_reference,
+            )
+            if len(master.scan_ids) == horizon
+        )
     selected = select_development_masters(
         masters,
         population_id=population_id,
@@ -1226,7 +1459,7 @@ def run_evaluation(
     masters_by_horizon = {
         horizon: (
             selected
-            if population_id == COMMON_POPULATION_ID
+            if population_id in {COMMON_POPULATION_ID, PROTOCOL_B_POPULATION_ID}
             else tuple(master for master in selected if len(master.scan_ids) == horizon)
         )
         for horizon in (
@@ -1238,12 +1471,11 @@ def run_evaluation(
 
     def row_counts(row: Mapping[str, object]) -> dict[str, int]:
         horizon_masters = masters_by_horizon[int(row["T"])]
-        return {
-            "reference_count": len(
-                {master.reference_id for master in horizon_masters}
-            ),
-            "master_count": len(horizon_masters),
-        }
+        return _population_counts(
+            horizon_masters,
+            population_id=population_id,
+            data_contract=data_contract,
+        )
 
     task_rows = [
         {
@@ -1351,10 +1583,14 @@ def run_evaluation(
                 for horizon, horizon_masters in sorted(masters_by_horizon.items())
             },
             "id": population_id,
-            "master_count": len(selected),
-            "reference_count": len({master.reference_id for master in selected}),
+            **_population_counts(
+                selected,
+                population_id=population_id,
+                data_contract=data_contract,
+            ),
             "smoke": smoke_master_count is not None,
         },
+        "protocol_b_manifest_sha256": protocol_b_manifest_sha256,
         "postprocess_sha256": postprocess_sha256,
         "produced": produced,
         "policies": ["lag1", "commit0"],
@@ -1413,6 +1649,9 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--data-contract", type=Path, default=DEFAULT_DATA_CONTRACT)
     parser.add_argument(
+        "--protocol-b-manifest", type=Path, default=DEFAULT_PROTOCOL_B_MANIFEST
+    )
+    parser.add_argument(
         "--variant-manifest", type=Path, default=DEFAULT_VARIANT_MANIFEST
     )
     parser.add_argument("--cache-root", type=Path)
@@ -1460,6 +1699,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         output_root=args.output,
         data_contract_path=args.data_contract,
         variant_manifest_path=args.variant_manifest,
+        protocol_b_manifest_path=args.protocol_b_manifest,
         device_name=args.device,
         population_id=args.population,
         smoke_master_count=args.smoke_masters,

@@ -17,9 +17,12 @@ from models.task_memory_state import TaskMemoryConfig, TaskMemoryState
 from scripts.evaluate_task_memory import (
     COMMON_POPULATION_ID,
     NATIVE_POPULATION_ID,
+    PROTOCOL_B_POPULATION_ID,
+    _build_protocol_b_population,
     _compute_population_rows,
     _csv_bytes,
     _episode_spec,
+    _population_counts,
     _population_horizons,
     _resolve_variant_evaluation_identity,
     _retention_rows_for_population,
@@ -148,6 +151,103 @@ def test_population_selection_separates_common_h5_and_additional_native_h2_h4() 
         ("native-3", 3),
         ("native-4", 4),
     ]
+
+
+class _ProtocolBase:
+    def __init__(self) -> None:
+        self.sequence_names = (
+            "scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01",
+        )
+        self.sequence_indices = ((17, 19, 21, 20, 18),)
+        self.max_points_per_sample = None
+        self.mode = "validation"
+        self.known_empty_scan_substitution_count = 0
+        self.calls: list[tuple[int, tuple[int, ...], object]] = []
+
+    def load_scan_indices(self, context_index, scan_indices, *, change_file):
+        call = (context_index, tuple(scan_indices), change_file)
+        self.calls.append(call)
+        return call
+
+
+def _protocol_fixture() -> dict[str, object]:
+    canonical = ("scene0069_00", "scene0069_02", "scene0069_04", "scene0069_03", "scene0069_01")
+    reverse = tuple(reversed(canonical))
+    seeded = ("scene0069_01", "scene0069_04", "scene0069_03", "scene0069_00", "scene0069_02")
+    indices = dict(zip(canonical, (17, 19, 21, 20, 18), strict=True))
+    return {
+        "schema_version": "protocol-b-v1",
+        "protocol": {
+            "horizons": [2, 3, 4, 5],
+            "order_variants": ["canonical", "reverse", "sha256_seed45"],
+        },
+        "masters": [
+            {
+                "master_sequence_id": "-".join(canonical),
+                "reference_scene_id": "reference-protocol",
+                "validation_index": 0,
+                "scan_indices": [indices[value] for value in canonical],
+                "orders": {
+                    name: {
+                        "visit_order": list(order),
+                        "scan_indices": [indices[value] for value in order],
+                    }
+                    for name, order in (
+                        ("canonical", canonical),
+                        ("reverse", reverse),
+                        ("sha256_seed45", seeded),
+                    )
+                },
+            }
+        ],
+    }
+
+
+def test_protocol_b_population_expands_each_master_into_three_exact_orders() -> None:
+    base = _ProtocolBase()
+
+    wrapped, masters = _build_protocol_b_population(base, _protocol_fixture())
+
+    assert len(masters) == 3
+    assert [master.context_index for master in masters] == [0, 1, 2]
+    assert [master.role for master in masters] == ["protocol_b_final"] * 3
+    assert [master.scan_indices for master in masters] == [
+        (17, 19, 21, 20, 18),
+        (18, 20, 21, 19, 17),
+        (18, 21, 20, 17, 19),
+    ]
+    assert wrapped.load_scan_indices(1, (18, 20), change_file=None) == (
+        0,
+        (18, 20),
+        None,
+    )
+    assert base.calls == [(0, (18, 20), None)]
+
+
+def test_protocol_b_population_uses_continuous_h5_and_reports_clustered_counts() -> None:
+    _, masters = _build_protocol_b_population(_ProtocolBase(), _protocol_fixture())
+    selected = select_development_masters(
+        masters,
+        population_id=PROTOCOL_B_POPULATION_ID,
+        smoke_master_count=None,
+    )
+    contract = {
+        "populations": {
+            "protocol_b_common_129": {
+                "master_count": 1,
+                "order_unit_count": 3,
+                "reference_count": 1,
+            }
+        }
+    }
+
+    assert selected == masters
+    assert _population_horizons(PROTOCOL_B_POPULATION_ID) == (5,)
+    assert _population_counts(
+        selected,
+        population_id=PROTOCOL_B_POPULATION_ID,
+        data_contract=contract,
+    ) == {"reference_count": 1, "master_count": 1, "order_count": 3}
 
 
 def test_native_episode_spec_uses_the_real_master_horizon() -> None:
