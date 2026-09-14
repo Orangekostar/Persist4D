@@ -22,6 +22,7 @@ from scripts.evaluate_task_memory import (
     _compute_population_rows,
     _csv_bytes,
     _episode_spec,
+    _masters_by_metric_horizon,
     _population_counts,
     _population_horizons,
     _resolve_variant_evaluation_identity,
@@ -259,6 +260,19 @@ def test_protocol_b_population_uses_continuous_h5_and_reports_clustered_counts()
         population_id=PROTOCOL_B_POPULATION_ID,
         data_contract=contract,
     ) == {"reference_count": 1, "master_count": 1, "order_count": 3}
+
+    by_horizon = _masters_by_metric_horizon(
+        selected, population_id=PROTOCOL_B_POPULATION_ID
+    )
+    assert tuple(by_horizon) == (2, 3, 4, 5)
+    assert all(value == selected for value in by_horizon.values())
+
+    assert _population_counts(
+        selected[:1],
+        population_id=PROTOCOL_B_POPULATION_ID,
+        data_contract=contract,
+        allow_subset=True,
+    ) == {"reference_count": 1, "master_count": 1, "order_count": 1}
 
 
 def test_protocol_b_smoke_panel_maximizes_reference_coverage() -> None:

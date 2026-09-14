@@ -302,6 +302,7 @@ def _population_counts(
     *,
     population_id: str,
     data_contract: Mapping[str, object],
+    allow_subset: bool = False,
 ) -> dict[str, int]:
     references = {master.reference_id for master in masters}
     if population_id != PROTOCOL_B_POPULATION_ID:
@@ -318,16 +319,30 @@ def _population_counts(
     )
     if not isinstance(frozen, Mapping):
         raise TaskMemoryEvaluationError("data contract lacks Protocol-B population")
-    result = {
+    frozen_counts = {
         "reference_count": frozen.get("reference_count"),
         "master_count": frozen.get("master_count"),
         "order_count": frozen.get("order_unit_count"),
     }
-    if (
-        any(isinstance(value, bool) or not isinstance(value, int) or value <= 0 for value in result.values())
-        or result["reference_count"] != len(references)
-        or result["order_count"] != len(masters)
+    if any(
+        isinstance(value, bool) or not isinstance(value, int) or value <= 0
+        for value in frozen_counts.values()
     ):
+        raise TaskMemoryEvaluationError("Protocol-B population counts differ")
+    result = {
+        "reference_count": len(references),
+        "master_count": len(
+            {
+                (master.reference_id, tuple(sorted(master.scan_ids)))
+                for master in masters
+            }
+        ),
+        "order_count": len(masters),
+    }
+    if allow_subset:
+        if any(result[key] > frozen_counts[key] for key in result):
+            raise TaskMemoryEvaluationError("Protocol-B smoke counts exceed population")
+    elif result != frozen_counts:
         raise TaskMemoryEvaluationError("Protocol-B population counts differ")
     return result
 
@@ -578,6 +593,22 @@ def _population_horizons(population_id: str) -> tuple[int, ...]:
         return (5,)
     if population_id == NATIVE_POPULATION_ID:
         return (2, 3, 4)
+    raise TaskMemoryEvaluationError("evaluation population is not frozen")
+
+
+def _masters_by_metric_horizon(
+    masters: Sequence[NativeEpisodeMaster], *, population_id: str
+) -> dict[int, tuple[NativeEpisodeMaster, ...]]:
+    selected = tuple(masters)
+    if population_id in {COMMON_POPULATION_ID, PROTOCOL_B_POPULATION_ID}:
+        return {horizon: selected for horizon in (2, 3, 4, 5)}
+    if population_id == NATIVE_POPULATION_ID:
+        return {
+            horizon: tuple(
+                master for master in selected if len(master.scan_ids) == horizon
+            )
+            for horizon in _population_horizons(population_id)
+        }
     raise TaskMemoryEvaluationError("evaluation population is not frozen")
 
 
@@ -1490,18 +1521,9 @@ def run_evaluation(
         "evaluation_seed": EVALUATION_SEED,
         "visual_content_control": visual_content_control,
     }
-    masters_by_horizon = {
-        horizon: (
-            selected
-            if population_id in {COMMON_POPULATION_ID, PROTOCOL_B_POPULATION_ID}
-            else tuple(master for master in selected if len(master.scan_ids) == horizon)
-        )
-        for horizon in (
-            (2, 3, 4, 5)
-            if population_id == COMMON_POPULATION_ID
-            else _population_horizons(population_id)
-        )
-    }
+    masters_by_horizon = _masters_by_metric_horizon(
+        selected, population_id=population_id
+    )
 
     def row_counts(row: Mapping[str, object]) -> dict[str, int]:
         horizon_masters = masters_by_horizon[int(row["T"])]
@@ -1509,6 +1531,7 @@ def run_evaluation(
             horizon_masters,
             population_id=population_id,
             data_contract=data_contract,
+            allow_subset=smoke_master_count is not None,
         )
 
     task_rows = [
@@ -1608,12 +1631,12 @@ def run_evaluation(
         "metrics": _artifact_record(metrics_path, row_count=len(task_rows)),
         "population": {
             "horizons": {
-                f"T{horizon}": {
-                    "master_count": len(horizon_masters),
-                    "reference_count": len(
-                        {master.reference_id for master in horizon_masters}
-                    ),
-                }
+                f"T{horizon}": _population_counts(
+                    horizon_masters,
+                    population_id=population_id,
+                    data_contract=data_contract,
+                    allow_subset=smoke_master_count is not None,
+                )
                 for horizon, horizon_masters in sorted(masters_by_horizon.items())
             },
             "id": population_id,
@@ -1621,6 +1644,7 @@ def run_evaluation(
                 selected,
                 population_id=population_id,
                 data_contract=data_contract,
+                allow_subset=smoke_master_count is not None,
             ),
             "smoke": smoke_master_count is not None,
         },
