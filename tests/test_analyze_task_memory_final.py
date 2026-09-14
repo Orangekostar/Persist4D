@@ -11,6 +11,7 @@ from scripts.analyze_task_memory_final import (
     build_retention_rows,
     validate_identity_events,
     validate_identity_rows,
+    validate_per_reference_rows,
     validate_primary_rows,
 )
 
@@ -258,3 +259,37 @@ def test_identity_events_include_error_counts_and_exact_rates() -> None:
     broken["false_reactivation_rate"] = 0.5
     with pytest.raises(FinalAnalysisError, match="identity event rate"):
         validate_identity_events(broken)
+
+
+def test_per_reference_rows_require_six_references_and_global_43_by_129() -> None:
+    rows = [
+        {
+            "population_id": "protocol_b_43_masters_3_orders",
+            "variant": "M3-V-CORE",
+            "checkpoint_sha256": "a" * 64,
+            "reference_id": f"reference-{reference}",
+            "T": horizon,
+            **{metric: 0.2 for metric in TASK_METRICS},
+            "direct_current_AP": 0.3,
+            "master_count": count,
+            "order_count": count * 3,
+        }
+        for reference, count in enumerate((8, 7, 7, 7, 7, 7))
+        for horizon in REPORT_HORIZONS
+    ]
+
+    validated = validate_per_reference_rows(
+        rows,
+        expected_variant="M3-V-CORE",
+        expected_checkpoint_sha256="a" * 64,
+    )
+
+    assert len(validated) == 24
+    broken = [dict(row) for row in rows]
+    broken[-1]["order_count"] = 18
+    with pytest.raises(FinalAnalysisError, match="per-reference population"):
+        validate_per_reference_rows(
+            broken,
+            expected_variant="M3-V-CORE",
+            expected_checkpoint_sha256="a" * 64,
+        )

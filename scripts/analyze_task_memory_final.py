@@ -973,6 +973,67 @@ def build_reference_delta_rows(
     return output
 
 
+def validate_per_reference_rows(
+    rows: Sequence[Mapping[str, object]],
+    *,
+    expected_variant: str,
+    expected_checkpoint_sha256: str,
+) -> list[dict[str, object]]:
+    normalized = []
+    indexed = set()
+    for raw in _sequence(rows, name="per-reference rows"):
+        if not isinstance(raw, Mapping):
+            raise FinalAnalysisError("per-reference row must be a mapping")
+        reference = _text(raw.get("reference_id"), name="reference_id")
+        horizon = _integer(raw.get("T"), name="per-reference T", minimum=2)
+        key = (reference, horizon)
+        if horizon not in REPORT_HORIZONS or key in indexed:
+            raise FinalAnalysisError("per-reference population differs")
+        indexed.add(key)
+        if (
+            raw.get("population_id") != PROTOCOL_B_POPULATION_ID
+            or raw.get("variant") != expected_variant
+            or raw.get("checkpoint_sha256") != expected_checkpoint_sha256
+        ):
+            raise FinalAnalysisError("per-reference population differs")
+        row = dict(raw)
+        row["T"] = horizon
+        for metric in TASK_METRICS:
+            row[metric] = _rate(raw.get(metric), name=f"per-reference {metric}")
+        row["direct_current_AP"] = _rate(
+            raw.get("direct_current_AP"), name="per-reference direct current AP"
+        )
+        row["master_count"] = _integer(
+            raw.get("master_count"), name="per-reference master count", minimum=1
+        )
+        row["order_count"] = _integer(
+            raw.get("order_count"), name="per-reference order count", minimum=1
+        )
+        normalized.append(row)
+    references = {reference for reference, _ in indexed}
+    expected = {
+        (reference, horizon) for reference in references for horizon in REPORT_HORIZONS
+    }
+    if len(references) != 6 or indexed != expected:
+        raise FinalAnalysisError("per-reference population differs")
+    for reference in references:
+        reference_rows = [row for row in normalized if row["reference_id"] == reference]
+        counts = {
+            (int(row["master_count"]), int(row["order_count"]))
+            for row in reference_rows
+        }
+        if len(counts) != 1 or any(orders != masters * 3 for masters, orders in counts):
+            raise FinalAnalysisError("per-reference population differs")
+    for horizon in REPORT_HORIZONS:
+        horizon_rows = [row for row in normalized if row["T"] == horizon]
+        if (
+            sum(int(row["master_count"]) for row in horizon_rows) != 43
+            or sum(int(row["order_count"]) for row in horizon_rows) != 129
+        ):
+            raise FinalAnalysisError("per-reference population differs")
+    return sorted(normalized, key=lambda row: (str(row["reference_id"]), int(row["T"])))
+
+
 def compute_per_reference_metrics(
     *,
     evaluation_root: Path,
@@ -1043,7 +1104,11 @@ def compute_per_reference_metrics(
         print(
             f"[task-memory-final] {variant} reference {reference} complete", flush=True
         )
-    return output
+    return validate_per_reference_rows(
+        output,
+        expected_variant=variant,
+        expected_checkpoint_sha256=checkpoint,
+    )
 
 
 def _class_mapper(data_root: Path, external_root: Path) -> object:
@@ -1100,6 +1165,8 @@ def analyze_final_results(
     output_root: Path,
     data_root: Path | None = None,
     external_root: Path | None = None,
+    candidate_reference_path: Path | None = None,
+    fh_reference_path: Path | None = None,
 ) -> dict[str, object]:
     current = {}
     identities = []
@@ -1151,7 +1218,22 @@ def analyze_final_results(
     per_reference = []
     reference_deltas = []
     cluster_effects = []
-    if data_root is not None and external_root is not None:
+    if (candidate_reference_path is None) != (fh_reference_path is None):
+        raise FinalAnalysisError("both precomputed reference tables are required")
+    if candidate_reference_path is not None and fh_reference_path is not None:
+        candidate_reference = validate_per_reference_rows(
+            _read_csv_rows(candidate_reference_path.expanduser().resolve(strict=True)),
+            expected_variant="M3-V-CORE",
+            expected_checkpoint_sha256=str(
+                current["M3-V-CORE"][0]["checkpoint_sha256"]
+            ),
+        )
+        fh_reference = validate_per_reference_rows(
+            _read_csv_rows(fh_reference_path.expanduser().resolve(strict=True)),
+            expected_variant="FH-CONT",
+            expected_checkpoint_sha256=str(current["FH-CONT"][0]["checkpoint_sha256"]),
+        )
+    elif data_root is not None and external_root is not None:
         mapper = _class_mapper(data_root, external_root)
         candidate_reference = compute_per_reference_metrics(
             evaluation_root=candidate_evaluation,
@@ -1165,6 +1247,10 @@ def analyze_final_results(
             variant="FH-CONT",
             class_mapper=mapper,
         )
+    else:
+        candidate_reference = []
+        fh_reference = []
+    if candidate_reference and fh_reference:
         per_reference = [*candidate_reference, *fh_reference]
         reference_deltas = build_reference_delta_rows(
             candidate_reference,
@@ -1262,6 +1348,10 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--data-root", type=Path)
     parser.add_argument("--external-root", type=Path)
+    parser.add_argument("--candidate-reference", type=Path)
+    parser.add_argument("--fh-reference", type=Path)
+    parser.add_argument("--reference-only", choices=("M3-V-CORE", "FH-CONT"))
+    parser.add_argument("--reference-output", type=Path)
     return parser
 
 
@@ -1269,6 +1359,40 @@ def main() -> int:
     args = _parser().parse_args()
     if (args.data_root is None) != (args.external_root is None):
         raise SystemExit("--data-root and --external-root must be provided together")
+    if args.reference_only is not None:
+        if (
+            args.data_root is None
+            or args.external_root is None
+            or args.reference_output is None
+        ):
+            raise SystemExit(
+                "--reference-only requires --data-root, --external-root, and "
+                "--reference-output"
+            )
+        evaluation, cache = {
+            "M3-V-CORE": (args.candidate_evaluation, args.candidate_cache),
+            "FH-CONT": (args.fh_evaluation, args.fh_cache),
+        }[args.reference_only]
+        rows = compute_per_reference_metrics(
+            evaluation_root=evaluation,
+            cache_root=cache,
+            variant=args.reference_only,
+            class_mapper=_class_mapper(args.data_root, args.external_root),
+        )
+        content = _csv_bytes(rows, PER_REFERENCE_FIELDS)
+        _atomic_write(args.reference_output.expanduser().resolve(), content)
+        print(
+            json.dumps(
+                {
+                    "status": "PASS",
+                    "variant": args.reference_only,
+                    "rows": len(rows),
+                    "sha256": hashlib.sha256(content).hexdigest(),
+                },
+                sort_keys=True,
+            )
+        )
+        return 0
     result = analyze_final_results(
         candidate_evaluation=args.candidate_evaluation,
         candidate_cache=args.candidate_cache,
@@ -1280,6 +1404,8 @@ def main() -> int:
         output_root=args.output_root,
         data_root=args.data_root,
         external_root=args.external_root,
+        candidate_reference_path=args.candidate_reference,
+        fh_reference_path=args.fh_reference,
     )
     print(json.dumps(result["status"], sort_keys=True))
     return 0
@@ -1299,6 +1425,7 @@ __all__ = [
     "load_legacy_baseline_rows",
     "validate_identity_events",
     "validate_identity_rows",
+    "validate_per_reference_rows",
     "validate_primary_rows",
 ]
 
