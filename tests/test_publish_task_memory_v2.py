@@ -7,6 +7,7 @@ import pytest
 
 from scripts.publish_task_memory_v2 import (
     CORRECTNESS_CLASSES,
+    FORMAL_PROTOCOL_B_ARTIFACTS,
     STATUS_FIELDS,
     VERIFICATION_CHECKS,
     PublicationError,
@@ -17,6 +18,15 @@ from scripts.publish_task_memory_v2 import (
     validate_statuses,
     validate_verification,
 )
+
+
+def test_publication_requires_formal_protocol_b_controls_and_cache_manifest() -> None:
+    assert set(FORMAL_PROTOCOL_B_ARTIFACTS) == {
+        "evaluation/M5/protocol_b/R1-B4-policy/cache_manifest.json",
+        "evaluation/M5/protocol_b/R1-B4-policy/policy_comparison.csv",
+        "evaluation/M5/protocol_b/baseline/control_observation_manifest.json",
+        "evaluation/M5/protocol_b/baseline/long_memory_controls.csv",
+    }
 
 
 def _statuses() -> dict[str, str]:

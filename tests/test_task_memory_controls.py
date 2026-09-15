@@ -6,12 +6,40 @@ import torch
 from datasets.task_memory_episode import StageMeta
 from scripts.run_task_memory_controls import (
     ControlRunnerError,
+    _records_by_sequence,
     _window_observation,
     observation_payload,
     prediction_observation_from_payload,
     run_control_trajectory,
     validate_observation_supplement,
 )
+
+
+def test_base_cache_records_allow_exact_repeated_sequences() -> None:
+    record = {
+        "sequence_id": "scan-0-scan-1",
+        "reference_id": "reference-0",
+        "filename": "episode.pt",
+        "sha256": "a" * 64,
+        "bytes": 42,
+    }
+    assert _records_by_sequence({"records": [record, dict(record)]}) == {
+        record["sequence_id"]: record
+    }
+
+
+def test_base_cache_records_reject_conflicting_repeated_sequences() -> None:
+    record = {
+        "sequence_id": "scan-0-scan-1",
+        "reference_id": "reference-0",
+        "filename": "episode.pt",
+        "sha256": "a" * 64,
+        "bytes": 42,
+    }
+    with pytest.raises(ControlRunnerError, match="conflicting"):
+        _records_by_sequence(
+            {"records": [record, dict(record, sha256="b" * 64)]}
+        )
 
 
 def _meta(stage: int) -> StageMeta:

@@ -385,8 +385,12 @@ def _records_by_sequence(manifest: Mapping[str, object]) -> dict[str, dict[str, 
             raise ControlRunnerError("base cache manifest record is invalid")
         record = dict(value)
         sequence_id = record.get("sequence_id")
-        if not isinstance(sequence_id, str) or sequence_id in result:
-            raise ControlRunnerError("base cache sequence records are not unique")
+        if not isinstance(sequence_id, str):
+            raise ControlRunnerError("base cache sequence record is invalid")
+        if sequence_id in result:
+            if result[sequence_id] != record:
+                raise ControlRunnerError("base cache sequence records are conflicting")
+            continue
         result[sequence_id] = record
     return result
 

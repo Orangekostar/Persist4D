@@ -72,6 +72,12 @@ PRIMARY_VARIANTS = (
     "D-EMA-commit0",
     "D-EMA-lag1",
 )
+FORMAL_PROTOCOL_B_ARTIFACTS = (
+    "evaluation/M5/protocol_b/R1-B4-policy/cache_manifest.json",
+    "evaluation/M5/protocol_b/R1-B4-policy/policy_comparison.csv",
+    "evaluation/M5/protocol_b/baseline/control_observation_manifest.json",
+    "evaluation/M5/protocol_b/baseline/long_memory_controls.csv",
+)
 _MANIFEST_EXCLUDED = {
     "FINAL_MANIFEST.json",
     "HANDOFF.md",
@@ -680,8 +686,7 @@ def publish_package(
         "implementation/real_gradient_smoke.json",
         "implementation/query_state_contract.md",
         "implementation/sequence_loss_example.csv",
-        "baseline/policy_comparison.csv",
-        "baseline/long_memory_controls.csv",
+        *FORMAL_PROTOCOL_B_ARTIFACTS,
         "training/variants.json",
         "training/M3_learning_curves.csv",
         "training/FH_CONT_learning_curves.csv",

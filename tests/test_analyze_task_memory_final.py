@@ -10,6 +10,7 @@ from scripts.analyze_task_memory_final import (
     REPORT_HORIZONS,
     TASK_METRICS,
     FinalAnalysisError,
+    _parser,
     bootstrap_equal_reference_deltas,
     build_all_t_comparison,
     build_horizon_comparison,
@@ -27,6 +28,13 @@ from scripts.analyze_task_memory_final import (
 from scripts.task_memory_contracts import canonical_json_sha256
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_final_analysis_defaults_to_formal_protocol_b_controls() -> None:
+    args = _parser().parse_args([])
+    root = PROJECT_ROOT / "artifacts/task_memory_retention_v2/evaluation/M5/protocol_b"
+    assert args.policy_baseline == root / "R1-B4-policy/policy_comparison.csv"
+    assert args.long_memory_controls == root / "baseline/long_memory_controls.csv"
 
 
 def _primary_rows(variant: str, checkpoint: str, base: float):

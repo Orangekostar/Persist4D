@@ -1907,12 +1907,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--policy-baseline",
         type=Path,
-        default=DEFAULT_ARTIFACT_ROOT / "baseline/policy_comparison.csv",
+        default=root / "R1-B4-policy/policy_comparison.csv",
     )
     parser.add_argument(
         "--long-memory-controls",
         type=Path,
-        default=DEFAULT_ARTIFACT_ROOT / "baseline/long_memory_controls.csv",
+        default=root / "baseline/long_memory_controls.csv",
     )
     parser.add_argument(
         "--independent-candidate-evaluation",
