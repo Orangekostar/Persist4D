@@ -1,0 +1,204 @@
+{
+  "artifacts": [
+    {
+      "bytes": 1117,
+      "path": "BUDGET_CONTRACT.json",
+      "sha256": "4c830025ae61da96d500023f7c9236909d15b13bd46eaf199a95d22c1bb10ff8"
+    },
+    {
+      "bytes": 6038,
+      "path": "COMMANDS.md",
+      "sha256": "14151b926e59d12a89c6c502c36d4dc1e478840e1665ec5907dbd47774ac02bf"
+    },
+    {
+      "bytes": 125954,
+      "path": "DATA_CONTRACT.json",
+      "sha256": "4434a84b14139b611baa90a365e59cc0fa7cfb27a10d21cc21f50fb2a520c96e"
+    },
+    {
+      "bytes": 552,
+      "path": "EVALUATION_CONTRACT.json",
+      "sha256": "93b4567e596e687856e9da10d77ccc8a85c404a2ca01dc85a0f3371fc38296b3"
+    },
+    {
+      "bytes": 9405,
+      "path": "EVIDENCE_MAP.md",
+      "sha256": "56a6859904eb27f611b0a10dfe235843ce2fc2a397427f7bdf69d73ad6fc0d87"
+    },
+    {
+      "bytes": 2225,
+      "path": "FINAL_REPORT.md",
+      "sha256": "1ea37c6545a1a5b2f1d1d7d1760dd9e511f6094631a8ac70a0fef69c1aacc120"
+    },
+    {
+      "bytes": 1079,
+      "path": "OUTPUT_CONTRACT.md",
+      "sha256": "5e52db76ae6c9a0f43a2175a21495ca67fd959f3f829384e450da39f77d8901b"
+    },
+    {
+      "bytes": 407,
+      "path": "PROFILE_CONTRACT.json",
+      "sha256": "52a74d7d47021a3751e8563363a34e17dc5f82b5d940a67ef7eb7190ce1db626"
+    },
+    {
+      "bytes": 3262,
+      "path": "START_STATE.json",
+      "sha256": "90794d3d788b9a63d1012d21e56473f1f493bdd724743199e2968e8f022a4783"
+    },
+    {
+      "bytes": 4441,
+      "path": "TEST_REPORT.md",
+      "sha256": "717c09a81744f24f100c2deea5e13e68a1af07600d965af8ced9f8e4358afe63"
+    },
+    {
+      "bytes": 5180,
+      "path": "VERIFICATION.json",
+      "sha256": "b8869cc9ba3dfc52210f90e878fb5ca5848a8edd50d93056354b756ab9efc3a8"
+    },
+    {
+      "bytes": 3897,
+      "path": "baseline/policy_comparison.csv",
+      "sha256": "7e6dd7eab796d1af9b61a120dc5d5ddd86a8298c18f3fa3f556e4f900655f56e"
+    },
+    {
+      "bytes": 8155,
+      "path": "final/all_t_metrics.csv",
+      "sha256": "ef5187f8ae1fabe2390d5afdc0e3c9386fe6fb3ac7ccc3606d08a5628733c81d"
+    },
+    {
+      "bytes": 5100,
+      "path": "final/identity_counts.csv",
+      "sha256": "f6aa2468ad7d8c43b7cba4ebf42c0459edd31f8a315fdb7e72d4575d365528c9"
+    },
+    {
+      "bytes": 7953,
+      "path": "final/paired_deltas.csv",
+      "sha256": "e8fb4c5c0c52d25b6984666a25210288685ae57169d053604b468f2b72483021"
+    },
+    {
+      "bytes": 15549,
+      "path": "final/per_reference_deltas.csv",
+      "sha256": "4875c31b206c7beba8ab771e0605557f7c64204951e98d8f0cb8db5dc19c4fcb"
+    },
+    {
+      "bytes": 12941,
+      "path": "final/per_reference_metrics.csv",
+      "sha256": "76b65caea0a1184bfa0b9d3e460ce45c39331e89014f71d0999f57e06cd6ede9"
+    },
+    {
+      "bytes": 1286,
+      "path": "final/reference_bootstrap.csv",
+      "sha256": "31e6108c0a12871e3729fb2c3561cd11558877666e9b88f4c668499548c0d981"
+    },
+    {
+      "bytes": 1355,
+      "path": "final/retention.csv",
+      "sha256": "2847d5f27708a977ba47f4d0e245956d24edf00ba3f325965b1d7da9b876ab32"
+    },
+    {
+      "bytes": 4229,
+      "path": "final/status.json",
+      "sha256": "191668b22a6deb28619a35cf2d70f1c2385e05d93cff4beedc1cb8521b02ebf0"
+    },
+    {
+      "bytes": 6223,
+      "path": "implementation/query_state_contract.md",
+      "sha256": "6e0b3d7fc331f94785b862f994d8e9ec1fcb71b2af88833daa9d6351de98fb32"
+    },
+    {
+      "bytes": 1109,
+      "path": "implementation/r1_load_report.json",
+      "sha256": "9d5765d7c5351628be6c1cfc51e78600da994ddb3102172336cd2dbfed5b42e6"
+    },
+    {
+      "bytes": 11764,
+      "path": "implementation/real_gradient_smoke.json",
+      "sha256": "7507c0ad74a809009d2c89a706f1ed9ba83d772d2f0d270d1f8ea1e75107fb88"
+    },
+    {
+      "bytes": 2294,
+      "path": "implementation/sequence_loss_example.csv",
+      "sha256": "791708b0b9089f056cfd4534b12569ccb561d090aab6a917ba7c48e66076ab75"
+    },
+    {
+      "bytes": 321930,
+      "path": "references_inventory.csv",
+      "sha256": "d2f3cade7cd8d1d298be8c6510a949d5af7b6f948fda2bf956e2bfe88e4b3f34"
+    },
+    {
+      "bytes": 689694,
+      "path": "resources/per_update_measurements.csv",
+      "sha256": "166efc7132f5550fef416e3e5fb280a219b15acad99c52885493c9e67aa9c2cf"
+    },
+    {
+      "bytes": 59917,
+      "path": "resources/profile_summary.csv",
+      "sha256": "3117eb0c4cfbc44be9accfc9b9753736d11c725ce1bbd6c359f64247c12b7cc7"
+    },
+    {
+      "bytes": 857,
+      "path": "resources/profile_units.csv",
+      "sha256": "6b68410b223ebd2fe6f99d1b062362d04d8d596c8e218bf6ef383d3d2ea2f20e"
+    },
+    {
+      "bytes": 2070,
+      "path": "resources/run_summary.json",
+      "sha256": "c58004251f63d703b89ad12f5b005ec808f2259e2394714db056c8ad144fdf5d"
+    },
+    {
+      "bytes": 1337,
+      "path": "resources/state_bytes.csv",
+      "sha256": "569d5ba3ef0404a7e6dafaa194e81b263d39b5aca333d9cf04f059877ad38398"
+    },
+    {
+      "bytes": 658,
+      "path": "training/FH_CONT_cost_and_exposure.csv",
+      "sha256": "6531b7137b2f8448266b5eb9a95681fde913725574e071c3ea3c3fa866d46eb0"
+    },
+    {
+      "bytes": 2328,
+      "path": "training/FH_CONT_learning_curves.csv",
+      "sha256": "aafca1be0fce971c9973ac549c4f52104b2c7f73d932e39259d69ec478b42f7d"
+    },
+    {
+      "bytes": 7037,
+      "path": "training/M3_learning_curves.csv",
+      "sha256": "3556afcd37c64856c7bd126c1e85a210482cd999d8e59d44ef14f6e2af5e2a1a"
+    },
+    {
+      "bytes": 435,
+      "path": "training/M4_budget_gate.csv",
+      "sha256": "37fb490d87c051873d35a31433db48d3da200748ab21357d9cf1607d31e6eb6d"
+    },
+    {
+      "bytes": 790,
+      "path": "training/costs_and_exposure.csv",
+      "sha256": "c0f22d604834801363f97c2ba337008f462cc3fc26269c170ffbefb8e8f4bdd4"
+    },
+    {
+      "bytes": 6877,
+      "path": "training/variants.json",
+      "sha256": "4ea7d01435d3f91d831016d9773f17fd4992820df3b517732c44e8ad6eb97b5a"
+    },
+    {
+      "bytes": 926,
+      "path": "visual/paired_content_ablation.csv",
+      "sha256": "2ccfe7dc338a9a82c5c7e0e3d861b9eb327a676ffb5979cb55a860d2437f4bc2"
+    }
+  ],
+  "content_sha256": "1f0dafbecf275466a98a1716cc186680e2a37b7738c0664773414c9aa9b7b1c4",
+  "publication_commit_resolution": "resolve from remote branch tip",
+  "results_commit": "fb4b6df8f46449981bcb344913de04208e312ba5",
+  "schema_version": "task-memory-final-manifest-v2",
+  "statuses": {
+    "EXECUTION": "PARTIAL",
+    "GENERALIZATION": "NOT_ESTABLISHED",
+    "MECHANISM": "PARTIAL",
+    "PUBLICATION": "PUSH_VERIFIED",
+    "RESOURCE": "TRADEOFF",
+    "RETENTION": "IMPROVED",
+    "TASK_METRICS_ALL_T": "PASS",
+    "TMAP_ALL_T_VS_MATCHED_FH": "PASS",
+    "TMAP_ALL_T_VS_R1": "FAIL"
+  }
+}
