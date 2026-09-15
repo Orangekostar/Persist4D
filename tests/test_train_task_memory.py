@@ -9,8 +9,8 @@ import pytest
 import torch
 from omegaconf import OmegaConf
 
-from datasets.task_memory_episode import NativeEpisodeMaster
 import scripts.train_task_memory as training_module
+from datasets.task_memory_episode import NativeEpisodeMaster
 from scripts.train_task_memory import (
     FORMAL_OPTIMIZER_UPDATES,
     M3_OPTIMIZER_UPDATES,

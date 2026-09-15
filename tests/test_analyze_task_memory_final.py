@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from scripts.analyze_task_memory_final import (
@@ -9,11 +11,13 @@ from scripts.analyze_task_memory_final import (
     bootstrap_equal_reference_deltas,
     build_all_t_comparison,
     build_retention_rows,
+    load_resource_status,
     validate_identity_events,
     validate_identity_rows,
     validate_per_reference_rows,
     validate_primary_rows,
 )
+from scripts.task_memory_contracts import canonical_json_sha256
 
 
 def _primary_rows(variant: str, checkpoint: str, base: float):
@@ -102,6 +106,27 @@ def test_retention_reports_absolute_relative_and_global_drop() -> None:
     assert [row["A_t_mAP"] for row in retention] == [0.5, 0.45, 0.4, 0.42]
     assert [row["R_t_mAP"] for row in retention] == pytest.approx([1.0, 0.9, 0.8, 0.84])
     assert all(row["Dmax_t_mAP"] == pytest.approx(0.1) for row in retention)
+
+
+def test_resource_status_uses_valid_profile_and_missing_means_not_measured(
+    tmp_path,
+) -> None:
+    summary = tmp_path / "run_summary.json"
+    assert load_resource_status(summary) == "NOT_MEASURED"
+
+    payload = {"status": "PASS", "resource_status": "TRADEOFF"}
+    payload["content_sha256"] = canonical_json_sha256(payload)
+    summary.write_text(json.dumps(payload), encoding="utf-8")
+
+    assert load_resource_status(summary) == "TRADEOFF"
+
+    payload["resource_status"] = "PASS"
+    payload["content_sha256"] = canonical_json_sha256(
+        {key: value for key, value in payload.items() if key != "content_sha256"}
+    )
+    summary.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(FinalAnalysisError, match="resource status"):
+        load_resource_status(summary)
 
 
 def test_reference_bootstrap_is_six_cluster_fixed_seed_and_descriptive() -> None:

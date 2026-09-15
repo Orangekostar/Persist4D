@@ -84,3 +84,69 @@ done
 
 Exact per-variant commands and resolved-config hashes are frozen in
 `training/variants.json`.
+
+## Verified Task 12 commands
+
+Run the three full Protocol-B evaluations. They may run concurrently on three
+A40 devices, or sequentially with each command mapped to `cuda:0`:
+
+```bash
+for variant in M3-V-CORE M3-BASE-CONT FH-CONT; do
+  CUDA_VISIBLE_DEVICES=0 python -m scripts.evaluate_task_memory \
+    --variant "$variant" \
+    --checkpoint "$PERSIST4D_RUN_ROOT/training/formal/$variant/update=1500.ckpt" \
+    --population protocol_b_43_masters_3_orders --reducers mean \
+    --device cuda:0 \
+    --cache-root "$PERSIST4D_RUN_ROOT/evaluation_cache/M5/protocol_b/$variant" \
+    --output "artifacts/task_memory_retention_v2/evaluation/M5/protocol_b/$variant"
+done
+```
+
+Compute the two six-reference tables independently, then merge them with the
+aggregate results:
+
+```bash
+mkdir -p "$PERSIST4D_RUN_ROOT/analysis_intermediate"
+
+python -m scripts.analyze_task_memory_final \
+  --data-root "$PERSIST4D_DATA_ROOT" --external-root "$PERSIST4D_RUN_ROOT" \
+  --candidate-cache "$PERSIST4D_RUN_ROOT/evaluation_cache/M5/protocol_b/M3-V-CORE" \
+  --reference-only M3-V-CORE \
+  --reference-output "$PERSIST4D_RUN_ROOT/analysis_intermediate/M3-V-CORE.csv"
+
+python -m scripts.analyze_task_memory_final \
+  --data-root "$PERSIST4D_DATA_ROOT" --external-root "$PERSIST4D_RUN_ROOT" \
+  --fh-cache "$PERSIST4D_RUN_ROOT/evaluation_cache/M5/protocol_b/FH-CONT" \
+  --reference-only FH-CONT \
+  --reference-output "$PERSIST4D_RUN_ROOT/analysis_intermediate/FH-CONT.csv"
+```
+
+Profile the frozen candidate and matched full-history checkpoint sequentially
+on one A40:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python -m scripts.profile_task_memory \
+  --comparison-contract artifacts/task_memory_retention_v2/PROFILE_CONTRACT.json \
+  --protocol-manifest artifacts/P6A/protocol_b_manifest.json \
+  --data-contract artifacts/task_memory_retention_v2/DATA_CONTRACT.json \
+  --variant-manifest artifacts/task_memory_retention_v2/training/variants.json \
+  --data-root "$PERSIST4D_DATA_ROOT" \
+  --rio-metadata "$PERSIST4D_RIO_METADATA" \
+  --pretrained "$PERSIST4D_CONCERTO_PRETRAINED" \
+  --external-root "$PERSIST4D_RUN_ROOT" \
+  --candidate-checkpoint "$PERSIST4D_RUN_ROOT/training/formal/M3-V-CORE/update=1500.ckpt" \
+  --fh-checkpoint "$PERSIST4D_RUN_ROOT/training/formal/FH-CONT/update=1500.ckpt" \
+  --device cuda:0 --warmup 5 --repeats 10 \
+  --output artifacts/task_memory_retention_v2/resources
+```
+
+Generate the final tables after the resource profile exists:
+
+```bash
+python -m scripts.analyze_task_memory_final \
+  --candidate-cache "$PERSIST4D_RUN_ROOT/evaluation_cache/M5/protocol_b/M3-V-CORE" \
+  --base-cache "$PERSIST4D_RUN_ROOT/evaluation_cache/M5/protocol_b/M3-BASE-CONT" \
+  --fh-cache "$PERSIST4D_RUN_ROOT/evaluation_cache/M5/protocol_b/FH-CONT" \
+  --candidate-reference "$PERSIST4D_RUN_ROOT/analysis_intermediate/M3-V-CORE.csv" \
+  --fh-reference "$PERSIST4D_RUN_ROOT/analysis_intermediate/FH-CONT.csv"
+```

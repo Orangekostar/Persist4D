@@ -12,7 +12,6 @@ import tempfile
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ARTIFACT_ROOT = PROJECT_ROOT / "artifacts/task_memory_retention_v2"
 M3_VARIANTS = ("M3-BASE-CONT", "M3-V-LAST", "M3-V-CORE")

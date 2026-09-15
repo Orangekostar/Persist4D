@@ -22,6 +22,7 @@ DEFAULT_ARTIFACT_ROOT = PROJECT_ROOT / "artifacts/task_memory_retention_v2"
 DEFAULT_LEGACY_BASELINE = (
     PROJECT_ROOT / "artifacts/allt_task_superiority_v1/baseline/all_t_metrics.csv"
 )
+DEFAULT_RESOURCE_SUMMARY = DEFAULT_ARTIFACT_ROOT / "resources/run_summary.json"
 PROTOCOL_B_POPULATION_ID = "protocol_b_43_masters_3_orders"
 
 REPORT_HORIZONS = (2, 3, 4, 5)
@@ -603,6 +604,20 @@ def _validate_content_hash(value: Mapping[str, object], *, name: str) -> None:
         raise FinalAnalysisError(f"{name} content SHA256 differs")
 
 
+def load_resource_status(path: Path) -> str:
+    path = path.expanduser().resolve()
+    if not path.exists():
+        return "NOT_MEASURED"
+    value = _load_json(path)
+    _validate_content_hash(value, name="resource profile")
+    if value.get("status") != "PASS":
+        raise FinalAnalysisError("resource profile did not pass")
+    status = value.get("resource_status")
+    if status not in {"ADVANTAGE", "TRADEOFF", "NO_ADVANTAGE"}:
+        raise FinalAnalysisError("resource status differs")
+    return str(status)
+
+
 def _read_csv_rows(path: Path) -> list[dict[str, object]]:
     try:
         with path.open(newline="", encoding="utf-8") as handle:
@@ -1167,6 +1182,7 @@ def analyze_final_results(
     external_root: Path | None = None,
     candidate_reference_path: Path | None = None,
     fh_reference_path: Path | None = None,
+    resource_summary: Path = DEFAULT_RESOURCE_SUMMARY,
 ) -> dict[str, object]:
     current = {}
     identities = []
@@ -1292,7 +1308,7 @@ def analyze_final_results(
         "TMAP_ALL_T_VS_MATCHED_FH": matched["tmap_all_t"],
         "TASK_METRICS_ALL_T": matched["task_metrics_all_t"],
         "RETENTION": _retention_status(current["M3-V-CORE"], current["FH-CONT"]),
-        "RESOURCE": "NOT_MEASURED",
+        "RESOURCE": load_resource_status(resource_summary),
         "MECHANISM": "PARTIAL",
         "GENERALIZATION": "NOT_ESTABLISHED",
         "PUBLICATION": "NOT_ATTEMPTED",
@@ -1350,6 +1366,9 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--external-root", type=Path)
     parser.add_argument("--candidate-reference", type=Path)
     parser.add_argument("--fh-reference", type=Path)
+    parser.add_argument(
+        "--resource-summary", type=Path, default=DEFAULT_RESOURCE_SUMMARY
+    )
     parser.add_argument("--reference-only", choices=("M3-V-CORE", "FH-CONT"))
     parser.add_argument("--reference-output", type=Path)
     return parser
@@ -1406,6 +1425,7 @@ def main() -> int:
         external_root=args.external_root,
         candidate_reference_path=args.candidate_reference,
         fh_reference_path=args.fh_reference,
+        resource_summary=args.resource_summary,
     )
     print(json.dumps(result["status"], sort_keys=True))
     return 0
@@ -1423,6 +1443,7 @@ __all__ = [
     "compute_per_reference_metrics",
     "load_evaluation_bundle",
     "load_legacy_baseline_rows",
+    "load_resource_status",
     "validate_identity_events",
     "validate_identity_rows",
     "validate_per_reference_rows",

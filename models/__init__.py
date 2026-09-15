@@ -93,11 +93,11 @@ for _n, _r in _DISABLED.items():
     if _n not in _MODELS:
         setattr(_pkg, _n, _stub(_n, _r))
 
+import models.object_visual_memory as _object_visual_memory
 import models.task_memory_criterion as _task_memory_criterion
 import models.task_memory_routing as _task_memory_routing
 import models.task_memory_state as _task_memory_state
 import models.task_memory_supervision as _task_memory_supervision
-import models.object_visual_memory as _object_visual_memory
 
 CommitResult = _task_memory_routing.CommitResult
 EntityRoute = _task_memory_routing.EntityRoute

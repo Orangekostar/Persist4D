@@ -1,0 +1,48 @@
+{
+  "content_sha256": "4c116f7cd4494163b783773547da868bdcd0c9d64f7c4d97a50bdd64a7149c56",
+  "data_contract_sha256": "4434a84b14139b611baa90a365e59cc0fa7cfb27a10d21cc21f50fb2a520c96e",
+  "device": "NVIDIA A40",
+  "measurement_rows": 1920,
+  "outputs": [
+    {
+      "path": "per_update_measurements.csv",
+      "sha256": "166efc7132f5550fef416e3e5fb280a219b15acad99c52885493c9e67aa9c2cf"
+    },
+    {
+      "path": "profile_summary.csv",
+      "sha256": "3117eb0c4cfbc44be9accfc9b9753736d11c725ce1bbd6c359f64247c12b7cc7"
+    },
+    {
+      "path": "profile_units.csv",
+      "sha256": "6b68410b223ebd2fe6f99d1b062362d04d8d596c8e218bf6ef383d3d2ea2f20e"
+    }
+  ],
+  "permanent_state_bytes": 489816,
+  "pretrained_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+  "profile_contract_sha256": "52a74d7d47021a3751e8563363a34e17dc5f82b5d940a67ef7eb7190ce1db626",
+  "profiled_models": [
+    {
+      "checkpoint_bytes": 757236870,
+      "checkpoint_sha256": "1b883db3faf26f168274853857719786125d640e24377f99d427d2b8aec7793f",
+      "resolved_config_sha256": "232dbc650aae7c6611744d35056d2fa116632d397150c9b37b7f0993ee03437b",
+      "variant": "M3-V-CORE"
+    },
+    {
+      "checkpoint_bytes": 754830374,
+      "checkpoint_sha256": "6672569c9524d38a0f932c9d8351d6606b9b26a574236a59d4799f225178d4f5",
+      "resolved_config_sha256": "7e0b45162dfb160a240db205ee6100a67f7bc9aadfc77ee39ee43b92a464a4fa",
+      "variant": "FH-CONT"
+    }
+  ],
+  "protocol_manifest_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "repeats": 10,
+  "resource_status": "TRADEOFF",
+  "rio_metadata_sha256": "674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64",
+  "schema_version": "task-memory-profile-run-v2",
+  "source_commit": "1f7c14ad5e7d7457222d5254d3d8d0a695d97954",
+  "state_bytes_evidence_sha256": "569d5ba3ef0404a7e6dafaa194e81b263d39b5aca333d9cf04f059877ad38398",
+  "status": "PASS",
+  "summary_rows": 192,
+  "variant_manifest_sha256": "4ea7d01435d3f91d831016d9773f17fd4992820df3b517732c44e8ad6eb97b5a",
+  "warmups": 5
+}
