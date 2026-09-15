@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
 
 import pytest
 
@@ -11,6 +12,9 @@ from scripts.publish_task_memory_v2 import (
     STATUS_FIELDS,
     VERIFICATION_CHECKS,
     PublicationError,
+    _final_report,
+    _load_json,
+    _read_csv,
     build_final_manifest,
     derive_package_statuses,
     render_handoff,
@@ -18,6 +22,22 @@ from scripts.publish_task_memory_v2 import (
     validate_statuses,
     validate_verification,
 )
+
+
+def test_final_report_discloses_stronger_controls_and_policy_scope() -> None:
+    root = Path(__file__).resolve().parents[1] / "artifacts/task_memory_retention_v2"
+    text = _final_report(
+        statuses=_statuses(),
+        metrics=_read_csv(root / "final/all_t_metrics.csv"),
+        analysis=_load_json(root / "final/status.json"),
+        resource=_load_json(root / "resources/run_summary.json"),
+        results_commit="a" * 40,
+    )
+    assert "Selected M3-V-CORE loses all four tMAP horizons" in text
+    assert "D-LAST-lag1" in text and "D-EMA-lag1" in text
+    assert "645 R1 stage forwards" in text
+    assert "not included in the A40 latency profile" in text
+    assert "FH-R1-native retains its original official output policy" in text
 
 
 def test_publication_requires_formal_protocol_b_controls_and_cache_manifest() -> None:

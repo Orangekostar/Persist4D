@@ -616,6 +616,9 @@ Results commit: `{results_commit}`.
 
 {_metric_table(metrics)}
 
+FH-R1-native retains its original official output policy; FH-R1-lag1 and the
+new-model rows use lag1/mean. Cross-policy deltas do not isolate a model change.
+
 ## Strict comparisons
 
 {_comparison_lines(analysis)}
@@ -643,6 +646,12 @@ six fixed canonical units, five warmups, ten measurements, cloned prior state, a
 separate model-update, end-to-end, materialization, and true cumulative scopes.
 
 ## Limitations
+
+Selected M3-V-CORE loses all four tMAP horizons against both D-LAST-lag1 and
+D-EMA-lag1, and against FH-R1-native. D controls use separately generated
+prediction-only R1 observations (645 R1 stage forwards in this run) that were
+not included in the A40 latency profile. Their gains over R1+B4 are not an
+isolated LAST/EMA update-rule effect.
 
 Protocol-B is a previously exposed historical benchmark. One training seed does
 not establish replicated training stability. FH encoder-cache equivalence and
