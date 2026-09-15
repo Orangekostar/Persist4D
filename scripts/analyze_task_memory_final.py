@@ -931,6 +931,141 @@ def load_legacy_baseline_rows(path: Path) -> list[dict[str, object]]:
     return selected
 
 
+def _external_all_t_row(
+    raw: Mapping[str, object],
+    *,
+    variant: str,
+    evidence_scope: str,
+) -> dict[str, object]:
+    if raw.get("population_id") != PROTOCOL_B_POPULATION_ID:
+        raise FinalAnalysisError("external baseline population differs")
+    counts = {
+        "reference_count": _integer(
+            raw.get("reference_count"), name="reference count", minimum=1
+        ),
+        "master_count": _integer(
+            raw.get("master_count"), name="master count", minimum=1
+        ),
+        "order_count": _integer(
+            raw.get("order_count"), name="order count", minimum=1
+        ),
+    }
+    if counts != {"reference_count": 6, "master_count": 43, "order_count": 129}:
+        raise FinalAnalysisError("external baseline Protocol-B population differs")
+    source_commit = _text(raw.get("source_commit"), name="source commit")
+    checkpoint = _text(raw.get("checkpoint_sha256"), name="checkpoint SHA256")
+    config = _text(raw.get("config_sha256"), name="config SHA256")
+    if len(source_commit) != 40 or len(checkpoint) != 64 or len(config) != 64:
+        raise FinalAnalysisError("external baseline provenance differs")
+    return {
+        "population_id": PROTOCOL_B_POPULATION_ID,
+        "evidence_scope": evidence_scope,
+        "variant": variant,
+        "checkpoint_sha256": checkpoint,
+        "source_commit": source_commit,
+        "config_sha256": config,
+        "training_seed": _integer(raw.get("training_seed"), name="training seed"),
+        "evaluation_seed": _integer(
+            raw.get("evaluation_seed"), name="evaluation seed"
+        ),
+        "policy": _text(raw.get("policy"), name="policy"),
+        "reducer": _text(raw.get("reducer"), name="reducer"),
+        "window": _text(raw.get("window"), name="window"),
+        "K": _integer(raw.get("K"), name="K"),
+        "r": _integer(raw.get("r"), name="r"),
+        "state_bytes": _integer(raw.get("state_bytes"), name="state bytes"),
+        "T": _integer(raw.get("T"), name="T", minimum=2),
+        **{metric: _rate(raw.get(metric), name=metric) for metric in TASK_METRICS},
+        "direct_current_AP": _rate(
+            raw.get("direct_current_AP"), name="direct_current_AP"
+        ),
+        **counts,
+    }
+
+
+def load_policy_baseline_rows(path: Path) -> list[dict[str, object]]:
+    """Load the measured Protocol-B R1+B4 lag1 baseline."""
+
+    selected = [
+        _external_all_t_row(
+            row,
+            variant="R1+B4-lag1",
+            evidence_scope="new_protocol_b_r1_b4_policy",
+        )
+        for row in _read_csv_rows(path.expanduser().resolve())
+        if row.get("population_id") == PROTOCOL_B_POPULATION_ID
+        and row.get("policy") == "lag1"
+        and row.get("reducer") == "mean"
+    ]
+    if not selected:
+        raise FinalAnalysisError("Protocol-B R1+B4 lag1 baseline is unavailable")
+    checkpoint = str(selected[0]["checkpoint_sha256"])
+    normalized = validate_primary_rows(
+        selected,
+        expected_variant="R1+B4-lag1",
+        expected_checkpoint_sha256=checkpoint,
+    )
+    if any(row["source_commit"] != selected[0]["source_commit"] for row in selected):
+        raise FinalAnalysisError("R1+B4 source commit differs across horizons")
+    return [{field: row[field] for field in ALL_T_FIELDS} for row in normalized]
+
+
+def load_long_memory_control_rows(path: Path) -> list[dict[str, object]]:
+    """Load measured Protocol-B D-LAST and D-EMA policy controls."""
+
+    selected = []
+    seen = set()
+    for raw in _read_csv_rows(path.expanduser().resolve()):
+        if raw.get("population_id") != PROTOCOL_B_POPULATION_ID:
+            continue
+        method = raw.get("method")
+        policy = raw.get("policy")
+        if (
+            method not in {"D-LAST", "D-EMA"}
+            or policy not in {"commit0", "lag1"}
+            or raw.get("reducer") != "mean"
+            or raw.get("status") != "MEASURED"
+        ):
+            raise FinalAnalysisError("long-memory control row differs")
+        horizon = _integer(raw.get("T"), name="control T", minimum=2)
+        key = (str(method), str(policy), horizon)
+        if horizon not in REPORT_HORIZONS or key in seen:
+            raise FinalAnalysisError("long-memory control coverage differs")
+        seen.add(key)
+        for field in ("base_cache_manifest_sha256", "observation_manifest_sha256"):
+            if len(_text(raw.get(field), name=field)) != 64:
+                raise FinalAnalysisError("long-memory control provenance differs")
+        selected.append(
+            _external_all_t_row(
+                raw,
+                variant=f"{method}-{policy}",
+                evidence_scope="new_protocol_b_long_memory_control",
+            )
+        )
+    expected = {
+        (method, policy, horizon)
+        for method in ("D-LAST", "D-EMA")
+        for policy in ("commit0", "lag1")
+        for horizon in REPORT_HORIZONS
+    }
+    if seen != expected:
+        raise FinalAnalysisError("long-memory control coverage differs")
+    for method in ("D-LAST", "D-EMA"):
+        for policy in ("commit0", "lag1"):
+            variant = f"{method}-{policy}"
+            rows = [row for row in selected if row["variant"] == variant]
+            validate_primary_rows(
+                rows,
+                expected_variant=variant,
+                expected_checkpoint_sha256=str(rows[0]["checkpoint_sha256"]),
+                expected_policy=policy,
+            )
+    return sorted(
+        selected,
+        key=lambda row: (str(row["variant"]), int(row["T"])),
+    )
+
+
 def build_reference_delta_rows(
     candidate_rows: Sequence[Mapping[str, object]],
     baseline_rows: Sequence[Mapping[str, object]],
@@ -1456,6 +1591,8 @@ __all__ = [
     "compute_per_reference_metrics",
     "load_evaluation_bundle",
     "load_legacy_baseline_rows",
+    "load_long_memory_control_rows",
+    "load_policy_baseline_rows",
     "load_resource_status",
     "validate_identity_events",
     "validate_identity_rows",

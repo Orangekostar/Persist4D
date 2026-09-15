@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 from pathlib import Path
 
@@ -13,6 +14,8 @@ from scripts.analyze_task_memory_final import (
     build_all_t_comparison,
     build_retention_rows,
     load_legacy_baseline_rows,
+    load_long_memory_control_rows,
+    load_policy_baseline_rows,
     load_resource_status,
     validate_identity_events,
     validate_identity_rows,
@@ -56,6 +59,83 @@ def test_legacy_b4_rows_remain_commit0_evidence() -> None:
     b4 = [row for row in rows if row["variant"] == "B4-commit0"]
     assert len(b4) == 4
     assert {row["policy"] for row in b4} == {"commit0"}
+
+
+def _write_rows(path: Path, rows: list[dict[str, object]]) -> None:
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=tuple(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def _external_row(*, policy: str, horizon: int) -> dict[str, object]:
+    return {
+        "population_id": "protocol_b_43_masters_3_orders",
+        "reference_count": 6,
+        "master_count": 43,
+        "order_count": 129,
+        "source_commit": "a" * 40,
+        "checkpoint_sha256": "b" * 64,
+        "config_sha256": "c" * 64,
+        "training_seed": 45,
+        "evaluation_seed": 45,
+        "policy": policy,
+        "reducer": "mean",
+        "window": "W2",
+        "K": 100,
+        "r": 0,
+        "state_bytes": 61008,
+        "T": horizon,
+        **{metric: 0.1 * horizon for metric in TASK_METRICS},
+        "direct_current_AP": 0.25,
+    }
+
+
+def test_policy_baseline_loader_selects_only_protocol_b_lag1(tmp_path: Path) -> None:
+    path = tmp_path / "policy.csv"
+    _write_rows(
+        path,
+        [
+            _external_row(policy=policy, horizon=horizon)
+            for policy in ("commit0", "lag1")
+            for horizon in REPORT_HORIZONS
+        ],
+    )
+
+    rows = load_policy_baseline_rows(path)
+
+    assert len(rows) == 4
+    assert {row["variant"] for row in rows} == {"R1+B4-lag1"}
+    assert {row["policy"] for row in rows} == {"lag1"}
+
+
+def test_long_memory_control_loader_preserves_method_and_policy(tmp_path: Path) -> None:
+    path = tmp_path / "controls.csv"
+    rows = []
+    for method in ("D-LAST", "D-EMA"):
+        for policy in ("commit0", "lag1"):
+            for horizon in REPORT_HORIZONS:
+                row = _external_row(policy=policy, horizon=horizon)
+                row.update(
+                    {
+                        "method": method,
+                        "base_cache_manifest_sha256": "d" * 64,
+                        "observation_manifest_sha256": "e" * 64,
+                        "status": "MEASURED",
+                    }
+                )
+                rows.append(row)
+    _write_rows(path, rows)
+
+    loaded = load_long_memory_control_rows(path)
+
+    assert len(loaded) == 16
+    assert {row["variant"] for row in loaded} == {
+        "D-LAST-commit0",
+        "D-LAST-lag1",
+        "D-EMA-commit0",
+        "D-EMA-lag1",
+    }
 
 
 def test_primary_rows_lock_checkpoint_policy_reducer_and_full_metric_schema() -> None:
