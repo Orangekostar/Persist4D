@@ -809,12 +809,13 @@ def _verified_evaluation_manifest(
         expected_entry_count = 129
         horizon_count = len(REPORT_HORIZONS)
     elif expected_population_id == NATIVE_POPULATION_ID:
-        expected_counts = {"reference_count": 40, "master_count": 220}
+        expected_counts = {
+            "reference_count": 40,
+            "master_count": 220,
+            "order_count": 220,
+        }
         expected_horizon_counts = {
-            f"T{horizon}": {
-                "reference_count": NATIVE_COUNTS[horizon]["reference_count"],
-                "master_count": NATIVE_COUNTS[horizon]["master_count"],
-            }
+            f"T{horizon}": NATIVE_COUNTS[horizon]
             for horizon in NATIVE_HORIZONS
         }
         expected_entry_count = 220

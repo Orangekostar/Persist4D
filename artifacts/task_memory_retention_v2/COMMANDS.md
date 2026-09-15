@@ -1,5 +1,10 @@
 # Commands
 
+Run from the project root in the `persist4d` Conda environment. External paths
+are resolved locally by the untracked
+`artifacts/task_memory_retention_v2/external_assets.local.json`; replace the
+example environment variables below with the same assets for reproduction.
+
 ```bash
 export PERSIST4D_DATA_ROOT=/actual/data/root
 export PERSIST4D_RIO_METADATA=/actual/3RScan.json
@@ -59,7 +64,7 @@ python -m pytest -q \
   tests/test_task_memory_output.py
 ```
 
-## Frozen M2 commands (not yet run)
+## Completed M2 commands
 
 Run each 300-update exact-schedule prefix in an isolated directory:
 
@@ -83,7 +88,11 @@ done
 ```
 
 Exact per-variant commands and resolved-config hashes are frozen in
-`training/variants.json`.
+`training/variants.json`. All four arms reached update 3000; the development
+selection fixed W-BASE at 3000, Q-INDEP and Q-TALA at 1500, and FH-MATCH at
+0750. M3 continues from Q-TALA/1500; FH-CONT continues from FH-MATCH/0750.
+The exact checkpoint identities and retained optimizer state are recorded in
+`training/selected_checkpoints.json`.
 
 ## Verified Task 12 commands
 
@@ -101,6 +110,41 @@ for variant in M3-V-CORE M3-BASE-CONT FH-CONT; do
     --output "artifacts/task_memory_retention_v2/evaluation/M5/protocol_b/$variant"
 done
 ```
+
+The same Protocol-B population was also evaluated for W-BASE, Q-TALA,
+FH-MATCH, and the frozen R1 weights through the FH-MATCH model path with
+`lag1/mean`. The original FH-R1-native reference retains its separate official
+output policy; do not relabel it as the same-policy FH-R1-lag1 measurement.
+
+## Formal prediction-only controls
+
+The formal R1+B4 cache manifest is in
+`evaluation/M5/protocol_b/R1-B4-policy/cache_manifest.json` and binds all 129
+orders to 115 unique sequence cache files. Shard production by unique sequence
+so that separate GPUs cannot write the same observation file:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python -m scripts.run_task_memory_controls \
+  --mode produce --population protocol_b_43_masters_3_orders \
+  --base-manifest artifacts/task_memory_retention_v2/evaluation/M5/protocol_b/R1-B4-policy/cache_manifest.json \
+  --output-root artifacts/task_memory_retention_v2/evaluation/M5/protocol_b \
+  --shard-index 0 --shard-count 2 --device cuda:0
+
+CUDA_VISIBLE_DEVICES=2 python -m scripts.run_task_memory_controls \
+  --mode produce --population protocol_b_43_masters_3_orders \
+  --base-manifest artifacts/task_memory_retention_v2/evaluation/M5/protocol_b/R1-B4-policy/cache_manifest.json \
+  --output-root artifacts/task_memory_retention_v2/evaluation/M5/protocol_b \
+  --shard-index 1 --shard-count 2 --device cuda:0
+
+python -m scripts.run_task_memory_controls \
+  --mode analyze --population protocol_b_43_masters_3_orders \
+  --base-manifest artifacts/task_memory_retention_v2/evaluation/M5/protocol_b/R1-B4-policy/cache_manifest.json \
+  --output-root artifacts/task_memory_retention_v2/evaluation/M5/protocol_b
+```
+
+The development CSV files under `baseline/` are not the formal Protocol-B
+policy or control inputs. The final analyzer defaults to the files under
+`evaluation/M5/protocol_b/`.
 
 Compute the two six-reference tables independently, then merge them with the
 aggregate results:

@@ -1,5 +1,55 @@
 {
+  "capacity_analysis": {
+    "reason": "registered new-model state occupancy did not enter saturation",
+    "status": "NOT_ESTABLISHED"
+  },
   "comparisons": {
+    "M3-V-CORE_vs_B4-commit0": {
+      "comparison": "M3-V-CORE_vs_B4-commit0",
+      "epsilon": 1e-06,
+      "failed_tmap_horizons": [
+        4,
+        5
+      ],
+      "mean_tmap_delta": -0.007245718501508236,
+      "minimum_tmap_delta": -0.020036820322275162,
+      "positive_cells": 12,
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL",
+      "total_cells": 20
+    },
+    "M3-V-CORE_vs_D-EMA-lag1": {
+      "comparison": "M3-V-CORE_vs_D-EMA-lag1",
+      "epsilon": 1e-06,
+      "failed_tmap_horizons": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "mean_tmap_delta": -0.022958040237426758,
+      "minimum_tmap_delta": -0.026056811213493347,
+      "positive_cells": 1,
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL",
+      "total_cells": 20
+    },
+    "M3-V-CORE_vs_D-LAST-lag1": {
+      "comparison": "M3-V-CORE_vs_D-LAST-lag1",
+      "epsilon": 1e-06,
+      "failed_tmap_horizons": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "mean_tmap_delta": -0.02354365587234497,
+      "minimum_tmap_delta": -0.026056811213493347,
+      "positive_cells": 1,
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL",
+      "total_cells": 20
+    },
     "M3-V-CORE_vs_FH-CONT": {
       "comparison": "M3-V-CORE_vs_FH-CONT",
       "epsilon": 1e-06,
@@ -11,8 +61,34 @@
       "tmap_all_t": "PASS",
       "total_cells": 20
     },
-    "M3-V-CORE_vs_FH-R1": {
-      "comparison": "M3-V-CORE_vs_FH-R1",
+    "M3-V-CORE_vs_FH-MATCH": {
+      "comparison": "M3-V-CORE_vs_FH-MATCH",
+      "epsilon": 1e-06,
+      "failed_tmap_horizons": [
+        2
+      ],
+      "mean_tmap_delta": 0.022998624946922064,
+      "minimum_tmap_delta": -0.0015610754489898682,
+      "positive_cells": 17,
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL",
+      "total_cells": 20
+    },
+    "M3-V-CORE_vs_FH-R1-lag1": {
+      "comparison": "M3-V-CORE_vs_FH-R1-lag1",
+      "epsilon": 1e-06,
+      "failed_tmap_horizons": [
+        2
+      ],
+      "mean_tmap_delta": 0.012998908758163452,
+      "minimum_tmap_delta": -0.02013389766216278,
+      "positive_cells": 16,
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL",
+      "total_cells": 20
+    },
+    "M3-V-CORE_vs_FH-R1-native": {
+      "comparison": "M3-V-CORE_vs_FH-R1-native",
       "epsilon": 1e-06,
       "failed_tmap_horizons": [
         2,
@@ -42,29 +118,77 @@
       "tmap_all_t": "FAIL",
       "total_cells": 20
     },
-    "M3-V-CORE_vs_R1+B4": {
-      "comparison": "M3-V-CORE_vs_R1+B4",
+    "M3-V-CORE_vs_Q-TALA": {
+      "comparison": "M3-V-CORE_vs_Q-TALA",
       "epsilon": 1e-06,
       "failed_tmap_horizons": [
+        2,
         4,
         5
       ],
-      "mean_tmap_delta": -0.007245718501508236,
-      "minimum_tmap_delta": -0.020036820322275162,
-      "positive_cells": 12,
+      "mean_tmap_delta": -0.005040286108851433,
+      "minimum_tmap_delta": -0.010162927210330963,
+      "positive_cells": 9,
       "task_metrics_all_t": "FAIL",
       "tmap_all_t": "FAIL",
       "total_cells": 20
+    },
+    "M3-V-CORE_vs_R1+B4-lag1": {
+      "comparison": "M3-V-CORE_vs_R1+B4-lag1",
+      "epsilon": 1e-06,
+      "failed_tmap_horizons": [
+        2
+      ],
+      "mean_tmap_delta": -4.514865577220917e-05,
+      "minimum_tmap_delta": -0.02157948911190033,
+      "positive_cells": 14,
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL",
+      "total_cells": 20
+    },
+    "M3-V-CORE_vs_W-BASE": {
+      "comparison": "M3-V-CORE_vs_W-BASE",
+      "epsilon": 1e-06,
+      "failed_tmap_horizons": [],
+      "mean_tmap_delta": 0.026429017540067434,
+      "minimum_tmap_delta": 0.0039364248514175415,
+      "positive_cells": 18,
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "PASS",
+      "total_cells": 20
     }
   },
-  "content_sha256": "0baf5d4377bc01605c915d7382f95354276a04a97c7bc6e3bfc57a14f8356b56",
+  "content_sha256": "9d57dc1ced5f29477c6909b5de05bf9485e38bdcaf2189942f4f953232d49504",
   "execution_limitations": [
-    "final candidate independent-native evaluation not run",
-    "not all preregistered long-memory controls were rerun on Protocol-B",
-    "single training seed"
+    "single training seed",
+    "native adaptation-holdout references were exposed to the original R1 base",
+    "native adaptation-holdout evidence covers T2-T4 only",
+    "FH_ENCODER_CACHE_NOT_ESTABLISHED",
+    "new-model capacity saturation was not entered; capacity effect is not established"
   ],
+  "fh_encoder_cache": {
+    "status": "FH_ENCODER_CACHE_NOT_ESTABLISHED"
+  },
   "identity_events": {
     "FH-CONT": {
+      "birth_count": 0,
+      "false_birth_count": 0,
+      "false_birth_rate": null,
+      "false_reactivation_count": 0,
+      "false_reactivation_rate": null,
+      "reactivation_count": 0,
+      "rejected_birth_count": 0
+    },
+    "FH-MATCH": {
+      "birth_count": 0,
+      "false_birth_count": 0,
+      "false_birth_rate": null,
+      "false_reactivation_count": 0,
+      "false_reactivation_rate": null,
+      "reactivation_count": 0,
+      "rejected_birth_count": 0
+    },
+    "FH-R1-lag1": {
       "birth_count": 0,
       "false_birth_count": 0,
       "false_birth_rate": null,
@@ -90,20 +214,85 @@
       "false_reactivation_rate": 0.5937286980231765,
       "reactivation_count": 1467,
       "rejected_birth_count": 0
+    },
+    "Q-TALA": {
+      "birth_count": 3124,
+      "false_birth_count": 1838,
+      "false_birth_rate": 0.588348271446863,
+      "false_reactivation_count": 883,
+      "false_reactivation_rate": 0.5871010638297872,
+      "reactivation_count": 1504,
+      "rejected_birth_count": 0
+    },
+    "W-BASE": {
+      "birth_count": 0,
+      "false_birth_count": 0,
+      "false_birth_rate": null,
+      "false_reactivation_count": 0,
+      "false_reactivation_rate": null,
+      "reactivation_count": 0,
+      "rejected_birth_count": 0
+    }
+  },
+  "independent_comparisons": {
+    "M3-V-CORE_vs_FH-CONT_base_exposed_native": {
+      "comparison": "M3-V-CORE_vs_FH-CONT_base_exposed_native",
+      "epsilon": 1e-06,
+      "failed_tmap_horizons": [
+        2
+      ],
+      "mean_tmap_delta": 0.025387609998385113,
+      "minimum_tmap_delta": -0.004181593656539917,
+      "positive_cells": 11,
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL",
+      "total_cells": 15
+    },
+    "M3-V-CORE_vs_M3-BASE-CONT_base_exposed_native": {
+      "comparison": "M3-V-CORE_vs_M3-BASE-CONT_base_exposed_native",
+      "epsilon": 1e-06,
+      "failed_tmap_horizons": [
+        2,
+        3
+      ],
+      "mean_tmap_delta": -0.0028871248165766397,
+      "minimum_tmap_delta": -0.006172835826873779,
+      "positive_cells": 8,
+      "task_metrics_all_t": "FAIL",
+      "tmap_all_t": "FAIL",
+      "total_cells": 15
+    }
+  },
+  "independent_evaluations": {
+    "FH-CONT": {
+      "checkpoint_sha256": "6672569c9524d38a0f932c9d8351d6606b9b26a574236a59d4799f225178d4f5",
+      "population_id": "additional_native_refs"
+    },
+    "M3-BASE-CONT": {
+      "checkpoint_sha256": "a0aa8f73aac5b27aa0aac972ac72cbf1a7dfb3f6d6a1ba103cbf0a92ba793ed6",
+      "population_id": "additional_native_refs"
+    },
+    "M3-V-CORE": {
+      "checkpoint_sha256": "1b883db3faf26f168274853857719786125d640e24377f99d427d2b8aec7793f",
+      "population_id": "additional_native_refs"
     }
   },
   "outputs": [
     {
       "path": "all_t_metrics.csv",
-      "sha256": "ef5187f8ae1fabe2390d5afdc0e3c9386fe6fb3ac7ccc3606d08a5628733c81d"
+      "sha256": "567f73ee8f0706435d04f06495a5300bb8c7c9d6f673f24ee9532244ff2dbe5c"
     },
     {
       "path": "identity_counts.csv",
-      "sha256": "f6aa2468ad7d8c43b7cba4ebf42c0459edd31f8a315fdb7e72d4575d365528c9"
+      "sha256": "d8949ea35a3ffdfca1af3b1fcbacdcec992f8140749a8bffe02e3c207e43bad6"
+    },
+    {
+      "path": "independent_reference_results.csv",
+      "sha256": "d0f9b6cd95f583c19ec666ec01537d96869584fc011d1d1f22b3c2842c58963d"
     },
     {
       "path": "paired_deltas.csv",
-      "sha256": "e8fb4c5c0c52d25b6984666a25210288685ae57169d053604b468f2b72483021"
+      "sha256": "5661a5c2d80c77ab3b8d8d8fb1129dacc7390ede28adf01cd70700ead26c9a84"
     },
     {
       "path": "per_reference_deltas.csv",
@@ -119,7 +308,7 @@
     },
     {
       "path": "retention.csv",
-      "sha256": "2847d5f27708a977ba47f4d0e245956d24edf00ba3f325965b1d7da9b876ab32"
+      "sha256": "5fab6c1e9b0182e3e4a9fe4658f19f7efa0d5643a387b8c23aad98589c302c21"
     }
   ],
   "population_id": "protocol_b_43_masters_3_orders",
@@ -127,10 +316,10 @@
     "interval_estimand": "equal-reference descriptive interval; not pooled-AP confidence interval",
     "status": "COMPLETE"
   },
-  "schema_version": "task-memory-final-analysis-v2",
+  "schema_version": "task-memory-final-analysis-v3",
   "status": {
-    "EXECUTION": "PARTIAL",
-    "GENERALIZATION": "NOT_ESTABLISHED",
+    "EXECUTION": "COMPLETE",
+    "GENERALIZATION": "BASE_EXPOSED_ONLY",
     "MECHANISM": "PARTIAL",
     "PUBLICATION": "NOT_ATTEMPTED",
     "RESOURCE": "TRADEOFF",
