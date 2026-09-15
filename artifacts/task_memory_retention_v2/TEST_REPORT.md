@@ -1,11 +1,11 @@
 # TaskMemory Retention V2 Test Report
 
-Results commit: `fb4b6df8f46449981bcb344913de04208e312ba5`.
+Results commit: `3027b942a5d76dea1dad3f42b3c67c0a9c9383ee`.
 
 ## Correctness classes
 
-- `r1_load_and_shutdown_parity`: PASS; tests/test_persist4d_task_memory.py plus the formal real-model profile load audit
-- `data_and_supervision_isolation`: PASS; tests/test_task_memory_episode.py in the 175-test direct suite
+- `r1_load_and_shutdown_parity`: PASS; tests/test_persist4d_task_memory.py plus PASS A40 two-update smoke and real-model profile load audit
+- `data_and_supervision_isolation`: PASS; tests/test_task_memory_episode.py in the 212-test direct suite
 - `route_and_commit`: PASS; routing and lag-one output tests in the direct suite
 - `tala_supervision`: PASS; tests/test_task_memory_criterion.py in the direct suite
 - `visual_memory`: PASS; tests/test_object_visual_memory.py plus the formal VCORE profile path
@@ -18,10 +18,10 @@ Results commit: `fb4b6df8f46449981bcb344913de04208e312ba5`.
 ### `correctness_suite`
 
 ```bash
-python -m pytest -q tests/test_persist4d_task_memory.py tests/test_task_memory_episode.py tests/test_task_memory_routing.py tests/test_task_memory_output.py tests/test_task_memory_criterion.py tests/test_object_visual_memory.py tests/test_task_memory_trainer.py tests/test_train_task_memory.py tests/test_task_memory_evaluation.py tests/test_analyze_task_memory_final.py tests/test_profile_task_memory.py tests/test_publish_task_memory_v2.py
+conda run -n persist4d python -m pytest -q tests/test_persist4d_task_memory.py tests/test_object_visual_memory.py tests/test_train_task_memory.py tests/test_task_memory_*.py tests/test_analyze_task_memory_final.py tests/test_publish_task_memory_v2.py tests/test_profile_task_memory.py
 ```
 
-Observed: 175 passed in 18.38s; one third-party SciPy deprecation warning (exit code 0).
+Observed: 212 passed in 19.87s; one third-party SciPy deprecation warning (exit code 0).
 
 ### `real_gpu_gate`
 
@@ -34,34 +34,34 @@ Observed: formal A40 profile passed with 1920 measurements, 192 summaries, and 4
 ### `ruff_changed_python`
 
 ```bash
-git diff --name-only 32a51e -- '*.py' | rg -v '^(datasets/pointcept_utils.py|datasets/semseg.py)$' | xargs -r ruff check && for file in datasets/pointcept_utils.py datasets/semseg.py; do diff -u <(git show "32a51e:$file" | ruff check --stdin-filename "$file" --output-format=json - | jq -S 'group_by(.code) | map({code: .[0].code, count: length})') <(ruff check "$file" --output-format=json | jq -S 'group_by(.code) | map({code: .[0].code, count: length})'); done
+ruff check scripts/run_task_memory_controls.py scripts/analyze_task_memory_final.py scripts/publish_task_memory_v2.py tests/test_task_memory_controls.py tests/test_analyze_task_memory_final.py tests/test_publish_task_memory_v2.py
 ```
 
-Observed: all branch Python outside two inherited-debt files passed; the two excluded files retained exactly the parent's 10 and 36 diagnostics with no added rule counts (exit code 0).
+Observed: six changed Python code and test files passed with no lint errors (exit code 0).
 
 ### `git_diff_check`
 
 ```bash
-git diff --cached --check
+git diff --check
 ```
 
-Observed: staged results diff had no whitespace errors before results commit E (exit code 0).
+Observed: no tracked whitespace errors after results commit E (exit code 0).
 
 ### `manifest_and_hash`
 
 ```bash
-python -c 'import csv,hashlib,json; from pathlib import Path; from scripts.task_memory_contracts import canonical_json_sha256; root=Path("artifacts/task_memory_retention_v2"); a=json.loads((root/"final/status.json").read_text()); p=json.loads((root/"resources/run_summary.json").read_text()); assert a["content_sha256"]==canonical_json_sha256({k:v for k,v in a.items() if k!="content_sha256"}); assert p["content_sha256"]==canonical_json_sha256({k:v for k,v in p.items() if k!="content_sha256"}); assert all(hashlib.sha256((base/item["path"]).read_bytes()).hexdigest()==item["sha256"] for owner,base in ((a,root/"final"),(p,root/"resources")) for item in owner["outputs"]); counts=tuple(sum(1 for _ in csv.DictReader((root/path).open())) for path in ("final/all_t_metrics.csv","final/paired_deltas.csv","final/per_reference_metrics.csv","resources/per_update_measurements.csv","resources/profile_summary.csv","resources/profile_units.csv")); assert counts==(20,80,48,1920,192,6); print("content hashes and row counts passed", counts)'
+conda run -n persist4d python -c 'import csv,json; from pathlib import Path; from scripts.task_memory_contracts import canonical_json_sha256; r=Path("artifacts/task_memory_retention_v2"); files=("final/status.json","resources/run_summary.json","evaluation/M5/protocol_b/R1-B4-policy/cache_manifest.json","evaluation/M5/protocol_b/baseline/control_observation_manifest.json"); assert all((lambda v:v["content_sha256"]==canonical_json_sha256({k:x for k,x in v.items() if k!="content_sha256"}))(json.loads((r/p).read_text())) for p in files); paths=("final/all_t_metrics.csv","evaluation/M5/protocol_b/baseline/long_memory_controls.csv","evaluation/M5/protocol_b/R1-B4-policy/policy_comparison.csv","final/independent_reference_results.csv"); counts=tuple(sum(1 for _ in csv.DictReader((r/p).open())) for p in paths); assert counts==(56,16,8,9); print("four canonical manifests and formal row coverage PASS", counts)'
 ```
 
-Observed: analysis/profile canonical hashes and all declared output hashes passed; row counts were 20, 80, 48, 1920, 192, and 6 (exit code 0).
+Observed: four canonical manifests verified; formal main, D-control, policy, and native tables contain 56, 16, 8, and 9 rows (exit code 0).
 
 ### `secret_scan`
 
 ```bash
-set -o pipefail; ! git diff --text 32a51e -- | rg -n -i -- '-----BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|hf_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}'; ! git diff --cached --text -- artifacts/task_memory_retention_v2 | rg -n -- "$PERSIST4D_PRIVATE_PATHS_PATTERN"
+! git diff --name-only -z 6933f635f1834849de3e00aef60cd737f0aa1cba 3027b942a5d76dea1dad3f42b3c67c0a9c9383ee | xargs -0 rg -q --no-messages -e 'ghp_[A-Za-z0-9]{30,}' -e 'github_pat_[A-Za-z0-9_]{30,}' -e '-----BEGIN (RSA |OPENSSH |EC )?PRIVATE KEY-----' -e 'Bearer [A-Za-z0-9_.-]{30,}'
 ```
 
-Observed: credential and public-local-path scan passed (exit code 0).
+Observed: no credential or private-key patterns in newly committed files (exit code 0).
 
 Passing engineering checks do not change failed or inconclusive scientific
 statuses.
