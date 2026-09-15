@@ -395,6 +395,19 @@ def _records_by_sequence(manifest: Mapping[str, object]) -> dict[str, dict[str, 
     return result
 
 
+def _shard_unique_specs(
+    specs: Sequence[TaskMemoryEpisodeSpec], *, shard_index: int, shard_count: int
+) -> list[TaskMemoryEpisodeSpec]:
+    unique = {}
+    for spec in specs:
+        unique.setdefault(spec.source_sequence_id, spec)
+    return [
+        spec
+        for index, spec in enumerate(unique.values())
+        if index % shard_count == shard_index
+    ]
+
+
 def _base_cache_link(record: Mapping[str, object]) -> dict[str, object]:
     return {
         key: record[key]
@@ -1077,9 +1090,9 @@ def run_controls(
             "mask_threshold": float(memory_config.mask_threshold),
             "minimum_mask_support": int(memory_config.minimum_mask_support),
         }
-        selected = [
-            spec for index, spec in enumerate(specs) if index % shard_count == shard_index
-        ]
+        selected = _shard_unique_specs(
+            specs, shard_index=shard_index, shard_count=shard_count
+        )
         with deterministic_inference_runtime(EVALUATION_SEED, device):
             for index, spec in enumerate(selected):
                 record = records[spec.source_sequence_id]

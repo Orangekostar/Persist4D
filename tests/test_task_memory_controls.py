@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 import torch
 
@@ -7,6 +9,7 @@ from datasets.task_memory_episode import StageMeta
 from scripts.run_task_memory_controls import (
     ControlRunnerError,
     _records_by_sequence,
+    _shard_unique_specs,
     _window_observation,
     observation_payload,
     prediction_observation_from_payload,
@@ -40,6 +43,21 @@ def test_base_cache_records_reject_conflicting_repeated_sequences() -> None:
         _records_by_sequence(
             {"records": [record, dict(record, sha256="b" * 64)]}
         )
+
+
+def test_production_shards_do_not_write_the_same_sequence_twice() -> None:
+    specs = [
+        SimpleNamespace(source_sequence_id=value)
+        for value in ("scan-a", "scan-b", "scan-a", "scan-c", "scan-b")
+    ]
+    first = _shard_unique_specs(specs, shard_index=0, shard_count=2)
+    second = _shard_unique_specs(specs, shard_index=1, shard_count=2)
+
+    assert first == [specs[0], specs[3]]
+    assert second == [specs[1]]
+    assert not ({spec.source_sequence_id for spec in first} & {
+        spec.source_sequence_id for spec in second
+    })
 
 
 def _meta(stage: int) -> StageMeta:
