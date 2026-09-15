@@ -1,0 +1,254 @@
+{
+  "content_sha256": "0208695bfb89b6d7852e59e8fb31e8a727da866c97abc2d8fde9e1348ce8c280",
+  "policy": "lag1",
+  "records": [
+    {
+      "last": {
+        "bytes": 754829798,
+        "logical_reference": "external:run_root/training/formal/W-BASE/last.ckpt",
+        "optimizer_state_retained": true,
+        "sha256": "06f9e1e1efca088ffda2888a6eeaa4aa67830d2f3a5798dee0c6ebaca93ac8e6",
+        "update": 3000
+      },
+      "selected": {
+        "bytes": 754829798,
+        "logical_reference": "external:run_root/training/formal/W-BASE/update=3000.ckpt",
+        "sha256": "06f9e1e1efca088ffda2888a6eeaa4aa67830d2f3a5798dee0c6ebaca93ac8e6",
+        "update": 3000
+      },
+      "selected_for_final": false,
+      "selection_role": "m2_arm_best_mean",
+      "variant": "W-BASE"
+    },
+    {
+      "last": {
+        "bytes": 756033078,
+        "logical_reference": "external:run_root/training/formal/Q-INDEP/last.ckpt",
+        "optimizer_state_retained": true,
+        "sha256": "7e8d439981dce440d1fd0c52e0a77fd35ceacef94796a8b87304f70d4f07f6df",
+        "update": 3000
+      },
+      "selected": {
+        "bytes": 756033078,
+        "logical_reference": "external:run_root/training/formal/Q-INDEP/update=1500.ckpt",
+        "sha256": "2b991f9f881f7bcb4414dba90974bd7879997442d797da8a8d2b98a95ff5a8dc",
+        "update": 1500
+      },
+      "selected_for_final": false,
+      "selection_role": "m2_gate_same_update_control",
+      "variant": "Q-INDEP"
+    },
+    {
+      "last": {
+        "bytes": 756033014,
+        "logical_reference": "external:run_root/training/formal/Q-TALA/last.ckpt",
+        "optimizer_state_retained": true,
+        "sha256": "41cba5668b1cabfd5dfc4026479a196d0b283ddb54878d5d963a42f1d51ac46d",
+        "update": 3000
+      },
+      "selected": {
+        "bytes": 756033014,
+        "logical_reference": "external:run_root/training/formal/Q-TALA/update=1500.ckpt",
+        "sha256": "a75c3e28b2fa3895414f1c1a1e35b1a9ca8d65ac5cc03e96e609e99511ef2b06",
+        "update": 1500
+      },
+      "selected_for_final": false,
+      "selection_role": "m3_parent_selected",
+      "variant": "Q-TALA"
+    },
+    {
+      "last": {
+        "bytes": 754829798,
+        "logical_reference": "external:run_root/training/formal/FH-MATCH/last.ckpt",
+        "optimizer_state_retained": true,
+        "sha256": "18cacf30403d0013a5a35d00c96ec485dcf92c114db2592fff17808b0f147d07",
+        "update": 3000
+      },
+      "selected": {
+        "bytes": 754829798,
+        "logical_reference": "external:run_root/training/formal/FH-MATCH/update=0750.ckpt",
+        "sha256": "42c94da7bfa55f949cd9520201126afbe47223f6f3b5cc8660198e08ffc65c79",
+        "update": 750
+      },
+      "selected_for_final": false,
+      "selection_role": "fh_cont_parent_selected",
+      "variant": "FH-MATCH"
+    },
+    {
+      "last": {
+        "bytes": 756033654,
+        "logical_reference": "external:run_root/training/formal/M3-BASE-CONT/last.ckpt",
+        "optimizer_state_retained": true,
+        "sha256": "a0aa8f73aac5b27aa0aac972ac72cbf1a7dfb3f6d6a1ba103cbf0a92ba793ed6",
+        "update": 1500
+      },
+      "selected": {
+        "bytes": 756033654,
+        "logical_reference": "external:run_root/training/formal/M3-BASE-CONT/update=1500.ckpt",
+        "sha256": "a0aa8f73aac5b27aa0aac972ac72cbf1a7dfb3f6d6a1ba103cbf0a92ba793ed6",
+        "update": 1500
+      },
+      "selected_for_final": false,
+      "selection_role": "m3_same_update_control",
+      "variant": "M3-BASE-CONT"
+    },
+    {
+      "last": {
+        "bytes": 757236870,
+        "logical_reference": "external:run_root/training/formal/M3-V-CORE/last.ckpt",
+        "optimizer_state_retained": true,
+        "sha256": "1b883db3faf26f168274853857719786125d640e24377f99d427d2b8aec7793f",
+        "update": 1500
+      },
+      "selected": {
+        "bytes": 757236870,
+        "logical_reference": "external:run_root/training/formal/M3-V-CORE/update=1500.ckpt",
+        "sha256": "1b883db3faf26f168274853857719786125d640e24377f99d427d2b8aec7793f",
+        "update": 1500
+      },
+      "selected_for_final": true,
+      "selection_role": "final_candidate_selected",
+      "variant": "M3-V-CORE"
+    },
+    {
+      "last": {
+        "bytes": 754830374,
+        "logical_reference": "external:run_root/training/formal/FH-CONT/last.ckpt",
+        "optimizer_state_retained": true,
+        "sha256": "6672569c9524d38a0f932c9d8351d6606b9b26a574236a59d4799f225178d4f5",
+        "update": 1500
+      },
+      "selected": {
+        "bytes": 754830374,
+        "logical_reference": "external:run_root/training/formal/FH-CONT/update=1500.ckpt",
+        "sha256": "6672569c9524d38a0f932c9d8351d6606b9b26a574236a59d4799f225178d4f5",
+        "update": 1500
+      },
+      "selected_for_final": true,
+      "selection_role": "matched_continuation_selected",
+      "variant": "FH-CONT"
+    }
+  ],
+  "reducer": "mean",
+  "schema_version": "task-memory-selected-checkpoints-v1",
+  "selection_population": "development_common_h5_canonical",
+  "sources": [
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/FH-MATCH/update=0000/metrics.csv",
+      "sha256": "dea74a9bb051a6ba25cd59fa6303f622d87f34af698c75ff15aeddf4cbe982e6"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/FH-MATCH/update=0750/metrics.csv",
+      "sha256": "a218a121a1be67ba2c9cffc1550df7696944e587b1408110223a673d05b52864"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/FH-MATCH/update=1500/metrics.csv",
+      "sha256": "a10c488cbf67ab719d2e14dc08696e3b5b817df6d8cba67c16c2de4fdd1ad7aa"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/FH-MATCH/update=2250/metrics.csv",
+      "sha256": "6c66312a88ea914fcd6d6ee4dd579db22eb5ceafa85e21cb8aac62d05a9b0f64"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/FH-MATCH/update=3000/metrics.csv",
+      "sha256": "45f6f50b12b3a48b52b0046732840df26eb9d3402cc07df8d790b9b74e40c073"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/Q-INDEP/update=0000/metrics.csv",
+      "sha256": "dd06768b98685968a4e1aeeef113c43991c986bd6dbcf4ab8c9d5ef5dbd99121"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/Q-INDEP/update=0750/metrics.csv",
+      "sha256": "9be3c4fb9fadf78c5465d7666f11f50de4a85a408c4b1b3dd06d35da09e8a657"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/Q-INDEP/update=1500/metrics.csv",
+      "sha256": "a329832443823ce2a5aa6bad14e2450f547023f0757f05a202f2516125c76f01"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/Q-INDEP/update=2250/metrics.csv",
+      "sha256": "1d2da065f7a8c38e48fdfc087dab35ca753e5efe67be27ca1fcb9763e461527a"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/Q-INDEP/update=3000/metrics.csv",
+      "sha256": "891c107149151827456e2b34b90d1cae6ed6dcc02366045cba55f5dcb40db6ae"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/Q-TALA/update=0000/metrics.csv",
+      "sha256": "7fdd31a2388dd12384cbf659922209bcabddba9e818748f24140a3f5d7c51feb"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/Q-TALA/update=0750/metrics.csv",
+      "sha256": "6ae14fea57f5a3a47e15ee453ee63f8a40d4a46c03834da3db6cde172bf8f3ff"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/Q-TALA/update=1500/metrics.csv",
+      "sha256": "dad1b8d03eb2c3e73a881779655eab52f794d65063ee02faa81b5f5304fc6df9"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/Q-TALA/update=2250/metrics.csv",
+      "sha256": "6955b99adb8107877c9fa772d1f00582ec62a2cdaebc3f26eb12941f15806d01"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/Q-TALA/update=3000/metrics.csv",
+      "sha256": "efc514c1376c7e2442e482162c82dc304c7cbd2638da444e0485f2403883b563"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/W-BASE/update=0000/metrics.csv",
+      "sha256": "1e5f47999f9ac2e5e3e422f89b08b43f7f8277d047bc6bd71be471ae86599cf2"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/W-BASE/update=0750/metrics.csv",
+      "sha256": "e68f6e5c081ac37984c4bac97ec8a4ee5196fab85ce1e5f8cac9b1045baf0703"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/W-BASE/update=1500/metrics.csv",
+      "sha256": "05be88d65f96553a3604079195090ebd9857a2e9c92da0723ac8fcc4b34c1328"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/W-BASE/update=2250/metrics.csv",
+      "sha256": "b2aa0ed71afd0fa9b2d74ad2943588d70a121b4b11a87a541b7f8ebed3efb1dd"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/evaluation/M2/W-BASE/update=3000/metrics.csv",
+      "sha256": "ef37d8876af4a37732d5a6d802940974b703d5adaadf7db4e7f8e12652c34dcd"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/FH_CONT_learning_curves.csv",
+      "sha256": "aafca1be0fce971c9973ac549c4f52104b2c7f73d932e39259d69ec478b42f7d"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/M3_learning_curves.csv",
+      "sha256": "3556afcd37c64856c7bd126c1e85a210482cd999d8e59d44ef14f6e2af5e2a1a"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/formal/FH-CONT/run_summary.json",
+      "sha256": "4561c704323213008bfb9b2a87315529effdd28ee9b82a9125e852aaff404a80"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/formal/FH-MATCH/run_summary.json",
+      "sha256": "8cacbd8c64a1886a26baf376a5ec9e0465f89ab8d39511f665cfc21b126ecfdf"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/formal/M3-BASE-CONT/run_summary.json",
+      "sha256": "aa7d218126d9af160f564c84199de7724469e3ff7aaf09c6dbdde049500703d6"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/formal/M3-V-CORE/run_summary.json",
+      "sha256": "48a4eee49bbc7e69026d92fd739e7359d923fa33b163234ae992cbbe3cfc008f"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/formal/Q-INDEP/run_summary.json",
+      "sha256": "a33195ed075ed0dd776f4b902a6996a33e567ed01abee94a9b4f3e9928d290e3"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/formal/Q-TALA/run_summary.json",
+      "sha256": "1d1ae137091a120e4db24be0744d9339de198f2b150702b55339b00bb95b71b9"
+    },
+    {
+      "logical_reference": "repo:artifacts/task_memory_retention_v2/training/formal/W-BASE/run_summary.json",
+      "sha256": "89aff9f7dc9e72a6bb4f52c411ace6ce1868f2167500d6ace6d61d1a3ab3db4c"
+    }
+  ],
+  "status": "PASS"
+}

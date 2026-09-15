@@ -12,6 +12,7 @@ from scripts.analyze_task_memory_final import (
     FinalAnalysisError,
     bootstrap_equal_reference_deltas,
     build_all_t_comparison,
+    build_horizon_comparison,
     build_retention_rows,
     load_legacy_baseline_rows,
     load_long_memory_control_rows,
@@ -19,6 +20,7 @@ from scripts.analyze_task_memory_final import (
     load_resource_status,
     validate_identity_events,
     validate_identity_rows,
+    validate_independent_rows,
     validate_per_reference_rows,
     validate_primary_rows,
 )
@@ -136,6 +138,76 @@ def test_long_memory_control_loader_preserves_method_and_policy(tmp_path: Path) 
         "D-EMA-commit0",
         "D-EMA-lag1",
     }
+
+
+def test_independent_rows_lock_base_exposed_native_population() -> None:
+    checkpoint = "f" * 64
+    counts = {2: (40, 111), 3: (23, 77), 4: (8, 32)}
+    rows = []
+    for horizon, (references, masters) in counts.items():
+        row = _external_row(policy="lag1", horizon=horizon)
+        row.update(
+            {
+                "population_id": "additional_native_refs",
+                "variant": "M3-V-CORE",
+                "checkpoint_sha256": checkpoint,
+                "episode_count": masters,
+                "reference_count": references,
+                "master_count": masters,
+            }
+        )
+        rows.append(row)
+
+    validated = validate_independent_rows(
+        rows,
+        expected_variant="M3-V-CORE",
+        expected_checkpoint_sha256=checkpoint,
+    )
+
+    assert len(validated) == 3
+    assert [row["T"] for row in validated] == [2, 3, 4]
+    broken = [dict(row) for row in rows]
+    broken[-1]["reference_count"] = 9
+    with pytest.raises(FinalAnalysisError, match="independent population"):
+        validate_independent_rows(
+            broken,
+            expected_variant="M3-V-CORE",
+            expected_checkpoint_sha256=checkpoint,
+        )
+
+
+def test_horizon_comparison_supports_native_t2_to_t4() -> None:
+    checkpoint = "f" * 64
+    counts = {2: (40, 111), 3: (23, 77), 4: (8, 32)}
+
+    def native(variant: str, base: float) -> list[dict[str, object]]:
+        output = []
+        for horizon, (references, masters) in counts.items():
+            row = _external_row(policy="lag1", horizon=horizon)
+            row.update(
+                {
+                    "population_id": "additional_native_refs",
+                    "variant": variant,
+                    "checkpoint_sha256": checkpoint,
+                    "episode_count": masters,
+                    "reference_count": references,
+                    "master_count": masters,
+                    **{metric: base + horizon / 100 for metric in TASK_METRICS},
+                }
+            )
+            output.append(row)
+        return output
+
+    result = build_horizon_comparison(
+        native("M3-V-CORE", 0.2),
+        native("FH-CONT", 0.1),
+        horizons=(2, 3, 4),
+        comparison_name="M3-V-CORE_vs_FH-CONT_native",
+    )
+
+    assert result["tmap_all_t"] == "PASS"
+    assert result["positive_cells"] == 15
+    assert len(result["rows"]) == 15
 
 
 def test_primary_rows_lock_checkpoint_policy_reducer_and_full_metric_schema() -> None:

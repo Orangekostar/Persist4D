@@ -56,6 +56,22 @@ STATUS_VALUES = {
     "GENERALIZATION": {"INDEPENDENT", "BASE_EXPOSED_ONLY", "NOT_ESTABLISHED"},
     "PUBLICATION": {"PUSH_VERIFIED", "PUSH_FAILED", "NOT_ATTEMPTED"},
 }
+PRIMARY_VARIANTS = (
+    "FH-R1-native",
+    "B4-commit0",
+    "R1+B4-lag1",
+    "FH-R1-lag1",
+    "W-BASE",
+    "Q-TALA",
+    "M3-BASE-CONT",
+    "M3-V-CORE",
+    "FH-MATCH",
+    "FH-CONT",
+    "D-LAST-commit0",
+    "D-LAST-lag1",
+    "D-EMA-commit0",
+    "D-EMA-lag1",
+)
 _MANIFEST_EXCLUDED = {
     "FINAL_MANIFEST.json",
     "HANDOFF.md",
@@ -349,13 +365,12 @@ def _atomic_write(path: Path, content: bytes) -> None:
 
 
 def _metric_table(rows: Sequence[Mapping[str, str]]) -> str:
-    wanted = ("R1+B4", "FH-R1", "M3-BASE-CONT", "FH-CONT", "M3-V-CORE")
     by_cell = {(row["variant"], int(row["T"])): row for row in rows}
     lines = [
         "| Variant | T2 | T3 | T4 | T5 | Mean |",
         "|---|---:|---:|---:|---:|---:|",
     ]
-    for variant in wanted:
+    for variant in PRIMARY_VARIANTS:
         values = [
             float(by_cell[(variant, horizon)]["t_mAP"]) for horizon in range(2, 6)
         ]
@@ -373,10 +388,17 @@ def _comparison_lines(analysis: Mapping[str, object]) -> str:
         raise PublicationError("final analysis comparisons differ")
     lines = []
     for name in (
-        "M3-V-CORE_vs_R1+B4",
-        "M3-V-CORE_vs_FH-R1",
+        "M3-V-CORE_vs_B4-commit0",
+        "M3-V-CORE_vs_R1+B4-lag1",
+        "M3-V-CORE_vs_FH-R1-native",
+        "M3-V-CORE_vs_FH-R1-lag1",
+        "M3-V-CORE_vs_W-BASE",
+        "M3-V-CORE_vs_Q-TALA",
         "M3-V-CORE_vs_M3-BASE-CONT",
+        "M3-V-CORE_vs_FH-MATCH",
         "M3-V-CORE_vs_FH-CONT",
+        "M3-V-CORE_vs_D-LAST-lag1",
+        "M3-V-CORE_vs_D-EMA-lag1",
     ):
         value = comparisons.get(name)
         if not isinstance(value, Mapping):
@@ -495,10 +517,11 @@ def _build_handoff_section_bodies(
         ),
         7: (
             "Completed M2 W-BASE/Q-INDEP/Q-TALA/FH-MATCH, M3 BASE-CONT/V-LAST/"
-            "V-CORE, FH-CONT, final three-model Protocol-B inference, per-reference "
+            "V-CORE, FH-CONT, the unified fourteen-method Protocol-B table, "
+            "base-exposed native evaluation, long-memory controls, per-reference "
             "analysis, and resource profiling. M4 was conditionally skipped as "
             f"`{m4.get('decision')}` because `{m4.get('reason')}`. Overall execution "
-            "remains PARTIAL for the explicit limitations in section 13."
+            f"is `{statuses['EXECUTION']}`; scientific limitations remain in section 13."
         ),
         8: _metric_table(metrics) + "\n\n" + _comparison_lines(analysis),
         9: (
@@ -534,14 +557,14 @@ def _build_handoff_section_bodies(
         14: (
             "Supported claims are limited to the exact all-T, retention, mechanism, "
             "and resource statuses in section 1. Not supported: indefinite-horizon "
-            "retention, replicated training stability, independent generalization, "
-            "or attribution of policy effects to memory content alone."
+            "retention, replicated training stability, truly unseen-base "
+            "generalization, or attribution of policy effects to memory content alone."
         ),
         15: (
             f"Results commit E publication status: `{statuses['PUBLICATION']}`. "
             f"FINAL_MANIFEST.json SHA256: `{final_manifest_sha256}`. Next exact "
-            "action: evaluate this frozen M3-V-CORE checkpoint on the registered "
-            "independent-native population before making a generalization claim."
+            "action: replicate M3-V-CORE and its strongest matched baseline with a "
+            "second training seed before making a stability claim."
         ),
     }
 
@@ -603,6 +626,10 @@ The six physical references are the statistical units. The T2/T5 intervals in
 `final/reference_bootstrap.csv` are equal-reference descriptive intervals, not
 pooled-AP confidence intervals.
 
+The separate native T2-T4 evidence in `final/independent_reference_results.csv`
+uses adaptation-holdout references that were exposed to the original R1 base;
+therefore its generalization status is `BASE_EXPOSED_ONLY`, not `INDEPENDENT`.
+
 ## Resources
 
 Resource status is `{resource.get("resource_status")}`. The profile uses one A40,
@@ -612,8 +639,9 @@ separate model-update, end-to-end, materialization, and true cumulative scopes.
 ## Limitations
 
 Protocol-B is a previously exposed historical benchmark. One training seed does
-not establish replicated training stability. Unrun variants and independent-data
-limits remain explicit in `final/status.json` and `training/variants.json`.
+not establish replicated training stability. FH encoder-cache equivalence and
+new-model saturation effects were not established. Exact limits remain explicit
+in `final/status.json`.
 """
 
 
@@ -633,9 +661,9 @@ def publish_package(
         analysis, resource, publication_status=publication_status
     )
     metrics = _read_csv(root / "final/all_t_metrics.csv")
-    if len(metrics) != 20:
+    if len(metrics) != len(PRIMARY_VARIANTS) * 4:
         raise PublicationError(
-            "final all-T table must contain five four-horizon models"
+            "final all-T table must contain fourteen four-horizon methods"
         )
     required = (
         "START_STATE.json",
@@ -653,9 +681,14 @@ def publish_package(
         "implementation/query_state_contract.md",
         "implementation/sequence_loss_example.csv",
         "baseline/policy_comparison.csv",
+        "baseline/long_memory_controls.csv",
         "training/variants.json",
         "training/M3_learning_curves.csv",
         "training/FH_CONT_learning_curves.csv",
+        "training/learning_curves.csv",
+        "training/terminal_update_comparison.csv",
+        "training/selected_checkpoint_comparison.csv",
+        "training/selected_checkpoints.json",
         "training/costs_and_exposure.csv",
         "training/FH_CONT_cost_and_exposure.csv",
         "training/M4_budget_gate.csv",
@@ -665,6 +698,7 @@ def publish_package(
         "final/per_reference_metrics.csv",
         "final/per_reference_deltas.csv",
         "final/reference_bootstrap.csv",
+        "final/independent_reference_results.csv",
         "final/identity_counts.csv",
         "final/retention.csv",
         "final/status.json",

@@ -24,6 +24,13 @@ DEFAULT_LEGACY_BASELINE = (
 )
 DEFAULT_RESOURCE_SUMMARY = DEFAULT_ARTIFACT_ROOT / "resources/run_summary.json"
 PROTOCOL_B_POPULATION_ID = "protocol_b_43_masters_3_orders"
+NATIVE_POPULATION_ID = "additional_native_refs"
+NATIVE_HORIZONS = (2, 3, 4)
+NATIVE_COUNTS = {
+    2: {"reference_count": 40, "master_count": 111, "order_count": 111},
+    3: {"reference_count": 23, "master_count": 77, "order_count": 77},
+    4: {"reference_count": 8, "master_count": 32, "order_count": 32},
+}
 
 REPORT_HORIZONS = (2, 3, 4, 5)
 TASK_METRICS = (
@@ -287,9 +294,83 @@ def validate_primary_rows(
     return sorted(normalized, key=lambda row: int(row["T"]))
 
 
+def validate_independent_rows(
+    rows: Sequence[Mapping[str, object]],
+    *,
+    expected_variant: str,
+    expected_checkpoint_sha256: str,
+) -> list[dict[str, object]]:
+    """Validate the frozen base-exposed native T2-T4 population."""
+
+    expected_variant = _text(expected_variant, name="expected variant")
+    expected_checkpoint_sha256 = _text(
+        expected_checkpoint_sha256, name="expected checkpoint SHA256"
+    )
+    normalized = []
+    seen = set()
+    for raw in _sequence(rows, name="independent rows"):
+        if not isinstance(raw, Mapping):
+            raise FinalAnalysisError("independent row must be a mapping")
+        if (
+            raw.get("population_id") != NATIVE_POPULATION_ID
+            or raw.get("variant", raw.get("model")) != expected_variant
+            or raw.get("checkpoint_sha256") != expected_checkpoint_sha256
+            or raw.get("policy") != "lag1"
+            or raw.get("reducer") != "mean"
+        ):
+            raise FinalAnalysisError("independent population differs")
+        horizon = _integer(raw.get("T"), name="independent T", minimum=2)
+        if horizon not in NATIVE_HORIZONS or horizon in seen:
+            raise FinalAnalysisError("independent population differs")
+        seen.add(horizon)
+        episode_count = _integer(
+            raw.get("episode_count"), name="independent episode count", minimum=1
+        )
+        counts = {
+            "reference_count": _integer(
+                raw.get("reference_count"),
+                name="independent reference count",
+                minimum=1,
+            ),
+            "master_count": _integer(
+                raw.get("master_count"), name="independent master count", minimum=1
+            ),
+            "order_count": episode_count,
+        }
+        if counts != NATIVE_COUNTS[horizon]:
+            raise FinalAnalysisError("independent population differs")
+        row = dict(raw)
+        row.update(counts)
+        row["T"] = horizon
+        for name in ("training_seed", "evaluation_seed"):
+            row[name] = _integer(raw.get(name), name=f"independent {name}")
+            if row[name] != 45:
+                raise FinalAnalysisError("independent population differs")
+        for metric in TASK_METRICS:
+            row[metric] = _rate(raw.get(metric), name=f"independent {metric}")
+        row["direct_current_AP"] = _rate(
+            raw.get("direct_current_AP", raw.get("local_current_AP")),
+            name="independent direct_current_AP",
+        )
+        normalized.append(row)
+    if seen != set(NATIVE_HORIZONS):
+        raise FinalAnalysisError("independent population differs")
+    return sorted(normalized, key=lambda row: int(row["T"]))
+
+
 def _index_metric_rows(
-    rows: Sequence[Mapping[str, object]], *, name: str
+    rows: Sequence[Mapping[str, object]],
+    *,
+    name: str,
+    horizons: Sequence[int] = REPORT_HORIZONS,
 ) -> dict[int, Mapping[str, object]]:
+    expected_horizons = tuple(horizons)
+    if (
+        not expected_horizons
+        or len(set(expected_horizons)) != len(expected_horizons)
+        or any(horizon < 2 for horizon in expected_horizons)
+    ):
+        raise FinalAnalysisError(f"{name} expected horizons differ")
     values = _sequence(rows, name=f"{name} rows")
     indexed = {}
     populations = set()
@@ -297,37 +378,43 @@ def _index_metric_rows(
         if not isinstance(row, Mapping):
             raise FinalAnalysisError(f"{name} row must be a mapping")
         horizon = _integer(row.get("T"), name=f"{name} T", minimum=2)
-        if horizon not in REPORT_HORIZONS or horizon in indexed:
+        if horizon not in expected_horizons or horizon in indexed:
             raise FinalAnalysisError(f"{name} horizon coverage differs")
         populations.add(_text(row.get("population_id"), name=f"{name} population"))
         for metric in TASK_METRICS:
             _rate(row.get(metric), name=f"{name} {metric}")
         indexed[horizon] = row
-    if set(indexed) != set(REPORT_HORIZONS) or len(populations) != 1:
+    if set(indexed) != set(expected_horizons) or len(populations) != 1:
         raise FinalAnalysisError(f"{name} horizon/population coverage differs")
     return indexed
 
 
-def build_all_t_comparison(
+def build_horizon_comparison(
     candidate_rows: Sequence[Mapping[str, object]],
     baseline_rows: Sequence[Mapping[str, object]],
     *,
+    horizons: Sequence[int],
     comparison_name: str,
     epsilon: float = ALL_T_EPSILON,
 ) -> dict[str, object]:
-    """Build all 20 primary cells and strict all-T verdicts."""
+    """Build a strict task-metric comparison over an explicit horizon set."""
 
     comparison_name = _text(comparison_name, name="comparison name")
+    expected_horizons = tuple(horizons)
     if not math.isfinite(epsilon) or epsilon < 0:
         raise FinalAnalysisError("comparison epsilon must be non-negative")
-    candidate = _index_metric_rows(candidate_rows, name="candidate")
-    baseline = _index_metric_rows(baseline_rows, name="baseline")
+    candidate = _index_metric_rows(
+        candidate_rows, name="candidate", horizons=expected_horizons
+    )
+    baseline = _index_metric_rows(
+        baseline_rows, name="baseline", horizons=expected_horizons
+    )
     if {row["population_id"] for row in candidate.values()} != {
         row["population_id"] for row in baseline.values()
     }:
         raise FinalAnalysisError("candidate and baseline populations differ")
     output = []
-    for horizon in REPORT_HORIZONS:
+    for horizon in expected_horizons:
         for metric in TASK_METRICS:
             candidate_value = _rate(candidate[horizon][metric], name=metric)
             baseline_value = _rate(baseline[horizon][metric], name=metric)
@@ -363,6 +450,24 @@ def build_all_t_comparison(
         "minimum_tmap_delta": min(tmap_deltas),
         "mean_tmap_delta": sum(tmap_deltas) / len(tmap_deltas),
     }
+
+
+def build_all_t_comparison(
+    candidate_rows: Sequence[Mapping[str, object]],
+    baseline_rows: Sequence[Mapping[str, object]],
+    *,
+    comparison_name: str,
+    epsilon: float = ALL_T_EPSILON,
+) -> dict[str, object]:
+    """Build all 20 primary cells and strict all-T verdicts."""
+
+    return build_horizon_comparison(
+        candidate_rows,
+        baseline_rows,
+        horizons=REPORT_HORIZONS,
+        comparison_name=comparison_name,
+        epsilon=epsilon,
+    )
 
 
 def build_retention_rows(
@@ -667,26 +772,73 @@ def _atomic_json(path: Path, value: Mapping[str, object]) -> None:
     )
 
 
-def _verified_evaluation_manifest(evaluation_root: Path) -> dict[str, object]:
+def _verified_evaluation_manifest(
+    evaluation_root: Path,
+    *,
+    expected_population_id: str = PROTOCOL_B_POPULATION_ID,
+) -> dict[str, object]:
     manifest = _load_json(evaluation_root / "manifest.json")
     _validate_content_hash(manifest, name="evaluation manifest")
     population = manifest.get("population")
+    reducers = manifest.get("reducers")
     if (
         manifest.get("status") != "PASS"
         or manifest.get("schema_version") != "task-memory-evaluation-run-v5"
         or not isinstance(population, Mapping)
-        or population.get("id") != PROTOCOL_B_POPULATION_ID
-        or population.get("reference_count") != 6
-        or population.get("master_count") != 43
-        or population.get("order_count") != 129
+        or population.get("id") != expected_population_id
         or population.get("smoke") is not False
         or manifest.get("evaluation_seed") != 45
         or manifest.get("policies") != ["lag1", "commit0"]
-        or manifest.get("reducers") != ["mean"]
+        or isinstance(reducers, (str, bytes))
+        or not isinstance(reducers, Sequence)
+        or not reducers
+        or "mean" not in reducers
+        or any(reducer not in {"mean", "latest", "max"} for reducer in reducers)
         or manifest.get("visual_content_control") != "native"
     ):
-        raise FinalAnalysisError("evaluation manifest is not complete Protocol-B")
-    for name, expected_rows in (("metrics", 8), ("identity_metrics", 4)):
+        raise FinalAnalysisError("evaluation manifest population differs")
+    if expected_population_id == PROTOCOL_B_POPULATION_ID:
+        expected_counts = {
+            "reference_count": 6,
+            "master_count": 43,
+            "order_count": 129,
+        }
+        expected_horizon_counts = {
+            f"T{horizon}": expected_counts for horizon in REPORT_HORIZONS
+        }
+        expected_entry_count = 129
+        horizon_count = len(REPORT_HORIZONS)
+    elif expected_population_id == NATIVE_POPULATION_ID:
+        expected_counts = {"reference_count": 40, "master_count": 220}
+        expected_horizon_counts = {
+            f"T{horizon}": {
+                "reference_count": NATIVE_COUNTS[horizon]["reference_count"],
+                "master_count": NATIVE_COUNTS[horizon]["master_count"],
+            }
+            for horizon in NATIVE_HORIZONS
+        }
+        expected_entry_count = 220
+        horizon_count = len(NATIVE_HORIZONS)
+    else:
+        raise FinalAnalysisError("evaluation population is not registered")
+    if (
+        any(population.get(name) != value for name, value in expected_counts.items())
+        or population.get("horizons") != expected_horizon_counts
+    ):
+        raise FinalAnalysisError("evaluation manifest population counts differ")
+    cache = manifest.get("cache")
+    records = cache.get("records") if isinstance(cache, Mapping) else None
+    if (
+        not isinstance(records, Sequence)
+        or len(records) != expected_entry_count
+        or cache.get("entry_count") != expected_entry_count
+    ):
+        raise FinalAnalysisError("evaluation cache manifest coverage differs")
+    expected_metric_rows = horizon_count * (len(reducers) + 1)
+    for name, expected_rows in (
+        ("metrics", expected_metric_rows),
+        ("identity_metrics", horizon_count),
+    ):
         record = manifest.get(name)
         if not isinstance(record, Mapping) or record.get("row_count") != expected_rows:
             raise FinalAnalysisError(f"evaluation manifest lacks {name}")
@@ -736,7 +888,13 @@ def _cache_identity(
 
     cache = manifest.get("cache")
     records = cache.get("records") if isinstance(cache, Mapping) else None
-    if not isinstance(records, Sequence) or len(records) != 129:
+    entry_count = cache.get("entry_count") if isinstance(cache, Mapping) else None
+    if (
+        not isinstance(entry_count, int)
+        or entry_count <= 0
+        or not isinstance(records, Sequence)
+        or len(records) != entry_count
+    ):
         raise FinalAnalysisError("evaluation cache manifest coverage differs")
     first = records[0]
     if not isinstance(first, Mapping):
@@ -765,9 +923,9 @@ def _state_shape(variant: str) -> tuple[int, int, int]:
         raise FinalAnalysisError("combined state byte evidence differs")
     if variant == "M3-V-CORE":
         return 100, 8, totals["combined_state"]
-    if variant == "M3-BASE-CONT":
+    if variant in {"Q-TALA", "M3-BASE-CONT"}:
         return 100, 0, totals["task_state"]
-    if variant == "FH-CONT":
+    if variant in {"W-BASE", "FH-MATCH", "FH-CONT"}:
         return 0, 0, 0
     raise FinalAnalysisError(f"state shape is not registered for {variant}")
 
@@ -777,9 +935,13 @@ def load_evaluation_bundle(
     cache_root: Path,
     *,
     expected_variant: str,
+    output_variant: str | None = None,
+    evidence_scope: str = "new_protocol_b_inference",
 ) -> tuple[list[dict[str, object]], list[dict[str, object]], dict[str, object]]:
     root = evaluation_root.expanduser().resolve()
-    manifest = _verified_evaluation_manifest(root)
+    manifest = _verified_evaluation_manifest(
+        root, expected_population_id=PROTOCOL_B_POPULATION_ID
+    )
     if manifest.get("variant") != expected_variant:
         raise FinalAnalysisError("evaluation variant differs")
     checkpoint = _text(manifest.get("checkpoint_sha256"), name="checkpoint SHA256")
@@ -813,11 +975,12 @@ def load_evaluation_bundle(
         expected_checkpoint_sha256=checkpoint,
     )
     capacity, representatives, state_bytes = _state_shape(expected_variant)
+    reported_variant = output_variant or expected_variant
     table = [
         {
             "population_id": PROTOCOL_B_POPULATION_ID,
-            "evidence_scope": "new_protocol_b_inference",
-            "variant": expected_variant,
+            "evidence_scope": evidence_scope,
+            "variant": reported_variant,
             "checkpoint_sha256": checkpoint,
             "source_commit": source_commit,
             "config_sha256": config_sha256,
@@ -843,10 +1006,77 @@ def load_evaluation_bundle(
         raise FinalAnalysisError("evaluation identity event summary differs")
     event_summary = validate_identity_events(events)
     identity = [
-        {**row, "identity_event_scope": "full_protocol_run", **event_summary}
+        {
+            **row,
+            "variant": reported_variant,
+            "identity_event_scope": "full_protocol_run",
+            **event_summary,
+        }
         for row in identity
     ]
     return table, identity, {"manifest": manifest, "identity_events": event_summary}
+
+
+def load_independent_evaluation_bundle(
+    evaluation_root: Path,
+    cache_root: Path,
+    *,
+    expected_variant: str,
+) -> tuple[list[dict[str, object]], dict[str, object]]:
+    """Load the frozen base-exposed adaptation-holdout native evaluation."""
+
+    root = evaluation_root.expanduser().resolve()
+    manifest = _verified_evaluation_manifest(
+        root, expected_population_id=NATIVE_POPULATION_ID
+    )
+    if manifest.get("variant") != expected_variant:
+        raise FinalAnalysisError("independent evaluation variant differs")
+    checkpoint = _text(manifest.get("checkpoint_sha256"), name="checkpoint SHA256")
+    source_commit = _text(manifest.get("source_commit"), name="source commit")
+    config_sha256, window = _cache_identity(manifest, cache_root.expanduser().resolve())
+    metrics_record = manifest.get("metrics")
+    if not isinstance(metrics_record, Mapping):
+        raise FinalAnalysisError("independent metric artifact differs")
+    metric_path = PROJECT_ROOT / str(metrics_record["logical_reference"]).removeprefix(
+        "repo:"
+    )
+    selected = [
+        row
+        for row in _read_csv_rows(metric_path)
+        if row.get("policy") == "lag1" and row.get("reducer") == "mean"
+    ]
+    primary = validate_independent_rows(
+        selected,
+        expected_variant=expected_variant,
+        expected_checkpoint_sha256=checkpoint,
+    )
+    capacity, representatives, state_bytes = _state_shape(expected_variant)
+    table = [
+        {
+            "population_id": NATIVE_POPULATION_ID,
+            "evidence_scope": "base_exposed_adaptation_holdout",
+            "variant": expected_variant,
+            "checkpoint_sha256": checkpoint,
+            "source_commit": source_commit,
+            "config_sha256": config_sha256,
+            "training_seed": row["training_seed"],
+            "evaluation_seed": row["evaluation_seed"],
+            "policy": row["policy"],
+            "reducer": row["reducer"],
+            "window": window,
+            "K": capacity,
+            "r": representatives,
+            "state_bytes": state_bytes,
+            "T": row["T"],
+            **{metric: row[metric] for metric in TASK_METRICS},
+            "direct_current_AP": row["direct_current_AP"],
+            "reference_count": row["reference_count"],
+            "master_count": row["master_count"],
+            "order_count": row["order_count"],
+        }
+        for row in primary
+    ]
+    return table, {"manifest": manifest}
 
 
 def load_legacy_baseline_rows(path: Path) -> list[dict[str, object]]:
@@ -1311,6 +1541,22 @@ def analyze_final_results(
     base_cache: Path,
     fh_evaluation: Path,
     fh_cache: Path,
+    wbase_evaluation: Path,
+    wbase_cache: Path,
+    parent_evaluation: Path,
+    parent_cache: Path,
+    fh_match_evaluation: Path,
+    fh_match_cache: Path,
+    fh_r1_lag1_evaluation: Path,
+    fh_r1_lag1_cache: Path,
+    policy_baseline: Path,
+    long_memory_controls: Path,
+    independent_candidate_evaluation: Path,
+    independent_candidate_cache: Path,
+    independent_base_evaluation: Path,
+    independent_base_cache: Path,
+    independent_fh_evaluation: Path,
+    independent_fh_cache: Path,
     legacy_baseline: Path,
     output_root: Path,
     data_root: Path | None = None,
@@ -1322,38 +1568,115 @@ def analyze_final_results(
     current = {}
     identities = []
     metadata = {}
-    for variant, evaluation, cache in (
-        ("M3-V-CORE", candidate_evaluation, candidate_cache),
-        ("M3-BASE-CONT", base_evaluation, base_cache),
-        ("FH-CONT", fh_evaluation, fh_cache),
+    for variant, output_variant, evaluation, cache, evidence_scope in (
+        (
+            "M3-V-CORE",
+            "M3-V-CORE",
+            candidate_evaluation,
+            candidate_cache,
+            "new_protocol_b_inference",
+        ),
+        (
+            "M3-BASE-CONT",
+            "M3-BASE-CONT",
+            base_evaluation,
+            base_cache,
+            "new_protocol_b_inference",
+        ),
+        (
+            "FH-CONT",
+            "FH-CONT",
+            fh_evaluation,
+            fh_cache,
+            "new_protocol_b_inference",
+        ),
+        (
+            "W-BASE",
+            "W-BASE",
+            wbase_evaluation,
+            wbase_cache,
+            "new_protocol_b_inference",
+        ),
+        (
+            "Q-TALA",
+            "Q-TALA",
+            parent_evaluation,
+            parent_cache,
+            "new_protocol_b_inference",
+        ),
+        (
+            "FH-MATCH",
+            "FH-MATCH",
+            fh_match_evaluation,
+            fh_match_cache,
+            "new_protocol_b_inference",
+        ),
+        (
+            "FH-MATCH",
+            "FH-R1-lag1",
+            fh_r1_lag1_evaluation,
+            fh_r1_lag1_cache,
+            "new_protocol_b_fh_r1_lag1",
+        ),
     ):
         rows, identity, details = load_evaluation_bundle(
-            evaluation, cache, expected_variant=variant
+            evaluation,
+            cache,
+            expected_variant=variant,
+            output_variant=output_variant,
+            evidence_scope=evidence_scope,
         )
-        current[variant] = rows
+        current[output_variant] = rows
         identities.extend(identity)
-        metadata[variant] = details
+        metadata[output_variant] = details
+    current["R1+B4-lag1"] = load_policy_baseline_rows(policy_baseline)
+    control_rows = load_long_memory_control_rows(long_memory_controls)
+    for variant in (
+        "D-LAST-commit0",
+        "D-LAST-lag1",
+        "D-EMA-commit0",
+        "D-EMA-lag1",
+    ):
+        current[variant] = [row for row in control_rows if row["variant"] == variant]
     legacy = load_legacy_baseline_rows(legacy_baseline)
     by_legacy = {
         variant: [row for row in legacy if row["variant"] == variant]
         for variant in ("B4-commit0", "FH-R1-native")
     }
-    all_metrics = [
-        *by_legacy["B4-commit0"],
-        *by_legacy["FH-R1-native"],
-        *current["M3-BASE-CONT"],
-        *current["FH-CONT"],
-        *current["M3-V-CORE"],
-    ]
+    current.update(by_legacy)
+    main_variants = (
+        "FH-R1-native",
+        "B4-commit0",
+        "R1+B4-lag1",
+        "FH-R1-lag1",
+        "W-BASE",
+        "Q-TALA",
+        "M3-BASE-CONT",
+        "M3-V-CORE",
+        "FH-MATCH",
+        "FH-CONT",
+        "D-LAST-commit0",
+        "D-LAST-lag1",
+        "D-EMA-commit0",
+        "D-EMA-lag1",
+    )
+    all_metrics = [row for variant in main_variants for row in current[variant]]
     comparisons = {}
     delta_rows = []
     for baseline in (
         "B4-commit0",
+        "R1+B4-lag1",
         "FH-R1-native",
+        "FH-R1-lag1",
+        "W-BASE",
+        "Q-TALA",
         "M3-BASE-CONT",
+        "FH-MATCH",
         "FH-CONT",
+        "D-LAST-lag1",
+        "D-EMA-lag1",
     ):
-        baseline_rows = current.get(baseline, by_legacy.get(baseline))
+        baseline_rows = current.get(baseline)
         if baseline_rows is None:
             raise FinalAnalysisError(f"required baseline is unavailable: {baseline}")
         name = f"M3-V-CORE_vs_{baseline}"
@@ -1366,16 +1689,8 @@ def analyze_final_results(
         delta_rows.extend(result["rows"])
     retention = [
         row
-        for variant in (
-            "B4-commit0",
-            "FH-R1-native",
-            "M3-BASE-CONT",
-            "FH-CONT",
-            "M3-V-CORE",
-        )
-        for row in build_retention_rows(
-            current.get(variant, by_legacy.get(variant)) or ()
-        )
+        for variant in main_variants
+        for row in build_retention_rows(current[variant])
     ]
     per_reference = []
     reference_deltas = []
@@ -1383,15 +1698,24 @@ def analyze_final_results(
     if (candidate_reference_path is None) != (fh_reference_path is None):
         raise FinalAnalysisError("both precomputed reference tables are required")
     if candidate_reference_path is not None and fh_reference_path is not None:
+        candidate_raw = _read_csv_rows(
+            candidate_reference_path.expanduser().resolve(strict=True)
+        )
+        fh_raw = (
+            candidate_raw
+            if candidate_reference_path.expanduser().resolve()
+            == fh_reference_path.expanduser().resolve()
+            else _read_csv_rows(fh_reference_path.expanduser().resolve(strict=True))
+        )
         candidate_reference = validate_per_reference_rows(
-            _read_csv_rows(candidate_reference_path.expanduser().resolve(strict=True)),
+            [row for row in candidate_raw if row.get("variant") == "M3-V-CORE"],
             expected_variant="M3-V-CORE",
             expected_checkpoint_sha256=str(
                 current["M3-V-CORE"][0]["checkpoint_sha256"]
             ),
         )
         fh_reference = validate_per_reference_rows(
-            _read_csv_rows(fh_reference_path.expanduser().resolve(strict=True)),
+            [row for row in fh_raw if row.get("variant") == "FH-CONT"],
             expected_variant="FH-CONT",
             expected_checkpoint_sha256=str(current["FH-CONT"][0]["checkpoint_sha256"]),
         )
@@ -1424,9 +1748,49 @@ def analyze_final_results(
             seed=45,
             resamples=1000,
         )
+    independent = {}
+    independent_metadata = {}
+    for variant, evaluation, cache in (
+        (
+            "M3-V-CORE",
+            independent_candidate_evaluation,
+            independent_candidate_cache,
+        ),
+        (
+            "M3-BASE-CONT",
+            independent_base_evaluation,
+            independent_base_cache,
+        ),
+        ("FH-CONT", independent_fh_evaluation, independent_fh_cache),
+    ):
+        rows, details = load_independent_evaluation_bundle(
+            evaluation, cache, expected_variant=variant
+        )
+        independent[variant] = rows
+        independent_metadata[variant] = details
+    independent_metrics = [
+        row
+        for variant in ("M3-BASE-CONT", "FH-CONT", "M3-V-CORE")
+        for row in independent[variant]
+    ]
+    independent_comparisons = {}
+    for baseline in ("M3-BASE-CONT", "FH-CONT"):
+        name = f"M3-V-CORE_vs_{baseline}_base_exposed_native"
+        result = build_horizon_comparison(
+            independent["M3-V-CORE"],
+            independent[baseline],
+            horizons=NATIVE_HORIZONS,
+            comparison_name=name,
+        )
+        independent_comparisons[name] = {
+            key: value for key, value in result.items() if key != "rows"
+        }
     output_root = output_root.expanduser().resolve()
     outputs = {
         "all_t_metrics.csv": _csv_bytes(all_metrics, ALL_T_FIELDS),
+        "independent_reference_results.csv": _csv_bytes(
+            independent_metrics, ALL_T_FIELDS
+        ),
         "paired_deltas.csv": _csv_bytes(delta_rows, PAIRED_DELTA_FIELDS),
         "identity_counts.csv": _csv_bytes(identities, tuple(identities[0])),
         "retention.csv": _csv_bytes(retention, RETENTION_FIELDS),
@@ -1449,8 +1813,8 @@ def analyze_final_results(
         _atomic_write(output_root / filename, content)
     matched = comparisons["M3-V-CORE_vs_FH-CONT"]
     status = {
-        "EXECUTION": "PARTIAL",
-        "TMAP_ALL_T_VS_R1": comparisons["M3-V-CORE_vs_B4-commit0"][
+        "EXECUTION": "COMPLETE",
+        "TMAP_ALL_T_VS_R1": comparisons["M3-V-CORE_vs_R1+B4-lag1"][
             "tmap_all_t"
         ],
         "TMAP_ALL_T_VS_MATCHED_FH": matched["tmap_all_t"],
@@ -1458,13 +1822,14 @@ def analyze_final_results(
         "RETENTION": _retention_status(current["M3-V-CORE"], current["FH-CONT"]),
         "RESOURCE": load_resource_status(resource_summary),
         "MECHANISM": "PARTIAL",
-        "GENERALIZATION": "NOT_ESTABLISHED",
+        "GENERALIZATION": "BASE_EXPOSED_ONLY",
         "PUBLICATION": "NOT_ATTEMPTED",
     }
     verdict = {
-        "schema_version": "task-memory-final-analysis-v2",
+        "schema_version": "task-memory-final-analysis-v3",
         "population_id": PROTOCOL_B_POPULATION_ID,
         "comparisons": comparisons,
+        "independent_comparisons": independent_comparisons,
         "status": status,
         "reference_analysis": {
             "status": "COMPLETE" if per_reference else "NOT_RUN",
@@ -1475,12 +1840,26 @@ def analyze_final_results(
             ),
         },
         "execution_limitations": [
-            "final candidate independent-native evaluation not run",
-            "not all preregistered long-memory controls were rerun on Protocol-B",
             "single training seed",
+            "native adaptation-holdout references were exposed to the original R1 base",
+            "native adaptation-holdout evidence covers T2-T4 only",
+            "FH_ENCODER_CACHE_NOT_ESTABLISHED",
+            "new-model capacity saturation was not entered; capacity effect is not established",
         ],
+        "capacity_analysis": {
+            "status": "NOT_ESTABLISHED",
+            "reason": "registered new-model state occupancy did not enter saturation",
+        },
+        "fh_encoder_cache": {"status": "FH_ENCODER_CACHE_NOT_ESTABLISHED"},
         "identity_events": {
             variant: details["identity_events"] for variant, details in metadata.items()
+        },
+        "independent_evaluations": {
+            variant: {
+                "population_id": details["manifest"]["population"]["id"],
+                "checkpoint_sha256": details["manifest"]["checkpoint_sha256"],
+            }
+            for variant, details in independent_metadata.items()
         },
         "outputs": [
             {"path": filename, "sha256": hashlib.sha256(content).hexdigest()}
@@ -1500,20 +1879,87 @@ def _parser() -> argparse.ArgumentParser:
     cache = Path(
         "/mnt/shared/ww/persist4d-task-memory-retention-v2/evaluation_cache/M5/protocol_b"
     )
+    native_root = DEFAULT_ARTIFACT_ROOT / "evaluation/M5/independent_native"
+    native_cache = Path(
+        "/mnt/shared/ww/persist4d-task-memory-retention-v2/"
+        "evaluation_cache/M5/independent_native"
+    )
     parser.add_argument("--candidate-evaluation", type=Path, default=root / "M3-V-CORE")
     parser.add_argument("--candidate-cache", type=Path, default=cache / "M3-V-CORE")
     parser.add_argument("--base-evaluation", type=Path, default=root / "M3-BASE-CONT")
     parser.add_argument("--base-cache", type=Path, default=cache / "M3-BASE-CONT")
     parser.add_argument("--fh-evaluation", type=Path, default=root / "FH-CONT")
     parser.add_argument("--fh-cache", type=Path, default=cache / "FH-CONT")
+    parser.add_argument("--wbase-evaluation", type=Path, default=root / "W-BASE")
+    parser.add_argument("--wbase-cache", type=Path, default=cache / "W-BASE")
+    parser.add_argument("--parent-evaluation", type=Path, default=root / "Q-TALA")
+    parser.add_argument("--parent-cache", type=Path, default=cache / "Q-TALA")
+    parser.add_argument(
+        "--fh-match-evaluation", type=Path, default=root / "FH-MATCH"
+    )
+    parser.add_argument("--fh-match-cache", type=Path, default=cache / "FH-MATCH")
+    parser.add_argument(
+        "--fh-r1-lag1-evaluation", type=Path, default=root / "FH-R1-lag1"
+    )
+    parser.add_argument(
+        "--fh-r1-lag1-cache", type=Path, default=cache / "FH-R1-lag1"
+    )
+    parser.add_argument(
+        "--policy-baseline",
+        type=Path,
+        default=DEFAULT_ARTIFACT_ROOT / "baseline/policy_comparison.csv",
+    )
+    parser.add_argument(
+        "--long-memory-controls",
+        type=Path,
+        default=DEFAULT_ARTIFACT_ROOT / "baseline/long_memory_controls.csv",
+    )
+    parser.add_argument(
+        "--independent-candidate-evaluation",
+        type=Path,
+        default=native_root / "M3-V-CORE",
+    )
+    parser.add_argument(
+        "--independent-candidate-cache",
+        type=Path,
+        default=native_cache / "M3-V-CORE",
+    )
+    parser.add_argument(
+        "--independent-base-evaluation",
+        type=Path,
+        default=native_root / "M3-BASE-CONT",
+    )
+    parser.add_argument(
+        "--independent-base-cache",
+        type=Path,
+        default=native_cache / "M3-BASE-CONT",
+    )
+    parser.add_argument(
+        "--independent-fh-evaluation",
+        type=Path,
+        default=native_root / "FH-CONT",
+    )
+    parser.add_argument(
+        "--independent-fh-cache",
+        type=Path,
+        default=native_cache / "FH-CONT",
+    )
     parser.add_argument("--legacy-baseline", type=Path, default=DEFAULT_LEGACY_BASELINE)
     parser.add_argument(
         "--output-root", type=Path, default=DEFAULT_ARTIFACT_ROOT / "final"
     )
     parser.add_argument("--data-root", type=Path)
     parser.add_argument("--external-root", type=Path)
-    parser.add_argument("--candidate-reference", type=Path)
-    parser.add_argument("--fh-reference", type=Path)
+    parser.add_argument(
+        "--candidate-reference",
+        type=Path,
+        default=DEFAULT_ARTIFACT_ROOT / "final/per_reference_metrics.csv",
+    )
+    parser.add_argument(
+        "--fh-reference",
+        type=Path,
+        default=DEFAULT_ARTIFACT_ROOT / "final/per_reference_metrics.csv",
+    )
     parser.add_argument(
         "--resource-summary", type=Path, default=DEFAULT_RESOURCE_SUMMARY
     )
@@ -1567,6 +2013,22 @@ def main() -> int:
         base_cache=args.base_cache,
         fh_evaluation=args.fh_evaluation,
         fh_cache=args.fh_cache,
+        wbase_evaluation=args.wbase_evaluation,
+        wbase_cache=args.wbase_cache,
+        parent_evaluation=args.parent_evaluation,
+        parent_cache=args.parent_cache,
+        fh_match_evaluation=args.fh_match_evaluation,
+        fh_match_cache=args.fh_match_cache,
+        fh_r1_lag1_evaluation=args.fh_r1_lag1_evaluation,
+        fh_r1_lag1_cache=args.fh_r1_lag1_cache,
+        policy_baseline=args.policy_baseline,
+        long_memory_controls=args.long_memory_controls,
+        independent_candidate_evaluation=args.independent_candidate_evaluation,
+        independent_candidate_cache=args.independent_candidate_cache,
+        independent_base_evaluation=args.independent_base_evaluation,
+        independent_base_cache=args.independent_base_cache,
+        independent_fh_evaluation=args.independent_fh_evaluation,
+        independent_fh_cache=args.independent_fh_cache,
         legacy_baseline=args.legacy_baseline,
         output_root=args.output_root,
         data_root=args.data_root,
@@ -1586,16 +2048,19 @@ __all__ = [
     "FinalAnalysisError",
     "bootstrap_equal_reference_deltas",
     "build_all_t_comparison",
+    "build_horizon_comparison",
     "build_reference_delta_rows",
     "build_retention_rows",
     "compute_per_reference_metrics",
     "load_evaluation_bundle",
+    "load_independent_evaluation_bundle",
     "load_legacy_baseline_rows",
     "load_long_memory_control_rows",
     "load_policy_baseline_rows",
     "load_resource_status",
     "validate_identity_events",
     "validate_identity_rows",
+    "validate_independent_rows",
     "validate_per_reference_rows",
     "validate_primary_rows",
 ]
