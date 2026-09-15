@@ -39,6 +39,10 @@ EVALUATION_SEED = 45
 DIAGNOSTIC_LIMIT = 12
 CACHE_LIMIT_BYTES = 40 * 1024**3
 CHECKPOINT_SHA256 = "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+DEVELOPMENT_POPULATION_ID = "development_train_holdout_47_masters_canonical"
+PROTOCOL_B_POPULATION_ID = "protocol_b_43_masters_3_orders"
+POPULATION_IDS = (DEVELOPMENT_POPULATION_ID, PROTOCOL_B_POPULATION_ID)
+DEFAULT_PROTOCOL_B_MANIFEST = PROJECT_ROOT / "artifacts/P6A/protocol_b_manifest.json"
 
 POLICY_FIELDS = (
     "population_id",
@@ -113,9 +117,10 @@ def select_diagnostic_masters(
         raise TaskMemoryPolicyBaselineError("diagnostic masters are invalid")
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 12:
         raise TaskMemoryPolicyBaselineError("diagnostic limit must be within 1-12")
-    if any(master.role != "development" for master in masters):
+    roles = {master.role for master in masters}
+    if len(roles) != 1 or not roles <= {"development", "protocol_b_final"}:
         raise TaskMemoryPolicyBaselineError(
-            "diagnostic panel must use development only"
+            "diagnostic panel must use one frozen population role"
         )
     grouped: dict[str, list[NativeEpisodeMaster]] = defaultdict(list)
     for master in masters:
@@ -137,6 +142,95 @@ def select_diagnostic_masters(
             break
         round_index += 1
     return tuple(selected)
+
+
+def population_counts(
+    masters: Sequence[NativeEpisodeMaster], *, population_id: str
+) -> dict[str, int]:
+    if (
+        isinstance(masters, (str, bytes))
+        or not isinstance(masters, Sequence)
+        or not masters
+        or any(not isinstance(master, NativeEpisodeMaster) for master in masters)
+    ):
+        raise TaskMemoryPolicyBaselineError("population masters are invalid")
+    if population_id == DEVELOPMENT_POPULATION_ID:
+        if any(master.role != "development" for master in masters):
+            raise TaskMemoryPolicyBaselineError("development population role differs")
+        master_count = len(masters)
+    elif population_id == PROTOCOL_B_POPULATION_ID:
+        if any(master.role != "protocol_b_final" for master in masters):
+            raise TaskMemoryPolicyBaselineError("Protocol-B population role differs")
+        groups: dict[tuple[str, int], int] = defaultdict(int)
+        for master in masters:
+            groups[(master.reference_id, master.context_index // 3)] += 1
+        if any(count != 3 for count in groups.values()):
+            raise TaskMemoryPolicyBaselineError(
+                "Protocol-B must contain three orders per master"
+            )
+        master_count = len(groups)
+    else:
+        raise TaskMemoryPolicyBaselineError("baseline population is not frozen")
+    return {
+        "reference_count": len({master.reference_id for master in masters}),
+        "master_count": master_count,
+        "order_count": len(masters),
+    }
+
+
+def build_baseline_population(
+    base: object,
+    *,
+    data_contract: Mapping[str, object],
+    metadata_path: Path,
+    population_id: str,
+    protocol_b_manifest_path: Path,
+) -> tuple[object, tuple[NativeEpisodeMaster, ...], str | None]:
+    from scripts.preflight_task_memory_episode import (
+        _role_by_reference,
+        load_reference_by_scene,
+    )
+
+    if population_id == DEVELOPMENT_POPULATION_ID:
+        masters = tuple(
+            master
+            for master in build_native_episode_masters(
+                base,
+                reference_by_scene=load_reference_by_scene(metadata_path),
+                role_by_reference=_role_by_reference(data_contract),
+            )
+            if master.role == "development" and len(master.scan_ids) == 5
+        )
+        if population_counts(masters, population_id=population_id) != {
+            "reference_count": 8,
+            "master_count": 47,
+            "order_count": 47,
+        }:
+            raise TaskMemoryPolicyBaselineError("development population differs")
+        return base, masters, None
+    if population_id != PROTOCOL_B_POPULATION_ID:
+        raise TaskMemoryPolicyBaselineError("baseline population is not frozen")
+
+    from scripts.evaluate_task_memory import _build_protocol_b_population
+
+    source = data_contract.get("sources", {}).get("protocol_b", {})
+    expected_sha256 = source.get("sha256") if isinstance(source, Mapping) else None
+    protocol_b_manifest_path = protocol_b_manifest_path.expanduser().resolve(
+        strict=True
+    )
+    observed_sha256 = _file_sha256(protocol_b_manifest_path)
+    if observed_sha256 != expected_sha256:
+        raise TaskMemoryPolicyBaselineError("Protocol-B manifest SHA256 differs")
+    wrapped, masters = _build_protocol_b_population(
+        base, _load_json(protocol_b_manifest_path)
+    )
+    if population_counts(masters, population_id=population_id) != {
+        "reference_count": 6,
+        "master_count": 43,
+        "order_count": 129,
+    }:
+        raise TaskMemoryPolicyBaselineError("Protocol-B population differs")
+    return wrapped, masters, observed_sha256
 
 
 def _target_ids(target: Mapping[str, object]) -> set[int]:
@@ -716,6 +810,8 @@ def _analyze(
     panel: Mapping[str, object],
     class_mapper: Callable[[int], int],
     output_root: Path,
+    population_id: str,
+    counts: Mapping[str, int],
 ) -> dict[str, object]:
     from scripts.analyze_persist4d_allt import AllTBaselineAccumulator
     from scripts.analyze_r1_downstream_validation import resolve_metric_dataset_spec
@@ -788,16 +884,13 @@ def _analyze(
         )
 
     main_rows = []
-    references = len({spec.reference_id for spec in specs})
     for policy in POLICIES:
         for horizon in HORIZONS:
             key = (policy, horizon)
             main_rows.append(
                 {
-                    "population_id": "development_train_holdout_47_masters_canonical",
-                    "reference_count": references,
-                    "master_count": len(specs),
-                    "order_count": len(specs),
+                    "population_id": population_id,
+                    **counts,
                     "source_commit": provenance["source_commit"],
                     "checkpoint_sha256": provenance["checkpoint_sha256"],
                     "config_sha256": provenance["config_sha256"],
@@ -842,7 +935,7 @@ def _analyze(
                     status = "NOT_AVAILABLE_NO_SEQUENCES"
                 gap_rows.append(
                     {
-                        "population_id": "development_preregistered_diagnostic_12",
+                        "population_id": f"{population_id}_diagnostic_12",
                         "diagnostic_panel_sha256": panel["content_sha256"],
                         "source_commit": provenance["source_commit"],
                         "checkpoint_sha256": provenance["checkpoint_sha256"],
@@ -867,6 +960,8 @@ def _analyze(
         "source_commit": provenance["source_commit"],
         "checkpoint_sha256": provenance["checkpoint_sha256"],
         "config_sha256": provenance["config_sha256"],
+        "population_id": population_id,
+        **counts,
         "entry_count": len(cache_records),
         "cache_bytes": cache_bytes,
         "cache_limit_bytes": CACHE_LIMIT_BYTES,
@@ -894,6 +989,8 @@ def run_baseline(
     pretrained_path: Path,
     run_root: Path,
     output_root: Path,
+    population_id: str = DEVELOPMENT_POPULATION_ID,
+    protocol_b_manifest_path: Path = DEFAULT_PROTOCOL_B_MANIFEST,
 ) -> dict[str, object]:
     import hydra
 
@@ -902,11 +999,7 @@ def run_baseline(
         _frozen_inference_seed,
         build_rio_class_mapper,
     )
-    from scripts.preflight_task_memory_episode import (
-        _rio_base_dataset,
-        _role_by_reference,
-        load_reference_by_scene,
-    )
+    from scripts.preflight_task_memory_episode import _rio_base_dataset
     from scripts.r1_downstream_context import (
         _load_r1_system,
         compose_r1_runtime_config,
@@ -950,7 +1043,17 @@ def run_baseline(
         label="Concerto pretrain",
     )
     runtime_config, memory_config = compose_r1_runtime_config(pretrained_path)
-    base = _rio_base_dataset(runtime_config, data_root=data_root, horizon=5)
+    if population_id == PROTOCOL_B_POPULATION_ID:
+        from scripts.evaluate_task_memory import _rio_population_base
+
+        base = _rio_population_base(
+            runtime_config,
+            data_root=data_root,
+            horizon=5,
+            population_id=PROTOCOL_B_POPULATION_ID,
+        )
+    else:
+        base = _rio_base_dataset(runtime_config, data_root=data_root, horizon=5)
     data_contract = _load_json(
         PROJECT_ROOT / "artifacts/task_memory_retention_v2/DATA_CONTRACT.json"
     )
@@ -958,18 +1061,15 @@ def run_baseline(
     data_sha256 = str(unsigned_data.pop("content_sha256"))
     if data_sha256 != canonical_json_sha256(unsigned_data):
         raise TaskMemoryPolicyBaselineError("data contract hash differs")
-    masters = tuple(
-        master
-        for master in build_native_episode_masters(
-            base,
-            reference_by_scene=load_reference_by_scene(metadata_path),
-            role_by_reference=_role_by_reference(data_contract),
-        )
-        if master.role == "development" and len(master.scan_ids) == 5
+    base, masters, protocol_b_manifest_sha256 = build_baseline_population(
+        base,
+        data_contract=data_contract,
+        metadata_path=metadata_path,
+        population_id=population_id,
+        protocol_b_manifest_path=protocol_b_manifest_path,
     )
-    if len(masters) != 47 or len({master.reference_id for master in masters}) != 8:
-        raise TaskMemoryPolicyBaselineError("development H5 population differs")
     specs = _episode_specs(masters)
+    counts = population_counts(masters, population_id=population_id)
     panel = _panel_payload(
         masters, source_commit=source_commit, data_sha256=data_sha256
     )
@@ -985,7 +1085,9 @@ def run_baseline(
         "data_contract_sha256": data_sha256,
         "diagnostic_panel_sha256": panel["content_sha256"],
         "evaluation_seed": EVALUATION_SEED,
-        "population": "development_train_holdout_47_masters_canonical",
+        "population": population_id,
+        "population_counts": counts,
+        "protocol_b_manifest_sha256": protocol_b_manifest_sha256,
         "policies": list(POLICIES),
         "reducer": "mean",
         "window": "W2",
@@ -1119,6 +1221,8 @@ def run_baseline(
             panel=panel,
             class_mapper=class_mapper,
             output_root=output_root,
+            population_id=population_id,
+            counts=counts,
         )
     return manifest
 
@@ -1132,6 +1236,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--shard-index", type=int, default=0)
     parser.add_argument("--shard-count", type=int, default=1)
+    parser.add_argument(
+        "--population", choices=POPULATION_IDS, default=DEVELOPMENT_POPULATION_ID
+    )
+    parser.add_argument(
+        "--protocol-b-manifest", type=Path, default=DEFAULT_PROTOCOL_B_MANIFEST
+    )
     parser.add_argument(
         "--data-root", type=Path, default=resolver["external:data_root"]
     )
@@ -1167,6 +1277,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         pretrained_path=args.pretrained,
         run_root=args.run_root,
         output_root=args.output_root,
+        population_id=args.population,
+        protocol_b_manifest_path=args.protocol_b_manifest,
     )
     print(
         json.dumps(
@@ -1185,8 +1297,12 @@ if __name__ == "__main__":
 
 
 __all__ = [
+    "DEVELOPMENT_POPULATION_ID",
+    "PROTOCOL_B_POPULATION_ID",
     "TaskMemoryPolicyBaselineError",
+    "build_baseline_population",
     "classify_gap_event",
+    "population_counts",
     "run_baseline",
     "select_diagnostic_masters",
 ]

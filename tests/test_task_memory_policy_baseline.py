@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+import pytest
 import torch
 
 from datasets.task_memory_episode import NativeEpisodeMaster
 from scripts.run_task_memory_policy_baseline import (
+    DEVELOPMENT_POPULATION_ID,
+    PROTOCOL_B_POPULATION_ID,
+    TaskMemoryPolicyBaselineError,
     _target_for_prefix,
     _validate_collated_stage_identity,
     classify_gap_event,
+    population_counts,
     select_diagnostic_masters,
 )
 
@@ -94,3 +99,44 @@ def test_prefix_target_supplies_contiguous_stage_keys() -> None:
     assert target["temporal_stages"].tolist() == [0, 0, 1, 1, 2, 2]
     assert target["ids"].tolist() == [1]
     assert target["masks"].shape == (1, 6)
+
+
+def test_population_counts_distinguish_masters_from_protocol_orders() -> None:
+    development = (
+        _master("ref-a", "scene0001_00-scene0001_01", 0),
+        _master("ref-b", "scene0002_00-scene0002_01", 1),
+    )
+    protocol = []
+    orders = (tuple(range(5)), tuple(reversed(range(5))), (2, 0, 4, 1, 3))
+    for index in range(6):
+        scan_ids = tuple(
+            f"scene{index // 3 + 1:04d}_{stage:02d}"
+            for stage in orders[index % 3]
+        )
+        protocol.append(
+            NativeEpisodeMaster(
+                reference_id=f"ref-{index // 3}",
+                sequence_id="-".join(scan_ids),
+                scan_ids=scan_ids,
+                scan_indices=orders[index % 3],
+                role="protocol_b_final",
+                context_index=index,
+            )
+        )
+
+    assert population_counts(
+        development, population_id=DEVELOPMENT_POPULATION_ID
+    ) == {"reference_count": 2, "master_count": 2, "order_count": 2}
+    assert population_counts(tuple(protocol), population_id=PROTOCOL_B_POPULATION_ID) == {
+        "reference_count": 2,
+        "master_count": 2,
+        "order_count": 6,
+    }
+
+
+def test_population_counts_reject_wrong_protocol_role() -> None:
+    with pytest.raises(TaskMemoryPolicyBaselineError, match="role"):
+        population_counts(
+            (_master("ref-a", "scene0001_00-scene0001_01", 0),),
+            population_id=PROTOCOL_B_POPULATION_ID,
+        )

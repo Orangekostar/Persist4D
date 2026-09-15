@@ -21,7 +21,6 @@ from datasets.task_memory_episode import (
     TaskMemoryEpisodeCollator,
     TaskMemoryEpisodeDataset,
     TaskMemoryEpisodeSpec,
-    build_native_episode_masters,
 )
 from models.task_memory_routing import (
     PredictionObservation,
@@ -32,9 +31,13 @@ from models.task_memory_state import TaskMemoryConfig, TaskMemoryState
 from scripts.run_task_memory_policy_baseline import (
     CACHE_LIMIT_BYTES,
     CHECKPOINT_SHA256,
+    DEFAULT_PROTOCOL_B_MANIFEST,
+    DEVELOPMENT_POPULATION_ID,
     EVALUATION_SEED,
     HORIZONS,
+    POPULATION_IDS,
     PROJECT_ROOT,
+    PROTOCOL_B_POPULATION_ID,
     _atomic_json,
     _episode_specs,
     _file_sha256,
@@ -47,6 +50,8 @@ from scripts.run_task_memory_policy_baseline import (
     _validate_cache,
     _validate_collated_stage_identity,
     _write_csv,
+    build_baseline_population,
+    population_counts,
 )
 from scripts.task_memory_contracts import canonical_json_sha256
 from scripts.task_memory_output import CommitZeroPublisher, LagOnePublisher
@@ -362,8 +367,11 @@ def _load_base_manifest(path: Path) -> dict[str, object]:
         declared != canonical_json_sha256(unsigned)
         or value.get("status") != "PASS"
         or value.get("checkpoint_sha256") != CHECKPOINT_SHA256
-        or value.get("entry_count") != 47
+        or isinstance(value.get("entry_count"), bool)
+        or not isinstance(value.get("entry_count"), int)
+        or value["entry_count"] <= 0
         or not isinstance(value.get("records"), list)
+        or len(value["records"]) != value["entry_count"]
     ):
         raise ControlRunnerError("base cache manifest is invalid")
     return value
@@ -679,6 +687,8 @@ def _analyze(
     provenance: Mapping[str, object],
     class_mapper: Callable[[int], int],
     output_root: Path,
+    population_id: str,
+    counts: Mapping[str, int],
 ) -> dict[str, object]:
     from scripts.analyze_persist4d_allt import AllTBaselineAccumulator
     from scripts.analyze_r1_downstream_validation import resolve_metric_dataset_spec
@@ -788,6 +798,8 @@ def _analyze(
         "checkpoint_sha256": CHECKPOINT_SHA256,
         "config_sha256": provenance["config_sha256"],
         "base_cache_manifest_sha256": base_manifest["content_sha256"],
+        "population_id": population_id,
+        **counts,
         "entry_count": len(supplement_records),
         "stage_count": len(supplement_records) * 5,
         "supplement_bytes": supplement_bytes,
@@ -808,10 +820,8 @@ def _analyze(
             for horizon in HORIZONS:
                 control_rows.append(
                     {
-                        "population_id": "development_train_holdout_47_masters_canonical",
-                        "reference_count": len({spec.reference_id for spec in specs}),
-                        "master_count": len(specs),
-                        "order_count": len(specs),
+                        "population_id": population_id,
+                        **counts,
                         "source_commit": provenance["source_commit"],
                         "checkpoint_sha256": CHECKPOINT_SHA256,
                         "base_cache_manifest_sha256": base_manifest["content_sha256"],
@@ -856,7 +866,7 @@ def _analyze(
         )
         router_rows.append(
             {
-                "population_id": "development_train_holdout_47_masters_canonical",
+                "population_id": population_id,
                 "source_commit": provenance["source_commit"],
                 "checkpoint_sha256": CHECKPOINT_SHA256,
                 "base_cache_manifest_sha256": base_manifest["content_sha256"],
@@ -911,6 +921,8 @@ def run_controls(
     run_root: Path,
     output_root: Path,
     base_manifest_path: Path,
+    population_id: str = DEVELOPMENT_POPULATION_ID,
+    protocol_b_manifest_path: Path = DEFAULT_PROTOCOL_B_MANIFEST,
 ) -> dict[str, object]:
     import hydra
 
@@ -918,11 +930,7 @@ def run_controls(
         _frozen_inference_seed,
         build_rio_class_mapper,
     )
-    from scripts.preflight_task_memory_episode import (
-        _rio_base_dataset,
-        _role_by_reference,
-        load_reference_by_scene,
-    )
+    from scripts.preflight_task_memory_episode import _rio_base_dataset
     from scripts.r1_downstream_context import (
         _load_r1_system,
         compose_r1_runtime_config,
@@ -964,29 +972,52 @@ def run_controls(
     runtime_config, memory_config = compose_r1_runtime_config(pretrained_path)
     data_root = data_root.expanduser().resolve(strict=True)
     metadata_path = metadata_path.expanduser().resolve(strict=True)
-    base_dataset = _rio_base_dataset(runtime_config, data_root=data_root, horizon=5)
+    if population_id == PROTOCOL_B_POPULATION_ID:
+        from scripts.evaluate_task_memory import _rio_population_base
+
+        base_dataset = _rio_population_base(
+            runtime_config,
+            data_root=data_root,
+            horizon=5,
+            population_id=PROTOCOL_B_POPULATION_ID,
+        )
+    else:
+        base_dataset = _rio_base_dataset(
+            runtime_config, data_root=data_root, horizon=5
+        )
     data_contract = _load_json(
         PROJECT_ROOT / "artifacts/task_memory_retention_v2/DATA_CONTRACT.json"
     )
-    masters = tuple(
-        master
-        for master in build_native_episode_masters(
-            base_dataset,
-            reference_by_scene=load_reference_by_scene(metadata_path),
-            role_by_reference=_role_by_reference(data_contract),
-        )
-        if master.role == "development" and len(master.scan_ids) == 5
+    base_dataset, masters, protocol_b_manifest_sha256 = build_baseline_population(
+        base_dataset,
+        data_contract=data_contract,
+        metadata_path=metadata_path,
+        population_id=population_id,
+        protocol_b_manifest_path=protocol_b_manifest_path,
     )
     specs = _episode_specs(masters)
-    if len(specs) != 47 or set(records) != {
-        spec.source_sequence_id for spec in specs
-    }:
-        raise ControlRunnerError("base cache and development population differ")
+    counts = population_counts(masters, population_id=population_id)
+    manifest_population = base_manifest.get("population_id")
+    manifest_counts = {key: base_manifest.get(key) for key in counts}
+    legacy_development_manifest = (
+        population_id == DEVELOPMENT_POPULATION_ID
+        and manifest_population is None
+        and all(value is None for value in manifest_counts.values())
+        and base_manifest["entry_count"] == 47
+    )
+    if (
+        not legacy_development_manifest
+        and (manifest_population != population_id or manifest_counts != counts)
+    ) or set(records) != {spec.source_sequence_id for spec in specs}:
+        raise ControlRunnerError("base cache and requested population differ")
     config_document = {
         "schema_version": "task-memory-controls-config-v2",
         "source_commit": source_commit,
         "base_cache_manifest_sha256": base_manifest["content_sha256"],
         "checkpoint_sha256": CHECKPOINT_SHA256,
+        "population": population_id,
+        "population_counts": counts,
+        "protocol_b_manifest_sha256": protocol_b_manifest_sha256,
         "methods": {
             "D-LAST": {"update_mode": "last"},
             "D-EMA": {"update_mode": "fixed_ema", "update_rate": 0.2},
@@ -1119,6 +1150,8 @@ def run_controls(
             provenance=provenance,
             class_mapper=class_mapper,
             output_root=output_root.expanduser().resolve(),
+            population_id=population_id,
+            counts=counts,
         )
     return result
 
@@ -1132,6 +1165,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--shard-index", type=int, default=0)
     parser.add_argument("--shard-count", type=int, default=1)
+    parser.add_argument(
+        "--population", choices=POPULATION_IDS, default=DEVELOPMENT_POPULATION_ID
+    )
+    parser.add_argument(
+        "--protocol-b-manifest", type=Path, default=DEFAULT_PROTOCOL_B_MANIFEST
+    )
     parser.add_argument("--data-root", type=Path, default=resolver["external:data_root"])
     parser.add_argument(
         "--rio-metadata", type=Path, default=resolver["external:rio_metadata"]
@@ -1172,6 +1211,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         run_root=args.run_root,
         output_root=args.output_root,
         base_manifest_path=args.base_manifest,
+        population_id=args.population,
+        protocol_b_manifest_path=args.protocol_b_manifest,
     )
     print(
         json.dumps(
