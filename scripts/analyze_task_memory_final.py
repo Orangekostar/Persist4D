@@ -860,12 +860,12 @@ def load_legacy_baseline_rows(path: Path) -> list[dict[str, object]]:
         method = row.get("method")
         reducer = row.get("reducer")
         if method == "B4" and reducer == "mean":
-            variant, policy, output_reducer = "R1+B4", "lag1", "mean"
+            variant, policy, output_reducer = "B4-commit0", "commit0", "mean"
             capacity, representatives, state_bytes = 100, 0, 61_008
             window = "local_pair"
         elif method == "FullHistory" and reducer == "official":
             variant, policy, output_reducer = (
-                "FH-R1",
+                "FH-R1-native",
                 "full_history_native",
                 "official",
             )
@@ -915,8 +915,8 @@ def load_legacy_baseline_rows(path: Path) -> list[dict[str, object]]:
             }
         )
     for variant, policy, reducer in (
-        ("R1+B4", "lag1", "mean"),
-        ("FH-R1", "full_history_native", "official"),
+        ("B4-commit0", "commit0", "mean"),
+        ("FH-R1-native", "full_history_native", "official"),
     ):
         rows = [row for row in selected if row["variant"] == variant]
         if not rows:
@@ -1201,18 +1201,23 @@ def analyze_final_results(
     legacy = load_legacy_baseline_rows(legacy_baseline)
     by_legacy = {
         variant: [row for row in legacy if row["variant"] == variant]
-        for variant in ("R1+B4", "FH-R1")
+        for variant in ("B4-commit0", "FH-R1-native")
     }
     all_metrics = [
-        *by_legacy["R1+B4"],
-        *by_legacy["FH-R1"],
+        *by_legacy["B4-commit0"],
+        *by_legacy["FH-R1-native"],
         *current["M3-BASE-CONT"],
         *current["FH-CONT"],
         *current["M3-V-CORE"],
     ]
     comparisons = {}
     delta_rows = []
-    for baseline in ("R1+B4", "FH-R1", "M3-BASE-CONT", "FH-CONT"):
+    for baseline in (
+        "B4-commit0",
+        "FH-R1-native",
+        "M3-BASE-CONT",
+        "FH-CONT",
+    ):
         baseline_rows = current.get(baseline, by_legacy.get(baseline))
         if baseline_rows is None:
             raise FinalAnalysisError(f"required baseline is unavailable: {baseline}")
@@ -1226,7 +1231,13 @@ def analyze_final_results(
         delta_rows.extend(result["rows"])
     retention = [
         row
-        for variant in ("R1+B4", "FH-R1", "M3-BASE-CONT", "FH-CONT", "M3-V-CORE")
+        for variant in (
+            "B4-commit0",
+            "FH-R1-native",
+            "M3-BASE-CONT",
+            "FH-CONT",
+            "M3-V-CORE",
+        )
         for row in build_retention_rows(
             current.get(variant, by_legacy.get(variant)) or ()
         )
@@ -1304,7 +1315,9 @@ def analyze_final_results(
     matched = comparisons["M3-V-CORE_vs_FH-CONT"]
     status = {
         "EXECUTION": "PARTIAL",
-        "TMAP_ALL_T_VS_R1": comparisons["M3-V-CORE_vs_R1+B4"]["tmap_all_t"],
+        "TMAP_ALL_T_VS_R1": comparisons["M3-V-CORE_vs_B4-commit0"][
+            "tmap_all_t"
+        ],
         "TMAP_ALL_T_VS_MATCHED_FH": matched["tmap_all_t"],
         "TASK_METRICS_ALL_T": matched["task_metrics_all_t"],
         "RETENTION": _retention_status(current["M3-V-CORE"], current["FH-CONT"]),

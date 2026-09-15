@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -11,6 +12,7 @@ from scripts.analyze_task_memory_final import (
     bootstrap_equal_reference_deltas,
     build_all_t_comparison,
     build_retention_rows,
+    load_legacy_baseline_rows,
     load_resource_status,
     validate_identity_events,
     validate_identity_rows,
@@ -18,6 +20,8 @@ from scripts.analyze_task_memory_final import (
     validate_primary_rows,
 )
 from scripts.task_memory_contracts import canonical_json_sha256
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _primary_rows(variant: str, checkpoint: str, base: float):
@@ -42,6 +46,16 @@ def _primary_rows(variant: str, checkpoint: str, base: float):
         }
         for horizon in REPORT_HORIZONS
     ]
+
+
+def test_legacy_b4_rows_remain_commit0_evidence() -> None:
+    rows = load_legacy_baseline_rows(
+        PROJECT_ROOT / "artifacts/allt_task_superiority_v1/baseline/all_t_metrics.csv"
+    )
+
+    b4 = [row for row in rows if row["variant"] == "B4-commit0"]
+    assert len(b4) == 4
+    assert {row["policy"] for row in b4} == {"commit0"}
 
 
 def test_primary_rows_lock_checkpoint_policy_reducer_and_full_metric_schema() -> None:
