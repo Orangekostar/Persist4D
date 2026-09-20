@@ -181,7 +181,7 @@ git commit -m "feat: implement bounded crosswindow association state"
 - Consumes: canonical frames, immutable plans, old `run_control_trajectory`, official metric adapters.
 - Produces: append-only `PublishedPrefix`, D-LEGACY/D-INDEXFIX/D0 rows, A0-U rows, `raw_current_AP`, `published_current_AP`, and parity ledgers.
 
-- [ ] **Step 1: Write failing route/commit/publish and metric-isolation tests**
+- [x] **Step 1: Write failing route/commit/publish and metric-isolation tests**
 
 ```python
 def test_publish_consumes_plan_without_reassignment():
@@ -194,19 +194,19 @@ def test_raw_current_ap_is_association_invariant():
     assert left == right
 ```
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run: `conda run -n persist4d python -m pytest -q tests/test_crosswindow_metrics.py`
 
-- [ ] **Step 3: Implement replay adapters, exact three-field evaluator boundary, archive canonicalization, collision fallback to a new identity, and separate raw/published current metrics**
+- [x] **Step 3: Implement replay adapters, exact three-field evaluator boundary, archive canonicalization, collision fallback to a new identity, and separate raw/published current metrics**
 
-- [ ] **Step 4: Verify GREEN and run E0 on DEV-CAL**
+- [x] **Step 4: Verify GREEN and run E0 on DEV-CAL**
 
 Run: `conda run -n persist4d python -m pytest -q tests/test_crosswindow_core.py tests/test_crosswindow_metrics.py tests/test_task_memory_controls.py tests/test_task_memory_output.py tests/test_system_comparison_metrics.py`
 
 Run: `conda run -n persist4d python -m scripts.crosswindow_campaign run --config configs/crosswindow_evidence_v1.yaml --through E0 --resume`
 
-- [ ] **Step 5: Commit E0 implementation and evidence**
+- [x] **Step 5: Commit E0 implementation and evidence**
 
 ```bash
 git add scripts/replay_crosswindow_association.py scripts/crosswindow_campaign.py tests/test_crosswindow_metrics.py artifacts/crosswindow_evidence_v1/e0 artifacts/crosswindow_evidence_v1/RUN_STATE.json

@@ -297,7 +297,7 @@ def _group_key(frame: CanonicalFrame, group: QueryGroup) -> GroupKey:
     )
 
 
-def _frame_sha256(frame: CanonicalFrame) -> str:
+def canonical_frame_sha256(frame: CanonicalFrame) -> str:
     digest = hashlib.sha256()
     digest.update(
         json.dumps(
@@ -545,7 +545,7 @@ def build_evidence(
 
     bundle = EvidenceBundle(
         source_state_sha256=_state_sha256(state),
-        frame_sha256=_frame_sha256(frame),
+        frame_sha256=canonical_frame_sha256(frame),
         reference_id=frame.reference_id,
         episode_id=frame.episode_id,
         absolute_stage=frame.absolute_stage,
@@ -931,7 +931,7 @@ def commit_observation(
     plan.validate()
     if plan.source_state_sha256 != _state_sha256(state):
         raise CrossWindowAssociationError("assignment plan belongs to another state")
-    if plan.frame_sha256 != _frame_sha256(frame):
+    if plan.frame_sha256 != canonical_frame_sha256(frame):
         raise CrossWindowAssociationError("assignment plan belongs to another frame")
     if (
         frame.absolute_stage != state.stage_watermark + 1
@@ -1047,6 +1047,7 @@ __all__ = [
     "EvidenceBundle",
     "associate",
     "build_evidence",
+    "canonical_frame_sha256",
     "commit_observation",
     "preregistered_association_configs",
     "score_a2",

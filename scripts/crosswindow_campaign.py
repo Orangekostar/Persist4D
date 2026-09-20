@@ -10,6 +10,7 @@ import json
 import os
 import subprocess
 import tempfile
+import time
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -734,6 +735,214 @@ def _preflight(args: argparse.Namespace) -> int:
     return 0 if numerical_pass else 1
 
 
+def _run_e0(args: argparse.Namespace) -> int:
+    from scripts.replay_crosswindow_association import E0ReplayAccumulator
+
+    started_cpu = time.process_time()
+    config_path = Path(args.config).resolve()
+    config = load_campaign_config(config_path)
+    paths = config["paths"]
+    artifact_root = PROJECT_ROOT / paths["artifact_root"]
+    data_contract_path = PROJECT_ROOT / paths["data_contract"]
+    state_path = artifact_root / "RUN_STATE.json"
+    state = load_resume_state(
+        state_path,
+        parent=config["identity"]["parent_commit"],
+        instruction_sha=config["identity"]["instruction_sha256"],
+        config_sha=_sha256(config_path),
+        data_sha=_sha256(data_contract_path),
+    )
+    e0_required = (
+        "baseline_metrics.csv",
+        "checkpoint_policy_matrix.csv",
+        "source_parity.csv",
+        "status.json",
+        "t2_same_forward_parity.json",
+    )
+    if (
+        args.resume
+        and state.get("stage") == "E0"
+        and state.get("stage_status") == "PASS"
+    ):
+        e0_root = artifact_root / "e0"
+        if not all((e0_root / name).is_file() for name in e0_required):
+            raise CampaignError("completed E0 state lacks required artifacts")
+        summary = _read_json(e0_root / "status.json")
+        parity = _read_json(e0_root / "t2_same_forward_parity.json")
+        if summary.get("status") != "PASS" or parity.get("status") != "PASS":
+            raise CampaignError("completed E0 artifacts do not pass")
+        print(json.dumps({**summary, "resumed": True}, indent=2, sort_keys=True))
+        return 0
+    external_root_value = args.external_root or os.environ.get("PERSIST4D_RUN_ROOT")
+    if not external_root_value:
+        raise CampaignError("run requires --external-root or PERSIST4D_RUN_ROOT")
+    external_root = Path(external_root_value).resolve()
+    assets = _read_json(external_root / "assets.local.json")
+    required_assets = (
+        "dev_base_cache_root",
+        "dev_supplement_root",
+        "metric_dataset_spec",
+    )
+    if any(not isinstance(assets.get(key), str) for key in required_assets):
+        raise CampaignError("E0 development assets are unresolved")
+    base_root = Path(assets["dev_base_cache_root"])
+    supplement_root = Path(assets["dev_supplement_root"])
+    metric_dataset_spec = Path(assets["metric_dataset_spec"])
+    if (
+        not base_root.is_dir()
+        or not supplement_root.is_dir()
+        or not metric_dataset_spec.is_file()
+    ):
+        raise CampaignError("E0 development assets are unavailable")
+
+    base_manifest = _read_json(PROJECT_ROOT / paths["dev_base_manifest"])
+    supplement_manifest = _read_json(PROJECT_ROOT / paths["dev_supplement_manifest"])
+    checkpoint_sha256 = supplement_manifest.get("checkpoint_sha256")
+    if checkpoint_sha256 != config["identity"]["r1_checkpoint_sha256"]:
+        raise CampaignError("E0 supplement checkpoint identity differs")
+    roles = _read_json(artifact_root / "DATA_ROLES.json").get("roles")
+    if not isinstance(roles, Mapping) or not isinstance(roles.get("DEV-CAL"), list):
+        raise CampaignError("DEV-CAL role is unavailable")
+    units = list(
+        iter_campaign_units(
+            role="DEV-CAL",
+            role_references=roles["DEV-CAL"],
+            base_manifest=base_manifest,
+            supplement_manifest=supplement_manifest,
+        )
+    )
+    metric_spec = yaml.safe_load(metric_dataset_spec.read_text(encoding="utf-8"))
+    class_mapping = (
+        metric_spec.get("valid_class_ids") if isinstance(metric_spec, dict) else None
+    )
+    if not isinstance(class_mapping, list) or any(
+        isinstance(value, bool) or not isinstance(value, int) for value in class_mapping
+    ):
+        raise CampaignError("metric dataset class mapping is unavailable")
+    correctness = _read_json(artifact_root / "e0/correctness_fix_ledger.json")
+    index_trigger_count = correctness.get("non_identity_trigger_count")
+    if isinstance(index_trigger_count, bool) or not isinstance(
+        index_trigger_count, int
+    ):
+        raise CampaignError("point-order trigger count is unavailable")
+    accumulator = E0ReplayAccumulator(
+        dataset_spec=str(metric_dataset_spec),
+        class_mapping=tuple(class_mapping),
+        checkpoint_sha256=checkpoint_sha256,
+        source_commit=config["identity"]["parent_commit"],
+        index_trigger_count=index_trigger_count,
+    )
+    hash_cache_path = external_root / "verified_hashes.local.json"
+    hash_cache = _read_json(hash_cache_path) if hash_cache_path.is_file() else {}
+    completed_units = []
+    for index, unit in enumerate(units, start=1):
+        base = _verified_torch_load(
+            path=base_root / unit.base_filename,
+            record={"bytes": unit.base_bytes, "sha256": unit.base_sha256},
+            hash_cache=hash_cache,
+        )
+        supplement = _verified_torch_load(
+            path=supplement_root / unit.supplement_filename,
+            record={
+                "bytes": unit.supplement_bytes,
+                "sha256": unit.supplement_sha256,
+            },
+            hash_cache=hash_cache,
+        )
+        accumulator.update(
+            logical_unit_id=unit.logical_unit_id,
+            base=base,
+            supplement=supplement,
+        )
+        completed_units.append(unit.logical_unit_id)
+        del base, supplement
+        print(
+            json.dumps(
+                {
+                    "stage": "E0",
+                    "completed": index,
+                    "total": len(units),
+                    "logical_unit_id": unit.logical_unit_id,
+                },
+                sort_keys=True,
+            ),
+            flush=True,
+        )
+    _atomic_json(hash_cache_path, hash_cache)
+    result = accumulator.finalize()
+    e0_root = artifact_root / "e0"
+    metric_rows = result["metric_rows"]
+    source_rows = result["source_rows"]
+    checkpoint_rows = result["checkpoint_rows"]
+    _atomic_csv(
+        e0_root / "baseline_metrics.csv",
+        metric_rows,
+        fieldnames=tuple(metric_rows[0]),
+    )
+    _atomic_csv(
+        e0_root / "source_parity.csv",
+        source_rows,
+        fieldnames=tuple(source_rows[0]),
+    )
+    _atomic_csv(
+        e0_root / "checkpoint_policy_matrix.csv",
+        checkpoint_rows,
+        fieldnames=tuple(checkpoint_rows[0]),
+    )
+    _atomic_json(e0_root / "t2_same_forward_parity.json", result["t2_parity"])
+    cpu_core_hours = (time.process_time() - started_cpu) / 3600.0
+    source_base_exact_rows = sum(
+        bool(row["generated_vs_base_exact"]) for row in source_rows
+    )
+    shared_forward_rows = sum(
+        bool(row["d_and_a_physical_forward"]) for row in source_rows
+    )
+    summary = {
+        "schema_version": "crosswindow-e0-summary-v1",
+        "status": result["status"],
+        "data_role": "DEV-CAL",
+        "reference_count": len(roles["DEV-CAL"]),
+        "logical_unit_count": len(units),
+        "source_parity_rows": len(source_rows),
+        "source_base_exact_rows": source_base_exact_rows,
+        "source_base_different_rows": len(source_rows) - source_base_exact_rows,
+        "d_and_a_shared_forward_rows": shared_forward_rows,
+        "metric_rows": len(metric_rows),
+        "index_trigger_count": result["index_trigger_count"],
+        "legacy_route_conflicts": result["route_conflicts"],
+        "legacy_fallback_matches": result["fallback_matches"],
+        "a0_collision_fallback_count": result["a0_collision_fallback_count"],
+        "cpu_core_hours": cpu_core_hours,
+    }
+    _atomic_json(e0_root / "status.json", summary)
+    budget = state.get("budget_used")
+    if not isinstance(budget, dict):
+        raise CampaignError("run-state budget is unavailable")
+    budget["cpu_core_hours"] = float(budget.get("cpu_core_hours", 0.0)) + cpu_core_hours
+    state.update(
+        {
+            "stage": "E0",
+            "stage_status": result["status"],
+            "completed_units": completed_units,
+            "methods": sorted({str(row["method"]) for row in metric_rows}),
+            "e0": summary,
+            "next_command": (
+                "python -m scripts.crosswindow_campaign run --config "
+                "configs/crosswindow_evidence_v1.yaml --through E2 --resume"
+            ),
+        }
+    )
+    atomic_write_run_state(state_path, state)
+    print(json.dumps(summary, indent=2, sort_keys=True))
+    return 0 if result["status"] == "PASS" else 1
+
+
+def _run(args: argparse.Namespace) -> int:
+    if args.through != "E0":
+        raise CampaignError("this implementation stage currently supports --through E0")
+    return _run_e0(args)
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -750,6 +959,11 @@ def _parser() -> argparse.ArgumentParser:
     preflight.add_argument("--external-root")
     preflight.add_argument("--resume", action="store_true")
     preflight.add_argument("--read-only", action="store_true")
+    run = subparsers.add_parser("run")
+    run.add_argument("--config", default=str(DEFAULT_CONFIG))
+    run.add_argument("--external-root")
+    run.add_argument("--resume", action="store_true")
+    run.add_argument("--through", required=True, choices=("E0", "E1", "E2", "E4"))
     return parser
 
 
@@ -759,6 +973,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _bootstrap(args)
     if args.command == "preflight":
         return _preflight(args)
+    if args.command == "run":
+        return _run(args)
     raise CampaignError(f"unsupported campaign command: {args.command}")
 
 

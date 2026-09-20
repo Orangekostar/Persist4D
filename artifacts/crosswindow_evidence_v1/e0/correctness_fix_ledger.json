@@ -1,7 +1,12 @@
 {
   "candidate_frames_validated": 235,
   "candidate_records_preserved": 23500,
-  "measured_metric_impact": "NOT_MEASURED",
+  "measured_metric_impact": {
+    "absolute_difference": 0.0,
+    "data_role": "DEV-CAL",
+    "reason": "all 92 repeated-scan transitions in DEV-CAL used identical point order",
+    "status": "NO_TRIGGER_EQUIVALENT"
+  },
   "multi_class_groups_preserved": 3980,
   "non_identity_trigger_count": 0,
   "real_module_three_cycle": {

@@ -1,0 +1,21 @@
+{
+  "candidate_fields": [
+    "mask",
+    "class",
+    "score"
+  ],
+  "checked_logical_units": 23,
+  "failed_logical_units": [],
+  "failure_count": 0,
+  "metric_abs_differences": {
+    "local_current_AP": 0.0,
+    "prefix_overall_mAP": 0.0,
+    "t_REC": 0.0,
+    "t_mAP": 0.0,
+    "t_mAP25": 0.0,
+    "t_mAP50": 0.0
+  },
+  "metric_tolerance": 1e-12,
+  "schema_version": "crosswindow-t2-same-forward-parity-v1",
+  "status": "PASS"
+}

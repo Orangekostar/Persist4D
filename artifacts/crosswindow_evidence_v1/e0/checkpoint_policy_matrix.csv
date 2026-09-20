@@ -1,0 +1,5 @@
+checkpoint_family,checkpoint_sha256,candidate_producer,output_policy,coverage,status,reason
+R1-B4-policy,629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd,R1-B4-policy,native-W2,DEV-CAL:T2,MEASURED,same cached physical forward as lag1 T2
+R1-B4-policy,629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd,R1-B4-policy,lag1,DEV-CAL:T2-T5,MEASURED,shared development supplement
+FH-CONT,,FH-CONT,native-full-prefix,none,BLOCKED_ASSET,full-history native payload unavailable
+FH-CONT,,FH-CONT,lag1,none,BLOCKED_ASSET,W2 candidates cannot be reconstructed from native FH payload

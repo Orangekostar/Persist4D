@@ -1,0 +1,24 @@
+{
+  "a0_collision_fallback_count": 0,
+  "cpu_core_hours": 2.8023206781636116,
+  "data_role": "DEV-CAL",
+  "d_and_a_shared_forward_rows": 115,
+  "index_trigger_count": 0,
+  "legacy_fallback_matches": {
+    "D-EMA": 2516,
+    "D-LAST": 2516
+  },
+  "legacy_route_conflicts": {
+    "D-EMA": 199,
+    "D-LAST": 199
+  },
+  "logical_unit_count": 23,
+  "metric_rows": 32,
+  "reference_count": 4,
+  "schema_version": "crosswindow-e0-summary-v1",
+  "source_base_different_rows": 44,
+  "source_base_exact_rows": 71,
+  "source_parity_rows": 115,
+  "valid_run_cpu_core_hours": 2.4223206781636115,
+  "status": "PASS"
+}

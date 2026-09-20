@@ -1,28 +1,93 @@
 {
   "budget_used": {
-    "cpu_core_hours": 0.0,
+    "cpu_core_hours": 2.8023206781636116,
     "head_training_gpu_hours": 0.0,
     "inference_gpu_hours": 0.0,
     "new_cache_bytes": 0,
     "profile_gpu_hours": 0.0
   },
-  "completed_units": [],
+  "completed_units": [
+    "DEV-CAL:00000",
+    "DEV-CAL:00001",
+    "DEV-CAL:00002",
+    "DEV-CAL:00003",
+    "DEV-CAL:00004",
+    "DEV-CAL:00005",
+    "DEV-CAL:00006",
+    "DEV-CAL:00007",
+    "DEV-CAL:00008",
+    "DEV-CAL:00009",
+    "DEV-CAL:00010",
+    "DEV-CAL:00011",
+    "DEV-CAL:00012",
+    "DEV-CAL:00013",
+    "DEV-CAL:00014",
+    "DEV-CAL:00015",
+    "DEV-CAL:00026",
+    "DEV-CAL:00027",
+    "DEV-CAL:00028",
+    "DEV-CAL:00029",
+    "DEV-CAL:00030",
+    "DEV-CAL:00031",
+    "DEV-CAL:00032"
+  ],
+  "e0": {
+    "a0_collision_fallback_count": 0,
+    "cpu_core_hours": 2.8023206781636116,
+    "data_role": "DEV-CAL",
+    "d_and_a_shared_forward_rows": 115,
+    "index_trigger_count": 0,
+    "legacy_fallback_matches": {
+      "D-EMA": 2516,
+      "D-LAST": 2516
+    },
+    "legacy_route_conflicts": {
+      "D-EMA": 199,
+      "D-LAST": 199
+    },
+    "logical_unit_count": 23,
+    "metric_rows": 32,
+    "reference_count": 4,
+    "schema_version": "crosswindow-e0-summary-v1",
+    "source_base_different_rows": 44,
+    "source_base_exact_rows": 71,
+    "source_parity_rows": 115,
+    "valid_run_cpu_core_hours": 2.4223206781636115,
+    "status": "PASS"
+  },
   "external_assets_file": "external:assets.local.json",
-  "failures": [],
+  "failures": [
+    {
+      "artifact_effect": "none; interrupted before numeric artifacts were written",
+      "cpu_core_hours_estimate": 0.38,
+      "reason": "metric backend exceeded the fixed 8-worker CPU limit",
+      "stage": "E0",
+      "status": "INVALIDATED_RESOURCE_LIMIT"
+    }
+  ],
   "identity": {
     "config_sha256": "4c9c897c218582f46a155d7653059641cf86164bf2fd814b316f97f552d78e2e",
     "data_sha256": "4434a84b14139b611baa90a365e59cc0fa7cfb27a10d21cc21f50fb2a520c96e",
     "instruction_sha256": "f7ee448782b0e8e4d2940a5b4e60748ce46d3dd07457eaf2460ab0f9006c01c2",
     "parent": "96edca52d9d1cab7781bfa2a273baf9fe52b6a7d"
   },
-  "methods": [],
-  "next_command": "python -m scripts.crosswindow_campaign preflight --config configs/crosswindow_evidence_v1.yaml --external-root \"$PERSIST4D_RUN_ROOT\" --resume --read-only",
+  "methods": [
+    "A0-U-default",
+    "D-CANONICAL-EMA",
+    "D-CANONICAL-LAST",
+    "D-INDEXFIX-EMA",
+    "D-INDEXFIX-LAST",
+    "D-LEGACY-EMA",
+    "D-LEGACY-LAST",
+    "D0"
+  ],
+  "next_command": "python -m scripts.crosswindow_campaign run --config configs/crosswindow_evidence_v1.yaml --through E2 --resume",
   "preflight": {
     "development_units": 47,
     "frames": 235,
     "status": "PASS"
   },
   "schema_version": "crosswindow-run-state-v1",
-  "stage": "BOOTSTRAP",
+  "stage": "E0",
   "stage_status": "PASS"
 }
