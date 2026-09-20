@@ -163,14 +163,20 @@ def test_verified_cache_bytes_include_digest_sidecar(tmp_path: Path) -> None:
     assert torch.equal(loaded["payload"], torch.tensor([1, 2, 3]))
 
 
-def _single_scan_meta(vertex_ids: tuple[int, ...]) -> StageMeta:
+def _single_scan_meta(
+    vertex_ids: tuple[int, ...],
+    *,
+    absolute_stage: int = 0,
+    scan_id: str = "scan-a",
+    episode_id: str = "episode-0",
+) -> StageMeta:
     point_count = len(vertex_ids)
     point_indices = torch.arange(point_count, dtype=torch.long)
     return StageMeta(
         reference_id="reference-0",
-        episode_id="episode-0",
-        scan_ids_in_window=("scan-a",),
-        absolute_stage_index=0,
+        episode_id=episode_id,
+        scan_ids_in_window=(scan_id,),
+        absolute_stage_index=absolute_stage,
         local_stage_ids=torch.zeros(point_count, dtype=torch.long),
         original_vertex_ids=(torch.tensor(vertex_ids, dtype=torch.long),),
         scan_vertex_offsets=torch.tensor([0, point_count], dtype=torch.long),
@@ -299,3 +305,435 @@ def test_campaign_units_preserve_duplicate_logical_to_physical_bindings() -> Non
         "protocol-b:00001",
     ]
     assert len({unit.physical_pair for unit in units}) == 1
+
+
+def _single_query_frame(
+    *,
+    absolute_stage: int,
+    feature: tuple[float, float],
+    class_prob: tuple[float, float],
+    scan_id: str,
+    valid: bool = True,
+    current_supported: bool = True,
+):
+    from scripts.rescene_task_postprocess import OfficialTaskPrediction
+
+    observation = PredictionObservation(
+        features=torch.tensor([[feature]], dtype=torch.float32),
+        class_prob=torch.tensor([[class_prob]], dtype=torch.float32),
+        confidence=torch.tensor([[0.9]], dtype=torch.float32),
+        valid=torch.tensor([[valid]]),
+        current_supported=torch.tensor([[current_supported]]),
+        previous_supported=torch.tensor([[False]]),
+    )
+    masks = torch.tensor([[True], [False], [True]], dtype=torch.bool)
+    prediction = OfficialTaskPrediction(
+        pred_masks=masks,
+        pred_scores=torch.tensor([0.8]),
+        pred_classes=torch.tensor([1]),
+        source_query_ids=torch.tensor([0]),
+        source_class_ids=torch.tensor([1]),
+        temporal_stages=torch.zeros(3, dtype=torch.long),
+        latest_stage_index=0,
+        latest_stage_masks=masks.clone(),
+    )
+    return build_canonical_frame(
+        producer_id="r1-b4",
+        order_id="order-0",
+        observation=observation,
+        prediction=prediction,
+        stage_meta=_single_scan_meta(
+            (30, 10, 20), absolute_stage=absolute_stage, scan_id=scan_id
+        ),
+    )
+
+
+def _two_scan_query_frame(
+    *,
+    absolute_stage: int,
+    feature: tuple[float, float],
+    class_prob: tuple[float, float],
+):
+    from scripts.rescene_task_postprocess import OfficialTaskPrediction
+
+    observation = PredictionObservation(
+        features=torch.tensor([[feature]], dtype=torch.float32),
+        class_prob=torch.tensor([[class_prob]], dtype=torch.float32),
+        confidence=torch.tensor([[0.9]], dtype=torch.float32),
+        valid=torch.tensor([[True]]),
+        current_supported=torch.tensor([[True]]),
+        previous_supported=torch.tensor([[True]]),
+    )
+    local_stages = torch.tensor([0, 0, 0, 1, 1, 1], dtype=torch.long)
+    point_indices = torch.arange(6, dtype=torch.long)
+    masks = torch.tensor(
+        [[True], [False], [True], [False], [True], [True]], dtype=torch.bool
+    )
+    prediction = OfficialTaskPrediction(
+        pred_masks=masks,
+        pred_scores=torch.tensor([0.8]),
+        pred_classes=torch.tensor([1]),
+        source_query_ids=torch.tensor([0]),
+        source_class_ids=torch.tensor([1]),
+        temporal_stages=local_stages.clone(),
+        latest_stage_index=1,
+        latest_stage_masks=masks[3:].clone(),
+    )
+    stage_meta = StageMeta(
+        reference_id="reference-0",
+        episode_id="episode-0",
+        scan_ids_in_window=("scan-a", "scan-b"),
+        absolute_stage_index=absolute_stage,
+        local_stage_ids=local_stages,
+        original_vertex_ids=(
+            torch.tensor([30, 10, 20]),
+            torch.tensor([30, 10, 20]),
+        ),
+        scan_vertex_offsets=torch.tensor([0, 3, 6]),
+        point2segment=point_indices.clone(),
+        segment_stage_ids=local_stages.clone(),
+        augmentation_transform_id="identity-v1",
+        coordinate_frame_id="reference-0",
+        voxel_inverse=point_indices.clone(),
+        full_resolution_point2segment=point_indices.clone(),
+    )
+    return build_canonical_frame(
+        producer_id="r1-b4",
+        order_id="order-0",
+        observation=observation,
+        prediction=prediction,
+        stage_meta=stage_meta,
+    )
+
+
+def test_private_nulls_keep_unmatched_groups_distinct() -> None:
+    from models.crosswindow_state import CrossWindowState
+    from models.overlap_entity_association import (
+        A0_DEFAULT,
+        associate,
+        build_evidence,
+    )
+
+    frame = build_canonical_frame(
+        producer_id="r1-b4",
+        order_id="order-0",
+        observation=_ledger_observation(),
+        prediction=_ledger_prediction(),
+        stage_meta=_single_scan_meta((30, 10, 20)),
+    )
+    state = CrossWindowState.empty(capacity=2, feature_dim=2, class_count=2)
+
+    plan = associate(build_evidence(frame, state, None), A0_DEFAULT)
+
+    assert len(set(plan.entity_for_group)) == len(frame.groups)
+    assert plan.is_new_id == (True, True, True)
+
+
+def test_full_capacity_rejects_residency_without_dropping_output() -> None:
+    from models.crosswindow_state import CrossWindowState
+    from models.overlap_entity_association import (
+        A0_DEFAULT,
+        associate,
+        build_evidence,
+        commit_observation,
+    )
+
+    state = CrossWindowState.empty(capacity=1, feature_dim=2, class_count=2)
+    first = _single_query_frame(
+        absolute_stage=0,
+        feature=(1.0, 0.0),
+        class_prob=(1.0, 0.0),
+        scan_id="scan-a",
+    )
+    first_plan = associate(build_evidence(first, state, None), A0_DEFAULT)
+    full_state, _ = commit_observation(first, state, first_plan)
+    second = _single_query_frame(
+        absolute_stage=1,
+        feature=(-1.0, 0.0),
+        class_prob=(0.0, 1.0),
+        scan_id="scan-b",
+    )
+    second_plan = associate(build_evidence(second, full_state, None), A0_DEFAULT)
+
+    next_state, committed = commit_observation(second, full_state, second_plan)
+
+    assert committed.nonresident_groups == (0,)
+    assert committed.public_id_for_group[0] >= 0
+    assert committed.buffer is not None
+    assert committed.buffer.groups[0].logical_id == committed.public_id_for_group[0]
+    assert next_state.occupied_count == next_state.capacity == 1
+
+
+def test_a2_missing_overlap_uses_base_score() -> None:
+    from models.crosswindow_state import CrossWindowState
+    from models.overlap_entity_association import (
+        A0_DEFAULT,
+        associate,
+        build_evidence,
+        commit_observation,
+        score_a2,
+    )
+
+    state = CrossWindowState.empty(capacity=2, feature_dim=2, class_count=2)
+    first = _single_query_frame(
+        absolute_stage=0,
+        feature=(1.0, 0.0),
+        class_prob=(1.0, 0.0),
+        scan_id="scan-a",
+    )
+    plan = associate(build_evidence(first, state, None), A0_DEFAULT)
+    resident_state, _ = commit_observation(first, state, plan)
+    second = _single_query_frame(
+        absolute_stage=1,
+        feature=(1.0, 0.0),
+        class_prob=(1.0, 0.0),
+        scan_id="scan-b",
+    )
+    bundle = build_evidence(second, resident_state, None)
+
+    scores = score_a2(bundle, lambda_=0.25)
+
+    assert not bundle.has_overlap.any().item()
+    assert scores[0, 0].item() == pytest.approx(bundle.base[0, 0].item())
+
+
+def test_resident_and_buffer_identity_merge_into_one_overlap_anchor() -> None:
+    from models.crosswindow_state import CrossWindowState
+    from models.overlap_entity_association import (
+        A0_DEFAULT,
+        associate,
+        build_evidence,
+        commit_observation,
+    )
+
+    state = CrossWindowState.empty(capacity=2, feature_dim=2, class_count=2)
+    first = _single_query_frame(
+        absolute_stage=0,
+        feature=(1.0, 0.0),
+        class_prob=(1.0, 0.0),
+        scan_id="scan-a",
+    )
+    first_plan = associate(build_evidence(first, state, None), A0_DEFAULT)
+    resident_state, committed = commit_observation(first, state, first_plan)
+    second = _two_scan_query_frame(
+        absolute_stage=1,
+        feature=(1.0, 0.0),
+        class_prob=(1.0, 0.0),
+    )
+
+    bundle = build_evidence(second, resident_state, committed.buffer)
+
+    assert bundle.anchor_count == 1
+    assert bundle.anchor_sources == ("resident",)
+    assert bundle.has_overlap.tolist() == [[True]]
+    assert bundle.overlap[0, 0].item() == pytest.approx(1.0)
+
+
+def test_buffer_only_identity_promotes_without_renaming() -> None:
+    from models.crosswindow_state import CrossWindowState
+    from models.overlap_entity_association import (
+        A0_DEFAULT,
+        associate,
+        build_evidence,
+        commit_observation,
+    )
+
+    state = CrossWindowState.empty(capacity=1, feature_dim=2, class_count=2)
+    exported_only = _single_query_frame(
+        absolute_stage=0,
+        feature=(1.0, 0.0),
+        class_prob=(1.0, 0.0),
+        scan_id="scan-a",
+        valid=False,
+        current_supported=False,
+    )
+    first_plan = associate(build_evidence(exported_only, state, None), A0_DEFAULT)
+    empty_state, committed = commit_observation(exported_only, state, first_plan)
+    second = _two_scan_query_frame(
+        absolute_stage=1,
+        feature=(1.0, 0.0),
+        class_prob=(1.0, 0.0),
+    )
+    second_plan = associate(
+        build_evidence(second, empty_state, committed.buffer), A0_DEFAULT
+    )
+
+    next_state, second_commit = commit_observation(second, empty_state, second_plan)
+
+    assert second_plan.is_new_id == (False,)
+    assert second_commit.public_id_for_group == committed.public_id_for_group
+    assert second_plan.residency_reason == ("PROMOTED_BUFFER",)
+    assert next_state.logical_ids[next_state.occupied].tolist() == [
+        committed.public_id_for_group[0]
+    ]
+
+
+def test_strict_threshold_rejects_equal_score() -> None:
+    from models.crosswindow_state import CrossWindowState
+    from models.overlap_entity_association import (
+        A0_DEFAULT,
+        AssociationConfig,
+        associate,
+        build_evidence,
+        commit_observation,
+    )
+
+    state = CrossWindowState.empty(capacity=2, feature_dim=2, class_count=2)
+    first = _single_query_frame(
+        absolute_stage=0,
+        feature=(1.0, 0.0),
+        class_prob=(1.0, 0.0),
+        scan_id="scan-a",
+    )
+    plan = associate(build_evidence(first, state, None), A0_DEFAULT)
+    resident_state, _ = commit_observation(first, state, plan)
+    second = _single_query_frame(
+        absolute_stage=1,
+        feature=(1.0, 0.0),
+        class_prob=(1.0, 0.0),
+        scan_id="scan-b",
+    )
+
+    equal_threshold = associate(
+        build_evidence(second, resident_state, None),
+        AssociationConfig(family="A0-U", tau=1.0),
+    )
+
+    assert equal_threshold.is_new_id == (True,)
+
+
+def test_class_probability_rows_are_validated_without_renormalizing() -> None:
+    from models.crosswindow_state import CrossWindowState
+    from models.overlap_entity_association import (
+        CrossWindowAssociationError,
+        build_evidence,
+    )
+
+    frame = _single_query_frame(
+        absolute_stage=0,
+        feature=(1.0, 0.0),
+        class_prob=(0.8, 0.4),
+        scan_id="scan-a",
+    )
+    state = CrossWindowState.empty(capacity=1, feature_dim=2, class_count=2)
+
+    with pytest.raises(CrossWindowAssociationError, match="row sums"):
+        build_evidence(frame, state, None)
+
+
+def test_assignment_plan_cannot_commit_against_next_state() -> None:
+    from models.crosswindow_state import CrossWindowState
+    from models.overlap_entity_association import (
+        A0_DEFAULT,
+        CrossWindowAssociationError,
+        associate,
+        build_evidence,
+        commit_observation,
+    )
+
+    state = CrossWindowState.empty(capacity=1, feature_dim=2, class_count=2)
+    frame = _single_query_frame(
+        absolute_stage=0,
+        feature=(1.0, 0.0),
+        class_prob=(1.0, 0.0),
+        scan_id="scan-a",
+    )
+    plan = associate(build_evidence(frame, state, None), A0_DEFAULT)
+    next_state, _ = commit_observation(frame, state, plan)
+
+    with pytest.raises(CrossWindowAssociationError, match="another state"):
+        commit_observation(frame, next_state, plan)
+
+
+def _matrix_evidence(
+    *, base: torch.Tensor, overlap: torch.Tensor, has_overlap: torch.Tensor
+):
+    from models.overlap_entity_association import EvidenceBundle
+
+    group_count, anchor_count = base.shape
+    return EvidenceBundle(
+        source_state_sha256="a" * 64,
+        frame_sha256="b" * 64,
+        reference_id="reference-0",
+        episode_id="episode-0",
+        absolute_stage=1,
+        group_keys=tuple(
+            ("producer", "episode-0", "order-0", 1, index)
+            for index in range(group_count)
+        ),
+        group_valid=(True,) * group_count,
+        group_current_supported=(True,) * group_count,
+        group_confidence=(0.9,) * group_count,
+        anchor_logical_ids=tuple(range(10, 10 + anchor_count)),
+        anchor_generations=(0,) * anchor_count,
+        anchor_slots=tuple(range(anchor_count)),
+        anchor_sources=("resident",) * anchor_count,
+        free_slots=(),
+        capacity=max(1, anchor_count),
+        next_logical_id=10 + anchor_count,
+        cosine=torch.zeros_like(base),
+        class_compatibility=torch.zeros_like(base),
+        base=base.float(),
+        overlap=overlap.float(),
+        has_overlap=has_overlap.bool(),
+        zero_norm_query_count=0,
+        zero_norm_anchor_count=0,
+    )
+
+
+def test_a1_locks_only_mutual_overlap_with_required_margins() -> None:
+    from models.overlap_entity_association import A1_DEFAULT, associate
+
+    bundle = _matrix_evidence(
+        base=torch.tensor([[0.8, 0.8], [0.8, 0.8]]),
+        overlap=torch.tensor([[0.9, 0.1], [0.1, 0.9]]),
+        has_overlap=torch.ones((2, 2), dtype=torch.bool),
+    )
+
+    plan = associate(bundle, A1_DEFAULT)
+
+    assert plan.anchor_for_group == (0, 1)
+    assert plan.source_edge == ("OVERLAP_LOCK", "OVERLAP_LOCK")
+
+
+def test_a1_single_mutual_candidate_uses_zero_second_best() -> None:
+    from models.overlap_entity_association import A1_DEFAULT, associate
+
+    bundle = _matrix_evidence(
+        base=torch.tensor([[0.8]]),
+        overlap=torch.tensor([[0.9]]),
+        has_overlap=torch.ones((1, 1), dtype=torch.bool),
+    )
+
+    plan = associate(bundle, A1_DEFAULT)
+
+    assert plan.anchor_for_group == (0,)
+    assert plan.source_edge == ("OVERLAP_LOCK",)
+    assert plan.decision_margin == pytest.approx((0.9,))
+
+
+def test_private_dummies_keep_one_to_one_when_groups_compete() -> None:
+    from models.overlap_entity_association import A0_DEFAULT, associate
+
+    bundle = _matrix_evidence(
+        base=torch.tensor([[0.9], [0.9]]),
+        overlap=torch.zeros((2, 1)),
+        has_overlap=torch.zeros((2, 1), dtype=torch.bool),
+    )
+
+    plan = associate(bundle, A0_DEFAULT)
+
+    assert plan.entity_for_group.count(10) == 1
+    assert len(set(plan.entity_for_group)) == 2
+    assert plan.is_new_id.count(True) == 1
+
+
+def test_preregistered_association_grid_is_exactly_three_three_six() -> None:
+    from models.overlap_entity_association import preregistered_association_configs
+
+    configs = preregistered_association_configs()
+
+    assert [config.family for config in configs].count("A0-U") == 3
+    assert [config.family for config in configs].count("A1") == 3
+    assert [config.family for config in configs].count("A2") == 6
+    assert len({config.config_id for config in configs}) == len(configs) == 12

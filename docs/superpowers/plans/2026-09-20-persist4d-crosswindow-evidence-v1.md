@@ -132,7 +132,7 @@ git commit -m "feat: add canonical crosswindow candidate ledger"
 - Produces: `CrossWindowState.empty(...)`, `EvidenceBundle`, frozen `AssignmentPlan`, `build_evidence(frame, state, previous_buffer)`, `associate(bundle, method_config)`, `commit_observation(frame, state, plan)`.
 - Invariants: one-to-one real anchors plus private nulls; every unmatched group receives a distinct monotonic public ID; no eviction; K-full births are nonresident outputs; generation matches all inherited identities.
 
-- [ ] **Step 1: Write failing assignment and lifecycle tests**
+- [x] **Step 1: Write failing assignment and lifecycle tests**
 
 ```python
 def test_private_nulls_keep_two_unmatched_groups_distinct():
@@ -150,19 +150,19 @@ def test_a2_missing_overlap_uses_base_score():
     assert scores[0, 0].item() == pytest.approx(BUNDLE_WITH_MISSING_OVERLAP.base[0, 0].item())
 ```
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run: `conda run -n persist4d python -m pytest -q tests/test_crosswindow_core.py -k 'private_nulls or full_capacity or missing_overlap'`
 
-- [ ] **Step 3: Implement frozen dataclasses, A0-U/A1/A2 formulas, stable assignment, single commit, resident/buffer union anchors, and byte accounting**
+- [x] **Step 3: Implement frozen dataclasses, A0-U/A1/A2 formulas, stable assignment, single commit, resident/buffer union anchors, and byte accounting**
 
 Use float32 for cosine/class/overlap scores; validate `class_prob >= 0` and row sums `<= 1+1e-5` without renormalizing; apply private dummy columns and strict `S > tau` acceptance.
 
-- [ ] **Step 4: Verify GREEN, then run all core tests**
+- [x] **Step 4: Verify GREEN, then run all core tests**
 
 Run: `conda run -n persist4d python -m pytest -q tests/test_crosswindow_core.py`
 
-- [ ] **Step 5: Commit state and association implementation**
+- [x] **Step 5: Commit state and association implementation**
 
 ```bash
 git add models/crosswindow_state.py models/overlap_entity_association.py tests/test_crosswindow_core.py
