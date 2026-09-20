@@ -1,41 +1,42 @@
 {
   "budget_used": {
-    "cpu_core_hours": 2.8023206781636116,
+    "cpu_core_hours": 14.668102312991389,
     "head_training_gpu_hours": 0.0,
     "inference_gpu_hours": 0.0,
     "new_cache_bytes": 0,
     "profile_gpu_hours": 0.0
   },
   "completed_units": [
-    "DEV-CAL:00000",
-    "DEV-CAL:00001",
-    "DEV-CAL:00002",
-    "DEV-CAL:00003",
-    "DEV-CAL:00004",
-    "DEV-CAL:00005",
-    "DEV-CAL:00006",
-    "DEV-CAL:00007",
-    "DEV-CAL:00008",
-    "DEV-CAL:00009",
-    "DEV-CAL:00010",
-    "DEV-CAL:00011",
-    "DEV-CAL:00012",
-    "DEV-CAL:00013",
-    "DEV-CAL:00014",
-    "DEV-CAL:00015",
-    "DEV-CAL:00026",
-    "DEV-CAL:00027",
-    "DEV-CAL:00028",
-    "DEV-CAL:00029",
-    "DEV-CAL:00030",
-    "DEV-CAL:00031",
-    "DEV-CAL:00032"
+    "DEV-SEL:00016",
+    "DEV-SEL:00017",
+    "DEV-SEL:00018",
+    "DEV-SEL:00019",
+    "DEV-SEL:00020",
+    "DEV-SEL:00021",
+    "DEV-SEL:00022",
+    "DEV-SEL:00023",
+    "DEV-SEL:00024",
+    "DEV-SEL:00025",
+    "DEV-SEL:00033",
+    "DEV-SEL:00034",
+    "DEV-SEL:00035",
+    "DEV-SEL:00036",
+    "DEV-SEL:00037",
+    "DEV-SEL:00038",
+    "DEV-SEL:00039",
+    "DEV-SEL:00040",
+    "DEV-SEL:00041",
+    "DEV-SEL:00042",
+    "DEV-SEL:00043",
+    "DEV-SEL:00044",
+    "DEV-SEL:00045",
+    "DEV-SEL:00046"
   ],
   "e0": {
     "a0_collision_fallback_count": 0,
-    "cpu_core_hours": 2.8023206781636116,
-    "data_role": "DEV-CAL",
+    "cpu_core_hours": 2.8023206781636114,
     "d_and_a_shared_forward_rows": 115,
+    "data_role": "DEV-CAL",
     "index_trigger_count": 0,
     "legacy_fallback_matches": {
       "D-EMA": 2516,
@@ -52,8 +53,173 @@
     "source_base_different_rows": 44,
     "source_base_exact_rows": 71,
     "source_parity_rows": 115,
-    "valid_run_cpu_core_hours": 2.4223206781636115,
+    "status": "PASS",
+    "valid_run_cpu_core_hours": 2.4223206781636115
+  },
+  "e1": {
+    "assignment_event_count": 115,
+    "coverage_event_count": 5724,
+    "cpu_core_hours": 2.332970564155833,
+    "data_role": "DEV-CAL",
+    "gate_decision": "MASK_OR_OTHER_DOMINANT",
+    "logical_unit_count": 23,
+    "reference_count": 4,
+    "schema_version": "crosswindow-e1-summary-v1",
     "status": "PASS"
+  },
+  "e2": {
+    "assignment_event_count": 360,
+    "calibration_grid_status": "SKIPPED_HEADROOM_GATE",
+    "collision_fallbacks": {
+      "A0-U-default": 0,
+      "A1-default": 0,
+      "A2-default": 0
+    },
+    "cpu_core_hours": 2.579386472389445,
+    "data_role": "DEV-SEL",
+    "exploratory_candidate": {
+      "config_id": "A1-theta-0.65",
+      "method": "A1-default",
+      "status": "FAIL_SELECTION_GATE"
+    },
+    "headroom_gate": "MASK_OR_OTHER_DOMINANT",
+    "logical_unit_count": 24,
+    "promoted_candidate": null,
+    "reference_count": 4,
+    "schema_version": "crosswindow-e2-summary-v1",
+    "status": "PASS"
+  },
+  "e2_invalidated": {
+    "assignment_event_count": 360,
+    "calibration_grid_status": "SKIPPED_HEADROOM_GATE",
+    "collision_fallbacks": {
+      "A0-U-default": 0,
+      "A1-default": 0,
+      "A2-default": 0
+    },
+    "cpu_core_hours": 2.9064223065741666,
+    "data_role": "DEV-SEL",
+    "exploratory_candidate": {
+      "config_id": "A1-theta-0.65",
+      "method": "A1-default",
+      "status": "FAIL_SELECTION_GATE"
+    },
+    "headroom_gate": "MASK_OR_OTHER_DOMINANT",
+    "logical_unit_count": 24,
+    "promoted_candidate": null,
+    "reference_count": 4,
+    "schema_version": "crosswindow-e2-summary-v1",
+    "status": "INVALIDATED_CORRECTNESS_BUG"
+  },
+  "e3": {
+    "assignment_count": 41,
+    "assignment_plan_checks": {
+      "archive_immutability": "COVERED_BY_TEST",
+      "generation_preserved": "COVERED_BY_TEST",
+      "publish_does_not_reassign": "COVERED_BY_TEST",
+      "single_commit": "COVERED_BY_TEST",
+      "unique_entity_per_group": "COVERED_BY_TEST"
+    },
+    "assignments_by_group_size": {
+      "2": 7,
+      "3": 34
+    },
+    "completion_status": "PASS",
+    "group_sizes": [
+      2,
+      3
+    ],
+    "maximum_absolute_error": 1.1102230246251565e-16,
+    "reason": "fixed U collapses the joint objective to the E2 assignment",
+    "schema_version": "crosswindow-fixed-u-equivalence-v1",
+    "status": "SKIPPED_EQUIVALENT",
+    "tolerance": 1e-12
+  },
+  "e4": {
+    "cpu_core_hours": 4.047002291708333,
+    "data_role": "DEV-SEL",
+    "factorial_row_count": 48,
+    "logical_unit_count": 24,
+    "reference_count": 4,
+    "revision_event_count": 25776,
+    "schema_version": "crosswindow-e4-summary-v1",
+    "selected_system": {
+      "fixed_score_ranking": {
+        "S_long": 0.0,
+        "S_mean": 0.0,
+        "S_min": 0.0,
+        "config_id": "M-new",
+        "delta_T2": 0.0,
+        "delta_T3": 0.0,
+        "delta_T4": 0.0,
+        "delta_T5": 0.0
+      },
+      "interpretation": "NO_REVISION_GAIN",
+      "parent": "D0",
+      "ranking": {
+        "S_long": 0.0,
+        "S_mean": 0.0,
+        "S_min": 0.0,
+        "config_id": "M-new",
+        "delta_T2": 0.0,
+        "delta_T3": 0.0,
+        "delta_T4": 0.0,
+        "delta_T5": 0.0,
+        "eligible_vs_parent": true
+      },
+      "score_mode": "SYSTEM_SELECTED_SCORE",
+      "score_reducer": "mean",
+      "selector": "M-new"
+    },
+    "status": "PASS"
+  },
+  "e6": {
+    "authorized": false,
+    "gpu_hours": 0.0,
+    "head_SHA": null,
+    "predicates": [
+      {
+        "evidence": "MASK_OR_OTHER_DOMINANT",
+        "id": "E1_HEADROOM",
+        "pass": false
+      },
+      {
+        "evidence": "NOT_EVALUATED_GATE_CLOSED; full CAL connector grid was not authorized",
+        "id": "CAL_GAP_TO_GT_LAG1",
+        "pass": false
+      },
+      {
+        "evidence": {
+          "adaptation_reference_count": 377,
+          "negative_pair_count": null,
+          "positive_pair_count": null,
+          "train_observation_cache_available": false
+        },
+        "id": "ISOLATED_ADAPTATION_PAIRS",
+        "pass": false
+      },
+      {
+        "evidence": {
+          "used_inference_gpu_hours": 0.0,
+          "used_training_gpu_hours": 0.0
+        },
+        "id": "GPU_BUDGET",
+        "pass": true
+      },
+      {
+        "evidence": {
+          "E0": "PASS",
+          "E2": "PASS",
+          "promoted_candidate": null
+        },
+        "id": "E0_E2_CHECKS",
+        "pass": true
+      }
+    ],
+    "reason": "one or more preregistered authorization predicates failed",
+    "schema_version": "crosswindow-e6-status-v1",
+    "status": "SKIPPED_CONDITION",
+    "training_steps": 0
   },
   "external_assets_file": "external:assets.local.json",
   "failures": [
@@ -63,6 +229,13 @@
       "reason": "metric backend exceeded the fixed 8-worker CPU limit",
       "stage": "E0",
       "status": "INVALIDATED_RESOURCE_LIMIT"
+    },
+    {
+      "artifact_effect": "task metrics and ranking unchanged; identity event fields invalid",
+      "cpu_core_hours": 2.9064223065741666,
+      "reason": "identity matching used full-prefix visibility instead of the current scan slice",
+      "stage": "E2",
+      "status": "INVALIDATED_CORRECTNESS_BUG"
     }
   ],
   "identity": {
@@ -72,22 +245,18 @@
     "parent": "96edca52d9d1cab7781bfa2a273baf9fe52b6a7d"
   },
   "methods": [
+    "D0",
     "A0-U-default",
-    "D-CANONICAL-EMA",
-    "D-CANONICAL-LAST",
-    "D-INDEXFIX-EMA",
-    "D-INDEXFIX-LAST",
-    "D-LEGACY-EMA",
-    "D-LEGACY-LAST",
-    "D0"
+    "A1-default",
+    "A2-default"
   ],
-  "next_command": "python -m scripts.crosswindow_campaign run --config configs/crosswindow_evidence_v1.yaml --through E2 --resume",
+  "next_command": "python -m scripts.crosswindow_campaign lock --config configs/crosswindow_evidence_v1.yaml",
   "preflight": {
     "development_units": 47,
     "frames": 235,
     "status": "PASS"
   },
   "schema_version": "crosswindow-run-state-v1",
-  "stage": "E0",
+  "stage": "E6",
   "stage_status": "PASS"
 }

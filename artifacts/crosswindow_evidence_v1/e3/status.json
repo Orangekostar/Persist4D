@@ -1,0 +1,24 @@
+{
+  "assignment_count": 41,
+  "assignment_plan_checks": {
+    "archive_immutability": "COVERED_BY_TEST",
+    "generation_preserved": "COVERED_BY_TEST",
+    "publish_does_not_reassign": "COVERED_BY_TEST",
+    "single_commit": "COVERED_BY_TEST",
+    "unique_entity_per_group": "COVERED_BY_TEST"
+  },
+  "assignments_by_group_size": {
+    "2": 7,
+    "3": 34
+  },
+  "completion_status": "PASS",
+  "group_sizes": [
+    2,
+    3
+  ],
+  "maximum_absolute_error": 1.1102230246251565e-16,
+  "reason": "fixed U collapses the joint objective to the E2 assignment",
+  "schema_version": "crosswindow-fixed-u-equivalence-v1",
+  "status": "SKIPPED_EQUIVALENT",
+  "tolerance": 1e-12
+}

@@ -307,6 +307,18 @@ def test_campaign_units_preserve_duplicate_logical_to_physical_bindings() -> Non
     assert len({unit.physical_pair for unit in units}) == 1
 
 
+def test_fixed_u_joint_objective_equivalence_is_exhaustive() -> None:
+    from scripts.evaluate_crosswindow_consensus import (
+        exhaustive_fixed_u_equivalence,
+    )
+
+    result = exhaustive_fixed_u_equivalence()
+
+    assert result["group_sizes"] == [2, 3]
+    assert result["assignment_count"] > 0
+    assert result["maximum_absolute_error"] <= 1e-12
+
+
 def _single_query_frame(
     *,
     absolute_stage: int,

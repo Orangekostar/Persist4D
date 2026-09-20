@@ -396,7 +396,7 @@ def build_evidence(
     state: CrossWindowState,
     previous_buffer: CrossWindowBuffer | None,
 ) -> EvidenceBundle:
-    """Build float32 association evidence without accepting targets or GT identities."""
+    """Build float32 association evidence through the supervision-free runtime API."""
     state.validate()
     expected_stage = state.stage_watermark + 1
     if frame.absolute_stage != expected_stage:

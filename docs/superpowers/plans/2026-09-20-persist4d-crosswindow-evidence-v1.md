@@ -225,16 +225,16 @@ git commit -m "feat: replay canonical crosswindow baselines"
 **Interfaces:**
 - Produces: policy/relaxed coverage ledgers, diagnostic-only GT-ID-RELAXED and GT-ID-LAG1, gate calculation, exact 12-config grid, CAL family ranking, fixed DEV-SEL evaluation, assignment events.
 
-- [ ] **Step 1: Write failing gate/ranking tests for sufficient, inconclusive, and negative-headroom cases**
-- [ ] **Step 2: Verify RED with `conda run -n persist4d python -m pytest -q tests/test_crosswindow_metrics.py -k 'headroom or ranking'`**
-- [ ] **Step 3: Implement GT-only diagnostic module and deterministic ranking against fixed D0**
-- [ ] **Step 4: Verify production modules do not import diagnostics and run through E2**
+- [x] **Step 1: Write failing gate/ranking tests for sufficient, inconclusive, and negative-headroom cases**
+- [x] **Step 2: Verify RED with `conda run -n persist4d python -m pytest -q tests/test_crosswindow_metrics.py -k 'headroom or ranking'`**
+- [x] **Step 3: Implement GT-only diagnostic module and deterministic ranking against fixed D0**
+- [x] **Step 4: Verify production modules do not import diagnostics and run through E2**
 
 Run: `! rg -n 'diagnose_crosswindow|target|gt_id' models/crosswindow_state.py models/overlap_entity_association.py`
 
 Run: `conda run -n persist4d python -m scripts.crosswindow_campaign run --config configs/crosswindow_evidence_v1.yaml --through E2 --resume`
 
-- [ ] **Step 5: Commit E1/E2 code and evidence**
+- [x] **Step 5: Commit E1/E2 code and evidence**
 
 ```bash
 git add scripts/diagnose_crosswindow_failures.py scripts/replay_crosswindow_association.py scripts/crosswindow_campaign.py tests/test_crosswindow_metrics.py artifacts/crosswindow_evidence_v1/e1 artifacts/crosswindow_evidence_v1/e2 artifacts/crosswindow_evidence_v1/RUN_STATE.json
@@ -252,14 +252,14 @@ git commit -m "feat: add crosswindow diagnostics and fixed calibration"
 **Interfaces:**
 - Produces: exhaustive fixed-U objective check, `M-new`, `M-old`, `M-score`, `MASK_ONLY_FIXED_SCORE`, `SYSTEM_SELECTED_SCORE`, and fixed-parent selection results.
 
-- [ ] **Step 1: Write failing fixed-U equivalence and revision-channel tests**
-- [ ] **Step 2: Verify RED with `conda run -n persist4d python -m pytest -q tests/test_crosswindow_core.py tests/test_crosswindow_metrics.py -k 'equivalence or mask_selector or score_channel'`**
-- [ ] **Step 3: Implement exhaustive 2-3 group equivalence proof and identity-frozen revision selector**
-- [ ] **Step 4: Verify GREEN and run through E4**
+- [x] **Step 1: Write failing fixed-U equivalence and revision-channel tests**
+- [x] **Step 2: Verify RED with `conda run -n persist4d python -m pytest -q tests/test_crosswindow_core.py tests/test_crosswindow_metrics.py -k 'equivalence or mask_selector or score_channel'`**
+- [x] **Step 3: Implement exhaustive 2-3 group equivalence proof and identity-frozen revision selector**
+- [x] **Step 4: Verify GREEN and run through E4**
 
 Run: `conda run -n persist4d python -m scripts.crosswindow_campaign run --config configs/crosswindow_evidence_v1.yaml --through E4 --resume`
 
-- [ ] **Step 5: Commit E3/E4 evidence**
+- [x] **Step 5: Commit E3/E4 evidence**
 
 ```bash
 git add scripts/evaluate_crosswindow_consensus.py tests/test_crosswindow_core.py tests/test_crosswindow_metrics.py artifacts/crosswindow_evidence_v1/e3 artifacts/crosswindow_evidence_v1/e4 artifacts/crosswindow_evidence_v1/RUN_STATE.json
@@ -279,11 +279,11 @@ git commit -m "feat: audit consistency and evaluate finite revision"
 - Consumes: isolated adaptation pairs and the frozen selected A2 configuration.
 - Produces: two 1000-step arms, checkpoints at `{0,250,500,750,1000}`, fixed CAL selection, DEV-SEL result, or exact `SKIPPED_CONDITION` reasons.
 
-- [ ] **Step 1: Evaluate all five authorization predicates before creating learning code**
-- [ ] **Step 2: If unauthorized, write `e6/status.json` and verify every failed predicate has numeric/file evidence**
-- [ ] **Step 3: If authorized, write failing feature-vector, zero-init, deterministic corruption, and two-step gradient tests**
-- [ ] **Step 4: Implement and run exactly the preregistered schedule within the 6 GPU-hour budget**
-- [ ] **Step 5: Commit E6 implementation/evidence or deterministic skip evidence**
+- [x] **Step 1: Evaluate all five authorization predicates before creating learning code**
+- [x] **Step 2: If unauthorized, write `e6/status.json` and verify every failed predicate has numeric/file evidence**
+- [x] **Step 3: If authorized, write failing feature-vector, zero-init, deterministic corruption, and two-step gradient tests** (not applicable; unauthorized)
+- [x] **Step 4: Implement and run exactly the preregistered schedule within the 6 GPU-hour budget** (not applicable; unauthorized)
+- [x] **Step 5: Commit E6 implementation/evidence or deterministic skip evidence**
 
 ### Task 8: Preflight review, selection lock, and commit C
 

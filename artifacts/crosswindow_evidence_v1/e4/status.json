@@ -1,0 +1,38 @@
+{
+  "cpu_core_hours": 4.047002291708333,
+  "data_role": "DEV-SEL",
+  "factorial_row_count": 48,
+  "logical_unit_count": 24,
+  "reference_count": 4,
+  "revision_event_count": 25776,
+  "schema_version": "crosswindow-e4-summary-v1",
+  "selected_system": {
+    "fixed_score_ranking": {
+      "S_long": 0.0,
+      "S_mean": 0.0,
+      "S_min": 0.0,
+      "config_id": "M-new",
+      "delta_T2": 0.0,
+      "delta_T3": 0.0,
+      "delta_T4": 0.0,
+      "delta_T5": 0.0
+    },
+    "interpretation": "NO_REVISION_GAIN",
+    "parent": "D0",
+    "ranking": {
+      "S_long": 0.0,
+      "S_mean": 0.0,
+      "S_min": 0.0,
+      "config_id": "M-new",
+      "delta_T2": 0.0,
+      "delta_T3": 0.0,
+      "delta_T4": 0.0,
+      "delta_T5": 0.0,
+      "eligible_vs_parent": true
+    },
+    "score_mode": "SYSTEM_SELECTED_SCORE",
+    "score_reducer": "mean",
+    "selector": "M-new"
+  },
+  "status": "PASS"
+}

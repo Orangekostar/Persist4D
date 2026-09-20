@@ -1,0 +1,112 @@
+{
+  "calibration_policy": "DEFAULTS_ONLY_NO_PARAMETER_SEARCH",
+  "candidates": [
+    {
+      "config_id": "A1-theta-0.65",
+      "identity_T5": {
+        "merge_count": 9,
+        "merge_opportunities": 460,
+        "merge_rate": 0.01956521739130435,
+        "recovery_attempts": 6,
+        "wrong_reactivation_rate": 1.0,
+        "wrong_reactivations": 6
+      },
+      "method": "A1-default",
+      "rank": 1,
+      "ranking": {
+        "S_long": -3.069639205932617e-05,
+        "S_mean": -0.00014254450798034668,
+        "S_min": -0.0008202791213989258,
+        "config_id": "A1-theta-0.65",
+        "delta_T2": 0.0,
+        "delta_T3": -0.0005087852478027344,
+        "delta_T4": 0.0007588863372802734,
+        "delta_T5": -0.0008202791213989258
+      },
+      "selection": {
+        "S_long": -3.069639205932617e-05,
+        "S_mean": -0.00014254450798034668,
+        "S_min": -0.0008202791213989258,
+        "eligible": false,
+        "failed_gates": [
+          "long_gain",
+          "mean_gain",
+          "positive_references",
+          "merge_rate"
+        ],
+        "identity_event_evidence_conclusive": false,
+        "merge_event_count": 460,
+        "positive_reference_count": 2,
+        "reactivation_event_count": 6,
+        "reference_count": 4,
+        "status": "FAIL_SELECTION_GATE"
+      }
+    },
+    {
+      "config_id": "A2-lambda-0.25-tau-0.666666666667",
+      "identity_T5": {
+        "merge_count": 5,
+        "merge_opportunities": 469,
+        "merge_rate": 0.010660980810234541,
+        "recovery_attempts": 6,
+        "wrong_reactivation_rate": 1.0,
+        "wrong_reactivations": 6
+      },
+      "method": "A2-default",
+      "rank": 2,
+      "ranking": {
+        "S_long": -0.0015385150909423828,
+        "S_mean": -0.0008413791656494141,
+        "S_min": -0.0016745328903198242,
+        "config_id": "A2-lambda-0.25-tau-0.666666666667",
+        "delta_T2": 0.0,
+        "delta_T3": -0.0002884864807128906,
+        "delta_T4": -0.0014024972915649414,
+        "delta_T5": -0.0016745328903198242
+      },
+      "selection": {
+        "S_long": -0.0015385150909423828,
+        "S_mean": -0.0008413791656494141,
+        "S_min": -0.0016745328903198242,
+        "eligible": false,
+        "failed_gates": [
+          "per_T_floor",
+          "long_gain",
+          "mean_gain",
+          "positive_references"
+        ],
+        "identity_event_evidence_conclusive": false,
+        "merge_event_count": 469,
+        "positive_reference_count": 1,
+        "reactivation_event_count": 6,
+        "reference_count": 4,
+        "status": "FAIL_SELECTION_GATE"
+      }
+    }
+  ],
+  "data_role": "DEV-SEL",
+  "exploratory_candidate": {
+    "config_id": "A1-theta-0.65",
+    "method": "A1-default",
+    "status": "FAIL_SELECTION_GATE"
+  },
+  "families": {
+    "A0-U": {
+      "config_id": "A0-U-tau-0.666666666667",
+      "role": "fixed_bridge_baseline"
+    },
+    "A1": {
+      "config_id": "A1-theta-0.65",
+      "role": "default_candidate"
+    },
+    "A2": {
+      "config_id": "A2-lambda-0.25-tau-0.666666666667",
+      "role": "default_candidate"
+    }
+  },
+  "final_association_parent": "D0",
+  "full_grid_run": false,
+  "headroom_gate": "MASK_OR_OTHER_DOMINANT",
+  "promoted_candidate": null,
+  "schema_version": "crosswindow-e2-family-candidates-v1"
+}

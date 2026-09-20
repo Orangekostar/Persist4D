@@ -1,0 +1,22 @@
+{
+  "assignment_event_count": 360,
+  "calibration_grid_status": "SKIPPED_HEADROOM_GATE",
+  "collision_fallbacks": {
+    "A0-U-default": 0,
+    "A1-default": 0,
+    "A2-default": 0
+  },
+  "cpu_core_hours": 2.579386472389445,
+  "data_role": "DEV-SEL",
+  "exploratory_candidate": {
+    "config_id": "A1-theta-0.65",
+    "method": "A1-default",
+    "status": "FAIL_SELECTION_GATE"
+  },
+  "headroom_gate": "MASK_OR_OTHER_DOMINANT",
+  "logical_unit_count": 24,
+  "promoted_candidate": null,
+  "reference_count": 4,
+  "schema_version": "crosswindow-e2-summary-v1",
+  "status": "PASS"
+}

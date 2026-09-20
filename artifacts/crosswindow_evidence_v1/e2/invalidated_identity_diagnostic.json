@@ -1,0 +1,6 @@
+{
+  "artifact_effect": "task metrics and ranking unchanged; identity event fields invalid",
+  "reason": "identity matching used full-prefix visibility instead of the current scan slice",
+  "required_action": "recompute all E2 units with current-scan identity updates",
+  "status": "INVALIDATED_CORRECTNESS_BUG"
+}

@@ -1,0 +1,48 @@
+{
+  "authorized": false,
+  "gpu_hours": 0.0,
+  "head_SHA": null,
+  "predicates": [
+    {
+      "evidence": "MASK_OR_OTHER_DOMINANT",
+      "id": "E1_HEADROOM",
+      "pass": false
+    },
+    {
+      "evidence": "NOT_EVALUATED_GATE_CLOSED; full CAL connector grid was not authorized",
+      "id": "CAL_GAP_TO_GT_LAG1",
+      "pass": false
+    },
+    {
+      "evidence": {
+        "adaptation_reference_count": 377,
+        "negative_pair_count": null,
+        "positive_pair_count": null,
+        "train_observation_cache_available": false
+      },
+      "id": "ISOLATED_ADAPTATION_PAIRS",
+      "pass": false
+    },
+    {
+      "evidence": {
+        "used_inference_gpu_hours": 0.0,
+        "used_training_gpu_hours": 0.0
+      },
+      "id": "GPU_BUDGET",
+      "pass": true
+    },
+    {
+      "evidence": {
+        "E0": "PASS",
+        "E2": "PASS",
+        "promoted_candidate": null
+      },
+      "id": "E0_E2_CHECKS",
+      "pass": true
+    }
+  ],
+  "reason": "one or more preregistered authorization predicates failed",
+  "schema_version": "crosswindow-e6-status-v1",
+  "status": "SKIPPED_CONDITION",
+  "training_steps": 0
+}

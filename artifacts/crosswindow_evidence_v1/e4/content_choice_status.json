@@ -1,0 +1,110 @@
+{
+  "M_consensus": {
+    "reason": "W=2 exposes only old and new masks",
+    "status": "SKIPPED_NO_INDEPENDENT_EVIDENCE"
+  },
+  "association_exploratory_parent": "A1-default",
+  "association_parent": "D0",
+  "parent_rankings": {
+    "A1-default": [
+      {
+        "S_long": 0.0,
+        "S_mean": 0.0,
+        "S_min": 0.0,
+        "config_id": "M-new",
+        "delta_T2": 0.0,
+        "delta_T3": 0.0,
+        "delta_T4": 0.0,
+        "delta_T5": 0.0,
+        "eligible_vs_parent": true
+      },
+      {
+        "S_long": -0.0012398958206176758,
+        "S_mean": 6.669759750366211e-05,
+        "S_min": -0.0062770843505859375,
+        "config_id": "M-score",
+        "delta_T2": 0.008401453495025635,
+        "delta_T3": -0.005654871463775635,
+        "delta_T4": -0.0062770843505859375,
+        "delta_T5": 0.003797292709350586,
+        "eligible_vs_parent": false
+      },
+      {
+        "S_long": -0.02270367741584778,
+        "S_mean": -0.015033647418022156,
+        "S_min": -0.025218605995178223,
+        "config_id": "M-old",
+        "delta_T2": 0.010491371154785156,
+        "delta_T3": -0.025218605995178223,
+        "delta_T4": -0.02331167459487915,
+        "delta_T5": -0.022095680236816406,
+        "eligible_vs_parent": false
+      }
+    ],
+    "D0": [
+      {
+        "S_long": 0.0,
+        "S_mean": 0.0,
+        "S_min": 0.0,
+        "config_id": "M-new",
+        "delta_T2": 0.0,
+        "delta_T3": 0.0,
+        "delta_T4": 0.0,
+        "delta_T5": 0.0,
+        "eligible_vs_parent": true
+      },
+      {
+        "S_long": -0.0007059872150421143,
+        "S_mean": 0.00042372941970825195,
+        "S_min": -0.005802035331726074,
+        "config_id": "M-score",
+        "delta_T2": 0.00890892744064331,
+        "delta_T3": -0.005802035331726074,
+        "delta_T4": -0.005512595176696777,
+        "delta_T5": 0.004100620746612549,
+        "eligible_vs_parent": false
+      },
+      {
+        "S_long": -0.02403855323791504,
+        "S_mean": -0.01602032780647278,
+        "S_min": -0.02676844596862793,
+        "config_id": "M-old",
+        "delta_T2": 0.010764241218566895,
+        "delta_T3": -0.02676844596862793,
+        "delta_T4": -0.02419734001159668,
+        "delta_T5": -0.0238797664642334,
+        "eligible_vs_parent": false
+      }
+    ]
+  },
+  "schema_version": "crosswindow-e4-content-choice-v1",
+  "selected_system": {
+    "fixed_score_ranking": {
+      "S_long": 0.0,
+      "S_mean": 0.0,
+      "S_min": 0.0,
+      "config_id": "M-new",
+      "delta_T2": 0.0,
+      "delta_T3": 0.0,
+      "delta_T4": 0.0,
+      "delta_T5": 0.0
+    },
+    "interpretation": "NO_REVISION_GAIN",
+    "parent": "D0",
+    "ranking": {
+      "S_long": 0.0,
+      "S_mean": 0.0,
+      "S_min": 0.0,
+      "config_id": "M-new",
+      "delta_T2": 0.0,
+      "delta_T3": 0.0,
+      "delta_T4": 0.0,
+      "delta_T5": 0.0,
+      "eligible_vs_parent": true
+    },
+    "score_mode": "SYSTEM_SELECTED_SCORE",
+    "score_reducer": "mean",
+    "selector": "M-new"
+  },
+  "status": "PASS"
+}

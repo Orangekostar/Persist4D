@@ -698,10 +698,19 @@ class LagOnePublisher:
         self._revision_log: tuple[RevisionRecord, ...] = ()
         self._episode: tuple[str, str] | None = None
         self._next_stage = 0
+        self._last_revision_pair: tuple[_DenseScan, _DenseScan] | None = None
 
     @property
     def buffer_scan_id(self) -> str | None:
         return None if self._buffer is None else self._buffer.scan_id
+
+    @property
+    def revision_pair(self) -> tuple[object, object] | None:
+        return self._last_revision_pair
+
+    @property
+    def current_dense_scan(self) -> object | None:
+        return self._buffer
 
     def update(
         self,
@@ -728,7 +737,9 @@ class LagOnePublisher:
             iou_threshold=self.iou_threshold,
         )
 
+        self._last_revision_pair = None
         if self._buffer is not None:
+            replaced = self._buffer
             if stage_meta.scan_ids_in_window[0] != self._buffer.scan_id:
                 raise TaskMemoryOutputError(
                     "W=2 previous scan differs from lag-one buffer"
@@ -740,6 +751,7 @@ class LagOnePublisher:
                 scan_position=0,
                 target_vertex_ids=self._buffer.vertex_ids,
             )
+            self._last_revision_pair = (replaced, revised)
             frozen = _archive_scan(revised)
             revision = RevisionRecord(
                 absolute_stage_index=stage_meta.absolute_stage_index,

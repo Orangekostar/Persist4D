@@ -1,0 +1,20 @@
+{
+  "ambiguity_metadata_status": "AMBIGUITY_METADATA_UNAVAILABLE",
+  "authorize_e6_by_e1": false,
+  "candidate_complete_failure_count": 11,
+  "candidate_complete_failure_fraction": 0.08270676691729323,
+  "data_role": "DEV-CAL",
+  "decision": "MASK_OR_OTHER_DOMINANT",
+  "diagnostic_status": "PASS",
+  "event_reference_count": 3,
+  "logical_unit_count": 23,
+  "long_gain": -0.1628255657851696,
+  "minimum_events": 20,
+  "minimum_failure_fraction": 0.1,
+  "minimum_long_gain": 0.005,
+  "minimum_references": 3,
+  "published_failure_count": 133,
+  "reference_count": 4,
+  "run_full_grid": false,
+  "schema_version": "crosswindow-headroom-gate-v1"
+}

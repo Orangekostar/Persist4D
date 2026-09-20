@@ -6,7 +6,7 @@ import hashlib
 import json
 import math
 from collections import defaultdict
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -16,7 +16,10 @@ from torch import Tensor
 from models.crosswindow_state import CrossWindowState, GroupKey
 from models.overlap_entity_association import (
     A0_DEFAULT,
+    A1_DEFAULT,
+    A2_DEFAULT,
     AssignmentPlan,
+    AssociationConfig,
     associate,
     build_evidence,
     canonical_frame_sha256,
@@ -67,6 +70,7 @@ class PublicationRevision:
     old_candidate_count: int
     new_candidate_count: int
     mask_selection: str
+    score_mode: str
 
 
 @dataclass(frozen=True)
@@ -319,17 +323,119 @@ def _materialize(
     )
 
 
+def select_revision_scan(
+    old: PublishedScan,
+    new: PublishedScan,
+    *,
+    selector: str,
+    score_mode: str,
+) -> tuple[PublishedScan, tuple[dict[str, object], ...]]:
+    """Select old/new masks under a frozen published identity trajectory."""
+    if selector not in {"M-new", "M-old", "M-score"}:
+        raise CrossWindowReplayError("revision selector must be M-new, M-old, or M-score")
+    if score_mode not in {"MASK_ONLY_FIXED_SCORE", "SYSTEM_SELECTED_SCORE"}:
+        raise CrossWindowReplayError("revision score mode differs")
+    if old.scan_id != new.scan_id or not torch.equal(
+        old.vertex_ids, new.vertex_ids
+    ):
+        raise CrossWindowReplayError("revision scans are not canonically aligned")
+    old_by_identity = {candidate.identity: candidate for candidate in old.candidates}
+    new_by_identity = {candidate.identity: candidate for candidate in new.candidates}
+    if len(old_by_identity) != len(old.candidates) or len(new_by_identity) != len(
+        new.candidates
+    ):
+        raise CrossWindowReplayError("revision scan identities must be unique")
+    selected = []
+    events = []
+    for new_candidate in new.candidates:
+        old_candidate = old_by_identity.get(new_candidate.identity)
+        if old_candidate is None:
+            selected.append(new_candidate)
+            events.append(
+                {
+                    "identity": repr(new_candidate.identity),
+                    "choice": "new_only",
+                    "selector": selector,
+                    "score_mode": score_mode,
+                    "mask_equal": None,
+                    "old_score": None,
+                    "new_score": new_candidate.score,
+                    "selected_score": new_candidate.score,
+                }
+            )
+            continue
+        mask_equal = torch.equal(old_candidate.mask, new_candidate.mask)
+        choose_new = selector == "M-new" or (
+            selector == "M-score"
+            and (mask_equal or new_candidate.score > old_candidate.score + 1e-6)
+        )
+        chosen = new_candidate if choose_new else old_candidate
+        selected_score = (
+            new_candidate.score
+            if score_mode == "MASK_ONLY_FIXED_SCORE"
+            else chosen.score
+        )
+        selected.append(
+            PublishedOccurrence(
+                identity=new_candidate.identity,
+                source_key=chosen.source_key,
+                source_query_id=chosen.source_query_id,
+                score=selected_score,
+                mask=chosen.mask,
+            )
+        )
+        events.append(
+            {
+                "identity": repr(new_candidate.identity),
+                "choice": "new" if choose_new else "old",
+                "selector": selector,
+                "score_mode": score_mode,
+                "mask_equal": mask_equal,
+                "old_score": old_candidate.score,
+                "new_score": new_candidate.score,
+                "selected_score": selected_score,
+            }
+        )
+    for identity, old_candidate in old_by_identity.items():
+        if identity not in new_by_identity:
+            events.append(
+                {
+                    "identity": repr(identity),
+                    "choice": "old_only_dropped",
+                    "selector": selector,
+                    "score_mode": score_mode,
+                    "mask_equal": None,
+                    "old_score": old_candidate.score,
+                    "new_score": None,
+                    "selected_score": None,
+                }
+            )
+    return (
+        _archive_scan(
+            scan_id=new.scan_id,
+            absolute_stage=new.absolute_stage,
+            vertex_ids=new.vertex_ids,
+            candidates=tuple(selected),
+        ),
+        tuple(events),
+    )
+
+
 def publish(
     frame: CanonicalFrame,
     plan: AssignmentPlan,
     *,
     mask_selection: str,
     history_boundary: HistoryBoundary | None,
+    score_mode: str = "SYSTEM_SELECTED_SCORE",
 ) -> PublishedPrefix:
     """Publish one causal stage using only the supplied immutable assignment plan."""
     plan.validate()
-    if mask_selection != "new":
-        raise CrossWindowReplayError("Task 4 publisher supports only fixed M-new")
+    selector = "M-new" if mask_selection == "new" else mask_selection
+    if selector not in {"M-new", "M-old", "M-score"}:
+        raise CrossWindowReplayError("publisher mask selector differs")
+    if score_mode not in {"MASK_ONLY_FIXED_SCORE", "SYSTEM_SELECTED_SCORE"}:
+        raise CrossWindowReplayError("publisher score mode differs")
     if plan.frame_sha256 != canonical_frame_sha256(frame):
         raise CrossWindowReplayError("assignment plan belongs to another frame")
     if plan.group_keys != _frame_group_keys(frame):
@@ -360,11 +466,17 @@ def publish(
     if prior is not None:
         if prior.scan_id not in frame.source_window:
             raise CrossWindowReplayError("lag-one frame omits the provisional scan")
-        revised = _scan_from_frame(
+        new_revision = _scan_from_frame(
             frame,
             plan,
             scan_id=prior.scan_id,
             publication_identities=publication_identities,
+        )
+        revised, _ = select_revision_scan(
+            prior,
+            new_revision,
+            selector=selector,
+            score_mode=score_mode,
         )
         archive = (*archive, revised)
         revisions = (
@@ -376,7 +488,8 @@ def publish(
                 committed_sha256=revised.content_sha256,
                 old_candidate_count=len(prior.candidates),
                 new_candidate_count=len(revised.candidates),
-                mask_selection=mask_selection,
+                mask_selection=selector,
+                score_mode=score_mode,
             ),
         )
     current_scan_id = frame.source_window[-1]
@@ -975,6 +1088,575 @@ class E0ReplayAccumulator:
             "index_trigger_count": self.index_trigger_count,
             "a0_collision_fallback_count": self.a0_collision_fallbacks,
             "status": "PASS" if parity_pass else "FAIL",
+        }
+
+
+_IDENTITY_COUNT_FIELDS = (
+    "deployment_id_switches",
+    "identity_transition_opportunities",
+    "fragmentation_count",
+    "fragmentation_opportunities",
+    "merge_count",
+    "merge_opportunities",
+    "gap_opportunities",
+    "recovery_attempts",
+    "correct_recoveries",
+)
+
+
+def _empty_identity_counts() -> dict[str, int]:
+    return {field: 0 for field in _IDENTITY_COUNT_FIELDS}
+
+
+def _identity_rates(counts: Mapping[str, int]) -> dict[str, int | float | None]:
+    normalized = {field: int(counts[field]) for field in _IDENTITY_COUNT_FIELDS}
+
+    def rate(numerator: str, denominator: str) -> float | None:
+        total = normalized[denominator]
+        return normalized[numerator] / total if total else None
+
+    wrong_reactivations = (
+        normalized["recovery_attempts"] - normalized["correct_recoveries"]
+    )
+    return {
+        **normalized,
+        "normalized_id_switch_rate": rate(
+            "deployment_id_switches", "identity_transition_opportunities"
+        ),
+        "fragmentation_rate": rate(
+            "fragmentation_count", "fragmentation_opportunities"
+        ),
+        "merge_rate": rate("merge_count", "merge_opportunities"),
+        "wrong_reactivations": wrong_reactivations,
+        "wrong_reactivation_rate": (
+            wrong_reactivations / normalized["recovery_attempts"]
+            if normalized["recovery_attempts"]
+            else None
+        ),
+        "gap_recovery_accuracy": rate(
+            "correct_recoveries", "recovery_attempts"
+        ),
+        "gap_recovery_recall": rate("correct_recoveries", "gap_opportunities"),
+    }
+
+
+class E2ReplayAccumulator:
+    """Evaluate fixed association configurations on one development role."""
+
+    horizons = (2, 3, 4, 5)
+
+    def __init__(
+        self,
+        *,
+        dataset_spec: str,
+        class_mapping: tuple[int, ...],
+        checkpoint_sha256: str,
+        source_commit: str,
+        data_role: str,
+        association_configs: Mapping[str, AssociationConfig] | None = None,
+        capacity: int = 100,
+    ) -> None:
+        from scripts.analyze_persist4d_allt import AllTBaselineAccumulator
+        from scripts.p6a_metrics import OfficialMetricAccumulator
+
+        if len(class_mapping) != 18 or len(set(class_mapping)) != 18:
+            raise CrossWindowReplayError("RIO class mapping must contain 18 IDs")
+        if data_role not in {"DEV-CAL", "DEV-SEL", "PROTOCOL-B"}:
+            raise CrossWindowReplayError("association evaluation role differs")
+        if isinstance(capacity, bool) or not isinstance(capacity, int) or capacity <= 0:
+            raise CrossWindowReplayError("association capacity must be positive")
+        configs = dict(
+            {
+                "A0-U-default": A0_DEFAULT,
+                "A1-default": A1_DEFAULT,
+                "A2-default": A2_DEFAULT,
+            }
+            if association_configs is None
+            else association_configs
+        )
+        if any(
+            not isinstance(name, str)
+            or not name
+            or not isinstance(config, AssociationConfig)
+            for name, config in configs.items()
+        ):
+            raise CrossWindowReplayError("E2 association configurations differ")
+        self.dataset_spec = dataset_spec
+        self.class_mapping = class_mapping
+        self.checkpoint_sha256 = checkpoint_sha256
+        self.source_commit = source_commit
+        self.data_role = data_role
+        self.capacity = capacity
+        self.association_configs = configs
+        self.methods = ("D0", *configs)
+        self.metrics = {
+            (method, horizon): AllTBaselineAccumulator(dataset_spec=dataset_spec)
+            for method in self.methods
+            for horizon in self.horizons
+        }
+        self.reference_metrics: dict[tuple[str, str, int], object] = {}
+        self.raw_metrics = {
+            horizon: OfficialMetricAccumulator(
+                mode="raw_local", dataset_spec=dataset_spec, min_region_size=100
+            )
+            for horizon in self.horizons
+        }
+        self.identity_counts = defaultdict(_empty_identity_counts)
+        self.reference_identity_counts = defaultdict(_empty_identity_counts)
+        self.assignment_events: list[dict[str, object]] = []
+        self.unit_count = 0
+        self.reference_ids: set[str] = set()
+        self.collision_fallbacks = defaultdict(int)
+        self.capacity_accounting = {
+            method: {
+                "peak_occupied_slots": 0,
+                "rejected_births": 0,
+                "resident_bytes": 0,
+                "buffer_bytes": 0,
+                "archive_bytes": 0,
+                "materialized_bytes": 0,
+            }
+            for method in self.methods
+        }
+
+    def _class_mapper(self, value: int) -> int:
+        if isinstance(value, bool) or not 0 <= value < len(self.class_mapping):
+            raise CrossWindowReplayError("model class is outside the fixed RIO mapping")
+        return self.class_mapping[value]
+
+    def _reference_metric(self, reference_id: str, method: str, horizon: int):
+        from scripts.analyze_persist4d_allt import AllTBaselineAccumulator
+
+        key = (reference_id, method, horizon)
+        if key not in self.reference_metrics:
+            self.reference_metrics[key] = AllTBaselineAccumulator(
+                dataset_spec=self.dataset_spec
+            )
+        return self.reference_metrics[key]
+
+    @staticmethod
+    def _issued_ids(
+        keys: Sequence[object], registry: dict[str, int]
+    ) -> Tensor:
+        values = []
+        for key in keys:
+            stable_key = f"{type(key).__qualname__}:{key!r}"
+            if stable_key not in registry:
+                registry[stable_key] = len(registry)
+            values.append(registry[stable_key])
+        return torch.tensor(values, dtype=torch.long)
+
+    def _record_identity(
+        self,
+        *,
+        method: str,
+        reference_id: str,
+        prefixes: Sequence[object],
+        targets: Sequence[Mapping[str, Tensor]],
+    ) -> None:
+        from scripts.system_comparison_metrics import (
+            compute_deployment_identity_metrics,
+            match_identity_update,
+        )
+
+        registry: dict[str, int] = {}
+        updates = []
+        for horizon, (prefix, target) in enumerate(
+            zip(prefixes, targets, strict=True), start=1
+        ):
+            prediction = prefix.prediction
+            temporal_stages = target["temporal_stages"].detach().cpu().long()
+            current_target = temporal_stages == horizon - 1
+            offsets = prefix.scan_vertex_offsets.detach().cpu().long()
+            current_start = int(offsets[-2].item())
+            if int(current_target.sum().item()) != int(
+                prediction["pred_masks"].shape[0] - current_start
+            ):
+                raise CrossWindowReplayError(
+                    "identity current-scan target and prediction differ"
+                )
+            updates.append(
+                match_identity_update(
+                    horizon=horizon,
+                    gt_ids=target["ids"],
+                    gt_classes=target["labels"],
+                    gt_masks=target["masks"][:, current_target],
+                    issued_ids=self._issued_ids(prefix.keys, registry),
+                    pred_classes=prediction["pred_classes"],
+                    pred_masks=prediction["pred_masks"][current_start:],
+                )
+            )
+        for horizon in self.horizons:
+            values = compute_deployment_identity_metrics(updates[:horizon])
+            for scope in (
+                self.identity_counts[(method, horizon)],
+                self.reference_identity_counts[(reference_id, method, horizon)],
+            ):
+                for field in _IDENTITY_COUNT_FIELDS:
+                    scope[field] += int(values[field])
+
+    def update(
+        self,
+        *,
+        logical_unit_id: str,
+        base: Mapping[str, object],
+        supplement: Mapping[str, object],
+    ) -> None:
+        from scripts.run_task_memory_controls import (
+            prediction_observation_from_payload,
+            run_control_trajectory,
+        )
+        from scripts.run_task_memory_policy_baseline import (
+            _meta_from_payload,
+            _prediction_from_payload,
+            _target_for_prefix,
+        )
+        from scripts.system_comparison_metrics import validate_causal_prefix_pair
+        from scripts.task_memory_output import LagOnePublisher
+
+        base_stages = base.get("stages")
+        supplement_stages = supplement.get("stages")
+        episode = base.get("episode")
+        if (
+            not isinstance(base_stages, list)
+            or not isinstance(supplement_stages, list)
+            or len(base_stages) != 5
+            or len(supplement_stages) != 5
+            or not isinstance(episode, Mapping)
+        ):
+            raise CrossWindowReplayError("E2 cache stage coverage differs")
+        reference_id = str(episode["reference_id"])
+        scan_ids = tuple(str(value) for value in episode["scan_ids"])
+        if len(scan_ids) != 5:
+            raise CrossWindowReplayError("E2 episode scan coverage differs")
+        metas = [_meta_from_payload(stage["stage_meta"]) for stage in base_stages]
+        observations = [
+            prediction_observation_from_payload(stage["observation"])
+            for stage in supplement_stages
+        ]
+        predictions = [
+            _prediction_from_payload(stage["prediction"])
+            for stage in supplement_stages
+        ]
+        frames = [
+            build_canonical_frame(
+                producer_id="R1-B4-policy",
+                order_id=logical_unit_id,
+                observation=observation,
+                prediction=prediction,
+                stage_meta=meta,
+            )
+            for observation, prediction, meta in zip(
+                observations, predictions, metas, strict=True
+            )
+        ]
+        original_targets = [stage["target"] for stage in base_stages]
+        canonical_targets = [
+            canonicalize_stage_target(
+                target,
+                original_vertex_ids=meta.original_vertex_ids[-1],
+            )
+            for target, meta in zip(original_targets, metas, strict=True)
+        ]
+        d0_trajectory = run_control_trajectory(
+            observations,
+            metas,
+            update_mode="last",
+            capacity=self.capacity,
+            class_weight=0.25,
+            association_threshold=0.5,
+            update_rate=0.2,
+        )
+        d0_publisher = LagOnePublisher(score_reducer="mean", iou_threshold=0.5)
+        d0_prefixes = [
+            d0_publisher.update(prediction, identity_map, meta)
+            for prediction, identity_map, meta in zip(
+                predictions, d0_trajectory.identity_maps, metas, strict=True
+            )
+        ]
+        d0_final = d0_prefixes[-1]
+        self.capacity_accounting["D0"]["peak_occupied_slots"] = max(
+            self.capacity_accounting["D0"]["peak_occupied_slots"],
+            d0_trajectory.diagnostics.peak_occupied_slots,
+        )
+        self.capacity_accounting["D0"]["rejected_births"] += (
+            d0_trajectory.diagnostics.rejected_births
+        )
+        self.capacity_accounting["D0"]["resident_bytes"] = max(
+            self.capacity_accounting["D0"]["resident_bytes"],
+            d0_trajectory.diagnostics.peak_state_bytes,
+        )
+        self.capacity_accounting["D0"]["buffer_bytes"] = max(
+            self.capacity_accounting["D0"]["buffer_bytes"],
+            d0_final.accounting.lag1_buffer_bytes,
+        )
+        self.capacity_accounting["D0"]["archive_bytes"] = max(
+            self.capacity_accounting["D0"]["archive_bytes"],
+            d0_final.accounting.archive_payload_bytes,
+        )
+        self.capacity_accounting["D0"]["materialized_bytes"] = max(
+            self.capacity_accounting["D0"]["materialized_bytes"],
+            d0_final.accounting.materialized_output_bytes,
+        )
+
+        association_prefixes: dict[str, list[PublishedPrefix]] = {}
+        for method, config in self.association_configs.items():
+            first = observations[0]
+            state = CrossWindowState.empty(
+                capacity=self.capacity,
+                feature_dim=first.features.shape[-1],
+                class_count=first.class_prob.shape[-1],
+            )
+            buffer = None
+            boundary = None
+            prefixes = []
+            for frame in frames:
+                evidence = build_evidence(frame, state, buffer)
+                plan = associate(evidence, config)
+                state, committed = commit_observation(frame, state, plan)
+                prefix = publish(
+                    frame,
+                    plan,
+                    mask_selection="new",
+                    history_boundary=boundary,
+                )
+                buffer = committed.buffer
+                boundary = prefix.history_boundary
+                prefixes.append(prefix)
+                self.collision_fallbacks[method] += prefix.collision_fallback_count
+                accounting = self.capacity_accounting[method]
+                accounting["peak_occupied_slots"] = max(
+                    accounting["peak_occupied_slots"], state.occupied_count
+                )
+                accounting["rejected_births"] += sum(
+                    reason in {"BIRTH_CAPACITY_FULL", "BUFFER_ONLY_CAPACITY_FULL"}
+                    for reason in plan.residency_reason
+                )
+                accounting["resident_bytes"] = max(
+                    accounting["resident_bytes"], committed.resident_bytes
+                )
+                accounting["buffer_bytes"] = max(
+                    accounting["buffer_bytes"], committed.buffer_bytes
+                )
+                accounting["archive_bytes"] = max(
+                    accounting["archive_bytes"], prefix.accounting.archive_bytes
+                )
+                accounting["materialized_bytes"] = max(
+                    accounting["materialized_bytes"],
+                    prefix.accounting.materialized_bytes,
+                )
+                matched = sum(anchor >= 0 for anchor in plan.anchor_for_group)
+                self.assignment_events.append(
+                    {
+                        "event_type": "ASSIGNMENT_SUMMARY",
+                        "data_role": self.data_role,
+                        "logical_unit_id": logical_unit_id,
+                        "reference_id": reference_id,
+                        "method": method,
+                        "config_id": config.config_id,
+                        "absolute_stage": frame.absolute_stage,
+                        "group_count": evidence.group_count,
+                        "anchor_count": evidence.anchor_count,
+                        "matched_group_count": matched,
+                        "new_identity_count": sum(plan.is_new_id),
+                        "nonresident_count": sum(
+                            slot < 0 for slot in plan.slot_for_group
+                        ),
+                        "overlap_lock_count": sum(
+                            source == "OVERLAP_LOCK" for source in plan.source_edge
+                        ),
+                        "feature_edge_count": sum(
+                            source == "FEATURE_ASSIGNMENT"
+                            for source in plan.source_edge
+                        ),
+                        "joint_edge_count": sum(
+                            source == "JOINT_ASSIGNMENT"
+                            for source in plan.source_edge
+                        ),
+                        "overlap_edge_count": int(evidence.has_overlap.sum().item()),
+                        "missing_overlap_edge_count": int(
+                            evidence.has_overlap.numel()
+                            - evidence.has_overlap.sum().item()
+                        ),
+                        "zero_norm_query_count": evidence.zero_norm_query_count,
+                        "zero_norm_anchor_count": evidence.zero_norm_anchor_count,
+                        "mean_decision_score": (
+                            sum(plan.decision_score) / len(plan.decision_score)
+                            if plan.decision_score
+                            else None
+                        ),
+                        "mean_decision_margin": (
+                            sum(plan.decision_margin) / len(plan.decision_margin)
+                            if plan.decision_margin
+                            else None
+                        ),
+                        "assignment_sha256": plan.content_sha256,
+                    }
+                )
+            association_prefixes[method] = prefixes
+
+        original_prefix_targets = [
+            _target_for_prefix(
+                original_targets,
+                horizon=horizon,
+                class_mapper=self._class_mapper,
+            )
+            for horizon in range(1, 6)
+        ]
+        canonical_prefix_targets = [
+            _target_for_prefix(
+                canonical_targets,
+                horizon=horizon,
+                class_mapper=self._class_mapper,
+            )
+            for horizon in range(1, 6)
+        ]
+        self._record_identity(
+            method="D0",
+            reference_id=reference_id,
+            prefixes=d0_prefixes,
+            targets=original_prefix_targets,
+        )
+        for method, prefixes in association_prefixes.items():
+            self._record_identity(
+                method=method,
+                reference_id=reference_id,
+                prefixes=prefixes,
+                targets=canonical_prefix_targets,
+            )
+
+        for horizon in self.horizons:
+            stage_index = horizon - 1
+            method_prefixes = {
+                "D0": (d0_prefixes[stage_index], original_prefix_targets[stage_index]),
+                **{
+                    method: (prefixes[stage_index], canonical_prefix_targets[stage_index])
+                    for method, prefixes in association_prefixes.items()
+                },
+            }
+            for method, (prefix, target) in method_prefixes.items():
+                prediction = (
+                    prefix.prediction
+                    if method == "D0"
+                    else evaluator_prediction(prefix)
+                )
+                pair = validate_causal_prefix_pair(
+                    prediction=prediction,
+                    target=target,
+                    horizon=horizon,
+                    observed_scan_ids=scan_ids[:horizon],
+                )
+                self._reference_metric(reference_id, method, horizon).update(pair)
+            current_target = _target_for_prefix(
+                [original_targets[stage_index]],
+                horizon=1,
+                class_mapper=self._class_mapper,
+            )
+            self.raw_metrics[horizon].update(
+                _raw_prediction(predictions[stage_index]), current_target
+            )
+
+        self.unit_count += 1
+        self.reference_ids.add(reference_id)
+
+    def _metric_row(
+        self,
+        *,
+        method: str,
+        horizon: int,
+        reference: str,
+        logical_unit_count: int,
+        values: Mapping[str, object],
+        raw_current_ap: float | None,
+    ) -> dict[str, object]:
+        config = self.association_configs.get(method)
+        identity_source = (
+            self.identity_counts[(method, horizon)]
+            if reference == "all"
+            else self.reference_identity_counts[(reference, method, horizon)]
+        )
+        identity = _identity_rates(identity_source)
+        return {
+            "population_id": "development",
+            "data_role": self.data_role,
+            "reference_count": len(self.reference_ids) if reference == "all" else 1,
+            "logical_unit_count": logical_unit_count,
+            "method": method,
+            "config_id": config.config_id if config is not None else "D0",
+            "source_commit": self.source_commit,
+            "R1_SHA": self.checkpoint_sha256,
+            "head_SHA": None,
+            "producer_id": "R1-B4-policy",
+            "policy": "lag1",
+            "mask_selector": "M-new",
+            "score_mode": "mean",
+            "K": self.capacity,
+            "reference": reference,
+            "master": "all",
+            "order": "all",
+            "T": horizon,
+            "t_mAP": values["t_mAP"],
+            "t_mAP50": values["t_mAP50"],
+            "t_mAP25": values["t_mAP25"],
+            "t_REC": values["t_REC"],
+            "prefix_overall_mAP": values["prefix_overall_mAP"],
+            "raw_current_AP": raw_current_ap,
+            "published_current_AP": values["local_current_AP"],
+            **identity,
+            "status": "MEASURED",
+            "reason": "",
+        }
+
+    def finalize(self) -> dict[str, object]:
+        for reference in sorted(self.reference_ids):
+            for method in self.methods:
+                for horizon in self.horizons:
+                    self.metrics[(method, horizon)].merge(
+                        self.reference_metrics[(reference, method, horizon)]
+                    )
+        raw = {
+            horizon: float(metric.compute()["raw_local_AP"])
+            for horizon, metric in self.raw_metrics.items()
+        }
+        rows = []
+        for method in self.methods:
+            for horizon in self.horizons:
+                rows.append(
+                    self._metric_row(
+                        method=method,
+                        horizon=horizon,
+                        reference="all",
+                        logical_unit_count=self.unit_count,
+                        values=self.metrics[(method, horizon)].compute(),
+                        raw_current_ap=raw[horizon],
+                    )
+                )
+        for reference in sorted(self.reference_ids):
+            reference_unit_count = 0
+            for key in self.reference_metrics:
+                if key[0] == reference and key[1] == "D0" and key[2] == 2:
+                    reference_unit_count = self.reference_metrics[key].sequence_count
+                    break
+            for method in self.methods:
+                for horizon in self.horizons:
+                    rows.append(
+                        self._metric_row(
+                            method=method,
+                            horizon=horizon,
+                            reference=reference,
+                            logical_unit_count=reference_unit_count,
+                            values=self.reference_metrics[
+                                (reference, method, horizon)
+                            ].compute(),
+                            raw_current_ap=None,
+                        )
+                    )
+        return {
+            "metric_rows": rows,
+            "assignment_events": self.assignment_events,
+            "collision_fallbacks": dict(self.collision_fallbacks),
+            "capacity_accounting": self.capacity_accounting,
+            "status": "PASS",
         }
 
 

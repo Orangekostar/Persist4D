@@ -270,3 +270,226 @@ def test_publish_revision_does_not_mutate_prior_history_boundary() -> None:
     assert [scan.scan_id for scan in second_prefix.archive] == ["scan-a"]
     assert second_prefix.provisional.scan_id == "scan-b"
     assert [revision.scan_id for revision in second_prefix.revisions] == ["scan-a"]
+
+
+def test_headroom_gate_supports_gain_or_sufficient_complete_failures() -> None:
+    from scripts.diagnose_crosswindow_failures import evaluate_headroom_gate
+
+    gain = evaluate_headroom_gate(
+        long_gain=0.005,
+        candidate_complete_failure_count=0,
+        published_failure_count=40,
+        event_reference_count=4,
+        diagnostic_status="PASS",
+    )
+    coverage = evaluate_headroom_gate(
+        long_gain=0.0,
+        candidate_complete_failure_count=20,
+        published_failure_count=100,
+        event_reference_count=3,
+        diagnostic_status="PASS",
+    )
+
+    assert gain["decision"] == "ASSOCIATION_HEADROOM_SUPPORTED"
+    assert coverage["decision"] == "ASSOCIATION_HEADROOM_SUPPORTED"
+
+
+def test_headroom_gate_separates_inconclusive_and_negative_evidence() -> None:
+    from scripts.diagnose_crosswindow_failures import evaluate_headroom_gate
+
+    inconclusive = evaluate_headroom_gate(
+        long_gain=0.0,
+        candidate_complete_failure_count=1,
+        published_failure_count=30,
+        event_reference_count=3,
+        diagnostic_status="INCONCLUSIVE_AMBIGUITY_METADATA_UNAVAILABLE",
+    )
+    negative = evaluate_headroom_gate(
+        long_gain=0.004,
+        candidate_complete_failure_count=1,
+        published_failure_count=30,
+        event_reference_count=3,
+        diagnostic_status="PASS",
+    )
+
+    assert inconclusive["decision"] == "INCONCLUSIVE"
+    assert negative["decision"] == "MASK_OR_OTHER_DOMINANT"
+
+
+def test_family_ranking_uses_fixed_d0_and_config_id_for_ties() -> None:
+    from scripts.diagnose_crosswindow_failures import rank_family_candidates
+
+    d0 = {2: 0.20, 3: 0.20, 4: 0.20, 5: 0.20}
+    rows = [
+        {"config_id": "A0-U-tau=0.73", "T": horizon, "t_mAP": 0.21}
+        for horizon in (2, 3, 4, 5)
+    ] + [
+        {"config_id": "A0-U-tau=0.60", "T": horizon, "t_mAP": 0.21}
+        for horizon in (2, 3, 4, 5)
+    ]
+
+    ranked = rank_family_candidates(rows, d0_by_horizon=d0)
+
+    assert [row["config_id"] for row in ranked] == [
+        "A0-U-tau=0.60",
+        "A0-U-tau=0.73",
+    ]
+    assert ranked[0]["S_min"] == ranked[0]["S_long"] == ranked[0]["S_mean"]
+
+
+def test_dev_selection_gate_passes_numeric_and_identity_constraints() -> None:
+    from scripts.diagnose_crosswindow_failures import evaluate_dev_selection_gate
+
+    result = evaluate_dev_selection_gate(
+        deltas={2: 0.0, 3: 0.001, 4: 0.006, 5: 0.008},
+        positive_reference_count=3,
+        reference_count=4,
+        candidate_merge_rate=0.02,
+        baseline_merge_rate=0.015,
+        merge_event_count=30,
+        candidate_wrong_reactivation_rate=0.01,
+        baseline_wrong_reactivation_rate=0.01,
+        reactivation_event_count=25,
+    )
+
+    assert result["eligible"] is True
+    assert result["status"] == "PASS"
+    assert result["S_long"] == 0.007
+
+
+def test_dev_selection_gate_marks_small_event_evidence_provisional() -> None:
+    from scripts.diagnose_crosswindow_failures import evaluate_dev_selection_gate
+
+    result = evaluate_dev_selection_gate(
+        deltas={2: 0.0, 3: 0.0, 4: 0.005, 5: 0.005},
+        positive_reference_count=3,
+        reference_count=4,
+        candidate_merge_rate=None,
+        baseline_merge_rate=None,
+        merge_event_count=0,
+        candidate_wrong_reactivation_rate=None,
+        baseline_wrong_reactivation_rate=None,
+        reactivation_event_count=0,
+    )
+
+    assert result["eligible"] is True
+    assert result["status"] == "PROVISIONAL_SMALL_EVENT_COUNT"
+
+
+def test_dev_selection_gate_rejects_long_gain_and_reference_instability() -> None:
+    from scripts.diagnose_crosswindow_failures import evaluate_dev_selection_gate
+
+    result = evaluate_dev_selection_gate(
+        deltas={2: 0.0, 3: 0.0, 4: 0.003, 5: 0.004},
+        positive_reference_count=2,
+        reference_count=4,
+        candidate_merge_rate=0.0,
+        baseline_merge_rate=0.0,
+        merge_event_count=30,
+        candidate_wrong_reactivation_rate=0.0,
+        baseline_wrong_reactivation_rate=0.0,
+        reactivation_event_count=30,
+    )
+
+    assert result["eligible"] is False
+    assert result["status"] == "FAIL_SELECTION_GATE"
+    assert set(result["failed_gates"]) == {"long_gain", "positive_references"}
+
+
+def test_revision_selector_freezes_identity_and_separates_score_channels() -> None:
+    from scripts.crosswindow_cache import CandidateKey
+    from scripts.replay_crosswindow_association import (
+        PublishedOccurrence,
+        PublishedScan,
+        select_revision_scan,
+    )
+
+    def occurrence(identity, candidate_index, score, mask):
+        return PublishedOccurrence(
+            identity=identity,
+            source_key=CandidateKey(
+                "r1", "episode", "order", 1, candidate_index, 0, candidate_index
+            ),
+            source_query_id=candidate_index,
+            score=score,
+            mask=torch.tensor(mask, dtype=torch.bool),
+        )
+
+    old = PublishedScan(
+        scan_id="scan-a",
+        absolute_stage=0,
+        vertex_ids=torch.tensor([10, 20]),
+        candidates=(
+            occurrence((7, 0, 1), 0, 0.7, [True, False]),
+            occurrence((9, 0, 1), 1, 0.8, [True, True]),
+        ),
+        content_sha256="old",
+        payload_bytes=0,
+    )
+    new = PublishedScan(
+        scan_id="scan-a",
+        absolute_stage=1,
+        vertex_ids=torch.tensor([10, 20]),
+        candidates=(
+            occurrence((7, 0, 1), 0, 0.9, [False, True]),
+            occurrence((8, 0, 1), 2, 0.6, [True, True]),
+        ),
+        content_sha256="new",
+        payload_bytes=0,
+    )
+
+    fixed, fixed_events = select_revision_scan(
+        old,
+        new,
+        selector="M-old",
+        score_mode="MASK_ONLY_FIXED_SCORE",
+    )
+    system, _ = select_revision_scan(
+        old,
+        new,
+        selector="M-old",
+        score_mode="SYSTEM_SELECTED_SCORE",
+    )
+
+    assert [candidate.identity for candidate in fixed.candidates] == [
+        (7, 0, 1),
+        (8, 0, 1),
+    ]
+    assert fixed.candidates[0].mask.tolist() == [True, False]
+    assert fixed.candidates[0].score == 0.9
+    assert system.candidates[0].score == 0.7
+    assert fixed_events[0]["choice"] == "old"
+    assert fixed_events[1]["choice"] == "new_only"
+
+
+def test_final_status_requires_all_t_quality_and_resource_pass() -> None:
+    from scripts.profile_crosswindow import evaluate_final_status
+
+    result = evaluate_final_status(
+        candidate_tmap={2: 0.21, 3: 0.22, 4: 0.23, 5: 0.24},
+        native_fh_tmap={2: 0.20, 3: 0.21, 4: 0.22, 5: 0.23},
+        resource_status="PASS",
+    )
+
+    assert result["TMAP_ALL_T_STATUS"] == "PASS"
+    assert result["JOINT_GOAL_PASS"] is True
+
+
+def test_final_status_is_unconfirmed_without_native_fh_or_profile() -> None:
+    from scripts.profile_crosswindow import evaluate_final_status
+
+    missing_quality = evaluate_final_status(
+        candidate_tmap={2: 0.21, 3: 0.22, 4: 0.23, 5: 0.24},
+        native_fh_tmap=None,
+        resource_status="PASS",
+    )
+    missing_resource = evaluate_final_status(
+        candidate_tmap={2: 0.21, 3: 0.22, 4: 0.23, 5: 0.24},
+        native_fh_tmap={2: 0.20, 3: 0.21, 4: 0.22, 5: 0.23},
+        resource_status="UNCONFIRMED",
+    )
+
+    assert missing_quality["TMAP_ALL_T_STATUS"] == "UNCONFIRMED"
+    assert missing_quality["JOINT_GOAL_PASS"] is False
+    assert missing_resource["RESOURCE_STATUS"] == "UNCONFIRMED"
+    assert missing_resource["JOINT_GOAL_PASS"] is False
