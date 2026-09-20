@@ -1,0 +1,190 @@
+{
+  "schema_version": "crosswindow-execution-contract-seed-v1",
+  "scope": "preset to materialize before experiments; not measured results",
+  "repository": "Orangekostar/Persist4D",
+  "parent_commit": "96edca52d9d1cab7781bfa2a273baf9fe52b6a7d",
+  "branch": "research/persist4d-crosswindow-evidence-v1",
+  "artifact_root": "artifacts/crosswindow_evidence_v1",
+  "r1_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "r1_bytes": 754813672,
+  "window": 2,
+  "query_budget": 100,
+  "resident_K": 100,
+  "buffer_groups_max": 100,
+  "anchor_count_max": 200,
+  "policy": "lag1",
+  "reducer": "mean",
+  "eval_seed": 45,
+  "horizons": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "budgets": {
+    "gpu_hours_total": 32,
+    "inference_gpu_hours": 22,
+    "head_training_gpu_hours": 6,
+    "profile_gpu_hours": 4,
+    "cpu_core_hours": 256,
+    "max_cpu_workers": 8,
+    "ram_gib": 48,
+    "new_cache_gib": 8
+  },
+  "data_split": {
+    "development_role": "development",
+    "train_role": "adaptation",
+    "sort_key": "sha256('crosswindow-v1:' + reference_id)",
+    "calibration_count": "floor(n/2)",
+    "selection": "remaining references",
+    "minimum_dev_references_for_search": 4,
+    "minimum_training_references": 8
+  },
+  "algorithms": {
+    "A0-U": {
+      "score": "B=(cos+0.25*C+1)/2.25",
+      "tau": [
+        0.6,
+        0.6666666666666666,
+        0.73
+      ],
+      "default_tau": 0.6666666666666666
+    },
+    "A1": {
+      "overlap_theta": [
+        0.5,
+        0.65,
+        0.8
+      ],
+      "default_theta": 0.65,
+      "mutual_margin": 0.1,
+      "tau": 0.6666666666666666
+    },
+    "A2": {
+      "lambda": [
+        0.25,
+        0.5
+      ],
+      "tau": [
+        0.6,
+        0.6666666666666666,
+        0.73
+      ],
+      "default_lambda": 0.25,
+      "default_tau": 0.6666666666666666,
+      "missing_overlap": "S=B"
+    },
+    "E3": {
+      "status": "SKIPPED_EQUIVALENT",
+      "reason": "fixed historical U makes consistency edge terms unary"
+    },
+    "E4": {
+      "selectors": [
+        "M-new",
+        "M-old",
+        "M-score"
+      ],
+      "score_modes": [
+        "MASK_ONLY_FIXED_SCORE",
+        "SYSTEM_SELECTED_SCORE"
+      ],
+      "comparison_tolerance": 1e-06,
+      "M-consensus": "SKIPPED_NO_INDEPENDENT_EVIDENCE"
+    }
+  },
+  "headroom_gate": {
+    "long_ap_gain": 0.005,
+    "candidate_complete_failure_fraction": 0.1,
+    "minimum_events": 20,
+    "minimum_event_references": 3
+  },
+  "selection": {
+    "reference": "fixed D0 and fixed parent for extension",
+    "ranking": [
+      "S_min",
+      "S_long",
+      "S_mean",
+      "simplicity",
+      "config_id"
+    ],
+    "max_per_T_drop": 0.001,
+    "min_long_gain": 0.005,
+    "min_mean_gain": 0.0,
+    "min_positive_refs": 3,
+    "max_error_rate_increase": 0.01,
+    "low_denominator": "PROVISIONAL, not statistical PASS"
+  },
+  "learning": {
+    "conditional": true,
+    "feature_dim": 10,
+    "hidden_dim": 32,
+    "output_dim": 1,
+    "output_init": "zero",
+    "maximum_correction": 0.1,
+    "steps": 1000,
+    "warmup": 100,
+    "eval_steps": [
+      0,
+      250,
+      500,
+      750,
+      1000
+    ],
+    "batch_pairs": 256,
+    "positive_to_negative": [
+      1,
+      3
+    ],
+    "lr": 0.001,
+    "min_lr": 1e-05,
+    "weight_decay": 0.0001,
+    "grad_clip": 1.0,
+    "seed": 45,
+    "arms": [
+      "L-PLAIN",
+      "L-DENOISE"
+    ],
+    "corruption_fraction": 0.25,
+    "training_reference_cap": 16,
+    "training_stage_forward_cap": 80
+  },
+  "profile": {
+    "warmup_full_sequences": 2,
+    "measured_full_sequences": 5,
+    "panel": "first canonical master of each Protocol-B reference",
+    "required_methods": [
+      "FH-R1-native",
+      "D0",
+      "frozen final candidate"
+    ],
+    "required_long_reduction": 0.05,
+    "absolute_peak_not_above_fh": true,
+    "e2e_not_above_fh": true
+  },
+  "success": {
+    "tmap_all_T_epsilon": 1e-06,
+    "formula": "TMAP_ALL_T_PASS and RESOURCE_PASS",
+    "no_success_by_execution_only": true
+  },
+  "run_order": [
+    "BOOTSTRAP",
+    "E0",
+    "E1",
+    "E2",
+    "E3-equivalence",
+    "E4",
+    "E6-if-authorized",
+    "SELECT_AND_LOCK",
+    "E5-final",
+    "REPORT",
+    "PUBLISH"
+  ],
+  "publication": {
+    "required": true,
+    "results_commit": "E",
+    "document_commit": "P",
+    "remote_branch_match_required": true,
+    "raw_or_api_readback_required": true,
+    "receipt": "external PUBLICATION_RECEIPT.local.json; no self-referential commit"
+  }
+}

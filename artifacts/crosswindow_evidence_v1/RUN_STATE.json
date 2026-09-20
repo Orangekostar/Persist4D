@@ -1,0 +1,23 @@
+{
+  "budget_used": {
+    "cpu_core_hours": 0.0,
+    "head_training_gpu_hours": 0.0,
+    "inference_gpu_hours": 0.0,
+    "new_cache_bytes": 0,
+    "profile_gpu_hours": 0.0
+  },
+  "completed_units": [],
+  "external_assets_file": "external:assets.local.json",
+  "failures": [],
+  "identity": {
+    "config_sha256": "4c9c897c218582f46a155d7653059641cf86164bf2fd814b316f97f552d78e2e",
+    "data_sha256": "4434a84b14139b611baa90a365e59cc0fa7cfb27a10d21cc21f50fb2a520c96e",
+    "instruction_sha256": "f7ee448782b0e8e4d2940a5b4e60748ce46d3dd07457eaf2460ab0f9006c01c2",
+    "parent": "96edca52d9d1cab7781bfa2a273baf9fe52b6a7d"
+  },
+  "methods": [],
+  "next_command": "python -m scripts.crosswindow_campaign preflight --config configs/crosswindow_evidence_v1.yaml --read-only",
+  "schema_version": "crosswindow-run-state-v1",
+  "stage": "BOOTSTRAP",
+  "stage_status": "PASS"
+}

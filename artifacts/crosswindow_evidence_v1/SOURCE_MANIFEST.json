@@ -1,0 +1,128 @@
+{
+  "assets": {
+    "concerto_pretrained": {
+      "available": true,
+      "kind": "file",
+      "source": "fallback"
+    },
+    "data_root": {
+      "available": true,
+      "kind": "directory",
+      "source": "fallback"
+    },
+    "dev_base_cache_root": {
+      "available": true,
+      "kind": "directory",
+      "source": "known_manifest"
+    },
+    "dev_supplement_root": {
+      "available": true,
+      "kind": "directory",
+      "source": "known_manifest"
+    },
+    "external_run_root": {
+      "available": true,
+      "kind": "directory",
+      "source": "cli"
+    },
+    "fh_native_cache_root": {
+      "available": false,
+      "kind": "missing",
+      "source": "unresolved"
+    },
+    "metric_dataset_spec": {
+      "available": true,
+      "kind": "file",
+      "source": "derived:data_root"
+    },
+    "pb_base_cache_root": {
+      "available": true,
+      "kind": "directory",
+      "source": "known_manifest"
+    },
+    "pb_supplement_root": {
+      "available": true,
+      "kind": "directory",
+      "source": "known_manifest"
+    },
+    "r1_checkpoint": {
+      "available": true,
+      "kind": "file",
+      "source": "fallback"
+    },
+    "rio_metadata": {
+      "available": true,
+      "kind": "file",
+      "source": "fallback"
+    },
+    "train_observation_cache_root": {
+      "available": false,
+      "kind": "missing",
+      "source": "unresolved"
+    }
+  },
+  "files": [
+    {
+      "bytes": 30975,
+      "path": "scripts/task_memory_output.py",
+      "sha256": "15c615299597db33822cc218170b667d3263b36acc07569df4b83df071f21f7a"
+    },
+    {
+      "bytes": 22415,
+      "path": "models/task_memory_routing.py",
+      "sha256": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321"
+    },
+    {
+      "bytes": 47015,
+      "path": "scripts/run_task_memory_controls.py",
+      "sha256": "9682d70357b191d794a0b169a0aabcd8f312312de7c67af744f2e46bca8bd01f"
+    },
+    {
+      "bytes": 9153,
+      "path": "scripts/rescene_task_postprocess.py",
+      "sha256": "2cfa05df84446f0baacff185dd3ad5df6d6f1200f08a815090f5e1df68324cf8"
+    },
+    {
+      "bytes": 27572,
+      "path": "scripts/analyze_persist4d_allt.py",
+      "sha256": "525b7ed26fee2fbb396e661e4f6d445dfd501330347a32b2d859c99d91f7e667"
+    },
+    {
+      "bytes": 21700,
+      "path": "scripts/system_comparison_metrics.py",
+      "sha256": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd"
+    },
+    {
+      "bytes": 125954,
+      "path": "artifacts/task_memory_retention_v2/DATA_CONTRACT.json",
+      "sha256": "4434a84b14139b611baa90a365e59cc0fa7cfb27a10d21cc21f50fb2a520c96e"
+    },
+    {
+      "bytes": 17508,
+      "path": "artifacts/task_memory_retention_v2/baseline/cache_manifest.json",
+      "sha256": "7e628a4b71626aa50df81bc1ec29214bee93b49ad46659b6caab11b629505f79"
+    },
+    {
+      "bytes": 22146,
+      "path": "artifacts/task_memory_retention_v2/baseline/control_observation_manifest.json",
+      "sha256": "424394696e1b97220292b36ce4498fdb75b271a3064cf7de7c7e0eb15f4e2a88"
+    },
+    {
+      "bytes": 47270,
+      "path": "artifacts/task_memory_retention_v2/evaluation/M5/protocol_b/R1-B4-policy/cache_manifest.json",
+      "sha256": "a55868a17f5548f74a7ed8f1a9434ebf3f7cf5cfe96f0041995f150ad6c1ba71"
+    },
+    {
+      "bytes": 59676,
+      "path": "artifacts/task_memory_retention_v2/evaluation/M5/protocol_b/baseline/control_observation_manifest.json",
+      "sha256": "afe88997a3a00575dd91631688d50fbb2660bf3a96d2f9611636811d30a0414e"
+    },
+    {
+      "bytes": 995,
+      "path": "artifacts/r1_downstream_validation_v1/cache_manifest.json",
+      "sha256": "d31cb21e3a1f2114e088409622845cbbb74d0c56b1dde97ffe066f444cb54d19"
+    }
+  ],
+  "schema_version": "crosswindow-source-manifest-v1",
+  "source_commit": "96edca52d9d1cab7781bfa2a273baf9fe52b6a7d"
+}
