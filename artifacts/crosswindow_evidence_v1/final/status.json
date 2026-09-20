@@ -1,0 +1,40 @@
+{
+  "JOINT_GOAL_PASS": false,
+  "RESOURCE_PASS": false,
+  "RESOURCE_STATUS": "UNCONFIRMED",
+  "TMAP_ALL_T_PASS": false,
+  "TMAP_ALL_T_STATUS": "UNCONFIRMED",
+  "candidate_t_mAP": {
+    "2": 0.24922862648963928,
+    "3": 0.15534649789333344,
+    "4": 0.09011446684598923,
+    "5": 0.06433148682117462
+  },
+  "common_cohort": true,
+  "coverage_by_method": {
+    "A0-U-default": 129,
+    "A1-default": 129,
+    "D0": 129,
+    "FH-R1-native": 0,
+    "frozen-final-candidate": 129
+  },
+  "cpu_core_hours": 151.57522590538613,
+  "data_role": "PROTOCOL-B",
+  "delta_vs_native_FH": {
+    "2": null,
+    "3": null,
+    "4": null,
+    "5": null
+  },
+  "epsilon": 1e-06,
+  "execution_status": "COMPLETE_WITH_EXTERNAL_BLOCKERS",
+  "leave_one_reference_out_status": "NOT_RUN_NO_NATIVE_COMPARATOR",
+  "logical_unit_count": 129,
+  "native_FH_t_mAP": null,
+  "native_fh_status": "BLOCKED_ASSET",
+  "population_id": "protocol_b_final",
+  "profile_status": "UNCONFIRMED_REAL_FORWARD_NOT_RUN",
+  "reference_count": 6,
+  "schema_version": "crosswindow-final-status-v1",
+  "status": "PASS"
+}

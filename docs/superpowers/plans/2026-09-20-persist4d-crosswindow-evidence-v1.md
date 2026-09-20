@@ -295,18 +295,18 @@ git commit -m "feat: audit consistency and evaluate finite revision"
 **Interfaces:**
 - Produces: a 14-item preflight verdict and final immutable system definition, comparison list, evaluator identity, data hashes, head SHA/null, CAL/SEL evidence.
 
-- [ ] **Step 1: Run the focused pytest and Ruff suite**
+- [x] **Step 1: Run the focused pytest and Ruff suite**
 
 Run: `conda run -n persist4d python -m pytest -q tests/test_crosswindow_core.py tests/test_crosswindow_metrics.py tests/test_task_memory_controls.py tests/test_task_memory_output.py tests/test_task_memory_routing.py tests/test_rescene_task_postprocess.py tests/test_system_comparison_metrics.py`
 
 Run: `conda run -n persist4d ruff check models/crosswindow_state.py models/overlap_entity_association.py scripts/crosswindow_*.py scripts/replay_crosswindow_association.py scripts/diagnose_crosswindow_failures.py scripts/evaluate_crosswindow_consensus.py tests/test_crosswindow_core.py tests/test_crosswindow_metrics.py`
 
-- [ ] **Step 2: Generate and inspect `PREFLIGHT_REVIEW.md`; resolve all numeric-correctness FAILs**
-- [ ] **Step 3: Run lock command before any candidate Protocol-B scoring**
+- [x] **Step 2: Generate and inspect `PREFLIGHT_REVIEW.md`; resolve all numeric-correctness FAILs**
+- [x] **Step 3: Run lock command before any candidate Protocol-B scoring**
 
 Run: `conda run -n persist4d python -m scripts.crosswindow_campaign lock --config configs/crosswindow_evidence_v1.yaml`
 
-- [ ] **Step 4: Commit the lock as commit C and record C in external run state**
+- [x] **Step 4: Commit the lock as commit C and record C in external run state**
 
 ```bash
 git add artifacts/crosswindow_evidence_v1/PREFLIGHT_REVIEW.md artifacts/crosswindow_evidence_v1/selection/FINAL_LOCK.json artifacts/crosswindow_evidence_v1/RUN_STATE.json
@@ -325,14 +325,14 @@ git commit -m "chore: freeze crosswindow final selection"
 - Consumes: `FINAL_LOCK.json`, 129 Protocol-B logical units, native FH payloads, K in `{16,32,100}`, real A40 forward path.
 - Produces: common-cohort T2-T5 metrics, per-reference/LOO deltas, event strata, capacity rows, four timing scopes, memory bytes, `TMAP_ALL_T_PASS`, `RESOURCE_PASS`, and `JOINT_GOAL_PASS`.
 
-- [ ] **Step 1: Write failing final-status and resource-gate tests, including null/unconfirmed behavior**
-- [ ] **Step 2: Verify RED, implement the gate exactly, and verify GREEN**
-- [ ] **Step 3: Run frozen confirmation with resume**
+- [x] **Step 1: Write failing final-status and resource-gate tests, including null/unconfirmed behavior**
+- [x] **Step 2: Verify RED, implement the gate exactly, and verify GREEN**
+- [x] **Step 3: Run frozen confirmation with resume**
 
 Run: `conda run -n persist4d python -m scripts.crosswindow_campaign confirm --config configs/crosswindow_evidence_v1.yaml --resume`
 
-- [ ] **Step 4: Check all locked methods share identical coverage and no final result changed the lock**
-- [ ] **Step 5: Commit code and numeric results as experiment commit E**
+- [x] **Step 4: Check all locked methods share identical coverage and no final result changed the lock**
+- [x] **Step 5: Commit code and numeric results as experiment commit E**
 
 ```bash
 git add scripts/profile_crosswindow.py scripts/crosswindow_campaign.py tests/test_crosswindow_metrics.py artifacts/crosswindow_evidence_v1
