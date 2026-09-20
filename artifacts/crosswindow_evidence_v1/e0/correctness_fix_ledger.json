@@ -1,0 +1,19 @@
+{
+  "candidate_frames_validated": 235,
+  "candidate_records_preserved": 23500,
+  "measured_metric_impact": "NOT_MEASURED",
+  "multi_class_groups_preserved": 3980,
+  "non_identity_trigger_count": 0,
+  "real_module_three_cycle": {
+    "corrected_iou": 1.0,
+    "function": "scripts.task_memory_output._align_masks",
+    "old_expression_iou": 0.0,
+    "passed": true
+  },
+  "repeated_scan_status_counts": {
+    "IDENTICAL": 188
+  },
+  "schema_version": "crosswindow-correctness-ledger-v1",
+  "scope": "development cache preflight; Protocol-B not yet scored",
+  "status": "PASS"
+}

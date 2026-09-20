@@ -16,7 +16,12 @@
     "parent": "96edca52d9d1cab7781bfa2a273baf9fe52b6a7d"
   },
   "methods": [],
-  "next_command": "python -m scripts.crosswindow_campaign preflight --config configs/crosswindow_evidence_v1.yaml --read-only",
+  "next_command": "python -m scripts.crosswindow_campaign preflight --config configs/crosswindow_evidence_v1.yaml --external-root \"$PERSIST4D_RUN_ROOT\" --resume --read-only",
+  "preflight": {
+    "development_units": 47,
+    "frames": 235,
+    "status": "PASS"
+  },
   "schema_version": "crosswindow-run-state-v1",
   "stage": "BOOTSTRAP",
   "stage_status": "PASS"

@@ -87,7 +87,7 @@ git commit -m "feat: bootstrap crosswindow evidence campaign"
 - Consumes: `PredictionObservation`, `OfficialTaskPrediction`, `StageMeta`, scan vertex IDs, base/supplement cache records.
 - Produces: `CandidateKey`, `CandidateSlice`, `QueryGroup`, `CanonicalFrame`, `align_mask(mask, from_ids, to_ids)`, and `iter_campaign_units(role)`.
 
-- [ ] **Step 1: Write failing canonicalization and preservation tests**
+- [x] **Step 1: Write failing canonicalization and preservation tests**
 
 ```python
 def test_align_mask_handles_non_identity_three_cycle():
@@ -100,21 +100,21 @@ def test_candidate_ledger_preserves_multiclass_and_valid_query_union():
     assert [candidate.score for candidate in frame.candidates] == ORIGINAL_SCORES
 ```
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run: `conda run -n persist4d python -m pytest -q tests/test_crosswindow_core.py -k 'align_mask or candidate_ledger'`
 
-- [ ] **Step 3: Implement strict ID validation, ascending canonical order, candidate keys, shared geometry groups, and logical-unit to physical-file binding**
+- [x] **Step 3: Implement strict ID validation, ascending canonical order, candidate keys, shared geometry groups, and logical-unit to physical-file binding**
 
 Reject duplicate vertex IDs, missing destination IDs, silent `(entity,scan,class)` overwrite, and manifest lineage mismatches. Cache loads are one logical unit at a time and large-file hashes are memoized by path/size/mtime.
 
-- [ ] **Step 4: Verify GREEN and inspect two real DEV units**
+- [x] **Step 4: Verify GREEN and inspect two real DEV units**
 
 Run: `conda run -n persist4d python -m pytest -q tests/test_crosswindow_core.py -k 'align_mask or candidate_ledger'`
 
-Run: `conda run -n persist4d python -m scripts.crosswindow_campaign preflight --config configs/crosswindow_evidence_v1.yaml --read-only`
+Run: `conda run -n persist4d python -m scripts.crosswindow_campaign preflight --config configs/crosswindow_evidence_v1.yaml --external-root /mnt/shared/ww/persist4d-crosswindow-evidence-v1 --read-only`
 
-- [ ] **Step 5: Commit canonical cache layer**
+- [x] **Step 5: Commit canonical cache layer**
 
 ```bash
 git add scripts/crosswindow_cache.py tests/test_crosswindow_core.py artifacts/crosswindow_evidence_v1
