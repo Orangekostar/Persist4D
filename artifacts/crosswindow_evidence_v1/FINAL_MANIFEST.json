@@ -1,0 +1,277 @@
+{
+  "entries": [
+    {
+      "bytes": 1251,
+      "path": "artifacts/crosswindow_evidence_v1/COMMANDS.md",
+      "role": "COMMANDS.md",
+      "sha256": "f84eb03c7b72a74770357676f07515cad2ed65242ae409fc43ac3f29f00d98fb"
+    },
+    {
+      "bytes": 19905,
+      "path": "artifacts/crosswindow_evidence_v1/DATA_ROLES.json",
+      "role": "DATA_ROLES.json",
+      "sha256": "6cb1d9d227d8e14670653b7ac86c56a0c69e6fadcd2cc618f93a50007ef341f4"
+    },
+    {
+      "bytes": 60577,
+      "path": "artifacts/crosswindow_evidence_v1/EXECUTION_INSTRUCTION.md",
+      "role": "EXECUTION_INSTRUCTION.md",
+      "sha256": "f7ee448782b0e8e4d2940a5b4e60748ce46d3dd07457eaf2460ab0f9006c01c2"
+    },
+    {
+      "bytes": 4449,
+      "path": "artifacts/crosswindow_evidence_v1/EXPERIMENT_CONTRACT.json",
+      "role": "EXPERIMENT_CONTRACT.json",
+      "sha256": "9e03adace289246bb3828337c5cb06ead28803abbe878d77786f14cf99faf1b6"
+    },
+    {
+      "bytes": 1682,
+      "path": "artifacts/crosswindow_evidence_v1/FINAL_REPORT.md",
+      "role": "FINAL_REPORT.md",
+      "sha256": "e906295a090771a3e0dba09ea314303c405acae9cdd9bf1403174011ecdc1f64"
+    },
+    {
+      "bytes": 889,
+      "path": "artifacts/crosswindow_evidence_v1/HANDOFF.md",
+      "role": "HANDOFF.md",
+      "sha256": "b9fb92fd42770c230cd06168282e7e6b44834a80dd7ef8aa7f9ff22b406fc049"
+    },
+    {
+      "bytes": 1224,
+      "path": "artifacts/crosswindow_evidence_v1/PREFLIGHT_REVIEW.md",
+      "role": "PREFLIGHT_REVIEW.md",
+      "sha256": "5b222ae79160832ad736e23eda68b5eee42857e22bc97f02c5456b6c5cf044cb"
+    },
+    {
+      "bytes": 627,
+      "path": "artifacts/crosswindow_evidence_v1/PUBLICATION.json",
+      "role": "PUBLICATION.json",
+      "sha256": "2bb5acac92c5d3ebb6f5cc474dd77009ff6f78495d1b859fd92b482c55c1a3b9"
+    },
+    {
+      "bytes": 11259,
+      "path": "artifacts/crosswindow_evidence_v1/RUN_STATE.json",
+      "role": "RUN_STATE.json",
+      "sha256": "ef2fb4347d1a6f76c71ba9e9a5fd5bc49fb2974849dd608fafbf160d874a9aaa"
+    },
+    {
+      "bytes": 3799,
+      "path": "artifacts/crosswindow_evidence_v1/SOURCE_MANIFEST.json",
+      "role": "SOURCE_MANIFEST.json",
+      "sha256": "736474274e2763f18f42faaeac4ff05a5c5e9ed64071e2882f7668c11688349b"
+    },
+    {
+      "bytes": 13318,
+      "path": "artifacts/crosswindow_evidence_v1/e0/baseline_metrics.csv",
+      "role": "e0",
+      "sha256": "a01766c3c346f4a6b3e9721e8c02a7f223c87ac39bf73e52bf98eee202eec082"
+    },
+    {
+      "bytes": 599,
+      "path": "artifacts/crosswindow_evidence_v1/e0/checkpoint_policy_matrix.csv",
+      "role": "e0",
+      "sha256": "66a9cae01dc1fe1be25bc7e721461806c4a05a973bc64f2077807b9a69a6b184"
+    },
+    {
+      "bytes": 754,
+      "path": "artifacts/crosswindow_evidence_v1/e0/correctness_fix_ledger.json",
+      "role": "e0",
+      "sha256": "052dd8dd0428969d92c49e89eeac63b77748b090538902af0ced5d7e656282b6"
+    },
+    {
+      "bytes": 576,
+      "path": "artifacts/crosswindow_evidence_v1/e0/execution_attempts.json",
+      "role": "e0",
+      "sha256": "36a7c4ef24ff1245e520639c0d10443d1ac7fce76cfc70c42dd47ce30f7aa2a6"
+    },
+    {
+      "bytes": 29079,
+      "path": "artifacts/crosswindow_evidence_v1/e0/index_trigger_counts.csv",
+      "role": "e0",
+      "sha256": "1082984786372939261a3fbe85c5a53947ec2ff4a4602670e33356c43e85f96f"
+    },
+    {
+      "bytes": 18566,
+      "path": "artifacts/crosswindow_evidence_v1/e0/source_parity.csv",
+      "role": "e0",
+      "sha256": "3b08780f2f0c7aaf7c2cd3fe6a3bc714037b5852822f4aac1d1ef6f963c78fdd"
+    },
+    {
+      "bytes": 605,
+      "path": "artifacts/crosswindow_evidence_v1/e0/status.json",
+      "role": "e0",
+      "sha256": "f90db109277ba5d2c7ae1bc5cff50b09cd35eae14f64b7c192e18052aaf0f3fb"
+    },
+    {
+      "bytes": 432,
+      "path": "artifacts/crosswindow_evidence_v1/e0/t2_same_forward_parity.json",
+      "role": "e0",
+      "sha256": "d4ea13668dac61eca845aa34bf3348e2a12db771b63ff82b36ad2621e6c1c345"
+    },
+    {
+      "bytes": 3183,
+      "path": "artifacts/crosswindow_evidence_v1/e1/candidate_coverage.csv",
+      "role": "e1",
+      "sha256": "d0e2c82799c1cc5049245ab9a99fb79db6f1201876af324e1e8c2f4b6b7caf17"
+    },
+    {
+      "bytes": 56746,
+      "path": "artifacts/crosswindow_evidence_v1/e1/failure_ledger.csv.gz",
+      "role": "e1",
+      "sha256": "0d383995e66a49747ae68a72051fa7d3c3fd158d23d4b3365449bfed80c1be58"
+    },
+    {
+      "bytes": 646,
+      "path": "artifacts/crosswindow_evidence_v1/e1/gate.json",
+      "role": "e1",
+      "sha256": "972014770538ebad1dd30dea8b5a49921950288454e5bca544b07ff4c7ddd148"
+    },
+    {
+      "bytes": 27616,
+      "path": "artifacts/crosswindow_evidence_v1/e1/gt_assignment_events.csv",
+      "role": "e1",
+      "sha256": "bc1a121eb87e7b2339716dc1d398f76fe63c7a1c7cb08d8c26b339cc9b5b337c"
+    },
+    {
+      "bytes": 3471,
+      "path": "artifacts/crosswindow_evidence_v1/e1/gt_assisted.csv",
+      "role": "e1",
+      "sha256": "9cce803231b4f75d55c76d95adbafb380715cae616095f9f205caab895281801"
+    },
+    {
+      "bytes": 299,
+      "path": "artifacts/crosswindow_evidence_v1/e1/status.json",
+      "role": "e1",
+      "sha256": "4cf12a8b90be11a44bebfb0963b9e83eb60fb2379327f0457f4c54f8ba35f34e"
+    },
+    {
+      "bytes": 88955,
+      "path": "artifacts/crosswindow_evidence_v1/e2/assignment_events.csv",
+      "role": "e2",
+      "sha256": "4f72d193c6ee6213067447a2e00e0e4b925ef68ae94773d06b0d03a07ec54fe8"
+    },
+    {
+      "bytes": 4289,
+      "path": "artifacts/crosswindow_evidence_v1/e2/bridge_baselines.csv",
+      "role": "e2",
+      "sha256": "9f687eb7e8e8bd5198eefd655e8afb81f446ee73f732fa0a946a4fbd490307dc"
+    },
+    {
+      "bytes": 5520,
+      "path": "artifacts/crosswindow_evidence_v1/e2/calibration_grid.csv",
+      "role": "e2",
+      "sha256": "2e6fd1b44cf7a0e7bfe5de2064d7239a13c5975962dbf477d07ea6a73a92db2f"
+    },
+    {
+      "bytes": 35186,
+      "path": "artifacts/crosswindow_evidence_v1/e2/dev_selection.csv",
+      "role": "e2",
+      "sha256": "86c7c49ad4148bf14c75952ccbf15e082982a1fb1db80bf25167b1e6d328a0c9"
+    },
+    {
+      "bytes": 3286,
+      "path": "artifacts/crosswindow_evidence_v1/e2/family_candidates.json",
+      "role": "e2",
+      "sha256": "f8f4ce8d11b7b2c1e2216b956cf95312273829075fff08e7e4fad0ed4ab773e8"
+    },
+    {
+      "bytes": 313,
+      "path": "artifacts/crosswindow_evidence_v1/e2/invalidated_identity_diagnostic.json",
+      "role": "e2",
+      "sha256": "a647070b44c105da268287e48602d1bc688cf87e021aa9333e2a8ab181ede0a1"
+    },
+    {
+      "bytes": 579,
+      "path": "artifacts/crosswindow_evidence_v1/e2/status.json",
+      "role": "e2",
+      "sha256": "25c8e9e748cc44a8f87aa82a2460ffacd9863ed4670ce68871653c433b5c6d0b"
+    },
+    {
+      "bytes": 652,
+      "path": "artifacts/crosswindow_evidence_v1/e3/CONSISTENCY_EQUIVALENCE.md",
+      "role": "e3",
+      "sha256": "baf500984522a708fba773c0f8674117d0d44f37b1ffd96ac7e07d08e92d83b7"
+    },
+    {
+      "bytes": 669,
+      "path": "artifacts/crosswindow_evidence_v1/e3/status.json",
+      "role": "e3",
+      "sha256": "f628708f1b4c7e3f0c84721d273bdd6a74a3a9c713e71eae0ff4c37b3285eb77"
+    },
+    {
+      "bytes": 14871,
+      "path": "artifacts/crosswindow_evidence_v1/e4/association_revision_factorial.csv",
+      "role": "e4",
+      "sha256": "c6be773e420f0f95268c8a1c48d32814f4783f01ac6590c5f609f6b93b630e1b"
+    },
+    {
+      "bytes": 2997,
+      "path": "artifacts/crosswindow_evidence_v1/e4/content_choice_status.json",
+      "role": "e4",
+      "sha256": "950e9632e4de839932d0f1486aad1cacea329929cffbd8cdb487d1f4b7117e2a"
+    },
+    {
+      "bytes": 4965188,
+      "path": "artifacts/crosswindow_evidence_v1/e4/revision_events.csv",
+      "role": "e4",
+      "sha256": "6ef02435a478d5a21fb6ecb05994dd80618f179c984cdaec4ec9cf73e6cac2ba"
+    },
+    {
+      "bytes": 893,
+      "path": "artifacts/crosswindow_evidence_v1/e4/status.json",
+      "role": "e4",
+      "sha256": "24aa65e7186421676ce313e4ae7d8991bffddd67f309b19e94b4ee4d540d9523"
+    },
+    {
+      "bytes": 1133,
+      "path": "artifacts/crosswindow_evidence_v1/e6/status.json",
+      "role": "e6",
+      "sha256": "260f89224a9d1da4cb5806e9b61da831f17c4fc8eaa6ee655e6417f1557d2332"
+    },
+    {
+      "bytes": 47443,
+      "path": "artifacts/crosswindow_evidence_v1/final/all_t_metrics.csv",
+      "role": "final",
+      "sha256": "95b0099d20fba881a1ae88b7e6022be24c2987810fbff19e784360793604a070"
+    },
+    {
+      "bytes": 4042,
+      "path": "artifacts/crosswindow_evidence_v1/final/identity_and_revision.csv",
+      "role": "final",
+      "sha256": "21673080c77a44aec953ce6cd0ce847ceccab2e69f0ecf890ba60835e8b2c5be"
+    },
+    {
+      "bytes": 4807,
+      "path": "artifacts/crosswindow_evidence_v1/final/resources.csv",
+      "role": "final",
+      "sha256": "9e6597a22225179e9005ae1ca6fdca861a1e9884964207cedb02f747dfb3bdba"
+    },
+    {
+      "bytes": 1071,
+      "path": "artifacts/crosswindow_evidence_v1/final/status.json",
+      "role": "final",
+      "sha256": "9a7fcd079ac6aad6fd96eeecadd4d37d2ba6b776a2e59eccac8199bca151ebaf"
+    },
+    {
+      "bytes": 332,
+      "path": "artifacts/crosswindow_evidence_v1/preflight/cache_preflight.json",
+      "role": "preflight",
+      "sha256": "f5d7c9b211fa471cbb4073d7be58bdc0c50aaa76327fb6ecc760efc177f2735b"
+    },
+    {
+      "bytes": 31085,
+      "path": "artifacts/crosswindow_evidence_v1/preflight/logical_unit_bindings.json",
+      "role": "preflight",
+      "sha256": "bb22e3e89abf88053d9a5594c77c5f5aeff4a38051e4046a1c65d82e69cc3162"
+    },
+    {
+      "bytes": 22835,
+      "path": "artifacts/crosswindow_evidence_v1/selection/FINAL_LOCK.json",
+      "role": "selection",
+      "sha256": "ebea717ebc64ed8c01601e7f0b0d73fb4d12311d635fca90484d2931ca116c1b"
+    }
+  ],
+  "experiment_commit_E": "fcc360c7d3d9f605e19b2f601195453f13e526f9",
+  "schema_version": "crosswindow-final-manifest-v1",
+  "self_hash_included": false
+}

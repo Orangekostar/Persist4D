@@ -349,17 +349,17 @@ git commit -m "exp: record frozen crosswindow evidence results"
 **Interfaces:**
 - Produces: truthful outcome report, resumable commands, self-hash-free manifest, E/P remote verification, raw/API readback hashes, and final receipt.
 
-- [ ] **Step 1: Generate reports from structured artifacts and verify every required file has a status/reason**
+- [x] **Step 1: Generate reports from structured artifacts and verify every required file has a status/reason**
 
 Run: `conda run -n persist4d python -m scripts.crosswindow_campaign report --config configs/crosswindow_evidence_v1.yaml`
 
-- [ ] **Step 2: Perform a scoped obvious token/key scan and push E; verify `ls-remote` and raw-readback main table bytes**
-- [ ] **Step 3: Create documentation commit P bound to E, push P, and read back HANDOFF, MANIFEST, and main table**
-- [ ] **Step 4: Write external receipt without committing it**
+- [x] **Step 2: Perform a scoped obvious token/key scan and push E; verify `ls-remote` and raw-readback main table bytes**
+- [x] **Step 3: Create documentation commit P bound to E, push P, and read back HANDOFF, MANIFEST, and main table**
+- [x] **Step 4: Write external receipt without committing it**
 
 Run: `conda run -n persist4d python -m scripts.crosswindow_campaign publish --config configs/crosswindow_evidence_v1.yaml`
 
-- [ ] **Step 5: Run completion audit against all 20 spec sections and the final checklist**
+- [x] **Step 5: Run completion audit against all 20 spec sections and the final checklist**
 
 Run: `git status --short`
 

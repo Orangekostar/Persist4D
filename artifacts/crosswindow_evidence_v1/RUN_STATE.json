@@ -326,6 +326,7 @@
     "status": "SKIPPED_CONDITION",
     "training_steps": 0
   },
+  "experiment_commit_E": "fcc360c7d3d9f605e19b2f601195453f13e526f9",
   "external_assets_file": "external:assets.local.json",
   "failures": [
     {
@@ -395,7 +396,7 @@
     "A1-default",
     "A2-default"
   ],
-  "next_command": "python -m scripts.crosswindow_campaign report --config configs/crosswindow_evidence_v1.yaml",
+  "next_command": "python -m scripts.crosswindow_campaign publish --config configs/crosswindow_evidence_v1.yaml",
   "preflight": {
     "development_units": 47,
     "frames": 235,
@@ -403,6 +404,6 @@
   },
   "schema_version": "crosswindow-run-state-v1",
   "selection_lock_sha256": "ebea717ebc64ed8c01601e7f0b0d73fb4d12311d635fca90484d2931ca116c1b",
-  "stage": "E5-final",
+  "stage": "REPORT",
   "stage_status": "PASS"
 }
