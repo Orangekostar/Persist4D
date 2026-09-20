@@ -250,13 +250,14 @@
     "A1-default",
     "A2-default"
   ],
-  "next_command": "python -m scripts.crosswindow_campaign lock --config configs/crosswindow_evidence_v1.yaml",
+  "next_command": "python -m scripts.crosswindow_campaign confirm --config configs/crosswindow_evidence_v1.yaml --resume",
   "preflight": {
     "development_units": 47,
     "frames": 235,
     "status": "PASS"
   },
   "schema_version": "crosswindow-run-state-v1",
-  "stage": "E6",
+  "selection_lock_sha256": "ebea717ebc64ed8c01601e7f0b0d73fb4d12311d635fca90484d2931ca116c1b",
+  "stage": "SELECT_AND_LOCK",
   "stage_status": "PASS"
 }
