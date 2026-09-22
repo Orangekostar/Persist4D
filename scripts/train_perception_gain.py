@@ -104,6 +104,7 @@ def compose_variant_config(
     *,
     pretrained: Path,
     run_dir: Path,
+    recipe_config: Mapping[str, object] | None = None,
 ) -> DictConfig:
     if variant not in VARIANTS:
         raise PerceptionTrainingError(f"unsupported perception variant: {variant}")
@@ -114,6 +115,10 @@ def compose_variant_config(
     with open_dict(config):
         config.backbone.name = str(pretrained)
         config.general.save_dir = str(run_dir)
+    if recipe_config is not None:
+        from scripts.perception_gain_v2_config import apply_recipe
+
+        apply_recipe(config, recipe_config)
     return config
 
 
@@ -614,6 +619,12 @@ def train_semantic_scorer(
     return summary
 
 
+def loader_timeout(*, num_workers: int, timeout_seconds: float = 0) -> float:
+    if num_workers < 0 or timeout_seconds < 0:
+        raise PerceptionTrainingError("loader worker count/timeout cannot be negative")
+    return float(timeout_seconds) if num_workers else 0.0
+
+
 def _build_loader(
     config: DictConfig,
     *,
@@ -683,6 +694,10 @@ def _build_loader(
         pin_memory=bool(config.data.pin_memory),
         collate_fn=collator,
         persistent_workers=int(config.data.num_workers) > 0,
+        timeout=loader_timeout(
+            num_workers=int(config.data.num_workers),
+            timeout_seconds=float(config.perception_training.get("timeout_seconds", 0)),
+        ),
         drop_last=True,
     )
     source_counts = {
@@ -716,17 +731,41 @@ def run(args: argparse.Namespace) -> int:
         run_subdir=args.run_subdir,
     )
     run_dir.mkdir(parents=True, exist_ok=True)
+    recipe_path = getattr(args, "recipe_config", None)
+    recipe = _load_json(recipe_path) if recipe_path is not None else None
     config = compose_variant_config(
         args.variant,
         pretrained=pretrained,
         run_dir=run_dir,
+        recipe_config=recipe,
     )
     with open_dict(config):
-        config.general.seed = int(args.train_seed)
+        if recipe is None:
+            config.general.seed = int(args.train_seed)
+        legacy_path = getattr(args, "legacy_resume_config", None)
+        if legacy_path is not None:
+            config.perception_legacy_resume_config = OmegaConf.to_container(
+                OmegaConf.load(legacy_path),
+                resolve=True,
+            )
+    if recipe is not None:
+        seed_everything(int(config.general.seed), workers=True)
     contract = _runtime_contract(config)
     if not 1 <= args.stop_after_updates <= contract.total_updates:
         raise PerceptionTrainingError("stop-after-updates is outside the V1 budget")
     progress = _resume_progress(args.resume)
+    if recipe is not None and args.resume is not None:
+        from scripts.perception_gain_v2_config import validate_resume_recipe
+
+        saved = torch.load(args.resume, map_location="cpu", weights_only=False)
+        validate_resume_recipe(
+            saved,
+            recipe,
+            legacy_config=OmegaConf.to_container(config, resolve=True).get(
+                "perception_legacy_resume_config"
+            ),
+        )
+        del saved
     if progress.completed_optimizer_updates > args.stop_after_updates:
         raise PerceptionTrainingError("resume checkpoint is beyond requested endpoint")
     loader, plan_summary = _build_loader(
@@ -772,6 +811,7 @@ def run(args: argparse.Namespace) -> int:
                 "seed": int(config.general.seed),
                 "stop_after_updates": args.stop_after_updates,
                 "variant": args.variant,
+                **({"recipe": dict(recipe)} if recipe is not None else {}),
             },
         )
     callback = PerceptionCheckpointCallback(
@@ -831,6 +871,7 @@ def run(args: argparse.Namespace) -> int:
             "training_audit": system.training_audit,
             "seed": int(config.general.seed),
             "variant": args.variant,
+            **({"recipe": dict(recipe)} if recipe is not None else {}),
         },
     )
     return 0
@@ -852,6 +893,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--resume", type=Path)
     parser.add_argument("--train-seed", type=int, choices=(45, 46), default=45)
     parser.add_argument("--run-subdir", type=Path)
+    parser.add_argument("--recipe-config", type=Path)
+    parser.add_argument("--legacy-resume-config", type=Path)
     parser.add_argument("--stop-after-updates", type=int)
     parser.add_argument("--scorer-cache", type=Path, nargs="*")
     parser.add_argument("--scorer-output", type=Path)

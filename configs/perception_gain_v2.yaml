@@ -1,0 +1,44 @@
+schema_version: perception-gain-v2-config-v1
+parent_commit: 8b5e93795817682fe70864daa545db219e1443c9
+branch: research/persist4d-perception-gain-v2
+instruction: docs/0921/Persist4D_Gain_V2/Persist4D_Codex_Gain_V2_FINAL.md
+instruction_sha256: 9b92e302d0af269614e86a76591cd324374f83fe64b097aa4c2ffdb330c3b688
+artifact_root: artifacts/perception_gain_v2
+cumulative_gpu_hour_cap: 192
+budget:
+  perception: 70
+  development: 34
+  refinement: 16
+  confirmation_reserve: 40
+  profile_maximum: 4
+  new_cache_gib: 32
+  association_cpu_core_hours: 16
+runtime:
+  perception_devices: 2
+  batch_size_per_gpu: 2
+  gradient_accumulation: 8
+  workers_per_rank: 2
+  loader_timeout_seconds: 180
+  maximum_cpu_workers: 8
+  maximum_ram_gib: 96
+  maximum_gpus: 4
+  maximum_training_jobs: 2
+training:
+  train_seed: 45
+  replication_seed: 46
+  pilot_updates: 750
+  full_updates: 3000
+  evaluation_updates: [0, 250, 750, 1500, 2250, 3000]
+  learning_rates: {H: 5.0e-5, L: 1.0e-5}
+refinement:
+  input_modes: [NEW_ONLY, OLD_NEW]
+  updates: 1500
+  evaluation_updates: [0, 500, 1000, 1500]
+  residual_bound: 2
+selection:
+  tolerance: 1.0e-6
+  perception: {mean: 0.005, minimum: -0.001, long: 0.0}
+  new_vs_c0: {mean: 0.002, minimum: -0.002}
+  repair: {mean: 0.003, minimum: -0.001, long: 0.0}
+  pair_vs_new: {mean: 0.001, minimum: -0.002, long: 0.0}
+  final: {mean: 0.003, minimum: -0.001, long: 0.0}

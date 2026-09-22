@@ -472,8 +472,26 @@ class PerceptionGainTrainer(InstanceSegmentation):
             rng_by_rank=[state for state in rng_by_rank if state is not None],
         )
         checkpoint["perception_training_audit"] = list(self.training_audit)
+        if self.config.get("perception_recipe") is not None:
+            from omegaconf import OmegaConf
+
+            checkpoint["perception_recipe"] = OmegaConf.to_container(
+                self.config.perception_recipe,
+                resolve=True,
+            )
 
     def on_load_checkpoint(self, checkpoint: Mapping[str, object]) -> None:
+        if self.config.get("perception_recipe") is not None:
+            from omegaconf import OmegaConf
+
+            from scripts.perception_gain_v2_config import validate_resume_recipe
+
+            resolved = OmegaConf.to_container(self.config, resolve=True)
+            validate_resume_recipe(
+                checkpoint,
+                resolved["perception_recipe"],
+                legacy_config=resolved.get("perception_legacy_resume_config"),
+            )
         if (
             not isinstance(checkpoint.get("optimizer_states"), list)
             or len(checkpoint["optimizer_states"]) != 1

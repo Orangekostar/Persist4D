@@ -1,0 +1,164 @@
+{
+  "scope": "STATIC_INSTRUCTION_AND_POLICY_REVIEW_NOT_SERVER_EXECUTION",
+  "passed": 31,
+  "total": 31,
+  "checks": [
+    {
+      "name": "source_references_resolve",
+      "passed": true,
+      "detail": "36 reference definitions; missing=set()"
+    },
+    {
+      "name": "balanced_fenced_code",
+      "passed": true,
+      "detail": "12 fence markers"
+    },
+    {
+      "name": "fixed_base_and_version",
+      "passed": true,
+      "detail": "Pinned B, separate V2 branch"
+    },
+    {
+      "name": "prior_history_read_only",
+      "passed": true,
+      "detail": "No rewriting V1 evidence"
+    },
+    {
+      "name": "no_unresolved_placeholder_commands",
+      "passed": true,
+      "detail": "No command placeholders requiring invented server paths"
+    },
+    {
+      "name": "budget_arithmetic",
+      "passed": true,
+      "detail": "Prior usage and nominal residual recomputed"
+    },
+    {
+      "name": "planned_allocation_sum",
+      "passed": true,
+      "detail": "Allocation fits nominal residual; runtime reconciliation required"
+    },
+    {
+      "name": "lower_budget_and_final_reserve",
+      "passed": true,
+      "detail": "Smaller budgets cause planned pruning, not a fixed-192 rejection"
+    },
+    {
+      "name": "quoted_cal_deltas",
+      "passed": true,
+      "detail": "C0 and S-BAL effects recomputed without mixing PB"
+    },
+    {
+      "name": "e1_not_live_or_ap_bound",
+      "passed": true,
+      "detail": "Historical E1 event fraction is not a live association/AP upper bound"
+    },
+    {
+      "name": "resume_350_not379",
+      "passed": true,
+      "detail": "Exact high-LR recovery separated from low-LR warm start"
+    },
+    {
+      "name": "asset_dependencies_scoped",
+      "passed": true,
+      "detail": "Fresh live paths no longer require unrelated old cache bytes"
+    },
+    {
+      "name": "dependency_graph_acyclic",
+      "passed": true,
+      "detail": "Abstract task graph has no cycle; skipped/blocked ancestors are terminal where protocol permits"
+    },
+    {
+      "name": "r1_repair_independent",
+      "passed": true,
+      "detail": "R1 repair depends on its data and R1, not perception lock"
+    },
+    {
+      "name": "new_only_control_is_fair",
+      "passed": true,
+      "detail": "Same eligibility/routing, only old numeric evidence removed"
+    },
+    {
+      "name": "mode_all_loaders",
+      "passed": true,
+      "detail": "Mode and parent binding follow the checkpoint throughout deployment"
+    },
+    {
+      "name": "true_zero_mapping",
+      "passed": true,
+      "detail": "Zero/no-op verified through actual bool materialization"
+    },
+    {
+      "name": "bounded_refiner_scope",
+      "passed": true,
+      "detail": "No unconstrained post-hoc refiner sweep"
+    },
+    {
+      "name": "parent_shift_requires_retraining",
+      "passed": true,
+      "detail": "New P creates new matching training features and heads"
+    },
+    {
+      "name": "association_grid_bounded",
+      "passed": true,
+      "detail": "12 fixed configurations, separate candidate because publishers differ"
+    },
+    {
+      "name": "continuation_only_path",
+      "passed": true,
+      "detail": "Positive C0 is not discarded when new mechanisms fail"
+    },
+    {
+      "name": "head_selection_positive_pair",
+      "passed": true,
+      "detail": "PAIR beats parent and same-control NEW"
+    },
+    {
+      "name": "head_selection_favor_simple",
+      "passed": true,
+      "detail": "Insufficient historical advantage keeps NEW"
+    },
+    {
+      "name": "head_selection_no_gain",
+      "passed": true,
+      "detail": "No gain retains parent"
+    },
+    {
+      "name": "head_selection_edge_defined",
+      "passed": true,
+      "detail": "PAIR parent pass alone cannot bypass NEW comparison threshold"
+    },
+    {
+      "name": "partial_comparison_is_null",
+      "passed": true,
+      "detail": "Incomplete coverage cannot become a win"
+    },
+    {
+      "name": "strict_all_t_threshold",
+      "passed": true,
+      "detail": "Equality is not strict victory"
+    },
+    {
+      "name": "test_scope_limited",
+      "passed": true,
+      "detail": "Targeted functional tests; no full audit campaign"
+    },
+    {
+      "name": "release_not_empty_success",
+      "passed": true,
+      "detail": "Nonempty required inventory, actual upload coverage"
+    },
+    {
+      "name": "immutable_release_sequence",
+      "passed": true,
+      "detail": "Draft-first upload handles immutable publication"
+    },
+    {
+      "name": "no_claimed_live_execution",
+      "passed": true,
+      "detail": "Document explicitly distinguishes static review from experiments"
+    }
+  ],
+  "nominal_prior_gpu_hours": 11.803828054742961,
+  "nominal_residual_gpu_hours": 180.19617194525705
+}

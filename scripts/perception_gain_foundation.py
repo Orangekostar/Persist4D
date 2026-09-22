@@ -456,6 +456,19 @@ def _csv_fields(rows: Sequence[Mapping[str, object]]) -> tuple[str, ...]:
     return tuple(dict.fromkeys(key for row in rows for key in row))
 
 
+def resolve_live_assets(assets_path: Path) -> dict[str, Any]:
+    """Resolve only actual live dependencies, without legacy-cache mutation."""
+    assets = _read_json(assets_path)
+    required = (
+        "r1_checkpoint", "concerto_pretrained", "data_root", "rio_metadata",
+        "metric_dataset_spec",
+    )
+    missing = [key for key in required if not isinstance(assets.get(key), str)]
+    if missing:
+        raise FoundationError(f"live assets are unresolved: {missing}")
+    return assets
+
+
 def _resolve_cache_assets(assets_path: Path) -> dict[str, Any]:
     assets = _read_json(assets_path)
     required = (
