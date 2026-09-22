@@ -620,6 +620,10 @@ def execute_task(task: str, config: dict, *, external_root: Path) -> dict:
         from scripts.perception_gain_v2_evidence import run_optional_parent_repair
 
         return run_optional_parent_repair(config, external_root=external_root)
+    if task == "LOCK":
+        from scripts.perception_gain_v2_lock import run_lock
+
+        return run_lock(config, external_root=external_root)
     if task == "HIGH_CONT":
         summary = train_recipe(
             config,

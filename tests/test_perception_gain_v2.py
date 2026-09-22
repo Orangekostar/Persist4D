@@ -372,3 +372,36 @@ def test_external_recovery_preserves_attempt_and_charges_cost_once(
         assert state["tasks"]["REPAIR_R1"]["status"] == "COMPLETE"
         assert state["tasks"]["REPAIR_R1"]["previous_attempt"]["status"] == "BLOCKED"
         assert state["v2_gpu_hours"] == state["tasks"]["REPAIR_R1"]["gpu_hours"] == 3.0
+
+
+def test_confirmation_identity_deduplicates_training_origin_but_preserves_mode():
+    from scripts.perception_gain_v2_lock import inference_identity
+
+    method = {
+        "kind": "D0",
+        "architecture_variant": "C0",
+        "parent_weight_sha256": v2_config().R1_SHA256,
+        "scorer_sha256": None,
+        "refiner": None,
+        "association_config": None,
+        "recipe_id": "C0-L-s45",
+    }
+    assert inference_identity(method) == inference_identity(
+        {**method, "recipe_id": "C0-H-s45"}
+    )
+    assert inference_identity(method) == inference_identity(
+        {**method, "architecture_variant": "S-BAL"}
+    )
+    assert inference_identity(method) != inference_identity(
+        {**method, "kind": "NATIVE"}
+    )
+    assert inference_identity(method) != inference_identity(
+        {**method, "architecture_variant": "Q-SEM", "scorer_sha256": "c" * 64}
+    )
+    head = {
+        **method,
+        "kind": "REFINER",
+        "refiner": {"checkpoint_sha256": "d" * 64, "input_mode": "NEW_ONLY"},
+    }
+    pair = {**head, "refiner": {**head["refiner"], "input_mode": "OLD_NEW"}}
+    assert inference_identity(head) != inference_identity(pair)
