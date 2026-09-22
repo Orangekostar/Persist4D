@@ -703,7 +703,12 @@ def run_refiner_evaluation(
                         alignment_cache.clear()
                         for method, publisher in refined_publishers.items():
                             refined_prefix = publisher.update(
-                                prediction, identity_map, meta
+                                prediction,
+                                identity_map,
+                                meta,
+                                reference_prefix=(
+                                    parent_prefix if recipe_config is not None else None
+                                ),
                             )
                             refined_prefixes[method] = refined_prefix
                             if parent_prefix.keys != refined_prefix.keys:
@@ -892,6 +897,20 @@ def run_refiner_evaluation(
                             "reason": str(error),
                         }
                     )
+                    print(
+                        json.dumps(
+                            {
+                                "status": "INCOMPLETE_UNIT",
+                                "ordinal": ordinal,
+                                "completed": len(completed_units),
+                                "failed": len(incomplete_units),
+                                "role": role,
+                                "failure": incomplete_units[-1],
+                            },
+                            sort_keys=True,
+                        ),
+                        flush=True,
+                    )
                     torch.cuda.empty_cache()
                     continue
                 finally:
@@ -914,7 +933,8 @@ def run_refiner_evaluation(
                 print(
                     json.dumps(
                         {
-                            "completed": ordinal,
+                            "completed": len(completed_units),
+                            "ordinal": ordinal,
                             "refiner_update": refiner_update,
                             "role": role,
                             "total": total_units,

@@ -292,6 +292,7 @@ def _materialize(
     revision_log: Sequence[RevisionRecord],
     score_reducer: str,
     provisional_scan_id: str | None,
+    reference_prefix: PublishedPrefix | None = None,
 ) -> PublishedPrefix:
     scans = [_dense_from_archive(scan) for scan in archive]
     if buffer is not None:
@@ -311,11 +312,22 @@ def _materialize(
     offsets = [0]
     for count in point_counts:
         offsets.append(offsets[-1] + count)
+    if reference_prefix is not None:
+        if (
+            reference_prefix.scan_ids != tuple(scan.scan_id for scan in scans)
+            or reference_prefix.scan_vertex_offsets.tolist() != offsets
+            or reference_prefix.score_reducer != score_reducer
+            or reference_prefix.provisional_scan_id != provisional_scan_id
+        ):
+            raise TaskMemoryOutputError("mask-only publication parent lineage differs")
+        # Selection and score occurrences belong to the unmodified parent.
+        # A repaired mask can vanish or regain support without changing either.
+        keys = list(reference_prefix.keys)
     masks = torch.zeros((offsets[-1], len(keys)), dtype=torch.bool)
     scores = torch.empty(len(keys), dtype=torch.float32)
     classes = torch.empty(len(keys), dtype=torch.long)
     for column, key in enumerate(keys):
-        values = occurrences[key]
+        values = occurrences.get(key, ())
         score_values = []
         for scan_index, candidate in values:
             start, stop = offsets[scan_index : scan_index + 2]
@@ -325,6 +337,10 @@ def _materialize(
                 )
             masks[start:stop, column] = candidate.mask
             score_values.append(candidate.score)
+        if reference_prefix is not None:
+            scores[column] = reference_prefix.prediction["pred_scores"][column]
+            classes[column] = reference_prefix.prediction["pred_classes"][column]
+            continue
         if score_reducer == "mean":
             reduced_score = sum(score_values) / len(score_values)
         elif score_reducer == "latest":
@@ -467,23 +483,36 @@ def _iou_matrix(
     source_vertex_ids: Tensor,
     target_vertex_ids: Tensor,
 ) -> Tensor:
-    source_ids = source_vertex_ids.detach().cpu().long().tolist()
-    target_ids = target_vertex_ids.detach().cpu().long().tolist()
-    if len(source_ids) != len(target_ids) or set(source_ids) != set(target_ids):
-        raise TaskMemoryOutputError(
-            "repeated scan must expose the same original vertex collection"
+    source = source_vertex_ids.detach().cpu().long()
+    target = target_vertex_ids.detach().cpu().long()
+    reorder = None
+    if not (
+        torch.equal(source, target) and bool(torch.all(source[1:] > source[:-1]).item())
+    ):
+        source_ids, target_ids = source.tolist(), target.tolist()
+        if len(source_ids) != len(target_ids) or set(source_ids) != set(target_ids):
+            raise TaskMemoryOutputError(
+                "repeated scan must expose the same original vertex collection"
+            )
+        source_position = {
+            vertex_id: index for index, vertex_id in enumerate(source_ids)
+        }
+        reorder = torch.tensor(
+            [source_position[vertex_id] for vertex_id in target_ids], dtype=torch.long
         )
-    source_position = {vertex_id: index for index, vertex_id in enumerate(source_ids)}
-    reorder = torch.tensor(
-        [source_position[vertex_id] for vertex_id in target_ids], dtype=torch.long
-    )
     prior_masks = torch.stack([candidate.mask for candidate in prior_candidates], dim=0)
-    prior_masks = prior_masks[:, reorder]
+    if reorder is not None:
+        prior_masks = prior_masks[:, reorder]
     new_masks = torch.stack(
         [candidate.previous_mask for candidate in window_candidates], dim=0
     )
-    intersection = (prior_masks[:, None] & new_masks[None]).sum(dim=-1).double()
-    union = (prior_masks[:, None] | new_masks[None]).sum(dim=-1).double()
+    # Binary sums in float64 are exact at every supported scan size. This avoids
+    # allocating candidate-pair-by-vertex tensors for both AND and OR.
+    prior_values, new_values = prior_masks.double(), new_masks.double()
+    intersection = prior_values @ new_values.T
+    union = (
+        prior_values.sum(dim=1)[:, None] + new_values.sum(dim=1)[None] - intersection
+    )
     return torch.where(union > 0, intersection / union, torch.zeros_like(union))
 
 
@@ -784,6 +813,8 @@ class LagOnePublisher:
         prediction: OfficialTaskPrediction,
         identity_map: Mapping[int, tuple[Hashable, int] | None],
         stage_meta: StageMeta,
+        *,
+        reference_prefix: PublishedPrefix | None = None,
     ) -> PublishedPrefix:
         episode = _validate_stage(
             prediction=prediction,
@@ -908,6 +939,7 @@ class LagOnePublisher:
             revision_log=self._revision_log,
             score_reducer=self.score_reducer,
             provisional_scan_id=self._buffer.scan_id,
+            reference_prefix=reference_prefix,
         )
 
 

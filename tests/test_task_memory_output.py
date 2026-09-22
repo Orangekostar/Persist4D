@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import inspect
+from types import SimpleNamespace
 
+import pytest
 import torch
 
 from datasets.task_memory_episode import StageMeta
@@ -11,6 +13,72 @@ from scripts.task_memory_output import (
     LagOnePublisher,
     PublishedIdentity,
 )
+
+
+@pytest.mark.parametrize(
+    "source,target",
+    [
+        ([10, 20, 30, 40], [10, 20, 30, 40]),
+        ([30, 10, 40, 20], [10, 20, 30, 40]),
+        ([10, 10, 20, 30], [30, 20, 10, 10]),
+        ([10, 10, 20, 30], [30, 20, 20, 10]),
+        ([], []),
+    ],
+)
+def test_iou_preserves_original_vertex_mapping_and_empty_union(source, target):
+    from scripts.task_memory_output import _iou_matrix
+
+    old = torch.tensor([[True, False, True, False], [False] * 4])[:, : len(source)]
+    new = torch.tensor([[True, True, False, False], [False] * 4])[:, : len(target)]
+    positions = {value: index for index, value in enumerate(source)}
+    aligned = old[
+        :, torch.tensor([positions[value] for value in target], dtype=torch.long)
+    ]
+    expected = torch.zeros((2, 2), dtype=torch.float64)
+    for row in range(2):
+        for column in range(2):
+            intersection = int((aligned[row] & new[column]).sum())
+            union = int((aligned[row] | new[column]).sum())
+            expected[row, column] = intersection / union if union else 0.0
+    actual = _iou_matrix(
+        [SimpleNamespace(mask=mask) for mask in old],
+        [SimpleNamespace(previous_mask=mask) for mask in new],
+        source_vertex_ids=torch.tensor(source, dtype=torch.long),
+        target_vertex_ids=torch.tensor(target, dtype=torch.long),
+    )
+    assert torch.equal(actual, expected)
+    assert actual.dtype == torch.float64
+
+
+def test_iou_matches_exact_integer_counts_on_long_masks():
+    from scripts.task_memory_output import _iou_matrix
+
+    generator = torch.Generator().manual_seed(45)
+    old = torch.rand((7, 20003), generator=generator) > 0.6
+    new = torch.rand((9, 20003), generator=generator) > 0.7
+    permutation = torch.randperm(20003, generator=generator)
+    aligned = old[:, permutation]
+    intersection = (aligned[:, None] & new[None]).sum(-1).double()
+    union = (aligned[:, None] | new[None]).sum(-1).double()
+    actual = _iou_matrix(
+        [SimpleNamespace(mask=mask) for mask in old],
+        [SimpleNamespace(previous_mask=mask) for mask in new],
+        source_vertex_ids=torch.arange(20003),
+        target_vertex_ids=permutation,
+    )
+    assert torch.equal(actual, intersection / union)
+
+
+def test_iou_rejects_different_original_vertex_collections():
+    from scripts.task_memory_output import TaskMemoryOutputError, _iou_matrix
+
+    with pytest.raises(TaskMemoryOutputError, match="same original vertex collection"):
+        _iou_matrix(
+            [],
+            [],
+            source_vertex_ids=torch.tensor([1, 2]),
+            target_vertex_ids=torch.tensor([1, 3]),
+        )
 
 
 def test_vertex_alignment_preserves_exact_reordering_and_independent_storage():
@@ -432,7 +500,11 @@ def test_publisher_contract_has_no_ground_truth_input() -> None:
         "prediction",
         "identity_map",
         "stage_meta",
+        "reference_prefix",
     )
+    reference = inspect.signature(LagOnePublisher.update).parameters["reference_prefix"]
+    assert reference.kind is inspect.Parameter.KEYWORD_ONLY
+    assert reference.default is None
 
 
 def test_lag1_revision_transform_changes_archive_only_after_identity_resolution() -> (
@@ -543,3 +615,67 @@ def test_lag1_revision_transform_can_restore_support_for_retained_candidate() ->
 
     identity = PublishedIdentity("track", 0, 3)
     assert _scan_masks(prefix, "scan-a")[identity].tolist() == [False, True]
+
+
+def test_mask_only_publication_preserves_parent_selection_and_score_occurrences():
+    parent = LagOnePublisher()
+    refined = LagOnePublisher(
+        revision_mask_transform=lambda request: {
+            0: torch.zeros(request.source_vertex_ids.numel(), dtype=torch.bool),
+            1: torch.ones(request.source_vertex_ids.numel(), dtype=torch.bool),
+        }
+    )
+    first = _prediction(
+        masks=[[True, False], [False, True]],
+        scores=[0.4, 0.7],
+        classes=[3, 4],
+        queries=[1, 2],
+        stages=[0, 0],
+    )
+    first_meta = _meta(absolute_stage=0, scan_ids=("a",), point_counts=(2,))
+    routes = {1: ("x", 0), 2: ("y", 0)}
+    baseline = parent.update(first, routes, first_meta)
+    refined.update(first, routes, first_meta, reference_prefix=baseline)
+    second = _prediction(
+        masks=[[True, False], [False, False], [False, True]],
+        scores=[0.8, 0.9],
+        classes=[3, 4],
+        queries=[1, 2],
+        stages=[0, 0, 1],
+    )
+    second_meta = _meta(absolute_stage=1, scan_ids=("a", "b"), point_counts=(2, 1))
+    baseline = parent.update(second, routes, second_meta)
+    actual = refined.update(second, routes, second_meta, reference_prefix=baseline)
+    # x becomes empty, y gains previous support. Neither change may rerank,
+    # filter candidates or alter which original scores enter the reduction.
+    assert actual.keys == baseline.keys
+    assert torch.equal(
+        actual.prediction["pred_scores"], baseline.prediction["pred_scores"]
+    )
+    assert torch.equal(
+        actual.prediction["pred_classes"], baseline.prediction["pred_classes"]
+    )
+    assert actual.prediction["pred_masks"].tolist() == [
+        [False, True],
+        [False, True],
+        [False, True],
+    ]
+    frozen = actual.archive[0].content_sha256
+    third = _prediction(
+        masks=[[False, False], [True, True]],
+        scores=[0.2, 0.3],
+        classes=[3, 4],
+        queries=[1, 2],
+        stages=[0, 1],
+    )
+    third_meta = _meta(absolute_stage=2, scan_ids=("b", "c"), point_counts=(1, 1))
+    baseline = parent.update(third, routes, third_meta)
+    actual = refined.update(third, routes, third_meta, reference_prefix=baseline)
+    assert actual.archive[0].content_sha256 == frozen
+    assert actual.keys == baseline.keys
+    assert torch.equal(
+        actual.prediction["pred_scores"], baseline.prediction["pred_scores"]
+    )
+    assert torch.equal(
+        actual.prediction["pred_masks"][-1], baseline.prediction["pred_masks"][-1]
+    )

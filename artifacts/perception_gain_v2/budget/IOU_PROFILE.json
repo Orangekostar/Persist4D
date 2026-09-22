@@ -1,0 +1,12 @@
+{
+  "scope": "Function-only synthetic CPU benchmark; not deployment latency",
+  "shape_prior_new_vertices": [24, 32, 120003],
+  "seed": 45,
+  "torch_threads": 1,
+  "old_seconds": [0.887378161016386, 0.8127912280033343, 0.7930763939511962],
+  "new_seconds": [0.0450817919918336, 0.03288734401576221, 0.02109415701124817],
+  "exact_equal_all_repeats": true,
+  "max_absolute_difference": 0.0,
+  "measurement": "time.perf_counter; both include original vertex alignment",
+  "implementation": "CPU float64 binary matrix multiplication; exact integer intersection and union counts at supported scan sizes"
+}
