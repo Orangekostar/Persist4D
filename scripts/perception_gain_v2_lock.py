@@ -2,12 +2,29 @@
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 from scripts.perception_gain_v2 import PROJECT_ROOT, file_hash, read_json, utc_now
 from scripts.perception_gain_v2_config import R1_SHA256, content_hash, executed_identity
 from scripts.perception_gain_v2_perception import baseline_candidate, resolve_checkpoint
 from scripts.perception_gain_v2_selection import compare, gate, select_final
+
+
+def effective_parent_weight_identity(
+    checkpoint_sha256: str,
+    *,
+    architecture: str,
+    update: int,
+    scorer_sha256: str | None,
+) -> str:
+    if architecture == "Q-SEM" and update == 0:
+        if scorer_sha256 is None:
+            raise ValueError("Zero-step Q requires its separate frozen scorer")
+        return hashlib.sha256(
+            f"{checkpoint_sha256}:Q-SEM:{scorer_sha256}".encode("ascii")
+        ).hexdigest()
+    return checkpoint_sha256
 
 
 def inference_identity(method: dict) -> str:
@@ -61,8 +78,19 @@ def describe(
     assets = read_json(external_root / "assets.local.json")
     update = parent["optimizer_update"]
     checkpoint = resolve_checkpoint(recipe_id, update, external_root=external_root)
-    weight = file_hash(
+    checkpoint_file_sha256 = file_hash(
         checkpoint if checkpoint is not None else Path(assets["r1_checkpoint"])
+    )
+    scorer_sha256 = (
+        file_hash(Path(assets["scorer_checkpoint"]))
+        if recipe["architecture_variant"] == "Q-SEM"
+        else None
+    )
+    weight = effective_parent_weight_identity(
+        checkpoint_file_sha256,
+        architecture=recipe["architecture_variant"],
+        update=update,
+        scorer_sha256=scorer_sha256,
     )
     if parent.get("checkpoint_sha256") != weight:
         raise ValueError("Selected parent weight differs from evaluated identity")
@@ -104,6 +132,7 @@ def describe(
             else None
         ),
         "parent_weight_sha256": weight,
+        "parent_checkpoint_file_sha256": checkpoint_file_sha256,
         "refiner": head,
         "association_config": association,
         "scorer_checkpoint": (
@@ -111,11 +140,7 @@ def describe(
             if recipe["architecture_variant"] == "Q-SEM"
             else None
         ),
-        "scorer_sha256": (
-            file_hash(Path(assets["scorer_checkpoint"]))
-            if recipe["architecture_variant"] == "Q-SEM"
-            else None
-        ),
+        "scorer_sha256": scorer_sha256,
         "eval_seed": 45,
         "training_seed": recipe["train_seed"],
         "state_capacity": 100,
