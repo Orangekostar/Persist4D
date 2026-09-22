@@ -100,8 +100,11 @@ class CausalMaskRefiner(nn.Module):
 
     input_dim = 135
 
-    def __init__(self) -> None:
+    def __init__(self, *, input_mode: str = "OLD_NEW") -> None:
         super().__init__()
+        if input_mode not in {"NEW_ONLY", "OLD_NEW"}:
+            raise ValueError("refiner input mode is invalid")
+        self.input_mode = input_mode
         self.feature_norm = nn.LayerNorm(128, eps=1e-5, elementwise_affine=False)
         self.input = nn.Linear(self.input_dim, 64)
         self.activation = nn.GELU()
@@ -133,6 +136,8 @@ class CausalMaskRefiner(nn.Module):
         old_score: Tensor | float,
         new_score: Tensor | float,
     ) -> tuple[Tensor, Tensor]:
+        if self.input_mode == "NEW_ONLY":
+            old_logits, old_score = new_logits, new_score
         if new_features.ndim != 2 or new_features.shape[1] != 128:
             raise ValueError("new_features must have shape [S, 128]")
         if (

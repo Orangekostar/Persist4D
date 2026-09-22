@@ -598,6 +598,67 @@ def test_refiner_episode_inventory_uses_first_master_and_canonical_reverse_only(
     assert r1[1]["scan_indices"] == tuple(reversed(r1[0]["scan_indices"]))
 
 
+def test_new_only_is_invariant_to_old_evidence_after_nonzero_training_weights():
+    torch.manual_seed(45)
+    new_only = CausalMaskRefiner(input_mode="NEW_ONLY")
+    pair = CausalMaskRefiner(input_mode="OLD_NEW")
+    with torch.no_grad():
+        new_only.output.weight.normal_(std=0.1)
+    pair.load_state_dict(new_only.state_dict())
+    inputs = {
+        "new_features": torch.randn(6, 128),
+        "new_logits": torch.randn(6),
+        "new_score": 0.8,
+    }
+    first = new_only(**inputs, old_logits=torch.randn(6), old_score=0.1)[0]
+    changed = new_only(
+        **inputs, old_logits=torch.full((6,), float("nan")), old_score=999.0
+    )[0]
+    control = pair(**inputs, old_logits=inputs["new_logits"], old_score=0.8)[0]
+    assert torch.equal(first, changed)
+    assert torch.equal(first, control)
+
+
+def test_v2_refiner_checkpoint_loads_mode_and_rejects_parent_mismatch(tmp_path):
+    from scripts.perception_refiner_evaluation import (
+        _load_refiner,
+        RefinerEvaluationError,
+    )
+
+    training = _training_module()
+    shard = tmp_path / "train.pt"
+    torch.save((_training_record("r0", 0),), shard)
+    binding = training.refiner_v2_binding(
+        input_mode="NEW_ONLY",
+        parent_recipe_hash="a" * 64,
+        parent_weight_hash="b" * 64,
+        cache_paths=(shard,),
+    )
+    summary = training.train_mask_refiner(
+        cache_paths=(shard,),
+        output_dir=tmp_path / "head",
+        stop_after_updates=1,
+        batch_candidates=1,
+        maximum_segments=4,
+        device="cpu",
+        binding=binding,
+    )
+    path = tmp_path / "head/update=0000.ckpt"
+    refiner, audit = _load_refiner(
+        path, optimizer_update=0, device="cpu", expected_binding=binding
+    )
+    assert refiner.input_mode == "NEW_ONLY"
+    assert audit["binding"] == binding
+    assert len(summary["loss_curve"]) == 1
+    with pytest.raises(RefinerEvaluationError, match="binding"):
+        _load_refiner(
+            path,
+            optimizer_update=0,
+            device="cpu",
+            expected_binding={**binding, "parent_weight_hash": "c" * 64},
+        )
+
+
 def test_refiner_producer_advances_the_frozen_d0_last_identity_path() -> None:
     from models.task_memory_routing import PredictionObservation
 

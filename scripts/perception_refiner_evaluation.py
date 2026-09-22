@@ -94,7 +94,11 @@ def append_live_refiner_target(
 
 
 def _load_refiner(
-    checkpoint: Path, *, optimizer_update: int, device: object
+    checkpoint: Path,
+    *,
+    optimizer_update: int,
+    device: object,
+    expected_binding: Mapping[str, object] | None = None,
 ) -> tuple[object, dict[str, object]]:
     import torch
 
@@ -104,15 +108,40 @@ def _load_refiner(
         raise RefinerEvaluationError("refiner checkpoint request is invalid")
     payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
     required = {"refiner_state_dict", "schema_version", "source_shards", "updates"}
+    binding = None
+    if (
+        isinstance(payload, Mapping)
+        and payload.get("schema_version") == "perception-refiner-frozen-v2"
+    ):
+        from scripts.train_perception_refiner import (
+            V2_BINDING_FIELDS,
+            validate_refiner_v2_binding,
+        )
+
+        required |= V2_BINDING_FIELDS
+        binding = {key: payload[key] for key in V2_BINDING_FIELDS if key in payload}
+        try:
+            validate_refiner_v2_binding(binding)
+        except (RuntimeError, ValueError) as error:
+            raise RefinerEvaluationError(
+                "refiner checkpoint binding differs"
+            ) from error
+    if expected_binding is not None and binding != dict(expected_binding):
+        raise RefinerEvaluationError(
+            "refiner checkpoint binding differs from parent/mode/source"
+        )
     if (
         not isinstance(payload, Mapping)
         or set(payload) != required
-        or payload["schema_version"] != "perception-refiner-frozen-v1"
+        or payload["schema_version"]
+        not in {"perception-refiner-frozen-v1", "perception-refiner-frozen-v2"}
         or payload["updates"] != optimizer_update
         or not isinstance(payload["refiner_state_dict"], Mapping)
     ):
         raise RefinerEvaluationError("refiner checkpoint contract differs")
-    refiner = CausalMaskRefiner()
+    refiner = CausalMaskRefiner(
+        input_mode=str(binding["input_mode"]) if binding is not None else "OLD_NEW"
+    )
     try:
         incompatible = refiner.load_state_dict(
             payload["refiner_state_dict"], strict=True
@@ -130,6 +159,7 @@ def _load_refiner(
         "parameter_count": sum(parameter.numel() for parameter in refiner.parameters()),
         "sha256": _sha256(checkpoint),
         "updates": optimizer_update,
+        **({"binding": binding} if binding is not None else {}),
     }
 
 

@@ -32,6 +32,61 @@ REFINER_BATCH_CANDIDATES = 16
 REFINER_MAXIMUM_SEGMENTS = 2048
 _RESUME_SCHEMA = "perception-refiner-resume-v1"
 _FROZEN_SCHEMA = "perception-refiner-frozen-v1"
+V2_BINDING_FIELDS = frozenset(
+    {
+        "input_mode",
+        "parent_recipe_hash",
+        "parent_weight_hash",
+        "source_shards_hash",
+        "seed",
+        "residual_bound",
+    }
+)
+
+
+def validate_refiner_v2_binding(binding: Mapping[str, object]) -> None:
+    if (
+        set(binding) != V2_BINDING_FIELDS
+        or binding["input_mode"] not in {"NEW_ONLY", "OLD_NEW"}
+        or binding["seed"] not in {45, 46}
+        or binding["residual_bound"] != 2
+    ):
+        raise RefinerTrainingError("V2 refiner binding contract differs")
+    for name in ("parent_recipe_hash", "parent_weight_hash", "source_shards_hash"):
+        value = binding[name]
+        if (
+            not isinstance(value, str)
+            or len(value) != 64
+            or any(character not in "0123456789abcdef" for character in value)
+        ):
+            raise RefinerTrainingError(f"V2 refiner {name} is not a SHA256")
+
+
+def refiner_v2_binding(
+    *,
+    input_mode: str,
+    parent_recipe_hash: str,
+    parent_weight_hash: str,
+    cache_paths: Sequence[Path],
+    seed: int = 45,
+) -> dict[str, object]:
+    from scripts.perception_gain_v2_config import content_hash
+
+    binding = {
+        "input_mode": input_mode,
+        "parent_recipe_hash": parent_recipe_hash,
+        "parent_weight_hash": parent_weight_hash,
+        "seed": seed,
+        "residual_bound": 2,
+        "source_shards_hash": content_hash(
+            [
+                {"sha256": _sha256(path), "bytes": path.stat().st_size}
+                for path in cache_paths
+            ]
+        ),
+    }
+    validate_refiner_v2_binding(binding)
+    return binding
 
 
 class RefinerTrainingError(RuntimeError):
@@ -129,12 +184,16 @@ class CausalRefinerRevisionTransform:
         system: object,
         refiner: CausalMaskRefiner,
         device: str | torch.device,
+        input_mode: str | None = None,
     ) -> None:
         if not isinstance(refiner, CausalMaskRefiner):
             raise RefinerTrainingError("revision refiner has the wrong type")
         self.system = system
         self.device = torch.device(device)
         self.refiner = refiner.to(self.device).eval()
+        self.input_mode = refiner.input_mode
+        if input_mode is not None and input_mode != self.input_mode:
+            raise RefinerTrainingError("revision transform/refiner input mode differs")
         self._old_stage: tuple[object, object] | None = None
         self._current_stage: tuple[object, object] | None = None
         self.last_audit: dict[str, int] = {
@@ -334,6 +393,13 @@ class CausalRefinerRevisionTransform:
         self.last_audit = {
             "paired_candidate_count": len(paired_indices),
             "fallback_candidate_count": len(decisions) - len(paired_indices),
+            "eligible_revision_candidate_count": len(decisions),
+            "fallback_no_adjacent_old_count": sum(
+                value.reason == "FALLBACK_NO_ADJACENT_OLD" for value in decisions
+            ),
+            "fallback_multiple_adjacent_old_count": sum(
+                value.reason == "FALLBACK_MULTIPLE_ADJACENT_OLD" for value in decisions
+            ),
         }
         self.last_candidate_records = tuple(candidate_records)
         return {index: full_masks[:new_stop, index].clone() for index in paired_indices}
@@ -810,14 +876,20 @@ def _frozen_payload(
     *,
     cache_paths: Sequence[Path],
     updates: int,
+    binding: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     return {
         "refiner_state_dict": {
             name: tensor.detach().cpu() for name, tensor in refiner.state_dict().items()
         },
-        "schema_version": _FROZEN_SCHEMA,
-        "source_shards": [str(path) for path in cache_paths],
+        "schema_version": (
+            _FROZEN_SCHEMA if binding is None else "perception-refiner-frozen-v2"
+        ),
+        "source_shards": [
+            str(path) if binding is None else path.name for path in cache_paths
+        ],
         "updates": updates,
+        **(dict(binding) if binding is not None else {}),
     }
 
 
@@ -831,6 +903,7 @@ def train_mask_refiner(
     batch_candidates: int = REFINER_BATCH_CANDIDATES,
     maximum_segments: int = REFINER_MAXIMUM_SEGMENTS,
     seed: int = 45,
+    binding: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     if (
         isinstance(stop_after_updates, bool)
@@ -845,11 +918,30 @@ def train_mask_refiner(
         or seed not in {45, 46}
     ):
         raise RefinerTrainingError("refiner endpoint or batch contract is invalid")
+    if binding is not None:
+        validate_refiner_v2_binding(binding)
+        expected = refiner_v2_binding(
+            input_mode=str(binding["input_mode"]),
+            parent_recipe_hash=str(binding["parent_recipe_hash"]),
+            parent_weight_hash=str(binding["parent_weight_hash"]),
+            cache_paths=cache_paths,
+            seed=seed,
+        )
+        if dict(binding) != expected:
+            raise RefinerTrainingError("V2 refiner cache or seed binding differs")
     records = _load_refiner_records(cache_paths)
     torch.manual_seed(seed)
     np.random.seed(seed)
     random.seed(seed)
-    refiner = CausalMaskRefiner().to(device)
+    refiner = CausalMaskRefiner(
+        input_mode=str(binding["input_mode"]) if binding is not None else "OLD_NEW",
+    ).to(device)
+    initial_state_sha256 = hashlib.sha256(
+        b"".join(
+            tensor.detach().cpu().numpy().tobytes()
+            for tensor in refiner.state_dict().values()
+        )
+    ).hexdigest()
     optimizer = torch.optim.AdamW(refiner.parameters(), lr=1.0e-3, weight_decay=1.0e-4)
     completed = 0
     losses: list[float] = []
@@ -866,12 +958,21 @@ def train_mask_refiner(
             "seed",
             "training_audit",
         }
+        if binding is not None:
+            required |= V2_BINDING_FIELDS
         if not isinstance(checkpoint, Mapping) or set(checkpoint) != required:
             raise RefinerTrainingError("refiner resume checkpoint is invalid")
-        if checkpoint["schema_version"] != _RESUME_SCHEMA:
+        expected_schema = (
+            _RESUME_SCHEMA if binding is None else "perception-refiner-resume-v2"
+        )
+        if checkpoint["schema_version"] != expected_schema:
             raise RefinerTrainingError("refiner resume schema differs")
         if checkpoint["seed"] != seed:
             raise RefinerTrainingError("refiner resume seed differs")
+        if binding is not None and any(
+            checkpoint[key] != value for key, value in binding.items()
+        ):
+            raise RefinerTrainingError("V2 refiner resume binding differs")
         refiner.load_state_dict(checkpoint["refiner_state_dict"], strict=True)
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         completed = int(checkpoint["completed_updates"])
@@ -888,7 +989,9 @@ def train_mask_refiner(
     if completed == 0 and not zero_checkpoint.exists():
         _atomic_torch_save(
             zero_checkpoint,
-            _frozen_payload(refiner, cache_paths=cache_paths, updates=0),
+            _frozen_payload(
+                refiner, cache_paths=cache_paths, updates=0, binding=binding
+            ),
         )
     started = time.perf_counter()
     for update in range(completed, stop_after_updates):
@@ -966,21 +1069,34 @@ def train_mask_refiner(
             "optimizer_state_dict": optimizer.state_dict(),
             "refiner_state_dict": refiner.state_dict(),
             "rng": capture_task_memory_rng_state(),
-            "schema_version": _RESUME_SCHEMA,
+            "schema_version": (
+                _RESUME_SCHEMA if binding is None else "perception-refiner-resume-v2"
+            ),
             "seed": seed,
             "training_audit": training_audit,
+            **(dict(binding) if binding is not None else {}),
         }
         if (update + 1) % 50 == 0 or update + 1 == stop_after_updates:
             _atomic_torch_save(output_dir / "last.ckpt", resume_payload)
         if (update + 1) in {500, 1000, 1500}:
             _atomic_torch_save(
                 output_dir / f"update={update + 1:04d}.ckpt",
-                _frozen_payload(refiner, cache_paths=cache_paths, updates=update + 1),
+                _frozen_payload(
+                    refiner,
+                    cache_paths=cache_paths,
+                    updates=update + 1,
+                    binding=binding,
+                ),
             )
     checkpoint_path = output_dir / f"update={stop_after_updates:04d}.ckpt"
     _atomic_torch_save(
         checkpoint_path,
-        _frozen_payload(refiner, cache_paths=cache_paths, updates=stop_after_updates),
+        _frozen_payload(
+            refiner,
+            cache_paths=cache_paths,
+            updates=stop_after_updates,
+            binding=binding,
+        ),
     )
     elapsed = time.perf_counter() - started
     summary = {
@@ -998,6 +1114,15 @@ def train_mask_refiner(
         "seed": seed,
         "candidate_count": len(records),
         "training_audit": training_audit,
+        **(
+            {
+                "binding": dict(binding),
+                "initial_state_sha256": initial_state_sha256,
+                "loss_curve": losses,
+            }
+            if binding is not None
+            else {}
+        ),
     }
     _atomic_json(output_dir / "run_summary.json", summary)
     return summary
@@ -1011,6 +1136,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--stop-after-updates", type=int, default=REFINER_UPDATES)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--seed", type=int, choices=(45, 46), default=45)
+    parser.add_argument("--binding", type=Path)
     parser.add_argument(
         "--batch-candidates", type=int, default=REFINER_BATCH_CANDIDATES
     )
@@ -1031,6 +1157,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         batch_candidates=arguments.batch_candidates,
         maximum_segments=arguments.maximum_segments,
         seed=arguments.seed,
+        binding=(
+            json.loads(arguments.binding.read_text())
+            if arguments.binding is not None
+            else None
+        ),
     )
     return 0
 

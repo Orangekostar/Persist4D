@@ -190,6 +190,8 @@ def run(
     shard_records: int = 128,
     output_root: Path | None = None,
     manifest_output: Path | None = None,
+    recipe_config: Mapping[str, object] | None = None,
+    required_inventory: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     import hydra
     import torch
@@ -219,7 +221,10 @@ def run(
         _load_evaluation_weights,
         _sha256,
     )
-    from scripts.perception_gain_foundation import _resolve_cache_assets
+    from scripts.perception_gain_foundation import (
+        _resolve_cache_assets,
+        resolve_live_assets,
+    )
     from scripts.preflight_task_memory_episode import (
         _rio_base_dataset,
         load_reference_by_scene,
@@ -241,7 +246,16 @@ def run(
 
     if variant not in VARIANTS or optimizer_update < 0 or shard_records <= 0:
         raise RefinerDataError("refiner producer request is invalid")
-    assets = _resolve_cache_assets(assets_path)
+    assets = (
+        resolve_live_assets(assets_path)
+        if recipe_config is not None
+        else _resolve_cache_assets(assets_path)
+    )
+    code = None
+    if recipe_config is not None:
+        from scripts.perception_gain_v2_config import live_execution_provenance
+
+        code = live_execution_provenance(recipe_config)
     roles = _read_json(roles_path).get("roles")
     train_references = roles.get("TRAIN") if isinstance(roles, Mapping) else None
     if not isinstance(train_references, list) or not train_references:
@@ -255,6 +269,7 @@ def run(
             if output_root is not None
             else external_root / "training/refiner/feature_producer"
         ),
+        recipe_config=recipe_config,
     )
     config.model.return_query_features = True
     if variant == "Q-SEM" and scorer_checkpoint is not None:
@@ -281,8 +296,61 @@ def run(
         reference_ids=tuple(reference for _, reference in kept),
         source_context_indices=tuple(index for index, _ in kept),
     )
+    bases_by_horizon = {5: base}
+    if recipe_config is not None:
+        # Include references with three/four real scans before applying the fixed
+        # hash selection. Each reference uses its longest available real master.
+        for horizon in (3, 4):
+            bases_by_horizon[horizon] = _rio_base_dataset(
+                config,
+                data_root=Path(assets["data_root"]),
+                horizon=horizon,
+            )
+        candidates = []
+        reference_horizons = {}
+        reference_by_scene = load_reference_by_scene(Path(assets["rio_metadata"]))
+        for horizon, source_base in sorted(bases_by_horizon.items()):
+            source_indices, source_references = filter_rio_train_indices(
+                source_base,
+                reference_by_scene=reference_by_scene,
+                train_references=set(train_references),
+            )
+            for index, reference in zip(source_indices, source_references, strict=True):
+                name = str(source_base.sequence_names[index])
+                scan_indices = tuple(
+                    int(value) for value in source_base.sequence_indices[index]
+                )
+                if (
+                    len(set(name.split("-"))) != horizon
+                    or len(set(scan_indices)) != horizon
+                ):
+                    continue
+                reference_horizons[reference] = horizon
+                candidates.append((horizon, reference, index, name, scan_indices))
+        candidates = [row for row in candidates if row[0] == reference_horizons[row[1]]]
+        inventory = build_refiner_episode_inventory(
+            sequence_names=tuple(row[3] for row in candidates),
+            sequence_indices=tuple(row[4] for row in candidates),
+            reference_ids=tuple(row[1] for row in candidates),
+            source_context_indices=tuple(row[2] for row in candidates),
+        )
+        if required_inventory is not None and canonical_json_sha256(
+            inventory
+        ) != canonical_json_sha256(required_inventory):
+            raise RefinerDataError("V2 refiner TRAIN inventory differs from R1")
     if inventory["status"] != "PASS":
         raise RefinerDataError("refiner inventory lacks eight TRAIN references")
+    if recipe_config is not None and manifest_output is not None:
+        _atomic_json(
+            manifest_output.with_name("TRAIN_INVENTORY.json"),
+            {
+                "inventory": inventory,
+                "inventory_sha256": canonical_json_sha256(inventory),
+                "recipe": dict(recipe_config),
+                "roles_sha256": _sha256(roles_path),
+                "execution_provenance": code,
+            },
+        )
     episode_rows = inventory["episodes"]
     wrapped = _ProtocolOrderDataset(
         base,
@@ -290,6 +358,17 @@ def run(
         sequence_indices=[row["scan_indices"] for row in episode_rows],
         source_context_indices=[row["source_context_index"] for row in episode_rows],
     )
+    wrapped_by_horizon = {
+        horizon: _ProtocolOrderDataset(
+            source_base,
+            sequence_names=[row["sequence_id"] for row in episode_rows],
+            sequence_indices=[row["scan_indices"] for row in episode_rows],
+            source_context_indices=[
+                row["source_context_index"] for row in episode_rows
+            ],
+        )
+        for horizon, source_base in bases_by_horizon.items()
+    }
     masters = tuple(
         NativeEpisodeMaster(
             reference_id=str(row["reference_id"]),
@@ -342,28 +421,85 @@ def run(
         "minimum_mask_support": int(settings["minimum_mask_support"]),
     }
     config_sha = canonical_json_sha256(OmegaConf.to_container(config, resolve=True))
+    output_root = (
+        output_root
+        if output_root is not None
+        else external_root / "training/refiner/data"
+    )
+    try:
+        output_reference_root = output_root.resolve().relative_to(
+            external_root.resolve()
+        )
+    except ValueError as error:
+        raise RefinerDataError(
+            "refiner output root must be within external root"
+        ) from error
+    shards = []
+    written_count = 0
+    completed_references = set()
+    zero_refiner = CausalMaskRefiner() if recipe_config is not None else None
+
+    def write_records(values):
+        cache_limit = MAXIMUM_CACHE_BYTES
+        if recipe_config is not None:
+            cache_root = external_root / "cache"
+            other_bytes = sum(
+                path.stat().st_size
+                for path in cache_root.rglob("*.pt")
+                if not path.is_relative_to(output_root)
+            )
+            cache_limit -= other_bytes
+        result = write_soft_sidecar_shard(
+            output_root,
+            shard_id=len(shards),
+            records=values,
+            maximum_cache_bytes=cache_limit,
+        )
+        shards.append(
+            {
+                **result,
+                "external_reference": f"external:{output_reference_root}/{result['path']}",
+            }
+        )
+
     records: list[dict[str, object]] = []
     incomplete = []
     totals: defaultdict[str, int] = defaultdict(int)
+    diagnostics: defaultdict[str, int] = defaultdict(int)
     started = time.perf_counter()
     with deterministic_inference_runtime(45, device):
         for ordinal, spec in enumerate(specs, start=1):
             episode_records = []
             try:
                 episode = TaskMemoryEpisodeDataset(
-                    wrapped, (spec,), apply_augmentation=False
+                    (
+                        wrapped_by_horizon[spec.horizon]
+                        if recipe_config is not None
+                        else wrapped
+                    ),
+                    (spec,),
+                    apply_augmentation=False,
                 )[0]
                 batch = collator([episode])
                 state = None
                 transform = CausalRefinerRevisionTransform(
                     system=system,
-                    refiner=CausalMaskRefiner(),
+                    refiner=(
+                        zero_refiner
+                        if zero_refiner is not None
+                        else CausalMaskRefiner()
+                    ),
                     device=device,
                 )
                 publisher = LagOnePublisher(
                     score_reducer="mean",
                     iou_threshold=0.5,
                     revision_mask_transform=transform,
+                )
+                parent_publisher = (
+                    LagOnePublisher(score_reducer="mean", iou_threshold=0.5)
+                    if recipe_config is not None
+                    else None
                 )
                 for stage_batch in batch.stage_batches:
                     data, targets, names = stage_batch.model_batch
@@ -428,7 +564,26 @@ def run(
                         latest_stage_index=latest_stage,
                         return_soft_evidence=True,
                     )
-                    publisher.update(prediction, identity_map, meta)
+                    refined_prefix = publisher.update(prediction, identity_map, meta)
+                    if parent_publisher is not None:
+                        from scripts.perception_refiner_evaluation import (
+                            validate_mask_only_refiner_output,
+                        )
+
+                        parent_prefix = parent_publisher.update(
+                            prediction, identity_map, meta
+                        )
+                        change = validate_mask_only_refiner_output(
+                            parent_prefix.prediction, refined_prefix.prediction
+                        )
+                        if (
+                            parent_prefix.keys != refined_prefix.keys
+                            or change["changed_point_count"]
+                        ):
+                            raise RefinerDataError(
+                                "zero refiner changed real parent output"
+                            )
+                        diagnostics["zero_equivalence_prefixes"] += 1
                     if meta.absolute_stage_index:
                         stage_records, audit = build_refiner_training_records(
                             pair_records=transform.last_candidate_records,
@@ -439,6 +594,34 @@ def run(
                         episode_records.extend(stage_records)
                         for name, value in audit.items():
                             totals[name] += value
+                        if recipe_config is not None:
+                            for name, value in transform.last_audit.items():
+                                diagnostics[name] += value
+                            for record in stage_records:
+                                new = record["new_logits"]
+                                old = record["old_logits"]
+                                target = record["target"]
+                                wrong = (new > 0) != (target > 0.5)
+                                modifiable = new.abs() < 2
+                                old_closer = (old.sigmoid() - target).abs() < (
+                                    new.sigmoid() - target
+                                ).abs()
+                                diagnostics["segments"] += new.numel()
+                                diagnostics["wrong_segments"] += int(wrong.sum())
+                                diagnostics["wrong_modifiable_segments"] += int(
+                                    (wrong & modifiable).sum()
+                                )
+                                diagnostics["wrong_boundary_abs2_segments"] += int(
+                                    (wrong & (new.abs() == 2)).sum()
+                                )
+                                for label, mask in (
+                                    ("modifiable", modifiable),
+                                    ("nonmodifiable", ~modifiable),
+                                ):
+                                    diagnostics[f"{label}_segments"] += int(mask.sum())
+                                    diagnostics[f"old_closer_{label}_segments"] += int(
+                                        (old_closer & mask).sum()
+                                    )
                     del (
                         data,
                         targets,
@@ -448,6 +631,14 @@ def run(
                         prediction,
                     )
                 records.extend(episode_records)
+                written_count += len(episode_records)
+                completed_references.update(
+                    str(record["reference_id"]) for record in episode_records
+                )
+                if recipe_config is not None:
+                    while len(records) >= shard_records:
+                        write_records(records[:shard_records])
+                        del records[:shard_records]
                 print(
                     json.dumps(
                         {
@@ -470,41 +661,17 @@ def run(
                     }
                 )
                 torch.cuda.empty_cache()
+                if recipe_config is not None:
+                    break
     torch.cuda.synchronize(device)
-    output_root = (
-        output_root
-        if output_root is not None
-        else external_root / "training/refiner/data"
-    )
-    try:
-        output_reference_root = output_root.resolve().relative_to(
-            external_root.resolve()
-        )
-    except ValueError as error:
-        raise RefinerDataError(
-            "refiner output root must be within external root"
-        ) from error
-    shards = []
-    for shard_id, offset in enumerate(range(0, len(records), shard_records)):
-        result = write_soft_sidecar_shard(
-            output_root,
-            shard_id=shard_id,
-            records=records[offset : offset + shard_records],
-            maximum_cache_bytes=MAXIMUM_CACHE_BYTES,
-        )
-        shards.append(
-            {
-                **result,
-                "external_reference": f"external:{output_reference_root}/{result['path']}",
-            }
-        )
+    for offset in range(0, len(records), shard_records):
+        write_records(records[offset : offset + shard_records])
     elapsed = time.perf_counter() - started
-    completed_references = {str(record["reference_id"]) for record in records}
     status = (
         "PASS"
         if not incomplete
         and len(completed_references) == inventory["reference_count"]
-        and records
+        and written_count
         else "PARTIAL"
     )
     summary = {
@@ -521,7 +688,7 @@ def run(
         "selected_reference_count": inventory["reference_count"],
         "completed_reference_count": len(completed_references),
         "episode_count": len(specs),
-        "candidate_count": len(records),
+        "candidate_count": written_count,
         "pairing_and_target_audit": dict(totals),
         "incomplete_units": incomplete,
         "load_audit": load_audit,
@@ -531,6 +698,34 @@ def run(
         "elapsed_seconds": elapsed,
         "gpu_hours": elapsed / 3600.0,
         "gpu_name": torch.cuda.get_device_name(device),
+        **(
+            {
+                "recipe": dict(recipe_config),
+                "execution_provenance": code,
+                "inventory": inventory,
+                "inventory_sha256": canonical_json_sha256(inventory),
+                "residual_diagnostics": dict(diagnostics),
+                "cache_binding": {
+                    "executed_code_commit": code["executed_code_commit"],
+                    "relevant_source_digest": code["relevant_source_digest"],
+                    "parent_weight_hash": checkpoint_sha,
+                    "inference_recipe_hash": recipe_config["inference_recipe_hash"],
+                    "resolved_config_sha256": config_sha,
+                    "input_manifest_hash": _sha256(
+                        roles_path.parent / "data/STAGING_MANIFEST.json"
+                    ),
+                    "roles_sha256": _sha256(roles_path),
+                    "inventory_sha256": canonical_json_sha256(inventory),
+                    "point_order_transform": "canonical_vertices/identity_geometry",
+                    "role": "TRAIN",
+                    "eval_seed": 45,
+                    "publisher": "D0/lag1/mean",
+                },
+                "diagnostic_scope": "Fixed TRAIN cache; segment targets follow new low partition. Counts are diagnostics, not an AP bound.",
+            }
+            if recipe_config is not None
+            else {}
+        ),
     }
     _atomic_json(
         (
@@ -558,6 +753,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--shard-records", type=int, default=128)
     parser.add_argument("--output-root", type=Path)
     parser.add_argument("--manifest-output", type=Path)
+    parser.add_argument("--recipe-config", type=Path)
     return parser
 
 
@@ -575,6 +771,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         shard_records=arguments.shard_records,
         output_root=arguments.output_root,
         manifest_output=arguments.manifest_output,
+        recipe_config=(
+            _read_json(arguments.recipe_config)
+            if arguments.recipe_config is not None
+            else None
+        ),
     )
     return 0 if result["status"] == "PASS" else 1
 
