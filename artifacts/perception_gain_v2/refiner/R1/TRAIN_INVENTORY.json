@@ -1,0 +1,1302 @@
+{
+  "execution_provenance": {
+    "executed_code_commit": "e4fdcb4d4554d94b0c12572312378efc25efd724",
+    "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+    "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+    "recipe_id": "C0-L-s45",
+    "relevant_source_digest": "c3017341853054344342964ad9d160bb5b5c987c1fc92d8ce81d0023a1becd88",
+    "source_files": {
+      "datasets/semseg.py": "c633c46a3069a93c549b64be9b94649e9c7da64145ba36555c150c45f34df6f1",
+      "datasets/task_memory_episode.py": "acbc5f293cb8d952eede8768bf3b6ddb9ac2739ae53d9fa59602f749f453f9a7",
+      "models/criterion.py": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150",
+      "models/overlap_entity_association.py": "2003641db14436de469fe4ec0be5c57051f8e32eb5aaa3729b5031f814405c68",
+      "models/perception_gain.py": "781bc9c12ea206a2ee589267cfcada4d8dffcef8e15d566ca06a07af876a6305",
+      "models/persistent_memory.py": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8",
+      "models/rescene.py": "d0088ab6a09623ac7865681929e06b315e580965bb90b1985f932eeefe64e12f",
+      "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+      "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+      "scripts/perception_gain_evaluation.py": "741c9a0d9e6a5ac49e8cca1b4531c823d314d14357d32aafe34d948a25faaf6a",
+      "scripts/perception_gain_local_evaluation.py": "cf1313b0f98b6813971a1f21e6fae5d5059478c3f597b21d88735ec4bf8c9464",
+      "scripts/perception_gain_native_evaluation.py": "d26990bdd34ac82019f245bfc1f7407a84efff06a5b500687e986122fcc14e2e",
+      "scripts/perception_gain_profile.py": "ea4b732ebd39a0b2cca62c8a65615094501ae6e7a878363fb29ab866660d4f3c",
+      "scripts/perception_gain_v2_config.py": "ddec6a1ce0737fe4997f69fcbb8e372751fe6337af902cdfb0cc961dc044aced",
+      "scripts/perception_refiner_evaluation.py": "ea7dd1041c50206dee79894509e4e19f1ba46119a417bf3244d03f539a958d01",
+      "scripts/prepare_perception_refiner.py": "b21e9a0a95a61bef86a9ba867674e5f575e13c0f81bfbd0803b5dbc0c7a345f4",
+      "scripts/replay_crosswindow_association.py": "05d31fa5d243ad909dc9bd0eaac0f7bfde47ca01c6b146ed6e0ddbd2ef3e5ed9",
+      "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+      "scripts/run_task_memory_controls.py": "9682d70357b191d794a0b169a0aabcd8f312312de7c67af744f2e46bca8bd01f",
+      "scripts/run_task_memory_policy_baseline.py": "9b1c3c1de2907a1b88dea1efde6b1bb184eeccc5e6e864e48401ab11cf174440",
+      "scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+      "scripts/system_comparison_metrics.py": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd",
+      "scripts/task_memory_output.py": "81f98957812232407a573fb7c4c85a521a39ebf2c8bcbd826775233e9326018d",
+      "scripts/train_perception_gain.py": "d746804deb0c4f2b7b96e939d37a7ea31113da53af6a68c147ef33c7b8fe2afc",
+      "scripts/train_perception_refiner.py": "ba284fa950943254cf2332de2d2d95d6039eb44b59d03eb7e32bc6491608c217",
+      "trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a",
+      "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+    },
+    "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329"
+  },
+  "inventory": {
+    "episodes": [
+      {
+        "order_id": "canonical",
+        "reference_id": "4fbad314-465b-2a5d-8445-9d021f278c1e",
+        "scan_ids": [
+          "scene0187_00",
+          "scene0187_01",
+          "scene0187_03",
+          "scene0187_02",
+          "scene0187_04"
+        ],
+        "scan_indices": [
+          442,
+          443,
+          445,
+          444,
+          446
+        ],
+        "sequence_id": "scene0187_00-scene0187_01-scene0187_03-scene0187_02-scene0187_04",
+        "source_context_index": 90,
+        "source_master_sequence_id": "scene0187_00-scene0187_01-scene0187_03-scene0187_02-scene0187_04"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "4fbad314-465b-2a5d-8445-9d021f278c1e",
+        "scan_ids": [
+          "scene0187_04",
+          "scene0187_02",
+          "scene0187_03",
+          "scene0187_01",
+          "scene0187_00"
+        ],
+        "scan_indices": [
+          446,
+          444,
+          445,
+          443,
+          442
+        ],
+        "sequence_id": "scene0187_04-scene0187_02-scene0187_03-scene0187_01-scene0187_00",
+        "source_context_index": 90,
+        "source_master_sequence_id": "scene0187_00-scene0187_01-scene0187_03-scene0187_02-scene0187_04"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "b1d87fae-e72e-2c8c-9cf3-c927fdb7c685",
+        "scan_ids": [
+          "scene0356_00",
+          "scene0356_03",
+          "scene0356_02",
+          "scene0356_01"
+        ],
+        "scan_indices": [
+          871,
+          874,
+          873,
+          872
+        ],
+        "sequence_id": "scene0356_00-scene0356_03-scene0356_02-scene0356_01",
+        "source_context_index": 341,
+        "source_master_sequence_id": "scene0356_00-scene0356_03-scene0356_02-scene0356_01"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "b1d87fae-e72e-2c8c-9cf3-c927fdb7c685",
+        "scan_ids": [
+          "scene0356_01",
+          "scene0356_02",
+          "scene0356_03",
+          "scene0356_00"
+        ],
+        "scan_indices": [
+          872,
+          873,
+          874,
+          871
+        ],
+        "sequence_id": "scene0356_01-scene0356_02-scene0356_03-scene0356_00",
+        "source_context_index": 341,
+        "source_master_sequence_id": "scene0356_00-scene0356_03-scene0356_02-scene0356_01"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "1d234018-e280-2b1a-8f22-da2b997865e8",
+        "scan_ids": [
+          "scene0097_00",
+          "scene0097_01",
+          "scene0097_02"
+        ],
+        "scan_indices": [
+          229,
+          230,
+          231
+        ],
+        "sequence_id": "scene0097_00-scene0097_01-scene0097_02",
+        "source_context_index": 167,
+        "source_master_sequence_id": "scene0097_00-scene0097_01-scene0097_02"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "1d234018-e280-2b1a-8f22-da2b997865e8",
+        "scan_ids": [
+          "scene0097_02",
+          "scene0097_01",
+          "scene0097_00"
+        ],
+        "scan_indices": [
+          231,
+          230,
+          229
+        ],
+        "sequence_id": "scene0097_02-scene0097_01-scene0097_00",
+        "source_context_index": 167,
+        "source_master_sequence_id": "scene0097_00-scene0097_01-scene0097_02"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "8eabc435-5af7-2f32-85c3-163c1fa6e280",
+        "scan_ids": [
+          "scene0304_00",
+          "scene0304_02",
+          "scene0304_01"
+        ],
+        "scan_indices": [
+          738,
+          740,
+          739
+        ],
+        "sequence_id": "scene0304_00-scene0304_02-scene0304_01",
+        "source_context_index": 517,
+        "source_master_sequence_id": "scene0304_00-scene0304_02-scene0304_01"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "8eabc435-5af7-2f32-85c3-163c1fa6e280",
+        "scan_ids": [
+          "scene0304_01",
+          "scene0304_02",
+          "scene0304_00"
+        ],
+        "scan_indices": [
+          739,
+          740,
+          738
+        ],
+        "sequence_id": "scene0304_01-scene0304_02-scene0304_00",
+        "source_context_index": 517,
+        "source_master_sequence_id": "scene0304_00-scene0304_02-scene0304_01"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "54b263a3-0199-2df4-87db-40539528902d",
+        "scan_ids": [
+          "scene0212_00",
+          "scene0212_01",
+          "scene0212_02"
+        ],
+        "scan_indices": [
+          506,
+          507,
+          508
+        ],
+        "sequence_id": "scene0212_00-scene0212_01-scene0212_02",
+        "source_context_index": 346,
+        "source_master_sequence_id": "scene0212_00-scene0212_01-scene0212_02"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "54b263a3-0199-2df4-87db-40539528902d",
+        "scan_ids": [
+          "scene0212_02",
+          "scene0212_01",
+          "scene0212_00"
+        ],
+        "scan_indices": [
+          508,
+          507,
+          506
+        ],
+        "sequence_id": "scene0212_02-scene0212_01-scene0212_00",
+        "source_context_index": 346,
+        "source_master_sequence_id": "scene0212_00-scene0212_01-scene0212_02"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "6bde608d-9162-246f-8dde-3f158d134d50",
+        "scan_ids": [
+          "scene0251_00",
+          "scene0251_01",
+          "scene0251_02"
+        ],
+        "scan_indices": [
+          611,
+          612,
+          613
+        ],
+        "sequence_id": "scene0251_00-scene0251_01-scene0251_02",
+        "source_context_index": 426,
+        "source_master_sequence_id": "scene0251_00-scene0251_01-scene0251_02"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "6bde608d-9162-246f-8dde-3f158d134d50",
+        "scan_ids": [
+          "scene0251_02",
+          "scene0251_01",
+          "scene0251_00"
+        ],
+        "scan_indices": [
+          613,
+          612,
+          611
+        ],
+        "sequence_id": "scene0251_02-scene0251_01-scene0251_00",
+        "source_context_index": 426,
+        "source_master_sequence_id": "scene0251_00-scene0251_01-scene0251_02"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "fcf66db2-622d-291c-8493-4f2517282f3f",
+        "scan_ids": [
+          "scene0475_00",
+          "scene0475_03",
+          "scene0475_01",
+          "scene0475_02"
+        ],
+        "scan_indices": [
+          1169,
+          1172,
+          1170,
+          1171
+        ],
+        "sequence_id": "scene0475_00-scene0475_03-scene0475_01-scene0475_02",
+        "source_context_index": 470,
+        "source_master_sequence_id": "scene0475_00-scene0475_03-scene0475_01-scene0475_02"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "fcf66db2-622d-291c-8493-4f2517282f3f",
+        "scan_ids": [
+          "scene0475_02",
+          "scene0475_01",
+          "scene0475_03",
+          "scene0475_00"
+        ],
+        "scan_indices": [
+          1171,
+          1170,
+          1172,
+          1169
+        ],
+        "sequence_id": "scene0475_02-scene0475_01-scene0475_03-scene0475_00",
+        "source_context_index": 470,
+        "source_master_sequence_id": "scene0475_00-scene0475_03-scene0475_01-scene0475_02"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "5555108d-36f1-29c0-8b37-5efa2bef59d4",
+        "scan_ids": [
+          "scene0215_00",
+          "scene0215_01",
+          "scene0215_02"
+        ],
+        "scan_indices": [
+          513,
+          514,
+          515
+        ],
+        "sequence_id": "scene0215_00-scene0215_01-scene0215_02",
+        "source_context_index": 349,
+        "source_master_sequence_id": "scene0215_00-scene0215_01-scene0215_02"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "5555108d-36f1-29c0-8b37-5efa2bef59d4",
+        "scan_ids": [
+          "scene0215_02",
+          "scene0215_01",
+          "scene0215_00"
+        ],
+        "scan_indices": [
+          515,
+          514,
+          513
+        ],
+        "sequence_id": "scene0215_02-scene0215_01-scene0215_00",
+        "source_context_index": 349,
+        "source_master_sequence_id": "scene0215_00-scene0215_01-scene0215_02"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "531cff02-0021-28f6-8deb-a71f6c628346",
+        "scan_ids": [
+          "scene0196_00",
+          "scene0196_04",
+          "scene0196_03",
+          "scene0196_01",
+          "scene0196_02"
+        ],
+        "scan_indices": [
+          466,
+          470,
+          469,
+          467,
+          468
+        ],
+        "sequence_id": "scene0196_00-scene0196_04-scene0196_03-scene0196_01-scene0196_02",
+        "source_context_index": 101,
+        "source_master_sequence_id": "scene0196_00-scene0196_04-scene0196_03-scene0196_01-scene0196_02"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "531cff02-0021-28f6-8deb-a71f6c628346",
+        "scan_ids": [
+          "scene0196_02",
+          "scene0196_01",
+          "scene0196_03",
+          "scene0196_04",
+          "scene0196_00"
+        ],
+        "scan_indices": [
+          468,
+          467,
+          469,
+          470,
+          466
+        ],
+        "sequence_id": "scene0196_02-scene0196_01-scene0196_03-scene0196_04-scene0196_00",
+        "source_context_index": 101,
+        "source_master_sequence_id": "scene0196_00-scene0196_04-scene0196_03-scene0196_01-scene0196_02"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "a090600e-66f7-2272-9cfe-63b80d55da17",
+        "scan_ids": [
+          "scene0327_00",
+          "scene0327_02",
+          "scene0327_01",
+          "scene0327_03"
+        ],
+        "scan_indices": [
+          797,
+          799,
+          798,
+          800
+        ],
+        "sequence_id": "scene0327_00-scene0327_02-scene0327_01-scene0327_03",
+        "source_context_index": 309,
+        "source_master_sequence_id": "scene0327_00-scene0327_02-scene0327_01-scene0327_03"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "a090600e-66f7-2272-9cfe-63b80d55da17",
+        "scan_ids": [
+          "scene0327_03",
+          "scene0327_01",
+          "scene0327_02",
+          "scene0327_00"
+        ],
+        "scan_indices": [
+          800,
+          798,
+          799,
+          797
+        ],
+        "sequence_id": "scene0327_03-scene0327_01-scene0327_02-scene0327_00",
+        "source_context_index": 309,
+        "source_master_sequence_id": "scene0327_00-scene0327_02-scene0327_01-scene0327_03"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "20c993b1-698f-29c5-865d-3a86c19acb3b",
+        "scan_ids": [
+          "scene0108_00",
+          "scene0108_03",
+          "scene0108_01",
+          "scene0108_02"
+        ],
+        "scan_indices": [
+          255,
+          258,
+          256,
+          257
+        ],
+        "sequence_id": "scene0108_00-scene0108_03-scene0108_01-scene0108_02",
+        "source_context_index": 85,
+        "source_master_sequence_id": "scene0108_00-scene0108_03-scene0108_01-scene0108_02"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "20c993b1-698f-29c5-865d-3a86c19acb3b",
+        "scan_ids": [
+          "scene0108_02",
+          "scene0108_01",
+          "scene0108_03",
+          "scene0108_00"
+        ],
+        "scan_indices": [
+          257,
+          256,
+          258,
+          255
+        ],
+        "sequence_id": "scene0108_02-scene0108_01-scene0108_03-scene0108_00",
+        "source_context_index": 85,
+        "source_master_sequence_id": "scene0108_00-scene0108_03-scene0108_01-scene0108_02"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "ab835fa7-54c6-29a1-997b-3804159c15ea",
+        "scan_ids": [
+          "scene0338_00",
+          "scene0338_01",
+          "scene0338_02"
+        ],
+        "scan_indices": [
+          826,
+          827,
+          828
+        ],
+        "sequence_id": "scene0338_00-scene0338_01-scene0338_02",
+        "source_context_index": 587,
+        "source_master_sequence_id": "scene0338_00-scene0338_01-scene0338_02"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "ab835fa7-54c6-29a1-997b-3804159c15ea",
+        "scan_ids": [
+          "scene0338_02",
+          "scene0338_01",
+          "scene0338_00"
+        ],
+        "scan_indices": [
+          828,
+          827,
+          826
+        ],
+        "sequence_id": "scene0338_02-scene0338_01-scene0338_00",
+        "source_context_index": 587,
+        "source_master_sequence_id": "scene0338_00-scene0338_01-scene0338_02"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "c7895f1d-339c-2d13-820f-f998ab956707",
+        "scan_ids": [
+          "scene0407_00",
+          "scene0407_01",
+          "scene0407_02",
+          "scene0407_03"
+        ],
+        "scan_indices": [
+          989,
+          990,
+          991,
+          992
+        ],
+        "sequence_id": "scene0407_00-scene0407_01-scene0407_02-scene0407_03",
+        "source_context_index": 387,
+        "source_master_sequence_id": "scene0407_00-scene0407_01-scene0407_02-scene0407_03"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "c7895f1d-339c-2d13-820f-f998ab956707",
+        "scan_ids": [
+          "scene0407_03",
+          "scene0407_02",
+          "scene0407_01",
+          "scene0407_00"
+        ],
+        "scan_indices": [
+          992,
+          991,
+          990,
+          989
+        ],
+        "sequence_id": "scene0407_03-scene0407_02-scene0407_01-scene0407_00",
+        "source_context_index": 387,
+        "source_master_sequence_id": "scene0407_00-scene0407_01-scene0407_02-scene0407_03"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "751a55a1-fe61-2c3b-8df5-925bfeac2496",
+        "scan_ids": [
+          "scene0272_00",
+          "scene0272_02",
+          "scene0272_01"
+        ],
+        "scan_indices": [
+          657,
+          659,
+          658
+        ],
+        "sequence_id": "scene0272_00-scene0272_02-scene0272_01",
+        "source_context_index": 456,
+        "source_master_sequence_id": "scene0272_00-scene0272_02-scene0272_01"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "751a55a1-fe61-2c3b-8df5-925bfeac2496",
+        "scan_ids": [
+          "scene0272_01",
+          "scene0272_02",
+          "scene0272_00"
+        ],
+        "scan_indices": [
+          658,
+          659,
+          657
+        ],
+        "sequence_id": "scene0272_01-scene0272_02-scene0272_00",
+        "source_context_index": 456,
+        "source_master_sequence_id": "scene0272_00-scene0272_02-scene0272_01"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "13124cc0-cec3-27a6-84bd-1f56cb6d11a8",
+        "scan_ids": [
+          "scene0077_00",
+          "scene0077_02",
+          "scene0077_01"
+        ],
+        "scan_indices": [
+          180,
+          182,
+          181
+        ],
+        "sequence_id": "scene0077_00-scene0077_02-scene0077_01",
+        "source_context_index": 126,
+        "source_master_sequence_id": "scene0077_00-scene0077_02-scene0077_01"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "13124cc0-cec3-27a6-84bd-1f56cb6d11a8",
+        "scan_ids": [
+          "scene0077_01",
+          "scene0077_02",
+          "scene0077_00"
+        ],
+        "scan_indices": [
+          181,
+          182,
+          180
+        ],
+        "sequence_id": "scene0077_01-scene0077_02-scene0077_00",
+        "source_context_index": 126,
+        "source_master_sequence_id": "scene0077_00-scene0077_02-scene0077_01"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "1776ad7c-4db7-2333-88b3-edb7a9803f6f",
+        "scan_ids": [
+          "scene0082_00",
+          "scene0082_02",
+          "scene0082_01",
+          "scene0082_03"
+        ],
+        "scan_indices": [
+          189,
+          191,
+          190,
+          192
+        ],
+        "sequence_id": "scene0082_00-scene0082_02-scene0082_01-scene0082_03",
+        "source_context_index": 60,
+        "source_master_sequence_id": "scene0082_00-scene0082_02-scene0082_01-scene0082_03"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "1776ad7c-4db7-2333-88b3-edb7a9803f6f",
+        "scan_ids": [
+          "scene0082_03",
+          "scene0082_01",
+          "scene0082_02",
+          "scene0082_00"
+        ],
+        "scan_indices": [
+          192,
+          190,
+          191,
+          189
+        ],
+        "sequence_id": "scene0082_03-scene0082_01-scene0082_02-scene0082_00",
+        "source_context_index": 60,
+        "source_master_sequence_id": "scene0082_00-scene0082_02-scene0082_01-scene0082_03"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "2e36954b-e133-204c-92ad-1a66c6f63e1a",
+        "scan_ids": [
+          "scene0125_00",
+          "scene0125_03",
+          "scene0125_02",
+          "scene0125_01"
+        ],
+        "scan_indices": [
+          292,
+          295,
+          294,
+          293
+        ],
+        "sequence_id": "scene0125_00-scene0125_03-scene0125_02-scene0125_01",
+        "source_context_index": 100,
+        "source_master_sequence_id": "scene0125_00-scene0125_03-scene0125_02-scene0125_01"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "2e36954b-e133-204c-92ad-1a66c6f63e1a",
+        "scan_ids": [
+          "scene0125_01",
+          "scene0125_02",
+          "scene0125_03",
+          "scene0125_00"
+        ],
+        "scan_indices": [
+          293,
+          294,
+          295,
+          292
+        ],
+        "sequence_id": "scene0125_01-scene0125_02-scene0125_03-scene0125_00",
+        "source_context_index": 100,
+        "source_master_sequence_id": "scene0125_00-scene0125_03-scene0125_02-scene0125_01"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "8f0f144b-55de-28ce-8053-2828b87a0cc9",
+        "scan_ids": [
+          "scene0313_00",
+          "scene0313_02",
+          "scene0313_01",
+          "scene0313_03"
+        ],
+        "scan_indices": [
+          760,
+          762,
+          761,
+          763
+        ],
+        "sequence_id": "scene0313_00-scene0313_02-scene0313_01-scene0313_03",
+        "source_context_index": 288,
+        "source_master_sequence_id": "scene0313_00-scene0313_02-scene0313_01-scene0313_03"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "8f0f144b-55de-28ce-8053-2828b87a0cc9",
+        "scan_ids": [
+          "scene0313_03",
+          "scene0313_01",
+          "scene0313_02",
+          "scene0313_00"
+        ],
+        "scan_indices": [
+          763,
+          761,
+          762,
+          760
+        ],
+        "sequence_id": "scene0313_03-scene0313_01-scene0313_02-scene0313_00",
+        "source_context_index": 288,
+        "source_master_sequence_id": "scene0313_00-scene0313_02-scene0313_01-scene0313_03"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "4e858ca1-fd93-2cb4-84b6-490997979830",
+        "scan_ids": [
+          "scene0186_00",
+          "scene0186_04",
+          "scene0186_02",
+          "scene0186_01",
+          "scene0186_03"
+        ],
+        "scan_indices": [
+          437,
+          441,
+          439,
+          438,
+          440
+        ],
+        "sequence_id": "scene0186_00-scene0186_04-scene0186_02-scene0186_01-scene0186_03",
+        "source_context_index": 85,
+        "source_master_sequence_id": "scene0186_00-scene0186_04-scene0186_02-scene0186_01-scene0186_03"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "4e858ca1-fd93-2cb4-84b6-490997979830",
+        "scan_ids": [
+          "scene0186_03",
+          "scene0186_01",
+          "scene0186_02",
+          "scene0186_04",
+          "scene0186_00"
+        ],
+        "scan_indices": [
+          440,
+          438,
+          439,
+          441,
+          437
+        ],
+        "sequence_id": "scene0186_03-scene0186_01-scene0186_02-scene0186_04-scene0186_00",
+        "source_context_index": 85,
+        "source_master_sequence_id": "scene0186_00-scene0186_04-scene0186_02-scene0186_01-scene0186_03"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "0cac7627-8d6f-2d13-8eac-41764b5f2c5b",
+        "scan_ids": [
+          "scene0048_00",
+          "scene0048_02",
+          "scene0048_01"
+        ],
+        "scan_indices": [
+          112,
+          114,
+          113
+        ],
+        "sequence_id": "scene0048_00-scene0048_02-scene0048_01",
+        "source_context_index": 78,
+        "source_master_sequence_id": "scene0048_00-scene0048_02-scene0048_01"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "0cac7627-8d6f-2d13-8eac-41764b5f2c5b",
+        "scan_ids": [
+          "scene0048_01",
+          "scene0048_02",
+          "scene0048_00"
+        ],
+        "scan_indices": [
+          113,
+          114,
+          112
+        ],
+        "sequence_id": "scene0048_01-scene0048_02-scene0048_00",
+        "source_context_index": 78,
+        "source_master_sequence_id": "scene0048_00-scene0048_02-scene0048_01"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "3b7b33a9-1b11-283e-9b02-e8f35f6ba24c",
+        "scan_ids": [
+          "scene0141_00",
+          "scene0141_01",
+          "scene0141_02",
+          "scene0141_03"
+        ],
+        "scan_indices": [
+          322,
+          323,
+          324,
+          325
+        ],
+        "sequence_id": "scene0141_00-scene0141_01-scene0141_02-scene0141_03",
+        "source_context_index": 108,
+        "source_master_sequence_id": "scene0141_00-scene0141_01-scene0141_02-scene0141_03"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "3b7b33a9-1b11-283e-9b02-e8f35f6ba24c",
+        "scan_ids": [
+          "scene0141_03",
+          "scene0141_02",
+          "scene0141_01",
+          "scene0141_00"
+        ],
+        "scan_indices": [
+          325,
+          324,
+          323,
+          322
+        ],
+        "sequence_id": "scene0141_03-scene0141_02-scene0141_01-scene0141_00",
+        "source_context_index": 108,
+        "source_master_sequence_id": "scene0141_00-scene0141_01-scene0141_02-scene0141_03"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "a38a57d8-8a91-2e91-9237-0f8c220feef5",
+        "scan_ids": [
+          "scene0328_00",
+          "scene0328_02",
+          "scene0328_01"
+        ],
+        "scan_indices": [
+          801,
+          803,
+          802
+        ],
+        "sequence_id": "scene0328_00-scene0328_02-scene0328_01",
+        "source_context_index": 568,
+        "source_master_sequence_id": "scene0328_00-scene0328_02-scene0328_01"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "a38a57d8-8a91-2e91-9237-0f8c220feef5",
+        "scan_ids": [
+          "scene0328_01",
+          "scene0328_02",
+          "scene0328_00"
+        ],
+        "scan_indices": [
+          802,
+          803,
+          801
+        ],
+        "sequence_id": "scene0328_01-scene0328_02-scene0328_00",
+        "source_context_index": 568,
+        "source_master_sequence_id": "scene0328_00-scene0328_02-scene0328_01"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "4a9a43d6-7736-2874-84c3-86ec156a3b2d",
+        "scan_ids": [
+          "scene0171_00",
+          "scene0171_02",
+          "scene0171_01",
+          "scene0171_03"
+        ],
+        "scan_indices": [
+          386,
+          388,
+          387,
+          389
+        ],
+        "sequence_id": "scene0171_00-scene0171_02-scene0171_01-scene0171_03",
+        "source_context_index": 122,
+        "source_master_sequence_id": "scene0171_00-scene0171_02-scene0171_01-scene0171_03"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "4a9a43d6-7736-2874-84c3-86ec156a3b2d",
+        "scan_ids": [
+          "scene0171_03",
+          "scene0171_01",
+          "scene0171_02",
+          "scene0171_00"
+        ],
+        "scan_indices": [
+          389,
+          387,
+          388,
+          386
+        ],
+        "sequence_id": "scene0171_03-scene0171_01-scene0171_02-scene0171_00",
+        "source_context_index": 122,
+        "source_master_sequence_id": "scene0171_00-scene0171_02-scene0171_01-scene0171_03"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "1e0ccbe6-9783-2bd7-8d51-ca9e9226bf35",
+        "scan_ids": [
+          "scene0104_00",
+          "scene0104_02",
+          "scene0104_01",
+          "scene0104_03"
+        ],
+        "scan_indices": [
+          243,
+          245,
+          244,
+          246
+        ],
+        "sequence_id": "scene0104_00-scene0104_02-scene0104_01-scene0104_03",
+        "source_context_index": 81,
+        "source_master_sequence_id": "scene0104_00-scene0104_02-scene0104_01-scene0104_03"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "1e0ccbe6-9783-2bd7-8d51-ca9e9226bf35",
+        "scan_ids": [
+          "scene0104_03",
+          "scene0104_01",
+          "scene0104_02",
+          "scene0104_00"
+        ],
+        "scan_indices": [
+          246,
+          244,
+          245,
+          243
+        ],
+        "sequence_id": "scene0104_03-scene0104_01-scene0104_02-scene0104_00",
+        "source_context_index": 81,
+        "source_master_sequence_id": "scene0104_00-scene0104_02-scene0104_01-scene0104_03"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "7272e161-a01b-20f6-8b5a-0b97efeb6545",
+        "scan_ids": [
+          "scene0265_00",
+          "scene0265_02",
+          "scene0265_01"
+        ],
+        "scan_indices": [
+          645,
+          647,
+          646
+        ],
+        "sequence_id": "scene0265_00-scene0265_02-scene0265_01",
+        "source_context_index": 450,
+        "source_master_sequence_id": "scene0265_00-scene0265_02-scene0265_01"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "7272e161-a01b-20f6-8b5a-0b97efeb6545",
+        "scan_ids": [
+          "scene0265_01",
+          "scene0265_02",
+          "scene0265_00"
+        ],
+        "scan_indices": [
+          646,
+          647,
+          645
+        ],
+        "sequence_id": "scene0265_01-scene0265_02-scene0265_00",
+        "source_context_index": 450,
+        "source_master_sequence_id": "scene0265_00-scene0265_02-scene0265_01"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "5630cfc9-12bf-2860-84ed-5bb189f0e94e",
+        "scan_ids": [
+          "scene0216_00",
+          "scene0216_01",
+          "scene0216_04",
+          "scene0216_05",
+          "scene0216_02"
+        ],
+        "scan_indices": [
+          516,
+          517,
+          520,
+          521,
+          518
+        ],
+        "sequence_id": "scene0216_00-scene0216_01-scene0216_04-scene0216_05-scene0216_02",
+        "source_context_index": 121,
+        "source_master_sequence_id": "scene0216_00-scene0216_01-scene0216_04-scene0216_05-scene0216_02"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "5630cfc9-12bf-2860-84ed-5bb189f0e94e",
+        "scan_ids": [
+          "scene0216_02",
+          "scene0216_05",
+          "scene0216_04",
+          "scene0216_01",
+          "scene0216_00"
+        ],
+        "scan_indices": [
+          518,
+          521,
+          520,
+          517,
+          516
+        ],
+        "sequence_id": "scene0216_02-scene0216_05-scene0216_04-scene0216_01-scene0216_00",
+        "source_context_index": 121,
+        "source_master_sequence_id": "scene0216_00-scene0216_01-scene0216_04-scene0216_05-scene0216_02"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "baf6738b-8e94-22f8-8085-24c4e5ef5220",
+        "scan_ids": [
+          "scene0374_00",
+          "scene0374_02",
+          "scene0374_01"
+        ],
+        "scan_indices": [
+          918,
+          920,
+          919
+        ],
+        "sequence_id": "scene0374_00-scene0374_02-scene0374_01",
+        "source_context_index": 665,
+        "source_master_sequence_id": "scene0374_00-scene0374_02-scene0374_01"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "baf6738b-8e94-22f8-8085-24c4e5ef5220",
+        "scan_ids": [
+          "scene0374_01",
+          "scene0374_02",
+          "scene0374_00"
+        ],
+        "scan_indices": [
+          919,
+          920,
+          918
+        ],
+        "sequence_id": "scene0374_01-scene0374_02-scene0374_00",
+        "source_context_index": 665,
+        "source_master_sequence_id": "scene0374_00-scene0374_02-scene0374_01"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "c92fb5b3-f771-2064-86f2-f14da264bfcf",
+        "scan_ids": [
+          "scene0428_00",
+          "scene0428_02",
+          "scene0428_01",
+          "scene0428_03"
+        ],
+        "scan_indices": [
+          1053,
+          1055,
+          1054,
+          1056
+        ],
+        "sequence_id": "scene0428_00-scene0428_02-scene0428_01-scene0428_03",
+        "source_context_index": 422,
+        "source_master_sequence_id": "scene0428_00-scene0428_02-scene0428_01-scene0428_03"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "c92fb5b3-f771-2064-86f2-f14da264bfcf",
+        "scan_ids": [
+          "scene0428_03",
+          "scene0428_01",
+          "scene0428_02",
+          "scene0428_00"
+        ],
+        "scan_indices": [
+          1056,
+          1054,
+          1055,
+          1053
+        ],
+        "sequence_id": "scene0428_03-scene0428_01-scene0428_02-scene0428_00",
+        "source_context_index": 422,
+        "source_master_sequence_id": "scene0428_00-scene0428_02-scene0428_01-scene0428_03"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "10b1795b-3938-2467-88fe-b10cad8913f8",
+        "scan_ids": [
+          "scene0071_00",
+          "scene0071_01",
+          "scene0071_02"
+        ],
+        "scan_indices": [
+          165,
+          166,
+          167
+        ],
+        "sequence_id": "scene0071_00-scene0071_01-scene0071_02",
+        "source_context_index": 117,
+        "source_master_sequence_id": "scene0071_00-scene0071_01-scene0071_02"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "10b1795b-3938-2467-88fe-b10cad8913f8",
+        "scan_ids": [
+          "scene0071_02",
+          "scene0071_01",
+          "scene0071_00"
+        ],
+        "scan_indices": [
+          167,
+          166,
+          165
+        ],
+        "sequence_id": "scene0071_02-scene0071_01-scene0071_00",
+        "source_context_index": 117,
+        "source_master_sequence_id": "scene0071_00-scene0071_01-scene0071_02"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "bf9a3dc9-45a5-2e80-80cc-29579f2928e6",
+        "scan_ids": [
+          "scene0394_00",
+          "scene0394_02",
+          "scene0394_01",
+          "scene0394_03"
+        ],
+        "scan_indices": [
+          952,
+          954,
+          953,
+          955
+        ],
+        "sequence_id": "scene0394_00-scene0394_02-scene0394_01-scene0394_03",
+        "source_context_index": 368,
+        "source_master_sequence_id": "scene0394_00-scene0394_02-scene0394_01-scene0394_03"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "bf9a3dc9-45a5-2e80-80cc-29579f2928e6",
+        "scan_ids": [
+          "scene0394_03",
+          "scene0394_01",
+          "scene0394_02",
+          "scene0394_00"
+        ],
+        "scan_indices": [
+          955,
+          953,
+          954,
+          952
+        ],
+        "sequence_id": "scene0394_03-scene0394_01-scene0394_02-scene0394_00",
+        "source_context_index": 368,
+        "source_master_sequence_id": "scene0394_00-scene0394_02-scene0394_01-scene0394_03"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "41385847-a238-2435-838b-61864922c518",
+        "scan_ids": [
+          "scene0145_00",
+          "scene0145_02",
+          "scene0145_01"
+        ],
+        "scan_indices": [
+          332,
+          334,
+          333
+        ],
+        "sequence_id": "scene0145_00-scene0145_02-scene0145_01",
+        "source_context_index": 232,
+        "source_master_sequence_id": "scene0145_00-scene0145_02-scene0145_01"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "41385847-a238-2435-838b-61864922c518",
+        "scan_ids": [
+          "scene0145_01",
+          "scene0145_02",
+          "scene0145_00"
+        ],
+        "scan_indices": [
+          333,
+          334,
+          332
+        ],
+        "sequence_id": "scene0145_01-scene0145_02-scene0145_00",
+        "source_context_index": 232,
+        "source_master_sequence_id": "scene0145_00-scene0145_02-scene0145_01"
+      },
+      {
+        "order_id": "canonical",
+        "reference_id": "0ad2d399-79e2-2212-99cf-7a3512734bd7",
+        "scan_ids": [
+          "scene0014_00",
+          "scene0014_02",
+          "scene0014_01"
+        ],
+        "scan_indices": [
+          40,
+          42,
+          41
+        ],
+        "sequence_id": "scene0014_00-scene0014_02-scene0014_01",
+        "source_context_index": 36,
+        "source_master_sequence_id": "scene0014_00-scene0014_02-scene0014_01"
+      },
+      {
+        "order_id": "reverse",
+        "reference_id": "0ad2d399-79e2-2212-99cf-7a3512734bd7",
+        "scan_ids": [
+          "scene0014_01",
+          "scene0014_02",
+          "scene0014_00"
+        ],
+        "scan_indices": [
+          41,
+          42,
+          40
+        ],
+        "sequence_id": "scene0014_01-scene0014_02-scene0014_00",
+        "source_context_index": 36,
+        "source_master_sequence_id": "scene0014_00-scene0014_02-scene0014_01"
+      }
+    ],
+    "reference_count": 32,
+    "references": [
+      "4fbad314-465b-2a5d-8445-9d021f278c1e",
+      "b1d87fae-e72e-2c8c-9cf3-c927fdb7c685",
+      "1d234018-e280-2b1a-8f22-da2b997865e8",
+      "8eabc435-5af7-2f32-85c3-163c1fa6e280",
+      "54b263a3-0199-2df4-87db-40539528902d",
+      "6bde608d-9162-246f-8dde-3f158d134d50",
+      "fcf66db2-622d-291c-8493-4f2517282f3f",
+      "5555108d-36f1-29c0-8b37-5efa2bef59d4",
+      "531cff02-0021-28f6-8deb-a71f6c628346",
+      "a090600e-66f7-2272-9cfe-63b80d55da17",
+      "20c993b1-698f-29c5-865d-3a86c19acb3b",
+      "ab835fa7-54c6-29a1-997b-3804159c15ea",
+      "c7895f1d-339c-2d13-820f-f998ab956707",
+      "751a55a1-fe61-2c3b-8df5-925bfeac2496",
+      "13124cc0-cec3-27a6-84bd-1f56cb6d11a8",
+      "1776ad7c-4db7-2333-88b3-edb7a9803f6f",
+      "2e36954b-e133-204c-92ad-1a66c6f63e1a",
+      "8f0f144b-55de-28ce-8053-2828b87a0cc9",
+      "4e858ca1-fd93-2cb4-84b6-490997979830",
+      "0cac7627-8d6f-2d13-8eac-41764b5f2c5b",
+      "3b7b33a9-1b11-283e-9b02-e8f35f6ba24c",
+      "a38a57d8-8a91-2e91-9237-0f8c220feef5",
+      "4a9a43d6-7736-2874-84c3-86ec156a3b2d",
+      "1e0ccbe6-9783-2bd7-8d51-ca9e9226bf35",
+      "7272e161-a01b-20f6-8b5a-0b97efeb6545",
+      "5630cfc9-12bf-2860-84ed-5bb189f0e94e",
+      "baf6738b-8e94-22f8-8085-24c4e5ef5220",
+      "c92fb5b3-f771-2064-86f2-f14da264bfcf",
+      "10b1795b-3938-2467-88fe-b10cad8913f8",
+      "bf9a3dc9-45a5-2e80-80cc-29579f2928e6",
+      "41385847-a238-2435-838b-61864922c518",
+      "0ad2d399-79e2-2212-99cf-7a3512734bd7"
+    ],
+    "status": "PASS"
+  },
+  "inventory_sha256": "795c3eb8cd7873297bd929f534e048039df22f5a6b9ac57c199060b569a860db",
+  "recipe": {
+    "architecture_variant": "C0",
+    "association": "D0/LAST",
+    "base_weight_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "batch_size_per_gpu": 2,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "devices": 2,
+    "eps": 1e-08,
+    "eval_seed": 45,
+    "evaluation_updates": [
+      0,
+      250,
+      750,
+      1500,
+      2250,
+      3000
+    ],
+    "freeze": "backbone_encoder",
+    "frozen_encoder_eval": false,
+    "gradient_accumulation": 8,
+    "gradient_clip_norm": 1.0,
+    "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+    "learning_rate": 1e-05,
+    "learning_rate_label": "L",
+    "minimum_lr_fraction": 0.1,
+    "nominal_dataset_weights": [
+      1.0,
+      0.8
+    ],
+    "num_workers": 2,
+    "objective": "raw_sum",
+    "optimizer_updates": 3000,
+    "precision": "32-true",
+    "publisher": "lag1/mean",
+    "query_count": 100,
+    "recipe_id": "C0-L-s45",
+    "schema_version": "perception-gain-v2-recipe-v1",
+    "stage_worst_alpha": 0.5,
+    "stage_worst_beta": 0.25,
+    "state_capacity": 100,
+    "timeout_seconds": 180,
+    "train_seed": 45,
+    "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329",
+    "warmup_updates": 150,
+    "weight_decay": 0.01
+  },
+  "roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b"
+}

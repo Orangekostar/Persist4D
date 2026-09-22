@@ -35,7 +35,7 @@ TASKS = {
     "LOW_PAIR": ("DATA",),
     "REPAIR_R1": ("DATA",),
     "ASSOC": ("BASELINE",),
-    "AUX": ("HIGH_CONT", "LOW_PAIR"),
+    "AUX": ("HIGH_CONT", "LOW_PAIR", "BASELINE"),
     "PERCEPTION": ("BASELINE", "AUX"),
     "REPAIR_P": ("PERCEPTION", "REPAIR_R1"),
     "LOCK": ("PERCEPTION", "REPAIR_R1", "REPAIR_P", "ASSOC", "BASELINE"),
@@ -87,6 +87,13 @@ def file_hash(path: Path) -> str:
 def dependency_closure(target: str) -> tuple[str, ...]:
     if target == "all":
         return tuple(TASKS)
+    if target == "core":
+        return tuple(
+            name
+            for name in TASKS
+            if name
+            in {"BIND", "DATA", "BASELINE", "HIGH_CONT", "LOW_PAIR", "REPAIR_R1"}
+        )
     needed = {target}
     for name in tuple(needed):
         if name not in TASKS:
@@ -598,6 +605,11 @@ def execute_task(task: str, config: dict, *, external_root: Path) -> dict:
             parent_update=0,
             parent_checkpoint=None,
         )
+    if task in {"AUX", "PERCEPTION"}:
+        from scripts.perception_gain_v2_perception import run_aux, run_perception
+
+        handler = run_aux if task == "AUX" else run_perception
+        return handler(config, external_root=external_root)
     if task == "HIGH_CONT":
         summary = train_recipe(
             config,
@@ -678,7 +690,21 @@ def training_watchdog_deadline(
                 if started >= started_unix and "end_utc" not in invocation:
                     active.append((started, run_dir))
     if not active:
-        return started_unix + 600
+        # AUX/full tasks also perform live evaluation between training invocations.
+        # Each completed unit flushes this task's log; other jobs cannot renew it.
+        task_log = external_root / f"tasks/{task}.log"
+        updated = task_log.stat().st_mtime if task_log.exists() else started_unix
+        if task in {"REPAIR_R1", "REPAIR_P"}:
+            parent = "R1" if task == "REPAIR_R1" else "P"
+            progress_files = list(
+                (external_root / f"training/refiner/{parent}").glob("*/last.ckpt")
+            )
+            progress_files.append(external_root / "cache/refiner/PROGRESS.json")
+            updated = max(
+                [updated]
+                + [path.stat().st_mtime for path in progress_files if path.exists()]
+            )
+        return max(started_unix, updated) + 600
     started, run_dir = max(active)
     progress = run_dir / "PROGRESS.json"
     if progress.is_file() and progress.stat().st_mtime >= started:
@@ -873,6 +899,9 @@ def run_tasks(
                 "AUX",
                 "PERCEPTION",
                 "REPLICATE",
+                "REPAIR_R1",
+                "REPAIR_P",
+                "BASELINE",
             }:
                 deadline = training_watchdog_deadline(
                     name,
@@ -995,7 +1024,7 @@ def main(argv=None) -> int:
         type=Path,
         default=Path.home() / "persist4d_runs/perception_gain_v1",
     )
-    parser.add_argument("--target", choices=("all", *TASKS), default="all")
+    parser.add_argument("--target", choices=("all", "core", *TASKS), default="all")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--retry-blocked", choices=tuple(TASKS))
     args = parser.parse_args(argv)

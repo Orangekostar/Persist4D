@@ -185,3 +185,131 @@ def test_v2_missing_coverage_is_null_and_combined_tie_uses_total_updates():
     a = {**common, "method_id": "a", "optimizer_update": 500, "tie_update": 2750}
     b = {**common, "method_id": "b", "optimizer_update": 1000, "tie_update": 1750}
     assert rank([a, b], baseline)[0]["method_id"] == "b"
+
+
+def test_full_promotion_selects_one_mechanism_with_its_own_lr_control():
+    from scripts.perception_gain_v2_selection import select_full_promotion
+
+    baseline = {
+        "method_id": "R1",
+        "coverage_status": "COMPLETE",
+        "metrics": {t: 0.2 for t in (2, 3, 4, 5)},
+    }
+    candidates = [
+        {
+            **baseline,
+            "method_id": name,
+            "optimizer_update": step,
+            "metrics": {t: 0.2 + delta for t in (2, 3, 4, 5)},
+        }
+        for name, delta in (
+            ("C0-H", 0),
+            ("C0-L", 0.003),
+            ("S-BAL-H", 0.005),
+            ("S-BAL-L", 0.004),
+        )
+        for step in (250, 750)
+    ]
+    controls = {"S-BAL-H": "C0-H", "S-BAL-L": "C0-L"}
+    result = select_full_promotion(candidates, baseline, control_by_method=controls)
+    assert result["full_training_recipes"] == ["C0-H", "S-BAL-H"]
+    without_control = [row for row in candidates if row["method_id"] != "C0-H"]
+    result = select_full_promotion(
+        without_control, baseline, control_by_method=controls
+    )
+    assert result["full_training_recipes"] == ["C0-L", "S-BAL-L"]
+    assert "S-BAL-H" in result["missing_controls"]
+
+
+def test_learning_rate_tie_and_incomparable_high_choose_low():
+    from scripts.perception_gain_v2_selection import select_learning_rate
+
+    baseline = {
+        "method_id": "R1",
+        "coverage_status": "COMPLETE",
+        "metrics": {t: 0.2 for t in (2, 3, 4, 5)},
+    }
+    row = {**baseline, "optimizer_update": 750}
+    assert (
+        select_learning_rate({"H": [row], "L": [row]}, baseline, comparable_high=True)[
+            "learning_rate_label"
+        ]
+        == "L"
+    )
+    high = {**row, "metrics": {t: 0.3 for t in (2, 3, 4, 5)}}
+    assert (
+        select_learning_rate(
+            {"H": [high], "L": [row]}, baseline, comparable_high=False
+        )["learning_rate_label"]
+        == "L"
+    )
+
+
+def test_refiner_cache_rejects_changed_roles_and_unreviewed_code(tmp_path, monkeypatch):
+    from scripts.perception_gain_v2 import file_hash, write_json
+    from scripts.perception_gain_v2_config import content_hash
+    from scripts.perception_gain_v2_evidence import validate_refiner_cache
+
+    recipe = v2_config().resolve_recipe("C0", learning_rate="L")
+    write_json(tmp_path / "data/STAGING_MANIFEST.json", {"files": []})
+    write_json(tmp_path / "DATA_ROLES.json", {"TRAIN": ["train-reference"]})
+    shard = tmp_path / "shard.pt"
+    shard.write_bytes(b"test shard content")
+    source = {
+        "source_files": {"producer.py": "a" * 64},
+        "executed_code_commit": "b" * 40,
+    }
+    monkeypatch.setattr(v2_config(), "live_execution_provenance", lambda _: source)
+    binding = {
+        "parent_weight_hash": "c" * 64,
+        "inference_recipe_hash": recipe["inference_recipe_hash"],
+        "input_manifest_hash": file_hash(tmp_path / "data/STAGING_MANIFEST.json"),
+        "roles_sha256": file_hash(tmp_path / "DATA_ROLES.json"),
+        "inventory_sha256": content_hash({"episodes": ["fixed"]}),
+        "point_order_transform": "canonical_vertices/identity_geometry",
+        "role": "TRAIN",
+        "eval_seed": 45,
+        "publisher": "D0/lag1/mean",
+        "relevant_source_digest": content_hash(source["source_files"]),
+        "executed_code_commit": source["executed_code_commit"],
+    }
+    manifest = {
+        "status": "PASS",
+        "recipe": recipe,
+        "checkpoint_sha256": "c" * 64,
+        "inventory": {"episodes": ["fixed"]},
+        "cache_binding": binding,
+        "execution_provenance": source,
+        "shards": [{"path": shard.name, "sha256": file_hash(shard)}],
+    }
+    kwargs = dict(
+        recipe=recipe,
+        parent_weight="c" * 64,
+        artifacts=tmp_path,
+        cache_root=tmp_path,
+        required_inventory=None,
+    )
+    assert validate_refiner_cache(manifest, **kwargs)["status"] == "VERIFIED"
+    write_json(tmp_path / "DATA_ROLES.json", {"TRAIN": ["held-out-reference"]})
+    with pytest.raises(ValueError, match="binding differs"):
+        validate_refiner_cache(manifest, **kwargs)
+    write_json(tmp_path / "DATA_ROLES.json", {"TRAIN": ["train-reference"]})
+    monkeypatch.setattr(
+        v2_config(),
+        "live_execution_provenance",
+        lambda _: {**source, "source_files": {"producer.py": "d" * 64}},
+    )
+    with pytest.raises(ValueError, match="without exact compatibility review"):
+        validate_refiner_cache(manifest, **kwargs)
+
+
+def test_repair_watchdog_handles_startup_and_its_own_training_checkpoint(tmp_path):
+    import os
+    from scripts.perception_gain_v2 import training_watchdog_deadline
+
+    assert training_watchdog_deadline("REPAIR_R1", tmp_path, 1000, 180) == 1600
+    checkpoint = tmp_path / "training/refiner/R1/NEW-s45/last.ckpt"
+    checkpoint.parent.mkdir(parents=True)
+    checkpoint.write_bytes(b"saved")
+    os.utime(checkpoint, (1500, 1500))
+    assert training_watchdog_deadline("REPAIR_R1", tmp_path, 1000, 180) == 2100

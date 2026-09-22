@@ -8,6 +8,114 @@ from scripts.perception_gain_v2 import PROJECT_ROOT, file_hash, read_json, write
 from scripts.perception_gain_v2_config import R1_SHA256
 
 
+def validate_refiner_cache(
+    manifest: dict,
+    *,
+    recipe: dict,
+    parent_weight: str,
+    artifacts: Path,
+    cache_root: Path,
+    required_inventory: dict | None,
+    external_root: Path | None = None,
+) -> dict:
+    from scripts.perception_gain_v2_config import (
+        content_hash,
+        live_execution_provenance,
+    )
+
+    binding = manifest.get("cache_binding", {})
+    expected = {
+        "parent_weight_hash": parent_weight,
+        "inference_recipe_hash": recipe["inference_recipe_hash"],
+        "input_manifest_hash": file_hash(artifacts / "data/STAGING_MANIFEST.json"),
+        "roles_sha256": file_hash(artifacts / "DATA_ROLES.json"),
+        "inventory_sha256": content_hash(manifest.get("inventory")),
+        "point_order_transform": "canonical_vertices/identity_geometry",
+        "role": "TRAIN",
+        "eval_seed": 45,
+        "publisher": "D0/lag1/mean",
+    }
+    if external_root is not None:
+        from omegaconf import OmegaConf
+        from scripts.train_perception_gain import compose_variant_config
+
+        assets = read_json(external_root / "assets.local.json")
+        resolved = compose_variant_config(
+            recipe["architecture_variant"],
+            pretrained=Path(assets["concerto_pretrained"]),
+            run_dir=cache_root.parent / "feature_producer",
+            recipe_config=recipe,
+        )
+        resolved.model.return_query_features = True
+        if recipe["architecture_variant"] == "Q-SEM":
+            resolved.perception_training.scorer_checkpoint = assets["scorer_checkpoint"]
+        expected["resolved_config_sha256"] = content_hash(
+            OmegaConf.to_container(resolved, resolve=True)
+        )
+        if manifest["p6a_config_sha256"] != file_hash(
+            PROJECT_ROOT / "conf/p6a/default.yaml"
+        ):
+            raise ValueError("Refiner producer postprocessing configuration changed")
+    if (
+        manifest.get("status") != "PASS"
+        or manifest.get("recipe") != recipe
+        or manifest.get("checkpoint_sha256") != parent_weight
+        or any(binding.get(key) != value for key, value in expected.items())
+        or (
+            required_inventory is not None
+            and manifest.get("inventory") != required_inventory
+        )
+    ):
+        raise ValueError(
+            "Existing refiner cache input/parent/role/inventory binding differs"
+        )
+    previous = manifest["execution_provenance"]
+    if content_hash(previous["source_files"]) != binding.get(
+        "relevant_source_digest"
+    ) or previous["executed_code_commit"] != binding.get("executed_code_commit"):
+        raise ValueError("Refiner cache source provenance is inconsistent")
+    current = live_execution_provenance(recipe)
+    review_path = artifacts / "refiner/CACHE_COMPATIBILITY.json"
+    review = read_json(review_path) if review_path.exists() else {"entries": []}
+    accepted = []
+    if set(previous["source_files"]) != set(current["source_files"]):
+        raise ValueError("Refiner cache source dependency inventory changed")
+    for name, digest in previous["source_files"].items():
+        now = current["source_files"][name]
+        if digest == now:
+            continue
+        match = next(
+            (
+                row
+                for row in review["entries"]
+                if row["source"] == name
+                and row["producer_sha256"] == digest
+                and row["consumer_sha256"] == now
+                and row["scope"] == "TRAIN_CACHE_ONLY"
+            ),
+            None,
+        )
+        if match is None:
+            raise ValueError(
+                f"Refiner cache dependency changed without exact compatibility review: {name}"
+            )
+        accepted.append(match)
+    for shard in manifest["shards"]:
+        path = cache_root / shard["path"]
+        if (
+            path.parent.resolve() != cache_root.resolve()
+            or file_hash(path) != shard["sha256"]
+        ):
+            raise ValueError("Refiner source shard differs from producer manifest")
+    return {
+        "status": "VERIFIED",
+        "producer_commit": previous["executed_code_commit"],
+        "consumer_commit": current["executed_code_commit"],
+        "source_compatibility_reviews": accepted,
+        "dependency_bindings": expected,
+    }
+
+
 def run_baselines(config: dict, *, external_root: Path) -> dict:
     import torch
     from models.perception_gain import CausalMaskRefiner
@@ -212,21 +320,16 @@ def run_repair(
     assets = read_json(external_root / "assets.local.json")
     manifest = read_json(manifest_path) if manifest_path.exists() else None
     if manifest is not None:
-        if (
-            manifest.get("status") != "PASS"
-            or manifest.get("recipe") != recipe
-            or manifest.get("checkpoint_sha256") != parent_weight
-            or (
-                required_inventory is not None
-                and manifest["inventory"] != required_inventory
-            )
-        ):
-            raise ValueError(
-                "Existing refiner data is incomplete or belongs to another parent; explicit recovery required"
-            )
-        for shard in manifest["shards"]:
-            if file_hash(cache_root / shard["path"]) != shard["sha256"]:
-                raise ValueError("Refiner source shard differs from producer manifest")
+        audit = validate_refiner_cache(
+            manifest,
+            recipe=recipe,
+            parent_weight=parent_weight,
+            artifacts=artifacts,
+            cache_root=cache_root,
+            required_inventory=required_inventory,
+            external_root=external_root,
+        )
+        write_json(public / "CACHE_REUSE_AUDIT.json", audit)
     else:
         manifest = prepare(
             variant=recipe["architecture_variant"],

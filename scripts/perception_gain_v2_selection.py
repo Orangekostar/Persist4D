@@ -143,7 +143,10 @@ def select_learning_rate(
 
 
 def select_full_promotion(
-    candidates: Sequence[Mapping], baseline: Mapping, *, c0_id: str
+    candidates: Sequence[Mapping],
+    baseline: Mapping,
+    *,
+    control_by_method: Mapping[str, str],
 ) -> dict:
     grouped = {}
     for row in candidates:
@@ -153,7 +156,20 @@ def select_full_promotion(
         for name, values in grouped.items()
         if (rows := rank(values, baseline))
     }
-    new = rank([row for name, row in best.items() if name != c0_id], baseline)
+    controls = set(control_by_method.values())
+    missing_controls = {
+        name: control
+        for name, control in control_by_method.items()
+        if name in best and control not in best
+    }
+    new = rank(
+        [
+            row
+            for name, row in best.items()
+            if name in control_by_method and name not in missing_controls
+        ],
+        baseline,
+    )
     eligible = [row for row in new if gate(row, mean=-0.01, minimum=-0.02, long=None)]
     chosen, reason = (eligible[0], "PILOT_GATE") if eligible else (None, "NO_NEW_ARM")
     if chosen is None and new and new[0]["S_mean"] >= -0.03 - TOLERANCE:
@@ -167,17 +183,23 @@ def select_full_promotion(
         ):
             if by_step[750]["S_mean"] >= by_step[250]["S_mean"] - 0.005 - TOLERANCE:
                 chosen, reason = new[0], "EXPLORATORY_FALLBACK"
-    c0 = best.get(c0_id)
+    controls_ranked = rank(
+        [row for name, row in best.items() if name in controls], baseline
+    )
+    c0 = next(
+        (row for row in controls_ranked if gate(row, mean=0.005, minimum=-0.001)), None
+    )
     if chosen is not None:
-        methods = [c0_id, chosen["method_id"]]
+        methods = [control_by_method[chosen["method_id"]], chosen["method_id"]]
     elif c0 is not None and gate(c0, mean=0.005, minimum=-0.001):
-        methods, reason = [c0_id], "C0_ONLY_GATE"
+        methods, reason = [c0["method_id"]], "C0_ONLY_GATE"
     else:
         methods = []
     return {
         "full_training_recipes": methods,
         "reason": reason,
         "pilot_best": best,
+        "missing_controls": missing_controls,
         "resume_update": 750,
         "endpoint": 3000,
     }

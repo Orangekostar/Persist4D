@@ -1,0 +1,28 @@
+{
+  "reviewer": "primary agent",
+  "producer_commit": "e4fdcb4d4554d94b0c12572312378efc25efd724",
+  "validation": "python -m pytest tests/test_perception_gain_v2.py tests/test_perception_gain_refiner.py tests/test_task_memory_output.py -q: 43 passed before adding the promotion tests",
+  "entries": [
+    {
+      "source": "scripts/perception_refiner_evaluation.py",
+      "producer_sha256": "ea7dd1041c50206dee79894509e4e19f1ba46119a417bf3244d03f539a958d01",
+      "consumer_sha256": "13259ca30a03c8e88747e89daf03e9df547cd3ad210bcfe9088a1758e08b4106",
+      "scope": "TRAIN_CACHE_ONLY",
+      "reason": "TRAIN producer does not call the evaluation runner; multihead alignment reuse, replay cache limits and CLI validation changes do not alter TRAIN features or targets."
+    },
+    {
+      "source": "scripts/task_memory_output.py",
+      "producer_sha256": "81f98957812232407a573fb7c4c85a521a39ebf2c8bcbd826775233e9326018d",
+      "consumer_sha256": "ad480376fafffcd7868b254a19a1b746bdeee9f802910ab014dc03be372f1fff",
+      "scope": "TRAIN_CACHE_ONLY",
+      "reason": "Sorted unique identity vertex alignment now clones directly. Non-identity and duplicate paths are unchanged; exact masks and independent storage were tested."
+    },
+    {
+      "source": "scripts/train_perception_refiner.py",
+      "producer_sha256": "ba284fa950943254cf2332de2d2d95d6039eb44b59d03eb7e32bc6491608c217",
+      "consumer_sha256": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
+      "scope": "TRAIN_CACHE_ONLY",
+      "reason": "Optional alignment cache defaults to None in the producer, optional aggregate save limit defaults off, and finite training guards are outside cache generation. Default producer values and reduction order are unchanged."
+    }
+  ]
+}
