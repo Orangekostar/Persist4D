@@ -51,7 +51,7 @@ Files: V2 entry point/config and existing trainer integration; tests cover DAG r
 - [x] Run H350→750, C0-L→750 and S-BAL-L→750 on the shared sample stream; all three have actual COMPLETE summaries at update750. Reuse C0-H weights read-only.
 - [x] Finish all eight prescribed H/L CAL checkpoints with actual identity; every result covers23/23 units. The fixed queue completed at20:50 UTC, and the separately evaluated S-BAL-L750 is also complete.
 - [x] Choose LR* by comparable CAL probes. The actual same-runtime/sample-stream audit passes for all four recipes; LR*=L. Its highest-ranked probe C0-L250 has mean delta+0.003148 and minimum delta−0.009059, so this LR choice alone does not establish a formal model win.
-- [ ] Run A-OPEN/Q-SEM/S-WORST in protocol order with explicit skips. AUX started at20:51 UTC with A-OPEN's prescribed zero-step evaluation. Keep scorer frozen and separate its steps/cost.
+- [ ] Run A-OPEN/Q-SEM/S-WORST in protocol order with explicit skips. A-OPEN-L completed750 updates at23:15 UTC. The task watchdog then mistook its stale evaluation log for stalled progress; fix32aa42e grants the existing600-second handoff grace from the current invocation's completion while preserving active-training180-second checks. All21 runner tests pass, including the reproduced failure and task-isolation cases. Recovery started23:24, reuses completed training, and continues fixed CAL probes before Q-SEM/S-WORST. Failed attempts and costs are preserved; the downstream supervisor remains paused until AUX/PERCEPTION recovery completes. Keep scorer frozen and separate its steps/cost.
 - [ ] Select at most one mechanism + same-LR C0 (or C0-only positive branch), continue fixed schedule to3000, CAL-lock then SEL-select P.
 
 ## Task 4 — Fair R1 repair pair and shared evaluation
@@ -69,7 +69,7 @@ Interfaces: shared mode adapter replaces old logits/score with new for NEW_ONLY 
 
 Files: existing canonical replay/association adapter and V2 task runner.
 
-- [ ] Replay exactly12 configurations on fresh R1 CAL evidence, M-new/mean; compare bridge to actual R1-D0; stop only at config boundaries for CPU budget. Recovery02 is running: its first configuration completes23/23 CAL units and reproduces all four D0 baseline scores exactly. The invalidated historical cohort remains excluded.
+- [ ] Replay exactly12 configurations on fresh R1 CAL evidence, M-new/mean; compare bridge to actual R1-D0; stop only at config boundaries for CPU budget. Recovery02 is running: six configurations have completed23/23 CAL units and reproduce all four D0 baseline scores exactly. The invalidated historical cohort remains excluded.
 - [ ] CAL-lock one A*, evaluate once on SEL, keep separate from refiner candidates.
 - [ ] If P≠R1, R1 repair has the required signal and budget permits, regenerate same TRAIN list under P and train/evaluate a new NEW/PAIR pair.
 
