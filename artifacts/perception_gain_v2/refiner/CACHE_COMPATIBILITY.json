@@ -4,6 +4,13 @@
   "validation": "python -m pytest tests/test_perception_gain_v2.py tests/test_perception_gain_refiner.py tests/test_task_memory_output.py -q: 43 passed before adding the promotion tests",
   "entries": [
     {
+      "source": "scripts/perception_gain_local_evaluation.py",
+      "producer_sha256": "cf1313b0f98b6813971a1f21e6fae5d5059478c3f597b21d88735ec4bf8c9464",
+      "consumer_sha256": "23cb1bff31eb19a56e159c936fafff1695bd4f49691ff8e8f1e711e85cc1b17c",
+      "scope": "TRAIN_CACHE_ONLY",
+      "reason": "LOCAL-T2 seed parameterization and manifest binding are outside the TRAIN producer call graph. All 20 evaluation tests passed; original default seed remains 45."
+    },
+    {
       "source": "scripts/perception_refiner_evaluation.py",
       "producer_sha256": "ea7dd1041c50206dee79894509e4e19f1ba46119a417bf3244d03f539a958d01",
       "consumer_sha256": "13259ca30a03c8e88747e89daf03e9df547cd3ad210bcfe9088a1758e08b4106",

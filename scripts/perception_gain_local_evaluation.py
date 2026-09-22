@@ -25,6 +25,17 @@ from scripts.perception_gain_evaluation import (
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT_ROOT = PROJECT_ROOT / "artifacts/perception_gain_v1"
 LOCAL_T2_SEQUENCE_COUNT = 154
+LOCAL_EVALUATION_PROVENANCE = (
+    PROJECT_ROOT
+    / "artifacts/rescene_task_learning_root_cause_v1/full_candidate/FULL_EVALUATION_PROVENANCE.json"
+)
+
+
+def local_evaluation_seeds() -> tuple[int, ...]:
+    sources = _load_json(LOCAL_EVALUATION_PROVENANCE)["run_sources"]
+    return tuple(
+        sorted(int(name.removeprefix("seed").removesuffix(".json")) for name in sources)
+    )
 
 
 def build_local_t2_summary(
@@ -38,6 +49,7 @@ def build_local_t2_summary(
     metrics: Mapping[str, object],
     elapsed_seconds: float,
     gpu_name: str,
+    eval_seed: int = 45,
 ) -> dict[str, object]:
     required = (
         "t_mAP",
@@ -67,6 +79,7 @@ def build_local_t2_summary(
         or elapsed_seconds < 0.0
         or not isinstance(gpu_name, str)
         or not gpu_name
+        or eval_seed not in local_evaluation_seeds()
     ):
         raise PerceptionEvaluationError("LOCAL-T2 result contract differs")
     return {
@@ -85,7 +98,7 @@ def build_local_t2_summary(
         "elapsed_seconds": float(elapsed_seconds),
         "gpu_hours": float(elapsed_seconds) / 3600.0,
         "gpu_name": gpu_name,
-        "eval_seed": 45,
+        "eval_seed": eval_seed,
         "output_policy": "native",
     }
 
@@ -102,6 +115,7 @@ def run_local_t2_evaluation(
     device_name: str = "cuda:0",
     recipe_config: Mapping[str, object] | None = None,
     artifact_root: Path | None = None,
+    eval_seed: int = 45,
 ) -> dict[str, object]:
     import torch
     from omegaconf import OmegaConf, open_dict
@@ -123,7 +137,11 @@ def run_local_t2_evaluation(
         from scripts.perception_gain_v2_config import live_execution_provenance
 
         code = live_execution_provenance(recipe_config)
-    if variant not in VARIANTS or optimizer_update not in CAL_UPDATES:
+    if (
+        variant not in VARIANTS
+        or optimizer_update not in CAL_UPDATES
+        or eval_seed not in local_evaluation_seeds()
+    ):
         raise PerceptionEvaluationError("LOCAL-T2 checkpoint request is invalid")
     assets = (
         resolve_live_assets(assets_path)
@@ -140,6 +158,8 @@ def run_local_t2_evaluation(
         / path_variant
         / f"update={optimizer_update:04d}"
     )
+    if recipe_config is not None or eval_seed != 45:
+        run_dir = run_dir / f"seed={eval_seed}"
     config = compose_variant_config(
         variant,
         pretrained=Path(assets["concerto_pretrained"]),
@@ -148,6 +168,7 @@ def run_local_t2_evaluation(
     )
     with open_dict(config):
         config.general.train_mode = False
+        config.general.seed = eval_seed
         config.general.gpus = 1
         config.data.batch_size = 1
         config.data.test_batch_size = 1
@@ -185,7 +206,7 @@ def run_local_t2_evaluation(
     system.validation_dataset = validation_dataset
     system.labels_info = validation_dataset.label_info
     system.requires_grad_(False).eval()
-    seed_everything(45, workers=True)
+    seed_everything(eval_seed, workers=True)
     trainer = Trainer(
         accelerator="gpu",
         devices=[device.index],
@@ -223,6 +244,7 @@ def run_local_t2_evaluation(
         metrics=normalize_metrics(results[0]),
         elapsed_seconds=elapsed,
         gpu_name=torch.cuda.get_device_name(device),
+        eval_seed=eval_seed,
     )
     result["load_audit"] = load_audit
     result["weight_sources"] = weight_sources
@@ -230,6 +252,9 @@ def run_local_t2_evaluation(
     if recipe_config is not None:
         result["recipe"] = dict(recipe_config)
         result["execution_provenance"] = code
+        result["original_evaluation_manifest_sha256"] = _sha256(
+            LOCAL_EVALUATION_PROVENANCE
+        )
     if output_path is None:
         output_root = artifact_root if artifact_root is not None else ARTIFACT_ROOT
         output_path = (
@@ -238,6 +263,8 @@ def run_local_t2_evaluation(
             / path_variant
             / f"update={optimizer_update:04d}.json"
         )
+        if recipe_config is not None or eval_seed != 45:
+            output_path = output_path.parent / f"seed={eval_seed}" / output_path.name
     _atomic_json(output_path, result)
     del system
     torch.cuda.empty_cache()
@@ -256,6 +283,9 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--artifact-root", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument(
+        "--eval-seed", type=int, choices=local_evaluation_seeds(), default=45
+    )
     return parser
 
 
@@ -277,6 +307,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         device_name=arguments.device,
         recipe_config=recipe,
         artifact_root=arguments.artifact_root,
+        eval_seed=arguments.eval_seed,
     )
     return 0 if result["status"] == "PASS" else 1
 

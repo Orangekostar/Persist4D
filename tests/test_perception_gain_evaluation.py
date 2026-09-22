@@ -584,7 +584,8 @@ def test_native_and_refiner_clis_accept_additional_population() -> None:
     assert refiner_arguments.role == "ADDITIONAL"
 
 
-def test_local_t2_summary_preserves_official_metrics_and_identity() -> None:
+@pytest.mark.parametrize("eval_seed", (45, 46, 47))
+def test_local_t2_summary_preserves_official_metrics_and_identity(eval_seed) -> None:
     evaluation = _local_evaluation_module()
     result = evaluation.build_local_t2_summary(
         variant="C0",
@@ -603,6 +604,7 @@ def test_local_t2_summary_preserves_official_metrics_and_identity() -> None:
         },
         elapsed_seconds=36.0,
         gpu_name="NVIDIA A40",
+        eval_seed=eval_seed,
     )
 
     assert result["status"] == "PASS"
@@ -613,6 +615,7 @@ def test_local_t2_summary_preserves_official_metrics_and_identity() -> None:
     assert result["metrics"]["overall_mAP"] == pytest.approx(0.4)
     assert result["SpatialStageMean"] == pytest.approx(0.4)
     assert result["gpu_hours"] == pytest.approx(0.01)
+    assert result["eval_seed"] == eval_seed
 
 
 def test_confirmation_d0_rows_keep_pooled_and_per_reference_metrics() -> None:
