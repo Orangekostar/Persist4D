@@ -197,6 +197,7 @@ class CausalRefinerRevisionTransform:
         refiner: CausalMaskRefiner,
         device: str | torch.device,
         input_mode: str | None = None,
+        alignment_cache: dict[tuple[int, ...], Tensor] | None = None,
     ) -> None:
         if not isinstance(refiner, CausalMaskRefiner):
             raise RefinerTrainingError("revision refiner has the wrong type")
@@ -204,6 +205,7 @@ class CausalRefinerRevisionTransform:
         self.device = torch.device(device)
         self.refiner = refiner.to(self.device).eval()
         self.input_mode = refiner.input_mode
+        self.alignment_cache = alignment_cache
         if input_mode is not None and input_mode != self.input_mode:
             raise RefinerTrainingError("revision transform/refiner input mode differs")
         self._old_stage: tuple[object, object] | None = None
@@ -343,16 +345,32 @@ class CausalRefinerRevisionTransform:
                 new_candidate = request.new_candidates[
                     new_by_index[new_occurrence.candidate_index]
                 ]
-                old_logits = align_old_probabilities_to_new_segments(
-                    old_vertex_ids=old_meta.original_vertex_ids[-1],
-                    old_point_probabilities=old_evidence.full_resolution_probabilities[
-                        old_start:old_stop, old_occurrence.candidate_index
-                    ],
-                    new_vertex_ids=new_meta.original_vertex_ids[0],
-                    new_low_point2segment=new_evidence.low_point2segment,
-                    new_voxel_inverse=new_evidence.voxel_inverse[:new_stop],
-                    new_segment_ids=segment_ids,
+                alignment_key = (
+                    id(old_evidence),
+                    id(new_evidence),
+                    id(old_meta),
+                    id(new_meta),
+                    old_occurrence.candidate_index,
+                    new_occurrence.candidate_index,
                 )
+                old_logits = (
+                    self.alignment_cache.get(alignment_key)
+                    if self.alignment_cache is not None
+                    else None
+                )
+                if old_logits is None:
+                    old_logits = align_old_probabilities_to_new_segments(
+                        old_vertex_ids=old_meta.original_vertex_ids[-1],
+                        old_point_probabilities=old_evidence.full_resolution_probabilities[
+                            old_start:old_stop, old_occurrence.candidate_index
+                        ],
+                        new_vertex_ids=new_meta.original_vertex_ids[0],
+                        new_low_point2segment=new_evidence.low_point2segment,
+                        new_voxel_inverse=new_evidence.voxel_inverse[:new_stop],
+                        new_segment_ids=segment_ids,
+                    )
+                    if self.alignment_cache is not None:
+                        self.alignment_cache[alignment_key] = old_logits
                 new_logits = new_evidence.segment_logits[
                     segment_ids, new_occurrence.candidate_index
                 ]
@@ -772,10 +790,25 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _atomic_torch_save(path: Path, value: object) -> None:
+def _atomic_torch_save(
+    path: Path,
+    value: object,
+    *,
+    cache_root: Path | None = None,
+    maximum_cache_bytes: int | None = None,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(f"{path.suffix}.tmp")
     torch.save(value, temporary)
+    if cache_root is not None and maximum_cache_bytes is not None:
+        existing = sum(
+            item.stat().st_size for item in cache_root.rglob("*.pt") if item != path
+        )
+        if existing + temporary.stat().st_size > maximum_cache_bytes:
+            temporary.unlink()
+            raise RefinerTrainingError(
+                "V2 aggregate prediction cache limit would be exceeded"
+            )
     os.replace(temporary, path)
 
 
@@ -1048,6 +1081,8 @@ def train_mask_refiner(
             )
             candidate_losses.append(candidate_loss)
         loss = torch.stack(candidate_losses).mean()
+        if not bool(torch.isfinite(loss)):
+            raise RefinerTrainingError("non-finite refiner loss")
         loss.backward()
         gradient_norm = math.sqrt(
             sum(
@@ -1056,6 +1091,8 @@ def train_mask_refiner(
                 if parameter.grad is not None
             )
         )
+        if not math.isfinite(gradient_norm):
+            raise RefinerTrainingError("non-finite refiner gradient")
         optimizer.step()
         losses.append(float(loss.detach().cpu().item()))
         if before is not None:

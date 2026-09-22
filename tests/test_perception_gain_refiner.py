@@ -390,8 +390,9 @@ def _stage_meta(
     )
 
 
-def test_revision_transform_pairs_frozen_identity_and_materializes_refined_logits() -> (
-    None
+@pytest.mark.parametrize("shared_alignment", (False, True))
+def test_revision_transform_pairs_frozen_identity_and_materializes_refined_logits(
+    shared_alignment,
 ):
     training = _training_module()
     system = type(
@@ -404,6 +405,7 @@ def test_revision_transform_pairs_frozen_identity_and_materializes_refined_logit
         system=system,
         refiner=refiner,
         device="cpu",
+        alignment_cache={} if shared_alignment else None,
     )
     old_prediction = _soft_prediction(
         segment_logits=torch.tensor([[2.0], [-2.0]]),
@@ -459,6 +461,8 @@ def test_revision_transform_pairs_frozen_identity_and_materializes_refined_logit
     assert record["source_query_id"] == 9
     assert record["source_class_id"] == 4
     assert record["new_features"].shape == (2, 128)
+    if shared_alignment:
+        assert len(transform.alignment_cache) == 1
     torch.testing.assert_close(record["new_logits"], torch.tensor([-0.5, -0.5]))
 
     wrong_class = RevisionMaskRequest(

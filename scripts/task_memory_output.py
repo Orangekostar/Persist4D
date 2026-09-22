@@ -631,6 +631,14 @@ def _resolve_identities(
 def _align_masks(
     *, source_vertex_ids: Tensor, target_vertex_ids: Tensor, mask: Tensor
 ) -> Tensor:
+    source_ids = source_vertex_ids.detach().cpu().long()
+    target_ids = target_vertex_ids.detach().cpu().long()
+    # Canonical vertices already share their order. Keep independent storage and
+    # retain the original path for permutations and duplicate-ID edge cases.
+    if torch.equal(source_ids, target_ids) and (
+        source_ids.numel() < 2 or bool(torch.all(source_ids[1:] > source_ids[:-1]))
+    ):
+        return mask.clone()
     source = source_vertex_ids.detach().cpu().long().tolist()
     target = target_vertex_ids.detach().cpu().long().tolist()
     if len(source) != len(target) or set(source) != set(target):

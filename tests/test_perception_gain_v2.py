@@ -134,3 +134,54 @@ def test_parallel_task_progress_cannot_mask_stalled_training(tmp_path):
         os.utime(directory / "PROGRESS.json", (progress, progress))
     assert runner.training_watchdog_deadline("HIGH_CONT", tmp_path, 999, 180) == 1280
     assert runner.training_watchdog_deadline("LOW_PAIR", tmp_path, 999, 180) == 5180
+
+
+@pytest.mark.parametrize(
+    "new_delta,pair_delta,expected",
+    [
+        (0.003, 0.005, "PAIR"),
+        (0.004, 0.0045, "NEW"),
+        (0.0, -0.001, "KEEP_PARENT"),
+        (0.0029, 0.0031, "KEEP_PARENT"),
+    ],
+)
+def test_supplied_v2_repair_policy_examples(new_delta, pair_delta, expected):
+    from scripts.perception_gain_v2_selection import select_repair
+
+    def candidate(name, delta):
+        return {
+            "method_id": name,
+            "metrics": {t: 0.2 + delta for t in (2, 3, 4, 5)},
+            "coverage_status": "COMPLETE",
+            "optimizer_update": 500,
+            "new_parameter_count": 8769,
+        }
+
+    result = select_repair(
+        parent=candidate("PARENT", 0),
+        new=candidate("NEW", new_delta),
+        pair=candidate("PAIR", pair_delta),
+    )
+    assert result["selected_mode"] == expected
+
+
+def test_v2_missing_coverage_is_null_and_combined_tie_uses_total_updates():
+    from scripts.perception_gain_v2_selection import compare, rank, strict_all_t
+
+    baseline = {
+        "method_id": "R1",
+        "metrics": {t: 0.2 for t in (2, 3, 4, 5)},
+        "coverage_status": "COMPLETE",
+    }
+    missing = {"method_id": "FH", "metrics": {}, "coverage_status": "INCOMPLETE"}
+    assert compare(baseline, missing)["S_mean"] is None
+    assert strict_all_t(baseline, missing) is None
+    assert strict_all_t(baseline, baseline) is False
+    common = {
+        "metrics": {t: 0.21 for t in (2, 3, 4, 5)},
+        "coverage_status": "COMPLETE",
+        "new_parameter_count": 10,
+    }
+    a = {**common, "method_id": "a", "optimizer_update": 500, "tie_update": 2750}
+    b = {**common, "method_id": "b", "optimizer_update": 1000, "tie_update": 1750}
+    assert rank([a, b], baseline)[0]["method_id"] == "b"

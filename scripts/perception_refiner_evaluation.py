@@ -425,6 +425,10 @@ def run_refiner_evaluation(
             device=device,
             expected_binding=request.get("binding"),
         )
+        if "binding" in identity and recipe_config is None:
+            raise RefinerEvaluationError(
+                "V2 refiner evaluation requires its bound parent recipe"
+            )
         if recipe_config is not None and (
             identity.get("binding", {}).get("parent_recipe_hash")
             != recipe_config["inference_recipe_hash"]
@@ -564,11 +568,15 @@ def run_refiner_evaluation(
                     parent_publisher = LagOnePublisher(
                         score_reducer="mean", iou_threshold=0.5
                     )
+                    alignment_cache = {}
                     transforms = {
                         name: CausalRefinerRevisionTransform(
                             system=system,
                             refiner=head,
                             device=device,
+                            alignment_cache=(
+                                alignment_cache if recipe_config is not None else None
+                            ),
                         )
                         for name, head in heads.items()
                     }
@@ -692,6 +700,7 @@ def run_refiner_evaluation(
                             )
                             parent_prefixes.append(parent_prefix)
                         refined_prefixes = {}
+                        alignment_cache.clear()
                         for method, publisher in refined_publishers.items():
                             refined_prefix = publisher.update(
                                 prediction, identity_map, meta
@@ -854,6 +863,8 @@ def run_refiner_evaluation(
                                     "scan_ids": list(spec.scan_ids),
                                 },
                             },
+                            cache_root=external_root / "cache",
+                            maximum_cache_bytes=32 * 1024**3,
                         )
                         replay_exports.append(
                             {
@@ -1090,8 +1101,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--parent-update", type=int, required=True)
     parser.add_argument("--parent-checkpoint", type=Path)
     parser.add_argument("--scorer-checkpoint", type=Path)
-    parser.add_argument("--refiner-update", type=int, required=True)
-    parser.add_argument("--refiner-checkpoint", type=Path, required=True)
+    parser.add_argument("--refiner-update", type=int, default=0)
+    parser.add_argument("--refiner-checkpoint", type=Path)
     parser.add_argument(
         "--role", choices=("CAL", "SEL", "PB", "ADDITIONAL"), required=True
     )
@@ -1107,7 +1118,10 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    arguments = _parser().parse_args(argv)
+    parser = _parser()
+    arguments = parser.parse_args(argv)
+    if arguments.heads is None and arguments.refiner_checkpoint is None:
+        parser.error("one of --heads or --refiner-checkpoint is required")
     result = run_refiner_evaluation(
         parent_variant=arguments.parent_variant,
         parent_update=arguments.parent_update,

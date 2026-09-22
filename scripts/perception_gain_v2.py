@@ -575,6 +575,7 @@ def train_recipe(
 
 def execute_task(task: str, config: dict, *, external_root: Path) -> dict:
     assets = read_json(external_root / "assets.local.json")
+    artifacts = PROJECT_ROOT / config["artifact_root"]
     if task == "DATA":
         result = prepare_local_data(config, external_root=external_root)
         return {
@@ -582,6 +583,21 @@ def execute_task(task: str, config: dict, *, external_root: Path) -> dict:
             for key, value in result.items()
             if key not in {"files", "source_manifests"}
         }
+    if task == "BASELINE":
+        from scripts.perception_gain_v2_evidence import run_baselines
+
+        return run_baselines(config, external_root=external_root)
+    if task == "REPAIR_R1":
+        from scripts.perception_gain_v2_evidence import run_repair
+
+        return run_repair(
+            config,
+            external_root=external_root,
+            parent_id="R1",
+            recipe=read_json(artifacts / "training/C0-L-s45/recipe.json"),
+            parent_update=0,
+            parent_checkpoint=None,
+        )
     if task == "HIGH_CONT":
         summary = train_recipe(
             config,

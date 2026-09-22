@@ -13,6 +13,26 @@ from scripts.task_memory_output import (
 )
 
 
+def test_vertex_alignment_preserves_exact_reordering_and_independent_storage():
+    from scripts.task_memory_output import _align_masks
+
+    for source, target in (
+        ([10, 20, 30], [10, 20, 30]),
+        ([30, 10, 20], [10, 20, 30]),
+        ([10, 10, 20], [10, 10, 20]),
+    ):
+        mask = torch.tensor([True, False, True])
+        positions = {value: index for index, value in enumerate(source)}
+        expected = mask[torch.tensor([positions[value] for value in target])]
+        actual = _align_masks(
+            source_vertex_ids=torch.tensor(source),
+            target_vertex_ids=torch.tensor(target),
+            mask=mask,
+        )
+        assert torch.equal(actual, expected)
+        assert actual.data_ptr() != mask.data_ptr()
+
+
 def _meta(
     *,
     absolute_stage: int,
