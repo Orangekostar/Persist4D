@@ -309,15 +309,23 @@ def run_repair(
     from scripts.prepare_perception_refiner import run as prepare
     from scripts.train_perception_refiner import refiner_v2_binding, train_mask_refiner
     from scripts.perception_refiner_evaluation import run_refiner_evaluation
+    from scripts.perception_gain_v2_lock import effective_parent_weight_identity
 
     artifacts = PROJECT_ROOT / config["artifact_root"]
     public = artifacts / f"refiner/{parent_id}"
     cache_root = external_root / f"cache/refiner/{parent_id}"
     manifest_path = public / "DATA_MANIFEST.json"
-    parent_weight = (
-        R1_SHA256 if parent_checkpoint is None else file_hash(parent_checkpoint)
-    )
     assets = read_json(external_root / "assets.local.json")
+    parent_weight = effective_parent_weight_identity(
+        R1_SHA256 if parent_checkpoint is None else file_hash(parent_checkpoint),
+        architecture=recipe["architecture_variant"],
+        update=parent_update,
+        scorer_sha256=(
+            file_hash(Path(assets["scorer_checkpoint"]))
+            if recipe["architecture_variant"] == "Q-SEM"
+            else None
+        ),
+    )
     manifest = read_json(manifest_path) if manifest_path.exists() else None
     if manifest is not None:
         audit = validate_refiner_cache(

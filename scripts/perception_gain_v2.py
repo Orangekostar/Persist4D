@@ -624,6 +624,14 @@ def execute_task(task: str, config: dict, *, external_root: Path) -> dict:
         from scripts.perception_gain_v2_lock import run_lock
 
         return run_lock(config, external_root=external_root)
+    if task == "REPLICATE":
+        from scripts.perception_gain_v2_replication import run_replication
+
+        return run_replication(config, external_root=external_root)
+    if task == "CONFIRM":
+        from scripts.perception_gain_v2_confirmation import run_confirmation
+
+        return run_confirmation(config, external_root=external_root)
     if task == "HIGH_CONT":
         summary = train_recipe(
             config,

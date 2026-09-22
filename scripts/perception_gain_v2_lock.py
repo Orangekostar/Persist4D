@@ -163,6 +163,7 @@ def run_lock(config: dict, *, external_root: Path) -> dict:
     from scripts.perception_gain_local_evaluation import local_evaluation_seeds
     from scripts.p6a_metrics import official_temporal_iou_thresholds
     from scripts.perception_gain_v2_confirmation import confirmation_budget
+    from scripts.perception_gain_v2_replication import commit_replication_scope
 
     artifacts = PROJECT_ROOT / config["artifact_root"]
     destination = artifacts / "selection/FINAL_LOCK.json"
@@ -389,6 +390,9 @@ def run_lock(config: dict, *, external_root: Path) -> dict:
     )
     payload["confirmation_forecast"] = forecast
     payload["confirmation_allocation"] = allocation
+    payload["replication_commitment"] = commit_replication_scope(
+        payload, artifacts=artifacts, external_root=external_root
+    )
     write_json(artifacts / "budget/CONFIRMATION_FORECAST.json", forecast)
     append_event(
         artifacts / "budget/ALLOCATION_EVENTS.jsonl",
@@ -397,6 +401,7 @@ def run_lock(config: dict, *, external_root: Path) -> dict:
             "event": "FINAL_LOCK_BEFORE_ANY_PB_METRIC",
             "forecast": forecast,
             "allocation": allocation,
+            "replication_commitment": payload["replication_commitment"],
         },
     )
     payload["content_sha256"] = content_hash(payload)
