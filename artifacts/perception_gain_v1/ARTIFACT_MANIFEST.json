@@ -1,0 +1,366 @@
+{
+  "files": [
+    {
+      "bytes": 2712,
+      "path": "artifacts/perception_gain_v1/CODE_BINDINGS.md",
+      "sha256": "afc6066b90c7924cc4951692f8509b42b06376b116c2f3abba6b2b3c5b471e70"
+    },
+    {
+      "bytes": 22854,
+      "path": "artifacts/perception_gain_v1/DATA_ROLES.json",
+      "sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b"
+    },
+    {
+      "bytes": 74982,
+      "path": "artifacts/perception_gain_v1/EXECUTION_INSTRUCTION.md",
+      "sha256": "e7ba7daf9299547dd0470bcafe081521aafde272cb2d30bd55cc9e802cafe2d5"
+    },
+    {
+      "bytes": 3516,
+      "path": "artifacts/perception_gain_v1/FINAL_REPORT.md",
+      "sha256": "2ac92e86117f5de45494f108bcb714b11032cddaeca743513bdede017c050fdc"
+    },
+    {
+      "bytes": 4768,
+      "path": "artifacts/perception_gain_v1/HANDOFF.md",
+      "sha256": "4997be3931e1ee2b197473986fc200872c456b2d3a9872ef03cdbd162f60b72a"
+    },
+    {
+      "bytes": 302,
+      "path": "artifacts/perception_gain_v1/RELEASE_PLAN.json",
+      "sha256": "2eee8c8df0db1343b71fb58919c0dcdb52ec9537fdb0db43936d0c9d82b5b371"
+    },
+    {
+      "bytes": 5172,
+      "path": "artifacts/perception_gain_v1/RUN_CONFIG.json",
+      "sha256": "70d5942cc3fd1e859dec253eb21775ded2c457c1295b769e405f7fd966040f2e"
+    },
+    {
+      "bytes": 9816,
+      "path": "artifacts/perception_gain_v1/foundation/LIVE_SMOKE.json",
+      "sha256": "35b6f56a57722e57e02067bdda99b0498c99908681aac04926b3ad56b22a8bf8"
+    },
+    {
+      "bytes": 3662,
+      "path": "artifacts/perception_gain_v1/foundation/NATIVE_SMOKE.json",
+      "sha256": "76a5e65b6208b20e21dd73c52b3766cf3c99e519a5783ac41190595f80577f1a"
+    },
+    {
+      "bytes": 3890,
+      "path": "artifacts/perception_gain_v1/foundation/R1_BINDING.json",
+      "sha256": "9c7782e211b0aeb52a2d26b707d83306fbb5e49751e8ba4d1c040c4d5b2866f5"
+    },
+    {
+      "bytes": 14135,
+      "path": "artifacts/perception_gain_v1/foundation/R1_RESOLVED_CONFIG.json",
+      "sha256": "b6159a663f0baa69a88cdb3eb41e817da44b1bcbd8dc9c33236abfffeec69620"
+    },
+    {
+      "bytes": 687770,
+      "path": "artifacts/perception_gain_v1/foundation/diagnostic_panel/attention_reachability.csv",
+      "sha256": "0a2d2fa7c67e734b5e392ea272cd005fd94cfe611f0a684f4826e6a166cae747"
+    },
+    {
+      "bytes": 615319,
+      "path": "artifacts/perception_gain_v1/foundation/diagnostic_panel/best_candidate_iou.csv",
+      "sha256": "c86b5d687694900bf6a1f000d2c252f5f4f86cfec1714340909bb081ff0daa9f"
+    },
+    {
+      "bytes": 58843,
+      "path": "artifacts/perception_gain_v1/foundation/diagnostic_panel/query_coverage.csv",
+      "sha256": "b92b47fa65bec7fa7ed46b10038652cdf736643a3c27e3a0d8b344a27d906da1"
+    },
+    {
+      "bytes": 2162,
+      "path": "artifacts/perception_gain_v1/foundation/diagnostic_panel/status.json",
+      "sha256": "e90d257f14526e6358d9c81269d0cb9a3a435a0d62fa8644cbf1d867a5bd4074"
+    },
+    {
+      "bytes": 11051,
+      "path": "artifacts/perception_gain_v1/foundation/e1/candidate_coverage.csv",
+      "sha256": "a3c811c80ff0208f93d1513165822614de32b08f8e28808539d4a76b150c55e7"
+    },
+    {
+      "bytes": 6928454,
+      "path": "artifacts/perception_gain_v1/foundation/e1/failure_ledger.csv",
+      "sha256": "31ea1070a8dee4592529f21485731f7a130b2df671d19c62dae03097420c3605"
+    },
+    {
+      "bytes": 651,
+      "path": "artifacts/perception_gain_v1/foundation/e1/gate.json",
+      "sha256": "0591649708a1af4857b706e95049bf875073aa612803b4f59ae0d2503b0432dd"
+    },
+    {
+      "bytes": 27156,
+      "path": "artifacts/perception_gain_v1/foundation/e1/gt_assignment_events.csv",
+      "sha256": "eaa243beed04e2201751e354730db761134e5e9b361bb02dfb40443ec53f3e7e"
+    },
+    {
+      "bytes": 3471,
+      "path": "artifacts/perception_gain_v1/foundation/e1/gt_assisted.csv",
+      "sha256": "645fccc1c205d4471ca8ceb21031301d37264f63e2f4011d77bef5a2d5a2fb75"
+    },
+    {
+      "bytes": 505,
+      "path": "artifacts/perception_gain_v1/foundation/e1/status.json",
+      "sha256": "81299444bc509df671a3517f890e65ecdca2524c3f1725e88af9ffadaeafd006"
+    },
+    {
+      "bytes": 1189,
+      "path": "artifacts/perception_gain_v1/training/S-BAL/INTERRUPTION.json",
+      "sha256": "031d2d7e9c739007c772da3b89505ca4cf00fe3e55d1afb071c7bb73f63e8881"
+    },
+    {
+      "bytes": 978,
+      "path": "artifacts/perception_gain_v1/training/pilot/THROUGHPUT_FORECAST.json",
+      "sha256": "42080c470cd4b00b9a8e0d33891ca630c060bd9eb0918f989e2c5e89d3605bdc"
+    },
+    {
+      "bytes": 7177,
+      "path": "artifacts/perception_gain_v1/training/pilot/evaluation/cal/C0/update=0000.json",
+      "sha256": "4c684b2b9a0ea4853053b57cb55f2ab0ae522382a25f00bad0caedb698345315"
+    },
+    {
+      "bytes": 7359,
+      "path": "artifacts/perception_gain_v1/training/pilot/evaluation/cal/C0/update=0250.json",
+      "sha256": "4f5a98b7a98179a09db13bdb0753e3e49f0dac28705651b111dc860922e23ef4"
+    },
+    {
+      "bytes": 7350,
+      "path": "artifacts/perception_gain_v1/training/pilot/evaluation/cal/C0/update=0750.json",
+      "sha256": "b15cc623e1795fee0a106626564a4c2fcb45facb99ffe010425969425af2b035"
+    },
+    {
+      "bytes": 7871,
+      "path": "artifacts/perception_gain_v1/training/pilot/evaluation/cal/Q-SEM/update=0000.json",
+      "sha256": "8a4b1d80446e502fb0cf4d411f73b015275442367fe7042c3af2558776a005c3"
+    },
+    {
+      "bytes": 7369,
+      "path": "artifacts/perception_gain_v1/training/pilot/evaluation/cal/S-BAL/update=0250.json",
+      "sha256": "5f31f2ec0260505c49c71c7fd282392622254ecd22a099e567e7cf7296b14659"
+    },
+    {
+      "bytes": 2759,
+      "path": "artifacts/perception_gain_v1/training/scorer/DATA_MANIFEST.json",
+      "sha256": "ad6e50250bb2847c8f277878636e2bb96c27854dd757d32f89390ed2a1b68b13"
+    },
+    {
+      "bytes": 644,
+      "path": "artifacts/perception_gain_v1/training/scorer/RUN_SUMMARY.json",
+      "sha256": "6c70679cba4f32fa68fe557f083dab12163fb9e586e5705a03b8f96e4b9c2047"
+    },
+    {
+      "bytes": 2254,
+      "path": "configs/perception_gain_v1.yaml",
+      "sha256": "3ee92bea9fcd82801afff65ced8262aede07a64e26ad837c28b0ccaf27dbf6ef"
+    },
+    {
+      "bytes": 4819,
+      "path": "models/__init__.py",
+      "sha256": "7074429fde233732f94c3771bd416915b26954a3f4a73ee8e436bf55c2287f38"
+    },
+    {
+      "bytes": 59246,
+      "path": "models/criterion.py",
+      "sha256": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150"
+    },
+    {
+      "bytes": 16563,
+      "path": "models/perception_gain.py",
+      "sha256": "a01726421a9c194154829cfd50cf53e489e49106417343941139d19a5449aa03"
+    },
+    {
+      "bytes": 31132,
+      "path": "models/rescene.py",
+      "sha256": "d0088ab6a09623ac7865681929e06b315e580965bb90b1985f932eeefe64e12f"
+    },
+    {
+      "bytes": 47400,
+      "path": "scripts/diagnose_crosswindow_failures.py",
+      "sha256": "e1ec7f1947c11f02cb7011914f0616e37d32968f51bcf8168dba2230e2964e64"
+    },
+    {
+      "bytes": 24235,
+      "path": "scripts/evaluate_crosswindow_consensus.py",
+      "sha256": "2e01fbe4116b1fb99ac9984998bfcc8db140df8435db952fbb9a8df2134b3874"
+    },
+    {
+      "bytes": 64790,
+      "path": "scripts/p6a_metrics.py",
+      "sha256": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62"
+    },
+    {
+      "bytes": 161167,
+      "path": "scripts/perception_gain_campaign.py",
+      "sha256": "a5c0338f488fcb65c4f9c57929f21d0daf54922c366dafcdd5ebc5807ccc9ef2"
+    },
+    {
+      "bytes": 15175,
+      "path": "scripts/perception_gain_data.py",
+      "sha256": "8a406c969599af763a0e44d03bafd82ac615e8df0da1c7aecaf817adea92eda1"
+    },
+    {
+      "bytes": 51489,
+      "path": "scripts/perception_gain_evaluation.py",
+      "sha256": "7c70d41c3b301cf5590a52bfe6c78b9929417b0f2d83e3f913da7f984c6a3cde"
+    },
+    {
+      "bytes": 47540,
+      "path": "scripts/perception_gain_foundation.py",
+      "sha256": "fed966f771bb5eaf5a30e13008bf5008f11a8f2d0f2027e66326c29ef8467e7f"
+    },
+    {
+      "bytes": 9058,
+      "path": "scripts/perception_gain_local_evaluation.py",
+      "sha256": "54b1c32419ce03a4bad0f35ca3c0c582e717c910620601129ba5dfd85573f30b"
+    },
+    {
+      "bytes": 20934,
+      "path": "scripts/perception_gain_native_evaluation.py",
+      "sha256": "9b48cb31690608ae91e0d2b372995bf1d401b90115d54d64f65427beefdd4f63"
+    },
+    {
+      "bytes": 36829,
+      "path": "scripts/perception_gain_profile.py",
+      "sha256": "ea4b732ebd39a0b2cca62c8a65615094501ae6e7a878363fb29ab866660d4f3c"
+    },
+    {
+      "bytes": 17086,
+      "path": "scripts/perception_gain_publish.py",
+      "sha256": "a4f151b7b10b519da7e4ad9fd4207c2321b16e73b214c13c4222d9e4e0483c91"
+    },
+    {
+      "bytes": 27236,
+      "path": "scripts/perception_gain_reporting.py",
+      "sha256": "424dbb91ea1df31bb21b09f5c4a4399361cb1b1339051c4b3fadd0b3021ae8d7"
+    },
+    {
+      "bytes": 34070,
+      "path": "scripts/perception_refiner_evaluation.py",
+      "sha256": "558950f22d35a68804b330111f946a1c0ab8a1be61b84b40e83368bcc0a97a24"
+    },
+    {
+      "bytes": 23211,
+      "path": "scripts/prepare_perception_refiner.py",
+      "sha256": "e3f54e3e08dba31f4f31401d63058c3a76f359e97ecd83be4fd3a03f3ad337b6"
+    },
+    {
+      "bytes": 11569,
+      "path": "scripts/prepare_perception_scorer.py",
+      "sha256": "b92e5c7bc38db551fdbbe32ecc20c32a25b8dce63f5947c711cacc4ac7cb7801"
+    },
+    {
+      "bytes": 66775,
+      "path": "scripts/replay_crosswindow_association.py",
+      "sha256": "05d31fa5d243ad909dc9bd0eaac0f7bfde47ca01c6b146ed6e0ddbd2ef3e5ed9"
+    },
+    {
+      "bytes": 18492,
+      "path": "scripts/rescene_task_postprocess.py",
+      "sha256": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6"
+    },
+    {
+      "bytes": 52732,
+      "path": "scripts/system_comparison_inference.py",
+      "sha256": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468"
+    },
+    {
+      "bytes": 36450,
+      "path": "scripts/task_memory_output.py",
+      "sha256": "81f98957812232407a573fb7c4c85a521a39ebf2c8bcbd826775233e9326018d"
+    },
+    {
+      "bytes": 33036,
+      "path": "scripts/train_perception_gain.py",
+      "sha256": "0af0c8a9bc16199847a00a709412fa7da33c2e6de2653a54ec38576def43b9e3"
+    },
+    {
+      "bytes": 42629,
+      "path": "scripts/train_perception_refiner.py",
+      "sha256": "629cc1a6b9555a0d4feacf7fefc883e8ac7691e285f0c989effb9d91931b49f0"
+    },
+    {
+      "bytes": 20487,
+      "path": "tests/test_crosswindow_metrics.py",
+      "sha256": "7a86ec63699a6c1fc931a0892f00d59338416e36222a5ee6103e25703e52f764"
+    },
+    {
+      "bytes": 18116,
+      "path": "tests/test_p6a_metrics.py",
+      "sha256": "781ee98196c6f643a5c1fec1221eded5bb74f3363f30728114f5e392d146777e"
+    },
+    {
+      "bytes": 39512,
+      "path": "tests/test_perception_gain_campaign.py",
+      "sha256": "c591c5d12f9d557da515b79396476f22d6d0327fb88ecfaabd5dd748fc58aebf"
+    },
+    {
+      "bytes": 5702,
+      "path": "tests/test_perception_gain_data.py",
+      "sha256": "af0b623c7e311e6883f604b56d1e0dc122c8cf31d91e8947cbb2b6254314e171"
+    },
+    {
+      "bytes": 21736,
+      "path": "tests/test_perception_gain_evaluation.py",
+      "sha256": "ed12ec7c72f5c57427f0669f129bb1498c8fe392b942b31cc819a8659fb20a70"
+    },
+    {
+      "bytes": 6017,
+      "path": "tests/test_perception_gain_foundation.py",
+      "sha256": "f28c94e0de498e8f6fbf425c090934b78ec946960581c1968286ee3364227d98"
+    },
+    {
+      "bytes": 8743,
+      "path": "tests/test_perception_gain_model.py",
+      "sha256": "82dbd983017aece400b2a3109555495111e51992660747cbd8612f6302b29d35"
+    },
+    {
+      "bytes": 5507,
+      "path": "tests/test_perception_gain_profile.py",
+      "sha256": "f4c9478fa9be2ae37916b1c5fff755ce882d8175c2c203e9d15daebc96b0f29b"
+    },
+    {
+      "bytes": 3115,
+      "path": "tests/test_perception_gain_publish.py",
+      "sha256": "3af8b3390204c12ac238076de9f3c903b922140c196791c92f6e6f3bd60d92ba"
+    },
+    {
+      "bytes": 24011,
+      "path": "tests/test_perception_gain_refiner.py",
+      "sha256": "d832d3835ef49f47e391abd90b6f2a0c4e8ac1539986359571a8a4128dc2fdca"
+    },
+    {
+      "bytes": 3187,
+      "path": "tests/test_perception_gain_reporting.py",
+      "sha256": "e347f5b2b223a63b9255c42ad0042376b4fb1e64d5b12d2978bf13d1af740850"
+    },
+    {
+      "bytes": 10081,
+      "path": "tests/test_perception_gain_training.py",
+      "sha256": "33e50ab2c5eee554477189d04e281ee4bd6f761cf3dbb40392b4af8c731ac9ef"
+    },
+    {
+      "bytes": 14341,
+      "path": "tests/test_rescene_query_features.py",
+      "sha256": "697a096379e549d6b4ec9e62bcb8d3f4835be93edc38d47ae8b997efa51505a3"
+    },
+    {
+      "bytes": 9544,
+      "path": "tests/test_rescene_task_postprocess.py",
+      "sha256": "ad1d73f5ba7578a895cc8ed2cf8762d08c1df32ff11466cec171db8e116ea209"
+    },
+    {
+      "bytes": 17092,
+      "path": "tests/test_task_memory_output.py",
+      "sha256": "ec9d7fe61f660518aaa978e96d30a5261a00bcf274005f7c44b3adbc04d3175b"
+    },
+    {
+      "bytes": 21605,
+      "path": "trainer/perception_gain_trainer.py",
+      "sha256": "9ae4209048e554e6466753cd53968b2603bee5c56f64c19f7fad0f23cc136a59"
+    }
+  ],
+  "schema_version": "perception-gain-artifact-manifest-v1",
+  "scope": "Git delivery snapshot; excludes mutable RUN_STATE/EXECUTION_LOG and this manifest"
+}

@@ -1,12 +1,12 @@
 # Persist4D Perception Gain V1 Final Report
 
-Experiment content commit: `6ef77620aa20926311eff3124a794a6ca2e32727`.
+Experiment content commit: `9e537358b4f78d48f037c75ea1aa040125cb12e5`.
 
 - EXECUTION: `PARTIAL_WITH_BLOCKERS`
 - PB_ALL_T_VS_NATIVE_FH: `N/A`
 - PB_ALL_T_VS_D0: `N/A`
 - DEFAULT_DEPLOYMENT: `UNCONFIRMED`
-- PUBLICATION_PHASE: `PREPARE`
+- PUBLICATION_PHASE: `READY`
 
 ## 表 1. 任务、实际步数与运行状态
 
@@ -72,6 +72,6 @@ ADDITIONAL 固定终点人口为 T2 111 单位/40 references、T3 77/23、T4 32/
 | profiling_gpu_hours | 0.000000 | 4 | GPU-hour |
 | new_cache_bytes | 101166032 | 32 | bytes / GiB limit |
 | profile_rows | 0 | N/A | rows |
-| publication | PREPARE | N/A | status |
+| publication | READY | N/A | status |
 
 本表中的训练/确认/profile 成本来自真实执行状态。单次部署延迟不包含离线训练或缓存生成；profile 明确排除磁盘冷读与官方 metric 计算。
