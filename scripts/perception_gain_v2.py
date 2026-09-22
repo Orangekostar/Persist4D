@@ -581,6 +581,8 @@ def train_recipe(
 
 
 def execute_task(task: str, config: dict, *, external_root: Path) -> dict:
+    # Set before any head training creates a CUDA/cuBLAS context in this process.
+    os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     assets = read_json(external_root / "assets.local.json")
     artifacts = PROJECT_ROOT / config["artifact_root"]
     if task == "DATA":
@@ -610,6 +612,10 @@ def execute_task(task: str, config: dict, *, external_root: Path) -> dict:
 
         handler = run_aux if task == "AUX" else run_perception
         return handler(config, external_root=external_root)
+    if task == "ASSOC":
+        from scripts.perception_gain_v2_association import run_association
+
+        return run_association(config, external_root=external_root)
     if task == "HIGH_CONT":
         summary = train_recipe(
             config,
@@ -816,9 +822,10 @@ def run_tasks(
             if name not in ready:
                 continue
             count = requirements[name]
-            if (
-                count > len(free)
-                or len(running) >= config["runtime"]["maximum_training_jobs"]
+            if count > len(free) or (
+                count
+                and sum(bool(item["gpus"]) for item in running.values())
+                >= config["runtime"]["maximum_training_jobs"]
             ):
                 continue
             reserve = (
@@ -853,6 +860,7 @@ def run_tasks(
                 "OMP_NUM_THREADS": "2",
                 "MKL_NUM_THREADS": "2",
                 "OPENBLAS_NUM_THREADS": "2",
+                "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
             }
             if assets_scorer := read_json(external_root / "assets.local.json").get(
                 "scorer_checkpoint"
