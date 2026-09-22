@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import math
+import datetime as dt
+import json
 from pathlib import Path
 import statistics
+import time
 
 from scripts.perception_gain_v2 import (
     PROJECT_ROOT,
@@ -29,6 +32,64 @@ POPULATIONS = {
         "4": {"logical_units": 32, "references": 8},
     },
 }
+
+
+def allocate_confirmation_balance(
+    *, remaining: float, required: float, default: float
+) -> dict:
+    if any(
+        not math.isfinite(value) or value < 0
+        for value in (remaining, required, default)
+    ):
+        raise ValueError("Confirmation allocation requires finite nonnegative budgets")
+    reserve = max(required, default)
+    funded = min(remaining, reserve)
+    return {
+        "remaining_gpu_hours": remaining,
+        "confirmation": funded,
+        "replication_and_recovery": remaining - funded,
+        "transfer_into_confirmation": max(0.0, funded - default),
+        "unfunded_confirmation": max(0.0, required - funded),
+        "perception_exploration": 0.0,
+        "development_search": 0.0,
+        "refinement_search": 0.0,
+        "scope": "Unspent allocation after final lock; includes profile within confirmation",
+    }
+
+
+def confirmation_budget(
+    config: dict, *, artifacts: Path, lock: dict
+) -> tuple[dict, dict]:
+    try:
+        forecast = forecast_confirmation(config, artifacts=artifacts, lock=lock)
+    except (OSError, ValueError, KeyError) as error:
+        forecast = {
+            "status": "MEASURED_FORECAST_UNAVAILABLE",
+            "reason": str(error),
+            "required_confirmation_gpu_hours": config["budget"]["confirmation_reserve"],
+            "limitation": "Retain the original planned reserve; this is not an empirical runtime estimate.",
+        }
+    events = {
+        row["event_id"]: row
+        for line in (artifacts / "budget/LEDGER.jsonl").read_text().splitlines()
+        if line.strip()
+        for row in (json.loads(line),)
+    }
+    settled = sum(row["gpu_hours"] for row in events.values())
+    state = read_json(artifacts / "RUN_STATE.json")
+    live = sum(
+        max(0.0, time.time() - dt.datetime.fromisoformat(row["start_utc"]).timestamp())
+        * len(row["gpus"])
+        / 3600
+        for row in state["tasks"].values()
+        if row["status"] == "RUNNING"
+    )
+    allocation = allocate_confirmation_balance(
+        remaining=max(0.0, config["cumulative_gpu_hour_cap"] - settled - live),
+        required=forecast["required_confirmation_gpu_hours"],
+        default=config["budget"]["confirmation_reserve"],
+    )
+    return forecast, allocation
 
 
 def confirmation_groups(lock: dict, role: str) -> list[dict]:
@@ -388,8 +449,9 @@ def evaluate_group(
 def run_confirmation(config: dict, *, external_root: Path) -> dict:
     artifacts = PROJECT_ROOT / config["artifact_root"]
     lock, lock_sha = load_lock(config, artifacts)
-    forecast = forecast_confirmation(config, artifacts=artifacts, lock=lock)
+    forecast, allocation = confirmation_budget(config, artifacts=artifacts, lock=lock)
     write_json(artifacts / "budget/CONFIRMATION_FORECAST.json", forecast)
+    write_json(artifacts / "budget/CONFIRMATION_CURRENT_ALLOCATION.json", allocation)
     results, failures = {}, {}
     for role in ("PB", "ADDITIONAL"):
         rows = {}

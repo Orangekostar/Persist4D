@@ -5,7 +5,14 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-from scripts.perception_gain_v2 import PROJECT_ROOT, file_hash, read_json, utc_now
+from scripts.perception_gain_v2 import (
+    PROJECT_ROOT,
+    append_event,
+    file_hash,
+    read_json,
+    utc_now,
+    write_json,
+)
 from scripts.perception_gain_v2_config import R1_SHA256, content_hash, executed_identity
 from scripts.perception_gain_v2_perception import baseline_candidate, resolve_checkpoint
 from scripts.perception_gain_v2_selection import compare, gate, select_final
@@ -155,6 +162,7 @@ def run_lock(config: dict, *, external_root: Path) -> dict:
     from scripts.perception_gain_evaluation import write_immutable_lock
     from scripts.perception_gain_local_evaluation import local_evaluation_seeds
     from scripts.p6a_metrics import official_temporal_iou_thresholds
+    from scripts.perception_gain_v2_confirmation import confirmation_budget
 
     artifacts = PROJECT_ROOT / config["artifact_root"]
     destination = artifacts / "selection/FINAL_LOCK.json"
@@ -177,6 +185,12 @@ def run_lock(config: dict, *, external_root: Path) -> dict:
             "status": "COMPLETE",
             "lock_sha256": file_hash(destination),
             "selected_method_id": locked["final_method_id"],
+            "confirmation_reserve_gpu_hours": max(
+                config["budget"]["confirmation_reserve"],
+                locked.get("confirmation_forecast", {}).get(
+                    "required_confirmation_gpu_hours", 0.0
+                ),
+            ),
         }
 
     def optional(path):
@@ -370,10 +384,29 @@ def run_lock(config: dict, *, external_root: Path) -> dict:
             [Path(__file__), PROJECT_ROOT / "scripts/perception_gain_v2_selection.py"],
         ),
     }
+    forecast, allocation = confirmation_budget(
+        config, artifacts=artifacts, lock=payload
+    )
+    payload["confirmation_forecast"] = forecast
+    payload["confirmation_allocation"] = allocation
+    write_json(artifacts / "budget/CONFIRMATION_FORECAST.json", forecast)
+    append_event(
+        artifacts / "budget/ALLOCATION_EVENTS.jsonl",
+        {
+            "utc": utc_now(),
+            "event": "FINAL_LOCK_BEFORE_ANY_PB_METRIC",
+            "forecast": forecast,
+            "allocation": allocation,
+        },
+    )
     payload["content_sha256"] = content_hash(payload)
     write_immutable_lock(destination, payload)
     return {
         "status": "COMPLETE",
         "lock_sha256": file_hash(destination),
         "selected_method_id": selected_id,
+        "confirmation_reserve_gpu_hours": max(
+            config["budget"]["confirmation_reserve"],
+            forecast["required_confirmation_gpu_hours"],
+        ),
     }

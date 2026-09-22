@@ -1,13 +1,26 @@
 from copy import deepcopy
 import hashlib
+import json
 
 from scripts.perception_gain_v2_lock import effective_parent_weight_identity
 
 from scripts.perception_gain_v2_confirmation import (
+    allocate_confirmation_balance,
     confirmation_groups,
     deployment_decision,
     normalize_evidence,
 )
+
+
+def test_confirmation_reserve_transfer_cannot_exceed_actual_balance():
+    allocation = allocate_confirmation_balance(remaining=60, required=50, default=40)
+    assert allocation["confirmation"] == 50
+    assert allocation["replication_and_recovery"] == 10
+    assert allocation["transfer_into_confirmation"] == 10
+    partial = allocate_confirmation_balance(remaining=30, required=50, default=40)
+    assert partial["confirmation"] == 30
+    assert partial["unfunded_confirmation"] == 20
+    assert partial["replication_and_recovery"] == 0
 
 
 def _result(value):
@@ -46,12 +59,73 @@ def test_zero_step_q_identity_includes_separate_frozen_scorer():
         )
         == raw
     )
-    assert (
-        effective_parent_weight_identity(
-            raw, architecture="C0", update=0, scorer_sha256=None
-        )
-        == raw
+
+
+def test_cached_zero_step_q_uses_effective_weight_identity(tmp_path, monkeypatch):
+    from scripts import perception_gain_v2_perception as runner
+    from scripts.perception_gain_v2 import file_hash
+    from scripts.perception_gain_v2_config import R1_SHA256
+
+    artifacts = tmp_path / "artifacts"
+    external = tmp_path / "external"
+    external.mkdir()
+    scorer = external / "scorer.pt"
+    scorer.write_bytes(b"frozen-scorer-test-fixture")
+    (external / "assets.local.json").write_text(
+        json.dumps({"scorer_checkpoint": str(scorer)})
     )
+    recipe = {
+        "recipe_id": "Q-SEM-L-s45",
+        "architecture_variant": "Q-SEM",
+        "inference_recipe_hash": "q-inference",
+    }
+    for relative, value in (
+        ("training/Q-SEM-L-s45/recipe.json", recipe),
+        ("DATA_ROLES.json", {}),
+        ("data/STAGING_MANIFEST.json", {}),
+    ):
+        path = artifacts / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(value))
+    binding = {
+        "weight_hash": effective_parent_weight_identity(
+            R1_SHA256, architecture="Q-SEM", update=0, scorer_sha256=file_hash(scorer)
+        ),
+        "inference_recipe_hash": "q-inference",
+        "input_manifest_hash": file_hash(artifacts / "data/STAGING_MANIFEST.json"),
+        "roles_sha256": file_hash(artifacts / "DATA_ROLES.json"),
+        "role": "CAL",
+        "point_order_transform": "canonical_vertices/identity_geometry",
+        "eval_seed": 45,
+        "publisher": "D0/LAST/lag1/mean",
+        "relevant_source_digest": "source-test-fixture",
+    }
+    saved = artifacts / "evaluation/CAL/Q-SEM-L-s45/update=0000.json"
+    saved.parent.mkdir(parents=True)
+    saved.write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "recipe": recipe,
+                "cache_binding": binding,
+                "candidate": {"checkpoint_sha256": binding["weight_hash"]},
+            }
+        )
+    )
+    monkeypatch.setattr(runner, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(
+        runner,
+        "live_execution_provenance",
+        lambda recipe: {"relevant_source_digest": "source-test-fixture"},
+    )
+    result = runner.evaluate(
+        {"artifact_root": "artifacts"},
+        external_root=external,
+        recipe_id=recipe["recipe_id"],
+        update=0,
+        role="CAL",
+    )
+    assert result["checkpoint_sha256"] == binding["weight_hash"]
 
 
 def test_incomplete_native_coverage_never_claims_full_population_win():

@@ -219,12 +219,23 @@ def evaluate(
     config: dict, *, external_root: Path, recipe_id: str, update: int, role: str
 ) -> dict:
     from scripts.perception_gain_evaluation import run_checkpoint_evaluation
+    from scripts.perception_gain_v2_lock import effective_parent_weight_identity
 
     artifacts = PROJECT_ROOT / config["artifact_root"]
     recipe = read_json(artifacts / f"training/{recipe_id}/recipe.json")
     path = artifacts / f"evaluation/{role}/{recipe_id}/update={update:04d}.json"
     checkpoint = resolve_checkpoint(recipe_id, update, external_root=external_root)
-    weight = file_hash(checkpoint) if checkpoint else R1_SHA256
+    assets = read_json(external_root / "assets.local.json")
+    weight = effective_parent_weight_identity(
+        file_hash(checkpoint) if checkpoint else R1_SHA256,
+        architecture=recipe["architecture_variant"],
+        update=update,
+        scorer_sha256=(
+            file_hash(Path(assets["scorer_checkpoint"]))
+            if recipe["architecture_variant"] == "Q-SEM"
+            else None
+        ),
+    )
     code = live_execution_provenance(recipe)
     expected = {
         "weight_hash": weight,
@@ -265,7 +276,6 @@ def evaluate(
             "optimizer_update": 0,
             "zero_step_alias": "R1-D0",
         }
-    assets = read_json(external_root / "assets.local.json")
     started = time.monotonic()
     try:
         result = run_checkpoint_evaluation(

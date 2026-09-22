@@ -985,6 +985,11 @@ def run_tasks(
                 "end_utc": utc_now(),
                 "dependency_signature": signature,
             }
+            if name == "LOCK" and result.get("status") == "COMPLETE":
+                state["confirmation_reserve_gpu_hours"] = max(
+                    state["confirmation_reserve_gpu_hours"],
+                    result.get("confirmation_reserve_gpu_hours", 0.0),
+                )
             event = {
                 "event_id": f"{name}:{item['start_utc']}",
                 "task": name,
