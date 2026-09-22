@@ -1,7 +1,10 @@
+from types import SimpleNamespace
+
 import pytest
 
 from scripts.perception_gain_v2_profile import (
     ProfileError,
+    cold_input_diagnostic,
     profile_inventory,
     summarize_measurements,
 )
@@ -63,3 +66,33 @@ def test_profile_checks_all_components_and_fixed_population_before_summary():
     rows[0]["end_to_end_ms"] = 7.0
     with pytest.raises(ProfileError, match="component"):
         summarize_measurements(rows, methods=["final"])
+
+
+def test_cold_io_distinguishes_storage_reads_and_cached_reads(tmp_path, monkeypatch):
+    from scripts import perception_gain_v2_profile as profile
+
+    source = tmp_path / "scan.npy"
+    source.write_bytes(b"test input bytes")
+    dataset = SimpleNamespace(data=[{"filepath": str(source)}])
+    spec = SimpleNamespace(scan_ids=("a",), scan_indices=(0,), reference_id="r")
+    monkeypatch.setattr(profile.os, "posix_fadvise", lambda *args: None)
+    for delta, expected in (
+        (16, "STORAGE_READ_OBSERVED"),
+        (0, "PARTIAL_OR_CACHED_READ"),
+    ):
+        counters = iter([100, 100 + delta])
+        monkeypatch.setattr(
+            profile, "_process_storage_read_bytes", lambda counters=counters: next(counters)
+        )
+        rows = cold_input_diagnostic(
+            dataset, [(spec, "unit")], allowed_root=tmp_path, check_budget=lambda: None
+        )
+        assert len(rows) == 1 and rows[0]["status"] == expected
+        assert rows[0]["bytes_read"] == rows[0]["input_bytes"] == 16
+    denied = cold_input_diagnostic(
+        dataset,
+        [(spec, "unit")],
+        allowed_root=tmp_path / "another-run",
+        check_budget=lambda: None,
+    )
+    assert denied[0]["status"] == "UNAVAILABLE"

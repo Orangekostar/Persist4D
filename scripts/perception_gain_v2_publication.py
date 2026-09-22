@@ -307,6 +307,24 @@ def publish_v2(config, *, external_root):
                 "Publication requires a stable experiment snapshot; active tasks: "
                 + ", ".join(active)
             )
+        independent = []
+        for invocation in (external_root / "tasks").glob("*_INVOCATION.json"):
+            event = read_json(invocation)
+            if event.get("end_utc") or event.get("task") == "PUBLISH":
+                continue
+            command_path = Path(f"/proc/{event.get('pid')}/cmdline")
+            if not command_path.exists():
+                continue
+            command = (
+                command_path.read_bytes().replace(b"\0", b" ").decode(errors="replace")
+            )
+            if str(external_root) in command or "scripts.perception_gain_v2" in command:
+                independent.append(invocation.name)
+        if independent:
+            raise PublicationError(
+                "Publication awaits independent experiment attempts: "
+                + ", ".join(sorted(independent))
+            )
         if (
             _run(("git", "branch", "--show-current")).stdout.strip() != BRANCH
             or config["branch"] != BRANCH

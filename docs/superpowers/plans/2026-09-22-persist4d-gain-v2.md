@@ -19,6 +19,7 @@
 - H/L learning rates 5e-5/1e-5; scheduler 3000, warmup150, FP32, effective batch32. H350 exact resume; L fresh R1 optimizer. One new full mechanism and its same-LR/runtime C0 only.
 - R1 NEW_ONLY/OLD_NEW share routing, eligibility, initialization and sampling; 1500 updates, ±2 residual, actual materialization, no score/class/state changes. New P requires newly generated features and paired retraining.
 - Targeted tests only; final affected regression once, targeted ruff once and diff check. CPU tests ≤30min, GPU smoke ≤1 GPU-hour. Explicit live evidence required beyond unit tests.
+- Native LOCAL metadata correction: the unchanged original 154 sequences actually cover 46 references (40 ADDITIONAL + 6 PB; TRAIN overlap 0). V1 incorrectly copied all 41 ADDITIONAL references into LOCAL roles. Preserve DATA_ROLES as historical registration, bind the actual population audit in FINAL_LOCK, and disclose 41→46 in the report.
 
 ## Task 1 — Runtime identity, independent bootstrap and data reliability
 
@@ -40,7 +41,7 @@ Interfaces: optional `recipe_config`, `artifact_root`, `assets_path`, `roles_pat
 
 - [x] Test live assets without legacy caches; recipe reaches train and evaluation; preserve official population denominators.
 - [x] Verify one real CAL sequence: repeated R1, D0 vs disabled refiner, zero residual through bool materialization, unchanged candidate/identity/score.
-- [ ] Produce full CAL/SEL R1-D0 and native FH (23/24 units); export read-only live canonical evidence for association and multihead evaluation.
+- [x] Produce full CAL/SEL R1-D0 and native FH (23/24 units); export read-only live canonical evidence for association and multihead evaluation. A fixed-runtime repeat reproduces the repair parent exactly; adoption waits for the owning core controller to exit. Original nonreproduced runtime evidence and costs are preserved.
 
 ## Task 3 — Independent perception jobs
 
@@ -60,7 +61,7 @@ Interfaces: shared mode adapter replaces old logits/score with new for NEW_ONLY 
 - [x] Test NEW invariance to old values, matched initialization/sampling, independent archives, strict mapping, source/mode mismatch rejection and no zero shortcut.
 - [x] Cache fixed 32-reference R1 training episodes once; compute pair/fallback and residual-correctability diagnostics from that data.
 - [x] Train each head to1500, preserve checkpoints0/500/1000/1500 and actual curves/audits.
-- [ ] Evaluate all CAL heads with one streamed upstream pass and separate publishers/official metrics; select each head then evaluate fixed SEL points and three comparisons.
+- [x] Evaluate all CAL heads with one streamed upstream pass and separate publishers/official metrics; select each head then evaluate fixed SEL points and three comparisons. Both heads select step 0 and retain R1; all trained 500/1000/1500 results are retained.
 
 ## Task 5 — Limited association and optional P repair
 

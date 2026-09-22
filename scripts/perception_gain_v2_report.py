@@ -191,6 +191,9 @@ def run_report(config: dict, *, external_root: Path) -> dict:
     state = read_json(artifacts / "RUN_STATE.json")
     tasks = observed_tasks(artifacts, external_root, state)
     lock = optional(artifacts / "selection/FINAL_LOCK.json")
+    local_population = optional(artifacts / "foundation/LOCAL_POPULATION_AUDIT.json")
+    rebaseline = optional(artifacts / "foundation/REBASELINE_STATUS.json")
+    supersession = optional(artifacts / "foundation/BASELINE_SUPERSESSION.json")
     confirmation = optional(artifacts / "confirmation/CONFIRMATION.json")
     perception = optional(artifacts / "selection/PERCEPTION.json")
     association = optional(artifacts / "association/SELECTION.json")
@@ -494,6 +497,7 @@ def run_report(config: dict, *, external_root: Path) -> dict:
         association_rows.append(
             {
                 "config": item.config_id,
+                "attempt": "CURRENT_PARENT",
                 "status": result.get("status", "NOT_RUN"),
                 "completed_units": len(result.get("completed_units", [])),
                 "expected_units": 23,
@@ -504,7 +508,35 @@ def run_report(config: dict, *, external_root: Path) -> dict:
                 },
             }
         )
-    formal, by_reference = confirmation_rows(lock, confirmation)
+    for path in sorted(
+        (artifacts / "association_invalidated_parent_drift/CAL").glob("*.json")
+    ):
+        result = read_json(path)
+        candidate = result.get("candidate", {})
+        association_rows.append(
+            {
+                "config": path.stem,
+                "attempt": "HISTORICAL_PARENT",
+                "status": "INVALIDATED_PARENT_RUNTIME",
+                "completed_units": len(result.get("completed_units", [])),
+                "expected_units": 23,
+                "cpu_core_hours": result.get("cpu_core_hours"),
+                **{
+                    f"T{t}": candidate.get("metrics", {}).get(str(t))
+                    for t in (2, 3, 4, 5)
+                },
+            }
+        )
+    display_lock = lock
+    if not lock and local_population.get("status") == "PASS":
+        display_lock = {
+            "confirmation_populations": {
+                "LOCAL-T2": {
+                    "references": local_population["validation_reference_count"]
+                }
+            }
+        }
+    formal, by_reference = confirmation_rows(display_lock, confirmation)
     write_json(
         artifacts / "foundation/PARENT_COHORT_COMPARISON.json",
         {
@@ -720,6 +752,7 @@ def run_report(config: dict, *, external_root: Path) -> dict:
             association_rows,
             [
                 "config",
+                "attempt",
                 "status",
                 "completed_units",
                 "expected_units",
@@ -788,6 +821,28 @@ def run_report(config: dict, *, external_root: Path) -> dict:
                 parent_cohorts, ["role", "status", "published_output_equal", "deltas"]
             )
             + "\n\n差异诊断与原始运行证据保留在 `foundation/`；同一次前向中的零残差一致性不能替代跨运行一致性。"
+        )
+    if local_population.get("metadata_correction"):
+        sections.append(
+            "## LOCAL 人口元数据更正\n\n"
+            f"继承的 DATA_ROLES 写为 {local_population['declared_reference_count']} refs；原始 native T2 的 "
+            f"{local_population['validation_sequence_count']} 条序列实际覆盖 {local_population['validation_reference_count']} refs。"
+            "V1 bootstrap 将 ADDITIONAL reference 列表直接用作 LOCAL 列表。这里完整保留原始序列及 45/46/47 seeds，"
+            "按实际 reference 数报告，并在 FINAL_LOCK 中绑定该元数据核对。"
+            "核对只读取人口元数据，不含锁定前预测或评分；TRAIN overlap 为 0。"
+            "详见 `foundation/LOCAL_POPULATION_AUDIT.json`；原始 DATA_ROLES 与 V1 历史文件保持不变。"
+        )
+    if rebaseline:
+        sections.append(
+            "## 父模型运行更正\n\n"
+            f"固定 recipe 的 CAL/SEL 重跑状态为 {rebaseline.get('status')}；采用状态为 {rebaseline.get('adoption')}。"
+            "原运行的差异原因仍为 UNDETERMINED，不能归因于已排除的线程数、零头或启动上下文。"
+            "当前重跑已与修复器父模型逐字节一致；历史父模型上的关联结果保留但不参与当前排名，全部耗时仍计入预算。"
+            + (
+                "原始四项基线已保存在 `foundation/original-runtime/`，替换记录见 `foundation/BASELINE_SUPERSESSION.json`。"
+                if supersession
+                else "当前控制器停止前，重跑结果暂存于 `foundation/rebaseline-fixed-runtime/`。"
+            )
         )
     (artifacts / "FINAL_REPORT.md").write_text("\n\n".join(sections) + "\n")
     commands = []

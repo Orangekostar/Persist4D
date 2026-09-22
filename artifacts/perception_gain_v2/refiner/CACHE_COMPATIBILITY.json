@@ -30,6 +30,49 @@
       "consumer_sha256": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
       "scope": "TRAIN_CACHE_ONLY",
       "reason": "Optional alignment cache defaults to None in the producer, optional aggregate save limit defaults off, and finite training guards are outside cache generation. Default producer values and reduction order are unchanged."
+    },
+    {
+      "source": "scripts/perception_gain_evaluation.py",
+      "producer_sha256": "741c9a0d9e6a5ac49e8cca1b4531c823d314d14357d32aafe34d948a25faaf6a",
+      "consumer_sha256": "938770aa3c9a6db2d5c8a8d5db732948a1c3d15f78eb7f7f5aa82cadd62db175",
+      "scope": "TRAIN_CACHE_ONLY",
+      "reason": "Optional replay episode length defaults to the original five stages. No TRAIN feature-generation call uses the new short-episode export argument; weights, collation, forward and postprocessing are unchanged."
+    },
+    {
+      "source": "scripts/perception_gain_local_evaluation.py",
+      "producer_sha256": "cf1313b0f98b6813971a1f21e6fae5d5059478c3f597b21d88735ec4bf8c9464",
+      "consumer_sha256": "2745a8ab2085bcc1823423b750a1e87bc4c81648fb5352685fce9421327b2b4a",
+      "scope": "TRAIN_CACHE_ONLY",
+      "reason": "Native LOCAL evaluation exports, runtime and population audits are outside the TRAIN cache producer call graph. The original 154 sequences are preserved; metadata correction does not change TRAIN roles or tensors."
+    },
+    {
+      "source": "scripts/perception_gain_native_evaluation.py",
+      "producer_sha256": "d26990bdd34ac82019f245bfc1f7407a84efff06a5b500687e986122fcc14e2e",
+      "consumer_sha256": "ae2fe20eac0fb33dc87db8fbaab028928560fcbafea5a5ee95721fff444c0ec3",
+      "scope": "TRAIN_CACHE_ONLY",
+      "reason": "Prediction export callback and one identical-input OOM retry apply only to native evaluation. TRAIN cache production does not invoke this evaluation runner."
+    },
+    {
+      "source": "scripts/perception_gain_profile.py",
+      "producer_sha256": "ea4b732ebd39a0b2cca62c8a65615094501ae6e7a878363fb29ab866660d4f3c",
+      "consumer_sha256": "1fbcc919f613a07a589aec5b93aae2b0a131b14fd6010af2f3dc8651dcaba512",
+      "scope": "TRAIN_CACHE_ONLY",
+      "reason": "The V2 CLI route is a deployment timing consumer and is not invoked by the TRAIN feature producer. Existing profiling helpers used by other consumers are unchanged."
+    },
+    {
+      "source": "scripts/perception_refiner_evaluation.py",
+      "producer_sha256": "ea7dd1041c50206dee79894509e4e19f1ba46119a417bf3244d03f539a958d01",
+      "consumer_sha256": "c7278e8cee65e49eb16d41d818ef0586ec54fdad487993fb4905e22466e4b4b2",
+      "scope": "TRAIN_CACHE_ONLY",
+      "reason": "The evaluation-only optional prediction and per-unit replay callbacks default to None. They do not modify TRAIN features, targets, head initialization, selection, or tensor transformations."
+    },
+    {
+      "source": "scripts/replay_crosswindow_association.py",
+      "producer_sha256": "05d31fa5d243ad909dc9bd0eaac0f7bfde47ca01c6b146ed6e0ddbd2ef3e5ed9",
+      "consumer_sha256": "a519901aac2644a16a1d1ab2cf600a52f9e2fa310610446d0ea925e28ea0a388",
+      "scope": "TRAIN_CACHE_ONLY",
+      "reason": "E2 now accepts explicit shorter ADDITIONAL episodes and output callbacks; defaults retain five stages and the same association/metric operations. E2 is not used to generate TRAIN refiner features."
     }
-  ]
+  ],
+  "additional_validation": "79 affected unit tests passed; native retry/export/profile follow-ups 14 passed; confirmation/report/replication 17 passed. Real CAL profile hashes equal canonical parent/zero-head/native inference. Real short-CAL E2 replay and lossless prediction roundtrip PASS, with all four official quality metrics exactly equal to the canonical parent accumulator. These reviews concern reuse of TRAIN tensors only."
 }

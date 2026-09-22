@@ -45,6 +45,64 @@ def profile_inventory(lock):
     return list(methods.values())
 
 
+def _process_storage_read_bytes():
+    for line in Path("/proc/self/io").read_text().splitlines():
+        if line.startswith("read_bytes:"):
+            return int(line.split(":", 1)[1])
+    raise ProfileError("Kernel storage-read counter is unavailable")
+
+
+def cold_input_diagnostic(dataset, selected, *, allowed_root, check_budget):
+    """One method-independent storage read, restricted to this run's staged data."""
+    rows, seen = [], set()
+    for spec, _ in selected:
+        for scan_id, scan_index in zip(spec.scan_ids, spec.scan_indices, strict=True):
+            check_budget()
+            path = Path(
+                str(dataset.data[scan_index]["filepath"]).replace("../../", "")
+            ).resolve()
+            if path in seen:
+                continue
+            seen.add(path)
+            row = {
+                "reference_scene_id": spec.reference_id,
+                "scan_id": scan_id,
+                "method": "COMMON_INPUT_IO_ONLY",
+                "status": "UNAVAILABLE",
+            }
+            try:
+                if not path.is_relative_to(allowed_root.resolve()):
+                    raise ProfileError(
+                        "Cold-read advice is limited to this run's own staged inputs"
+                    )
+                expected = path.stat().st_size
+                with path.open("rb", buffering=0) as stream:
+                    os.posix_fadvise(stream.fileno(), 0, 0, os.POSIX_FADV_DONTNEED)
+                    before = _process_storage_read_bytes()
+                    started = time.perf_counter_ns()
+                    read = 0
+                    while block := stream.read(4 * 1024**2):
+                        read += len(block)
+                    elapsed = (time.perf_counter_ns() - started) / 1_000_000
+                    storage = _process_storage_read_bytes() - before
+                if read != expected:
+                    raise ProfileError("Cold-read input byte coverage differs")
+                row.update(
+                    status="STORAGE_READ_OBSERVED"
+                    if storage >= expected
+                    else "PARTIAL_OR_CACHED_READ",
+                    input_bytes=expected,
+                    bytes_read=read,
+                    kernel_storage_read_bytes=storage,
+                    input_read_ms=elapsed,
+                    cache_advice="POSIX_FADV_DONTNEED",
+                )
+            except (OSError, RuntimeError, ValueError, AttributeError) as error:
+                row["reason"] = str(error)
+            rows.append(row)
+    return rows
+
+
 def summarize_measurements(rows, *, methods):
     validate_profile_rows(rows, methods=methods, repeats=3)
     groups = defaultdict(list)
@@ -790,7 +848,7 @@ def run_profile_v2(config, *, external_root):
             "minimum_mask_support",
         )
     }
-    rows, io_rows, failures, reloads = [], [], [], []
+    rows, io_rows, failures, reloads, cold_io_rows = [], [], [], [], []
     selected_identity = None
     population_sha = None
     output_root = artifacts / "resources"
@@ -827,6 +885,12 @@ def run_profile_v2(config, *, external_root):
             ]
             if selected_identity is None:
                 selected_identity, population_sha = current_identity, manifest_sha
+                cold_io_rows = cold_input_diagnostic(
+                    dataset,
+                    selected,
+                    allowed_root=Path(assets["data_root"]),
+                    check_budget=check_budget,
+                )
             elif (
                 selected_identity != current_identity or population_sha != manifest_sha
             ):
@@ -966,6 +1030,11 @@ def run_profile_v2(config, *, external_root):
         (output_root / "INPUT_LOAD_DIAGNOSTIC.csv").write_bytes(
             _csv_bytes(io_rows, tuple(io_rows[0]))
         )
+    if cold_io_rows:
+        fields = tuple(dict.fromkeys(key for row in cold_io_rows for key in row))
+        (output_root / "COLD_INPUT_IO_DIAGNOSTIC.csv").write_bytes(
+            _csv_bytes(cold_io_rows, fields)
+        )
     final_id = lock["aliases"]["FINAL"]
     resource = (
         resource_comparison(
@@ -987,6 +1056,14 @@ def run_profile_v2(config, *, external_root):
         "selected_sequences": selected_identity,
         "population_manifest_sha256": population_sha,
         "measurement_rows": len(rows),
+        "cold_input_io": {
+            "scan_files": len(cold_io_rows),
+            "storage_read_observed_files": sum(
+                row["status"] == "STORAGE_READ_OBSERVED" for row in cold_io_rows
+            ),
+            "diagnostic": "COLD_INPUT_IO_DIAGNOSTIC.csv",
+            "excluded_from_deployment_timings": True,
+        },
         "bundle_reload_checks": reloads,
         "failures": failures,
         "elapsed_seconds": time.monotonic() - started,
@@ -997,7 +1074,7 @@ def run_profile_v2(config, *, external_root):
             "state_and_revision": ["state_update_ms", "refiner_ms"],
             "usable_output": "materialize_ms",
             "end_to_end": "In-memory input preparation and transfer, live networks, state, revisions and output; excludes file loading, metrics and validation hashes.",
-            "io_diagnostic": "Observed input loading is separate. OS cache state is uncontrolled; this is not a guaranteed cold-cache benchmark.",
+            "io_diagnostic": "Cold-read advice and measured kernel storage bytes are recorded once on shared staged input files, separately from all methods. Advice does not guarantee eviction; partial/cached reads are labeled. Per-method input loading is also separate and has uncontrolled OS cache state.",
             "memory": "Absolute CUDA peaks, process RSS, actual resident/soft/archive storage. Binary history grows with T.",
         },
     }
