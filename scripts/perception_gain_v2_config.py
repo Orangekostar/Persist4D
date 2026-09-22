@@ -258,3 +258,48 @@ def executed_identity(project_root: Path, sources: Sequence[Path]) -> dict[str, 
         "relevant_source_digest": content_hash(hashes),
         "source_files": hashes,
     }
+
+
+def live_execution_provenance(recipe: Mapping[str, object]) -> dict[str, object]:
+    """Bind the actual executed code and shared numerical origin of a live result."""
+    recipe = validate_recipe(recipe)
+    root = Path(__file__).resolve().parents[1]
+    sources = [
+        root / name
+        for name in (
+            "scripts/perception_gain_v2_config.py",
+            "scripts/train_perception_gain.py",
+            "trainer/perception_gain_trainer.py",
+            "trainer/trainer.py",
+            "models/rescene.py",
+            "models/perception_gain.py",
+            "models/criterion.py",
+            "models/persistent_memory.py",
+            "models/task_memory_routing.py",
+            "models/overlap_entity_association.py",
+            "datasets/semseg.py",
+            "datasets/task_memory_episode.py",
+            "scripts/perception_gain_evaluation.py",
+            "scripts/perception_gain_native_evaluation.py",
+            "scripts/perception_gain_local_evaluation.py",
+            "scripts/perception_refiner_evaluation.py",
+            "scripts/prepare_perception_refiner.py",
+            "scripts/train_perception_refiner.py",
+            "scripts/rescene_task_postprocess.py",
+            "scripts/task_memory_output.py",
+            "scripts/replay_crosswindow_association.py",
+            "scripts/p6a_metrics.py",
+            "scripts/system_comparison_inference.py",
+            "scripts/system_comparison_metrics.py",
+            "scripts/run_task_memory_controls.py",
+            "scripts/run_task_memory_policy_baseline.py",
+            "scripts/perception_gain_profile.py",
+        )
+    ]
+    return {
+        **executed_identity(root, sources),
+        **{
+            key: recipe[key]
+            for key in ("recipe_id", "training_recipe_hash", "inference_recipe_hash")
+        },
+    }

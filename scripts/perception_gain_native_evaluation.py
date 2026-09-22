@@ -142,6 +142,8 @@ def run_native_checkpoint_evaluation(
     external_root: Path = DEFAULT_EXTERNAL_ROOT,
     output_path: Path | None = None,
     device_name: str = "cuda:0",
+    recipe_config: Mapping[str, object] | None = None,
+    artifact_root: Path | None = None,
 ) -> dict[str, object]:
     import hydra
     import torch
@@ -153,7 +155,10 @@ def run_native_checkpoint_evaluation(
         _validate_cuda_device,
     )
     from scripts.evaluate_persist4d_p6a import build_rio_class_mapper
-    from scripts.perception_gain_foundation import _resolve_cache_assets
+    from scripts.perception_gain_foundation import (
+        _resolve_cache_assets,
+        resolve_live_assets,
+    )
     from scripts.run_task_memory_policy_baseline import (
         DEVELOPMENT_POPULATION_ID,
         PROTOCOL_B_POPULATION_ID,
@@ -169,6 +174,11 @@ def run_native_checkpoint_evaluation(
     from scripts.train_perception_gain import compose_variant_config
     from trainer.perception_gain_trainer import PerceptionGainTrainer
 
+    code = None
+    if recipe_config is not None:
+        from scripts.perception_gain_v2_config import live_execution_provenance
+
+        code = live_execution_provenance(recipe_config)
     requested_horizons = tuple(int(value) for value in horizons)
     if (
         variant not in VARIANTS
@@ -189,7 +199,14 @@ def run_native_checkpoint_evaluation(
     ):
         raise PerceptionEvaluationError("native evaluation request is invalid")
 
-    assets = _resolve_cache_assets(assets_path)
+    assets = (
+        resolve_live_assets(assets_path)
+        if recipe_config is not None
+        else _resolve_cache_assets(assets_path)
+    )
+    path_variant = (
+        str(recipe_config["recipe_id"]) if recipe_config is not None else variant
+    )
     roles_payload = _load_json(roles_path).get("roles")
     references = roles_payload.get(role) if isinstance(roles_payload, Mapping) else None
     if (
@@ -203,13 +220,14 @@ def run_native_checkpoint_evaluation(
         external_root
         / "evaluation"
         / role.lower()
-        / f"FH-{variant}-native"
+        / f"FH-{path_variant}-native"
         / f"update={optimizer_update:04d}"
     )
     config = compose_variant_config(
         variant,
         pretrained=Path(assets["concerto_pretrained"]),
         run_dir=run_dir,
+        recipe_config=recipe_config,
     )
     config.model.return_query_features = True
     if variant == "Q-SEM" and scorer_checkpoint is not None:
@@ -290,7 +308,11 @@ def run_native_checkpoint_evaluation(
     p6a = yaml.safe_load(p6a_path.read_text(encoding="utf-8"))
     settings = p6a["baselines"]["b4"]
     provenance = {
-        "source_commit": "6ef77620aa20926311eff3124a794a6ca2e32727",
+        "source_commit": (
+            code["executed_code_commit"]
+            if code is not None
+            else "6ef77620aa20926311eff3124a794a6ca2e32727"
+        ),
         "checkpoint_sha256": checkpoint_sha,
         "config_sha256": config_sha,
         "protocol_sha256": _sha256(protocol_path),
@@ -492,12 +514,16 @@ def run_native_checkpoint_evaluation(
         "gpu_name": torch.cuda.get_device_name(device),
         "source_sha256": _sha256(Path(__file__)),
     }
+    if recipe_config is not None:
+        summary["recipe"] = dict(recipe_config)
+        summary["execution_provenance"] = code
     if output_path is None:
+        output_root = artifact_root if artifact_root is not None else ARTIFACT_ROOT
         output_path = (
-            ARTIFACT_ROOT
+            output_root
             / "foundation/native_fh"
             / role.lower()
-            / variant
+            / path_variant
             / f"update={optimizer_update:04d}.json"
         )
     _atomic_json(output_path, summary)
@@ -520,6 +546,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--assets", type=Path, default=DEFAULT_ASSETS)
     parser.add_argument("--roles", type=Path, default=DEFAULT_ROLES)
     parser.add_argument("--external-root", type=Path, default=DEFAULT_EXTERNAL_ROOT)
+    parser.add_argument("--recipe-config", type=Path)
+    parser.add_argument("--artifact-root", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--device", default="cuda:0")
     return parser
@@ -527,6 +555,11 @@ def _parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = _parser().parse_args(argv)
+    recipe = (
+        _load_json(arguments.recipe_config)
+        if arguments.recipe_config is not None
+        else None
+    )
     result = run_native_checkpoint_evaluation(
         variant=arguments.variant,
         optimizer_update=arguments.update,
@@ -540,6 +573,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         external_root=arguments.external_root,
         output_path=arguments.output,
         device_name=arguments.device,
+        recipe_config=recipe,
+        artifact_root=arguments.artifact_root,
     )
     return 0 if result["status"] == "PASS" else 1
 

@@ -110,3 +110,27 @@ def test_manifest_staging_preserves_data_and_localizes_symlink_target(tmp_path):
     assert not destination.is_symlink()
     assert record["bytes"] == 18
     assert len(record["sha256"]) == 64
+
+
+def test_parallel_task_progress_cannot_mask_stalled_training(tmp_path):
+    import datetime as dt
+    import os
+
+    runner = importlib.import_module("scripts.perception_gain_v2")
+    for recipe_id, started, progress in (
+        ("S-BAL-H-s45", 1000, 1100),
+        ("C0-L-s45", 1001, 5000),
+    ):
+        directory = tmp_path / "training" / recipe_id
+        runner.write_json(
+            directory / "invocation-00.json",
+            {
+                "start_utc": dt.datetime.fromtimestamp(
+                    started, dt.timezone.utc
+                ).isoformat(),
+            },
+        )
+        runner.write_json(directory / "PROGRESS.json", {})
+        os.utime(directory / "PROGRESS.json", (progress, progress))
+    assert runner.training_watchdog_deadline("HIGH_CONT", tmp_path, 999, 180) == 1280
+    assert runner.training_watchdog_deadline("LOW_PAIR", tmp_path, 999, 180) == 5180

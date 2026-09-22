@@ -17,6 +17,7 @@ from scripts.perception_gain_evaluation import (
     PerceptionEvaluationError,
     _atomic_json,
     _external_reference,
+    _load_json,
     _load_evaluation_weights,
     _sha256,
 )
@@ -99,6 +100,8 @@ def run_local_t2_evaluation(
     external_root: Path = DEFAULT_EXTERNAL_ROOT,
     output_path: Path | None = None,
     device_name: str = "cuda:0",
+    recipe_config: Mapping[str, object] | None = None,
+    artifact_root: Path | None = None,
 ) -> dict[str, object]:
     import torch
     from omegaconf import OmegaConf, open_dict
@@ -107,25 +110,41 @@ def run_local_t2_evaluation(
     from scripts.evaluate_persist4d import _validate_cuda_device
     from scripts.evaluate_sonata_second_checkpoint import normalize_metrics
     from scripts.evaluate_task_memory import NATIVE_POPULATION_ID, _rio_population_base
-    from scripts.perception_gain_foundation import _resolve_cache_assets
+    from scripts.perception_gain_foundation import (
+        _resolve_cache_assets,
+        resolve_live_assets,
+    )
     from scripts.task_memory_contracts import canonical_json_sha256
     from scripts.train_perception_gain import compose_variant_config
     from trainer.perception_gain_trainer import PerceptionGainTrainer
 
+    code = None
+    if recipe_config is not None:
+        from scripts.perception_gain_v2_config import live_execution_provenance
+
+        code = live_execution_provenance(recipe_config)
     if variant not in VARIANTS or optimizer_update not in CAL_UPDATES:
         raise PerceptionEvaluationError("LOCAL-T2 checkpoint request is invalid")
-    assets = _resolve_cache_assets(assets_path)
+    assets = (
+        resolve_live_assets(assets_path)
+        if recipe_config is not None
+        else _resolve_cache_assets(assets_path)
+    )
+    path_variant = (
+        str(recipe_config["recipe_id"]) if recipe_config is not None else variant
+    )
     device = _validate_cuda_device(device_name)
     run_dir = (
         external_root
         / "evaluation/local-t2"
-        / variant
+        / path_variant
         / f"update={optimizer_update:04d}"
     )
     config = compose_variant_config(
         variant,
         pretrained=Path(assets["concerto_pretrained"]),
         run_dir=run_dir,
+        recipe_config=recipe_config,
     )
     with open_dict(config):
         config.general.train_mode = False
@@ -208,11 +227,15 @@ def run_local_t2_evaluation(
     result["load_audit"] = load_audit
     result["weight_sources"] = weight_sources
     result["source_sha256"] = _sha256(Path(__file__))
+    if recipe_config is not None:
+        result["recipe"] = dict(recipe_config)
+        result["execution_provenance"] = code
     if output_path is None:
+        output_root = artifact_root if artifact_root is not None else ARTIFACT_ROOT
         output_path = (
-            ARTIFACT_ROOT
+            output_root
             / "confirmation/local-t2"
-            / variant
+            / path_variant
             / f"update={optimizer_update:04d}.json"
         )
     _atomic_json(output_path, result)
@@ -229,6 +252,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--scorer-checkpoint", type=Path)
     parser.add_argument("--assets", type=Path, default=DEFAULT_ASSETS)
     parser.add_argument("--external-root", type=Path, default=DEFAULT_EXTERNAL_ROOT)
+    parser.add_argument("--recipe-config", type=Path)
+    parser.add_argument("--artifact-root", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--device", default="cuda:0")
     return parser
@@ -236,6 +261,11 @@ def _parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = _parser().parse_args(argv)
+    recipe = (
+        _load_json(arguments.recipe_config)
+        if arguments.recipe_config is not None
+        else None
+    )
     result = run_local_t2_evaluation(
         variant=arguments.variant,
         optimizer_update=arguments.update,
@@ -245,6 +275,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         external_root=arguments.external_root,
         output_path=arguments.output,
         device_name=arguments.device,
+        recipe_config=recipe,
+        artifact_root=arguments.artifact_root,
     )
     return 0 if result["status"] == "PASS" else 1
 

@@ -379,16 +379,42 @@ class DeterministicPerceptionCollator:
 
 
 class PerceptionCheckpointCallback(Callback):
-    def __init__(self, run_dir: Path, evaluation_updates: Sequence[int]) -> None:
+    def __init__(
+        self,
+        run_dir: Path,
+        evaluation_updates: Sequence[int],
+        *,
+        report_progress: bool = False,
+    ) -> None:
         super().__init__()
         self.run_dir = Path(run_dir)
         self.evaluation_updates = set(
             int(value) for value in evaluation_updates if value
         )
         self.last_saved_step = -1
+        self.report_progress = report_progress
+        self.last_batch_time = None
+        self.maximum_batch_interval_seconds = 0.0
 
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx) -> None:
-        del pl_module, outputs, batch, batch_idx
+        del pl_module, outputs, batch
+        if self.report_progress and trainer.is_global_zero:
+            now = time.time()
+            if self.last_batch_time is not None:
+                self.maximum_batch_interval_seconds = max(
+                    self.maximum_batch_interval_seconds,
+                    now - self.last_batch_time,
+                )
+            self.last_batch_time = now
+            _atomic_json(
+                self.run_dir / "PROGRESS.json",
+                {
+                    "completed_optimizer_updates": int(trainer.global_step),
+                    "completed_batch_index": batch_idx,
+                    "updated_unix": now,
+                    "maximum_batch_interval_seconds": self.maximum_batch_interval_seconds,
+                },
+            )
         step = int(trainer.global_step)
         if step <= 0 or step == self.last_saved_step:
             return
@@ -733,6 +759,11 @@ def run(args: argparse.Namespace) -> int:
     run_dir.mkdir(parents=True, exist_ok=True)
     recipe_path = getattr(args, "recipe_config", None)
     recipe = _load_json(recipe_path) if recipe_path is not None else None
+    code = None
+    if recipe is not None:
+        from scripts.perception_gain_v2_config import live_execution_provenance
+
+        code = live_execution_provenance(recipe)
     config = compose_variant_config(
         args.variant,
         pretrained=pretrained,
@@ -812,11 +843,13 @@ def run(args: argparse.Namespace) -> int:
                 "stop_after_updates": args.stop_after_updates,
                 "variant": args.variant,
                 **({"recipe": dict(recipe)} if recipe is not None else {}),
+                **({"execution_provenance": code} if code is not None else {}),
             },
         )
     callback = PerceptionCheckpointCallback(
         run_dir,
         contract.checkpoint_updates,
+        report_progress=recipe is not None,
     )
     trainer = Trainer(
         accelerator="gpu",
@@ -872,6 +905,7 @@ def run(args: argparse.Namespace) -> int:
             "seed": int(config.general.seed),
             "variant": args.variant,
             **({"recipe": dict(recipe)} if recipe is not None else {}),
+            **({"execution_provenance": code} if code is not None else {}),
         },
     )
     return 0

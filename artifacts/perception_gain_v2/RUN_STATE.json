@@ -1,0 +1,119 @@
+{
+  "auth": {
+    "git_push_dry_run": "AVAILABLE",
+    "git_read": "AVAILABLE",
+    "release": "UNAVAILABLE"
+  },
+  "confirmation_reserve_gpu_hours": 40,
+  "execution_status": "IN_PROGRESS",
+  "identity": {
+    "config_sha256": "93b35fdbf9e1c4f28ef20653e9e7a27e942ea6657d88f3cc9f02002e63f13765",
+    "instruction_sha256": "9b92e302d0af269614e86a76591cd324374f83fe64b097aa4c2ffdb330c3b688",
+    "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9"
+  },
+  "prior_gpu_hours": 12.124826178494708,
+  "remaining_gpu_hours": 179.87517382150529,
+  "schema_version": "perception-gain-v2-state-v1",
+  "tasks": {
+    "ASSOC": {
+      "status": "PENDING"
+    },
+    "AUX": {
+      "status": "PENDING"
+    },
+    "BASELINE": {
+      "status": "PENDING"
+    },
+    "BIND": {
+      "inputs": {
+        "C0_H_0250": {
+          "bytes": 754935460,
+          "logical_reference": "asset:C0_H_0250",
+          "sha256": "362a8575fb0d011b079b60af4eb92f57fcb5734484230c76c468bb9718007b87",
+          "status": "VERIFIED"
+        },
+        "C0_H_0750": {
+          "bytes": 754935460,
+          "logical_reference": "asset:C0_H_0750",
+          "sha256": "384884e3e86de79b5ca92661aa887b1f34612d2d8c90e93a66bbf70b87e30143",
+          "status": "VERIFIED"
+        },
+        "S_BAL_H_resume": {
+          "bytes": 754935460,
+          "logical_reference": "asset:S_BAL_H_resume",
+          "sha256": "49062639ec7e1f38280c6be2a42be81fe913cd6e1169dff862b9fc8f551b20ce",
+          "status": "VERIFIED"
+        },
+        "concerto_pretrained": {
+          "bytes": 433987358,
+          "logical_reference": "asset:concerto_pretrained",
+          "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+          "status": "VERIFIED"
+        },
+        "r1_checkpoint": {
+          "bytes": 754813672,
+          "logical_reference": "asset:r1_checkpoint",
+          "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+          "status": "VERIFIED"
+        },
+        "scorer_checkpoint": {
+          "bytes": 37730,
+          "logical_reference": "asset:scorer_checkpoint",
+          "sha256": "5bf58cdde393493daeb29bd023cb058db51bec56e76d39ba14ff68a6f911380c",
+          "status": "VERIFIED"
+        }
+      },
+      "status": "COMPLETE",
+      "utc": "2026-09-22T14:22:11.642326+00:00"
+    },
+    "CONFIRM": {
+      "status": "PENDING"
+    },
+    "DATA": {
+      "bytes": 18543848605,
+      "elapsed_seconds": 121.85909135901602,
+      "file_count": 8984,
+      "roles": {
+        "ADDITIONAL": "INPUTS_LOCAL",
+        "CAL": "INPUTS_LOCAL",
+        "LOCAL-T2": "INPUTS_LOCAL",
+        "PB": "INPUTS_LOCAL",
+        "SEL": "INPUTS_LOCAL",
+        "TRAIN": "INPUTS_LOCAL"
+      },
+      "scope": "All files referenced by existing RIO/ScanNet split/sequence manifests; no split edits",
+      "status": "COMPLETE"
+    },
+    "HIGH_CONT": {
+      "status": "PENDING"
+    },
+    "LOCK": {
+      "status": "PENDING"
+    },
+    "LOW_PAIR": {
+      "status": "PENDING"
+    },
+    "PERCEPTION": {
+      "status": "PENDING"
+    },
+    "PROFILE": {
+      "status": "PENDING"
+    },
+    "PUBLISH": {
+      "status": "PENDING"
+    },
+    "REPAIR_P": {
+      "status": "PENDING"
+    },
+    "REPAIR_R1": {
+      "status": "PENDING"
+    },
+    "REPLICATE": {
+      "status": "PENDING"
+    },
+    "REPORT": {
+      "status": "PENDING"
+    }
+  },
+  "v2_gpu_hours": 0.0
+}

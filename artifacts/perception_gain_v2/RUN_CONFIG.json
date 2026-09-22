@@ -1,0 +1,147 @@
+{
+  "code": {
+    "executed_code_commit": "2237725b7c3faca39fbf2c440f1289b1bca7c2b3",
+    "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+    "relevant_source_digest": "920d069e769723570bbc0e8e943a86abdbe9acf7f3b4c9735ff12ea23302fc8d",
+    "source_files": {
+      "scripts/perception_gain_v2.py": "b6c9fe7b9fca730935afa68156130cea8aba0b22f8c658cae3c94deebcf9f726",
+      "scripts/perception_gain_v2_config.py": "98fe5067b5df9f5b7dae66f69f45d010008fb6374fc077dcc40a21f1045d83dd"
+    }
+  },
+  "identity": {
+    "config_sha256": "93b35fdbf9e1c4f28ef20653e9e7a27e942ea6657d88f3cc9f02002e63f13765",
+    "instruction_sha256": "9b92e302d0af269614e86a76591cd324374f83fe64b097aa4c2ffdb330c3b688",
+    "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9"
+  },
+  "prior_usage_records": [
+    {
+      "event_id": "V1-published-total",
+      "gpu_hours": 11.803828054742961,
+      "measurement": "MIXED_MEASURED_AND_ESTIMATED_INTERRUPTION",
+      "source": "repo:artifacts/perception_gain_v1/RUN_STATE.json"
+    },
+    {
+      "event_id": "V1-smoke-exact2_continuous",
+      "gpu_hours": 0.04833764844470554,
+      "limitation": "Earlier slice occupancy estimated from hparams/checkpoint timestamps; setup outside these intervals is not measurable.",
+      "measurement": "SUMMARY_PLUS_ESTIMATED_EARLIER_SLICES",
+      "source": "prior:smoke/exact2_continuous/training/C0/run_summary.json"
+    },
+    {
+      "event_id": "V1-smoke-exact2_split",
+      "gpu_hours": 0.06399376538064744,
+      "limitation": "Earlier slice occupancy estimated from hparams/checkpoint timestamps; setup outside these intervals is not measurable.",
+      "measurement": "SUMMARY_PLUS_ESTIMATED_EARLIER_SLICES",
+      "source": "prior:smoke/exact2_split/training/C0/run_summary.json"
+    },
+    {
+      "event_id": "V1-smoke-exact_continuous",
+      "gpu_hours": 0.0615574049949646,
+      "limitation": "Earlier slice occupancy estimated from hparams/checkpoint timestamps; setup outside these intervals is not measurable.",
+      "measurement": "SUMMARY_PLUS_ESTIMATED_EARLIER_SLICES",
+      "source": "prior:smoke/exact_continuous/training/C0/run_summary.json"
+    },
+    {
+      "event_id": "V1-smoke-exact_split",
+      "gpu_hours": 0.07119612587822809,
+      "limitation": "Earlier slice occupancy estimated from hparams/checkpoint timestamps; setup outside these intervals is not measurable.",
+      "measurement": "SUMMARY_PLUS_ESTIMATED_EARLIER_SLICES",
+      "source": "prior:smoke/exact_split/training/C0/run_summary.json"
+    },
+    {
+      "event_id": "V1-smoke-task8",
+      "gpu_hours": 0.07591317905320061,
+      "limitation": "Earlier slice occupancy estimated from hparams/checkpoint timestamps; setup outside these intervals is not measurable.",
+      "measurement": "SUMMARY_PLUS_ESTIMATED_EARLIER_SLICES",
+      "source": "prior:smoke/task8/training/C0/run_summary.json"
+    }
+  ],
+  "resolved_config": {
+    "artifact_root": "artifacts/perception_gain_v2",
+    "branch": "research/persist4d-perception-gain-v2",
+    "budget": {
+      "association_cpu_core_hours": 16,
+      "confirmation_reserve": 40,
+      "development": 34,
+      "new_cache_gib": 32,
+      "perception": 70,
+      "profile_maximum": 4,
+      "refinement": 16
+    },
+    "cumulative_gpu_hour_cap": 192,
+    "instruction": "docs/0921/Persist4D_Gain_V2/Persist4D_Codex_Gain_V2_FINAL.md",
+    "instruction_sha256": "9b92e302d0af269614e86a76591cd324374f83fe64b097aa4c2ffdb330c3b688",
+    "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+    "refinement": {
+      "evaluation_updates": [
+        0,
+        500,
+        1000,
+        1500
+      ],
+      "input_modes": [
+        "NEW_ONLY",
+        "OLD_NEW"
+      ],
+      "residual_bound": 2,
+      "updates": 1500
+    },
+    "runtime": {
+      "batch_size_per_gpu": 2,
+      "gradient_accumulation": 8,
+      "loader_timeout_seconds": 180,
+      "maximum_cpu_workers": 8,
+      "maximum_gpus": 4,
+      "maximum_ram_gib": 96,
+      "maximum_training_jobs": 2,
+      "perception_devices": 2,
+      "workers_per_rank": 2
+    },
+    "schema_version": "perception-gain-v2-config-v1",
+    "selection": {
+      "final": {
+        "long": 0.0,
+        "mean": 0.003,
+        "minimum": -0.001
+      },
+      "new_vs_c0": {
+        "mean": 0.002,
+        "minimum": -0.002
+      },
+      "pair_vs_new": {
+        "long": 0.0,
+        "mean": 0.001,
+        "minimum": -0.002
+      },
+      "perception": {
+        "long": 0.0,
+        "mean": 0.005,
+        "minimum": -0.001
+      },
+      "repair": {
+        "long": 0.0,
+        "mean": 0.003,
+        "minimum": -0.001
+      },
+      "tolerance": 1e-06
+    },
+    "training": {
+      "evaluation_updates": [
+        0,
+        250,
+        750,
+        1500,
+        2250,
+        3000
+      ],
+      "full_updates": 3000,
+      "learning_rates": {
+        "H": 5e-05,
+        "L": 1e-05
+      },
+      "pilot_updates": 750,
+      "replication_seed": 46,
+      "train_seed": 45
+    }
+  }
+}

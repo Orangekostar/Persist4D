@@ -7,6 +7,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import signal
 import shutil
 import subprocess
 import sys
@@ -483,10 +484,465 @@ def prepare_local_data(config: dict, *, external_root: Path) -> dict:
     return result
 
 
+def train_recipe(
+    config: dict,
+    *,
+    recipe_id: str,
+    endpoint: int,
+    external_root: Path,
+    import_resume: Path | None = None,
+    legacy_config: Path | None = None,
+) -> dict:
+    artifacts = PROJECT_ROOT / config["artifact_root"]
+    recipe_path = artifacts / f"training/{recipe_id}/recipe.json"
+    recipe = read_json(recipe_path)
+    run_dir = external_root / f"training/{recipe_id}"
+    summary_path = run_dir / "run_summary.json"
+    if summary_path.is_file():
+        summary = read_json(summary_path)
+        if (
+            summary.get("recipe") == recipe
+            and summary["completed_global_step"] == endpoint
+            and summary["status"] == "COMPLETE"
+        ):
+            return summary
+    resume = run_dir / "last.ckpt"
+    resume = resume if resume.is_file() else import_resume
+    command = [
+        sys.executable,
+        "-m",
+        "scripts.train_perception_gain",
+        "--variant",
+        recipe["architecture_variant"],
+        "--recipe-config",
+        str(recipe_path),
+        "--run-subdir",
+        recipe_id,
+        "--assets",
+        str(external_root / "assets.local.json"),
+        "--roles",
+        str(artifacts / "DATA_ROLES.json"),
+        "--external-root",
+        str(external_root),
+        "--stop-after-updates",
+        str(endpoint),
+    ]
+    if resume is not None:
+        command += ["--resume", str(resume)]
+    if legacy_config is not None:
+        command += ["--legacy-resume-config", str(legacy_config)]
+    event = {
+        "recipe_id": recipe_id,
+        "argv": command,
+        "cwd": str(PROJECT_ROOT),
+        "start_utc": utc_now(),
+        "endpoint": endpoint,
+        "resume": str(resume) if resume else None,
+    }
+    run_dir.mkdir(parents=True, exist_ok=True)
+    attempt = len(list(run_dir.glob("invocation-*.json")))
+    invocation = run_dir / f"invocation-{attempt:02d}.json"
+    with (run_dir / f"stdout-{attempt:02d}.log").open("w") as stream:
+        process = subprocess.Popen(
+            command, cwd=PROJECT_ROOT, stdout=stream, stderr=subprocess.STDOUT
+        )
+        event["pid"] = process.pid
+        write_json(invocation, event)
+        exit_code = process.wait()
+    event.update({"end_utc": utc_now(), "exit_code": exit_code})
+    write_json(invocation, event)
+    if exit_code:
+        raise RuntimeError(
+            f"training {recipe_id} exited {exit_code}; see external:training/{recipe_id}/stdout-{attempt:02d}.log"
+        )
+    summary = read_json(summary_path)
+    # Copy only portable, small training evidence; optimizer checkpoints stay external.
+    destination = artifacts / f"training/{recipe_id}"
+    for name in ("resolved_config.yaml", "run_plan.json", "run_summary.json"):
+        content = (run_dir / name).read_text()
+        content = content.replace(
+            str(external_root), "$PERSIST4D_GAIN_V2_ROOT"
+        ).replace(str(PROJECT_ROOT), "$PERSIST4D_REPO")
+        (destination / name).write_text(content)
+    for metrics in sorted((run_dir / "training_metrics").glob("version_*/metrics.csv")):
+        shutil.copyfile(metrics, destination / f"metrics-{metrics.parent.name}.csv")
+    write_json(
+        destination / "checkpoint_manifest.json",
+        {"checkpoints": summary["checkpoints"]},
+    )
+    return summary
+
+
+def execute_task(task: str, config: dict, *, external_root: Path) -> dict:
+    assets = read_json(external_root / "assets.local.json")
+    if task == "DATA":
+        result = prepare_local_data(config, external_root=external_root)
+        return {
+            key: value
+            for key, value in result.items()
+            if key not in {"files", "source_manifests"}
+        }
+    if task == "HIGH_CONT":
+        summary = train_recipe(
+            config,
+            recipe_id="S-BAL-H-s45",
+            endpoint=750,
+            external_root=external_root,
+            import_resume=Path(assets["S_BAL_H_resume"]),
+            legacy_config=Path(assets["S_BAL_H_config"]),
+        )
+        return {
+            "status": "COMPLETE",
+            "training": {"S-BAL-H-s45": summary},
+            "C0_H_weights": ["asset:C0_H_0250", "asset:C0_H_0750"],
+        }
+    if task == "LOW_PAIR":
+        rows = {}
+        for recipe_id in ("C0-L-s45", "S-BAL-L-s45"):
+            try:
+                rows[recipe_id] = train_recipe(
+                    config,
+                    recipe_id=recipe_id,
+                    endpoint=750,
+                    external_root=external_root,
+                )
+            except (OSError, RuntimeError, ValueError) as error:
+                rows[recipe_id] = {"status": "BLOCKED", "reason": str(error)}
+        return {
+            "status": (
+                "COMPLETE"
+                if all(row["status"] == "COMPLETE" for row in rows.values())
+                else "BLOCKED"
+            ),
+            "training": rows,
+        }
+    raise RuntimeError(
+        f"V2 handler {task} is still under development; no experiment was performed"
+    )
+
+
+def _free_gpus() -> list[int]:
+    result = subprocess.run(
+        [
+            "nvidia-smi",
+            "--query-gpu=index,name,memory.used,utilization.gpu",
+            "--format=csv,noheader,nounits",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return [
+        int(parts[0])
+        for line in result.stdout.splitlines()
+        if len(parts := [value.strip() for value in line.split(",")]) == 4
+        and "A40" in parts[1]
+        and int(parts[2]) < 256
+        and int(parts[3]) == 0
+    ]
+
+
+def training_watchdog_deadline(
+    task: str, external_root: Path, started_unix: float, timeout_seconds: float
+) -> float:
+    """Only a task's current invocation may renew its completion watchdog."""
+    patterns = {
+        "HIGH_CONT": ("S-BAL-H-s45",),
+        "LOW_PAIR": ("C0-L-s45", "S-BAL-L-s45"),
+        "AUX": ("A-OPEN-*-s45", "Q-SEM-*-s45", "S-WORST-*-s45"),
+        "PERCEPTION": ("*-s45",),
+        "REPLICATE": ("*-s46",),
+    }
+    active = []
+    for pattern in patterns.get(task, ()):
+        for run_dir in (external_root / "training").glob(pattern):
+            for path in run_dir.glob("invocation-*.json"):
+                invocation = read_json(path)
+                started = dt.datetime.fromisoformat(invocation["start_utc"]).timestamp()
+                if started >= started_unix and "end_utc" not in invocation:
+                    active.append((started, run_dir))
+    if not active:
+        return started_unix + 600
+    started, run_dir = max(active)
+    progress = run_dir / "PROGRESS.json"
+    if progress.is_file() and progress.stat().st_mtime >= started:
+        return progress.stat().st_mtime + timeout_seconds
+    return started + 600
+
+
+def run_tasks(
+    config: dict,
+    *,
+    config_path: Path,
+    external_root: Path,
+    target: str,
+    retry_blocked: str | None = None,
+) -> dict:
+    artifacts = PROJECT_ROOT / config["artifact_root"]
+    state_path = artifacts / "RUN_STATE.json"
+    state = read_json(state_path)
+    if state["identity"]["config_sha256"] != file_hash(config_path):
+        raise ValueError("V2 resume config changed")
+    if any(row["status"] == "RUNNING" for row in state["tasks"].values()):
+        raise RuntimeError(
+            "existing RUNNING task must be reconciled against its live PID before resuming"
+        )
+    signature = content_hash(
+        {
+            "assets": read_json(external_root / "assets.local.json"),
+            "code": executed_identity(PROJECT_ROOT, [Path(__file__)]),
+        }
+    )
+    if retry_blocked:
+        row = state["tasks"][retry_blocked]
+        if row["status"] != "BLOCKED" or row.get("dependency_signature") == signature:
+            raise ValueError(
+                "retry requires a blocked task and changed dependency/fix signature"
+            )
+        state["tasks"][retry_blocked] = {"status": "PENDING", "previous_attempt": row}
+    running = {}
+    task_root = external_root / "tasks"
+    task_root.mkdir(exist_ok=True)
+    requirements = {name: 1 for name in TASKS}
+    requirements.update(
+        {
+            name: config["runtime"]["perception_devices"]
+            for name in ("HIGH_CONT", "LOW_PAIR", "AUX", "PERCEPTION", "REPLICATE")
+        }
+    )
+    requirements.update(
+        {name: 0 for name in ("BIND", "DATA", "ASSOC", "LOCK", "REPORT", "PUBLISH")}
+    )
+    start_cost = float(state["v2_gpu_hours"])
+    # The protocol-specific order starts R1 repair independently on the spare GPU.
+    order = (
+        "BIND",
+        "DATA",
+        "REPAIR_R1",
+        "HIGH_CONT",
+        "LOW_PAIR",
+        "BASELINE",
+        "ASSOC",
+        "AUX",
+        "PERCEPTION",
+        "REPAIR_P",
+        "LOCK",
+        "REPLICATE",
+        "CONFIRM",
+        "PROFILE",
+        "REPORT",
+        "PUBLISH",
+    )
+    while True:
+        live_gpu_cost = sum(
+            (time.monotonic() - item["start"]) * len(item["gpus"]) / 3600
+            for item in running.values()
+        )
+        remaining = (
+            config["cumulative_gpu_hour_cap"]
+            - state["prior_gpu_hours"]
+            - state["v2_gpu_hours"]
+            - live_gpu_cost
+        )
+        ready = ready_tasks(state["tasks"], target=target)
+        reserved = {gpu for item in running.values() for gpu in item["gpus"]}
+        free = (
+            [gpu for gpu in _free_gpus() if gpu not in reserved][
+                : max(0, config["runtime"]["maximum_gpus"] - len(reserved))
+            ]
+            if any(requirements[name] for name in ready)
+            else []
+        )
+        for name in order:
+            if name not in ready:
+                continue
+            count = requirements[name]
+            if (
+                count > len(free)
+                or len(running) >= config["runtime"]["maximum_training_jobs"]
+            ):
+                continue
+            reserve = (
+                0
+                if name in {"CONFIRM", "PROFILE", "REPORT", "PUBLISH"}
+                else state["confirmation_reserve_gpu_hours"]
+            )
+            if count and remaining <= reserve:
+                state["tasks"][name] = {
+                    "status": "BLOCKED",
+                    "reason": "Cumulative budget leaves only protected confirmation reserve",
+                    "dependency_signature": signature,
+                }
+                write_json(state_path, state)
+                continue
+            gpus, free = free[:count], free[count:]
+            argv = [
+                sys.executable,
+                "-m",
+                "scripts.perception_gain_v2",
+                "execute-task",
+                "--config",
+                str(config_path),
+                "--external-root",
+                str(external_root),
+                "--target",
+                name,
+            ]
+            environment = {
+                **os.environ,
+                "CUDA_VISIBLE_DEVICES": ",".join(map(str, gpus)),
+                "OMP_NUM_THREADS": "2",
+                "MKL_NUM_THREADS": "2",
+                "OPENBLAS_NUM_THREADS": "2",
+            }
+            if assets_scorer := read_json(external_root / "assets.local.json").get(
+                "scorer_checkpoint"
+            ):
+                environment["PERSIST4D_Q_SEM_SCORER"] = assets_scorer
+            stream = (task_root / f"{name}.log").open("a")
+            process = subprocess.Popen(
+                argv,
+                cwd=PROJECT_ROOT,
+                env=environment,
+                stdout=stream,
+                stderr=subprocess.STDOUT,
+                start_new_session=True,
+            )
+            item = {
+                "process": process,
+                "stream": stream,
+                "start": time.monotonic(),
+                "gpus": gpus,
+                "start_utc": utc_now(),
+                "argv": argv,
+            }
+            running[name] = item
+            state["tasks"][name] = {
+                "status": "RUNNING",
+                "pid": process.pid,
+                "gpus": gpus,
+                "start_utc": item["start_utc"],
+                "dependency_signature": signature,
+            }
+            write_json(state_path, state)
+        for name, item in list(running.items()):
+            process = item["process"]
+            limit = (
+                0
+                if name in {"CONFIRM", "PROFILE"}
+                else state["confirmation_reserve_gpu_hours"]
+            )
+            if process.poll() is None and item["gpus"] and remaining <= limit:
+                item["terminated_reason"] = "GPU budget/reserve limit"
+            if process.poll() is None and name in {
+                "HIGH_CONT",
+                "LOW_PAIR",
+                "AUX",
+                "PERCEPTION",
+                "REPLICATE",
+            }:
+                deadline = training_watchdog_deadline(
+                    name,
+                    external_root,
+                    dt.datetime.fromisoformat(item["start_utc"]).timestamp(),
+                    config["runtime"]["loader_timeout_seconds"],
+                )
+                if time.time() > deadline:
+                    item["terminated_reason"] = (
+                        "No completed batch/update within startup/progress watchdog"
+                    )
+            if process.poll() is None and "terminated_reason" in item:
+                if "terminated_at" not in item:
+                    os.killpg(process.pid, signal.SIGTERM)
+                    item["terminated_at"] = time.monotonic()
+                elif time.monotonic() - item["terminated_at"] > 30:
+                    os.killpg(process.pid, signal.SIGKILL)
+            exit_code = process.poll()
+            if exit_code is None:
+                continue
+            item["stream"].close()
+            elapsed = time.monotonic() - item["start"]
+            hours = elapsed * len(item["gpus"]) / 3600
+            result_path = task_root / f"{name}.json"
+            result = (
+                read_json(result_path)
+                if result_path.is_file() and exit_code == 0
+                else {
+                    "status": "BLOCKED",
+                    "reason": item.get(
+                        "terminated_reason",
+                        f"Task exited {exit_code}; see external:tasks/{name}.log",
+                    ),
+                }
+            )
+            state["tasks"][name] = {
+                **result,
+                "exit_code": exit_code,
+                "gpu_hours": hours,
+                "end_utc": utc_now(),
+                "dependency_signature": signature,
+            }
+            event = {
+                "event_id": f"{name}:{item['start_utc']}",
+                "task": name,
+                "gpu_hours": hours,
+                "measurement": "MEASURED_PROCESS_GPU_RESERVATION_WALLTIME",
+                "elapsed_seconds": elapsed,
+                "gpu_count": len(item["gpus"]),
+                "start_utc": item["start_utc"],
+                "end_utc": utc_now(),
+                "scope": "V2",
+            }
+            append_event(artifacts / "budget/LEDGER.jsonl", event)
+            portable_argv = [
+                part.replace(str(PROJECT_ROOT), "$PERSIST4D_REPO").replace(
+                    str(external_root), "$PERSIST4D_GAIN_V2_ROOT"
+                )
+                for part in item["argv"]
+            ]
+            append_event(
+                artifacts / "EXECUTION_LOG.jsonl",
+                {
+                    **event,
+                    "argv": portable_argv,
+                    "cwd": "repo:.",
+                    "pid": process.pid,
+                    "gpus": item["gpus"],
+                    "exit_code": exit_code,
+                    "outputs": [f"external:tasks/{name}.json"],
+                },
+            )
+            state["v2_gpu_hours"] += hours
+            state["remaining_gpu_hours"] = max(
+                0,
+                config["cumulative_gpu_hour_cap"]
+                - state["prior_gpu_hours"]
+                - state["v2_gpu_hours"],
+            )
+            write_json(state_path, state)
+            del running[name]
+        if not running:
+            if not ready_tasks(state["tasks"], target=target):
+                break
+            if all(
+                requirements[name] > len(_free_gpus())
+                for name in ready_tasks(state["tasks"], target=target)
+            ):
+                break
+        time.sleep(5)
+    return {
+        "tasks": {
+            name: state["tasks"][name]["status"] for name in dependency_closure(target)
+        },
+        "incremental_gpu_hours": state["v2_gpu_hours"] - start_cost,
+    }
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "command", choices=("bootstrap", "run", "status", "report", "publish")
+        "command",
+        choices=("bootstrap", "run", "status", "report", "publish", "execute-task"),
     )
     parser.add_argument(
         "--config", type=Path, default=PROJECT_ROOT / "configs/perception_gain_v2.yaml"
@@ -534,6 +990,10 @@ def main(argv=None) -> int:
     if args.command == "status":
         print(json.dumps(state, indent=2))
         return 0
+    if args.command == "execute-task":
+        result = execute_task(args.target, config, external_root=args.external_root)
+        write_json(args.external_root / f"tasks/{args.target}.json", result)
+        return 0
     if args.command == "run" and args.target == "DATA":
         result = prepare_local_data(config, external_root=args.external_root)
         state["tasks"]["DATA"] = {
@@ -543,6 +1003,19 @@ def main(argv=None) -> int:
         }
         write_json(artifact_root / "RUN_STATE.json", state)
         print(json.dumps(state["tasks"]["DATA"]))
+        return 0
+    if args.command == "run":
+        print(
+            json.dumps(
+                run_tasks(
+                    config,
+                    config_path=args.config.resolve(),
+                    external_root=args.external_root,
+                    target=args.target,
+                    retry_blocked=args.retry_blocked,
+                )
+            )
+        )
         return 0
     raise RuntimeError(
         "requested V2 task handler is not implemented yet; run remains IN_PROGRESS"

@@ -1,0 +1,49 @@
+{
+  "architecture_variant": "S-WORST",
+  "association": "D0/LAST",
+  "base_weight_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "batch_size_per_gpu": 2,
+  "betas": [
+    0.9,
+    0.999
+  ],
+  "devices": 2,
+  "eps": 1e-08,
+  "eval_seed": 45,
+  "evaluation_updates": [
+    0,
+    250,
+    750,
+    1500,
+    2250,
+    3000
+  ],
+  "freeze": "backbone_encoder",
+  "frozen_encoder_eval": false,
+  "gradient_accumulation": 8,
+  "gradient_clip_norm": 1.0,
+  "inference_recipe_hash": "9cb10bb0afad17126df6a2a49385133ef1b436e753be619a4db27bff46bdf2f3",
+  "learning_rate": 1e-05,
+  "learning_rate_label": "L",
+  "minimum_lr_fraction": 0.1,
+  "nominal_dataset_weights": [
+    1.0,
+    0.8
+  ],
+  "num_workers": 2,
+  "objective": "raw_sum",
+  "optimizer_updates": 3000,
+  "precision": "32-true",
+  "publisher": "lag1/mean",
+  "query_count": 100,
+  "recipe_id": "S-WORST-L-s45",
+  "schema_version": "perception-gain-v2-recipe-v1",
+  "stage_worst_alpha": 0.5,
+  "stage_worst_beta": 0.25,
+  "state_capacity": 100,
+  "timeout_seconds": 180,
+  "train_seed": 45,
+  "training_recipe_hash": "19aff3f1e5421719324eb7aeff4762273082e5b1f0f41f42f0338b9f0f11ab3f",
+  "warmup_updates": 150,
+  "weight_decay": 0.01
+}
