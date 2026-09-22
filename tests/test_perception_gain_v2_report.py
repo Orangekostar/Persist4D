@@ -1,6 +1,60 @@
 import pytest
 
-from scripts.perception_gain_v2_report import confirmation_rows, ledger_totals
+from scripts.perception_gain_v2_report import (
+    auxiliary_complete,
+    confirmation_rows,
+    ledger_totals,
+)
+
+
+def completed_auxiliary():
+    return {
+        "status": "COMPLETE",
+        "learning_rate": "L",
+        "probes": {
+            rate: [{"coverage_status": "COMPLETE"} for _ in range(4)]
+            for rate in ("H", "L")
+        },
+        "arms": {
+            f"{variant}-L-s45": {
+                "status": "COMPLETE",
+                "completed_global_step": 750,
+                "cal": [
+                    {"optimizer_update": step, "coverage_status": "COMPLETE"}
+                    for step in ((250, 750) if variant == "S-WORST" else (0, 250, 750))
+                ],
+            }
+            for variant in ("A-OPEN", "Q-SEM", "S-WORST")
+        },
+    }
+
+
+def test_completed_auxiliary_requires_real_training_and_cal_coverage():
+    result = completed_auxiliary()
+    assert auxiliary_complete(result)
+    result["arms"]["A-OPEN-L-s45"]["cal"][-1]["coverage_status"] = "INCOMPLETE"
+    assert not auxiliary_complete(result)
+
+
+def test_auxiliary_wrapper_completion_does_not_hide_a_blocked_or_missing_arm():
+    result = completed_auxiliary()
+    result["arms"]["A-OPEN-L-s45"] = {"status": "BLOCKED", "reason": "Loader failed"}
+    assert not auxiliary_complete(result)
+    del result["arms"]["A-OPEN-L-s45"]
+    assert not auxiliary_complete(result)
+    assert not auxiliary_complete({})
+
+
+def test_auxiliary_allows_the_prescribed_skips_but_not_a_missing_probe():
+    result = completed_auxiliary()
+    result["arms"]["S-WORST-L-s45"] = {"status": "SKIPPED_BUDGET"}
+    result["arms"]["Q-SEM-L-s45"] = {
+        "status": "SKIPPED_SEVERE_ZERO_STEP",
+        "cal": [{"optimizer_update": 0, "coverage_status": "COMPLETE"}],
+    }
+    assert auxiliary_complete(result)
+    result["probes"]["H"][0]["coverage_status"] = "INCOMPLETE"
+    assert not auxiliary_complete(result)
 
 
 def test_missing_confirmation_keeps_the_original_denominators_and_unknown_scores():

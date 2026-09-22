@@ -156,6 +156,42 @@ def table(rows: list[dict], fields: list[str]) -> str:
     )
 
 
+def auxiliary_complete(result: dict) -> bool:
+    """A finished wrapper can still contain failed pilots or missing CAL evidence."""
+    rate = result.get("learning_rate")
+    if result.get("status") != "COMPLETE" or rate not in {"H", "L"}:
+        return False
+    for label in ("H", "L"):
+        probes = result.get("probes", {}).get(label, [])
+        if len(probes) != 4 or any(
+            row.get("coverage_status") != "COMPLETE" for row in probes
+        ):
+            return False
+    arms = result.get("arms", {})
+    expected = {f"{variant}-{rate}-s45" for variant in ("A-OPEN", "Q-SEM", "S-WORST")}
+    if set(arms) != expected:
+        return False
+    for name, row in arms.items():
+        points = row.get("cal", [])
+        if any(point.get("coverage_status") != "COMPLETE" for point in points):
+            return False
+        steps = {point.get("optimizer_update") for point in points}
+        status = row.get("status")
+        zero_probe = not name.startswith("S-WORST-")
+        if status == "SKIPPED_BUDGET":
+            continue
+        if status == "SKIPPED_SEVERE_ZERO_STEP" and zero_probe and steps == {0}:
+            continue
+        required = {0, 250, 750} if zero_probe else {250, 750}
+        if (
+            status != "COMPLETE"
+            or row.get("completed_global_step") != 750
+            or not required.issubset(steps)
+        ):
+            return False
+    return True
+
+
 def observed_tasks(artifacts: Path, external_root: Path, state: dict) -> dict:
     """Report external recovery without mutating a running controller's state."""
     tasks = dict(state["tasks"])
@@ -195,6 +231,7 @@ def run_report(config: dict, *, external_root: Path) -> dict:
     rebaseline = optional(artifacts / "foundation/REBASELINE_STATUS.json")
     supersession = optional(artifacts / "foundation/BASELINE_SUPERSESSION.json")
     confirmation = optional(artifacts / "confirmation/CONFIRMATION.json")
+    auxiliary = optional(artifacts / "selection/AUX.json")
     perception = optional(artifacts / "selection/PERCEPTION.json")
     association = optional(artifacts / "association/SELECTION.json")
     replication = optional(artifacts / "replication/REPLICATION.json")
@@ -602,6 +639,7 @@ def run_report(config: dict, *, external_root: Path) -> dict:
                 )
             )
             and replication.get("status") in {"COMPLETE", "SKIPPED_BUDGET"}
+            and auxiliary_complete(auxiliary)
             else "PARTIAL_WITH_BLOCKERS"
         ),
         "perception_selection": (
@@ -798,6 +836,27 @@ def run_report(config: dict, *, external_root: Path) -> dict:
                 "learning_rate": optional(
                     artifacts / "selection/LEARNING_RATE.json"
                 ).get("learning_rate_label"),
+                "auxiliary_pilots": {
+                    name: {
+                        **{
+                            key: row.get(key)
+                            for key in (
+                                "status",
+                                "reason",
+                                "completed_global_step",
+                                "budget",
+                            )
+                        },
+                        "cal": [
+                            {
+                                "step": point.get("optimizer_update"),
+                                "coverage": point.get("coverage_status"),
+                            }
+                            for point in row.get("cal", [])
+                        ],
+                    }
+                    for name, row in auxiliary.get("arms", {}).items()
+                },
                 "full_promotion": optional(artifacts / "selection/FULL_PROMOTION.json"),
                 "perception_failures": perception.get("failures"),
                 "final_method": lock.get("final_method_id"),
