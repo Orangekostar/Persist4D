@@ -38,15 +38,15 @@ Files: extend perception/native/local/refiner evaluation, preparation and profil
 
 Interfaces: optional `recipe_config`, `artifact_root`, `assets_path`, `roles_path`, `external_root`; execution provenance records actual HEAD plus relevant source digest, complete input/point order/seed/publisher identity.
 
-- [ ] Test live assets without legacy caches; recipe reaches train and evaluation; preserve official population denominators.
-- [ ] Verify one real CAL sequence: repeated R1, D0 vs disabled refiner, zero residual through bool materialization, unchanged candidate/identity/score.
+- [x] Test live assets without legacy caches; recipe reaches train and evaluation; preserve official population denominators.
+- [x] Verify one real CAL sequence: repeated R1, D0 vs disabled refiner, zero residual through bool materialization, unchanged candidate/identity/score.
 - [ ] Produce full CAL/SEL R1-D0 and native FH (23/24 units); export read-only live canonical evidence for association and multihead evaluation.
 
 ## Task 3 — Independent perception jobs
 
 Files: V2 entry point/config and existing trainer integration; tests cover DAG readiness, retry signatures and budget reservation.
 
-- [ ] DAG supports per-task/recipe terminal states and dependency closure; REPAIR_R1 has no perception-selection dependency. Persist PID/argv/device/start/end/update interval and ledger from primary process.
+- [x] DAG supports per-task/recipe terminal states and dependency closure; REPAIR_R1 has no perception-selection dependency. Persist PID/argv/device/start/end/update interval and ledger from primary process.
 - [ ] Run H350→750, C0-L→750 and S-BAL-L→750 on the shared sample stream. Reuse C0-H weights read-only and evaluate all required checkpoints with actual identity.
 - [ ] Choose LR* by comparable CAL probe; A-OPEN/Q-SEM/S-WORST in protocol order with explicit skips. Keep scorer frozen and separate its steps/cost.
 - [ ] Select at most one mechanism + same-LR C0 (or C0-only positive branch), continue fixed schedule to3000, CAL-lock then SEL-select P.
@@ -57,9 +57,9 @@ Files: `models/perception_gain.py`, `train_perception_refiner.py`, `prepare_perc
 
 Interfaces: shared mode adapter replaces old logits/score with new for NEW_ONLY before derived features; frozen/resume schema carries mode/parent recipe hash/parent weight/source shards/seed/updates/bound; every loader uses it.
 
-- [ ] Test NEW invariance to old values, matched initialization/sampling, independent archives, strict mapping, source/mode mismatch rejection and no zero shortcut.
-- [ ] Cache fixed 32-reference R1 training episodes once; compute pair/fallback and residual-correctability diagnostics from that data.
-- [ ] Train each head to1500, preserve checkpoints0/500/1000/1500 and actual curves/audits.
+- [x] Test NEW invariance to old values, matched initialization/sampling, independent archives, strict mapping, source/mode mismatch rejection and no zero shortcut.
+- [x] Cache fixed 32-reference R1 training episodes once; compute pair/fallback and residual-correctability diagnostics from that data.
+- [x] Train each head to1500, preserve checkpoints0/500/1000/1500 and actual curves/audits.
 - [ ] Evaluate all CAL heads with one streamed upstream pass and separate publishers/official metrics; select each head then evaluate fixed SEL points and three comparisons.
 
 ## Task 5 — Limited association and optional P repair
@@ -74,7 +74,7 @@ Files: existing canonical replay/association adapter and V2 task runner.
 
 Files: V2 runner/config helper, existing evaluation entry points and targeted decision tests.
 
-- [ ] Implement protocol ranking/tolerance, same-LR C0 attribution, NEW/PAIR gates, tie_update and fallback; verify four supplied policy examples and missing-coverage null.
+- [x] Implement protocol ranking/tolerance, same-LR C0 attribution, NEW/PAIR gates, tie_update and fallback; verify four supplied policy examples and missing-coverage null.
 - [ ] Write immutable FINAL_LOCK with fixed confirmation inventory before PB. Record omitted search scopes.
 - [ ] Run allowed seed46 fixed-step component/pipeline replication without reselection.
 - [ ] Complete PB 129/516 per distinct required method; LOCAL154 per prescribed seed; ADDITIONAL111/77/32 units. Preserve failed-prefix denominator and separate native FH errors.

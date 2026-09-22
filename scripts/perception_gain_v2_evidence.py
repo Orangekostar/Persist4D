@@ -540,3 +540,79 @@ def run_repair(
     }
     write_json(public / "SELECTION.json", result)
     return result
+
+
+def run_optional_parent_repair(config: dict, *, external_root: Path) -> dict:
+    from scripts.perception_gain_v2_perception import (
+        budget_decision,
+        resolve_checkpoint,
+    )
+
+    artifacts = PROJECT_ROOT / config["artifact_root"]
+    perception_path = artifacts / "selection/PERCEPTION.json"
+    r1_path = artifacts / "refiner/R1/SELECTION.json"
+    if not perception_path.exists() or not r1_path.exists():
+        result = {
+            "status": "BLOCKED",
+            "reason": "Perception or paired R1 selection is unavailable",
+        }
+    else:
+        perception, r1 = read_json(perception_path), read_json(r1_path)
+        parent = perception["selected"]
+        if parent["method_id"] == "R1-D0":
+            result = {
+                "status": "NOT_APPLICABLE",
+                "reason": "P is R1; reuse its existing paired repair",
+            }
+        elif r1.get("status") != "COMPLETE" or not r1["selection"]["base_positive"]:
+            result = {
+                "status": "NOT_APPLICABLE",
+                "reason": "Complete R1 paired control did not establish a positive repair base gate",
+            }
+        else:
+            import json
+
+            prior = [
+                json.loads(line)
+                for line in (artifacts / "budget/LEDGER.jsonl").read_text().splitlines()
+                if line.strip()
+            ]
+            # Include cache generation, head training, CAL/SEL and failed reservation cost.
+            measured = sum(
+                row["gpu_hours"]
+                for row in {
+                    row["event_id"]: row
+                    for row in prior
+                    if row.get("scope") == "V2" and row.get("task") == "REPAIR_R1"
+                }.values()
+            )
+            decision = budget_decision(
+                config,
+                external_root=external_root,
+                label="P paired repair",
+                predicted_gpu_hours=measured,
+                category="refinement",
+            )
+            if not decision["affordable"]:
+                result = {"status": "SKIPPED_BUDGET", "budget": decision}
+            else:
+                recipe = read_json(
+                    artifacts / f"training/{parent['recipe_id']}/recipe.json"
+                )
+                result = run_repair(
+                    config,
+                    external_root=external_root,
+                    parent_id="P",
+                    recipe=recipe,
+                    parent_update=parent["optimizer_update"],
+                    parent_checkpoint=resolve_checkpoint(
+                        parent["recipe_id"],
+                        parent["optimizer_update"],
+                        external_root=external_root,
+                    ),
+                    required_inventory=read_json(
+                        artifacts / "refiner/R1/DATA_MANIFEST.json"
+                    )["inventory"],
+                )
+    write_json(artifacts / "refiner/P/SELECTION.json", result)
+    return result

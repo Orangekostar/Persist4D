@@ -63,7 +63,21 @@ def resolve_checkpoint(
 
 
 def baseline_candidate(artifacts: Path, role: str) -> dict:
-    result = read_json(artifacts / f"foundation/{role}/D0.json")
+    path = artifacts / f"foundation/{role}/D0.json"
+    result = (
+        read_json(path)
+        if path.exists()
+        else {
+            "candidate": {
+                "coverage_status": "INCOMPLETE",
+                "metrics": {},
+                "optimizer_update": 0,
+                "new_parameter_count": 0,
+                "checkpoint_sha256": R1_SHA256,
+                "reason": "R1 live baseline has not completed",
+            }
+        }
+    )
     return {
         **result["candidate"],
         "method_id": "R1-D0",
@@ -143,6 +157,12 @@ def budget_decision(
             for row in unique.values()
             if row.get("task") in {"HIGH_CONT", "LOW_PAIR"}
         )
+    if category == "refinement":
+        spent += sum(
+            row["gpu_hours"]
+            for row in unique.values()
+            if row.get("task") in {"REPAIR_R1", "REPAIR_P"}
+        )
     reserve = state["confirmation_reserve_gpu_hours"]
     core_refinement = max(
         0.0,
@@ -153,6 +173,8 @@ def budget_decision(
             if row.get("task") in {"REPAIR_R1", "REPAIR_P"}
         ),
     )
+    if state["tasks"]["REPAIR_R1"]["status"] == "COMPLETE":
+        core_refinement = 0.0
     needed = predicted_gpu_hours * 1.25
     result = {
         "label": label,
@@ -326,6 +348,15 @@ def comparable_cohort(external_root: Path) -> dict:
 def run_aux(config: dict, *, external_root: Path) -> dict:
     artifacts = PROJECT_ROOT / config["artifact_root"]
     baseline = baseline_candidate(artifacts, "CAL")
+    if baseline["coverage_status"] != "COMPLETE":
+        result = {
+            "status": "BLOCKED",
+            "reason": "Complete R1 CAL comparison is unavailable",
+            "probes": {"H": [], "L": []},
+            "arms": {},
+        }
+        write_json(artifacts / "selection/AUX.json", result)
+        return result
     probes = {label: [] for label in ("H", "L")}
     for label in probes:
         for variant in ("C0", "S-BAL"):
