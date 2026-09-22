@@ -716,13 +716,19 @@ def training_watchdog_deadline(
         "REPLICATE": ("*-s46",),
     }
     active = []
+    completed = []
     for pattern in patterns.get(task, ()):
         for run_dir in (external_root / "training").glob(pattern):
             for path in run_dir.glob("invocation-*.json"):
                 invocation = read_json(path)
                 started = dt.datetime.fromisoformat(invocation["start_utc"]).timestamp()
-                if started >= started_unix and "end_utc" not in invocation:
-                    active.append((started, run_dir))
+                if started >= started_unix:
+                    if "end_utc" in invocation:
+                        completed.append(
+                            dt.datetime.fromisoformat(invocation["end_utc"]).timestamp()
+                        )
+                    else:
+                        active.append((started, run_dir))
     if not active:
         # AUX/full tasks also perform live evaluation between training invocations.
         # Each completed unit flushes this task's log; other jobs cannot renew it.
@@ -738,7 +744,9 @@ def training_watchdog_deadline(
                 [updated]
                 + [path.stat().st_mtime for path in progress_files if path.exists()]
             )
-        return max(started_unix, updated) + 600
+        # Training logs are separate: its completion starts the next evaluation's
+        # startup grace even when the task log has been quiet throughout training.
+        return max(started_unix, updated, *completed) + 600
     started, run_dir = max(active)
     progress = run_dir / "PROGRESS.json"
     if progress.is_file() and progress.stat().st_mtime >= started:

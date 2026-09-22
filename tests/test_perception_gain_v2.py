@@ -136,6 +136,48 @@ def test_parallel_task_progress_cannot_mask_stalled_training(tmp_path):
     assert runner.training_watchdog_deadline("LOW_PAIR", tmp_path, 999, 180) == 5180
 
 
+@pytest.mark.parametrize("active_training", [False, True])
+def test_watchdog_allows_completed_training_to_hand_off_to_evaluation(
+    tmp_path, active_training
+):
+    import datetime as dt
+    import os
+
+    runner = importlib.import_module("scripts.perception_gain_v2")
+    for recipe_id, started, ended in (
+        ("A-OPEN-L-s45", 1100, 9000),
+        ("Q-SEM-L-s45", 999, 12000),
+        ("C0-L-s45", 1100, 15000),
+    ):
+        runner.write_json(
+            tmp_path / "training" / recipe_id / "invocation-00.json",
+            {
+                "start_utc": dt.datetime.fromtimestamp(
+                    started, dt.timezone.utc
+                ).isoformat(),
+                "end_utc": dt.datetime.fromtimestamp(
+                    ended, dt.timezone.utc
+                ).isoformat(),
+                "exit_code": 0,
+            },
+        )
+    task_log = tmp_path / "tasks/AUX.log"
+    task_log.parent.mkdir()
+    task_log.write_text("Previous evaluation completed\n")
+    os.utime(task_log, (2000, 2000))
+    if active_training:
+        run_dir = tmp_path / "training/S-WORST-L-s45"
+        runner.write_json(
+            run_dir / "invocation-00.json",
+            {"start_utc": dt.datetime.fromtimestamp(8000, dt.timezone.utc).isoformat()},
+        )
+        runner.write_json(run_dir / "PROGRESS.json", {})
+        os.utime(run_dir / "PROGRESS.json", (8100, 8100))
+    assert runner.training_watchdog_deadline("AUX", tmp_path, 1000, 180) == (
+        8280 if active_training else 9600
+    )
+
+
 @pytest.mark.parametrize(
     "new_delta,pair_delta,expected",
     [
