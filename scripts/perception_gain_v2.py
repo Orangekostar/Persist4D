@@ -632,6 +632,10 @@ def execute_task(task: str, config: dict, *, external_root: Path) -> dict:
         from scripts.perception_gain_v2_confirmation import run_confirmation
 
         return run_confirmation(config, external_root=external_root)
+    if task == "REPORT":
+        from scripts.perception_gain_v2_report import run_report
+
+        return run_report(config, external_root=external_root)
     if task == "HIGH_CONT":
         summary = train_recipe(
             config,
@@ -1105,6 +1109,11 @@ def main(argv=None) -> int:
     state = read_json(artifact_root / "RUN_STATE.json")
     if args.command == "status":
         print(json.dumps(state, indent=2))
+        return 0
+    if args.command == "report":
+        print(
+            json.dumps(execute_task("REPORT", config, external_root=args.external_root))
+        )
         return 0
     if args.command == "execute-task":
         result = execute_task(args.target, config, external_root=args.external_root)
