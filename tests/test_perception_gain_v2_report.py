@@ -25,6 +25,35 @@ def test_missing_confirmation_keeps_the_original_denominators_and_unknown_scores
     assert references == []
 
 
+def test_local_report_uses_audited_population_and_measured_references():
+    lock = {
+        "confirmation_methods": {"LOCAL-T2": ["native"]},
+        "confirmation_populations": {"LOCAL-T2": {"references": 46}},
+    }
+    report = {
+        "local_t2": {
+            "native": {
+                "seeds": {
+                    "45": {
+                        "validation_sequence_count": 154,
+                        "validation_reference_count": 46,
+                        "status": "PASS",
+                        "metrics": {"t_mAP": 0.4},
+                    }
+                }
+            }
+        }
+    }
+    rows, _ = confirmation_rows(lock, report)
+    measured = next(
+        row
+        for row in rows
+        if row["population"] == "LOCAL-T2" and row["eval_seed"] == 45
+    )
+    assert measured["actual_references"] == measured["expected_references"] == 46
+    assert measured["expected_units"] == measured["actual_units"] == 154
+
+
 def test_cost_report_deduplicates_settled_events_without_losing_prior_cost():
     events = [
         {"event_id": "prior", "scope": "PRIOR", "gpu_hours": 12.1},

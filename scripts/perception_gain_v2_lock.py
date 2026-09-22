@@ -159,9 +159,12 @@ def describe(
 
 
 def run_lock(config: dict, *, external_root: Path) -> dict:
-    from scripts.perception_gain_evaluation import write_immutable_lock
-    from scripts.perception_gain_local_evaluation import local_evaluation_seeds
     from scripts.p6a_metrics import official_temporal_iou_thresholds
+    from scripts.perception_gain_evaluation import write_immutable_lock
+    from scripts.perception_gain_local_evaluation import (
+        audit_local_population,
+        local_evaluation_seeds,
+    )
     from scripts.perception_gain_v2_confirmation import confirmation_budget
     from scripts.perception_gain_v2_replication import commit_replication_scope
 
@@ -177,6 +180,10 @@ def run_lock(config: dict, *, external_root: Path) -> dict:
             ("data_roles_sha256", artifacts / "DATA_ROLES.json"),
             ("input_manifest_sha256", artifacts / "data/STAGING_MANIFEST.json"),
             ("run_config_sha256", artifacts / "RUN_CONFIG.json"),
+            (
+                "local_population_audit_sha256",
+                artifacts / "foundation/LOCAL_POPULATION_AUDIT.json",
+            ),
         ):
             if locked[field] != file_hash(path):
                 raise ValueError(
@@ -346,6 +353,9 @@ def run_lock(config: dict, *, external_root: Path) -> dict:
         ),
     }
     assets = read_json(external_root / "assets.local.json")
+    local_population = audit_local_population(
+        artifacts=artifacts, external_root=external_root
+    )
     payload = {
         "schema_version": "perception-gain-final-lock-v2",
         "status": "LOCKED",
@@ -363,7 +373,14 @@ def run_lock(config: dict, *, external_root: Path) -> dict:
         "confirmation_populations": {
             "PB": {"references": 6, "logical_units": 129, "prefixes": 516},
             "LOCAL-T2": {
-                "references": 41,
+                "references": local_population["validation_reference_count"],
+                "declared_legacy_references": local_population[
+                    "declared_reference_count"
+                ],
+                "metadata_correction": local_population["metadata_correction"],
+                "population_manifest_sha256": local_population[
+                    "population_manifest_sha256"
+                ],
                 "logical_units_per_seed": 154,
                 "eval_seeds": local_evaluation_seeds(),
             },
@@ -374,6 +391,9 @@ def run_lock(config: dict, *, external_root: Path) -> dict:
             },
         },
         "data_roles_sha256": file_hash(artifacts / "DATA_ROLES.json"),
+        "local_population_audit_sha256": file_hash(
+            artifacts / "foundation/LOCAL_POPULATION_AUDIT.json"
+        ),
         "input_manifest_sha256": file_hash(artifacts / "data/STAGING_MANIFEST.json"),
         "run_config_sha256": file_hash(artifacts / "RUN_CONFIG.json"),
         "selection_thresholds": config["selection"],

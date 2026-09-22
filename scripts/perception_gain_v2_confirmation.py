@@ -224,6 +224,7 @@ def load_lock(config: dict, artifacts: Path) -> tuple[dict, str]:
         ("data_roles_sha256", "DATA_ROLES.json"),
         ("input_manifest_sha256", "data/STAGING_MANIFEST.json"),
         ("run_config_sha256", "RUN_CONFIG.json"),
+        ("local_population_audit_sha256", "foundation/LOCAL_POPULATION_AUDIT.json"),
     ):
         if lock[key] != file_hash(artifacts / relative):
             raise ValueError(f"Locked confirmation input changed: {relative}")
@@ -579,12 +580,19 @@ def run_confirmation(config: dict, *, external_root: Path) -> dict:
         full = all(
             row.get("status") == "PASS"
             and row.get("validation_sequence_count") == 154
-            and row.get("validation_reference_count") == 41
+            and row.get("validation_reference_count")
+            == lock["confirmation_populations"]["LOCAL-T2"]["references"]
+            and row.get("population_manifest_sha256")
+            == lock["confirmation_populations"]["LOCAL-T2"][
+                "population_manifest_sha256"
+            ]
             for row in seeds.values()
         )
         local[name] = {
             "coverage_status": "COMPLETE" if full else "INCOMPLETE",
-            "expected_references": 41,
+            "expected_references": lock["confirmation_populations"]["LOCAL-T2"][
+                "references"
+            ],
             "expected_units_per_seed": 154,
             "seeds": seeds,
             "mean_metrics": (

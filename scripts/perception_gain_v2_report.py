@@ -5,9 +5,9 @@ from __future__ import annotations
 import csv
 import datetime as dt
 import json
-from pathlib import Path
 import shlex
 import subprocess
+from pathlib import Path
 
 from scripts.perception_gain_v2 import (
     PROJECT_ROOT,
@@ -92,8 +92,10 @@ def confirmation_rows(lock: dict, report: dict) -> tuple[list, list]:
                     "eval_seed": seed,
                     "actual_units": value.get("validation_sequence_count", 0),
                     "expected_units": 154,
-                    "actual_references": value.get("actual_reference_count", 0),
-                    "expected_references": 41,
+                    "actual_references": value.get("validation_reference_count", 0),
+                    "expected_references": lock.get("confirmation_populations", {})
+                    .get("LOCAL-T2", {})
+                    .get("references", 41),
                     "t_mAP": value.get("metrics", {}).get("t_mAP"),
                     "coverage": result.get("coverage_status", "NOT_RUN"),
                     "source_status": value.get("status", "NOT_RUN"),
@@ -318,7 +320,9 @@ def run_report(config: dict, *, external_root: Path) -> dict:
                     (
                         "IN_PROGRESS"
                         if progress
-                        else "IMPORTED" if imported_steps else "NOT_RUN"
+                        else "IMPORTED"
+                        if imported_steps
+                        else "NOT_RUN"
                     ),
                 ),
                 "last_checkpoint": (
@@ -574,7 +578,9 @@ def run_report(config: dict, *, external_root: Path) -> dict:
             else (
                 "CONTINUATION_ONLY"
                 if perception.get("selected", {}).get("architecture_variant") == "C0"
-                else "NEW_PERCEPTION" if perception.get("selected") else "NOT_RUN"
+                else "NEW_PERCEPTION"
+                if perception.get("selected")
+                else "NOT_RUN"
             )
         ),
         "repair_R1_selection": repairs["R1"]
@@ -640,7 +646,7 @@ def run_report(config: dict, *, external_root: Path) -> dict:
     ):
         write_csv(artifacts / relative, rows)
     sections = [
-        f"# Persist4D Perception Gain V2\n\n生成时间：{utc_now()}；代码：`{current_commit}`。这是实际文件的当前快照。\n\n所有 AP 与差值使用 0–1 标度；缺失值为 —。只有完整人口才能支持全覆盖胜出结论。\n\n```json\n{json.dumps(status,ensure_ascii=False,indent=2)}\n```"
+        f"# Persist4D Perception Gain V2\n\n生成时间：{utc_now()}；代码：`{current_commit}`。这是实际文件的当前快照。\n\n所有 AP 与差值使用 0–1 标度；缺失值为 —。只有完整人口才能支持全覆盖胜出结论。\n\n```json\n{json.dumps(status, ensure_ascii=False, indent=2)}\n```"
     ]
     for title, rows, fields in (
         ("1. 任务与训练范围", task_rows, ["task", "status", "reason", "observed_from"]),
@@ -751,7 +757,7 @@ def run_report(config: dict, *, external_root: Path) -> dict:
             ["asset", "status", "bytes", "sha256", "url"],
         ),
     ):
-        sections.append(f"## {title}\n\n{table(rows,fields)}")
+        sections.append(f"## {title}\n\n{table(rows, fields)}")
     sections.append(
         "## 选择与证据边界\n\n"
         + json.dumps(
@@ -811,7 +817,7 @@ def run_report(config: dict, *, external_root: Path) -> dict:
     tests = optional(artifacts / "validation/FINAL_TESTS.json")
     audit = optional(artifacts / "validation/REQUIREMENT_AUDIT.json")
     handoff = [
-        f"# V2 交接\n\n固定起点：`{config['parent_commit']}`；当前代码：`{current_commit}`；分支：`{config['branch']}`。\n\n实际实验代码见每个评价的 `execution_provenance` 与 `EXECUTION_LOG.jsonl`。资产 SHA/角色见 `INPUT_MANIFEST.json`、`DATA_ROLES.json`；本机绑定为 `$PERSIST4D_GAIN_V2_ROOT/assets.local.json`。源码映射见 `CODE_BINDINGS.md`。\n\n当前执行：`{status['execution_status']}`；候选：`{lock.get('final_method_id','NOT_LOCKED')}`；默认部署：`{confirmation.get('deployment',{}).get('default_method','UNCONFIRMED')}`。正式结果、每臂步数和失效范围见 `FINAL_REPORT.md` 与各原始 JSON/CSV。",
+        f"# V2 交接\n\n固定起点：`{config['parent_commit']}`；当前代码：`{current_commit}`；分支：`{config['branch']}`。\n\n实际实验代码见每个评价的 `execution_provenance` 与 `EXECUTION_LOG.jsonl`。资产 SHA/角色见 `INPUT_MANIFEST.json`、`DATA_ROLES.json`；本机绑定为 `$PERSIST4D_GAIN_V2_ROOT/assets.local.json`。源码映射见 `CODE_BINDINGS.md`。\n\n当前执行：`{status['execution_status']}`；候选：`{lock.get('final_method_id', 'NOT_LOCKED')}`；默认部署：`{confirmation.get('deployment', {}).get('default_method', 'UNCONFIRMED')}`。正式结果、每臂步数和失效范围见 `FINAL_REPORT.md` 与各原始 JSON/CSV。",
         "## 已执行命令\n\n命令逐条来自真实日志：`tables/EXECUTED_COMMANDS.csv`。恢复前保留失败结果，并先解决对应 reason；控制器拒绝相同依赖下盲目重试。\n\n```bash\nexport PERSIST4D_GAIN_V2_ROOT=/home/ww/persist4d_runs/perception_gain_v2\ncd /home/ww/paper5/.worktrees/persist4d-perception-gain-v2\nconda run -n persist4d python -m scripts.perception_gain_v2 status\nconda run -n persist4d python -m scripts.perception_gain_v2 report\n```\n\n已有控制器运行时不启动另一控制器；待其退出后，按下表恢复。标为 CODE_HANDLER_PENDING 的任务暂不能运行。",
         "## 检查与待完成证据\n\n"
         + json.dumps(

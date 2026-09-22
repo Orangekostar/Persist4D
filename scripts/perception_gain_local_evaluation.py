@@ -104,6 +104,59 @@ def build_local_t2_summary(
     }
 
 
+def audit_local_population(*, artifacts: Path, external_root: Path) -> dict:
+    """Bind original native T2 sequences independently of legacy role metadata."""
+    from datasets.task_memory_episode import _scan_scene
+    from scripts.evaluate_task_memory import NATIVE_POPULATION_ID, _rio_population_base
+    from scripts.perception_gain_v2 import read_json, write_json
+    from scripts.preflight_task_memory_episode import load_reference_by_scene
+    from scripts.task_memory_contracts import canonical_json_sha256
+    from scripts.train_perception_gain import compose_variant_config
+
+    assets = read_json(external_root / "assets.local.json")
+    config = compose_variant_config(
+        "C0", pretrained=Path(assets["concerto_pretrained"]),
+        run_dir=external_root / "evaluation/local-population-audit",
+        recipe_config=read_json(artifacts / "training/C0-L-s45/recipe.json"),
+    )
+    dataset = _rio_population_base(config, data_root=Path(assets["data_root"]),
+                                   horizon=2, population_id=NATIVE_POPULATION_ID)
+    names = tuple(str(value) for value in dataset.sequence_names)
+    reference_by_scene = load_reference_by_scene(Path(assets["rio_metadata"]))
+    references = {reference_by_scene[_scan_scene(scan)] for sequence in names for scan in sequence.split("-")}
+    roles = read_json(artifacts / "DATA_ROLES.json")["roles"]
+    if (len(names) != len(set(names)) or len(names) != LOCAL_T2_SEQUENCE_COUNT
+        or references & set(roles["TRAIN"])
+        or not references.issubset(set(roles["PB"]) | set(roles["ADDITIONAL"]))):
+        raise PerceptionEvaluationError("Original LOCAL-T2 population differs or overlaps TRAIN")
+    declared = set(roles["LOCAL-T2"])
+    result = {
+        "status": "PASS", "scope": "Metadata only; no model prediction or scoring",
+        "validation_sequence_count": len(names), "validation_reference_count": len(references),
+        "validation_reference_ids": sorted(references), "sequence_names": names,
+        "population_manifest_sha256": canonical_json_sha256({
+            "population_id": "official_like_rio_validation_t2_154", "sequence_names": names,
+        }),
+        "declared_reference_count": len(declared), "declared_reference_ids": sorted(declared),
+        "extra_references_vs_legacy": sorted(references - declared),
+        "absent_references_vs_legacy": sorted(declared - references),
+        "overlap_counts": {role: len(references & set(values)) for role, values in roles.items()},
+        "metadata_correction": references != declared,
+        "decision": "Preserve every original native T2 sequence; report actual references. Legacy V1 bootstrap passed ADDITIONAL references as LOCAL-T2 without reading the native T2 population.",
+        "legacy_binding_source": "scripts/perception_gain_campaign.py::bootstrap/build_data_roles(local_t2_reference_ids=additional)",
+        "legacy_binding_source_sha256": _sha256(PROJECT_ROOT / "scripts/perception_gain_campaign.py"),
+        "rio_metadata_sha256": _sha256(Path(assets["rio_metadata"])),
+        "data_roles_sha256": _sha256(artifacts / "DATA_ROLES.json"),
+        "input_manifest_sha256": _sha256(artifacts / "data/STAGING_MANIFEST.json"),
+        "original_evaluation_manifest_sha256": _sha256(LOCAL_EVALUATION_PROVENANCE),
+    }
+    path = artifacts / "foundation/LOCAL_POPULATION_AUDIT.json"
+    if path.exists() and canonical_json_sha256(read_json(path)) != canonical_json_sha256(result):
+        raise PerceptionEvaluationError("Audited original LOCAL population changed")
+    write_json(path, result)
+    return result
+
+
 def run_local_t2_evaluation(
     *,
     variant: str,
