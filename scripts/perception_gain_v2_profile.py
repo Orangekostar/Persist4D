@@ -504,7 +504,7 @@ def profile_native_sequence(
                 torch.cuda.synchronize(device)
                 started = time.perf_counter_ns()
                 data, targets, names = base_collator([sample])
-                if list(names) != ["-".join(spec.scan_ids[:horizon])]:
+                if list(names) != [spec.source_sequence_id]:
                     raise ProfileError("Native profile changed the input prefix")
                 full = data.target_full[0]
                 data = _move_data_to_device(data, device)
