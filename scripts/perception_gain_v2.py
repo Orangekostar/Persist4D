@@ -746,6 +746,30 @@ def run_tasks(
         - state["prior_gpu_hours"]
         - state["remaining_gpu_hours"]
     )
+    recovery_path = artifacts / "RECOVERY_EVENTS.jsonl"
+    recovered = set(state.get("applied_recovery_events", []))
+    for line in (
+        recovery_path.read_text().splitlines() if recovery_path.exists() else ()
+    ):
+        event = json.loads(line)
+        if event["event_id"] in recovered or event["exit_code"] != 0:
+            continue
+        result_path = external_root / event["result_path"]
+        if file_hash(result_path) != event["result_sha256"]:
+            raise ValueError("External recovery result identity changed")
+        name = event["task"]
+        previous = state["tasks"][name]
+        if previous["status"] not in {"BLOCKED", "PENDING"}:
+            raise ValueError("External recovery conflicts with a live/completed task")
+        result = read_json(result_path)
+        state["tasks"][name] = {
+            **result,
+            "previous_attempt": previous,
+            "recovery_event": event,
+            "gpu_hours": previous.get("gpu_hours", 0.0) + event["gpu_hours"],
+        }
+        recovered.add(event["event_id"])
+    state["applied_recovery_events"] = sorted(recovered)
     if state["identity"]["config_sha256"] != file_hash(config_path):
         raise ValueError("V2 resume config changed")
     if any(row["status"] == "RUNNING" for row in state["tasks"].values()):
@@ -765,6 +789,7 @@ def run_tasks(
                 "retry requires a blocked task and changed dependency/fix signature"
             )
         state["tasks"][retry_blocked] = {"status": "PENDING", "previous_attempt": row}
+    write_json(state_path, state)
     running = {}
     task_root = external_root / "tasks"
     task_root.mkdir(exist_ok=True)

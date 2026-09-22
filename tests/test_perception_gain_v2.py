@@ -313,3 +313,62 @@ def test_repair_watchdog_handles_startup_and_its_own_training_checkpoint(tmp_pat
     checkpoint.write_bytes(b"saved")
     os.utime(checkpoint, (1500, 1500))
     assert training_watchdog_deadline("REPAIR_R1", tmp_path, 1000, 180) == 2100
+
+
+def test_external_recovery_preserves_attempt_and_charges_cost_once(
+    tmp_path, monkeypatch
+):
+    from scripts import perception_gain_v2 as runner
+
+    monkeypatch.setattr(runner, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(runner, "executed_identity", lambda *args: {})
+    config_path = tmp_path / "config.json"
+    runner.write_json(config_path, {})
+    artifacts, external = tmp_path / "artifacts", tmp_path / "external"
+    runner.write_json(external / "assets.local.json", {})
+    tasks = {name: {"status": "COMPLETE"} for name in runner.TASKS}
+    tasks["REPAIR_R1"] = {"status": "BLOCKED", "gpu_hours": 1.0}
+    runner.write_json(
+        artifacts / "RUN_STATE.json",
+        {
+            "tasks": tasks,
+            "identity": {"config_sha256": runner.file_hash(config_path)},
+            "prior_gpu_hours": 10.0,
+            "confirmation_reserve_gpu_hours": 40.0,
+        },
+    )
+    for identifier, hours in (("failed", 1.0), ("recovered", 2.0)):
+        runner.append_event(
+            artifacts / "budget/LEDGER.jsonl",
+            {"event_id": identifier, "scope": "V2", "gpu_hours": hours},
+        )
+    result = external / "tasks/recovered.json"
+    runner.write_json(result, {"status": "COMPLETE"})
+    runner.append_event(
+        artifacts / "RECOVERY_EVENTS.jsonl",
+        {
+            "event_id": "recovered",
+            "task": "REPAIR_R1",
+            "exit_code": 0,
+            "gpu_hours": 2.0,
+            "result_path": "tasks/recovered.json",
+            "result_sha256": runner.file_hash(result),
+        },
+    )
+    config = {
+        "artifact_root": "artifacts",
+        "cumulative_gpu_hour_cap": 100,
+        "runtime": {
+            "perception_devices": 2,
+            "maximum_gpus": 4,
+            "maximum_training_jobs": 2,
+        },
+    }
+    for _ in range(2):
+        runner.run_tasks(
+            config, config_path=config_path, external_root=external, target="REPAIR_R1"
+        )
+        state = runner.read_json(artifacts / "RUN_STATE.json")
+        assert state["tasks"]["REPAIR_R1"]["status"] == "COMPLETE"
+        assert state["tasks"]["REPAIR_R1"]["previous_attempt"]["status"] == "BLOCKED"
+        assert state["v2_gpu_hours"] == state["tasks"]["REPAIR_R1"]["gpu_hours"] == 3.0
