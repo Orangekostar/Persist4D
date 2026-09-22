@@ -632,6 +632,10 @@ def execute_task(task: str, config: dict, *, external_root: Path) -> dict:
         from scripts.perception_gain_v2_confirmation import run_confirmation
 
         return run_confirmation(config, external_root=external_root)
+    if task == "PROFILE":
+        from scripts.perception_gain_v2_profile import run_profile_v2
+
+        return run_profile_v2(config, external_root=external_root)
     if task == "REPORT":
         from scripts.perception_gain_v2_report import run_report
 
