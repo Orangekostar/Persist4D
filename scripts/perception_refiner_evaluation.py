@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import time
+from contextlib import ExitStack
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -204,13 +206,18 @@ def run_refiner_evaluation(
     parent_checkpoint: Path | None,
     scorer_checkpoint: Path | None,
     refiner_update: int,
-    refiner_checkpoint: Path,
+    refiner_checkpoint: Path | None,
     role: str,
     assets_path: Path = DEFAULT_ASSETS,
     roles_path: Path = DEFAULT_ROLES,
     external_root: Path = DEFAULT_EXTERNAL_ROOT,
     output_path: Path | None = None,
     device_name: str = "cuda:0",
+    recipe_config: Mapping[str, object] | None = None,
+    artifact_root: Path | None = None,
+    refiner_checkpoints: Sequence[Mapping[str, object]] | None = None,
+    export_replay_root: Path | None = None,
+    maximum_units: int | None = None,
 ) -> dict[str, object]:
     import hydra
     import torch
@@ -230,6 +237,7 @@ def run_refiner_evaluation(
         _validate_cuda_device,
     )
     from scripts.evaluate_persist4d_p6a import (
+        _frozen_inference_seed,
         build_rio_class_mapper,
         cache_payload_from_inference,
     )
@@ -244,6 +252,7 @@ def run_refiner_evaluation(
         build_additional_population_slices,
         build_live_cache_key,
         build_live_provenance,
+        build_live_replay_payload,
         build_role_base_dataset,
         select_live_population_units,
         summarize_additional_population_slices,
@@ -251,17 +260,26 @@ def run_refiner_evaluation(
     from scripts.perception_gain_foundation import (
         _metric_class_mapping,
         _resolve_cache_assets,
+        resolve_live_assets,
     )
     from scripts.prepare_perception_refiner import advance_d0_identity
     from scripts.rescene_task_postprocess import extract_official_task_prediction
     from scripts.run_task_memory_controls import (
         _validate_collated_stage_identity,
         _window_observation,
+        observation_payload,
+        prediction_observation_from_payload,
+        run_control_trajectory,
     )
     from scripts.run_task_memory_policy_baseline import (
         DEVELOPMENT_POPULATION_ID,
         PROTOCOL_B_POPULATION_ID,
         _episode_specs,
+        _meta_payload,
+        _prediction_payload,
+        _meta_from_payload,
+        _prediction_from_payload,
+        _stage_target,
         _target_for_prefix,
         build_baseline_population,
     )
@@ -283,7 +301,16 @@ def run_refiner_evaluation(
         or role not in {"CAL", "SEL", "PB", "ADDITIONAL"}
     ):
         raise RefinerEvaluationError("refiner evaluation request is invalid")
-    assets = _resolve_cache_assets(assets_path)
+    code = None
+    if recipe_config is not None:
+        from scripts.perception_gain_v2_config import live_execution_provenance
+
+        code = live_execution_provenance(recipe_config)
+    assets = (
+        resolve_live_assets(assets_path)
+        if recipe_config is not None
+        else _resolve_cache_assets(assets_path)
+    )
     roles = _load_json(roles_path).get("roles")
     references = roles.get(role) if isinstance(roles, Mapping) else None
     if (
@@ -298,13 +325,14 @@ def run_refiner_evaluation(
         / "evaluation"
         / role.lower()
         / "R-REFINE"
-        / f"parent={parent_variant}-{parent_update:04d}"
+        / f"parent={recipe_config['recipe_id'] if recipe_config is not None else parent_variant}-{parent_update:04d}"
         / f"update={refiner_update:04d}"
     )
     config = compose_variant_config(
         parent_variant,
         pretrained=Path(assets["concerto_pretrained"]),
         run_dir=run_dir,
+        recipe_config=recipe_config,
     )
     config.model.return_query_features = True
     if parent_variant == "Q-SEM" and scorer_checkpoint is not None:
@@ -374,12 +402,39 @@ def run_refiner_evaluation(
             parent_checkpoint, external_root=external_root
         )
     system.to(device).eval().requires_grad_(False)
-    refiner, refiner_identity = _load_refiner(
-        refiner_checkpoint, optimizer_update=refiner_update, device=device
+    requests = (
+        refiner_checkpoints
+        if refiner_checkpoints is not None
+        else (
+            {
+                "method_id": "R-REFINE",
+                "checkpoint": refiner_checkpoint,
+                "optimizer_update": refiner_update,
+            },
+        )
     )
-    refiner_identity["checkpoint"] = _external_reference(
-        refiner_checkpoint, external_root=external_root
-    )
+    heads, head_identities = {}, {}
+    for request in requests:
+        name = str(request["method_id"])
+        if name == "PARENT" or name in heads:
+            raise RefinerEvaluationError("shared refiner method IDs are not unique")
+        checkpoint_path = Path(request["checkpoint"])
+        head, identity = _load_refiner(
+            checkpoint_path,
+            optimizer_update=int(request["optimizer_update"]),
+            device=device,
+            expected_binding=request.get("binding"),
+        )
+        if recipe_config is not None and (
+            identity.get("binding", {}).get("parent_recipe_hash")
+            != recipe_config["inference_recipe_hash"]
+            or identity.get("binding", {}).get("parent_weight_hash") != parent_sha
+        ):
+            raise RefinerEvaluationError("refiner parent recipe/weight binding differs")
+        identity["checkpoint"] = _external_reference(
+            checkpoint_path, external_root=external_root
+        )
+        heads[name], head_identities[name] = head, identity
     collator = TaskMemoryEpisodeCollator(
         hydra.utils.instantiate(config.data.validation_collation)
     )
@@ -403,7 +458,11 @@ def run_refiner_evaluation(
     }
     config_sha = canonical_json_sha256(OmegaConf.to_container(config, resolve=True))
     provenance = build_live_provenance(
-        source_commit="6ef77620aa20926311eff3124a794a6ca2e32727",
+        source_commit=(
+            code["executed_code_commit"]
+            if code is not None
+            else "6ef77620aa20926311eff3124a794a6ca2e32727"
+        ),
         checkpoint_sha256=parent_sha,
         config_sha256=config_sha,
         episodes=tuple(
@@ -416,6 +475,23 @@ def run_refiner_evaluation(
             for unit in units
         ),
     )
+    cache_binding = None
+    if recipe_config is not None:
+        cache_binding = {
+            "executed_code_commit": code["executed_code_commit"],
+            "relevant_source_digest": code["relevant_source_digest"],
+            "weight_hash": parent_sha,
+            "inference_recipe_hash": recipe_config["inference_recipe_hash"],
+            "resolved_config_sha256": config_sha,
+            "input_manifest_hash": _sha256(
+                roles_path.parent / "data/STAGING_MANIFEST.json"
+            ),
+            "roles_sha256": _sha256(roles_path),
+            "role": role,
+            "point_order_transform": "canonical_vertices/identity_geometry",
+            "eval_seed": 45,
+            "publisher": "D0/LAST/lag1/mean",
+        }
 
     def metric_factory(mode: str) -> object:
         from scripts.p6a_metrics import OfficialMetricAccumulator
@@ -445,6 +521,12 @@ def run_refiner_evaluation(
     started = time.perf_counter()
     total_units = sum(len(item[2]) for item in mapped_population_slices)
     ordinal = 0
+    network_forward_count = 0
+    replay_exports = []
+    output_hashes = {name: hashlib.sha256() for name in ("PARENT", *heads)}
+    bridge_prefix_count = 0
+    network_seconds = 0.0
+    metric_seconds = 0.0
     with deterministic_inference_runtime(45, device):
         for (
             base_dataset,
@@ -454,15 +536,21 @@ def run_refiner_evaluation(
             class_mapper,
         ) in mapped_population_slices:
             for unit in units:
+                if maximum_units is not None and ordinal >= maximum_units:
+                    break
                 ordinal += 1
                 spec = episode_specs[unit.spec_index]
                 unit_pairs: list[tuple[str, int, object]] = []
                 unit_change_totals: defaultdict[str, int] = defaultdict(int)
                 unit_transform_totals: defaultdict[str, int] = defaultdict(int)
+                unit_context = ExitStack()
+                live_stages, parent_prefixes = [], []
                 try:
                     episode = TaskMemoryEpisodeDataset(
                         base_dataset, (spec,), apply_augmentation=False
                     )[0]
+                    if recipe_config is not None:
+                        unit_context.enter_context(_frozen_inference_seed(45, device))
                     batch = collator([episode])
                     targets: tuple[dict[str, object], ...] = ()
                     scan_ids = tuple(str(value) for value in spec.scan_ids)
@@ -476,14 +564,22 @@ def run_refiner_evaluation(
                     parent_publisher = LagOnePublisher(
                         score_reducer="mean", iou_threshold=0.5
                     )
-                    transform = CausalRefinerRevisionTransform(
-                        system=system, refiner=refiner, device=device
-                    )
-                    refined_publisher = LagOnePublisher(
-                        score_reducer="mean",
-                        iou_threshold=0.5,
-                        revision_mask_transform=transform,
-                    )
+                    transforms = {
+                        name: CausalRefinerRevisionTransform(
+                            system=system,
+                            refiner=head,
+                            device=device,
+                        )
+                        for name, head in heads.items()
+                    }
+                    refined_publishers = {
+                        name: LagOnePublisher(
+                            score_reducer="mean",
+                            iou_threshold=0.5,
+                            revision_mask_transform=transform,
+                        )
+                        for name, transform in transforms.items()
+                    }
                     for stage_batch in batch.stage_batches:
                         data, low_targets, names = stage_batch.model_batch
                         meta = stage_batch.stage_meta[0]
@@ -512,6 +608,8 @@ def run_refiner_evaluation(
                         segment_stages = _segment_stages(low_target)
                         latest_stage = int(segment_stages.max().item())
                         raw_coordinates = system._process_raw_coordinates(data)
+                        torch.cuda.synchronize(device)
+                        forward_started = time.perf_counter()
                         with torch.inference_mode():
                             output = system(
                                 data,
@@ -519,6 +617,9 @@ def run_refiner_evaluation(
                                 raw_coordinates=raw_coordinates,
                                 is_eval=True,
                             )
+                        torch.cuda.synchronize(device)
+                        network_seconds += time.perf_counter() - forward_started
+                        network_forward_count += 1
                         local = build_local_observation(
                             output,
                             [segment_stages],
@@ -580,19 +681,66 @@ def run_refiner_evaluation(
                         parent_prefix = parent_publisher.update(
                             prediction, identity_map, meta
                         )
-                        refined_prefix = refined_publisher.update(
-                            prediction, identity_map, meta
-                        )
-                        if parent_prefix.keys != refined_prefix.keys:
-                            raise RefinerEvaluationError(
-                                "refiner changed D0 identities"
+                        if recipe_config is not None:
+                            live_stages.append(
+                                {
+                                    "observation": observation_payload(observation),
+                                    "prediction": _prediction_payload(prediction),
+                                    "stage_meta": _meta_payload(meta),
+                                    "target": _stage_target(raw),
+                                }
                             )
-                        for name, value in validate_mask_only_refiner_output(
-                            parent_prefix.prediction, refined_prefix.prediction
-                        ).items():
-                            unit_change_totals[name] += value
-                        for name, value in transform.last_audit.items():
-                            unit_transform_totals[name] += value
+                            parent_prefixes.append(parent_prefix)
+                        refined_prefixes = {}
+                        for method, publisher in refined_publishers.items():
+                            refined_prefix = publisher.update(
+                                prediction, identity_map, meta
+                            )
+                            refined_prefixes[method] = refined_prefix
+                            if parent_prefix.keys != refined_prefix.keys:
+                                raise RefinerEvaluationError(
+                                    "refiner changed D0 identities"
+                                )
+                            changes = validate_mask_only_refiner_output(
+                                parent_prefix.prediction, refined_prefix.prediction
+                            )
+                            if (
+                                head_identities[method]["updates"] == 0
+                                and changes["changed_point_count"]
+                            ):
+                                raise RefinerEvaluationError(
+                                    "zero residual changed real parent masks"
+                                )
+                            for name, value in changes.items():
+                                unit_change_totals[
+                                    (
+                                        f"{method}:{name}"
+                                        if refiner_checkpoints is not None
+                                        else name
+                                    )
+                                ] += value
+                            for name, value in transforms[method].last_audit.items():
+                                unit_transform_totals[
+                                    (
+                                        f"{method}:{name}"
+                                        if refiner_checkpoints is not None
+                                        else name
+                                    )
+                                ] += value
+                        for method, prefix in {
+                            "PARENT": parent_prefix,
+                            **refined_prefixes,
+                        }.items():
+                            digest = output_hashes[method]
+                            digest.update(repr(prefix.keys).encode())
+                            for field in ("pred_masks", "pred_scores", "pred_classes"):
+                                digest.update(
+                                    prefix.prediction[field]
+                                    .detach()
+                                    .cpu()
+                                    .numpy()
+                                    .tobytes()
+                                )
                         horizon = meta.absolute_stage_index + 1
                         if horizon in scored_horizons:
                             target = _target_for_prefix(
@@ -610,18 +758,19 @@ def run_refiner_evaluation(
                                     ),
                                 )
                             )
-                            unit_pairs.append(
-                                (
-                                    "R-REFINE",
-                                    horizon,
-                                    validate_causal_prefix_pair(
-                                        prediction=refined_prefix.prediction,
-                                        target=target,
-                                        horizon=horizon,
-                                        observed_scan_ids=scan_ids[:horizon],
-                                    ),
+                            for method, refined_prefix in refined_prefixes.items():
+                                unit_pairs.append(
+                                    (
+                                        method,
+                                        horizon,
+                                        validate_causal_prefix_pair(
+                                            prediction=refined_prefix.prediction,
+                                            target=target,
+                                            horizon=horizon,
+                                            observed_scan_ids=scan_ids[:horizon],
+                                        ),
+                                    )
                                 )
-                            )
                         del (
                             data,
                             low_targets,
@@ -631,8 +780,91 @@ def run_refiner_evaluation(
                             current_masks,
                             prediction,
                         )
-                    if len(unit_pairs) != 2 * len(scored_horizons):
+                    if len(unit_pairs) != (1 + len(heads)) * len(scored_horizons):
                         raise RefinerEvaluationError("refiner unit lacks scored pairs")
+                    if recipe_config is not None:
+                        # Exercise the existing D0 replay route against the live
+                        # parent on identical prediction/observation/vertex inputs.
+                        replay_metas = [
+                            _meta_from_payload(row["stage_meta"]) for row in live_stages
+                        ]
+                        trajectory = run_control_trajectory(
+                            [
+                                prediction_observation_from_payload(row["observation"])
+                                for row in live_stages
+                            ],
+                            replay_metas,
+                            update_mode="last",
+                            capacity=100,
+                            class_weight=0.25,
+                            association_threshold=0.5,
+                            update_rate=0.2,
+                        )
+                        replay_publisher = LagOnePublisher(
+                            score_reducer="mean", iou_threshold=0.5
+                        )
+                        for row, meta, identities, parent_prefix in zip(
+                            live_stages,
+                            replay_metas,
+                            trajectory.identity_maps,
+                            parent_prefixes,
+                            strict=True,
+                        ):
+                            replay_prefix = replay_publisher.update(
+                                _prediction_from_payload(row["prediction"]),
+                                identities,
+                                meta,
+                            )
+                            differences = validate_mask_only_refiner_output(
+                                parent_prefix.prediction, replay_prefix.prediction
+                            )
+                            if (
+                                parent_prefix.keys != replay_prefix.keys
+                                or differences["changed_point_count"]
+                            ):
+                                raise RefinerEvaluationError(
+                                    "live/refiner parent differs from D0 replay"
+                                )
+                            bridge_prefix_count += 1
+                    if export_replay_root is not None:
+                        base_payload, supplement = build_live_replay_payload(
+                            reference_id=spec.reference_id,
+                            sequence_id=spec.source_sequence_id,
+                            episode_id=spec.episode_id,
+                            scan_ids=spec.scan_ids,
+                            stages=live_stages,
+                        )
+                        export_replay_root.mkdir(parents=True, exist_ok=True)
+                        export_path = export_replay_root / f"unit-{ordinal:04d}.pt"
+                        from scripts.train_perception_refiner import _atomic_torch_save
+
+                        _atomic_torch_save(
+                            export_path,
+                            {
+                                "logical_unit_id": unit.logical_unit_id,
+                                "base": base_payload,
+                                "supplement": supplement,
+                                "provenance": provenance,
+                                "execution_provenance": code,
+                                "cache_binding": {
+                                    **cache_binding,
+                                    "reference": spec.reference_id,
+                                    "sequence": spec.source_sequence_id,
+                                    "episode_id": spec.episode_id,
+                                    "scan_ids": list(spec.scan_ids),
+                                },
+                            },
+                        )
+                        replay_exports.append(
+                            {
+                                "logical_unit_id": unit.logical_unit_id,
+                                "path": _external_reference(
+                                    export_path, external_root=external_root
+                                ),
+                                "sha256": _sha256(export_path),
+                                "bytes": export_path.stat().st_size,
+                            }
+                        )
                 except (
                     OSError,
                     RuntimeError,
@@ -651,9 +883,13 @@ def run_refiner_evaluation(
                     )
                     torch.cuda.empty_cache()
                     continue
+                finally:
+                    unit_context.close()
+                metric_started = time.perf_counter()
                 for method, horizon, pair in unit_pairs:
                     accumulator(method, horizon, "all").update(pair)
                     accumulator(method, horizon, unit.reference_id).update(pair)
+                metric_seconds += time.perf_counter() - metric_started
                 for name, value in unit_change_totals.items():
                     change_totals[name] += value
                 for name, value in unit_transform_totals.items():
@@ -686,8 +922,9 @@ def run_refiner_evaluation(
         )
 
     metric_rows = []
+    metric_started = time.perf_counter()
     evaluated_horizons = tuple(sorted(completed_units_by_horizon))
-    for method in ("PARENT", "R-REFINE"):
+    for method in ("PARENT", *heads):
         for horizon in evaluated_horizons:
             horizon_references = completed_references_by_horizon[horizon]
             for reference in ("all", *sorted(horizon_references)):
@@ -707,39 +944,65 @@ def run_refiner_evaluation(
                         accumulator=accumulators[(method, horizon, reference)],
                     )
                 )
-    refined_metrics = {
-        int(row["T"]): float(row["t_mAP"])
-        for row in metric_rows
-        if row["method"] == "R-REFINE" and row["reference"] == "all"
-    }
+    metric_seconds += time.perf_counter() - metric_started
     parent_metrics = {
         int(row["T"]): float(row["t_mAP"])
         for row in metric_rows
         if row["method"] == "PARENT" and row["reference"] == "all"
     }
-    candidate = {
-        "method_id": "R-REFINE",
-        "optimizer_update": refiner_update,
-        "new_parameter_count": refiner_identity["parameter_count"],
-        "metrics": refined_metrics,
+    coverage = {
         "coverage_status": (
             "COMPLETE" if len(completed_units) == total_units else "INCOMPLETE"
         ),
-        "checkpoint": refiner_identity["checkpoint"],
-        "checkpoint_sha256": refiner_identity["sha256"],
         "expected_logical_units": total_units,
         "completed_logical_units": len(completed_units),
     }
+    candidates = {
+        name: {
+            **coverage,
+            "method_id": name,
+            "optimizer_update": identity["updates"],
+            "new_parameter_count": identity["parameter_count"],
+            "metrics": {
+                int(row["T"]): float(row["t_mAP"])
+                for row in metric_rows
+                if row["method"] == name and row["reference"] == "all"
+            },
+            "checkpoint": identity["checkpoint"],
+            "checkpoint_sha256": identity["sha256"],
+            **({"binding": identity["binding"]} if "binding" in identity else {}),
+        }
+        for name, identity in head_identities.items()
+    }
+    parent_candidate = {
+        **coverage,
+        "method_id": "PARENT",
+        "optimizer_update": parent_update,
+        "metrics": parent_metrics,
+        "checkpoint": parent_reference,
+        "checkpoint_sha256": parent_sha,
+        "new_parameter_count": sum(
+            parameter.numel()
+            for name, parameter in system.named_parameters()
+            if name.startswith("model.semantic_query_scorer.")
+        ),
+    }
     status = (
         "PASS"
-        if candidate["coverage_status"] == "COMPLETE" and not incomplete_units
+        if coverage["coverage_status"] == "COMPLETE" and not incomplete_units
         else "PARTIAL"
     )
+    if maximum_units is not None:
+        status = (
+            "SMOKE_PASS"
+            if len(completed_units) == maximum_units and not incomplete_units
+            else "SMOKE_FAILED"
+        )
     summary = {
         "schema_version": "perception-refiner-evaluation-v1",
         "status": status,
         "data_role": role,
-        "output_policy": "D0/lag1/mean+mask-only-refiner",
+        "output_policy": "D0/lag1/mean+mask-only-refiner" if heads else "D0/lag1/mean",
         "official_metric": "pooled_t_mAP",
         "parent": {
             "variant": parent_variant,
@@ -749,7 +1012,11 @@ def run_refiner_evaluation(
             "load_audit": parent_load,
             "weight_sources": parent_sources,
         },
-        "refiner": refiner_identity,
+        "refiner": (
+            head_identities.get("R-REFINE")
+            if refiner_checkpoints is None
+            else head_identities
+        ),
         "resolved_config_sha256": config_sha,
         "population_manifest_sha256": population_manifest_sha256,
         "evaluation_input_mode": "LIVE_LOCAL_DATASET",
@@ -774,7 +1041,12 @@ def run_refiner_evaluation(
         },
         "completed_units": completed_units,
         "incomplete_units": incomplete_units,
-        "candidate": candidate,
+        **(
+            {"candidate": candidates["R-REFINE"]}
+            if refiner_checkpoints is None
+            else {"candidates": candidates}
+        ),
+        "parent_candidate": parent_candidate,
         "parent_metrics": parent_metrics,
         "metric_rows": metric_rows,
         "mask_change_audit": dict(change_totals),
@@ -783,16 +1055,31 @@ def run_refiner_evaluation(
         "gpu_hours": elapsed / 3600.0,
         "gpu_name": torch.cuda.get_device_name(device),
         "source_sha256": _sha256(Path(__file__)),
+        "network_forward_count": network_forward_count,
+        "method_output_sha256": {
+            name: value.hexdigest() for name, value in output_hashes.items()
+        },
+        "d0_replay_bridge_prefixes": bridge_prefix_count,
+        "replay_exports": replay_exports,
+        "smoke_maximum_units": maximum_units,
+        "network_seconds": network_seconds,
+        "official_metric_seconds": metric_seconds,
+        "cache_binding": cache_binding,
+        **(
+            {"recipe": dict(recipe_config), "execution_provenance": code}
+            if recipe_config is not None
+            else {}
+        ),
     }
     if output_path is None:
         output_path = (
-            ARTIFACT_ROOT
+            (artifact_root if artifact_root is not None else ARTIFACT_ROOT)
             / "training/refiner/evaluation"
             / role.lower()
             / f"update={refiner_update:04d}.json"
         )
     _atomic_json(output_path, summary)
-    del system, refiner
+    del system, heads
     torch.cuda.empty_cache()
     return summary
 
@@ -813,6 +1100,9 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--external-root", type=Path, default=DEFAULT_EXTERNAL_ROOT)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument("--recipe-config", type=Path)
+    parser.add_argument("--artifact-root", type=Path)
+    parser.add_argument("--heads", type=Path)
     return parser
 
 
@@ -831,6 +1121,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         external_root=arguments.external_root,
         output_path=arguments.output,
         device_name=arguments.device,
+        recipe_config=(
+            json.loads(arguments.recipe_config.read_text())
+            if arguments.recipe_config is not None
+            else None
+        ),
+        artifact_root=arguments.artifact_root,
+        refiner_checkpoints=(
+            json.loads(arguments.heads.read_text())
+            if arguments.heads is not None
+            else None
+        ),
     )
     return 0 if result["status"] == "PASS" else 1
 

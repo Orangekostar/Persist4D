@@ -868,6 +868,33 @@ def _load_evaluation_weights(
         state = payload.get("state_dict") if isinstance(payload, Mapping) else None
         if not isinstance(state, Mapping):
             raise PerceptionEvaluationError("trained checkpoint lacks state_dict")
+        recipe = getattr(getattr(system, "config", None), "perception_recipe", None)
+        recipe_audit = None
+        if recipe is not None:
+            from omegaconf import OmegaConf
+            from scripts.perception_gain_v2_config import validate_resume_recipe
+
+            legacy_path = checkpoint.parent / "resolved_config.yaml"
+            legacy_config = None
+            if "perception_recipe" not in payload and legacy_path.is_file():
+                legacy_config = OmegaConf.to_container(
+                    OmegaConf.load(legacy_path), resolve=True
+                )
+            validate_resume_recipe(
+                payload,
+                OmegaConf.to_container(recipe, resolve=True),
+                legacy_config=legacy_config,
+            )
+            if payload.get("global_step") != optimizer_update:
+                raise PerceptionEvaluationError(
+                    "checkpoint update differs from requested recipe"
+                )
+            recipe_audit = {
+                "training_recipe_hash": recipe.training_recipe_hash,
+                "legacy_config_sha256": (
+                    _sha256(legacy_path) if legacy_config is not None else None
+                ),
+            }
         try:
             incompatible = system.load_state_dict(state, strict=True)
         except RuntimeError as error:
@@ -882,6 +909,7 @@ def _load_evaluation_weights(
             "loaded_key_count": len(state),
             "missing_keys": [],
             "unexpected_keys": [],
+            **({"recipe_binding": recipe_audit} if recipe_audit is not None else {}),
         }
         weight_sources.append(
             {
@@ -915,8 +943,52 @@ def run_checkpoint_evaluation(
     external_root: Path = DEFAULT_EXTERNAL_ROOT,
     output_path: Path | None = None,
     device_name: str = "cuda:0",
+    recipe_config: Mapping[str, object] | None = None,
+    artifact_root: Path | None = None,
+    export_replay_root: Path | None = None,
 ) -> dict[str, object]:
     """Stream one real checkpoint through the fixed CAL or SEL D0 protocol."""
+
+    if recipe_config is not None:
+        from scripts.perception_refiner_evaluation import run_refiner_evaluation
+
+        destination = output_path or (
+            (artifact_root if artifact_root is not None else ARTIFACT_ROOT)
+            / "evaluation"
+            / role.lower()
+            / str(recipe_config["recipe_id"])
+            / f"update={optimizer_update:04d}.json"
+        )
+        result = run_refiner_evaluation(
+            parent_variant=variant,
+            parent_update=optimizer_update,
+            parent_checkpoint=checkpoint,
+            scorer_checkpoint=scorer_checkpoint,
+            refiner_update=0,
+            refiner_checkpoint=None,
+            refiner_checkpoints=(),
+            role=role,
+            assets_path=assets_path,
+            roles_path=roles_path,
+            external_root=external_root,
+            output_path=destination,
+            device_name=device_name,
+            recipe_config=recipe_config,
+            artifact_root=artifact_root,
+            export_replay_root=export_replay_root,
+        )
+        result.update(
+            {
+                "variant": variant,
+                "optimizer_update": optimizer_update,
+                "candidate": {
+                    **result["parent_candidate"],
+                    "method_id": str(recipe_config["recipe_id"]),
+                },
+            }
+        )
+        _atomic_json(destination, result)
+        return result
 
     import hydra
     import torch
@@ -1344,6 +1416,8 @@ def _main() -> int:
     parser.add_argument("--external-root", type=Path, default=DEFAULT_EXTERNAL_ROOT)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument("--recipe-config", type=Path)
+    parser.add_argument("--artifact-root", type=Path)
     arguments = parser.parse_args()
     if arguments.mode == "evaluate":
         if arguments.variant is None or arguments.update is None:
@@ -1359,6 +1433,12 @@ def _main() -> int:
             external_root=arguments.external_root,
             output_path=arguments.output,
             device_name=arguments.device,
+            recipe_config=(
+                _load_json(arguments.recipe_config)
+                if arguments.recipe_config is not None
+                else None
+            ),
+            artifact_root=arguments.artifact_root,
         )
         return 0
     if arguments.lock is None or arguments.payload is None:

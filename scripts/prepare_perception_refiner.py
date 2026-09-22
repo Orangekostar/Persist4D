@@ -622,6 +622,16 @@ def run(
                                     diagnostics[f"old_closer_{label}_segments"] += int(
                                         (old_closer & mask).sum()
                                     )
+                    if recipe_config is not None:
+                        _atomic_json(
+                            output_root.parent / "PROGRESS.json",
+                            {
+                                "episode_ordinal": ordinal,
+                                "episode_count": len(specs),
+                                "completed_stage_index": meta.absolute_stage_index,
+                                "updated_unix": time.time(),
+                            },
+                        )
                     del (
                         data,
                         targets,

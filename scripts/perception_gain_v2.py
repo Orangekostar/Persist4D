@@ -681,6 +681,23 @@ def run_tasks(
     artifacts = PROJECT_ROOT / config["artifact_root"]
     state_path = artifacts / "RUN_STATE.json"
     state = read_json(state_path)
+    ledger_path = artifacts / "budget/LEDGER.jsonl"
+    settled = [
+        json.loads(line)
+        for line in ledger_path.read_text().splitlines()
+        if line.strip()
+    ]
+    v2_events = [event for event in settled if event.get("scope") == "V2"]
+    state["remaining_gpu_hours"] = remaining_gpu_hours(
+        config["cumulative_gpu_hour_cap"],
+        state["prior_gpu_hours"],
+        v2_events,
+    )
+    state["v2_gpu_hours"] = (
+        config["cumulative_gpu_hour_cap"]
+        - state["prior_gpu_hours"]
+        - state["remaining_gpu_hours"]
+    )
     if state["identity"]["config_sha256"] != file_hash(config_path):
         raise ValueError("V2 resume config changed")
     if any(row["status"] == "RUNNING" for row in state["tasks"].values()):

@@ -619,6 +619,34 @@ def test_new_only_is_invariant_to_old_evidence_after_nonzero_training_weights():
     assert torch.equal(first, control)
 
 
+def test_soft_alignment_preserves_exact_means_with_permuted_vertices_and_segments():
+    generator = torch.Generator().manual_seed(7)
+    count = 12003
+    old_ids = torch.randperm(count, generator=generator)
+    new_ids = torch.randperm(count, generator=generator)
+    values_by_vertex = torch.rand(count, generator=generator)
+    low_segments = torch.arange(517)
+    inverse = torch.randint(0, 517, (count,), generator=generator)
+    segment_ids = torch.randperm(517, generator=generator)
+    expected = torch.logit(
+        torch.stack(
+            [
+                values_by_vertex[new_ids][inverse == segment].mean()
+                for segment in segment_ids
+            ]
+        ).clamp(1e-4, 1 - 1e-4)
+    )
+    result = _training_module().align_old_probabilities_to_new_segments(
+        old_vertex_ids=old_ids,
+        old_point_probabilities=values_by_vertex[old_ids],
+        new_vertex_ids=new_ids,
+        new_low_point2segment=low_segments,
+        new_voxel_inverse=inverse,
+        new_segment_ids=segment_ids,
+    )
+    assert torch.equal(result, expected)
+
+
 def test_v2_refiner_checkpoint_loads_mode_and_rejects_parent_mismatch(tmp_path):
     from scripts.perception_refiner_evaluation import (
         _load_refiner,

@@ -1,0 +1,17 @@
+{
+  "status": "MEASURED_FUNCTION_BENCHMARK",
+  "reason": "Live R1 cache sampling showed repeated full-vertex scans in per-segment means.",
+  "profile_samples": 379,
+  "profile_errors": 0,
+  "profile_duration_seconds": 20,
+  "old_code_commit": "0edfed8aea1961cd1067813956ef39b3a0fc0212",
+  "points": 120003,
+  "segments": 1200,
+  "cpu_threads": 2,
+  "original_seconds": 0.47497384704183787,
+  "stable_grouping_seconds": 0.08863389102043584,
+  "output_bitwise_equal": true,
+  "maximum_absolute_logit_difference": 0.0,
+  "scope": "One CPU alignment call under concurrent training; not an end-to-end or deployment speedup claim.",
+  "method": "Stable sort groups vertices while preserving their original order inside each segment; unchanged torch mean and logit clamp."
+}

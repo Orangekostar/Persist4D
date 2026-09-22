@@ -26,11 +26,11 @@ Files: add `configs/perception_gain_v2.yaml`, `scripts/perception_gain_v2.py`, `
 
 Interfaces: `resolve_recipe(variant, learning_rate, seed, devices)` returns the fixed flat numerical recipe and its hash; `compose_variant_config(..., recipe_config=None)` applies it to every real consumer; checkpoint `perception_recipe` binds resume identity. V2 CLI bootstrap/status/data records source, assets, provenance and cost without importing the all-five-arm validator.
 
-- [ ] Test real composed H/L optimizer rates, fixed 3000 horizon, schedule/cursor restoration and mismatched resume rejection.
-- [ ] Implement optional recipe and loader timeout; seed before model construction; preserve default V1 calls.
-- [ ] Inspect manifest-referenced data paths, stage NFS files to local storage if capacity permits, verify relative names/bytes and retain full populations.
-- [ ] Bootstrap with asset hashes, actual code commit, role intersections, previous cost reconciliation and auth observations; validate low-cap accounting.
-- [ ] Commit executable code before formal runs. Run the required bootstrap CLI.
+- [x] Test real composed H/L optimizer rates, fixed 3000 horizon, schedule/cursor restoration and mismatched resume rejection.
+- [x] Implement optional recipe and loader timeout; seed before model construction; preserve default V1 calls.
+- [x] Inspect manifest-referenced data paths, stage NFS files to local storage if capacity permits, verify relative names/bytes and retain full populations.
+- [x] Bootstrap with asset hashes, actual code commit, role intersections, previous cost reconciliation and auth observations; validate low-cap accounting.
+- [x] Commit executable code before formal runs. Run the required bootstrap CLI.
 
 ## Task 2 — Shared live identity and full development baselines
 

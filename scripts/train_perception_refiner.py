@@ -165,12 +165,24 @@ def align_old_probabilities_to_new_segments(
     )
     aligned_probabilities = probabilities[reorder]
     full_segment_ids = low_point2segment[voxel_inverse].to(probabilities.device)
+    # Stable grouping preserves the exact per-segment reduction order while
+    # avoiding one full vertex scan for every segment and every candidate.
+    grouping = torch.argsort(full_segment_ids, stable=True)
+    grouped_probabilities = aligned_probabilities[grouping]
+    groups, counts = torch.unique_consecutive(
+        full_segment_ids[grouping], return_counts=True
+    )
+    offsets = torch.cat((counts.new_zeros(1), counts.cumsum(0))).cpu().tolist()
+    ranges = {
+        segment: (offsets[index], offsets[index + 1])
+        for index, segment in enumerate(groups.cpu().tolist())
+    }
     values = []
     for segment_id in segment_ids.tolist():
-        selector = full_segment_ids == int(segment_id)
-        if not selector.any().item():
+        if segment_id not in ranges:
             raise RefinerTrainingError("new segment lacks full-resolution vertices")
-        values.append(aligned_probabilities[selector].mean())
+        start, stop = ranges[segment_id]
+        values.append(grouped_probabilities[start:stop].mean())
     means = torch.stack(values).clamp(1.0e-4, 1.0 - 1.0e-4)
     return torch.logit(means)
 
