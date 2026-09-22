@@ -64,16 +64,12 @@ def sigmoid_ce_loss(
     Returns:
         Loss tensor
     """
-    loss = F.binary_cross_entropy_with_logits(
-        inputs, targets, reduction="none"
-    )
+    loss = F.binary_cross_entropy_with_logits(inputs, targets, reduction="none")
 
     return loss.mean(1).sum() / num_masks
 
 
-sigmoid_ce_loss_jit = torch.jit.script(
-    sigmoid_ce_loss
-)  # type: torch.jit.ScriptModule
+sigmoid_ce_loss_jit = torch.jit.script(sigmoid_ce_loss)  # type: torch.jit.ScriptModule
 
 
 def calculate_uncertainty(logits):
@@ -162,7 +158,7 @@ def _build_chunk_pairs(
 
         # Grid of (anchor_rel, pos_abs)
         rows_add = anchors_rel.repeat_interleave(pos_abs.numel())  # (A * P_inst,)
-        cols_add = pos_abs.repeat(anchors_rel.numel())             # (A * P_inst,)
+        cols_add = pos_abs.repeat(anchors_rel.numel())  # (A * P_inst,)
 
         if not include_self:
             # Drop self-pairs
@@ -174,10 +170,10 @@ def _build_chunk_pairs(
             continue
 
         if use_stage:
-            a_stage = anchor_stage_chunk[anchors_rel]                       # (A,)
-            p_stage = stages[pos_abs]                                       # (P_inst,)
-            a_stage_rep = a_stage.repeat_interleave(p_stage.numel())        # (A * P_inst,)
-            p_stage_rep = p_stage.repeat(anchors_rel.numel())               # (A * P_inst,)
+            a_stage = anchor_stage_chunk[anchors_rel]  # (A,)
+            p_stage = stages[pos_abs]  # (P_inst,)
+            a_stage_rep = a_stage.repeat_interleave(p_stage.numel())  # (A * P_inst,)
+            p_stage_rep = p_stage.repeat(anchors_rel.numel())  # (A * P_inst,)
             w_add = torch.where(p_stage_rep == a_stage_rep, stage_same_t, stage_cross_t)
             if not include_self and self_mask.numel() > 0:
                 w_add = w_add[self_mask]
@@ -313,9 +309,7 @@ def _streaming_info_nce_chunk(
 
     for candidate_start in range(0, num_candidates, candidate_chunk_size):
         candidate_end = min(candidate_start + candidate_chunk_size, num_candidates)
-        similarities = (
-            anchor_features @ all_features[candidate_start:candidate_end].T
-        )
+        similarities = anchor_features @ all_features[candidate_start:candidate_end].T
 
         if norm_type == "log_odds" and clamp_limits is not None:
             similarities = torch.clamp(similarities, *clamp_limits)
@@ -324,9 +318,8 @@ def _streaming_info_nce_chunk(
             similarities = ((1 + similarities) / 2).clamp(min=0, max=1)
 
         similarities = similarities.to(accumulation_dtype)
-        similarities = (
-            similarities * logit_scale.to(accumulation_dtype)
-            + bias.to(accumulation_dtype)
+        similarities = similarities * logit_scale.to(accumulation_dtype) + bias.to(
+            accumulation_dtype
         )
 
         if not include_self:
@@ -360,9 +353,7 @@ def _streaming_info_nce_chunk(
             denominator_sum,
             torch.ones_like(denominator_sum),
         )
-        block_denominator_log = (
-            torch.log(safe_denominator_sum) + safe_block_max
-        )
+        block_denominator_log = torch.log(safe_denominator_sum) + safe_block_max
         denominator_log, denominator_valid = _merge_block_logsumexp(
             denominator_log,
             denominator_valid,
@@ -370,9 +361,7 @@ def _streaming_info_nce_chunk(
             block_valid,
         )
 
-        in_block = (positive_cols >= candidate_start) & (
-            positive_cols < candidate_end
-        )
+        in_block = (positive_cols >= candidate_start) & (positive_cols < candidate_end)
         block_rows = positive_rows[in_block]
         block_cols = positive_cols[in_block] - candidate_start
         block_weights = positive_weights[in_block].to(accumulation_dtype)
@@ -434,16 +423,16 @@ def infoNCE_chunked_loss(
     features: torch.Tensor,
     instance_masks: torch.Tensor,
     chunk_size: int = 2048,
-    logit_scale = 1.0,
+    logit_scale=1.0,
     normalize: bool = True,
-    bias = 0.0,
+    bias=0.0,
     include_self: bool = False,
-    temporal_stages = None,
+    temporal_stages=None,
     stage_weight_same: float = 1.0,
     stage_weight_cross: float = 1.0,
     assume_single_label: bool = False,
     norm_type: str = "temperature",
-    clamp_limits = None,
+    clamp_limits=None,
     candidate_chunk_size: int | None = None,
 ) -> torch.Tensor:
     """
@@ -496,10 +485,15 @@ def infoNCE_chunked_loss(
     bias_t = torch.as_tensor(bias, device=device, dtype=dtype)
     if candidate_chunk_size is not None and candidate_chunk_size <= 0:
         raise ValueError("candidate_chunk_size must be positive")
-    accumulation_element_size = 4 if dtype in (
-        torch.float16,
-        torch.bfloat16,
-    ) else features.element_size()
+    accumulation_element_size = (
+        4
+        if dtype
+        in (
+            torch.float16,
+            torch.bfloat16,
+        )
+        else features.element_size()
+    )
     max_block_elements = max(
         1,
         _INFO_NCE_SIMILARITY_BLOCK_BYTES // accumulation_element_size,
@@ -553,8 +547,7 @@ def infoNCE_chunked_loss(
             bias_t,
         )
         requires_checkpoint = torch.is_grad_enabled() and any(
-            tensor.requires_grad
-            for tensor in (z, logit_scale_t, bias_t)
+            tensor.requires_grad for tensor in (z, logit_scale_t, bias_t)
         )
         if requires_checkpoint:
             denom_log, num_log = activation_checkpoint(
@@ -581,10 +574,10 @@ def bce_sampled_loss(
     instance_masks: torch.Tensor,
     num_negatives: int = 256,
     normalize: bool = True,
-    logit_scale = 1.0,
-    bias = 0.0,
+    logit_scale=1.0,
+    bias=0.0,
     include_self: bool = False,
-    temporal_stages = None,
+    temporal_stages=None,
     stage_weight_same: float = 1.0,
     stage_weight_cross: float = 1.0,
 ) -> torch.Tensor:
@@ -676,7 +669,9 @@ def bce_sampled_loss(
             neg_idx = neg_pool[perm]
         else:
             # With replacement
-            rand_idx = torch.randint(0, neg_pool.numel(), (num_negatives,), device=device)
+            rand_idx = torch.randint(
+                0, neg_pool.numel(), (num_negatives,), device=device
+            )
             neg_idx = neg_pool[rand_idx]
 
         neg_logits = sim_row[neg_idx]
@@ -691,7 +686,9 @@ def bce_sampled_loss(
             neg_logits, neg_targets, weight=neg_weights, reduction="sum"
         )
 
-        total_loss = total_loss + (pos_loss + neg_loss) / (pos_idx.numel() + neg_idx.numel())
+        total_loss = total_loss + (pos_loss + neg_loss) / (
+            pos_idx.numel() + neg_idx.numel()
+        )
         counted += 1
 
     if counted == 0:
@@ -701,13 +698,14 @@ def bce_sampled_loss(
 
 class ContrastiveLoss(nn.Module):
     """Contrastive loss module with configurable loss type and learnable parameters."""
+
     CLAMP_LIMITS = {
         torch.float16: (-0.99, 0.99),
-        torch.bfloat16: (-0.995, 0.995), 
+        torch.bfloat16: (-0.995, 0.995),
         torch.float32: (-0.99999, 0.99999),
-        torch.float64: (-0.99999999999, 0.99999999999)
+        torch.float64: (-0.99999999999, 0.99999999999),
     }
-    
+
     def __init__(
         self,
         loss_type="infonce",
@@ -724,7 +722,7 @@ class ContrastiveLoss(nn.Module):
         assume_single_label=False,  # optimization: set True if points belong to at most one instance
     ):
         super().__init__()
-        
+
         # Normalize loss type naming
         self.loss_type = loss_type.lower()
         self.learnable_temperature = learnable_temperature
@@ -734,7 +732,7 @@ class ContrastiveLoss(nn.Module):
             self.t = nn.Parameter(torch.tensor(initial_temperature))
         else:
             self.t = torch.tensor(initial_temperature)
-            
+
         if learnable_bias:
             self.bias = nn.Parameter(torch.tensor(initial_bias))
         else:
@@ -760,7 +758,7 @@ class ContrastiveLoss(nn.Module):
         features = F.normalize(features, p=2, dim=1, eps=1e-6)
         features = torch.nan_to_num(features, nan=0.0, posinf=0.0, neginf=0.0)
         sim_matrix = torch.mm(features, features.T)
-        
+
         if self.norm_type == "log_odds":
             sim_matrix = torch.clamp(sim_matrix, *self.CLAMP_LIMITS[sim_matrix.dtype])
             logits = 2 * torch.atanh(sim_matrix) + self.bias
@@ -779,7 +777,7 @@ class ContrastiveLoss(nn.Module):
         gt_similarity = torch.mm(instance_masks.T, instance_masks)
 
         return logits, gt_similarity
-    
+
     def sigmoid_loss(self, logits, gt_mask, weights=None):
         """Sigmoid loss: Binary cross-entropy loss for contrastive learning."""
         # mathematically equivalent to sigmoid cross-entropy loss
@@ -791,8 +789,10 @@ class ContrastiveLoss(nn.Module):
         gt_mask = gt_mask[tri_mask]
         if weights is not None:
             weights = weights[tri_mask]
-        loss = F.binary_cross_entropy_with_logits(logits, gt_mask, weight=weights, reduction="mean")
-        
+        loss = F.binary_cross_entropy_with_logits(
+            logits, gt_mask, weight=weights, reduction="mean"
+        )
+
         return loss
 
     def infoNCE_loss(self, logits, gt_mask, weights=None):
@@ -802,20 +802,20 @@ class ContrastiveLoss(nn.Module):
         - Excludes rows with no positives in reduction (included only as negative samples)
         - Uses uniform soft targets over positives to equalize their probabilities
         """
-        
+
         # Remove self-similarity by setting diagonal to -inf so logsumexp ignores it
         logits.fill_diagonal_(-torch.inf)
-        gt_mask.fill_diagonal_(0) 
+        gt_mask.fill_diagonal_(0)
 
         # Filter out queries with no positive pairs (excluding diagonal)
         valid_mask = gt_mask.any(dim=1)  # (N,)
         # if queries have no positive pairs, return 0 loss
         if not valid_mask.any():
             return torch.tensor(0.0, device=logits.device, dtype=logits.dtype)
-        
+
         # Compute logsumexp over all similarities for each query
         all_logsumexp = torch.logsumexp(logits[valid_mask], dim=1)  # (N,)
-        
+
         # For each query, compute the sum of exp(similarities) for positive pairs
         # multiply similarities by positive mask, then use logsumexp
         # note: positives not equalized, encourages entire positive mass to be large
@@ -825,11 +825,13 @@ class ContrastiveLoss(nn.Module):
             # Only affect positive pairs; others stay the same
             # Multiply exp(sim) by weight => add log(weight) to logits before logsumexp
             safe_w = torch.clamp(weights, min=1e-12)
-            add_log_w = torch.where(gt_mask.bool(), torch.log(safe_w), torch.zeros_like(safe_w))
+            add_log_w = torch.where(
+                gt_mask.bool(), torch.log(safe_w), torch.zeros_like(safe_w)
+            )
             pos_sim = pos_sim + add_log_w
 
         pos_logsumexp = torch.logsumexp(pos_sim[valid_mask], dim=1)  # (N,)
-        
+
         # InfoNCE loss per query: -log(exp(pos) / exp(all)) = -pos + all
         per_sample_loss = -pos_logsumexp + all_logsumexp  # (N,)
 
@@ -845,13 +847,13 @@ class ContrastiveLoss(nn.Module):
         raise NotImplementedError
         # Convert to soft assignments using Sinkhorn-Knopp
         t = self.sinkhorn_knopp(logits, gt_mask)
-        
+
         # Compute loss between soft assignments and similarity matrix
         s = F.softmax(logits / self.temperature, dim=-1)
-        
+
         # KL divergence between target and predicted distributions
         loss = -(t * torch.log(s + 1e-8)).sum(dim=1).mean()
-        
+
         return loss
 
     def sinkhorn_knopp(self, logits, gt_mask, num_iterations=10):
@@ -861,17 +863,16 @@ class ContrastiveLoss(nn.Module):
         raise NotImplementedError
         # Start with similarity matrix
         t = F.softmax(logits / self.temperature, dim=-1)
-        
+
         # Sinkhorn-Knopp iterations
         for _ in range(num_iterations):
             # Normalize rows
             t = t / (t.sum(dim=1, keepdim=True) + 1e-8)
-            # Normalize columns  
+            # Normalize columns
             t = t / (t.sum(dim=0, keepdim=True) + 1e-8)
-        
+
         return t
 
-    
     def forward(self, features, instance_masks, temporal_stages=None):
         """Forward pass using the configured loss type.
         features: (N, C) tensor
@@ -894,14 +895,16 @@ class ContrastiveLoss(nn.Module):
             # Compute logit scale and bias from learnable parameters
             # Support both learnable and fixed parameters (as tensors or scalars)
             if self.norm_type == "temperature":
-                logit_scale = self.temperature()  # Returns tensor if learnable, scalar if fixed
+                logit_scale = (
+                    self.temperature()
+                )  # Returns tensor if learnable, scalar if fixed
             elif self.norm_type == "clamp":
                 logit_scale = 1.0
             elif self.norm_type == "log_odds":
                 logit_scale = 1.0
             else:
                 logit_scale = 1.0
-            
+
             # Get bias value (can be tensor or scalar)
             if self.learnable_bias:
                 bias_val = self.bias  # Keep as tensor for gradients
@@ -910,12 +913,14 @@ class ContrastiveLoss(nn.Module):
                     bias_val = self.bias.item()
                 else:
                     bias_val = float(self.bias)
-            
+
             # Map temporal weighting: if weight_temporal_stages is True, we upweight cross-stage pairs
             # The chunked version uses stage_weight_same=1.0 and stage_weight_cross=temporal_positive_weight
             stage_weight_same = 1.0
-            stage_weight_cross = self.temporal_positive_weight if self.weight_temporal_stages else 1.0
-            
+            stage_weight_cross = (
+                self.temporal_positive_weight if self.weight_temporal_stages else 1.0
+            )
+
             if self.loss_type == "infonce":
                 loss = infoNCE_chunked_loss(
                     features=features,
@@ -925,7 +930,9 @@ class ContrastiveLoss(nn.Module):
                     normalize=True,  # Always normalize in chunked version
                     bias=bias_val,
                     include_self=False,
-                    temporal_stages=temporal_stages if self.weight_temporal_stages else None,
+                    temporal_stages=(
+                        temporal_stages if self.weight_temporal_stages else None
+                    ),
                     stage_weight_same=stage_weight_same,
                     stage_weight_cross=stage_weight_cross,
                     assume_single_label=self.assume_single_label,
@@ -941,7 +948,9 @@ class ContrastiveLoss(nn.Module):
                     logit_scale=logit_scale,
                     bias=bias_val,
                     include_self=False,
-                    temporal_stages=temporal_stages if self.weight_temporal_stages else None,
+                    temporal_stages=(
+                        temporal_stages if self.weight_temporal_stages else None
+                    ),
                     stage_weight_same=stage_weight_same,
                     stage_weight_cross=stage_weight_cross,
                 )
@@ -953,7 +962,9 @@ class ContrastiveLoss(nn.Module):
                     weights = self.temporal_positive_weights(temporal_stages, gt_mask)
                 loss = self.sigmoid_loss(logits, gt_mask, weights)
             else:
-                raise NotImplementedError(f"Unsupported contrastive loss type: {self.loss_type}")
+                raise NotImplementedError(
+                    f"Unsupported contrastive loss type: {self.loss_type}"
+                )
         else:
             # Fall back to old dense implementation
             logits, gt_mask = self.logits_and_gt_mask(features, instance_masks)
@@ -966,7 +977,9 @@ class ContrastiveLoss(nn.Module):
             elif self.loss_type == "sigmoid":
                 loss = self.sigmoid_loss(logits, gt_mask, weights)
             else:
-                raise NotImplementedError(f"Unsupported contrastive loss type: {self.loss_type}")
+                raise NotImplementedError(
+                    f"Unsupported contrastive loss type: {self.loss_type}"
+                )
 
         if (
             getattr(self, "p2_fail_closed_runtime", False)
@@ -977,7 +990,7 @@ class ContrastiveLoss(nn.Module):
         # Preserve the upstream fallback outside the P2 fail-closed path.
         if torch.isnan(loss):
             return torch.tensor(0.0, device=features.device, dtype=features.dtype)
-        
+
         return loss
 
     def temporal_positive_weights(self, temporal_stages, gt_mask):
@@ -993,8 +1006,12 @@ class ContrastiveLoss(nn.Module):
         cross_stage = cross_stage & gt_mask.bool()
         weights = torch.ones_like(gt_mask, dtype=torch.float32)
         if self.temporal_positive_weight != 1.0:
-            weights = torch.where(cross_stage, torch.full_like(weights, self.temporal_positive_weight), weights)  
-        
+            weights = torch.where(
+                cross_stage,
+                torch.full_like(weights, self.temporal_positive_weight),
+                weights,
+            )
+
         return weights
 
 
@@ -1016,14 +1033,14 @@ class SetCriterion(nn.Module):
         oversample_ratio,
         importance_sample_ratio,
         class_weights,
-        num_changes, 
+        num_changes,
         change_weights,
         contrastive_loss=False,
         contrastive_loss_type="infoNCE",
         learnable_temperature=True,
         learnable_bias=True,
         initial_temperature=0.5,
-        initial_bias=0.0, 
+        initial_bias=0.0,
         norm_type="temperature",
         weight_temporal_stages=False,
         temporal_positive_weight=2.0,
@@ -1034,6 +1051,9 @@ class SetCriterion(nn.Module):
         use_chunked_loss=True,
         num_negatives=256,
         assume_single_label=False,
+        mask_loss_mode="legacy",
+        stage_worst_alpha=0.5,
+        stage_worst_beta=0.25,
     ):
         """Create the criterion.
         Parameters:
@@ -1042,7 +1062,7 @@ class SetCriterion(nn.Module):
             weight_dict: dict containing as key the names of the losses and as values their relative weight.
             eos_coef: relative classification weight applied to the no-object category
             losses: list of all the losses to be applied. See get_loss for list of available losses.
-            num_changes: number of change classes to predict 
+            num_changes: number of change classes to predict
             change_weights: weights for the change classes
         """
         super().__init__()
@@ -1065,7 +1085,7 @@ class SetCriterion(nn.Module):
                 len(self.class_weights) == self.num_classes
             ), "CLASS WEIGHTS DO NOT MATCH"
             empty_weight[:-1] = torch.tensor(self.class_weights)
-            
+
         if change_weights != -1:
             assert (
                 len(change_weights) == self.num_changes
@@ -1079,6 +1099,12 @@ class SetCriterion(nn.Module):
         self.num_points = num_points
         self.oversample_ratio = oversample_ratio
         self.importance_sample_ratio = importance_sample_ratio
+        if mask_loss_mode not in {"legacy", "balanced", "worst"}:
+            raise ValueError("mask_loss_mode must be legacy, balanced, or worst")
+        self.mask_loss_mode = mask_loss_mode
+        self.stage_worst_alpha = stage_worst_alpha
+        self.stage_worst_beta = stage_worst_beta
+        self.stage_debug = []
 
         if self.use_contrastive_loss:
             self.contrastive_loss = ContrastiveLoss(
@@ -1095,7 +1121,6 @@ class SetCriterion(nn.Module):
                 num_negatives=num_negatives,
                 assume_single_label=assume_single_label,
             )
-
 
     def loss_labels(self, outputs, targets, indices, num_masks, mask_type):
         """Classification loss (NLL)
@@ -1124,7 +1149,7 @@ class SetCriterion(nn.Module):
         )
         losses = {"loss_ce": loss_ce}
         return losses
-    
+
     def loss_change_labels(self, outputs, targets, indices, num_masks, mask_type):
         """Classification loss (NLL)
         targets dicts must contain the key "change" containing a tensor of dim [nb_target_boxes]
@@ -1136,7 +1161,7 @@ class SetCriterion(nn.Module):
         target_changes_o = torch.cat(
             [t["changes"][J] for t, (_, J) in zip(targets, indices)]
         )
-        # instead of no object label, default to static 
+        # instead of no object label, default to static
         target_changes = torch.full(
             src_logits.shape[:2],
             0,
@@ -1155,8 +1180,14 @@ class SetCriterion(nn.Module):
 
     def loss_aux_contrastive(self, outputs, targets, indices, num_masks, mask_type):
         device = next(iter(outputs.values())).device
-        if ("aux_features" not in outputs or "pooling_fn" not in outputs) or "labels" not in targets[0]:
-            return {"loss_aux_contrastive": torch.tensor(0.0, device=next(iter(outputs.values())).device)}
+        if (
+            "aux_features" not in outputs or "pooling_fn" not in outputs
+        ) or "labels" not in targets[0]:
+            return {
+                "loss_aux_contrastive": torch.tensor(
+                    0.0, device=next(iter(outputs.values())).device
+                )
+            }
 
         aux_features = outputs["aux_features"][::-1]
         batch_size = len(targets)
@@ -1168,8 +1199,10 @@ class SetCriterion(nn.Module):
         total_loss = torch.tensor(0.0, device=device)
         for layer_idx, aux_feature in enumerate(aux_features):
             aux_layer_loss = torch.tensor(0.0, device=device)
-            # pool gt masks 
-            pooled_instance_masks = outputs["pooling_fn"](aux_feature,pooled_instance_masks, reduce="max")
+            # pool gt masks
+            pooled_instance_masks = outputs["pooling_fn"](
+                aux_feature, pooled_instance_masks, reduce="max"
+            )
             features = aux_feature.decomposed_features
             for b in range(batch_size):
                 # Sample features to reduce memory usage while maintaining point-level structure
@@ -1179,18 +1212,25 @@ class SetCriterion(nn.Module):
                 instance_masks = pooled_instance_masks[b]  # (num_points, num_instances)
                 num_points = point_features.shape[0]
 
-                
                 if num_points > self.max_points:
                     # Randomly sample points
-                    sample_indices = torch.randperm(num_points, device=device)[:self.max_points]
-                    sampled_features = point_features[sample_indices]  # (max_points, feature_dim)
-                    sampled_instance_masks = instance_masks[sample_indices]  # (max_points, num_instances)
+                    sample_indices = torch.randperm(num_points, device=device)[
+                        : self.max_points
+                    ]
+                    sampled_features = point_features[
+                        sample_indices
+                    ]  # (max_points, feature_dim)
+                    sampled_instance_masks = instance_masks[
+                        sample_indices
+                    ]  # (max_points, num_instances)
                 else:
                     sampled_features = point_features
                     sampled_instance_masks = instance_masks
-                
+
                 # temporal_stages[b] = pooling_fn(temporal_stages[b])
-                aux_layer_loss += self.contrastive_loss(sampled_features, sampled_instance_masks.T)
+                aux_layer_loss += self.contrastive_loss(
+                    sampled_features, sampled_instance_masks.T
+                )
             if batch_size > 0:
                 aux_layer_loss = aux_layer_loss / batch_size
             out[f"loss_aux_contrastive_layer_{layer_idx}"] = aux_layer_loss
@@ -1199,10 +1239,9 @@ class SetCriterion(nn.Module):
         out.update({"loss_aux_contrastive": total_loss})
         return out
 
-
     def loss_segment_contrastive(self, outputs, targets, indices, num_masks, mask_type):
         """Segment level contrastive loss using mask decoded segment features.
-        
+
         Computes contrastive loss at the segment level by:
         1. Using pre-computed segment features from feature_refinement_aux
         2. Building ground truth similarity matrix from segment_mask (already downsampled)
@@ -1211,10 +1250,14 @@ class SetCriterion(nn.Module):
         # Resolve device
         device = next(iter(outputs.values())).device
         if "segment_features" not in outputs or "labels" not in targets[0]:
-            return {"loss_segment_contrastive": torch.tensor(0.0, device=next(iter(outputs.values())).device)}
+            return {
+                "loss_segment_contrastive": torch.tensor(
+                    0.0, device=next(iter(outputs.values())).device
+                )
+            }
 
         batch_size = len(targets)
-        
+
         # Get device from segment features
         total_loss = torch.tensor(0.0, device=device)
         per_layer_losses = {}
@@ -1222,17 +1265,26 @@ class SetCriterion(nn.Module):
             layer_loss = torch.tensor(0.0, device=device)
             for b in range(batch_size):
                 instance_masks = targets[b]["segment_mask"]
-                
-                if self.contrastive_loss.weight_temporal_stages and "temporal_stages" in targets[b]:
+
+                if (
+                    self.contrastive_loss.weight_temporal_stages
+                    and "temporal_stages" in targets[b]
+                ):
                     # Reduce temporal_stages from points to segments
                     p2s = targets[b]["point2segment"]
                     ts = targets[b]["temporal_stages"]
-                    temporal_stages = torch.zeros(int(p2s.max()) + 1, device=ts.device, dtype=ts.dtype)
-                    temporal_stages.scatter_reduce_(0, p2s, ts, reduce='amax', include_self=False)
+                    temporal_stages = torch.zeros(
+                        int(p2s.max()) + 1, device=ts.device, dtype=ts.dtype
+                    )
+                    temporal_stages.scatter_reduce_(
+                        0, p2s, ts, reduce="amax", include_self=False
+                    )
                 else:
                     temporal_stages = None
-                
-                layer_loss += self.contrastive_loss(layer_features[b], instance_masks, temporal_stages)
+
+                layer_loss += self.contrastive_loss(
+                    layer_features[b], instance_masks, temporal_stages
+                )
             if batch_size > 0:
                 layer_loss = layer_loss / batch_size
             per_layer_losses[f"loss_segment_contrastive_layer{layer_idx}"] = layer_loss
@@ -1240,7 +1292,9 @@ class SetCriterion(nn.Module):
 
         if self.scale_contrastive_loss and len(outputs["segment_features"]) == 1:
             # scale by the number of aux outputs to balance the loss
-            total_loss = total_loss * len(outputs["aux_outputs"]) * self.contrastive_loss_weight
+            total_loss = (
+                total_loss * len(outputs["aux_outputs"]) * self.contrastive_loss_weight
+            )
 
         out = {"loss_segment_contrastive": total_loss}
         out.update(per_layer_losses)
@@ -1251,6 +1305,9 @@ class SetCriterion(nn.Module):
         targets dicts must contain the key "masks" containing a tensor of dim [nb_target_boxes, h, w]
         """
         assert "pred_masks" in outputs
+
+        if self.mask_loss_mode != "legacy":
+            return self._loss_masks_by_stage(outputs, targets, indices, mask_type)
 
         loss_masks = []
         loss_dices = []
@@ -1291,6 +1348,69 @@ class SetCriterion(nn.Module):
             "loss_dice": torch.sum(torch.stack(loss_dices)),
         }
 
+    def _loss_masks_by_stage(self, outputs, targets, indices, mask_type):
+        from models.perception_gain import (
+            derive_segment_stage_ids,
+            stage_aware_mask_losses,
+        )
+
+        loss_masks = []
+        loss_dices = []
+        for batch_id, (map_id, target_id) in enumerate(indices):
+            source = outputs["pred_masks"][batch_id]
+            mask_logits = source[:, map_id].T
+            target_mask = targets[batch_id][mask_type][target_id]
+            finite_rows = torch.isfinite(mask_logits).all(dim=1)
+            mask_logits = mask_logits[finite_rows]
+            target_mask = target_mask[finite_rows]
+            target = targets[batch_id]
+            if mask_type == "segment_mask":
+                derived = derive_segment_stage_ids(
+                    target["point2segment"], target["temporal_stages"]
+                )
+                provided = target.get("segment_stage_ids")
+                if provided is not None:
+                    provided = provided.to(derived.device).long()
+                    if not torch.equal(provided, derived):
+                        raise ValueError(
+                            "segment_stage_ids differ from strict point-derived stages"
+                        )
+                stage_ids = derived
+            else:
+                stage_ids = target.get("temporal_stages")
+                if not isinstance(stage_ids, torch.Tensor):
+                    raise ValueError("point mask loss requires temporal_stages")
+            if stage_ids.numel() != source.shape[0]:
+                raise ValueError("stage IDs do not align with pred_masks support")
+            loss_mask, loss_dice, debug = stage_aware_mask_losses(
+                mask_logits,
+                target_mask,
+                stage_ids,
+                mode=self.mask_loss_mode,
+                sample_fraction=self.num_points,
+                alpha=self.stage_worst_alpha,
+                beta=self.stage_worst_beta,
+            )
+            self.stage_debug.append(
+                {"batch_id": batch_id, "mode": self.mask_loss_mode, **debug}
+            )
+            loss_masks.append(loss_mask)
+            loss_dices.append(loss_dice)
+        if not loss_masks:
+            zero = (
+                sum(
+                    torch.where(
+                        torch.isfinite(value), value, torch.zeros_like(value)
+                    ).sum()
+                    for value in outputs["pred_masks"]
+                )
+                * 0
+            )
+            return {"loss_mask": zero, "loss_dice": zero}
+        return {
+            "loss_mask": torch.stack(loss_masks).sum(),
+            "loss_dice": torch.stack(loss_dices).sum(),
+        }
 
     def _get_src_permutation_idx(self, indices):
         # permute predictions following indices
@@ -1310,8 +1430,8 @@ class SetCriterion(nn.Module):
 
     def get_loss(self, loss, outputs, targets, indices, num_masks, mask_type):
         loss_map = {
-            "labels": self.loss_labels, 
-            "masks": self.loss_masks, 
+            "labels": self.loss_labels,
+            "masks": self.loss_masks,
             "changes": self.loss_change_labels,
         }
         assert loss in loss_map, f"do you really want to compute {loss} loss?"
@@ -1324,6 +1444,8 @@ class SetCriterion(nn.Module):
              targets: list of dicts, such that len(targets) == batch_size.
                       The expected keys in each dict depends on the losses applied, see each loss' doc
         """
+        self.stage_debug = []
+
         def normalized_num_masks(device):
             num_masks = sum(len(t["labels"]) for t in targets)
             num_masks = torch.as_tensor(
@@ -1346,30 +1468,32 @@ class SetCriterion(nn.Module):
         if p2_fail_closed_runtime:
             num_masks = normalized_num_masks(outputs["pred_logits"].device)
 
-        outputs_without_aux = {
-            k: v for k, v in outputs.items() if k != "aux_outputs"
-        }
+        outputs_without_aux = {k: v for k, v in outputs.items() if k != "aux_outputs"}
 
         # Retrieve the matching between the outputs of the last layer and the targets
         indices = self.matcher(outputs_without_aux, targets, mask_type)
 
         if not p2_fail_closed_runtime:
-            num_masks = normalized_num_masks(
-                next(iter(outputs.values())).device
-            )
+            num_masks = normalized_num_masks(next(iter(outputs.values())).device)
 
         # Compute all the requested losses
         losses = {}
         for loss in self.losses:
             losses.update(
-                self.get_loss(
-                    loss, outputs, targets, indices, num_masks, mask_type
-                )
+                self.get_loss(loss, outputs, targets, indices, num_masks, mask_type)
             )
 
         if self.use_contrastive_loss:
-            losses.update(self.loss_segment_contrastive(outputs, targets, indices, num_masks, mask_type))
-            losses.update(self.loss_aux_contrastive(outputs, targets, indices, num_masks, mask_type))
+            losses.update(
+                self.loss_segment_contrastive(
+                    outputs, targets, indices, num_masks, mask_type
+                )
+            )
+            losses.update(
+                self.loss_aux_contrastive(
+                    outputs, targets, indices, num_masks, mask_type
+                )
+            )
 
         # In case of auxiliary losses, we repeat this process with the output of each intermediate layer.
         # exclude contrastive loss from auxiliary losses

@@ -415,8 +415,10 @@ def _published_match_by_gt(
     *,
     horizon: int,
     class_mapping: tuple[int, ...],
-) -> dict[int, bool]:
+    tau: float,
+) -> dict[int, dict[str, object]]:
     from scripts.evaluate_persist4d_p6a import build_temporal_target
+    from scripts.p6a_metrics import official_temporal_match_trace
 
     if not hasattr(prefix, "prediction"):
         raise CrossWindowDiagnosticError("D0 prefix is unavailable")
@@ -430,19 +432,11 @@ def _published_match_by_gt(
         [class_mapping[int(value)] for value in target["labels"].tolist()],
         dtype=torch.long,
     )
-    prediction = prefix.prediction
-    masks = prediction["pred_masks"].detach().cpu().bool()
-    classes = prediction["pred_classes"].detach().cpu().long()
-    result = {}
-    for gt_index, gt_id in enumerate(target["ids"].tolist()):
-        gt_mask = target["masks"][gt_index].detach().cpu().bool()
-        gt_class = int(target["labels"][gt_index].item())
-        result[int(gt_id)] = any(
-            int(classes[index].item()) == gt_class
-            and _mask_iou(gt_mask, masks[:, index]) > 0.5
-            for index in range(classes.numel())
-        )
-    return result
+    return official_temporal_match_trace(
+        prefix.prediction,
+        target,
+        threshold=tau,
+    )
 
 
 def diagnose_candidate_coverage(
@@ -464,15 +458,23 @@ def diagnose_candidate_coverage(
         == 5
     ):
         raise CrossWindowDiagnosticError("coverage inputs must contain five stages")
+    from scripts.p6a_metrics import official_temporal_iou_thresholds
+
     rows = []
+    official_thresholds = official_temporal_iou_thresholds()
+    diagnostic_thresholds = tuple(sorted({*official_thresholds, 0.25, 0.75}))
     for horizon in (2, 3, 4, 5):
         pools = build_candidate_pools(frames, horizon=horizon)
-        published = _published_match_by_gt(
-            d0_prefixes[horizon - 1],
-            original_targets,
-            horizon=horizon,
-            class_mapping=class_mapping,
-        )
+        published_by_threshold = {
+            threshold: _published_match_by_gt(
+                d0_prefixes[horizon - 1],
+                original_targets,
+                horizon=horizon,
+                class_mapping=class_mapping,
+                tau=threshold,
+            )
+            for threshold in diagnostic_thresholds
+        }
         stage_targets = [_target_rows(value) for value in canonical_targets[:horizon]]
         gt_ids = sorted({gt_id for target in stage_targets for gt_id in target})
         for pool_name, pool in pools.items():
@@ -509,9 +511,19 @@ def diagnose_candidate_coverage(
                     stage_best_iou.append(scored[0][0] if scored else 0.0)
                     stage_candidate_count.append(len(candidates))
                     stage_source.append(scored[0][1].source if scored else "none")
-                for threshold in (0.25, 0.5, 0.75):
+                for threshold in diagnostic_thresholds:
+                    trace = published_by_threshold[threshold].get(gt_id)
+                    if trace is None:
+                        trace = {
+                            "gt_id_or_group": str(gt_id),
+                            "eligible": False,
+                            "matched": None,
+                            "ambiguity_status": "AMBIGUOUS_UNRESOLVED",
+                            "exclusion_reason": "MISSING_FROM_EVALUATOR_TRACE",
+                        }
+                    eligible = bool(trace["eligible"])
                     complete = all(value > threshold for value in stage_best_iou)
-                    published_failure = not published.get(gt_id, False)
+                    published_failure = not bool(trace["matched"]) if eligible else None
                     first_failure = next(
                         (
                             visible[index]
@@ -527,13 +539,24 @@ def diagnose_candidate_coverage(
                             "order_id": order_id,
                             "prefix_T": horizon,
                             "gt_id": gt_id,
+                            "gt_id_or_group": trace["gt_id_or_group"],
                             "tau": threshold,
+                            "tau_scope": (
+                                "OFFICIAL_TMAP"
+                                if threshold in official_thresholds
+                                else "DISPLAY_ONLY"
+                            ),
                             "pool": pool_name,
-                            "candidate_complete": complete,
+                            "evaluator_eligible": eligible,
+                            "candidate_complete": complete if eligible else None,
                             "published_failure": published_failure,
                             "diag_complete_candidate_failure": (
-                                complete and published_failure
+                                complete and bool(published_failure)
+                                if eligible
+                                else None
                             ),
+                            "evaluator_exclusion_reason": trace["exclusion_reason"],
+                            "ambiguity_status": trace["ambiguity_status"],
                             "visible_stage_count": len(visible),
                             "first_failure_stage": first_failure,
                             "gap": max(0, visible[-1] - visible[0] + 1 - len(visible)),
@@ -545,7 +568,6 @@ def diagnose_candidate_coverage(
                                 str(value) for value in stage_candidate_count
                             ),
                             "selected_source": ";".join(stage_source),
-                            "ambiguity_status": "AMBIGUITY_METADATA_UNAVAILABLE",
                         }
                     )
     return tuple(rows)
@@ -1063,10 +1085,21 @@ class E1DiagnosticAccumulator:
             ].append(event)
         coverage_rows = []
         for (pool, threshold, horizon), events in sorted(grouped.items()):
-            complete = sum(bool(event["candidate_complete"]) for event in events)
-            failures = sum(bool(event["published_failure"]) for event in events)
+            eligible_events = [
+                event for event in events if bool(event["evaluator_eligible"])
+            ]
+            excluded_events = [
+                event for event in events if not bool(event["evaluator_eligible"])
+            ]
+            complete = sum(
+                bool(event["candidate_complete"]) for event in eligible_events
+            )
+            failures = sum(
+                bool(event["published_failure"]) for event in eligible_events
+            )
             complete_failures = sum(
-                bool(event["diag_complete_candidate_failure"]) for event in events
+                bool(event["diag_complete_candidate_failure"])
+                for event in eligible_events
             )
             coverage_rows.append(
                 {
@@ -1075,24 +1108,49 @@ class E1DiagnosticAccumulator:
                     "pool": pool,
                     "tau": threshold,
                     "T": horizon,
-                    "event_count": len(events),
+                    "event_count": len(eligible_events),
+                    "raw_event_count": len(events),
+                    "excluded_count": len(excluded_events),
+                    "ambiguous_unresolved_count": sum(
+                        event["ambiguity_status"] == "AMBIGUOUS_UNRESOLVED"
+                        for event in excluded_events
+                    ),
                     "candidate_complete_count": complete,
-                    "candidate_complete_fraction": complete / len(events),
+                    "candidate_complete_fraction": (
+                        complete / len(eligible_events) if eligible_events else None
+                    ),
                     "published_failure_count": failures,
                     "diag_complete_candidate_failure_count": complete_failures,
                     "diag_complete_candidate_failure_fraction": (
                         complete_failures / failures if failures else None
                     ),
                     "reference_count": len(
-                        {str(event["reference_id"]) for event in events}
+                        {str(event["reference_id"]) for event in eligible_events}
                     ),
-                    "ambiguity_status": "AMBIGUITY_METADATA_UNAVAILABLE",
+                    "ambiguity_status": (
+                        "AMBIGUOUS_UNRESOLVED"
+                        if any(
+                            event["ambiguity_status"] == "AMBIGUOUS_UNRESOLVED"
+                            for event in events
+                        )
+                        else (
+                            "AMBIGUITY_METADATA_UNAVAILABLE"
+                            if any(
+                                event["ambiguity_status"]
+                                == "AMBIGUITY_METADATA_UNAVAILABLE"
+                                for event in events
+                            )
+                            else "PASS"
+                        )
+                    ),
                 }
             )
         primary = [
             event
             for event in self.coverage_events
-            if event["pool"] == "POLICY_POOL" and event["tau"] == 0.5
+            if event["pool"] == "POLICY_POOL"
+            and event["tau"] == 0.5
+            and bool(event["evaluator_eligible"])
         ]
         published_failures = [event for event in primary if event["published_failure"]]
         complete_failures = [

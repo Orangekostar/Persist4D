@@ -1,0 +1,29 @@
+{
+  "checkpoint": "external:training/S-BAL/last.ckpt",
+  "checkpoint_bytes": 754935460,
+  "checkpoint_sha256": "49062639ec7e1f38280c6be2a42be81fe913cd6e1169dff862b9fc8f551b20ce",
+  "failure": {
+    "error_type": "DistBackendError",
+    "external_dependency": "192.168.100.102:2049",
+    "external_dependency_status": "CONNECTION_REFUSED",
+    "reason": "NFS data workers blocked long enough for rank 0 to hit the 1800000 ms NCCL ALLREDUCE watchdog timeout"
+  },
+  "last_observed_uncommitted_update": 379,
+  "resource_accounting": {
+    "accounted_elapsed_seconds": 5967.453447,
+    "accounted_gpu_hours": 3.315251915,
+    "derivation": "2 GPUs * (run_plan_mtime_to_last_checkpoint_mtime + 1800 second NCCL watchdog) / 3600",
+    "last_checkpoint_utc": "2026-09-22T06:16:41.156077618Z",
+    "run_plan_utc": "2026-09-22T05:07:13.702630947Z",
+    "watchdog_timeout_seconds": 1800
+  },
+  "resume_progress": {
+    "completed_local_batches": 2800,
+    "completed_optimizer_updates": 350,
+    "next_global_draw_index": 11200,
+    "world_size": 2
+  },
+  "schema_version": "perception-gain-training-interruption-v1",
+  "status": "RESUMABLE_EXTERNAL_INTERRUPTION",
+  "utc": "2026-09-22T06:55:47Z"
+}

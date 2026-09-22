@@ -1,0 +1,77 @@
+# @package _global_
+defaults:
+  - /config_rescene4d_concerto_rootcause
+  - _self_
+
+aux_metric: null
+
+general:
+  train_mode: true
+  seed: 45
+  freeze: backbone_encoder
+  frozen_encoder_eval: false
+  gpus: ${perception_training.devices}
+  project_name: persist4d_perception_gain_v1
+  experiment_name: perception-common
+  save_dir: ${oc.env:PERSIST4D_RUN_ROOT,/home/ww/persist4d_runs/perception_gain_v1}/training/${general.experiment_name}
+  rootcause_objective_mode: raw_sum
+  rootcause_fail_closed_runtime: true
+  rootcause_common_initialization: null
+  rootcause_common_initialization_sha256: null
+
+data:
+  batch_size: 2
+  num_workers: 4
+  train_collation:
+    preserve_empty_targets: true
+  train_dataloader:
+    batch_size: ${data.batch_size}
+    num_workers: ${data.num_workers}
+    shuffle: false
+
+backbone:
+  name: ${oc.env:PERSIST4D_CONCERTO_PRETRAINED,concerto_base.pth}
+
+model:
+  return_query_features: false
+  semantic_query_positioning: false
+  semantic_query_fraction: 0.75
+  open_first_cross_attention: false
+
+loss:
+  mask_loss_mode: legacy
+  stage_worst_alpha: 0.5
+  stage_worst_beta: 0.25
+
+perception_training:
+  variant: perception-common
+  optimizer_updates: 3000
+  warmup_updates: 150
+  minimum_lr_fraction: 0.1
+  existing_lr: 5.0e-5
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.01
+  devices: 2
+  batch_size_per_gpu: 2
+  gradient_accumulation: 8
+  effective_batch_size: 32
+  precision: 32-true
+  gradient_clip_norm: 1.0
+  evaluation_updates: [0, 250, 750, 1500, 2250, 3000]
+  pilot_update: 750
+  nominal_dataset_weights: [1.0, 0.8]
+  scorer_checkpoint: null
+
+trainer:
+  max_epochs: -1
+  max_steps: ${perception_training.optimizer_updates}
+  min_epochs: null
+  accumulate_grad_batches: ${perception_training.gradient_accumulation}
+  check_val_every_n_epoch: null
+  num_sanity_val_steps: 0
+  limit_val_batches: 0
+  gradient_clip_val: ${perception_training.gradient_clip_norm}
+  precision: ${perception_training.precision}
+  deterministic: false
+  strategy: ddp_find_unused_parameters_false

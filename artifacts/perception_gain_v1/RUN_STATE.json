@@ -1,0 +1,670 @@
+{
+  "bind": {
+    "local_t2": {
+      "evaluation_provenance_content_sha256": "d54a1ceefcc5feaeb7b8e855f3e2dbb37ba9321baed900a19e65625b2a48bf9a",
+      "physical_reference_count": 41,
+      "physical_reference_ids": [
+        "095821f7-e2c2-2de1-9568-b9ce59920e29",
+        "0988ea72-eb32-2e61-8344-99e2283c2728",
+        "0cac7540-8d6f-2d13-8eee-36ba2a428e3f",
+        "0cac7584-8d6f-2d13-8df8-c05e4307b418",
+        "0cac75dc-8d6f-2d13-8d08-9c497bd6acdc",
+        "0cac7676-8d6f-2d13-8f3a-d7bf7f03e721",
+        "1d233fe8-e280-2b1a-8fac-c3646a1cd64a",
+        "1d234022-e280-2b1a-8cec-e9787bb0d7b2",
+        "20c993b7-698f-29c5-847d-c8cb8a685f5a",
+        "321c8680-a5a8-2a84-85c2-816a26d59516",
+        "38770ca1-86d7-27b8-8619-ab66f67d9adf",
+        "4138582f-a238-2435-8332-6902542c2823",
+        "422885b3-192d-25fc-84c9-9b80eea1752d",
+        "4238490c-60a7-271e-9f38-3c651e3b3912",
+        "43b8cae1-6678-2e38-9865-c19c07c25015",
+        "4a9a43d2-7736-2874-874d-d0fad0570e19",
+        "4d3d82b0-8cf4-2e04-80a8-c955ea964c2f",
+        "4fbad31e-465b-2a5d-84b7-c0ddea978db4",
+        "5341b79f-8a66-2cdd-84d5-6dba6525dd75",
+        "5341b7e3-8a66-2cdd-8709-66a2159f0017",
+        "6bde6081-9162-246f-8c4e-ffaf709d17b1",
+        "6bde60cb-9162-246f-8cf5-d04f7426e56f",
+        "742e8f15-be0a-294e-9ebb-6c72dbcb9662",
+        "75c25975-9ca2-2844-9769-84677f46d4cf",
+        "7747a50c-9431-24e8-877d-e60c3a341cc2",
+        "8e0f1c28-9e28-2339-8584-ff06ff93c341",
+        "a0905fd9-66f7-2272-9dfb-0483fdcc54c7",
+        "ab835fae-54c6-29a1-995e-b06cfc555786",
+        "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5",
+        "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e",
+        "b1f23308-d255-2761-94da-981d962c6bf8",
+        "ba6fdaaa-a4c1-2dca-8163-a52b18bf6b64",
+        "bcb0fe06-4f39-2c70-9c24-a8dd7496c2f8",
+        "bf9a3da2-45a5-2e80-8219-1f0a216399fe",
+        "bf9a3de9-45a5-2e80-8022-277108d67404",
+        "c7895f27-339c-2d13-836b-c12dca280261",
+        "c7895f7c-339c-2d13-819f-3bb0b26c91f6",
+        "c92fb5b5-f771-2064-8570-dbe16cb33764",
+        "d7d40d4e-7a5d-2b36-97e7-34324c52ac42",
+        "e61b0e04-bada-2f31-82d6-72831a602ba7",
+        "fcf66d7b-622d-291c-86b8-7db96aebcee3"
+      ],
+      "run_sources": {
+        "seed45.json": {
+          "bytes": 1331,
+          "sha256": "12feaa24d25db07857a5b7538f80145a04a7557adcebcc830d40ec78eecff544"
+        },
+        "seed46.json": {
+          "bytes": 1325,
+          "sha256": "190b9cdda02e577953c7b1e9e1dd403a0b2db13c9b43d81b29ebbaf7c40e0a21"
+        },
+        "seed47.json": {
+          "bytes": 1329,
+          "sha256": "7431acd57759e1e07755b738970f571562fd0ab50e87cbbeaa7d628554ba8a42"
+        }
+      },
+      "validation_sequence_count": 154
+    },
+    "r1": {
+      "checkpoint_bytes": 754813672,
+      "checkpoint_reference": "external:checkpoint/rootcause_full/r1/epoch390/629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "objective_mode": "raw_sum",
+      "resolved_config_sha256": "3846415b6de3ea12b7b08d39ea20398916dd685c99ce7ad33e42df17d9ac6536",
+      "selected_epoch": 390,
+      "selected_step": 25740
+    },
+    "schema_version": "perception-gain-foundation-binding-v1",
+    "sources": {
+      "evaluation_provenance": {
+        "logical_reference": "repo:artifacts/rescene_task_learning_root_cause_v1/full_candidate/FULL_EVALUATION_PROVENANCE.json",
+        "sha256": "46f50cebcd964f75434df93d06ab4905c2f7a1e192833159e9efc6f539b3a832"
+      },
+      "selected_checkpoint_manifest": {
+        "logical_reference": "repo:artifacts/rescene_task_learning_root_cause_v1/full_candidate/selected_checkpoint_manifest.json",
+        "sha256": "a08a92086b10da37ab1526ae0b29ff307b9c911bed293386564063d70b35f17a"
+      },
+      "variant_manifest": {
+        "logical_reference": "repo:artifacts/rescene_task_learning_root_cause_v1/short_curves/variant_manifest.json",
+        "sha256": "bff1dcc31ebc1455e4e0b5995166a2006044ff0c111e29fc1ee61c8a95a09dec"
+      }
+    },
+    "status": "PASS"
+  },
+  "budget_used": {
+    "foundation_and_evaluation_gpu_hours": 3.653669649958901,
+    "new_cache_bytes": 101166032,
+    "perception_training_gpu_hours": 8.15015840478406,
+    "profiling_gpu_hours": 0.0,
+    "refinement_gpu_hours": 0.0,
+    "smoke_and_recovery_gpu_hours": 0.0
+  },
+  "completed_stages": [
+    "bootstrap",
+    "bind",
+    "foundation",
+    "scorer"
+  ],
+  "execution_status": "PARTIAL_WITH_BLOCKERS",
+  "failures": [
+    {
+      "accounted_gpu_hours": 3.315251915,
+      "completed_arm_updates": {
+        "C0": 750,
+        "S-BAL": 350
+      },
+      "completed_optimizer_updates": 350,
+      "external_dependency": "192.168.100.102:2049",
+      "external_dependency_status": "CONNECTION_REFUSED",
+      "reason": "NFS data workers blocked long enough for rank 0 to hit the 1800000 ms NCCL ALLREDUCE watchdog timeout",
+      "resume_checkpoint": "external:training/S-BAL/last.ckpt",
+      "resume_checkpoint_sha256": "49062639ec7e1f38280c6be2a42be81fe913cd6e1169dff862b9fc8f551b20ce",
+      "stage": "perception_pilot",
+      "status": "RESUMABLE_EXTERNAL_INTERRUPTION"
+    }
+  ],
+  "foundation": {
+    "corrected_e1": {
+      "assignment_event_count": 115,
+      "coverage_event_count": 19080,
+      "data_role": "CAL",
+      "diagnostic_source_sha256": "f268a470fa4362b0d93ad86f0c47b9f3c455f6b00c821a68d1b9bf16310fb0cd",
+      "elapsed_seconds": 2040.3468672829913,
+      "gate_decision": "ASSOCIATION_HEADROOM_SUPPORTED",
+      "logical_unit_count": 23,
+      "metric_source_sha256": "51b2006b7364df0dcd968235a1cc9f6bfefbd8a30c1bd95c026e46895af78fed",
+      "reference_count": 4,
+      "schema_version": "perception-gain-foundation-e1-v1",
+      "status": "PASS"
+    },
+    "diagnostic_panel": {
+      "attention_reachability": {
+        "earliest_allowed_gt_fraction_mean": 0.15633000303857864,
+        "earliest_decoder_layer": 0
+      },
+      "best_candidate_iou_mean_by_decoder_layer": {
+        "0": 0.051576930343168834,
+        "1": 0.6661669328661248,
+        "10": 0.7469172816871121,
+        "11": 0.7468567021504635,
+        "12": 0.7466676795467881,
+        "2": 0.6991624724267438,
+        "3": 0.7431833047862395,
+        "4": 0.7461776068471003,
+        "5": 0.75036518477678,
+        "6": 0.7473241092618739,
+        "7": 0.7475238638367541,
+        "8": 0.7504172439659291,
+        "9": 0.7479422991671184
+      },
+      "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "completed_prefix_count": 20,
+      "elapsed_seconds": 45.3410942129849,
+      "expected_prefix_count": 20,
+      "foundation_source_sha256": "dc2e454f48ef5901bd1bd75ef8e299edf01ba725f702ef0c11203b6898fd9085",
+      "gpu_hours": 0.012594748392495806,
+      "gpu_name": "NVIDIA A40",
+      "incomplete_units": [],
+      "load_audit": {
+        "loaded_key_count": 798,
+        "missing_keys": [],
+        "r1_subtree_exact": true,
+        "r1_subtree_mismatches": [],
+        "unexpected_keys": []
+      },
+      "panel_sequences": [
+        {
+          "prefix_count": 5,
+          "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+          "sequence_id": "scene0007_04-scene0007_00-scene0007_01-scene0007_03-scene0007_02"
+        },
+        {
+          "prefix_count": 5,
+          "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+          "sequence_id": "scene0066_04-scene0066_01-scene0066_00-scene0066_02-scene0066_03"
+        },
+        {
+          "prefix_count": 5,
+          "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14",
+          "sequence_id": "scene0068_01-scene0068_00-scene0068_05-scene0068_03-scene0068_02"
+        },
+        {
+          "prefix_count": 5,
+          "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+          "sequence_id": "scene0174_03-scene0174_00-scene0174_06-scene0174_01-scene0174_05"
+        }
+      ],
+      "query_coverage": {
+        "foreground_query_fraction_mean": 0.300500001385808,
+        "gt_instance_coverage_mean": 0.732818640768528,
+        "scene_count": 20
+      },
+      "reference_count": 4,
+      "schema_version": "perception-gain-foundation-diagnostic-panel-v1",
+      "status": "PASS"
+    },
+    "gpu_hours": 0.041172527211941395,
+    "live_smoke": {
+      "cached_live_parity": {
+        "compared_tensor_count": 65,
+        "mismatches": [
+          "stages[0].observation.class_prob",
+          "stages[0].observation.confidence",
+          "stages[0].observation.features",
+          "stages[0].prediction.latest_stage_masks",
+          "stages[0].prediction.pred_classes",
+          "stages[0].prediction.pred_masks",
+          "stages[0].prediction.pred_scores",
+          "stages[0].prediction.source_class_ids",
+          "stages[0].prediction.source_query_ids",
+          "stages[1].observation.class_prob",
+          "stages[1].observation.confidence",
+          "stages[1].observation.current_supported",
+          "stages[1].observation.features",
+          "stages[1].observation.previous_supported",
+          "stages[1].prediction.latest_stage_masks",
+          "stages[1].prediction.pred_classes",
+          "stages[1].prediction.pred_masks",
+          "stages[1].prediction.pred_scores",
+          "stages[1].prediction.source_class_ids",
+          "stages[1].prediction.source_query_ids",
+          "stages[2].observation.class_prob",
+          "stages[2].observation.confidence",
+          "stages[2].observation.current_supported",
+          "stages[2].observation.features",
+          "stages[2].observation.previous_supported",
+          "stages[2].prediction.latest_stage_masks",
+          "stages[2].prediction.pred_classes",
+          "stages[2].prediction.pred_masks",
+          "stages[2].prediction.pred_scores",
+          "stages[2].prediction.source_class_ids",
+          "stages[2].prediction.source_query_ids",
+          "stages[3].observation.class_prob",
+          "stages[3].observation.confidence",
+          "stages[3].observation.current_supported",
+          "stages[3].observation.features",
+          "stages[3].observation.previous_supported",
+          "stages[3].prediction.latest_stage_masks",
+          "stages[3].prediction.pred_classes",
+          "stages[3].prediction.pred_masks",
+          "stages[3].prediction.pred_scores",
+          "stages[3].prediction.source_class_ids",
+          "stages[3].prediction.source_query_ids",
+          "stages[4].observation.class_prob",
+          "stages[4].observation.confidence",
+          "stages[4].observation.current_supported",
+          "stages[4].observation.features",
+          "stages[4].observation.previous_supported",
+          "stages[4].prediction.latest_stage_masks",
+          "stages[4].prediction.pred_classes",
+          "stages[4].prediction.pred_masks",
+          "stages[4].prediction.pred_scores",
+          "stages[4].prediction.source_class_ids",
+          "stages[4].prediction.source_query_ids"
+        ],
+        "status": "FAIL"
+      },
+      "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "d0_live_metrics": [
+        {
+          "K": 100,
+          "R1_SHA": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+          "T": 2,
+          "archive_bytes": 2282444,
+          "buffer_bytes": 4612128,
+          "config_id": "D0",
+          "data_role": "DEV-CAL",
+          "head_SHA": null,
+          "logical_unit_count": 1,
+          "mask_selector": "M-new",
+          "master": "all",
+          "materialized_bytes": 62550271,
+          "method": "D0",
+          "order": "all",
+          "policy": "lag1",
+          "population_id": "development",
+          "prefix_overall_mAP": 0.5722222328186035,
+          "producer_id": "R1-B4-policy",
+          "published_current_AP": 0.7555555701255798,
+          "raw_current_AP": 0.7555555701255798,
+          "reason": "",
+          "reference": "all",
+          "reference_count": 1,
+          "resident_bytes": 62616,
+          "score_mode": "mean",
+          "source_commit": "6ef77620aa20926311eff3124a794a6ca2e32727",
+          "source_method": "D-LAST",
+          "status": "MEASURED_CORRECTED_BASELINE",
+          "t_REC": 0.625,
+          "t_mAP": 0.5555555820465088,
+          "t_mAP25": 0.800000011920929,
+          "t_mAP50": 0.6000000238418579
+        },
+        {
+          "K": 100,
+          "R1_SHA": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+          "T": 3,
+          "archive_bytes": 2282444,
+          "buffer_bytes": 4612128,
+          "config_id": "D0",
+          "data_role": "DEV-CAL",
+          "head_SHA": null,
+          "logical_unit_count": 1,
+          "mask_selector": "M-new",
+          "master": "all",
+          "materialized_bytes": 62550271,
+          "method": "D0",
+          "order": "all",
+          "policy": "lag1",
+          "population_id": "development",
+          "prefix_overall_mAP": 0.761904776096344,
+          "producer_id": "R1-B4-policy",
+          "published_current_AP": 0.8703703880310059,
+          "raw_current_AP": 0.8703703880310059,
+          "reason": "",
+          "reference": "all",
+          "reference_count": 1,
+          "resident_bytes": 62616,
+          "score_mode": "mean",
+          "source_commit": "6ef77620aa20926311eff3124a794a6ca2e32727",
+          "source_method": "D-LAST",
+          "status": "MEASURED_CORRECTED_BASELINE",
+          "t_REC": 0.6774193644523621,
+          "t_mAP": 0.6666666865348816,
+          "t_mAP25": 0.8571428656578064,
+          "t_mAP50": 0.7142857313156128
+        },
+        {
+          "K": 100,
+          "R1_SHA": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+          "T": 4,
+          "archive_bytes": 2282444,
+          "buffer_bytes": 4612128,
+          "config_id": "D0",
+          "data_role": "DEV-CAL",
+          "head_SHA": null,
+          "logical_unit_count": 1,
+          "mask_selector": "M-new",
+          "master": "all",
+          "materialized_bytes": 62550271,
+          "method": "D0",
+          "order": "all",
+          "policy": "lag1",
+          "population_id": "development",
+          "prefix_overall_mAP": 0.7341269850730896,
+          "producer_id": "R1-B4-policy",
+          "published_current_AP": 0.9444444179534912,
+          "raw_current_AP": 0.9444444179534912,
+          "reason": "",
+          "reference": "all",
+          "reference_count": 1,
+          "resident_bytes": 62616,
+          "score_mode": "mean",
+          "source_commit": "6ef77620aa20926311eff3124a794a6ca2e32727",
+          "source_method": "D-LAST",
+          "status": "MEASURED_CORRECTED_BASELINE",
+          "t_REC": 0.682539701461792,
+          "t_mAP": 0.682539701461792,
+          "t_mAP25": 0.8571428656578064,
+          "t_mAP50": 0.7142857313156128
+        },
+        {
+          "K": 100,
+          "R1_SHA": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+          "T": 5,
+          "archive_bytes": 2282444,
+          "buffer_bytes": 4612128,
+          "config_id": "D0",
+          "data_role": "DEV-CAL",
+          "head_SHA": null,
+          "logical_unit_count": 1,
+          "mask_selector": "M-new",
+          "master": "all",
+          "materialized_bytes": 62550271,
+          "method": "D0",
+          "order": "all",
+          "policy": "lag1",
+          "population_id": "development",
+          "prefix_overall_mAP": 0.6984127163887024,
+          "producer_id": "R1-B4-policy",
+          "published_current_AP": 0.644444465637207,
+          "raw_current_AP": 0.644444465637207,
+          "reason": "",
+          "reference": "all",
+          "reference_count": 1,
+          "resident_bytes": 62616,
+          "score_mode": "mean",
+          "source_commit": "6ef77620aa20926311eff3124a794a6ca2e32727",
+          "source_method": "D-LAST",
+          "status": "MEASURED_CORRECTED_BASELINE",
+          "t_REC": 0.6111111044883728,
+          "t_mAP": 0.557539701461792,
+          "t_mAP25": 0.7321428656578064,
+          "t_mAP50": 0.5892857313156128
+        }
+      ],
+      "elapsed_seconds": 99.85657851901487,
+      "foundation_source_sha256": "b904ecf01639814c04759c9b561b2903848a12a2d299343e04f6e986aba91ce7",
+      "gpu_hours": 0.02773793847750413,
+      "gpu_name": "NVIDIA A40",
+      "historical_cache_disposition": "SEPARATE_HISTORICAL_ROW",
+      "historical_cache_provenance": {
+        "base_cache_manifest_sha256": "489577a52e462d43042e1945d4c27dc5a71b65aabb84deb6d93d7c3d75314851",
+        "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+        "config_sha256": "08bfffc333854f90f470e0a0559f64954a107bffcf575cb494d3c142e531534d",
+        "source_commit": "f654aadce76630d88dc9e5ebd88a4089107e9da0"
+      },
+      "live_repeat_parity": {
+        "compared_tensor_count": 65,
+        "mismatches": [],
+        "status": "PASS"
+      },
+      "live_supplement": {
+        "bytes": 116372412,
+        "cache_reference": "external:foundation/live/live_supplement.pt",
+        "sha256": "1762151d4d8cc90140e501da9061a3a4985f8ead0eb3f5dfdcda247c087f7a16"
+      },
+      "load_audit": {
+        "loaded_key_count": 798,
+        "missing_keys": [],
+        "r1_subtree_exact": true,
+        "r1_subtree_mismatches": [],
+        "unexpected_keys": []
+      },
+      "native": {
+        "T2": {
+          "bytes": 3449570,
+          "cache_reference": "external:foundation/live/native_T2.pt",
+          "content_sha256": "25b6b582109c3ad0b6a9eaa31762eb75e0dfdf59f88a6495b60ad2625e41ae6e",
+          "elapsed_seconds": 2.3697332669980824,
+          "input_stats": {
+            "full_point_count": 160595,
+            "low_resolution_point_count": 120779,
+            "model_input_bytes": 22377292,
+            "scan_count": 2,
+            "scan_point_counts": [
+              81286,
+              79309
+            ],
+            "segment_count": 3496
+          },
+          "prediction_fingerprint": "23ccec0a0350251752980ee6c50ac77d227704cae1c4cfd971a725d86860fabe",
+          "sha256": "df6d2bb1e01913d7f916d2f2cb07586deb28ba8dcf09774845cb0331102855b0"
+        },
+        "T5": {
+          "bytes": 8407074,
+          "cache_reference": "external:foundation/live/native_T5.pt",
+          "content_sha256": "16291b407b0abcca746dcee89d06c3964d54f678815ca1e178a74a1c6dcf2c12",
+          "elapsed_seconds": 3.168316229013726,
+          "input_stats": {
+            "full_point_count": 388499,
+            "low_resolution_point_count": 286031,
+            "model_input_bytes": 53125108,
+            "scan_count": 5,
+            "scan_point_counts": [
+              81286,
+              79309,
+              88091,
+              77550,
+              62263
+            ],
+            "segment_count": 9740
+          },
+          "prediction_fingerprint": "c2ae31d0aee67b0037e062b2f79f4bc8df95c6bbfe6c9064148a6322ca3c2392",
+          "sha256": "a54fa9230507100d43d9ea2b9aa51d56d3c7dec6705798cb5b5bd4f71fa2de39"
+        }
+      },
+      "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+      "schema_version": "perception-gain-foundation-live-v1",
+      "sequence_id": "scene0174_03-scene0174_00-scene0174_06-scene0174_01-scene0174_05",
+      "status": "PASS"
+    },
+    "native_smoke": {
+      "checkpoint": "external:r1_checkpoint",
+      "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "completed_prefix_count": 2,
+      "completed_units_by_horizon": {
+        "2": [
+          "CAL:00000"
+        ],
+        "5": [
+          "CAL:00000"
+        ]
+      },
+      "data_role": "CAL",
+      "distinct_physical_forward_count": 2,
+      "elapsed_seconds": 3.0234252309892327,
+      "expected_logical_unit_count": 1,
+      "expected_prefix_count": 2,
+      "gpu_hours": 0.0008398403419414536,
+      "gpu_name": "NVIDIA A40",
+      "horizons": [
+        2,
+        5
+      ],
+      "incomplete_units": [],
+      "load_audit": {
+        "loaded_key_count": 798,
+        "missing_keys": [],
+        "r1_subtree_exact": true,
+        "r1_subtree_mismatches": [],
+        "unexpected_keys": []
+      },
+      "method_id": "FH-C0-native",
+      "metric_rows": [
+        {
+          "T": 2,
+          "current_stage_AP": 0.854938268661499,
+          "data_role": "CAL",
+          "logical_unit_count": 1,
+          "method": "FH-C0-native",
+          "optimizer_update": 0,
+          "output_policy": "native",
+          "producer_id": "native-full-history-live",
+          "reference": "all",
+          "reference_count": 1,
+          "status": "MEASURED",
+          "t_REC": 0.7654320597648621,
+          "t_mAP": 0.7011315822601318,
+          "t_mAP25": 1.0,
+          "t_mAP50": 0.9212962985038757,
+          "variant": "C0"
+        },
+        {
+          "T": 2,
+          "current_stage_AP": 0.854938268661499,
+          "data_role": "CAL",
+          "logical_unit_count": 1,
+          "method": "FH-C0-native",
+          "optimizer_update": 0,
+          "output_policy": "native",
+          "producer_id": "native-full-history-live",
+          "reference": "09582244-e2c2-2de1-956c-357092d949d1",
+          "reference_count": 1,
+          "status": "MEASURED",
+          "t_REC": 0.7654320597648621,
+          "t_mAP": 0.7011315822601318,
+          "t_mAP25": 1.0,
+          "t_mAP50": 0.9212962985038757,
+          "variant": "C0"
+        },
+        {
+          "T": 5,
+          "current_stage_AP": 0.8981481194496155,
+          "data_role": "CAL",
+          "logical_unit_count": 1,
+          "method": "FH-C0-native",
+          "optimizer_update": 0,
+          "output_policy": "native",
+          "producer_id": "native-full-history-live",
+          "reference": "all",
+          "reference_count": 1,
+          "status": "MEASURED",
+          "t_REC": 0.7160494327545166,
+          "t_mAP": 0.6682834029197693,
+          "t_mAP25": 1.0,
+          "t_mAP50": 1.0,
+          "variant": "C0"
+        },
+        {
+          "T": 5,
+          "current_stage_AP": 0.8981481194496155,
+          "data_role": "CAL",
+          "logical_unit_count": 1,
+          "method": "FH-C0-native",
+          "optimizer_update": 0,
+          "output_policy": "native",
+          "producer_id": "native-full-history-live",
+          "reference": "09582244-e2c2-2de1-956c-357092d949d1",
+          "reference_count": 1,
+          "status": "MEASURED",
+          "t_REC": 0.7160494327545166,
+          "t_mAP": 0.6682834029197693,
+          "t_mAP25": 1.0,
+          "t_mAP50": 1.0,
+          "variant": "C0"
+        }
+      ],
+      "new_parameter_count": 0,
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "p6a_config_sha256": "dd7a9fccc098fc7e5faecc059d6202ca7f8a762aaee3e7182738a2d7f800aac2",
+      "protocol_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+      "resolved_config_sha256": "c430ce0357ac77920ceb9a703ae7adcdfdf88044e2b37ab6988d8aad0a889f99",
+      "roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+      "schema_version": "perception-gain-native-evaluation-v1",
+      "source_sha256": "21f6f6db4b122435e1062874516ba62b94146ed8e62d03beb23f02a99fa80071",
+      "status": "PASS",
+      "variant": "C0",
+      "weight_sources": [
+        {
+          "bytes": 754813672,
+          "role": "r1_initialization",
+          "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+        }
+      ]
+    },
+    "status": "PASS"
+  },
+  "identity": {
+    "config_sha256": "3ee92bea9fcd82801afff65ced8262aede07a64e26ad837c28b0ccaf27dbf6ef",
+    "data_sha256": "4434a84b14139b611baa90a365e59cc0fa7cfb27a10d21cc21f50fb2a520c96e",
+    "instruction_sha256": "e7ba7daf9299547dd0470bcafe081521aafde272cb2d30bd55cc9e802cafe2d5",
+    "parent": "6ef77620aa20926311eff3124a794a6ca2e32727"
+  },
+  "next_command": "python -m scripts.perception_gain_campaign run --config configs/perception_gain_v1.yaml --external-root \"$PERSIST4D_PERCEPTION_RUN_ROOT\" --through perception_pilot --resume",
+  "partial_costs": {
+    "C0_training_gpu_hours": 4.820667215718164,
+    "CAL_evaluation_gpu_hours": 3.61249712274696,
+    "CAL_evaluations": [
+      {
+        "gpu_hours": 0.6509112774930529,
+        "path": "training/pilot/evaluation/cal/C0/update=0000.json"
+      },
+      {
+        "gpu_hours": 0.6893332901391679,
+        "path": "training/pilot/evaluation/cal/C0/update=0250.json"
+      },
+      {
+        "gpu_hours": 0.7855309116877874,
+        "path": "training/pilot/evaluation/cal/C0/update=0750.json"
+      },
+      {
+        "gpu_hours": 0.6227629425244474,
+        "path": "training/pilot/evaluation/cal/Q-SEM/update=0000.json"
+      },
+      {
+        "gpu_hours": 0.8639587009025046,
+        "path": "training/pilot/evaluation/cal/S-BAL/update=0250.json"
+      }
+    ],
+    "S_BAL_interrupted_gpu_hours": 3.315251915
+  },
+  "partial_delivery": {
+    "publish": "RUNNING",
+    "report": "PASS",
+    "status": "PREPARING",
+    "uncompleted_stages": [
+      "perception_pilot",
+      "perception_full",
+      "perception_select",
+      "refinement",
+      "final_lock",
+      "replication",
+      "confirm",
+      "profile",
+      "report",
+      "publish"
+    ]
+  },
+  "schema_version": "perception-gain-run-state-v1",
+  "scorer": {
+    "cache_bytes": 101166032,
+    "checkpoint": "external:training/scorer/model/update=0500.ckpt",
+    "checkpoint_sha256": "5bf58cdde393493daeb29bd023cb058db51bec56e76d39ba14ff68a6f911380c",
+    "data_pair_count": 64,
+    "gpu_hours": 0.0142392740658963,
+    "reference_count": 64,
+    "status": "PASS",
+    "training_updates": 500
+  },
+  "stage": "perception_pilot",
+  "stage_status": "BLOCKED"
+}

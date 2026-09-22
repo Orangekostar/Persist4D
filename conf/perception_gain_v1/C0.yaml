@@ -1,0 +1,10 @@
+# @package _global_
+defaults:
+  - common
+  - _self_
+
+general:
+  experiment_name: C0
+
+perception_training:
+  variant: C0

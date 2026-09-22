@@ -156,16 +156,16 @@ def unpack_bool_matrix(value: Mapping[str, object]) -> Tensor:
     if data.numel() != expected_bytes:
         raise FullHistoryCacheError("packed boolean byte count differs from shape")
     unpacked = np.unpackbits(data.numpy(), bitorder="little", count=count)
-    return torch.from_numpy(unpacked.astype(np.bool_, copy=False)).reshape(rows, columns)
+    return torch.from_numpy(unpacked.astype(np.bool_, copy=False)).reshape(
+        rows, columns
+    )
 
 
 def validate_full_history_cache_key(value: Mapping[str, object]) -> dict[str, object]:
     key = _mapping(value, name="full-history cache key")
     if set(key) != _KEY_FIELDS:
         raise FullHistoryCacheError("full-history cache key fields differ")
-    master_id = _nonempty_string(
-        key["master_sequence_id"], name="master_sequence_id"
-    )
+    master_id = _nonempty_string(key["master_sequence_id"], name="master_sequence_id")
     reference_id = _nonempty_string(
         key["reference_scene_id"], name="reference_scene_id"
     )
@@ -175,12 +175,14 @@ def validate_full_history_cache_key(value: Mapping[str, object]) -> dict[str, ob
     context_index = _nonnegative_integer(key["context_index"], name="context_index")
     context_scan_indices = [
         _nonnegative_integer(item, name="context_scan_indices item")
-        for item in _sequence(
-            key["context_scan_indices"], name="context_scan_indices"
-        )
+        for item in _sequence(key["context_scan_indices"], name="context_scan_indices")
     ]
-    if len(context_scan_indices) != 5 or len(set(context_scan_indices)) != 5:
-        raise FullHistoryCacheError("context_scan_indices must contain five unique scans")
+    if not 2 <= len(context_scan_indices) <= 5 or len(set(context_scan_indices)) != len(
+        context_scan_indices
+    ):
+        raise FullHistoryCacheError(
+            "context_scan_indices must contain two to five unique scans"
+        )
     horizon = _nonnegative_integer(key["horizon"], name="horizon")
     if not 1 <= horizon <= 5:
         raise FullHistoryCacheError("horizon must be within T1-T5")
@@ -261,7 +263,9 @@ def full_history_cache_keys(
 
 def _key_identity(key: Mapping[str, object]) -> str:
     validated = validate_full_history_cache_key(key)
-    return json.dumps(validated, ensure_ascii=True, separators=(",", ":"), sort_keys=True)
+    return json.dumps(
+        validated, ensure_ascii=True, separators=(",", ":"), sort_keys=True
+    )
 
 
 def _update_digest(hasher: Any, value: object) -> None:
@@ -463,21 +467,24 @@ def postprocess_full_history_output(
     train_on_segments = bool(
         getattr(getattr(system, "model", None), "train_on_segments", False)
     )
-    thresholded_segment_masks = (
-        segment_logits.sigmoid() >= mask_threshold
-    ).float()
+    thresholded_segment_masks = (segment_logits.sigmoid() >= mask_threshold).float()
     query_low_masks = (
         thresholded_segment_masks[low_point2segment]
         if train_on_segments
         else thresholded_segment_masks
     )
-    all_query_masks = torch.as_tensor(
-        get_full_res_mask(
-            query_low_masks,
-            inverse_maps[0],
-            full_point2segment,
+    all_query_masks = (
+        torch.as_tensor(
+            get_full_res_mask(
+                query_low_masks,
+                inverse_maps[0],
+                full_point2segment,
+            )
         )
-    ).bool().cpu().contiguous()
+        .bool()
+        .cpu()
+        .contiguous()
+    )
     temporal_stages = normalize_temporal_stages(
         target_full_resolution.get("temporal_stages"),
         name="target_full.temporal_stages",
@@ -577,7 +584,9 @@ def _validate_provenance(value: Mapping[str, object]) -> dict[str, str]:
     return result
 
 
-def _validate_input_stats(value: Mapping[str, object], *, horizon: int) -> dict[str, object]:
+def _validate_input_stats(
+    value: Mapping[str, object], *, horizon: int
+) -> dict[str, object]:
     stats = _mapping(value, name="input_stats")
     expected = {
         "scan_count",
@@ -691,11 +700,12 @@ def validate_full_history_payload(
         raise FullHistoryCacheError("full-history payload schema differs")
     key = validate_full_history_cache_key(payload["key"])
     provenance = _validate_provenance(payload["provenance"])
-    if expected_key is not None and key != validate_full_history_cache_key(expected_key):
+    if expected_key is not None and key != validate_full_history_cache_key(
+        expected_key
+    ):
         raise FullHistoryCacheError("full-history payload key differs")
-    if (
-        expected_provenance is not None
-        and provenance != _validate_provenance(expected_provenance)
+    if expected_provenance is not None and provenance != _validate_provenance(
+        expected_provenance
     ):
         raise FullHistoryCacheError("full-history payload provenance differs")
     stats = _validate_input_stats(payload["input_stats"], horizon=int(key["horizon"]))
@@ -727,7 +737,10 @@ def validate_full_history_payload(
     changes = _integer_tensor(target["changes"], name="target changes")
     stages = _integer_tensor(target["temporal_stages"], name="target temporal stages")
     horizon = int(key["horizon"])
-    if set(stages.tolist()) != set(range(horizon)) or int(stages.max().item()) >= horizon:
+    if (
+        set(stages.tolist()) != set(range(horizon))
+        or int(stages.max().item()) >= horizon
+    ):
         raise FullHistoryCacheError("target temporal stages contain future information")
     if (
         task_masks.shape[0] != stats["full_point_count"]
@@ -894,7 +907,10 @@ def load_full_history_cache_entry(
     path = Path(cache_directory) / filename
     if path.is_symlink() or not path.is_file():
         raise FullHistoryCacheError("cache entry file is unavailable")
-    if path.stat().st_size != record["byte_size"] or _file_sha256(path) != record["sha256"]:
+    if (
+        path.stat().st_size != record["byte_size"]
+        or _file_sha256(path) != record["sha256"]
+    ):
         raise FullHistoryCacheError("cache entry file hash differs")
     payload = torch.load(path, map_location="cpu", weights_only=False)
     validated = validate_full_history_payload(
@@ -997,7 +1013,9 @@ def build_full_history_cache_manifest(
         expected_files = {entry["filename"] for entry in normalized}
         actual_files = {path.name for path in directory.iterdir()}
         if actual_files != expected_files:
-            raise FullHistoryCacheError("cache directory coverage differs from manifest")
+            raise FullHistoryCacheError(
+                "cache directory coverage differs from manifest"
+            )
         for entry in normalized:
             load_full_history_cache_entry(
                 directory,
@@ -1088,7 +1106,9 @@ def deterministic_inference_runtime(seed: int, device: torch.device):
     """Restore all deterministic runtime state after a frozen inference group."""
 
     if device.type != "cuda" or device.index is None:
-        raise FullHistoryCacheError("deterministic inference requires an indexed CUDA device")
+        raise FullHistoryCacheError(
+            "deterministic inference requires an indexed CUDA device"
+        )
     python_state = random.getstate()
     numpy_state = np.random.get_state()
     deterministic = torch.are_deterministic_algorithms_enabled()
@@ -1196,9 +1216,7 @@ class FullHistoryPredictionProducer:
     minimum_mask_support: int = 1
     seed: int = 45
 
-    def produce_bundle(
-        self, logical_key: Mapping[str, object]
-    ) -> ProducedFullHistory:
+    def produce_bundle(self, logical_key: Mapping[str, object]) -> ProducedFullHistory:
         key = validate_full_history_cache_key(logical_key)
         validate_full_history_dataset_context(self.dataset, key)
         context_index = int(key["context_index"])

@@ -413,3 +413,113 @@ def test_publisher_contract_has_no_ground_truth_input() -> None:
         "identity_map",
         "stage_meta",
     )
+
+
+def test_lag1_revision_transform_changes_archive_only_after_identity_resolution() -> (
+    None
+):
+    requests = []
+
+    def transform(request):
+        requests.append(request)
+        assert request.scan_id == "scan-a"
+        assert request.old_candidates[0].source_query_id == 5
+        assert request.new_candidates[0].source_query_id == 9
+        assert request.old_candidates[0].identity == request.new_candidates[0].identity
+        return {0: torch.tensor([True, False, True])}
+
+    parent = LagOnePublisher()
+    refined = LagOnePublisher(revision_mask_transform=transform)
+    first_prediction = _prediction(
+        masks=[[True], [True], [False]],
+        scores=[0.4],
+        classes=[4],
+        queries=[5],
+        stages=[0, 0, 0],
+    )
+    first_meta = _meta(
+        absolute_stage=0,
+        scan_ids=("scan-a",),
+        point_counts=(3,),
+    )
+    for publisher in (parent, refined):
+        publisher.update(first_prediction, {5: ("track", 2)}, first_meta)
+
+    second_prediction = _prediction(
+        masks=[[False], [True], [False], [True], [False]],
+        scores=[0.8],
+        classes=[4],
+        queries=[9],
+        stages=[0, 0, 0, 1, 1],
+    )
+    second_meta = _meta(
+        absolute_stage=1,
+        scan_ids=("scan-a", "scan-b"),
+        point_counts=(3, 2),
+    )
+    parent_prefix = parent.update(second_prediction, {9: ("track", 2)}, second_meta)
+    refined_prefix = refined.update(second_prediction, {9: ("track", 2)}, second_meta)
+    identity = PublishedIdentity("track", 2, 4)
+
+    assert len(requests) == 1
+    assert _scan_masks(parent_prefix, "scan-a")[identity].tolist() == [
+        False,
+        True,
+        False,
+    ]
+    assert _scan_masks(refined_prefix, "scan-a")[identity].tolist() == [
+        True,
+        False,
+        True,
+    ]
+    assert refined.revision_pair[1].candidates[0].mask.tolist() == [False, True, False]
+    assert refined.current_dense_scan.candidates[0].mask.tolist() == [True, False]
+    parent_current = parent.current_dense_scan.candidates[0]
+    refined_current = refined.current_dense_scan.candidates[0]
+    assert parent_current.candidate_index == refined_current.candidate_index
+    assert parent_current.identity == refined_current.identity
+    assert parent_current.source_query_id == refined_current.source_query_id
+    assert parent_current.score == refined_current.score
+    assert torch.equal(parent_current.mask, refined_current.mask)
+    assert parent_prefix.keys == refined_prefix.keys
+    torch.testing.assert_close(
+        parent_prefix.prediction["pred_scores"],
+        refined_prefix.prediction["pred_scores"],
+    )
+
+
+def test_lag1_revision_transform_can_restore_support_for_retained_candidate() -> None:
+    publisher = LagOnePublisher(
+        revision_mask_transform=lambda request: {
+            request.new_candidates[0].candidate_index: torch.tensor([False, True])
+        }
+    )
+    publisher.update(
+        _prediction(
+            masks=[[True], [False]],
+            scores=[0.4],
+            classes=[3],
+            queries=[1],
+            stages=[0, 0],
+        ),
+        {1: ("track", 0)},
+        _meta(absolute_stage=0, scan_ids=("scan-a",), point_counts=(2,)),
+    )
+    prefix = publisher.update(
+        _prediction(
+            masks=[[False], [False], [True]],
+            scores=[0.7],
+            classes=[3],
+            queries=[7],
+            stages=[0, 0, 1],
+        ),
+        {7: ("track", 0)},
+        _meta(
+            absolute_stage=1,
+            scan_ids=("scan-a", "scan-b"),
+            point_counts=(2, 1),
+        ),
+    )
+
+    identity = PublishedIdentity("track", 0, 3)
+    assert _scan_masks(prefix, "scan-a")[identity].tolist() == [False, True]

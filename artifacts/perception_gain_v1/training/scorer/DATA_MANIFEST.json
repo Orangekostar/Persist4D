@@ -1,0 +1,100 @@
+{
+  "candidate_pair_count": 1125,
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "completed_pair_count": 64,
+  "elapsed_seconds": 47.80121112300549,
+  "gpu_hours": 0.013278114200834858,
+  "gpu_name": "NVIDIA A40",
+  "incomplete_units": [],
+  "load_audit": {
+    "loaded_key_count": 798,
+    "missing_keys": [],
+    "r1_subtree_exact": true,
+    "r1_subtree_mismatches": [],
+    "unexpected_keys": []
+  },
+  "reference_count": 64,
+  "schema_version": "perception-gain-scorer-data-v1",
+  "selected_pair_count": 64,
+  "shards": [
+    {
+      "bytes": 11559242,
+      "external_reference": "external:training/scorer/data/scorer-0000.pt",
+      "record_count": 8,
+      "sha256": "cc802bc3045a0bfa69f296bb245697be25b5257322a8fa8a8b770f323c1862c8"
+    },
+    {
+      "bytes": 16670154,
+      "external_reference": "external:training/scorer/data/scorer-0001.pt",
+      "record_count": 8,
+      "sha256": "2bab825e791c05dcf4c68692ab35b5768446a6182b74ad77fb9fe3345794da8a"
+    },
+    {
+      "bytes": 9701450,
+      "external_reference": "external:training/scorer/data/scorer-0002.pt",
+      "record_count": 8,
+      "sha256": "1ee121a813354a0a6df94929d97f9087b728e2818c0eb4e9075cf66cd8bb1cb2"
+    },
+    {
+      "bytes": 11624138,
+      "external_reference": "external:training/scorer/data/scorer-0003.pt",
+      "record_count": 8,
+      "sha256": "cfda854146878e87f1f2bf3ff18a98d2192d1b0e6d548a9ab6d1d8760840167d"
+    },
+    {
+      "bytes": 12748874,
+      "external_reference": "external:training/scorer/data/scorer-0004.pt",
+      "record_count": 8,
+      "sha256": "519e27771dd9279abdaab2b16e1c498dd8d090148069ade8cb23f87e2985d2d6"
+    },
+    {
+      "bytes": 14024394,
+      "external_reference": "external:training/scorer/data/scorer-0005.pt",
+      "record_count": 8,
+      "sha256": "7bbea8a050770ec3b77ecf112eb555c4d6881c96ae2082b96fe2c2d525b760b5"
+    },
+    {
+      "bytes": 9946442,
+      "external_reference": "external:training/scorer/data/scorer-0006.pt",
+      "record_count": 8,
+      "sha256": "23da348099a77d9d113cee676b75cb9f694d1bc839914af1d021ba8f562e750c"
+    },
+    {
+      "bytes": 14891338,
+      "external_reference": "external:training/scorer/data/scorer-0007.pt",
+      "record_count": 8,
+      "sha256": "4ee575884822546a5b25e212d0767b4ad82055b9856436a4b113d0ec38ce50b7"
+    }
+  ],
+  "status": "PASS",
+  "taxonomy": {
+    "class_space": "dataset_remapped_semantic_ids_before_label_offset",
+    "ignore_class_ids": [
+      255
+    ],
+    "stuff_class_ids": [
+      0,
+      1
+    ],
+    "thing_class_ids": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ]
+  }
+}

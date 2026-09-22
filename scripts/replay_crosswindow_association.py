@@ -332,12 +332,12 @@ def select_revision_scan(
 ) -> tuple[PublishedScan, tuple[dict[str, object], ...]]:
     """Select old/new masks under a frozen published identity trajectory."""
     if selector not in {"M-new", "M-old", "M-score"}:
-        raise CrossWindowReplayError("revision selector must be M-new, M-old, or M-score")
+        raise CrossWindowReplayError(
+            "revision selector must be M-new, M-old, or M-score"
+        )
     if score_mode not in {"MASK_ONLY_FIXED_SCORE", "SYSTEM_SELECTED_SCORE"}:
         raise CrossWindowReplayError("revision score mode differs")
-    if old.scan_id != new.scan_id or not torch.equal(
-        old.vertex_ids, new.vertex_ids
-    ):
+    if old.scan_id != new.scan_id or not torch.equal(old.vertex_ids, new.vertex_ids):
         raise CrossWindowReplayError("revision scans are not canonically aligned")
     old_by_identity = {candidate.identity: candidate for candidate in old.candidates}
     new_by_identity = {candidate.identity: candidate for candidate in new.candidates}
@@ -668,6 +668,30 @@ def prediction_multiset_equal(
     return signatures(left) == signatures(right)
 
 
+def source_parity_fields(
+    overlap: Mapping[str, object] | None,
+    *,
+    generated_candidate_count: int,
+) -> dict[str, object]:
+    if overlap is None:
+        return {
+            "generated_candidate_count": generated_candidate_count,
+            "base_candidate_count": None,
+            "common_candidate_count": None,
+            "score_max_abs": None,
+            "aligned_mask_iou_mean": None,
+            "generated_vs_base_exact": None,
+        }
+    return {
+        "generated_candidate_count": overlap["generated_candidate_count"],
+        "base_candidate_count": overlap["base_candidate_count"],
+        "common_candidate_count": overlap["common_candidate_count"],
+        "score_max_abs": overlap["score_max_abs"],
+        "aligned_mask_iou_mean": overlap["aligned_mask_iou_mean"],
+        "generated_vs_base_exact": overlap["exact"],
+    }
+
+
 class E0ReplayAccumulator:
     """Stream DEV-CAL E0 evidence without retaining cache payloads."""
 
@@ -881,19 +905,19 @@ class E0ReplayAccumulator:
         for stage_index, (base_stage, supplement_stage) in enumerate(
             zip(base_stages, supplement_stages, strict=True)
         ):
-            overlap = supplement_stage["base_overlap"]
+            overlap = supplement_stage.get("base_overlap")
             self.source_rows.append(
                 {
                     "logical_unit_id": logical_unit_id,
                     "reference_id": episode["reference_id"],
                     "sequence_id": episode["sequence_id"],
                     "absolute_stage": stage_index,
-                    "generated_candidate_count": overlap["generated_candidate_count"],
-                    "base_candidate_count": overlap["base_candidate_count"],
-                    "common_candidate_count": overlap["common_candidate_count"],
-                    "score_max_abs": overlap["score_max_abs"],
-                    "aligned_mask_iou_mean": overlap["aligned_mask_iou_mean"],
-                    "generated_vs_base_exact": overlap["exact"],
+                    **source_parity_fields(
+                        overlap,
+                        generated_candidate_count=int(
+                            predictions[stage_index].pred_scores.numel()
+                        ),
+                    ),
                     "d_and_a_physical_forward": True,
                 }
             )
@@ -1133,9 +1157,7 @@ def _identity_rates(counts: Mapping[str, int]) -> dict[str, int | float | None]:
             if normalized["recovery_attempts"]
             else None
         ),
-        "gap_recovery_accuracy": rate(
-            "correct_recoveries", "recovery_attempts"
-        ),
+        "gap_recovery_accuracy": rate("correct_recoveries", "recovery_attempts"),
         "gap_recovery_recall": rate("correct_recoveries", "gap_opportunities"),
     }
 
@@ -1235,9 +1257,7 @@ class E2ReplayAccumulator:
         return self.reference_metrics[key]
 
     @staticmethod
-    def _issued_ids(
-        keys: Sequence[object], registry: dict[str, int]
-    ) -> Tensor:
+    def _issued_ids(keys: Sequence[object], registry: dict[str, int]) -> Tensor:
         values = []
         for key in keys:
             stable_key = f"{type(key).__qualname__}:{key!r}"
@@ -1335,8 +1355,7 @@ class E2ReplayAccumulator:
             for stage in supplement_stages
         ]
         predictions = [
-            _prediction_from_payload(stage["prediction"])
-            for stage in supplement_stages
+            _prediction_from_payload(stage["prediction"]) for stage in supplement_stages
         ]
         frames = [
             build_canonical_frame(
@@ -1379,9 +1398,9 @@ class E2ReplayAccumulator:
             self.capacity_accounting["D0"]["peak_occupied_slots"],
             d0_trajectory.diagnostics.peak_occupied_slots,
         )
-        self.capacity_accounting["D0"]["rejected_births"] += (
-            d0_trajectory.diagnostics.rejected_births
-        )
+        self.capacity_accounting["D0"][
+            "rejected_births"
+        ] += d0_trajectory.diagnostics.rejected_births
         self.capacity_accounting["D0"]["resident_bytes"] = max(
             self.capacity_accounting["D0"]["resident_bytes"],
             d0_trajectory.diagnostics.peak_state_bytes,
@@ -1470,8 +1489,7 @@ class E2ReplayAccumulator:
                             for source in plan.source_edge
                         ),
                         "joint_edge_count": sum(
-                            source == "JOINT_ASSIGNMENT"
-                            for source in plan.source_edge
+                            source == "JOINT_ASSIGNMENT" for source in plan.source_edge
                         ),
                         "overlap_edge_count": int(evidence.has_overlap.sum().item()),
                         "missing_overlap_edge_count": int(
@@ -1530,7 +1548,10 @@ class E2ReplayAccumulator:
             method_prefixes = {
                 "D0": (d0_prefixes[stage_index], original_prefix_targets[stage_index]),
                 **{
-                    method: (prefixes[stage_index], canonical_prefix_targets[stage_index])
+                    method: (
+                        prefixes[stage_index],
+                        canonical_prefix_targets[stage_index],
+                    )
                     for method, prefixes in association_prefixes.items()
                 },
             }
@@ -1728,4 +1749,5 @@ __all__ = [
     "evaluator_prediction",
     "prediction_multiset_equal",
     "publish",
+    "source_parity_fields",
 ]

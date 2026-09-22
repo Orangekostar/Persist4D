@@ -24,6 +24,8 @@ from scripts.p6a_metrics import (
     compute_raw_local_metrics,
     global_hungarian_match,
     greedy_diagnostic_match,
+    official_temporal_iou_thresholds,
+    official_temporal_match_trace,
     raw_observation_fingerprint,
     recompute_official_metric_evidence,
     recompute_official_metric_population_evidence,
@@ -287,6 +289,57 @@ def test_official_temporal_accumulator_exposes_fixed_stmetrics_keys():
     assert compute_official_temporal_metrics([prediction], [target]) == metric.compute()
 
 
+def test_official_temporal_trace_uses_strict_worst_stage_one_to_one_and_exclusions():
+    stage_points = 8
+    gt = torch.zeros((3, stage_points * 2), dtype=torch.bool)
+    gt[0, :4] = True
+    gt[0, stage_points : stage_points + 4] = True
+    gt[1] = gt[0]
+    pred = torch.zeros(stage_points * 2, dtype=torch.bool)
+    pred[:4] = True
+    pred[stage_points : stage_points + 3] = True
+    prediction = {
+        "pred_masks": pred[:, None],
+        "pred_classes": torch.tensor([3]),
+        "pred_scores": torch.tensor([0.9]),
+    }
+    target = {
+        "masks": gt,
+        "labels": torch.tensor([3, 3, 3]),
+        "ids": torch.tensor([10, 11, 12]),
+        "changes": torch.tensor([0, 0, 0]),
+        "temporal_stages": torch.tensor(
+            [0] * stage_points + [1] * stage_points, dtype=torch.long
+        ),
+    }
+
+    loose = official_temporal_match_trace(
+        prediction, target, threshold=0.5, min_region_size=1
+    )
+    strict = official_temporal_match_trace(
+        prediction, target, threshold=0.75, min_region_size=1
+    )
+
+    assert sum(row["matched"] is True for row in loose.values()) == 1
+    assert loose[10]["eligible"] is True
+    assert loose[11]["eligible"] is True
+    assert loose[12]["eligible"] is False
+    assert loose[12]["exclusion_reason"] == "INVALID_GT"
+    assert strict[10]["matched"] is False
+    assert strict[11]["matched"] is False
+    assert official_temporal_iou_thresholds() == (
+        0.5,
+        0.55,
+        0.6,
+        0.65,
+        0.7,
+        0.75,
+        0.8,
+        0.85,
+        0.9,
+    )
+
+
 def test_official_metric_state_evidence_recomputes_exact_aggregate() -> None:
     point_count = 120
     mask = torch.ones(point_count, dtype=torch.bool)
@@ -349,8 +402,8 @@ def test_official_metric_population_evidence_merges_identity_keyed_states() -> N
     ]
 
     evidence = build_official_metric_population_evidence(records)
-    computed, restored, per_sequence = (
-        recompute_official_metric_population_evidence(evidence)
+    computed, restored, per_sequence = recompute_official_metric_population_evidence(
+        evidence
     )
 
     assert evidence["updates"] == 2

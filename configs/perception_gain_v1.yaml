@@ -1,0 +1,81 @@
+schema_version: perception-gain-v1
+
+identity:
+  repository: Orangekostar/Persist4D
+  parent_commit: 6ef77620aa20926311eff3124a794a6ca2e32727
+  source_branch: research/persist4d-crosswindow-evidence-v1
+  branch: research/persist4d-perception-gain-v1
+  instruction_sha256: e7ba7daf9299547dd0470bcafe081521aafde272cb2d30bd55cc9e802cafe2d5
+  r1_checkpoint_sha256: 629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd
+  r1_checkpoint_bytes: 754813672
+  concerto_sha256: 845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07
+
+paths:
+  artifact_root: artifacts/perception_gain_v1
+  instruction: artifacts/perception_gain_v1/EXECUTION_INSTRUCTION.md
+  task_data_contract: artifacts/task_memory_retention_v2/DATA_CONTRACT.json
+  crosswindow_data_roles: artifacts/crosswindow_evidence_v1/DATA_ROLES.json
+  crosswindow_config: configs/crosswindow_evidence_v1.yaml
+  task_asset_locator: artifacts/task_memory_retention_v2/external_assets.local.json
+
+runtime:
+  devices: 2
+  batch_size_per_gpu: 2
+  gradient_accumulation: 8
+  precision: 32-true
+  cpu_workers: 8
+  train_seed: 45
+  eval_seed: 45
+
+budget:
+  total_gpu_hours: 192
+  foundation_and_evaluation_gpu_hours: 32
+  perception_training_gpu_hours: 136
+  refinement_gpu_hours: 16
+  profiling_gpu_hours: 4
+  smoke_and_recovery_gpu_hours: 4
+  host_memory_gib: 96
+  new_cache_gib: 32
+
+training:
+  optimizer: AdamW
+  existing_lr: 5.0e-5
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.01
+  total_updates: 3000
+  warmup_updates: 150
+  minimum_lr_fraction: 0.1
+  gradient_clip_norm: 1.0
+  pilot_update: 750
+  evaluation_updates: [0, 250, 750, 1500, 2250, 3000]
+  variants: [C0, S-BAL, S-WORST, Q-SEM, A-OPEN]
+
+scorer:
+  updates: 500
+  batch_segments: 1024
+  learning_rate: 1.0e-3
+  weight_decay: 1.0e-4
+  pair_limit: 64
+  minimum_reference_count: 8
+  semantic_fraction: 0.75
+
+refiner:
+  updates: 1500
+  warmup_updates: 75
+  evaluation_updates: [0, 500, 1000, 1500]
+  batch_candidates: 16
+  maximum_segments: 2048
+  learning_rate: 1.0e-3
+  weight_decay: 1.0e-4
+  delta_scale: 2.0
+
+evaluation:
+  query_count: 100
+  state_capacity: 100
+  window_size: 2
+  output_policy: lag1
+  score_reducer: mean
+  second_seed: 46
+  official_thresholds: [0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90]
+

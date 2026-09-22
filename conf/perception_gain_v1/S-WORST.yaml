@@ -1,0 +1,13 @@
+# @package _global_
+defaults:
+  - common
+  - _self_
+
+general:
+  experiment_name: S-WORST
+
+loss:
+  mask_loss_mode: worst
+
+perception_training:
+  variant: S-WORST

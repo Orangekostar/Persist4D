@@ -159,6 +159,7 @@ def _select_legacy_revision(old, new, *, selector: str, score_mode: str):
         )
         selected.append(
             _DenseCandidate(
+                candidate_index=chosen.candidate_index,
                 identity=new_candidate.identity,
                 source_query_id=chosen.source_query_id,
                 score=score,
@@ -235,11 +236,11 @@ def _gt_revision_rows(
             transition = (
                 "weak_to_strong"
                 if not old_pass and new_pass
-                else "strong_to_weak"
-                if old_pass and not new_pass
-                else "both_strong"
-                if old_pass and new_pass
-                else "both_weak"
+                else (
+                    "strong_to_weak"
+                    if old_pass and not new_pass
+                    else "both_strong" if old_pass and new_pass else "both_weak"
+                )
             )
             rows.append(
                 {
@@ -262,9 +263,7 @@ def _gt_revision_rows(
                     "old_choice_count": int(choices.get("old", 0)),
                     "new_choice_count": int(choices.get("new", 0)),
                     "new_only_count": int(choices.get("new_only", 0)),
-                    "old_only_dropped_count": int(
-                        choices.get("old_only_dropped", 0)
-                    ),
+                    "old_only_dropped_count": int(choices.get("old_only_dropped", 0)),
                 }
             )
     return rows
@@ -411,7 +410,9 @@ class E4RevisionAccumulator:
         buffer = None
         plans = []
         for frame in frames:
-            plan = associate(build_evidence(frame, state, buffer), self.association_config)
+            plan = associate(
+                build_evidence(frame, state, buffer), self.association_config
+            )
             state, committed = commit_observation(frame, state, plan)
             buffer = committed.buffer
             plans.append(plan)
@@ -491,8 +492,7 @@ class E4RevisionAccumulator:
             for stage in supplement_stages
         ]
         predictions = [
-            _prediction_from_payload(stage["prediction"])
-            for stage in supplement_stages
+            _prediction_from_payload(stage["prediction"]) for stage in supplement_stages
         ]
         frames = [
             build_canonical_frame(
@@ -554,7 +554,9 @@ class E4RevisionAccumulator:
             for selector in self.selectors:
                 for score_mode in self.score_modes:
                     d0_prefix = legacy[(selector, score_mode)][stage_index]
-                    association_prefix = association[(selector, score_mode)][stage_index]
+                    association_prefix = association[(selector, score_mode)][
+                        stage_index
+                    ]
                     d0_pair = validate_causal_prefix_pair(
                         prediction=d0_prefix.prediction,
                         target=original_target,
@@ -567,9 +569,7 @@ class E4RevisionAccumulator:
                         horizon=horizon,
                         observed_scan_ids=scan_ids[:horizon],
                     )
-                    self.metrics[("D0", selector, score_mode, horizon)].update(
-                        d0_pair
-                    )
+                    self.metrics[("D0", selector, score_mode, horizon)].update(d0_pair)
                     self.metrics[
                         (
                             self.association_method,
@@ -610,12 +610,8 @@ class E4RevisionAccumulator:
                                 "t_mAP50": values["t_mAP50"],
                                 "t_mAP25": values["t_mAP25"],
                                 "t_REC": values["t_REC"],
-                                "prefix_overall_mAP": values[
-                                    "prefix_overall_mAP"
-                                ],
-                                "published_current_AP": values[
-                                    "local_current_AP"
-                                ],
+                                "prefix_overall_mAP": values["prefix_overall_mAP"],
+                                "published_current_AP": values["local_current_AP"],
                                 "source_commit": self.source_commit,
                                 "R1_SHA": self.checkpoint_sha256,
                                 "status": "MEASURED",

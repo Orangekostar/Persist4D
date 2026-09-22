@@ -1056,6 +1056,148 @@ class OfficialMetricAccumulator:
         return {**core, "sha256": digest}
 
 
+def official_temporal_iou_thresholds(
+    *,
+    dataset_spec: str | Path = _DEFAULT_DATASET_SPEC,
+    min_region_size: int = 100,
+) -> tuple[float, ...]:
+    """Read the primary temporal AP thresholds from the bound evaluator."""
+
+    accumulator = OfficialMetricAccumulator(
+        mode="strict_online",
+        dataset_spec=dataset_spec,
+        min_region_size=min_region_size,
+    )
+    configured = accumulator._metric.matcher.config.overlaps.detach().cpu().tolist()
+    return tuple(
+        sorted({round(float(value), 2) for value in configured if value >= 0.5})
+    )
+
+
+def official_temporal_match_trace(
+    prediction: Mapping[str, Any],
+    target: Mapping[str, Any],
+    *,
+    threshold: float,
+    dataset_spec: str | Path = _DEFAULT_DATASET_SPEC,
+    min_region_size: int = 100,
+) -> dict[int, dict[str, Any]]:
+    """Expose the official temporal evaluator's per-GT assignment decision."""
+
+    if (
+        isinstance(threshold, bool)
+        or not isinstance(threshold, (int, float))
+        or not math.isfinite(float(threshold))
+        or not 0.0 <= float(threshold) <= 1.0
+    ):
+        raise ValueError("threshold must be finite and within [0, 1]")
+    normalized_prediction = _prediction_copy(prediction)
+    normalized_target = _clone_cpu(target)
+    required_target = {
+        "masks",
+        "labels",
+        "ids",
+        "changes",
+        "temporal_stages",
+    }
+    if not isinstance(normalized_target, Mapping) or not required_target.issubset(
+        normalized_target
+    ):
+        raise ValueError(
+            "official metric target must contain masks, labels, ids, changes, "
+            "and temporal_stages"
+        )
+
+    accumulator = OfficialMetricAccumulator(
+        mode="strict_online",
+        dataset_spec=dataset_spec,
+        min_region_size=min_region_size,
+    )
+    metric = accumulator._metric
+    matcher = metric.matcher
+    head = metric.heads[0]
+    gt2pred, pred2gt = matcher.match_batch(
+        [normalized_prediction], [normalized_target]
+    )[0]
+    ids = torch.as_tensor(normalized_target["ids"]).detach().cpu().long()
+    labels = torch.as_tensor(normalized_target["labels"]).detach().cpu().long()
+    if ids.ndim != 1 or labels.shape != ids.shape:
+        raise ValueError("official metric target ids and labels must align")
+    if len(set(ids.tolist())) != ids.numel():
+        raise ValueError("official metric target ids must be unique")
+    ambiguity_metadata_available = "ambiguities" in normalized_target
+    ambiguity_ids = {
+        int(value)
+        for group in normalized_target.get("ambiguities", ()) or ()
+        for value in group
+    }
+    valid_class_ids = set(matcher.spec.valid_class_ids)
+    result: dict[int, dict[str, Any]] = {}
+    for gt_id, label in zip(ids.tolist(), labels.tolist(), strict=True):
+        result[int(gt_id)] = {
+            "gt_id_or_group": str(int(gt_id)),
+            "eligible": False,
+            "matched": None,
+            "ambiguous": int(gt_id) in ambiguity_ids,
+            "ambiguity_status": (
+                "AMBIGUITY_METADATA_UNAVAILABLE"
+                if not ambiguity_metadata_available
+                else (
+                    "AMBIGUOUS_UNRESOLVED"
+                    if int(gt_id) in ambiguity_ids
+                    else "NOT_AMBIGUOUS"
+                )
+            ),
+            "exclusion_reason": (
+                "INVALID_CLASS" if int(label) not in valid_class_ids else "INVALID_GT"
+            ),
+        }
+
+    config = matcher.config
+    params_prefix = (
+        head.label,
+        float(threshold),
+        int(config.min_region_sizes[0].item()),
+        float(config.distance_threshes[0].item()),
+        float(config.distance_confs[0].item()),
+    )
+    for class_name in matcher.class_labels:
+        _, _, _, matches = head._evaluate_class(
+            gt2pred,
+            pred2gt,
+            (*params_prefix, class_name),
+        )
+        for gt_id, match in matches.items():
+            source = gt2pred[class_name][gt_id]
+            assigned = tuple(
+                int(value.item() if isinstance(value, Tensor) else value)
+                for value in source.get("ambiguous_assigned", ())
+            )
+            ambiguous = bool(source.get("ambiguous", False))
+            group_key = (
+                "ambiguity:" + "|".join(str(value) for value in assigned)
+                if assigned
+                else str(int(gt_id))
+            )
+            result[int(gt_id)] = {
+                "gt_id_or_group": group_key,
+                "eligible": True,
+                "matched": bool(match["matched"]),
+                "ambiguous": ambiguous,
+                "ambiguity_status": (
+                    "RESOLVED_BY_OFFICIAL_MATCHER"
+                    if ambiguous
+                    else (
+                        "AMBIGUITY_METADATA_UNAVAILABLE"
+                        if not ambiguity_metadata_available
+                        else "NOT_AMBIGUOUS"
+                    )
+                ),
+                "exclusion_reason": None,
+            }
+    return result
+
+
 def _restore_official_metric_evidence(
     evidence: Mapping[str, Any],
 ) -> OfficialMetricAccumulator:
@@ -1406,10 +1548,7 @@ def recompute_official_metric_population_evidence(
         raise ValueError(
             "official metric population evidence cannot be decoded"
         ) from error
-    if (
-        len(raw) > _MAX_OFFICIAL_METRIC_POPULATION_RAW_BYTES
-        or decoder.unconsumed_tail
-    ):
+    if len(raw) > _MAX_OFFICIAL_METRIC_POPULATION_RAW_BYTES or decoder.unconsumed_tail:
         raise ValueError("official metric population evidence payload exceeds limit")
     if (
         not decoder.eof
@@ -1431,9 +1570,11 @@ def recompute_official_metric_population_evidence(
     combined_head = combined._metric.heads[0]
     individual = OfficialMetricAccumulator(mode="strict_online")
     merged: dict[str, list[Tensor] | Tensor] = {
-        name: []
-        if isinstance(getattr(combined_head, name), list)
-        else torch.zeros_like(getattr(combined_head, name))
+        name: (
+            []
+            if isinstance(getattr(combined_head, name), list)
+            else torch.zeros_like(getattr(combined_head, name))
+        )
         for name in sorted(combined_head.metric_state)
     }
     for record in records:
@@ -1574,6 +1715,8 @@ __all__ = [
     "hungarian_diagnostic_match",
     "match_instances_hungarian",
     "observation_fingerprint",
+    "official_temporal_iou_thresholds",
+    "official_temporal_match_trace",
     "raw_local_metrics",
     "raw_observation_fingerprint",
     "relative_retention",

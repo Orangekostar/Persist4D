@@ -94,6 +94,7 @@ for _n, _r in _DISABLED.items():
         setattr(_pkg, _n, _stub(_n, _r))
 
 import models.object_visual_memory as _object_visual_memory
+import models.perception_gain as _perception_gain
 import models.task_memory_criterion as _task_memory_criterion
 import models.task_memory_routing as _task_memory_routing
 import models.task_memory_state as _task_memory_state
@@ -111,6 +112,8 @@ TrainingIdentityLedger = _task_memory_supervision.TrainingIdentityLedger
 build_tala_assignment = _task_memory_supervision.build_tala_assignment
 ObjectVisualRead = _object_visual_memory.ObjectVisualRead
 ObjectVisualState = _object_visual_memory.ObjectVisualState
+SemanticQueryScorer = _perception_gain.SemanticQueryScorer
+CausalMaskRefiner = _perception_gain.CausalMaskRefiner
 
 
 def get_models() -> list[type]:

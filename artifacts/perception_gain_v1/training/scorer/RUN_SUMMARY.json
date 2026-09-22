@@ -1,0 +1,23 @@
+{
+  "batch_segments": 1024,
+  "checkpoint": "update=0500.ckpt",
+  "checkpoint_sha256": "5bf58cdde393493daeb29bd023cb058db51bec56e76d39ba14ff68a6f911380c",
+  "completed_updates": 500,
+  "elapsed_seconds": 3.4601755142211914,
+  "final_loss": 0.23380061984062195,
+  "gpu_hours": 0.000961159865061442,
+  "reference_count": 64,
+  "status": "COMPLETE",
+  "training_audit": [
+    {
+      "gradient_norm": 1.0281467497329353,
+      "optimizer_update": 1,
+      "parameter_change_norm": 0.09259326749016296
+    },
+    {
+      "gradient_norm": 1.02201321067618,
+      "optimizer_update": 2,
+      "parameter_change_norm": 0.08994315550786992
+    }
+  ]
+}

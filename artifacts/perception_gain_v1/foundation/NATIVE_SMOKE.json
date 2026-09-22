@@ -1,0 +1,125 @@
+{
+  "checkpoint": "external:r1_checkpoint",
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "completed_prefix_count": 2,
+  "completed_units_by_horizon": {
+    "2": [
+      "CAL:00000"
+    ],
+    "5": [
+      "CAL:00000"
+    ]
+  },
+  "data_role": "CAL",
+  "distinct_physical_forward_count": 2,
+  "elapsed_seconds": 3.0234252309892327,
+  "expected_logical_unit_count": 1,
+  "expected_prefix_count": 2,
+  "gpu_hours": 0.0008398403419414536,
+  "gpu_name": "NVIDIA A40",
+  "horizons": [
+    2,
+    5
+  ],
+  "incomplete_units": [],
+  "load_audit": {
+    "loaded_key_count": 798,
+    "missing_keys": [],
+    "r1_subtree_exact": true,
+    "r1_subtree_mismatches": [],
+    "unexpected_keys": []
+  },
+  "method_id": "FH-C0-native",
+  "metric_rows": [
+    {
+      "T": 2,
+      "current_stage_AP": 0.854938268661499,
+      "data_role": "CAL",
+      "logical_unit_count": 1,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "all",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.7654320597648621,
+      "t_mAP": 0.7011315822601318,
+      "t_mAP25": 1.0,
+      "t_mAP50": 0.9212962985038757,
+      "variant": "C0"
+    },
+    {
+      "T": 2,
+      "current_stage_AP": 0.854938268661499,
+      "data_role": "CAL",
+      "logical_unit_count": 1,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "09582244-e2c2-2de1-956c-357092d949d1",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.7654320597648621,
+      "t_mAP": 0.7011315822601318,
+      "t_mAP25": 1.0,
+      "t_mAP50": 0.9212962985038757,
+      "variant": "C0"
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.8981481194496155,
+      "data_role": "CAL",
+      "logical_unit_count": 1,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "all",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.7160494327545166,
+      "t_mAP": 0.6682834029197693,
+      "t_mAP25": 1.0,
+      "t_mAP50": 1.0,
+      "variant": "C0"
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.8981481194496155,
+      "data_role": "CAL",
+      "logical_unit_count": 1,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "09582244-e2c2-2de1-956c-357092d949d1",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.7160494327545166,
+      "t_mAP": 0.6682834029197693,
+      "t_mAP25": 1.0,
+      "t_mAP50": 1.0,
+      "variant": "C0"
+    }
+  ],
+  "new_parameter_count": 0,
+  "optimizer_update": 0,
+  "output_policy": "native",
+  "p6a_config_sha256": "dd7a9fccc098fc7e5faecc059d6202ca7f8a762aaee3e7182738a2d7f800aac2",
+  "protocol_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "resolved_config_sha256": "c430ce0357ac77920ceb9a703ae7adcdfdf88044e2b37ab6988d8aad0a889f99",
+  "roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+  "schema_version": "perception-gain-native-evaluation-v1",
+  "source_sha256": "21f6f6db4b122435e1062874516ba62b94146ed8e62d03beb23f02a99fa80071",
+  "status": "PASS",
+  "variant": "C0",
+  "weight_sources": [
+    {
+      "bytes": 754813672,
+      "role": "r1_initialization",
+      "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+    }
+  ]
+}

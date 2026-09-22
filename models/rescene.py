@@ -37,12 +37,15 @@ class ReScene(nn.Module):
         gauss_scale,
         random_query_both,
         random_normal,
-        D, 
-        num_changes, 
+        D,
+        num_changes,
         temporal_masking,
         use_changes_loss,
         save_segment_info,
         return_query_features=False,
+        semantic_query_positioning=False,
+        semantic_query_fraction=0.75,
+        open_first_cross_attention=False,
     ):
         super().__init__()
 
@@ -74,18 +77,23 @@ class ReScene(nn.Module):
         self.temporal_masking = temporal_masking
         self.save_segment_info = bool(save_segment_info)
         self.return_query_features = bool(return_query_features)
+        self.semantic_query_positioning = bool(semantic_query_positioning)
+        self.semantic_query_fraction = float(semantic_query_fraction)
+        self.open_first_cross_attention = bool(open_first_cross_attention)
+        self.open_attention_call_count = 0
+        self.semantic_query_debug = []
 
         self.backbone = config.backbone
         self.num_levels = len(self.hlevels)
         sizes = self.backbone.PLANES[-5:]
 
         self.mask_features_head = nn.Linear(
-            in_features=self.backbone.PLANES[-1], 
-            out_features=self.mask_dim,         
-            bias=True
+            in_features=self.backbone.PLANES[-1], out_features=self.mask_dim, bias=True
         )
 
-        self.scatter_fn = AdaptiveScatter(scatter_type=self.scatter_type, feat_dim=self.mask_dim, p=3, eps=1e-6)
+        self.scatter_fn = AdaptiveScatter(
+            scatter_type=self.scatter_type, feat_dim=self.mask_dim, p=3, eps=1e-6
+        )
 
         assert (
             not use_np_features
@@ -107,6 +115,16 @@ class ReScene(nn.Module):
                     nn.ReLU(),
                     nn.Linear(hidden_dim, hidden_dim),
                 )
+            if self.semantic_query_positioning:
+                from models.perception_gain import SemanticQueryScorer
+
+                if self.use_np_features or not self.train_on_segments:
+                    raise ValueError(
+                        "semantic query positioning requires segment training and zero query content"
+                    )
+                self.semantic_query_scorer = SemanticQueryScorer(hidden_dim)
+                self.semantic_query_scorer.requires_grad_(False)
+                self.semantic_query_scorer.eval()
         elif self.random_query_both:
             self.query_projection = GenericMLP(
                 input_dim=2 * self.mask_dim,
@@ -134,7 +152,7 @@ class ReScene(nn.Module):
         )
 
         self.class_embed_head = nn.Linear(hidden_dim, self.num_classes)
-        
+
         # Only initialize change_embed_head if changes loss is enabled
         # This prevents unused parameters in DDP when changes loss is disabled
         if use_changes_loss:
@@ -150,7 +168,7 @@ class ReScene(nn.Module):
                 d_pos=self.mask_dim,
                 gauss_scale=self.gauss_scale,
                 normalize=self.normalize_pos_enc,
-                d_in=self.D
+                d_in=self.D,
             )
         elif self.pos_enc_type == "sine":
             self.pos_enc = PositionEmbeddingCoordsSine(
@@ -185,9 +203,7 @@ class ReScene(nn.Module):
                     )
                 )
 
-                tmp_squeeze_attention.append(
-                    nn.Linear(sizes[hlevel], self.mask_dim)
-                )
+                tmp_squeeze_attention.append(nn.Linear(sizes[hlevel], self.mask_dim))
 
                 tmp_self_attention.append(
                     SelfAttentionLayer(
@@ -213,12 +229,58 @@ class ReScene(nn.Module):
             self.lin_squeeze.append(tmp_squeeze_attention)
         self.decoder_norm = nn.LayerNorm(hidden_dim)
 
-
-    def initialize_queries(self, pcd_features, coords):
+    def initialize_queries(
+        self,
+        pcd_features,
+        coords,
+        *,
+        semantic_features=None,
+        semantic_coordinates=None,
+        semantic_stage_ids=None,
+        semantic_stable_keys=None,
+    ):
         sampled_coords = None
         batch_size = len(coords)
 
-        if self.non_parametric_queries:
+        if getattr(self, "semantic_query_positioning", False):
+            from models.perception_gain import select_semantic_query_indices
+
+            values = (
+                semantic_features,
+                semantic_coordinates,
+                semantic_stage_ids,
+                semantic_stable_keys,
+            )
+            if any(value is None for value in values):
+                raise ValueError(
+                    "semantic query inputs are required when Q-SEM is enabled"
+                )
+            selected = []
+            debug = []
+            for features, coordinates, stages, keys in zip(*values, strict=True):
+                indices, row = select_semantic_query_indices(
+                    features,
+                    coordinates,
+                    stages,
+                    stable_keys=tuple(keys),
+                    scorer=self.semantic_query_scorer,
+                    num_queries=self.num_queries,
+                    semantic_fraction=self.semantic_query_fraction,
+                )
+                selected.append(coordinates[indices])
+                debug.append(row)
+            sampled_coords = torch.stack(selected)
+            mins = torch.stack(
+                [value.min(dim=0).values for value in semantic_coordinates]
+            )
+            maxs = torch.stack(
+                [value.max(dim=0).values for value in semantic_coordinates]
+            )
+            query_pos = self.pos_enc(sampled_coords.float(), input_range=[mins, maxs])
+            query_pos = self.query_projection(query_pos).permute((0, 2, 1))
+            queries = torch.zeros_like(query_pos)
+            self.semantic_query_debug = debug
+        elif self.non_parametric_queries:
             fps_idx = [
                 furthest_point_sample(
                     pcd_features.decomposed_coordinates[i][None, ...].float(),
@@ -230,23 +292,14 @@ class ReScene(nn.Module):
             ]
 
             sampled_coords = torch.stack(
-                [
-                    coords[-1][i][fps_idx[i].long(), :]
-                    for i in range(len(fps_idx))
-                ]
+                [coords[-1][i][fps_idx[i].long(), :] for i in range(len(fps_idx))]
             )
 
             mins = torch.stack(
-                [
-                    coords[-1][i].min(dim=0)[0]
-                    for i in range(len(coords[-1]))
-                ]
+                [coords[-1][i].min(dim=0)[0] for i in range(len(coords[-1]))]
             )
             maxs = torch.stack(
-                [
-                    coords[-1][i].max(dim=0)[0]
-                    for i in range(len(coords[-1]))
-                ]
+                [coords[-1][i].max(dim=0)[0] for i in range(len(coords[-1]))]
             )
 
             query_pos = self.pos_enc(
@@ -257,7 +310,9 @@ class ReScene(nn.Module):
             query_pos = query_pos.permute((0, 2, 1))
 
             if not self.use_np_features:
-                queries = torch.zeros_like(query_pos)  # query_pos is already (batch, queries, features)
+                queries = torch.zeros_like(
+                    query_pos
+                )  # query_pos is already (batch, queries, features)
             else:
                 queries = torch.stack(
                     [
@@ -272,7 +327,7 @@ class ReScene(nn.Module):
                 torch.rand(
                     batch_size,
                     self.num_queries,  # Swap order: queries first
-                    self.mask_dim,     # features second
+                    self.mask_dim,  # features second
                     device=pcd_features.device,
                 )
                 - 0.5
@@ -286,7 +341,7 @@ class ReScene(nn.Module):
                     torch.rand(
                         batch_size,
                         self.num_queries,  # queries first
-                        2 * self.mask_dim, # features second
+                        2 * self.mask_dim,  # features second
                         device=pcd_features.device,
                     )
                     - 0.5
@@ -295,45 +350,37 @@ class ReScene(nn.Module):
                 query_pos_feat = torch.randn(
                     batch_size,
                     self.num_queries,  # queries first
-                    2 * self.mask_dim, # features second
+                    2 * self.mask_dim,  # features second
                     device=pcd_features.device,
                 )
 
-            queries = query_pos_feat[:, :, : self.mask_dim]  # (batch, num_queries, features)
+            queries = query_pos_feat[
+                :, :, : self.mask_dim
+            ]  # (batch, num_queries, features)
             # (batch, num_queries, features)
-            query_pos = query_pos_feat[:, :, self.mask_dim :]  
+            query_pos = query_pos_feat[:, :, self.mask_dim :]
         else:
             # PARAMETRIC QUERIES
-            queries = self.query_feat.weight.unsqueeze(0).repeat(
-                batch_size, 1, 1
-            )
+            queries = self.query_feat.weight.unsqueeze(0).repeat(batch_size, 1, 1)
             # (batch, num_queries, features)
-            query_pos = self.query_pos.weight.unsqueeze(0).repeat(
-                batch_size, 1, 1
-            )
+            query_pos = self.query_pos.weight.unsqueeze(0).repeat(batch_size, 1, 1)
 
         return queries, query_pos, sampled_coords
 
     def sample_and_batch_features(
         self, decomposed_feat, curr_sample_max=None, is_eval=False, extra=None
     ):
-        # stack and sample features 
+        # stack and sample features
         device = decomposed_feat[0].device
         extra = [] if extra is None else extra
 
-        curr_sample_size = max(
-            [pcd.shape[0] for pcd in decomposed_feat]
-        )
+        curr_sample_size = max([pcd.shape[0] for pcd in decomposed_feat])
 
         if min([pcd.shape[0] for pcd in decomposed_feat]) == 1:
-            raise RuntimeError(
-                "only a single point gives nans in cross-attention"
-            )
+            raise RuntimeError("only a single point gives nans in cross-attention")
 
         if not (self.max_sample_size or is_eval) and curr_sample_max is not None:
-            curr_sample_size = min(
-                curr_sample_size, curr_sample_max
-            )
+            curr_sample_size = min(curr_sample_size, curr_sample_max)
 
         rand_idx = []
         mask_idx = []
@@ -354,17 +401,15 @@ class ReScene(nn.Module):
                     device=device,
                 )
 
-                idx[:pcd_size] = torch.arange(
-                    pcd_size, device=device
-                )
+                idx[:pcd_size] = torch.arange(pcd_size, device=device)
 
                 midx[:pcd_size] = False  # attend to first points
             else:
                 # we have more points in pcd as we like to sample
                 # take a subset (no padding or masking needed)
-                idx = torch.randperm(
-                    decomposed_feat[k].shape[0], device=device
-                )[:curr_sample_size]
+                idx = torch.randperm(decomposed_feat[k].shape[0], device=device)[
+                    :curr_sample_size
+                ]
                 midx = torch.zeros(
                     curr_sample_size,
                     dtype=torch.bool,
@@ -375,20 +420,14 @@ class ReScene(nn.Module):
             mask_idx.append(midx)
 
         batched_feat = torch.stack(
-            [
-                decomposed_feat[k][rand_idx[k], :]
-                for k in range(len(rand_idx))
-            ]
+            [decomposed_feat[k][rand_idx[k], :] for k in range(len(rand_idx))]
         )
 
         # batch all other decomposed items if any are provided
         batched_outputs = []
         for decomposed_item in extra:
             batched = torch.stack(
-                [
-                    decomposed_item[k][rand_idx[k], :]
-                    for k in range(len(rand_idx))
-                ]
+                [decomposed_item[k][rand_idx[k], :] for k in range(len(rand_idx))]
             )
             batched_outputs.append(batched)
 
@@ -399,9 +438,8 @@ class ReScene(nn.Module):
     def unstack_batched(self, batched_feat, batch_mapping):
         return [f[~m] for f, m in zip(batched_feat.unbind(0), batch_mapping.unbind(0))]
 
-
     def get_pos_encs(self, coords):
-        # coords: list of raw coordinates at each hierarchical level per batch sample 
+        # coords: list of raw coordinates at each hierarchical level per batch sample
         pos_encodings_pcd = []
 
         for i in range(len(coords)):
@@ -410,7 +448,7 @@ class ReScene(nn.Module):
                 scene_min = coords_batch.min(dim=0)[0][None, ...]
                 scene_max = coords_batch.max(dim=0)[0][None, ...]
 
-                with autocast('cuda', enabled=False):
+                with autocast("cuda", enabled=False):
                     tmp = self.pos_enc(
                         coords_batch[None, ...].float(),
                         input_range=[scene_min, scene_max],
@@ -433,27 +471,75 @@ class ReScene(nn.Module):
         """Protected parameter-free extension point after each decoder FFN."""
         return queries
 
-    def forward(
-        self, x, point2segment=None, raw_coordinates=None, is_eval=False
-    ):  
+    def forward(self, x, point2segment=None, raw_coordinates=None, is_eval=False):
         if not self.train_on_segments:
-            point2segment=None # ensure no point2segment is used
+            point2segment = None  # ensure no point2segment is used
 
         x.raw_coordinates = raw_coordinates
         x.point2segment = point2segment
-        
+
         # backbone and positional encodings
         pcd_features, aux, coords = self.backbone(x)
         pos_encodings_pcd = self.get_pos_encs(coords)
-        
+
         # mask feature head and aggregation to segments if needed
         agg_feat, _agg_coords = self.aggregate_features(pcd_features, point2segment)
         batched_features, batch_map = self.sample_and_batch_features(agg_feat)
 
+        semantic_inputs = {}
+        if self.semantic_query_positioning:
+            from models.perception_gain import derive_segment_stage_ids
+
+            if raw_coordinates is None or point2segment is None:
+                raise ValueError("Q-SEM requires raw coordinates and point2segment")
+            if isinstance(raw_coordinates, torch.Tensor):
+                sizes = [value.numel() for value in point2segment]
+                if raw_coordinates.shape[0] != sum(sizes):
+                    raise ValueError("raw coordinates do not align with point2segment")
+                raw_batches = list(raw_coordinates.split(sizes, dim=0))
+            else:
+                raw_batches = list(raw_coordinates)
+            segment_coordinates = []
+            segment_stages = []
+            segment_keys = []
+            for batch_index, (raw, p2s) in enumerate(
+                zip(raw_batches, point2segment, strict=True)
+            ):
+                if raw.ndim != 2 or raw.shape[0] != p2s.numel() or raw.shape[1] < 4:
+                    raise ValueError(
+                        "Q-SEM requires aligned real xyz+stage coordinates"
+                    )
+                raw = raw.to(agg_feat[batch_index].device)
+                p2s = p2s.to(raw.device).long()
+                rounded_stage = raw[:, -1].round()
+                if not torch.equal(rounded_stage, raw[:, -1]):
+                    raise ValueError("raw temporal coordinates must be integer-valued")
+                stages = derive_segment_stage_ids(p2s, rounded_stage.long())
+                coordinates = self.scatter_fn.mean_scatter(raw, p2s)
+                if coordinates.shape[0] != agg_feat[batch_index].shape[0]:
+                    raise ValueError(
+                        "segment coordinates and mask features do not align"
+                    )
+                segment_coordinates.append(coordinates)
+                segment_stages.append(stages)
+                segment_keys.append(
+                    tuple(
+                        f"{batch_index}:{int(stage.item())}:{index}"
+                        for index, stage in enumerate(stages)
+                    )
+                )
+            semantic_inputs = {
+                "semantic_features": agg_feat,
+                "semantic_coordinates": segment_coordinates,
+                "semantic_stage_ids": segment_stages,
+                "semantic_stable_keys": segment_keys,
+            }
+
         # query initialization
         queries, query_pos, sampled_coords = self.initialize_queries(
             pcd_features=pcd_features,
-            coords=coords
+            coords=coords,
+            **semantic_inputs,
         )
 
         predictions_class = []
@@ -462,43 +548,59 @@ class ReScene(nn.Module):
         segment_features = [agg_feat]
 
         execution_stage_idx = 0
+        self.open_attention_call_count = 0
         for decoder_execution_idx in range(self.num_decoders):
             decoder_counter = 0 if self.shared_decoder else decoder_execution_idx
             for i, hlevel in enumerate(self.hlevels):
-                output_class, output_change, output_logits = self.mask_module(queries, batched_features)
+                output_class, output_change, output_logits = self.mask_module(
+                    queries, batched_features
+                )
                 output_mask = self.unstack_batched(output_logits, batch_map)
 
                 # list of attn masks per batch sample
                 attn_masks = self.attn_mask(
-                    output_logits, 
-                    batch_map, 
-                    sparse_coords=pcd_features, # associate features with original coordinates for pooling 
-                    num_pooling_steps=len(aux) - hlevel - 1, 
-                    point2segment=point2segment # map to full size if trained on segments
+                    output_logits,
+                    batch_map,
+                    sparse_coords=pcd_features,  # associate features with original coordinates for pooling
+                    num_pooling_steps=len(aux) - hlevel - 1,
+                    point2segment=point2segment,  # map to full size if trained on segments
                 )
 
-                batched_aux, batched_attn, batched_pos_enc, padding_mask = self.sample_and_batch_features(
-                    aux[hlevel].decomposed_features,
-                    self.sample_sizes[hlevel],
-                    is_eval,
-                    extra = [attn_masks, pos_encodings_pcd[hlevel][0]] # also batched attn and pos enc
+                batched_aux, batched_attn, batched_pos_enc, padding_mask = (
+                    self.sample_and_batch_features(
+                        aux[hlevel].decomposed_features,
+                        self.sample_sizes[hlevel],
+                        is_eval,
+                        extra=[
+                            attn_masks,
+                            pos_encodings_pcd[hlevel][0],
+                        ],  # also batched attn and pos enc
+                    )
                 )
 
                 # reset queries that attended to all positions
-                batched_attn.permute((0, 2, 1))[batched_attn.sum(1) == batched_attn.shape[1]] = False
+                batched_attn.permute((0, 2, 1))[
+                    batched_attn.sum(1) == batched_attn.shape[1]
+                ] = False
                 attn_mask = batched_attn.repeat_interleave(
-                        self.num_heads, dim=0
-                    ).permute((0, 2, 1))  # Shape: (num_heads*batch, seq_len, num_queries) -> (num_heads*batch, num_queries, seq_len)
+                    self.num_heads, dim=0
+                ).permute(
+                    (0, 2, 1)
+                )  # Shape: (num_heads*batch, seq_len, num_queries) -> (num_heads*batch, num_queries, seq_len)
 
-                # linear layer 
+                # linear layer
                 src_pcd = self.lin_squeeze[decoder_counter][i](batched_aux)
                 if self.use_level_embed:
                     src_pcd += self.level_embed.weight[i]
 
+                memory_mask = attn_mask
+                if self.open_first_cross_attention and execution_stage_idx == 0:
+                    memory_mask = None
+                    self.open_attention_call_count += 1
                 output = self.cross_attention[decoder_counter][i](
                     queries,
                     src_pcd,
-                    memory_mask=attn_mask,
+                    memory_mask=memory_mask,
                     memory_key_padding_mask=padding_mask,  # Use dedicated padding mask for better performance
                     pos=batched_pos_enc,
                     query_pos=query_pos,
@@ -512,9 +614,7 @@ class ReScene(nn.Module):
                 )
 
                 # FFN
-                queries = self.ffn_attention[decoder_counter][i](
-                    output
-                ) 
+                queries = self.ffn_attention[decoder_counter][i](output)
                 queries = self.after_decoder_stage(
                     queries,
                     execution_stage_idx=execution_stage_idx,
@@ -530,7 +630,9 @@ class ReScene(nn.Module):
                 predictions_mask.append(output_mask)
 
         # final predictions
-        output_class, output_change, output_logits = self.mask_module(queries, batched_features)
+        output_class, output_change, output_logits = self.mask_module(
+            queries, batched_features
+        )
         output_mask = self.unstack_batched(output_logits, batch_map)
 
         predictions_class.append(output_class)
@@ -545,9 +647,11 @@ class ReScene(nn.Module):
             "aux_outputs": self._set_aux_loss(
                 predictions_class, predictions_mask, predictions_changes
             ),
-            "sampled_coords": sampled_coords.detach().cpu().numpy()
-            if sampled_coords is not None
-            else None,
+            "sampled_coords": (
+                sampled_coords.detach().cpu().numpy()
+                if sampled_coords is not None
+                else None
+            ),
             "backbone_features": pcd_features,
             "segment_features": segment_features,
         }
@@ -583,10 +687,16 @@ class ReScene(nn.Module):
                 point_inst_idx = inst_idx
 
                 seg_cls = self.scatter_fn.mode_scatter(
-                    point_cls, p2s, num_categories=int(self.num_classes), ignore_index=-1
+                    point_cls,
+                    p2s,
+                    num_categories=int(self.num_classes),
+                    ignore_index=-1,
                 )
                 seg_inst_idx = self.scatter_fn.mode_scatter(
-                    point_inst_idx, p2s, num_categories=int(gm.shape[0]), ignore_index=-1
+                    point_inst_idx,
+                    p2s,
+                    num_categories=int(gm.shape[0]),
+                    ignore_index=-1,
                 )
 
                 seg_gt_classes.append(seg_cls)
@@ -599,27 +709,37 @@ class ReScene(nn.Module):
         return output_dict
 
     def aggregate_features(self, pcd_features, point2segment=None):
-        # mask feature head 
+        # mask feature head
         mask_features = self.mask_features_head(pcd_features.F)
         mask_features = self.backbone.sparse_from_sample(mask_features, pcd_features)
-        
-        # accumulate mask features per segment if needed 
+
+        # accumulate mask features per segment if needed
         if self.train_on_segments:
             mask_segments = []
             segment_coordinates = []
-            for i, (mask_feature, mask_coords) in enumerate(zip(mask_features.decomposed_features, mask_features.decomposed_coordinates)):
+            for i, (mask_feature, mask_coords) in enumerate(
+                zip(
+                    mask_features.decomposed_features,
+                    mask_features.decomposed_coordinates,
+                )
+            ):
                 mask_segments.append(self.scatter_fn(mask_feature, point2segment[i]))
-                segment_coordinates.append(self.scatter_fn.mean_scatter(mask_coords, point2segment[i]))
-            
+                segment_coordinates.append(
+                    self.scatter_fn.mean_scatter(mask_coords, point2segment[i])
+                )
+
             return mask_segments, segment_coordinates
-        else: 
-            return mask_features.decomposed_features, mask_features.decomposed_coordinates
-        
+        else:
+            return (
+                mask_features.decomposed_features,
+                mask_features.decomposed_coordinates,
+            )
+
     def mask_module(self, query_feat, features):
         query_feat = self.decoder_norm(query_feat)
         mask_embed = self.mask_embed_head(query_feat)
         outputs_class = self.class_embed_head(query_feat)
-        
+
         # Only compute change predictions if change_embed_head is initialized
         if self.change_embed_head is not None:
             outputs_change = self.change_embed_head(query_feat)
@@ -631,9 +751,17 @@ class ReScene(nn.Module):
 
         return outputs_class, outputs_change, output_logits
 
-    def attn_mask(self, logits, mask=None, sparse_coords=None, num_pooling_steps=0, point2segment=None, threshold=0.5):
-        
-        # if no batch mapping is provided return the mask as is 
+    def attn_mask(
+        self,
+        logits,
+        mask=None,
+        sparse_coords=None,
+        num_pooling_steps=0,
+        point2segment=None,
+        threshold=0.5,
+    ):
+
+        # if no batch mapping is provided return the mask as is
         if mask is None:
             return logits.detach().sigmoid() < threshold
 
@@ -644,25 +772,27 @@ class ReScene(nn.Module):
                 output_masks.append(logits[i][~mask[i]][point2segment[i]])
             output_masks = torch.cat(output_masks)
 
-        else: 
+        else:
             output_masks = logits[~mask]
 
         if sparse_coords is not None:
             attn_mask = self.backbone.sparse_from_sample(output_masks, sparse_coords)
-            # pool attn mask to current hierarchical level 
+            # pool attn mask to current hierarchical level
             for _ in range(num_pooling_steps):
                 attn_mask = self.backbone.pooling(attn_mask)
 
             # pool across time if configured
-            if self.temporal_masking: 
+            if self.temporal_masking:
                 attn_mask = self.backbone.temporal_pool_merge(attn_mask)
 
-            attn_mask = self.backbone.sparse_from_sample((attn_mask.F.detach().sigmoid() < threshold), attn_mask).decomposed_features
+            attn_mask = self.backbone.sparse_from_sample(
+                (attn_mask.F.detach().sigmoid() < threshold), attn_mask
+            ).decomposed_features
         else:
             attn_mask = output_masks.detach().sigmoid() < threshold
 
         return attn_mask
-    
+
     def space_n_time_m(self, n, m):
         return n if self.D == 3 else [n, n, n, m]
 
@@ -673,5 +803,7 @@ class ReScene(nn.Module):
         # as a dict having both a Tensor and a list.
         return [
             {"pred_logits": a, "pred_masks": b, "pred_changes": c}
-            for a, b, c in zip(outputs_class[:-1], outputs_seg_masks[:-1], outputs_change[:-1])
+            for a, b, c in zip(
+                outputs_class[:-1], outputs_seg_masks[:-1], outputs_change[:-1]
+            )
         ]

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import torch
 
 from datasets.task_memory_episode import StageMeta
@@ -85,6 +87,19 @@ def test_publish_consumes_plan_without_reassignment() -> None:
     assert prefix.archive == ()
     assert prefix.provisional.vertex_ids.tolist() == [10, 20, 30]
     assert set(prefix.prediction) == {"pred_masks", "pred_scores", "pred_classes"}
+
+
+def test_live_source_parity_marks_base_comparison_unavailable() -> None:
+    from scripts.replay_crosswindow_association import source_parity_fields
+
+    assert source_parity_fields(None, generated_candidate_count=3) == {
+        "generated_candidate_count": 3,
+        "base_candidate_count": None,
+        "common_candidate_count": None,
+        "score_max_abs": None,
+        "aligned_mask_iou_mean": None,
+        "generated_vs_base_exact": None,
+    }
 
 
 class _MaskSumMetric:
@@ -292,6 +307,113 @@ def test_headroom_gate_supports_gain_or_sufficient_complete_failures() -> None:
 
     assert gain["decision"] == "ASSOCIATION_HEADROOM_SUPPORTED"
     assert coverage["decision"] == "ASSOCIATION_HEADROOM_SUPPORTED"
+
+
+def test_published_match_is_recomputed_for_each_temporal_threshold() -> None:
+    from scripts.diagnose_crosswindow_failures import _published_match_by_gt
+
+    stage_points = 200
+    target_mask = torch.zeros((1, stage_points), dtype=torch.bool)
+    target_mask[:, :160] = True
+    targets = [
+        {
+            "gt_ids": torch.tensor([7]),
+            "gt_classes": torch.tensor([0]),
+            "gt_masks": target_mask.clone(),
+            "changes": torch.tensor([0]),
+            "change_labels_valid": False,
+            "change_label_semantics": (
+                "unavailable_for_protocol_b_order_stress_test_all_static_placeholder"
+            ),
+            "gt_class_semantics": "rescene_model_index_0_based",
+        }
+        for _ in range(2)
+    ]
+    pred_mask = torch.zeros(stage_points * 2, dtype=torch.bool)
+    pred_mask[:160] = True
+    pred_mask[stage_points : stage_points + 120] = True
+    prefix = SimpleNamespace(
+        prediction={
+            "pred_masks": pred_mask[:, None],
+            "pred_classes": torch.tensor([3]),
+            "pred_scores": torch.tensor([0.9]),
+        }
+    )
+
+    loose = _published_match_by_gt(
+        prefix,
+        targets,
+        horizon=2,
+        class_mapping=(3,),
+        tau=0.5,
+    )
+    strict = _published_match_by_gt(
+        prefix,
+        targets,
+        horizon=2,
+        class_mapping=(3,),
+        tau=0.75,
+    )
+
+    assert loose[7]["matched"] is True
+    assert strict[7]["matched"] is False
+
+
+def test_candidate_coverage_preserves_evaluator_ambiguity(monkeypatch) -> None:
+    import scripts.diagnose_crosswindow_failures as diagnostics
+
+    candidate = diagnostics.DiagnosticCandidate(
+        scan_id="scan-a",
+        stage_index=0,
+        source_class_id=0,
+        class_id=3,
+        score=0.9,
+        mask=torch.tensor([True]),
+        source="unit-test",
+        source_key="candidate-0",
+    )
+    monkeypatch.setattr(
+        diagnostics,
+        "build_candidate_pools",
+        lambda frames, *, horizon: {
+            "POLICY_POOL": tuple((candidate,) for _ in range(horizon))
+        },
+    )
+    monkeypatch.setattr(
+        diagnostics,
+        "_target_rows",
+        lambda target: {7: (0, torch.tensor([True]))},
+    )
+    monkeypatch.setattr(
+        diagnostics,
+        "_published_match_by_gt",
+        lambda *args, **kwargs: {
+            7: {
+                "gt_id_or_group": "7|8",
+                "eligible": False,
+                "matched": None,
+                "ambiguity_status": "AMBIGUOUS_UNRESOLVED",
+                "exclusion_reason": "AMBIGUOUS_GT_GROUP",
+            }
+        },
+    )
+
+    events = diagnostics.diagnose_candidate_coverage(
+        reference_id="reference-0",
+        master_id="master-0",
+        order_id="order-0",
+        frames=(object(),) * 5,
+        original_targets=({},) * 5,
+        canonical_targets=({},) * 5,
+        d0_prefixes=(object(),) * 5,
+        class_mapping=(3,),
+    )
+
+    assert events
+    assert {event["ambiguity_status"] for event in events} == {"AMBIGUOUS_UNRESOLVED"}
+    assert {event["evaluator_exclusion_reason"] for event in events} == {
+        "AMBIGUOUS_GT_GROUP"
+    }
 
 
 def test_headroom_gate_separates_inconclusive_and_negative_evidence() -> None:

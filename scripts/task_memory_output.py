@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import math
 from collections import defaultdict
-from collections.abc import Hashable, Mapping, Sequence
+from collections.abc import Callable, Hashable, Mapping, Sequence
 from dataclasses import dataclass
 
 import numpy as np
@@ -103,6 +103,7 @@ class PublishedPrefix:
 
 @dataclass(frozen=True)
 class _DenseCandidate:
+    candidate_index: int
     identity: PublishedIdentity
     source_query_id: int
     score: float
@@ -134,6 +135,27 @@ class _WindowCandidate:
     @property
     def has_current_support(self) -> bool:
         return self.current_mask.any().item()
+
+
+@dataclass(frozen=True)
+class RevisionCandidate:
+    candidate_index: int
+    identity: PublishedIdentity
+    source_query_id: int
+    score: float
+    mask: Tensor
+
+
+@dataclass(frozen=True)
+class RevisionMaskRequest:
+    scan_id: str
+    absolute_stage_index: int
+    source_vertex_ids: Tensor
+    target_vertex_ids: Tensor
+    augmentation_transform_id: str
+    coordinate_frame_id: str
+    old_candidates: tuple[RevisionCandidate, ...]
+    new_candidates: tuple[RevisionCandidate, ...]
 
 
 _SCORE_REDUCERS = frozenset({"mean", "latest", "max"})
@@ -237,12 +259,13 @@ def _dense_from_archive(scan: ArchivedScan) -> _DenseScan:
         vertex_ids=torch.arange(scan.point_count, dtype=torch.long),
         candidates=tuple(
             _DenseCandidate(
+                candidate_index=index,
                 identity=candidate.identity,
                 source_query_id=candidate.source_query_id,
                 score=candidate.score,
                 mask=candidate.mask(),
             )
-            for candidate in scan.candidates
+            for index, candidate in enumerate(scan.candidates)
         ),
     )
 
@@ -422,9 +445,9 @@ def _window_candidates(
             source_query_id=query_id,
             class_id=class_id,
             score=float(scores[index].item()),
-            previous_mask=masks[:previous_stop, index].clone()
-            if has_previous
-            else None,
+            previous_mask=(
+                masks[:previous_stop, index].clone() if has_previous else None
+            ),
             current_mask=masks[current_start:, index].clone(),
             routed_identity=routed_identity,
         )
@@ -629,6 +652,7 @@ def _build_dense_scan(
     stage_meta: StageMeta,
     scan_position: int,
     target_vertex_ids: Tensor | None = None,
+    mask_overrides: Mapping[int, Tensor] | None = None,
 ) -> _DenseScan:
     source_vertex_ids = (
         stage_meta.original_vertex_ids[scan_position]
@@ -643,6 +667,15 @@ def _build_dense_scan(
         if target_vertex_ids is None
         else target_vertex_ids.detach().cpu().long().contiguous().clone()
     )
+    overrides = {} if mask_overrides is None else dict(mask_overrides)
+    candidate_indices = {candidate.candidate_index for candidate in candidates}
+    if any(
+        isinstance(index, bool)
+        or not isinstance(index, int)
+        or index not in candidate_indices
+        for index in overrides
+    ):
+        raise TaskMemoryOutputError("revision mask override candidate is unknown")
     dense_candidates = []
     for candidate in candidates:
         mask = (
@@ -650,6 +683,18 @@ def _build_dense_scan(
             if scan_position == 0 and len(stage_meta.scan_ids_in_window) == 2
             else candidate.current_mask
         )
+        if candidate.candidate_index in overrides:
+            override = overrides[candidate.candidate_index]
+            if (
+                not isinstance(override, Tensor)
+                or override.ndim != 1
+                or override.dtype != torch.bool
+                or override.numel() != source_vertex_ids.numel()
+            ):
+                raise TaskMemoryOutputError(
+                    "revision mask override must be a scan-aligned bool vector"
+                )
+            mask = override.detach().cpu().contiguous().clone()
         if mask is None or not mask.any().item():
             continue
         if target_vertex_ids is not None:
@@ -660,6 +705,7 @@ def _build_dense_scan(
             )
         dense_candidates.append(
             _DenseCandidate(
+                candidate_index=candidate.candidate_index,
                 identity=identities[candidate.candidate_index],
                 source_query_id=candidate.source_query_id,
                 score=candidate.score,
@@ -681,7 +727,15 @@ def _build_dense_scan(
 class LagOnePublisher:
     """Replace only the prior provisional scan using the current W=2 output."""
 
-    def __init__(self, *, score_reducer: str = "mean", iou_threshold: float = 0.5):
+    def __init__(
+        self,
+        *,
+        score_reducer: str = "mean",
+        iou_threshold: float = 0.5,
+        revision_mask_transform: (
+            Callable[[RevisionMaskRequest], Mapping[int, Tensor] | None] | None
+        ) = None,
+    ):
         self.score_reducer = _validate_reducer(score_reducer)
         if (
             isinstance(iou_threshold, bool)
@@ -692,7 +746,12 @@ class LagOnePublisher:
             raise TaskMemoryOutputError(
                 "iou_threshold must be finite and within [0, 1]"
             )
+        if revision_mask_transform is not None and not callable(
+            revision_mask_transform
+        ):
+            raise TaskMemoryOutputError("revision_mask_transform must be callable")
         self.iou_threshold = float(iou_threshold)
+        self.revision_mask_transform = revision_mask_transform
         self._archive: tuple[ArchivedScan, ...] = ()
         self._buffer: _DenseScan | None = None
         self._revision_log: tuple[RevisionRecord, ...] = ()
@@ -724,6 +783,10 @@ class LagOnePublisher:
             expected_stage=self._next_stage,
             expected_episode=self._episode,
         )
+        if self.revision_mask_transform is not None:
+            observer = getattr(self.revision_mask_transform, "observe_stage", None)
+            if callable(observer):
+                observer(prediction, stage_meta)
         routes = _normalize_identity_map(identity_map)
         candidates = _window_candidates(
             prediction=prediction,
@@ -752,14 +815,70 @@ class LagOnePublisher:
                 target_vertex_ids=self._buffer.vertex_ids,
             )
             self._last_revision_pair = (replaced, revised)
-            frozen = _archive_scan(revised)
+            committed = revised
+            if self.revision_mask_transform is not None:
+                source_vertex_ids = (
+                    stage_meta.original_vertex_ids[0]
+                    .detach()
+                    .cpu()
+                    .long()
+                    .contiguous()
+                    .clone()
+                )
+                request = RevisionMaskRequest(
+                    scan_id=revised.scan_id,
+                    absolute_stage_index=stage_meta.absolute_stage_index,
+                    source_vertex_ids=source_vertex_ids,
+                    target_vertex_ids=self._buffer.vertex_ids.clone(),
+                    augmentation_transform_id=stage_meta.augmentation_transform_id,
+                    coordinate_frame_id=stage_meta.coordinate_frame_id,
+                    old_candidates=tuple(
+                        RevisionCandidate(
+                            candidate_index=candidate.candidate_index,
+                            identity=candidate.identity,
+                            source_query_id=candidate.source_query_id,
+                            score=candidate.score,
+                            mask=candidate.mask.clone(),
+                        )
+                        for candidate in replaced.candidates
+                    ),
+                    new_candidates=tuple(
+                        RevisionCandidate(
+                            candidate_index=candidate.candidate_index,
+                            identity=identities[candidate.candidate_index],
+                            source_query_id=candidate.source_query_id,
+                            score=candidate.score,
+                            mask=candidate.previous_mask.detach()
+                            .cpu()
+                            .bool()
+                            .contiguous()
+                            .clone(),
+                        )
+                        for candidate in candidates
+                        if candidate.previous_mask is not None
+                    ),
+                )
+                overrides = self.revision_mask_transform(request)
+                if overrides is not None and not isinstance(overrides, Mapping):
+                    raise TaskMemoryOutputError(
+                        "revision_mask_transform must return a mapping or None"
+                    )
+                committed = _build_dense_scan(
+                    candidates=candidates,
+                    identities=identities,
+                    stage_meta=stage_meta,
+                    scan_position=0,
+                    target_vertex_ids=self._buffer.vertex_ids,
+                    mask_overrides=overrides,
+                )
+            frozen = _archive_scan(committed)
             revision = RevisionRecord(
                 absolute_stage_index=stage_meta.absolute_stage_index,
-                scan_id=revised.scan_id,
+                scan_id=committed.scan_id,
                 replaced_sha256=_scan_digest(self._buffer),
                 committed_sha256=frozen.content_sha256,
                 old_candidate_count=len(self._buffer.candidates),
-                new_candidate_count=len(revised.candidates),
+                new_candidate_count=len(committed.candidates),
                 route_conflicts=route_conflicts,
                 fallback_matches=fallback_matches,
             )
@@ -853,6 +972,8 @@ __all__ = [
     "PublicationAccounting",
     "PublishedIdentity",
     "PublishedPrefix",
+    "RevisionCandidate",
+    "RevisionMaskRequest",
     "RevisionRecord",
     "TaskMemoryOutputError",
 ]

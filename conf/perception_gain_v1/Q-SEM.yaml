@@ -1,0 +1,14 @@
+# @package _global_
+defaults:
+  - common
+  - _self_
+
+general:
+  experiment_name: Q-SEM
+
+model:
+  semantic_query_positioning: true
+
+perception_training:
+  variant: Q-SEM
+  scorer_checkpoint: ${oc.env:PERSIST4D_Q_SEM_SCORER,null}

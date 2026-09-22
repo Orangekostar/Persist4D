@@ -65,6 +65,16 @@ class _PassthroughAttention(nn.Module):
         return queries
 
 
+class _CapturingAttention(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.calls = []
+
+    def forward(self, queries, *_args, **kwargs):
+        self.calls.append(kwargs)
+        return queries
+
+
 class _DeterministicDecoderUpdate(nn.Module):
     def __init__(self):
         super().__init__()
@@ -273,8 +283,7 @@ def test_decoder_stage_hook_runs_after_ffn_with_execution_and_parameter_indices(
     torch.testing.assert_close(captured[1][0], initial + 2 * offset)
     assert [row[1:3] for row in captured] == [(0, 0), (1, 0)]
     assert all(
-        set(row[3])
-        == {"decoder_features", "decoder_padding_mask", "point2segment"}
+        set(row[3]) == {"decoder_features", "decoder_padding_mask", "point2segment"}
         for row in captured
     )
 
@@ -291,6 +300,23 @@ def test_query_features_preserve_gradient_flow():
     decoder_update = model.ffn_attention[0][0]
     assert decoder_update.offset.grad is not None
     assert torch.count_nonzero(decoder_update.offset.grad) > 0
+
+
+def test_a_open_clears_only_first_memory_mask_and_preserves_padding() -> None:
+    model = _build_model(open_first_cross_attention=True, num_decoders=2)
+    capture = _CapturingAttention()
+    model.cross_attention[0][0] = capture
+
+    _forward(model)
+
+    assert len(capture.calls) == 2
+    assert capture.calls[0]["memory_mask"] is None
+    assert isinstance(capture.calls[1]["memory_mask"], torch.Tensor)
+    first_padding = capture.calls[0]["memory_key_padding_mask"]
+    second_padding = capture.calls[1]["memory_key_padding_mask"]
+    assert torch.equal(first_padding, second_padding)
+    assert first_padding.any()
+    assert model.open_attention_call_count == 1
 
 
 @pytest.mark.skipif(

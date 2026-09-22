@@ -1,0 +1,66 @@
+{
+  "attention_reachability": {
+    "earliest_allowed_gt_fraction_mean": 0.15633000303857864,
+    "earliest_decoder_layer": 0
+  },
+  "best_candidate_iou_mean_by_decoder_layer": {
+    "0": 0.051576930343168834,
+    "1": 0.6661669328661248,
+    "10": 0.7469172816871121,
+    "11": 0.7468567021504635,
+    "12": 0.7466676795467881,
+    "2": 0.6991624724267438,
+    "3": 0.7431833047862395,
+    "4": 0.7461776068471003,
+    "5": 0.75036518477678,
+    "6": 0.7473241092618739,
+    "7": 0.7475238638367541,
+    "8": 0.7504172439659291,
+    "9": 0.7479422991671184
+  },
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "completed_prefix_count": 20,
+  "elapsed_seconds": 45.3410942129849,
+  "expected_prefix_count": 20,
+  "foundation_source_sha256": "dc2e454f48ef5901bd1bd75ef8e299edf01ba725f702ef0c11203b6898fd9085",
+  "gpu_hours": 0.012594748392495806,
+  "gpu_name": "NVIDIA A40",
+  "incomplete_units": [],
+  "load_audit": {
+    "loaded_key_count": 798,
+    "missing_keys": [],
+    "r1_subtree_exact": true,
+    "r1_subtree_mismatches": [],
+    "unexpected_keys": []
+  },
+  "panel_sequences": [
+    {
+      "prefix_count": 5,
+      "reference_id": "09582244-e2c2-2de1-956c-357092d949d1",
+      "sequence_id": "scene0007_04-scene0007_00-scene0007_01-scene0007_03-scene0007_02"
+    },
+    {
+      "prefix_count": 5,
+      "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+      "sequence_id": "scene0066_04-scene0066_01-scene0066_00-scene0066_02-scene0066_03"
+    },
+    {
+      "prefix_count": 5,
+      "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14",
+      "sequence_id": "scene0068_01-scene0068_00-scene0068_05-scene0068_03-scene0068_02"
+    },
+    {
+      "prefix_count": 5,
+      "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+      "sequence_id": "scene0174_03-scene0174_00-scene0174_06-scene0174_01-scene0174_05"
+    }
+  ],
+  "query_coverage": {
+    "foreground_query_fraction_mean": 0.300500001385808,
+    "gt_instance_coverage_mean": 0.732818640768528,
+    "scene_count": 20
+  },
+  "reference_count": 4,
+  "schema_version": "perception-gain-foundation-diagnostic-panel-v1",
+  "status": "PASS"
+}

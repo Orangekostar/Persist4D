@@ -1,0 +1,13 @@
+# @package _global_
+defaults:
+  - common
+  - _self_
+
+general:
+  experiment_name: A-OPEN
+
+model:
+  open_first_cross_attention: true
+
+perception_training:
+  variant: A-OPEN

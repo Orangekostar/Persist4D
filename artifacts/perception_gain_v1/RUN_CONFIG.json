@@ -1,0 +1,174 @@
+{
+  "asset_resolution_sources": {
+    "concerto_pretrained": "fallback",
+    "data_root": "fallback",
+    "dev_base_cache_root": "unresolved",
+    "dev_supplement_root": "unresolved",
+    "external_run_root": "fallback",
+    "fh_native_cache_root": "unresolved",
+    "metric_dataset_spec": "derived:data_root",
+    "pb_base_cache_root": "unresolved",
+    "pb_supplement_root": "unresolved",
+    "r1_checkpoint": "fallback",
+    "rio_metadata": "fallback",
+    "train_observation_cache_root": "unresolved"
+  },
+  "external_assets_file": "external:assets.local.json",
+  "inputs": {
+    "concerto_pretrained": {
+      "bytes": 433987358,
+      "kind": "file",
+      "logical_reference": "external:concerto_pretrained",
+      "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+      "status": "VERIFIED"
+    },
+    "data_root": {
+      "kind": "directory",
+      "logical_reference": "external:data_root",
+      "status": "VERIFIED"
+    },
+    "metric_dataset_spec": {
+      "bytes": 427,
+      "kind": "file",
+      "logical_reference": "external:metric_dataset_spec",
+      "sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "status": "VERIFIED"
+    },
+    "r1_checkpoint": {
+      "bytes": 754813672,
+      "kind": "file",
+      "logical_reference": "external:r1_checkpoint",
+      "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "status": "VERIFIED"
+    },
+    "rio_metadata": {
+      "bytes": 3155995,
+      "kind": "file",
+      "logical_reference": "external:rio_metadata",
+      "sha256": "674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64",
+      "status": "VERIFIED"
+    },
+    "task_data_contract": {
+      "bytes": 125954,
+      "kind": "file",
+      "logical_reference": "artifacts/task_memory_retention_v2/DATA_CONTRACT.json",
+      "sha256": "4434a84b14139b611baa90a365e59cc0fa7cfb27a10d21cc21f50fb2a520c96e",
+      "status": "VERIFIED"
+    }
+  },
+  "pilot_config_frozen": true,
+  "resolved_config": {
+    "budget": {
+      "foundation_and_evaluation_gpu_hours": 32,
+      "host_memory_gib": 96,
+      "new_cache_gib": 32,
+      "perception_training_gpu_hours": 136,
+      "profiling_gpu_hours": 4,
+      "refinement_gpu_hours": 16,
+      "smoke_and_recovery_gpu_hours": 4,
+      "total_gpu_hours": 192
+    },
+    "evaluation": {
+      "official_thresholds": [
+        0.5,
+        0.55,
+        0.6,
+        0.65,
+        0.7,
+        0.75,
+        0.8,
+        0.85,
+        0.9
+      ],
+      "output_policy": "lag1",
+      "query_count": 100,
+      "score_reducer": "mean",
+      "second_seed": 46,
+      "state_capacity": 100,
+      "window_size": 2
+    },
+    "identity": {
+      "branch": "research/persist4d-perception-gain-v1",
+      "concerto_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+      "instruction_sha256": "e7ba7daf9299547dd0470bcafe081521aafde272cb2d30bd55cc9e802cafe2d5",
+      "parent_commit": "6ef77620aa20926311eff3124a794a6ca2e32727",
+      "r1_checkpoint_bytes": 754813672,
+      "r1_checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "repository": "Orangekostar/Persist4D",
+      "source_branch": "research/persist4d-crosswindow-evidence-v1"
+    },
+    "paths": {
+      "artifact_root": "artifacts/perception_gain_v1",
+      "crosswindow_config": "configs/crosswindow_evidence_v1.yaml",
+      "crosswindow_data_roles": "artifacts/crosswindow_evidence_v1/DATA_ROLES.json",
+      "instruction": "artifacts/perception_gain_v1/EXECUTION_INSTRUCTION.md",
+      "task_asset_locator": "artifacts/task_memory_retention_v2/external_assets.local.json",
+      "task_data_contract": "artifacts/task_memory_retention_v2/DATA_CONTRACT.json"
+    },
+    "refiner": {
+      "batch_candidates": 16,
+      "delta_scale": 2.0,
+      "evaluation_updates": [
+        0,
+        500,
+        1000,
+        1500
+      ],
+      "learning_rate": 0.001,
+      "maximum_segments": 2048,
+      "updates": 1500,
+      "warmup_updates": 75,
+      "weight_decay": 0.0001
+    },
+    "runtime": {
+      "batch_size_per_gpu": 2,
+      "cpu_workers": 8,
+      "devices": 2,
+      "eval_seed": 45,
+      "gradient_accumulation": 8,
+      "precision": "32-true",
+      "train_seed": 45
+    },
+    "schema_version": "perception-gain-v1",
+    "scorer": {
+      "batch_segments": 1024,
+      "learning_rate": 0.001,
+      "minimum_reference_count": 8,
+      "pair_limit": 64,
+      "semantic_fraction": 0.75,
+      "updates": 500,
+      "weight_decay": 0.0001
+    },
+    "training": {
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "eps": 1e-08,
+      "evaluation_updates": [
+        0,
+        250,
+        750,
+        1500,
+        2250,
+        3000
+      ],
+      "existing_lr": 5e-05,
+      "gradient_clip_norm": 1.0,
+      "minimum_lr_fraction": 0.1,
+      "optimizer": "AdamW",
+      "pilot_update": 750,
+      "total_updates": 3000,
+      "variants": [
+        "C0",
+        "S-BAL",
+        "S-WORST",
+        "Q-SEM",
+        "A-OPEN"
+      ],
+      "warmup_updates": 150,
+      "weight_decay": 0.01
+    }
+  },
+  "schema_version": "perception-gain-run-config-v1"
+}

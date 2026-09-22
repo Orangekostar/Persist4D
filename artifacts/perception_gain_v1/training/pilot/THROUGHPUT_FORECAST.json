@@ -1,0 +1,26 @@
+{
+  "budget_decision": "RUN_ALL_FIVE_PILOT_ARMS",
+  "budget_limit_gpu_hours": 136.0,
+  "first_50": {
+    "devices": 2,
+    "elapsed_seconds": 639.022305665,
+    "end_checkpoint": "external:training/C0/last.ckpt",
+    "end_checkpoint_bytes": 754935460,
+    "end_checkpoint_mtime_utc": "2026-09-22T02:51:43.396171306Z",
+    "gpu_hours": 0.3550123920361111,
+    "measurement": "run_plan_mtime_to_update_0050_checkpoint_mtime",
+    "optimizer_updates": 50,
+    "run_plan_mtime_utc": "2026-09-22T02:41:04.373865641Z",
+    "seconds_per_optimizer_update": 12.7804461133,
+    "updates_per_second": 0.07824453087850671,
+    "variant": "C0"
+  },
+  "forecast": {
+    "additional_2250_updates_gpu_hours_per_arm": 15.975557641625,
+    "pilot_750_updates_gpu_hours_per_arm": 5.325185880208333,
+    "three_arm_full_extension_gpu_hours": 47.926672924875,
+    "five_arm_pilot_gpu_hours": 26.625929401041666
+  },
+  "schema_version": "perception-gain-throughput-forecast-v1",
+  "status": "PASS"
+}
