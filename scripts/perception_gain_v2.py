@@ -636,6 +636,10 @@ def execute_task(task: str, config: dict, *, external_root: Path) -> dict:
         from scripts.perception_gain_v2_report import run_report
 
         return run_report(config, external_root=external_root)
+    if task == "PUBLISH":
+        from scripts.perception_gain_publish import publish
+
+        return publish(version="v2", config=config, external_root=external_root)
     if task == "HIGH_CONT":
         summary = train_recipe(
             config,
@@ -1115,6 +1119,10 @@ def main(argv=None) -> int:
             json.dumps(execute_task("REPORT", config, external_root=args.external_root))
         )
         return 0
+    if args.command == "publish":
+        result = execute_task("PUBLISH", config, external_root=args.external_root)
+        print(json.dumps(result))
+        return int(result["status"] == "BLOCKED")
     if args.command == "execute-task":
         result = execute_task(args.target, config, external_root=args.external_root)
         write_json(args.external_root / f"tasks/{args.target}.json", result)

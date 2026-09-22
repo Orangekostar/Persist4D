@@ -77,13 +77,13 @@ def _run(
     return result
 
 
-def choose_release_tag(existing_tags: set[str]) -> str:
-    if BASE_TAG not in existing_tags:
-        return BASE_TAG
+def choose_release_tag(existing_tags: set[str], *, base_tag: str = BASE_TAG) -> str:
+    if base_tag not in existing_tags:
+        return base_tag
     suffix = 2
-    while f"{BASE_TAG}-r{suffix}" in existing_tags:
+    while f"{base_tag}-r{suffix}" in existing_tags:
         suffix += 1
-    return f"{BASE_TAG}-r{suffix}"
+    return f"{base_tag}-r{suffix}"
 
 
 def validate_release_assets(
@@ -323,11 +323,27 @@ def _create_release(
 def publish(
     *,
     artifact_root: Path = ARTIFACT_ROOT,
-    external_root: Path = DEFAULT_EXTERNAL_ROOT,
+    external_root: Path | None = None,
+    version: str = "v1",
+    config: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
+    if version == "v2":
+        from scripts.perception_gain_v2 import load_config
+        from scripts.perception_gain_v2_publication import publish_v2
+
+        config = config or load_config(PROJECT_ROOT / "configs/perception_gain_v2.yaml")
+        external_root = external_root or Path(
+            os.environ.get(
+                "PERSIST4D_GAIN_V2_ROOT", Path.home() / "persist4d_runs/perception_gain_v2"
+            )
+        )
+        return publish_v2(config, external_root=external_root)
+    if version != "v1":
+        raise PublicationError("Unknown publication version")
     from scripts.perception_gain_reporting import generate_delivery
 
     artifact_root = artifact_root.resolve()
+    external_root = external_root or DEFAULT_EXTERNAL_ROOT
     external_root = external_root.expanduser().resolve(strict=True)
     branch = _run(("git", "branch", "--show-current")).stdout.strip()
     if branch != BRANCH:
@@ -450,7 +466,8 @@ def publish(
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--artifact-root", type=Path, default=ARTIFACT_ROOT)
-    parser.add_argument("--external-root", type=Path, default=DEFAULT_EXTERNAL_ROOT)
+    parser.add_argument("--external-root", type=Path)
+    parser.add_argument("--version", choices=("v1", "v2"), default="v1")
     return parser
 
 
@@ -461,6 +478,7 @@ def main() -> int:
             publish(
                 artifact_root=args.artifact_root,
                 external_root=args.external_root,
+                version=args.version,
             ),
             sort_keys=True,
         )

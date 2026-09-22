@@ -278,7 +278,17 @@ def build_method_bundle(method: dict, *, external_root: Path, artifacts: Path) -
         "live_panel_reload": "NOT_RUN",
         "method": method,
     }
-    write_json(artifacts / f"publication/bundles/{safe_name}.json", manifest)
+    manifest_path = artifacts / f"publication/bundles/{safe_name}.json"
+    if manifest_path.exists():
+        previous = read_json(manifest_path)
+        if (
+            previous.get("sha256") == manifest["sha256"]
+            and previous.get("method") == method
+        ):
+            for key in ("live_panel_reload", "live_panel_evidence"):
+                if key in previous:
+                    manifest[key] = previous[key]
+    write_json(manifest_path, manifest)
     return manifest
 
 
