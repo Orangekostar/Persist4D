@@ -452,6 +452,7 @@ def build_live_replay_payload(
     episode_id: str,
     scan_ids: Sequence[str],
     stages: Sequence[Mapping[str, object]],
+    expected_stage_count: int = 5,
 ) -> tuple[dict[str, object], dict[str, object]]:
     required = {"observation", "prediction", "stage_meta", "target"}
     if (
@@ -461,17 +462,21 @@ def build_live_replay_payload(
         )
         or isinstance(scan_ids, (str, bytes))
         or not isinstance(scan_ids, Sequence)
-        or len(scan_ids) != 5
-        or len(set(scan_ids)) != 5
+        or expected_stage_count not in {2, 3, 4, 5}
+        or len(scan_ids) != expected_stage_count
+        or len(set(scan_ids)) != expected_stage_count
         or any(not isinstance(value, str) or not value for value in scan_ids)
         or isinstance(stages, (str, bytes))
         or not isinstance(stages, Sequence)
-        or len(stages) != 5
+        or len(stages) != expected_stage_count
         or any(
             not isinstance(stage, Mapping) or set(stage) != required for stage in stages
         )
     ):
-        raise PerceptionEvaluationError("live replay requires exact five stages")
+        raise PerceptionEvaluationError(
+            "live replay requires exact five stages" if expected_stage_count == 5
+            else f"live replay requires exact {expected_stage_count} stages"
+        )
     return (
         {
             "episode": {

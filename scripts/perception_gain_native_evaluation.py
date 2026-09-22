@@ -128,6 +128,23 @@ def _metric_row(
     }
 
 
+def produce_native_with_retry(producer, key, *, on_retry):
+    """Retry one genuine OOM using the same producer, prefix, device and precision."""
+    import gc
+
+    import torch
+
+    try:
+        return producer.produce_bundle(key)
+    except torch.OutOfMemoryError as error:
+        on_retry(str(error))
+        # Release the failed producer frame before clearing this process's cache.
+        error.__traceback__ = None
+    gc.collect()
+    torch.cuda.empty_cache()
+    return producer.produce_bundle(key)
+
+
 def run_native_checkpoint_evaluation(
     *,
     variant: str,
@@ -144,6 +161,7 @@ def run_native_checkpoint_evaluation(
     device_name: str = "cuda:0",
     recipe_config: Mapping[str, object] | None = None,
     artifact_root: Path | None = None,
+    prediction_callback=None,
 ) -> dict[str, object]:
     import hydra
     import torch
@@ -348,6 +366,7 @@ def run_native_checkpoint_evaluation(
     completed = {horizon: [] for horizon in requested_horizons}
     completed_references = {horizon: set() for horizon in requested_horizons}
     incomplete = []
+    oom_retries = []
     started = time.perf_counter()
     total_units = sum(len(item[2]) for item in producer_slices)
     unit_index = 0
@@ -375,7 +394,27 @@ def run_native_checkpoint_evaluation(
                         ),
                     )
                     try:
-                        produced = producer.produce_bundle(key)
+                        produced = produce_native_with_retry(
+                            producer, key,
+                            on_retry=lambda reason, logical_unit_id=unit.logical_unit_id, retry_horizon=horizon: oom_retries.append({
+                                "logical_unit_id": logical_unit_id,
+                                "T": retry_horizon, "reason": reason,
+                                "same_input_device_precision": True,
+                            }),
+                        )
+                        if prediction_callback is not None:
+                            counts = produced.payload["input_stats"]["scan_point_counts"]
+                            offsets = [0]
+                            for count in counts:
+                                offsets.append(offsets[-1] + count)
+                            prediction_callback(
+                                method=f"FH-{variant}-native",
+                                logical_unit_id=unit.logical_unit_id,
+                                horizon=horizon,
+                                scan_ids=spec.scan_ids[:horizon],
+                                prediction=produced.processed.task_prediction,
+                                scan_vertex_offsets=offsets,
+                            )
                         pair = validate_causal_prefix_pair(
                             prediction=produced.processed.task_prediction,
                             target=produced.processed.target,
@@ -491,6 +530,7 @@ def run_native_checkpoint_evaluation(
         "horizons": list(requested_horizons),
         "expected_logical_unit_count": expected_units,
         "expected_prefix_count": expected_prefixes,
+        "oom_retries": oom_retries,
         "completed_prefix_count": completed_prefixes,
         "population_by_horizon": {
             str(horizon): {

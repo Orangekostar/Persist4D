@@ -9,7 +9,7 @@ import json
 import time
 from contextlib import ExitStack
 from collections import defaultdict
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -218,6 +218,8 @@ def run_refiner_evaluation(
     refiner_checkpoints: Sequence[Mapping[str, object]] | None = None,
     export_replay_root: Path | None = None,
     maximum_units: int | None = None,
+    prediction_callback: Callable[..., None] | None = None,
+    replay_callback: Callable[..., None] | None = None,
 ) -> dict[str, object]:
     import hydra
     import torch
@@ -302,6 +304,8 @@ def run_refiner_evaluation(
     ):
         raise RefinerEvaluationError("refiner evaluation request is invalid")
     code = None
+    if replay_callback is not None and recipe_config is None:
+        raise RefinerEvaluationError("Live replay callback requires the V2 recipe")
     if recipe_config is not None:
         from scripts.perception_gain_v2_config import live_execution_provenance
 
@@ -757,6 +761,18 @@ def run_refiner_evaluation(
                                 )
                         horizon = meta.absolute_stage_index + 1
                         if horizon in scored_horizons:
+                            if prediction_callback is not None:
+                                for method, prefix in {
+                                    "PARENT": parent_prefix, **refined_prefixes
+                                }.items():
+                                    prediction_callback(
+                                        method=method,
+                                        logical_unit_id=unit.logical_unit_id,
+                                        horizon=horizon,
+                                        scan_ids=scan_ids[:horizon],
+                                        prediction=prefix.prediction,
+                                        scan_vertex_offsets=prefix.scan_vertex_offsets,
+                                    )
                             target = _target_for_prefix(
                                 targets, horizon=horizon, class_mapper=class_mapper
                             )
@@ -840,14 +856,22 @@ def run_refiner_evaluation(
                                     "live/refiner parent differs from D0 replay"
                                 )
                             bridge_prefix_count += 1
-                    if export_replay_root is not None:
+                    if export_replay_root is not None or replay_callback is not None:
                         base_payload, supplement = build_live_replay_payload(
                             reference_id=spec.reference_id,
                             sequence_id=spec.source_sequence_id,
                             episode_id=spec.episode_id,
                             scan_ids=spec.scan_ids,
                             stages=live_stages,
+                            expected_stage_count=len(spec.scan_ids),
                         )
+                        if replay_callback is not None:
+                            replay_callback(
+                                logical_unit_id=unit.logical_unit_id,
+                                base=base_payload,
+                                supplement=supplement,
+                            )
+                    if export_replay_root is not None:
                         export_replay_root.mkdir(parents=True, exist_ok=True)
                         export_path = export_replay_root / f"unit-{ordinal:04d}.pt"
                         from scripts.train_perception_refiner import _atomic_torch_save

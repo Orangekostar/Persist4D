@@ -1177,14 +1177,29 @@ class E2ReplayAccumulator:
         data_role: str,
         association_configs: Mapping[str, AssociationConfig] | None = None,
         capacity: int = 100,
+        episode_horizon: int = 5,
+        horizons: Sequence[int] = (2, 3, 4, 5),
+        prediction_callback: Callable[..., None] | None = None,
     ) -> None:
         from scripts.analyze_persist4d_allt import AllTBaselineAccumulator
         from scripts.p6a_metrics import OfficialMetricAccumulator
 
         if len(class_mapping) != 18 or len(set(class_mapping)) != 18:
             raise CrossWindowReplayError("RIO class mapping must contain 18 IDs")
-        if data_role not in {"DEV-CAL", "DEV-SEL", "PROTOCOL-B"}:
+        if data_role not in {"DEV-CAL", "DEV-SEL", "PROTOCOL-B", "ADDITIONAL"}:
             raise CrossWindowReplayError("association evaluation role differs")
+        if (
+            episode_horizon not in {2, 3, 4, 5}
+            or not horizons
+            or tuple(sorted(set(horizons))) != tuple(horizons)
+            or any(horizon not in range(2, episode_horizon + 1) for horizon in horizons)
+            or (data_role == "ADDITIONAL" and tuple(horizons) != (episode_horizon,))
+            or (data_role != "ADDITIONAL" and (episode_horizon != 5 or tuple(horizons) != (2, 3, 4, 5)))
+        ):
+            raise CrossWindowReplayError("association episode or scored horizons differ")
+        self.episode_horizon = episode_horizon
+        self.horizons = tuple(horizons)
+        self.prediction_callback = prediction_callback
         if isinstance(capacity, bool) or not isinstance(capacity, int) or capacity <= 0:
             raise CrossWindowReplayError("association capacity must be positive")
         configs = dict(
@@ -1340,14 +1355,14 @@ class E2ReplayAccumulator:
         if (
             not isinstance(base_stages, list)
             or not isinstance(supplement_stages, list)
-            or len(base_stages) != 5
-            or len(supplement_stages) != 5
+            or len(base_stages) != self.episode_horizon
+            or len(supplement_stages) != self.episode_horizon
             or not isinstance(episode, Mapping)
         ):
             raise CrossWindowReplayError("E2 cache stage coverage differs")
         reference_id = str(episode["reference_id"])
         scan_ids = tuple(str(value) for value in episode["scan_ids"])
-        if len(scan_ids) != 5:
+        if len(scan_ids) != self.episode_horizon:
             raise CrossWindowReplayError("E2 episode scan coverage differs")
         metas = [_meta_from_payload(stage["stage_meta"]) for stage in base_stages]
         observations = [
@@ -1519,7 +1534,7 @@ class E2ReplayAccumulator:
                 horizon=horizon,
                 class_mapper=self._class_mapper,
             )
-            for horizon in range(1, 6)
+            for horizon in range(1, self.episode_horizon + 1)
         ]
         canonical_prefix_targets = [
             _target_for_prefix(
@@ -1527,7 +1542,7 @@ class E2ReplayAccumulator:
                 horizon=horizon,
                 class_mapper=self._class_mapper,
             )
-            for horizon in range(1, 6)
+            for horizon in range(1, self.episode_horizon + 1)
         ]
         self._record_identity(
             method="D0",
@@ -1568,6 +1583,15 @@ class E2ReplayAccumulator:
                     observed_scan_ids=scan_ids[:horizon],
                 )
                 self._reference_metric(reference_id, method, horizon).update(pair)
+                if self.prediction_callback is not None:
+                    self.prediction_callback(
+                        method=method,
+                        logical_unit_id=logical_unit_id,
+                        horizon=horizon,
+                        scan_ids=scan_ids[:horizon],
+                        prediction=prediction,
+                        scan_vertex_offsets=prefix.scan_vertex_offsets,
+                    )
             current_target = _target_for_prefix(
                 [original_targets[stage_index]],
                 horizon=1,
@@ -1598,7 +1622,7 @@ class E2ReplayAccumulator:
         )
         identity = _identity_rates(identity_source)
         return {
-            "population_id": "development",
+            "population_id": {"PROTOCOL-B": "protocol-b", "ADDITIONAL": "additional"}.get(self.data_role, "development"),
             "data_role": self.data_role,
             "reference_count": len(self.reference_ids) if reference == "all" else 1,
             "logical_unit_count": logical_unit_count,
@@ -1655,7 +1679,7 @@ class E2ReplayAccumulator:
         for reference in sorted(self.reference_ids):
             reference_unit_count = 0
             for key in self.reference_metrics:
-                if key[0] == reference and key[1] == "D0" and key[2] == 2:
+                if key[0] == reference and key[1] == "D0" and key[2] == self.horizons[0]:
                     reference_unit_count = self.reference_metrics[key].sequence_count
                     break
             for method in self.methods:

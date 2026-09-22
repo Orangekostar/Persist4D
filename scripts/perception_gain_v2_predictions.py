@@ -218,6 +218,7 @@ class PredictionSink:
             "sha256": sha,
             "bytes": len(encoded),
         }
+        self.finalize()
 
     def finalize(self):
         counts = {
@@ -237,6 +238,64 @@ class PredictionSink:
         }
         write_json(self.root / "INDEX.json", result)
         return result
+
+
+class PredictionExports:
+    """Fan out a shared producer's outputs without changing scientific results."""
+
+    def __init__(
+        self,
+        *,
+        external_root,
+        methods,
+        role,
+        eval_seed,
+        lock_sha256,
+        expected_units_by_horizon,
+        source_methods,
+    ):
+        self.external_root = external_root
+        self.errors, self.sinks, self.source_methods = {}, {}, source_methods
+        for method in methods:
+            binding = {
+                "method_id": method["method_id"],
+                "data_role": role,
+                "eval_seed": eval_seed,
+                "inference_identity": method["inference_identity"],
+                "lock_sha256": lock_sha256,
+            }
+            self.sinks[method["method_id"]] = PredictionSink(
+                external_root / "cache/predictions" / content_hash(binding),
+                binding=binding,
+                expected_units_by_horizon=expected_units_by_horizon,
+                cache_root=external_root / "cache",
+            )
+
+    def __call__(self, *, method, **entry):
+        for name, source in self.source_methods.items():
+            if source != method or name in self.errors:
+                continue
+            try:
+                self.sinks[name].write(**entry)
+            except (OSError, ValueError, RuntimeError) as error:
+                # Stop exporting this method after the first failure. Forward
+                # evaluation continues with its unchanged inputs and population.
+                self.errors[name] = str(error)
+
+    def finalize(self):
+        records = {}
+        for name, sink in self.sinks.items():
+            result = sink.finalize()
+            index = sink.root / "INDEX.json"
+            records[name] = {
+                "status": result["status"],
+                "error": self.errors.get(name),
+                "index": "external:" + str(index.relative_to(self.external_root)),
+                "index_sha256": file_hash(index),
+                "completed_units_by_horizon": result["completed_units_by_horizon"],
+                "expected_units_by_horizon": result["expected_units_by_horizon"],
+            }
+        return records
 
 
 def package_predictions(root: Path, *, destination: Path):
@@ -284,3 +343,80 @@ def package_predictions(root: Path, *, destination: Path):
         "expected_units_by_horizon": index["expected_units_by_horizon"],
         "completed_units_by_horizon": index["completed_units_by_horizon"],
     }
+
+
+def prepare_prediction_assets(*, artifacts: Path, external_root: Path):
+    from scripts.perception_gain_v2_bundle import split_asset
+    from scripts.perception_gain_v2_publication import _asset
+
+    lock_path = artifacts / "selection/FINAL_LOCK.json"
+    lock = read_json(lock_path) if lock_path.exists() else None
+    lock_sha = file_hash(lock_path) if lock is not None else None
+    required = {
+        (role, name, seed)
+        for role, names in (lock or {}).get("confirmation_methods", {}).items()
+        for name in names
+        for seed in (
+            lock["confirmation_populations"][role]["eval_seeds"]
+            if role == "LOCAL-T2"
+            else [45]
+        )
+    }
+    assets, exports, missing, complete = [], [], [], set()
+    for index_path in sorted(
+        (external_root / "cache/predictions").glob("*/INDEX.json")
+    ):
+        index = read_json(index_path)
+        binding = index["binding"]
+        if binding["lock_sha256"] != lock_sha:
+            continue
+        identity = (binding["data_role"], binding["method_id"], binding["eval_seed"])
+        if lock is not None and identity not in required:
+            continue
+        name = (
+            "predictions-"
+            + content_hash(binding)[:16]
+            + "-"
+            + file_hash(index_path)[:16]
+            + ".zip"
+        )
+        destination = external_root / "publication/predictions" / name
+        package = package_predictions(index_path.parent, destination=destination)
+        parts = split_asset(destination)
+        assets.extend(
+            _asset(
+                destination.parent / part["name"],
+                external_root=external_root,
+                role="sanitized_predictions",
+            )
+            for part in parts["ordered_parts"]
+        )
+        assets.append(
+            _asset(
+                destination.with_suffix(".zip.manifest.json"),
+                external_root=external_root,
+                role="prediction_parts_manifest",
+            )
+        )
+        exports.append(package)
+        if index["status"] == "COMPLETE":
+            complete.add(identity)
+    for role, name, seed in sorted(required - complete):
+        missing.append(
+            {"name": f"predictions:{role}:{name}:seed{seed}", "status": "INCOMPLETE"}
+        )
+    if not assets:
+        missing.append({"name": "sanitized-predictions", "status": "MISSING"})
+    result = {
+        "schema_version": SCHEMA,
+        "lock_sha256": lock_sha,
+        "status": "COMPLETE" if not missing else "PARTIAL",
+        "assets": [
+            {key: value for key, value in asset.items() if key != "path"}
+            for asset in assets
+        ],
+        "exports": exports,
+        "unfulfilled_requirements": missing,
+    }
+    write_json(artifacts / "publication/PREDICTION_ASSETS.json", result)
+    return result

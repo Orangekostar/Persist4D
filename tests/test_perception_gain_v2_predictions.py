@@ -8,6 +8,7 @@ from scripts.perception_gain_v2_predictions import (
     PredictionSink,
     decode_prediction,
     encode_prediction,
+    prepare_prediction_assets,
 )
 
 
@@ -126,3 +127,45 @@ def test_partial_prediction_inventory_preserves_denominators_and_rejects_changed
     prediction["pred_scores"] = torch.tensor([0.8])
     with pytest.raises(ValueError, match="different output"):
         resumed.write(prediction, **kwargs)
+
+
+def test_prediction_release_marks_missing_frozen_population_despite_nonempty_assets(
+    tmp_path,
+):
+    from scripts.perception_gain_v2 import file_hash, write_json
+
+    artifacts, external = tmp_path / "artifacts", tmp_path / "external"
+    lock_path = artifacts / "selection/FINAL_LOCK.json"
+    write_json(lock_path, {"confirmation_methods": {"PB": ["m"]}})
+    sink = PredictionSink(
+        external / "cache/predictions/m",
+        binding={
+            "method_id": "m",
+            "data_role": "PB",
+            "eval_seed": 45,
+            "inference_identity": "b" * 64,
+            "lock_sha256": file_hash(lock_path),
+        },
+        expected_units_by_horizon={2: 129, 3: 129, 4: 129, 5: 129},
+    )
+    sink.write(
+        {
+            "pred_masks": torch.zeros(2, 0, dtype=torch.bool),
+            "pred_scores": torch.zeros(0),
+            "pred_classes": torch.zeros(0, dtype=torch.long),
+        },
+        logical_unit_id="unit",
+        horizon=2,
+        scan_ids=["a", "b"],
+        scan_vertex_offsets=[0, 1, 2],
+    )
+    manifest = prepare_prediction_assets(artifacts=artifacts, external_root=external)
+    assert manifest["assets"]
+    assert manifest["status"] == "PARTIAL"
+    assert manifest["unfulfilled_requirements"] == [
+        {"name": "predictions:PB:m:seed45", "status": "INCOMPLETE"}
+    ]
+    assert (
+        prepare_prediction_assets(artifacts=artifacts, external_root=external)
+        == manifest
+    )

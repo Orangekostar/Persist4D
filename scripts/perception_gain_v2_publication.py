@@ -324,6 +324,9 @@ def publish_v2(config, *, external_root):
                 "Commit reviewed source changes before preparing publication"
             )
         assets, missing = prepare_model_assets(artifacts, external_root)
+        from scripts.perception_gain_v2_predictions import prepare_prediction_assets
+
+        prepare_prediction_assets(artifacts=artifacts, external_root=external_root)
         run_report(config, external_root=external_root)
         owned = snapshot_paths(artifacts, PROJECT_ROOT)
         if owned:
@@ -369,7 +372,9 @@ def publish_v2(config, *, external_root):
         # missing export remains a missing requirement, even with a results ZIP.
         predictions = artifacts / "publication/PREDICTION_ASSETS.json"
         if predictions.is_file():
-            for row in read_json(predictions).get("assets", []):
+            prediction_manifest = read_json(predictions)
+            missing.extend(prediction_manifest.get("unfulfilled_requirements", []))
+            for row in prediction_manifest.get("assets", []):
                 reference = row["logical_reference"]
                 from scripts.perception_gain_v2_lock import external_path
 

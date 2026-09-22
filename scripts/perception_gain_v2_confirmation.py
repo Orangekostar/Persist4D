@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import math
 import datetime as dt
 import json
-from pathlib import Path
+import math
 import statistics
 import time
+from pathlib import Path
 
 from scripts.perception_gain_v2 import (
     PROJECT_ROOT,
@@ -382,6 +382,29 @@ def evaluate_group(
         if result.get("confirmation_binding") != binding:
             raise ValueError("Confirmation cache binding differs")
         return result, path
+    from scripts.perception_gain_v2_predictions import PredictionExports
+
+    exports = PredictionExports(
+        external_root=external_root,
+        methods=[lock["methods"][name] for name in group["method_ids"]],
+        role=role,
+        eval_seed=45,
+        lock_sha256=lock_sha256,
+        expected_units_by_horizon={
+            t: value["logical_units"] for t, value in POPULATIONS[role].items()
+        },
+        source_methods={
+            name: (
+                f"FH-{lock['methods'][name]['architecture_variant']}-native"
+                if group["native"]
+                else name
+                if lock["methods"][name]["kind"] in {"ASSOCIATION", "REFINER"}
+                else "PARENT"
+            )
+            for name in group["method_ids"]
+        },
+    )
+    inputs["prediction_callback"] = exports
     if group["native"]:
         from scripts.perception_gain_native_evaluation import (
             run_native_checkpoint_evaluation,
@@ -406,6 +429,7 @@ def evaluate_group(
             association_method=lock["methods"][group["associations"][0]],
             role=role,
             output_path=path,
+            prediction_callback=exports,
         )
     else:
         from scripts.perception_refiner_evaluation import run_refiner_evaluation
@@ -441,6 +465,7 @@ def evaluate_group(
             roles_path=artifacts / "DATA_ROLES.json",
             output_path=path,
         )
+    result["prediction_exports"] = exports.finalize()
     result["confirmation_binding"] = binding
     write_json(path, result)
     return result, path
@@ -521,9 +546,27 @@ def run_confirmation(config: dict, *, external_root: Path) -> dict:
                     if row.get("confirmation_binding") != binding:
                         raise ValueError("LOCAL confirmation cache binding differs")
                 else:
-                    row = run_local_t2_evaluation(
-                        **inputs, eval_seed=seed, output_path=path
+                    from scripts.perception_gain_v2_predictions import PredictionExports
+
+                    exports = PredictionExports(
+                        external_root=external_root,
+                        methods=[method],
+                        role="LOCAL-T2",
+                        eval_seed=seed,
+                        lock_sha256=lock_sha,
+                        expected_units_by_horizon={2: 154},
+                        source_methods={name: "LOCAL"},
                     )
+                    try:
+                        row = run_local_t2_evaluation(
+                            **inputs,
+                            eval_seed=seed,
+                            output_path=path,
+                            prediction_callback=exports,
+                        )
+                    finally:
+                        exported = exports.finalize()
+                    row["prediction_exports"] = exported
                     row["confirmation_binding"] = binding
                     write_json(path, row)
                 seeds[str(seed)] = row
@@ -534,7 +577,9 @@ def run_confirmation(config: dict, *, external_root: Path) -> dict:
                     "eval_seed": seed,
                 }
         full = all(
-            row.get("status") == "PASS" and row.get("validation_sequence_count") == 154
+            row.get("status") == "PASS"
+            and row.get("validation_sequence_count") == 154
+            and row.get("validation_reference_count") == 41
             for row in seeds.values()
         )
         local[name] = {

@@ -941,11 +941,13 @@ def run_profile(
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--version", choices=("v1", "v2"), default="v1")
+    parser.add_argument("--config", type=Path, default=PROJECT_ROOT / "configs/perception_gain_v2.yaml")
     parser.add_argument(
         "--final-lock", type=Path, default=ARTIFACT_ROOT / "selection/FINAL_LOCK.json"
     )
     parser.add_argument("--assets", type=Path, default=DEFAULT_ASSETS)
-    parser.add_argument("--external-root", type=Path, default=DEFAULT_EXTERNAL_ROOT)
+    parser.add_argument("--external-root", type=Path)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--warmup", type=int, default=WARMUP_REPEATS)
     parser.add_argument("--repeats", type=int, default=MEASURED_REPEATS)
@@ -957,10 +959,20 @@ def main() -> int:
     args = _parser().parse_args()
     if args.warmup != WARMUP_REPEATS or args.repeats != MEASURED_REPEATS:
         raise SystemExit("profile requires --warmup 1 --repeats 3")
+    if args.version == "v2":
+        from scripts.perception_gain_v2 import load_config
+        from scripts.perception_gain_v2_profile import run_profile_v2
+
+        root = args.external_root or Path(os.environ.get(
+            "PERSIST4D_GAIN_V2_ROOT", Path.home() / "persist4d_runs/perception_gain_v2"
+        ))
+        result = run_profile_v2(load_config(args.config), external_root=root)
+        print(json.dumps(result, sort_keys=True))
+        return int(result["status"] != "COMPLETE")
     result = run_profile(
         final_lock_path=args.final_lock,
         assets_path=args.assets,
-        external_root=args.external_root,
+        external_root=args.external_root or DEFAULT_EXTERNAL_ROOT,
         output_root=args.output,
         device_name=args.device,
     )

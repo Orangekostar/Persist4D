@@ -363,6 +363,25 @@ def test_live_replay_payload_uses_exact_five_stage_identity() -> None:
         )
 
 
+@pytest.mark.parametrize("horizon", [2, 3, 4])
+def test_additional_replay_preserves_exact_short_episode(horizon):
+    evaluation = _evaluation_module()
+    stages = [{"observation": {}, "prediction": {}, "stage_meta": {}, "target": {}}
+              for _ in range(horizon)]
+    base, supplement = evaluation.build_live_replay_payload(
+        reference_id="r", sequence_id="s", episode_id="e",
+        scan_ids=tuple(f"scan-{i}" for i in range(horizon)), stages=stages,
+        expected_stage_count=horizon,
+    )
+    assert len(base["stages"]) == len(supplement["stages"]) == horizon
+    with pytest.raises(evaluation.PerceptionEvaluationError):
+        evaluation.build_live_replay_payload(
+            reference_id="r", sequence_id="s", episode_id="e",
+            scan_ids=base["episode"]["scan_ids"], stages=stages[:-1],
+            expected_stage_count=horizon,
+        )
+
+
 def test_trained_checkpoint_load_does_not_reopen_external_r1(tmp_path: Path) -> None:
     evaluation = _evaluation_module()
     system = torch.nn.Linear(2, 1)

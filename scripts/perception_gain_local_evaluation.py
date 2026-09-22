@@ -7,6 +7,7 @@ import argparse
 import math
 import time
 from collections.abc import Mapping, Sequence
+from contextlib import nullcontext
 from pathlib import Path
 
 from scripts.perception_gain_evaluation import (
@@ -116,6 +117,7 @@ def run_local_t2_evaluation(
     recipe_config: Mapping[str, object] | None = None,
     artifact_root: Path | None = None,
     eval_seed: int = 45,
+    prediction_callback=None,
 ) -> dict[str, object]:
     import torch
     from omegaconf import OmegaConf, open_dict
@@ -172,7 +174,7 @@ def run_local_t2_evaluation(
         config.general.gpus = 1
         config.data.batch_size = 1
         config.data.test_batch_size = 1
-        config.data.num_workers = 4
+        config.data.num_workers = 2 if recipe_config is not None else 4
         config.trainer.precision = "32-true"
         config.model.return_query_features = False
         if variant == "Q-SEM" and scorer_checkpoint is not None:
@@ -203,6 +205,50 @@ def run_local_t2_evaluation(
     sequence_names = tuple(str(value) for value in validation_dataset.sequence_names)
     if len(sequence_names) != LOCAL_T2_SEQUENCE_COUNT:
         raise PerceptionEvaluationError("LOCAL-T2 population identity differs")
+    audit_population = recipe_config is not None or prediction_callback is not None
+    references = set()
+    if audit_population:
+        from datasets.task_memory_episode import _scan_scene
+        from scripts.preflight_task_memory_episode import load_reference_by_scene
+
+        reference_by_scene = load_reference_by_scene(Path(assets["rio_metadata"]))
+        references = {
+            reference_by_scene[_scan_scene(scan)]
+            for sequence in sequence_names
+            for scan in sequence.split("-")
+        }
+    observed_sequences = set()
+    process_predictions = system._process_predictions
+
+    def export_processed_predictions(**kwargs):
+        predictions = process_predictions(**kwargs)
+        for prediction, sequence, target in zip(
+            predictions, kwargs["file_names"], kwargs["target_full_res"], strict=True
+        ):
+            sequence = str(sequence)
+            if sequence not in sequence_names or sequence in observed_sequences:
+                raise PerceptionEvaluationError("LOCAL-T2 emitted an unexpected or repeated sequence")
+            observed_sequences.add(sequence)
+            if prediction_callback is not None:
+                from scripts.system_comparison_inference import (
+                    normalize_temporal_stages,
+                )
+
+                stages = normalize_temporal_stages(
+                    target["temporal_stages"], name="LOCAL-T2 temporal stages"
+                )
+                counts = [int((stages == stage).sum()) for stage in (0, 1)]
+                if not torch.equal(stages, torch.repeat_interleave(torch.arange(2), torch.tensor(counts))):
+                    raise PerceptionEvaluationError("LOCAL-T2 prediction point order differs")
+                prediction_callback(
+                    method="LOCAL", logical_unit_id=sequence, horizon=2,
+                    scan_ids=sequence.split("-"), prediction=prediction,
+                    scan_vertex_offsets=[0, counts[0], sum(counts)],
+                )
+        return predictions
+
+    if audit_population:
+        system._process_predictions = export_processed_predictions
     system.validation_dataset = validation_dataset
     system.labels_info = validation_dataset.label_info
     system.requires_grad_(False).eval()
@@ -219,14 +265,19 @@ def run_local_t2_evaluation(
         precision="32-true",
     )
     started = time.perf_counter()
-    results = trainer.validate(
-        system,
-        dataloaders=system.val_dataloader(),
-        verbose=False,
-    )
+    from scripts.system_comparison_inference import deterministic_inference_runtime
+
+    with (deterministic_inference_runtime(eval_seed, device) if recipe_config is not None else nullcontext()):
+        results = trainer.validate(
+            system,
+            dataloaders=system.val_dataloader(),
+            verbose=False,
+        )
     elapsed = time.perf_counter() - started
     if not isinstance(results, list) or len(results) != 1:
         raise PerceptionEvaluationError("LOCAL-T2 evaluator returned invalid results")
+    if audit_population and observed_sequences != set(sequence_names):
+        raise PerceptionEvaluationError("LOCAL-T2 did not score its complete sequence population")
     result = build_local_t2_summary(
         variant=variant,
         optimizer_update=optimizer_update,
@@ -247,6 +298,10 @@ def run_local_t2_evaluation(
         eval_seed=eval_seed,
     )
     result["load_audit"] = load_audit
+    if audit_population:
+        result["validation_reference_count"] = len(references)
+        result["completed_sequences"] = sorted(observed_sequences)
+        result["validation_reference_ids"] = sorted(references)
     result["weight_sources"] = weight_sources
     result["source_sha256"] = _sha256(Path(__file__))
     if recipe_config is not None:
