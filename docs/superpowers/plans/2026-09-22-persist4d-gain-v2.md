@@ -69,8 +69,8 @@ Interfaces: shared mode adapter replaces old logits/score with new for NEW_ONLY 
 
 Files: existing canonical replay/association adapter and V2 task runner.
 
-- [ ] Replay exactly12 configurations on fresh R1 CAL evidence, M-new/mean; compare bridge to actual R1-D0; stop only at config boundaries for CPU budget. Recovery02 is running: six configurations have completed23/23 CAL units and reproduce all four D0 baseline scores exactly. The invalidated historical cohort remains excluded.
-- [ ] CAL-lock one A*, evaluate once on SEL, keep separate from refiner candidates.
+- [x] Replay exactly12 configurations on fresh R1 CAL evidence, M-new/mean; compare bridge to actual R1-D0; stop only at config boundaries for CPU budget. At2026-09-23 01:53 UTC, all12 configurations have PASS results covering23/23 CAL units, with exactly zero differences for all four D0 bridge scores. No configuration was pruned and no failures were recorded; cumulative settled association cost including historical attempts is7.856553 CPU-core-hours. The invalidated historical cohort remains excluded.
+- [ ] CAL-lock one A*, evaluate once on SEL, keep separate from refiner candidates. CAL_LOCK selects A0-U tau0.73, with mean/minimum/long deltas−0.00166284/−0.00377811/−0.00242119 versus R1. Its single fixed SEL evaluation is running; this development selection does not establish a gain.
 - [ ] If P≠R1, R1 repair has the required signal and budget permits, regenerate same TRAIN list under P and train/evaluate a new NEW/PAIR pair.
 
 ## Task 6 — Selection, replication and confirmation
