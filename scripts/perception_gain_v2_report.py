@@ -45,6 +45,15 @@ def ledger_totals(events: list[dict]) -> dict:
     }
 
 
+def perception_selection_label(result: dict) -> str:
+    selected = result.get("selected", {})
+    if result.get("fallback") or selected.get("method_id") == "R1-D0":
+        return "KEEP_R1"
+    if selected.get("architecture_variant") == "C0":
+        return "CONTINUATION_ONLY"
+    return "NEW_PERCEPTION" if selected else "NOT_RUN"
+
+
 def confirmation_rows(lock: dict, report: dict) -> tuple[list, list]:
     rows, references = [], []
     defaults = {
@@ -642,17 +651,7 @@ def run_report(config: dict, *, external_root: Path) -> dict:
             and auxiliary_complete(auxiliary)
             else "PARTIAL_WITH_BLOCKERS"
         ),
-        "perception_selection": (
-            "KEEP_R1"
-            if perception.get("fallback")
-            else (
-                "CONTINUATION_ONLY"
-                if perception.get("selected", {}).get("architecture_variant") == "C0"
-                else "NEW_PERCEPTION"
-                if perception.get("selected")
-                else "NOT_RUN"
-            )
-        ),
+        "perception_selection": perception_selection_label(perception),
         "repair_R1_selection": repairs["R1"]
         .get("selection", {})
         .get("selected_mode", "NOT_RUN"),

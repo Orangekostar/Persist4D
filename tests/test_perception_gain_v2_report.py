@@ -117,3 +117,40 @@ def test_cost_report_deduplicates_settled_events_without_losing_prior_cost():
     assert result["prior_gpu_hours"] == 12.1
     assert result["v2_gpu_hours"] == 2.3
     assert result["settled_gpu_hours"] == pytest.approx(14.4)
+
+
+@pytest.mark.parametrize(
+    "result,expected",
+    [
+        (
+            {
+                "status": "BLOCKED",
+                "reason": "Pilot selection unavailable",
+                "selected": {"method_id": "R1-D0", "architecture_variant": "C0"},
+                "full_training_recipes": [],
+            },
+            "KEEP_R1",
+        ),
+        (
+            {
+                "status": "COMPLETE",
+                "selected": {"method_id": "C0-L-s45", "architecture_variant": "C0"},
+            },
+            "CONTINUATION_ONLY",
+        ),
+        (
+            {
+                "status": "COMPLETE",
+                "selected": {
+                    "method_id": "A-OPEN-L-s45",
+                    "architecture_variant": "A-OPEN",
+                },
+            },
+            "NEW_PERCEPTION",
+        ),
+    ],
+)
+def test_perception_label_distinguishes_retained_r1_from_trained_c0(result, expected):
+    from scripts.perception_gain_v2_report import perception_selection_label
+
+    assert perception_selection_label(result) == expected
