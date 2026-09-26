@@ -13,7 +13,7 @@ from scripts.perception_gain_v2_predictions import (
 )
 
 
-def test_export_cache_separates_executed_source_and_input_identity(tmp_path):
+def test_export_cache_separates_executed_source_and_input_identity(tmp_path, monkeypatch):
     common = {
         "external_root": tmp_path,
         "methods": [{"method_id": "native", "inference_identity": "same-model"}],
@@ -26,6 +26,11 @@ def test_export_cache_separates_executed_source_and_input_identity(tmp_path):
     roots = {exports.sinks["native"].root for exports in (old, new, changed_input)}
     assert len(roots) == 3
     assert new.sinks["native"].binding["execution_binding"] == {"source": "new", "input": "a"}
+    monkeypatch.setenv("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+    baseline = PredictionExports(**common, execution_binding={"source": "new", "input": "a"})
+    monkeypatch.setenv("CUBLAS_WORKSPACE_CONFIG", ":16:8")
+    alternate = PredictionExports(**common, execution_binding={"source": "new", "input": "a"})
+    assert baseline.sinks["native"].root != alternate.sinks["native"].root
 
 
 def test_prediction_package_roundtrips_exact_arrays_without_ground_truth():

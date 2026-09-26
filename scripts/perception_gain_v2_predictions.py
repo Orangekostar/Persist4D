@@ -265,6 +265,13 @@ class PredictionExports:
                 "inference_identity": method["inference_identity"],
                 "lock_sha256": lock_sha256,
                 "execution_binding": execution_binding,
+                "runtime_environment": {
+                    key: os.environ.get(key)
+                    for key in (
+                        "OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
+                        "CUBLAS_WORKSPACE_CONFIG", "PYTHONHASHSEED",
+                    )
+                },
             }
             self.sinks[method["method_id"]] = PredictionSink(
                 external_root / "cache/predictions" / content_hash(binding),
