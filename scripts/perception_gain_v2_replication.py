@@ -84,7 +84,7 @@ def replication_plan(lock: dict) -> dict:
             if row.get("optimizer_update") is not None
         }
         selected_step = final["refiner"]["optimizer_update"]
-        updates = sorted(set([*fixed.values(), selected_step]))
+        updates = sorted({*fixed.values(), selected_step})
         if (
             any(step not in {0, 500, 1000, 1500} for step in updates)
             or max(updates) == 0
@@ -234,9 +234,9 @@ def _repair_replication(
     from scripts.perception_gain_v2_confirmation import method_inputs
     from scripts.perception_gain_v2_evidence import validate_refiner_cache
     from scripts.perception_gain_v2_lock import effective_parent_weight_identity
+    from scripts.perception_refiner_evaluation import run_refiner_evaluation
     from scripts.prepare_perception_refiner import run as prepare
     from scripts.train_perception_refiner import refiner_v2_binding, train_mask_refiner
-    from scripts.perception_refiner_evaluation import run_refiner_evaluation
 
     artifacts = PROJECT_ROOT / config["artifact_root"]
     spec = plan["repair"]

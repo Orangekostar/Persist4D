@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Evaluate Perception Gain checkpoints on the frozen official-like RIO T2 split."""
 
 from __future__ import annotations
@@ -18,8 +17,8 @@ from scripts.perception_gain_evaluation import (
     PerceptionEvaluationError,
     _atomic_json,
     _external_reference,
-    _load_json,
     _load_evaluation_weights,
+    _load_json,
     _sha256,
 )
 
@@ -159,8 +158,9 @@ def audit_local_population(*, artifacts: Path, external_root: Path) -> dict:
 
 def diagnostic_loss_forward(forward):
     """Permit unsupported CUDA loss reductions only in no-grad diagnostics."""
-    import torch
     from functools import wraps
+
+    import torch
 
     @wraps(forward)
     def wrapped(*args, **kwargs):

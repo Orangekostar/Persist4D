@@ -13,8 +13,8 @@ from scripts.perception_gain_v2 import (
     append_event,
     file_hash,
     read_json,
-    train_recipe,
     stage_input_file,
+    train_recipe,
     utc_now,
     write_json,
 )
@@ -400,10 +400,10 @@ def run_aux(config: dict, *, external_root: Path) -> dict:
         write_json(artifacts / "selection/AUX.json", result)
         return result
     probes = {label: [] for label in ("H", "L")}
-    for label in probes:
+    for label, probe_rows in probes.items():
         for variant in ("C0", "S-BAL"):
             for update in (250, 750):
-                probes[label].append(
+                probe_rows.append(
                     _safe_evaluate(
                         config,
                         external_root=external_root,

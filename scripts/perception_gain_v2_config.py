@@ -167,7 +167,8 @@ def validate_resume_recipe(
     training = legacy_config.get("perception_training", {})
     general = legacy_config.get("general", {})
     if not isinstance(training, Mapping) or not isinstance(general, Mapping):
-        raise ValueError("legacy resume recipe is unavailable")
+        # Malformed saved configuration uses the same resume-validation contract.
+        raise ValueError("legacy resume recipe is unavailable")  # noqa: TRY004
     fields = {
         "variant": recipe["architecture_variant"],
         "existing_lr": recipe["learning_rate"],

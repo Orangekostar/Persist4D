@@ -1,8 +1,6 @@
-from copy import deepcopy
 import hashlib
 import json
-
-from scripts.perception_gain_v2_lock import effective_parent_weight_identity
+from copy import deepcopy
 
 from scripts.perception_gain_v2_confirmation import (
     allocate_confirmation_balance,
@@ -10,11 +8,12 @@ from scripts.perception_gain_v2_confirmation import (
     deployment_decision,
     normalize_evidence,
 )
+from scripts.perception_gain_v2_lock import effective_parent_weight_identity
 
 
 def test_confirmation_reuse_accepts_only_local_evaluator_source_change():
-    from scripts.perception_gain_v2_confirmation import reusable_after_local_change
     from scripts.perception_gain_v2_config import content_hash
+    from scripts.perception_gain_v2_confirmation import reusable_after_local_change
 
     old_files = {"scripts/perception_gain_local_evaluation.py": "old", "model.py": "same"}
     new_files = {**old_files, "scripts/perception_gain_local_evaluation.py": "new"}

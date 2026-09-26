@@ -1,10 +1,10 @@
 from copy import deepcopy
 
 from scripts.perception_gain_v2_replication import (
-    replication_plan,
+    commit_replication_scope,
     component_result,
     pipeline_result,
-    commit_replication_scope,
+    replication_plan,
 )
 
 
@@ -133,6 +133,7 @@ def test_budget_scope_is_committed_before_pb_and_counts_both_reserved_gpus(
     tmp_path, monkeypatch
 ):
     import json
+
     from scripts import perception_gain_v2_replication as runner
 
     path = tmp_path / "foundation/SEL/D0.json"

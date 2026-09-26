@@ -7,8 +7,8 @@ import datetime as dt
 import hashlib
 import json
 import os
-import signal
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -321,12 +321,13 @@ def bootstrap(
         ),
     ):
         probe = subprocess.run(
-            command, cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=30
+            command, cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=30,
+            check=False,
         )
         auth[name] = "AVAILABLE" if probe.returncode == 0 else "UNAVAILABLE"
     if shutil.which("gh"):
         probe = subprocess.run(
-            ["gh", "auth", "status"], capture_output=True, timeout=30
+            ["gh", "auth", "status"], capture_output=True, timeout=30, check=False
         )
         auth["release"] = "AVAILABLE" if probe.returncode == 0 else "UNAVAILABLE"
     elif os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN"):

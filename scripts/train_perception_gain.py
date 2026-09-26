@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Train one frozen-budget Perception Gain V1 adaptation arm."""
 
 from __future__ import annotations
@@ -388,9 +387,9 @@ class PerceptionCheckpointCallback(Callback):
     ) -> None:
         super().__init__()
         self.run_dir = Path(run_dir)
-        self.evaluation_updates = set(
+        self.evaluation_updates = {
             int(value) for value in evaluation_updates if value
-        )
+        }
         self.last_saved_step = -1
         self.report_progress = report_progress
         self.last_batch_time = None

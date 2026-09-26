@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from collections import Counter
-from contextlib import nullcontext
-from itertools import groupby
 import argparse
 import hashlib
 import json
 import os
-from pathlib import Path
 import time
+from collections import Counter
+from contextlib import nullcontext
+from itertools import groupby
+from pathlib import Path
 from types import SimpleNamespace
 
 from scripts.perception_gain_v2 import (
@@ -81,10 +81,11 @@ def run_diagnostics(
     reserved_started = time.monotonic()
     import hydra
     import torch
+
     from datasets.task_memory_episode import (
+        TaskMemoryEpisodeCollator,
         TaskMemoryEpisodeDataset,
         TaskMemoryEpisodeSpec,
-        TaskMemoryEpisodeCollator,
     )
     from scripts.evaluate_task_memory import _ProtocolOrderDataset
     from scripts.p6a_metrics import official_temporal_iou_thresholds
@@ -93,8 +94,8 @@ def run_diagnostics(
     from scripts.perception_refiner_evaluation import _load_refiner
     from scripts.preflight_task_memory_episode import _rio_base_dataset
     from scripts.run_task_memory_policy_baseline import NativeEpisodeMaster
-    from scripts.train_perception_gain import compose_variant_config
     from scripts.system_comparison_inference import deterministic_inference_runtime
+    from scripts.train_perception_gain import compose_variant_config
     from trainer.trainer import InstanceSegmentation
 
     artifacts = PROJECT_ROOT / config["artifact_root"]
@@ -314,7 +315,14 @@ def run_diagnostics(
                             )
                         )
 
-                        def materialize(logits):
+                        def materialize(
+                            logits,
+                            *,
+                            meta=meta,
+                            segment_ids=segment_ids,
+                            evaluation_partition=evaluation_partition,
+                            stop=stop,
+                        ):
                             all_logits = torch.zeros(
                                 (meta.segment_stage_ids.numel(), 1), dtype=torch.float32
                             )

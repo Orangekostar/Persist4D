@@ -37,6 +37,7 @@ def validate_refiner_cache(
     }
     if external_root is not None:
         from omegaconf import OmegaConf
+
         from scripts.train_perception_gain import compose_variant_config
 
         assets = read_json(external_root / "assets.local.json")
@@ -118,17 +119,18 @@ def validate_refiner_cache(
 
 def run_baselines(config: dict, *, external_root: Path) -> dict:
     import torch
+
     from models.perception_gain import CausalMaskRefiner
     from scripts.perception_gain_evaluation import (
-        run_checkpoint_evaluation,
         extract_pooled_d0_metrics,
+        run_checkpoint_evaluation,
     )
     from scripts.perception_gain_foundation import _metric_class_mapping
-    from scripts.replay_crosswindow_association import E0ReplayAccumulator
     from scripts.perception_gain_native_evaluation import (
         run_native_checkpoint_evaluation,
     )
     from scripts.perception_refiner_evaluation import run_refiner_evaluation
+    from scripts.replay_crosswindow_association import E0ReplayAccumulator
     from scripts.train_perception_refiner import (
         _atomic_torch_save,
         _frozen_payload,
@@ -137,13 +139,13 @@ def run_baselines(config: dict, *, external_root: Path) -> dict:
 
     artifacts = PROJECT_ROOT / config["artifact_root"]
     recipe = read_json(artifacts / "training/C0-L-s45/recipe.json")
-    common = dict(
-        assets_path=external_root / "assets.local.json",
-        roles_path=artifacts / "DATA_ROLES.json",
-        external_root=external_root,
-        recipe_config=recipe,
-        artifact_root=artifacts,
-    )
+    common = {
+        "assets_path": external_root / "assets.local.json",
+        "roles_path": artifacts / "DATA_ROLES.json",
+        "external_root": external_root,
+        "recipe_config": recipe,
+        "artifact_root": artifacts,
+    }
     smoke_heads = []
     for mode in ("NEW_ONLY", "OLD_NEW"):
         binding = refiner_v2_binding(
@@ -306,10 +308,10 @@ def run_repair(
     required_inventory: dict | None = None,
 ) -> dict:
     """Generate one real cache, train matched heads, then evaluate CAL once."""
+    from scripts.perception_gain_v2_lock import effective_parent_weight_identity
+    from scripts.perception_refiner_evaluation import run_refiner_evaluation
     from scripts.prepare_perception_refiner import run as prepare
     from scripts.train_perception_refiner import refiner_v2_binding, train_mask_refiner
-    from scripts.perception_refiner_evaluation import run_refiner_evaluation
-    from scripts.perception_gain_v2_lock import effective_parent_weight_identity
 
     artifacts = PROJECT_ROOT / config["artifact_root"]
     public = artifacts / f"refiner/{parent_id}"

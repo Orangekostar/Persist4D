@@ -2,11 +2,11 @@ import pytest
 import torch
 
 from scripts.perception_gain_v2_bundle import (
+    reassemble_asset,
     replacement_state,
     restore_state,
-    state_digest,
     split_asset,
-    reassemble_asset,
+    state_digest,
 )
 
 

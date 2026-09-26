@@ -50,7 +50,8 @@ def replacement_state(
     replacements, kinds = {}, {}
     for name, tensor in final.items():
         if not isinstance(tensor, torch.Tensor):
-            raise ValueError("Deployment state contains a non-tensor")
+            # Preserve the malformed-deployment validation exception contract.
+            raise ValueError("Deployment state contains a non-tensor")  # noqa: TRY004
         added = name not in base
         if not added and (
             base[name].shape != tensor.shape or base[name].dtype != tensor.dtype
@@ -151,6 +152,7 @@ def instantiate_bundle(
 
 def build_method_bundle(method: dict, *, external_root: Path, artifacts: Path) -> dict:
     import torch
+
     from scripts.perception_gain_evaluation import _load_evaluation_weights
     from scripts.perception_gain_v2_confirmation import method_inputs
     from scripts.perception_gain_v2_lock import external_path

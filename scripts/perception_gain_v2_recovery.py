@@ -6,13 +6,13 @@ import argparse
 import datetime as dt
 import json
 import os
-from pathlib import Path
 import resource
 import shutil
 import signal
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 from scripts.perception_gain_v2 import (
     PROJECT_ROOT,

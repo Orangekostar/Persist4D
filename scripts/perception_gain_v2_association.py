@@ -23,6 +23,7 @@ def replay_configuration(
     config: dict, *, external_root: Path, association_config, role: str
 ) -> dict:
     import torch
+
     from scripts.perception_gain_foundation import _metric_class_mapping
     from scripts.replay_crosswindow_association import E2ReplayAccumulator
 

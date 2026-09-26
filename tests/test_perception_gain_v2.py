@@ -353,13 +353,13 @@ def test_refiner_cache_rejects_changed_roles_and_unreviewed_code(tmp_path, monke
         "execution_provenance": source,
         "shards": [{"path": shard.name, "sha256": file_hash(shard)}],
     }
-    kwargs = dict(
-        recipe=recipe,
-        parent_weight="c" * 64,
-        artifacts=tmp_path,
-        cache_root=tmp_path,
-        required_inventory=None,
-    )
+    kwargs = {
+        "recipe": recipe,
+        "parent_weight": "c" * 64,
+        "artifacts": tmp_path,
+        "cache_root": tmp_path,
+        "required_inventory": None,
+    }
     assert validate_refiner_cache(manifest, **kwargs)["status"] == "VERIFIED"
     write_json(tmp_path / "DATA_ROLES.json", {"TRAIN": ["held-out-reference"]})
     with pytest.raises(ValueError, match="binding differs"):
@@ -376,6 +376,7 @@ def test_refiner_cache_rejects_changed_roles_and_unreviewed_code(tmp_path, monke
 
 def test_repair_watchdog_handles_startup_and_its_own_training_checkpoint(tmp_path):
     import os
+
     from scripts.perception_gain_v2 import training_watchdog_deadline
 
     assert training_watchdog_deadline("REPAIR_R1", tmp_path, 1000, 180) == 1600

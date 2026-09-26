@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import math
-from functools import cmp_to_key
 from collections.abc import Mapping, Sequence
+from functools import cmp_to_key
 
 TOLERANCE = 1e-6
 HORIZONS = (2, 3, 4, 5)
@@ -180,9 +180,8 @@ def select_full_promotion(
         if all(
             step in by_step and by_step[step]["comparison_status"] == "COMPLETE"
             for step in (250, 750)
-        ):
-            if by_step[750]["S_mean"] >= by_step[250]["S_mean"] - 0.005 - TOLERANCE:
-                chosen, reason = new[0], "EXPLORATORY_FALLBACK"
+        ) and by_step[750]["S_mean"] >= by_step[250]["S_mean"] - 0.005 - TOLERANCE:
+            chosen, reason = new[0], "EXPLORATORY_FALLBACK"
     controls_ranked = rank(
         [row for name, row in best.items() if name in controls], baseline
     )
