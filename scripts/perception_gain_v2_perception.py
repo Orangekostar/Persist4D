@@ -215,6 +215,38 @@ def measured_update_cost(external_root: Path) -> float:
     return max(estimates)
 
 
+def remaining_full_updates(
+    methods: list[str], artifacts: Path, external_root: Path
+) -> int:
+    """Do not reserve another full run for an already verified endpoint."""
+    remaining = 0
+    for name in methods:
+        run = external_root / f"training/{name}"
+        path = run / "run_summary.json"
+        summary = read_json(path) if path.exists() else {}
+        recipe = read_json(artifacts / f"training/{name}/recipe.json")
+        if (
+            summary.get("status") == "COMPLETE"
+            and summary.get("completed_global_step") == 3000
+            and summary.get("recipe") == recipe
+        ):
+            checkpoint = run / "update=3000.ckpt"
+            rows = [
+                row
+                for row in summary.get("checkpoints", [])
+                if row.get("name") == checkpoint.name
+            ]
+            if (
+                len(rows) != 1
+                or not checkpoint.is_file()
+                or rows[0].get("sha256") != file_hash(checkpoint)
+            ):
+                raise ValueError(f"Completed full checkpoint identity changed: {name}")
+        else:
+            remaining += 2250
+    return remaining
+
+
 def evaluate(
     config: dict, *, external_root: Path, recipe_id: str, update: int, role: str
 ) -> dict:
@@ -516,8 +548,7 @@ def run_perception(config: dict, *, external_root: Path) -> dict:
             external_root=external_root,
             label="full:" + "+".join(methods),
             predicted_gpu_hours=measured_update_cost(external_root)
-            * 2250
-            * len(methods),
+            * remaining_full_updates(methods, artifacts, external_root),
         )
         if not decision["affordable"]:
             result = {

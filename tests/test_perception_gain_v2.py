@@ -12,6 +12,35 @@ def v2_config():
     return importlib.import_module("scripts.perception_gain_v2_config")
 
 
+def test_full_retry_reserves_only_unfinished_training(tmp_path):
+    from scripts.perception_gain_v2 import file_hash, write_json
+    from scripts.perception_gain_v2_perception import remaining_full_updates
+
+    artifacts, external = tmp_path / "public", tmp_path / "external"
+    name = "C0-L-s45"
+    recipe = {"recipe_id": name}
+    write_json(artifacts / f"training/{name}/recipe.json", recipe)
+    assert remaining_full_updates([name], artifacts, external) == 2250
+    run = external / f"training/{name}"
+    run.mkdir(parents=True)
+    checkpoint = run / "update=3000.ckpt"
+    checkpoint.write_bytes(b"completed checkpoint")
+    summary = {
+        "recipe": recipe,
+        "status": "COMPLETE",
+        "completed_global_step": 3000,
+        "checkpoints": [{"name": checkpoint.name, "sha256": file_hash(checkpoint)}],
+    }
+    write_json(run / "run_summary.json", summary)
+    assert remaining_full_updates([name], artifacts, external) == 0
+    write_json(run / "run_summary.json", {**summary, "status": "INCOMPLETE"})
+    assert remaining_full_updates([name], artifacts, external) == 2250
+    write_json(run / "run_summary.json", summary)
+    checkpoint.write_bytes(b"changed checkpoint")
+    with pytest.raises(ValueError, match="checkpoint"):
+        remaining_full_updates([name], artifacts, external)
+
+
 def test_h_l_recipes_drive_real_optimizer_and_keep_full_schedule(tmp_path: Path):
     from scripts.train_perception_gain import compose_variant_config
     from trainer.perception_gain_trainer import PerceptionGainTrainer
