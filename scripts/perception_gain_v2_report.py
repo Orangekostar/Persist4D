@@ -715,7 +715,7 @@ def run_report(config: dict, *, external_root: Path) -> dict:
             "S_mean": row.get("S_mean"),
             "S_min": row.get("S_min"),
             "S_long": row.get("S_long"),
-            "selected": row.get("method_id") == perception.get("selected", {}).get("method_id"),
+            "selected": row.get("method_id") == (perception.get("selected") or {}).get("method_id"),
         }
         for row in perception.get("evaluated", [])
     ]
