@@ -352,6 +352,28 @@ def forecast_confirmation(config: dict, *, artifacts: Path, lock: dict) -> dict:
     }
 
 
+def reusable_after_local_change(saved: dict, binding: dict, current_code: dict) -> bool:
+    """LOCAL-only code cannot affect the separate PB/ADDITIONAL producers."""
+    if saved.get("status") != "PASS" or binding.get("role") not in {"PB", "ADDITIONAL"}:
+        return False
+    previous = saved.get("confirmation_binding", {})
+    old_code = saved.get("execution_provenance", {})
+    old_files = old_code.get("source_files", {})
+    new_files = current_code.get("source_files", {})
+    local = "scripts/perception_gain_local_evaluation.py"
+    return (
+        local in old_files and local in new_files
+        and previous.get("relevant_source_digest") == content_hash(old_files)
+        and old_code.get("relevant_source_digest") == content_hash(old_files)
+        and current_code.get("relevant_source_digest") == content_hash(new_files)
+        and binding.get("relevant_source_digest") == current_code.get("relevant_source_digest")
+        and {k: v for k, v in previous.items() if k != "relevant_source_digest"}
+        == {k: v for k, v in binding.items() if k != "relevant_source_digest"}
+        and {k: v for k, v in old_files.items() if k != local}
+        == {k: v for k, v in new_files.items() if k != local}
+    )
+
+
 def evaluate_group(
     config: dict,
     *,
@@ -365,6 +387,7 @@ def evaluate_group(
     inputs = method_inputs(
         group["parent"], external_root=external_root, artifacts=artifacts
     )
+    current_code = live_execution_provenance(inputs["recipe_config"])
     binding = {
         "lock_sha256": lock_sha256,
         "group_identity": group["identity"],
@@ -373,9 +396,7 @@ def evaluate_group(
         "roles_sha256": lock["data_roles_sha256"],
         "input_manifest_sha256": lock["input_manifest_sha256"],
         "eval_seed": 45,
-        "relevant_source_digest": live_execution_provenance(inputs["recipe_config"])[
-            "relevant_source_digest"
-        ],
+        "relevant_source_digest": current_code["relevant_source_digest"],
     }
     path = artifacts / f"confirmation/{role}/{content_hash(binding)}.json"
     if path.exists():
@@ -383,6 +404,27 @@ def evaluate_group(
         if result.get("confirmation_binding") != binding:
             raise ValueError("Confirmation cache binding differs")
         return result, path
+    # Preserve the original result bytes and execution identity. Record reuse
+    # separately; never relabel historical inference as execution of new code.
+    reusable = []
+    for previous_path in path.parent.glob("*.json"):
+        previous = read_json(previous_path)
+        if reusable_after_local_change(previous, binding, current_code):
+            reusable.append((previous, previous_path))
+    if len(reusable) > 1:
+        raise ValueError("Multiple equivalent confirmation results require reconciliation")
+    if reusable:
+        result, original = reusable[0]
+        write_json(artifacts / f"confirmation/source_reuse/{content_hash(binding)}.json", {
+            "status": "REUSED_UNCHANGED_NONLOCAL_PRODUCER",
+            "original_path": str(original.relative_to(artifacts)),
+            "original_sha256": file_hash(original),
+            "original_binding": result["confirmation_binding"],
+            "requested_binding": binding,
+            "changed_scope": "LOCAL evaluator only; not called by PB/ADDITIONAL producers",
+            "current_execution_provenance": current_code,
+        })
+        return result, original
     from scripts.perception_gain_v2_predictions import PredictionExports
 
     exports = PredictionExports(

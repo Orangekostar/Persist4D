@@ -157,6 +157,26 @@ def audit_local_population(*, artifacts: Path, external_root: Path) -> dict:
     return result
 
 
+def diagnostic_loss_forward(forward):
+    """Permit unsupported CUDA loss reductions only in no-grad diagnostics."""
+    import torch
+    from functools import wraps
+
+    @wraps(forward)
+    def wrapped(*args, **kwargs):
+        if torch.is_grad_enabled():
+            raise RuntimeError("Diagnostic loss wrapper requires no-grad evaluation")
+        enabled = torch.are_deterministic_algorithms_enabled()
+        warn_only = torch.is_deterministic_algorithms_warn_only_enabled()
+        try:
+            torch.use_deterministic_algorithms(enabled, warn_only=True)
+            return forward(*args, **kwargs)
+        finally:
+            torch.use_deterministic_algorithms(enabled, warn_only=warn_only)
+
+    return wrapped
+
+
 def run_local_t2_evaluation(
     *,
     variant: str,
@@ -305,6 +325,9 @@ def run_local_t2_evaluation(
     system.validation_dataset = validation_dataset
     system.labels_info = validation_dataset.label_info
     system.requires_grad_(False).eval()
+    # Predictions/official metrics precede the diagnostic criterion in _eval_step.
+    # Keep their strict deterministic runtime, and preserve the criterion's RNG use.
+    system.criterion.forward = diagnostic_loss_forward(system.criterion.forward)
     seed_everything(eval_seed, workers=True)
     trainer = Trainer(
         accelerator="gpu",
@@ -351,6 +374,7 @@ def run_local_t2_evaluation(
         eval_seed=eval_seed,
     )
     result["load_audit"] = load_audit
+    result["diagnostic_loss_determinism"] = "WARN_ONLY_SCOPED_TO_NO_GRAD_CRITERION"
     if audit_population:
         result["validation_reference_count"] = len(references)
         result["completed_sequences"] = sorted(observed_sequences)

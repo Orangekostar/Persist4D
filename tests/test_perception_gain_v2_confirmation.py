@@ -12,6 +12,26 @@ from scripts.perception_gain_v2_confirmation import (
 )
 
 
+def test_confirmation_reuse_accepts_only_local_evaluator_source_change():
+    from scripts.perception_gain_v2_confirmation import reusable_after_local_change
+    from scripts.perception_gain_v2_config import content_hash
+
+    old_files = {"scripts/perception_gain_local_evaluation.py": "old", "model.py": "same"}
+    new_files = {**old_files, "scripts/perception_gain_local_evaluation.py": "new"}
+    old_code = {"source_files": old_files, "relevant_source_digest": content_hash(old_files)}
+    new_code = {"source_files": new_files, "relevant_source_digest": content_hash(new_files)}
+    binding = {"role": "PB", "lock_sha256": "locked", "relevant_source_digest": content_hash(new_files)}
+    saved = {"status": "PASS", "execution_provenance": old_code,
+             "confirmation_binding": {**binding, "relevant_source_digest": content_hash(old_files)}}
+    assert reusable_after_local_change(saved, binding, new_code)
+    assert not reusable_after_local_change(saved, {**binding, "lock_sha256": "other"}, new_code)
+    assert not reusable_after_local_change({**saved, "status": "PARTIAL"}, binding, new_code)
+    changed = {**new_files, "model.py": "changed"}
+    assert not reusable_after_local_change(saved, binding, {
+        "source_files": changed, "relevant_source_digest": content_hash(changed)})
+    assert not reusable_after_local_change({**saved, "execution_provenance": {}}, binding, new_code)
+
+
 def test_confirmation_reserve_transfer_cannot_exceed_actual_balance():
     allocation = allocate_confirmation_balance(remaining=60, required=50, default=40)
     assert allocation["confirmation"] == 50
