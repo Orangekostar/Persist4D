@@ -174,7 +174,10 @@ class _ProtocolBase:
     def load_scan_indices(self, context_index, scan_indices, *, change_file):
         call = (context_index, tuple(scan_indices), change_file)
         self.calls.append(call)
-        return call
+        return (
+            call, None, None, self.sequence_names[context_index],
+            None, None, None, context_index, {},
+        )
 
 
 def _protocol_fixture() -> dict[str, object]:
@@ -223,7 +226,7 @@ def test_protocol_b_population_expands_each_master_into_three_exact_orders() -> 
         (18, 20, 21, 19, 17),
         (18, 21, 20, 17, 19),
     ]
-    assert wrapped.load_scan_indices(1, (18, 20), change_file=None) == (
+    assert wrapped.load_scan_indices(1, (18, 20), change_file=None)[0] == (
         0,
         (18, 20),
         None,
@@ -236,6 +239,31 @@ def test_protocol_b_dataset_proxies_rio_label_metadata() -> None:
 
     assert wrapped.label_offset == 1
     assert torch.equal(wrapped._remap_model_output(torch.tensor([2])), torch.tensor([12]))
+
+
+def test_protocol_order_sample_name_matches_requested_order_without_changing_data():
+    class SampleBase(_ProtocolBase):
+        def load_scan_indices(self, context_index, scan_indices, *, change_file):
+            super().load_scan_indices(
+                context_index, scan_indices, change_file=change_file
+            )
+            self.sample = (
+                torch.tensor(scan_indices), torch.ones(2, 3), torch.zeros(2, 3),
+                self.sequence_names[context_index], torch.ones(2, 3),
+                torch.zeros(2, 3), torch.ones(2, 4), context_index, {},
+            )
+            return self.sample
+
+    base = SampleBase()
+    wrapped, masters = _build_protocol_b_population(base, _protocol_fixture())
+    for master in masters:
+        sample = wrapped.load_scan_indices(
+            master.context_index, master.scan_indices[:2], change_file=None
+        )
+        assert sample[3] == master.sequence_id
+        assert len(sample) == 9
+        assert all(sample[i] is base.sample[i] for i in (0, 1, 2, 4, 5, 6, 7, 8))
+        assert base.calls[-1] == (0, master.scan_indices[:2], None)
 
 
 def test_protocol_b_population_uses_continuous_h5_and_reports_clustered_counts() -> None:

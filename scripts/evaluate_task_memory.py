@@ -185,11 +185,14 @@ class _ProtocolOrderDataset:
             raise TaskMemoryEvaluationError(
                 "Protocol-B order context is unavailable"
             ) from error
-        return self.base.load_scan_indices(
+        sample = self.base.load_scan_indices(
             source_context_index,
             scan_indices,
             change_file=change_file,
         )
+        # The base loader names its canonical context even when scan_indices
+        # requests a different frozen order. Keep every data field unchanged.
+        return (*sample[:3], self.sequence_names[context_index], *sample[4:])
 
 
 def _build_protocol_b_population(
