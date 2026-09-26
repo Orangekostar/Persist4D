@@ -1,0 +1,41 @@
+{
+  "created_utc": "2026-09-26T17:20:10.012846+00:00",
+  "model_assets": [
+    {
+      "bytes": 3364,
+      "logical_reference": "external:publication/bundles/R1-D0.pt",
+      "planned_name": "R1-D0.pt",
+      "role": "deployment_bundle",
+      "sha256": "6cf153757b72f2320f12cbddaef8e2dad9e2a971345f4c425ba1c84e62b0d295",
+      "status": "READY"
+    },
+    {
+      "bytes": 294,
+      "logical_reference": "external:publication/bundles/R1-D0.pt.manifest.json",
+      "planned_name": "R1-D0.pt.manifest.json",
+      "role": "bundle_parts_manifest",
+      "sha256": "41d78e57f0d7ed95af33583ffb88cd3324afec83b6289ec64ff0774579953e8b",
+      "status": "READY"
+    },
+    {
+      "bytes": 106869934,
+      "logical_reference": "external:publication/bundles/C0-L-s45.pt",
+      "planned_name": "C0-L-s45.pt",
+      "role": "deployment_bundle",
+      "sha256": "b2f059bdcdf8a048fe807babd45d2d476ae687090fb8ef92282205632bf83823",
+      "status": "READY"
+    },
+    {
+      "bytes": 310,
+      "logical_reference": "external:publication/bundles/C0-L-s45.pt.manifest.json",
+      "planned_name": "C0-L-s45.pt.manifest.json",
+      "role": "bundle_parts_manifest",
+      "sha256": "4381f7b3c91c47a962dbd880246c719154dd5896ad71c340132905f454661c01",
+      "status": "READY"
+    }
+  ],
+  "prediction_asset_count": 34,
+  "prediction_status": "COMPLETE",
+  "unfulfilled_model_requirements": [],
+  "unfulfilled_prediction_requirements": []
+}

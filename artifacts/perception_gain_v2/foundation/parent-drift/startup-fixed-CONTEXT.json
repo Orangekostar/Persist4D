@@ -1,0 +1,32 @@
+{
+  "cublas": ":4096:8",
+  "results": [
+    {
+      "hashes": {
+        "PARENT": "737cba18642c200afc2ed3bf397a33f78dc2912046fd8fdd164783cd13792d02",
+        "ZERO-NEW_ONLY": "737cba18642c200afc2ed3bf397a33f78dc2912046fd8fdd164783cd13792d02",
+        "ZERO-OLD_NEW": "737cba18642c200afc2ed3bf397a33f78dc2912046fd8fdd164783cd13792d02"
+      },
+      "metrics": {
+        "2": 0.7342480421066284,
+        "3": 0.623947262763977,
+        "4": 0.5163145661354065,
+        "5": 0.5493504405021667
+      },
+      "name": "startup-fixed-heads"
+    },
+    {
+      "hashes": {
+        "PARENT": "737cba18642c200afc2ed3bf397a33f78dc2912046fd8fdd164783cd13792d02"
+      },
+      "metrics": {
+        "2": 0.7342480421066284,
+        "3": 0.623947262763977,
+        "4": 0.5163145661354065,
+        "5": 0.5493504405021667
+      },
+      "name": "startup-fixed-repeat"
+    }
+  ],
+  "torch": "2.6.0+cu126"
+}

@@ -1,0 +1,347 @@
+{
+  "all_probes": {
+    "H": [
+      {
+        "architecture_variant": "C0",
+        "checkpoint": "external:inputs/imported/C0-H-s45/update=0250.ckpt",
+        "checkpoint_sha256": "362a8575fb0d011b079b60af4eb92f57fcb5734484230c76c468bb9718007b87",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "C0-H-s45",
+        "metrics": {
+          "2": 0.35375484824180603,
+          "3": 0.27594244480133057,
+          "4": 0.2354133278131485,
+          "5": 0.21766230463981628
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "C0-H-s45"
+      },
+      {
+        "architecture_variant": "C0",
+        "checkpoint": "external:inputs/imported/C0-H-s45/update=0750.ckpt",
+        "checkpoint_sha256": "384884e3e86de79b5ca92661aa887b1f34612d2d8c90e93a66bbf70b87e30143",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "C0-H-s45",
+        "metrics": {
+          "2": 0.3342858552932739,
+          "3": 0.280689001083374,
+          "4": 0.22574535012245178,
+          "5": 0.21675042808055878
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 750,
+        "recipe_id": "C0-H-s45"
+      },
+      {
+        "architecture_variant": "S-BAL",
+        "checkpoint": "external:inputs/imported/S-BAL-H-s45/update=0250.ckpt",
+        "checkpoint_sha256": "9b47b174c1048167fc8156ea2a327692dabae947265adc9193f787d6c7c857f6",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "S-BAL-H-s45",
+        "metrics": {
+          "2": 0.34864190220832825,
+          "3": 0.2776104509830475,
+          "4": 0.239545077085495,
+          "5": 0.22264978289604187
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "S-BAL-H-s45"
+      },
+      {
+        "architecture_variant": "S-BAL",
+        "checkpoint": "external:training/S-BAL-H-s45/update=0750.ckpt",
+        "checkpoint_sha256": "941e6d039e8c41b1b042a3a0a4cb3fa3d82598e1a213ba98d36dca52bcaeda9b",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "S-BAL-H-s45",
+        "metrics": {
+          "2": 0.327426016330719,
+          "3": 0.27379339933395386,
+          "4": 0.23528482019901276,
+          "5": 0.20809350907802582
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 750,
+        "recipe_id": "S-BAL-H-s45"
+      }
+    ],
+    "L": [
+      {
+        "architecture_variant": "C0",
+        "checkpoint": "external:training/C0-L-s45/update=0250.ckpt",
+        "checkpoint_sha256": "e85a2217c05d41fd2e82b996ff6676213cb050d5bc7dd48a0e37a33d26c11a1d",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "C0-L-s45",
+        "metrics": {
+          "2": 0.3535640239715576,
+          "3": 0.30249422788619995,
+          "4": 0.2448398768901825,
+          "5": 0.23554366827011108
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "C0-L-s45"
+      },
+      {
+        "architecture_variant": "C0",
+        "checkpoint": "external:training/C0-L-s45/update=0750.ckpt",
+        "checkpoint_sha256": "f89ff00798057476adb3405abdac6bf477026240396613d6f0c454c5eaf2d930",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "C0-L-s45",
+        "metrics": {
+          "2": 0.3577871322631836,
+          "3": 0.296448677778244,
+          "4": 0.24584166705608368,
+          "5": 0.2243504524230957
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 750,
+        "recipe_id": "C0-L-s45"
+      },
+      {
+        "architecture_variant": "S-BAL",
+        "checkpoint": "external:training/S-BAL-L-s45/update=0250.ckpt",
+        "checkpoint_sha256": "6faad03cf702428f33d1d347066ddf5605ddec46071cec97173cd223309041ff",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "S-BAL-L-s45",
+        "metrics": {
+          "2": 0.3629983365535736,
+          "3": 0.29093214869499207,
+          "4": 0.23279176652431488,
+          "5": 0.2211921513080597
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "S-BAL-L-s45"
+      },
+      {
+        "architecture_variant": "S-BAL",
+        "checkpoint": "external:training/S-BAL-L-s45/update=0750.ckpt",
+        "checkpoint_sha256": "f2322334abaa715b35440fec2eb9a70aa6aacd29d00fc9849f43806632082652",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "S-BAL-L-s45",
+        "metrics": {
+          "2": 0.3582857549190521,
+          "3": 0.2945186495780945,
+          "4": 0.2410450130701065,
+          "5": 0.22247296571731567
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 750,
+        "recipe_id": "S-BAL-L-s45"
+      }
+    ]
+  },
+  "cohort_audit": {
+    "comparable": true,
+    "legacy_numerics_check": "validated by live checkpoint loader before H metrics enter selection",
+    "runtime_and_draw_identities": {
+      "C0-H-s45": {
+        "contract": {
+          "batch_size_per_gpu": 2,
+          "devices": 2,
+          "effective_batch_size": 32,
+          "evaluation_updates": [
+            0,
+            250,
+            750,
+            1500,
+            2250,
+            3000
+          ],
+          "gradient_accumulation": 8,
+          "gradient_clip_norm": 1.0,
+          "precision": "32-true",
+          "total_updates": 3000
+        },
+        "plan": {
+          "plan_sha256": "57dc334b323b7ebfc1f1b3b999497254926b68e01ef93002e878fbef2ec872b1",
+          "rio_pair_count": 1127,
+          "scannet_scan_count": 1199,
+          "source_counts": {
+            "rio": 53388,
+            "scannet": 42612
+          },
+          "total_global_draws": 96000,
+          "train_reference_count": 376
+        },
+        "r1_checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+        "seed": 45
+      },
+      "C0-L-s45": {
+        "contract": {
+          "batch_size_per_gpu": 2,
+          "devices": 2,
+          "effective_batch_size": 32,
+          "evaluation_updates": [
+            0,
+            250,
+            750,
+            1500,
+            2250,
+            3000
+          ],
+          "gradient_accumulation": 8,
+          "gradient_clip_norm": 1.0,
+          "precision": "32-true",
+          "total_updates": 3000
+        },
+        "plan": {
+          "plan_sha256": "57dc334b323b7ebfc1f1b3b999497254926b68e01ef93002e878fbef2ec872b1",
+          "rio_pair_count": 1127,
+          "scannet_scan_count": 1199,
+          "source_counts": {
+            "rio": 53388,
+            "scannet": 42612
+          },
+          "total_global_draws": 96000,
+          "train_reference_count": 376
+        },
+        "r1_checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+        "seed": 45
+      },
+      "S-BAL-H-s45": {
+        "contract": {
+          "batch_size_per_gpu": 2,
+          "devices": 2,
+          "effective_batch_size": 32,
+          "evaluation_updates": [
+            0,
+            250,
+            750,
+            1500,
+            2250,
+            3000
+          ],
+          "gradient_accumulation": 8,
+          "gradient_clip_norm": 1.0,
+          "precision": "32-true",
+          "total_updates": 3000
+        },
+        "plan": {
+          "plan_sha256": "57dc334b323b7ebfc1f1b3b999497254926b68e01ef93002e878fbef2ec872b1",
+          "rio_pair_count": 1127,
+          "scannet_scan_count": 1199,
+          "source_counts": {
+            "rio": 53388,
+            "scannet": 42612
+          },
+          "total_global_draws": 96000,
+          "train_reference_count": 376
+        },
+        "r1_checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+        "seed": 45
+      },
+      "S-BAL-L-s45": {
+        "contract": {
+          "batch_size_per_gpu": 2,
+          "devices": 2,
+          "effective_batch_size": 32,
+          "evaluation_updates": [
+            0,
+            250,
+            750,
+            1500,
+            2250,
+            3000
+          ],
+          "gradient_accumulation": 8,
+          "gradient_clip_norm": 1.0,
+          "precision": "32-true",
+          "total_updates": 3000
+        },
+        "plan": {
+          "plan_sha256": "57dc334b323b7ebfc1f1b3b999497254926b68e01ef93002e878fbef2ec872b1",
+          "rio_pair_count": 1127,
+          "scannet_scan_count": 1199,
+          "source_counts": {
+            "rio": 53388,
+            "scannet": 42612
+          },
+          "total_global_draws": 96000,
+          "train_reference_count": 376
+        },
+        "r1_checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+        "seed": 45
+      }
+    }
+  },
+  "high_comparable": true,
+  "learning_rate_label": "L",
+  "probes": {
+    "H": {
+      "S_long": -0.0036088749766349792,
+      "S_mean": -0.008850287646055222,
+      "S_min": -0.014202684164047241,
+      "architecture_variant": "S-BAL",
+      "checkpoint": "external:inputs/imported/S-BAL-H-s45/update=0250.ckpt",
+      "checkpoint_sha256": "9b47b174c1048167fc8156ea2a327692dabae947265adc9193f787d6c7c857f6",
+      "comparison_status": "COMPLETE",
+      "completed_logical_units": 23,
+      "coverage_status": "COMPLETE",
+      "deltas": {
+        "2": -0.013980716466903687,
+        "3": -0.014202684164047241,
+        "4": -0.0071641504764556885,
+        "5": -5.359947681427002e-05
+      },
+      "expected_logical_units": 23,
+      "method_id": "S-BAL-H-s45",
+      "metrics": {
+        "2": 0.34864190220832825,
+        "3": 0.2776104509830475,
+        "4": 0.239545077085495,
+        "5": 0.22264978289604187
+      },
+      "new_parameter_count": 0,
+      "optimizer_update": 250,
+      "recipe_id": "S-BAL-H-s45"
+    },
+    "L": {
+      "S_long": 0.005485467612743378,
+      "S_mean": 0.003148358315229416,
+      "S_min": -0.009058594703674316,
+      "architecture_variant": "C0",
+      "checkpoint": "external:training/C0-L-s45/update=0250.ckpt",
+      "checkpoint_sha256": "e85a2217c05d41fd2e82b996ff6676213cb050d5bc7dd48a0e37a33d26c11a1d",
+      "comparison_status": "COMPLETE",
+      "completed_logical_units": 23,
+      "coverage_status": "COMPLETE",
+      "deltas": {
+        "2": -0.009058594703674316,
+        "3": 0.010681092739105225,
+        "4": -0.0018693506717681885,
+        "5": 0.012840285897254944
+      },
+      "expected_logical_units": 23,
+      "method_id": "C0-L-s45",
+      "metrics": {
+        "2": 0.3535640239715576,
+        "3": 0.30249422788619995,
+        "4": 0.2448398768901825,
+        "5": 0.23554366827011108
+      },
+      "new_parameter_count": 0,
+      "optimizer_update": 250,
+      "recipe_id": "C0-L-s45"
+    }
+  },
+  "tie_preference": "L"
+}

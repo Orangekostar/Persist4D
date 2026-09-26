@@ -1,0 +1,37 @@
+{
+  "checkpoint_update": 800,
+  "first_updates": [
+    {
+      "nonfinite_gradient_count": 0,
+      "optimizer_update": 1,
+      "total_parameter_change_norm": 0.0003404032513851949
+    },
+    {
+      "nonfinite_gradient_count": 0,
+      "optimizer_update": 2,
+      "total_parameter_change_norm": 0.0004825688540803027
+    }
+  ],
+  "full_endpoint": 3000,
+  "full_resume_update": 750,
+  "next_global_draw_at_resume": 24000,
+  "optimizer_states": 1,
+  "progress": {
+    "completed_local_batches": 6400,
+    "completed_optimizer_updates": 800,
+    "next_global_draw_index": 25600,
+    "schema_version": "perception-gain-exact-resume-v1"
+  },
+  "recipe_id": "C0-L-s45",
+  "recipe_identity": "EXACT_REGISTERED_RECIPE",
+  "rng_rank_count": 2,
+  "sample_plan_sha256": "57dc334b323b7ebfc1f1b3b999497254926b68e01ef93002e878fbef2ec872b1",
+  "scheduler_last_epoch": 800,
+  "scheduler_states": 1,
+  "scope": "CPU inspection of the actual planned update800 checkpoint; no extra training or confirmation evaluation.",
+  "scorer_applicability": "NOT_APPLICABLE",
+  "source_checkpoint": "external:training/C0-L-s45/full-resume-audit/update=0800.ckpt",
+  "source_sha256": "bc71769dec2523d9137e1a40d60d1b7f57c46a12b090a9c476bfd31ec23eaaac",
+  "status": "PASS",
+  "utc": "2026-09-23T05:24:49.820061+00:00"
+}

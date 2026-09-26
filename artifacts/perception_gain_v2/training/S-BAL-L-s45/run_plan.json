@@ -1,0 +1,130 @@
+{
+  "contract": {
+    "batch_size_per_gpu": 2,
+    "devices": 2,
+    "effective_batch_size": 32,
+    "evaluation_updates": [
+      0,
+      250,
+      750,
+      1500,
+      2250,
+      3000
+    ],
+    "gradient_accumulation": 8,
+    "gradient_clip_norm": 1.0,
+    "precision": "32-true",
+    "total_updates": 3000
+  },
+  "execution_provenance": {
+    "executed_code_commit": "09d350a961cfa4d696d2d878b53d9e3eb259c77d",
+    "inference_recipe_hash": "c773f59ab725f0087eb9f7d34943b4831d4955787d1b2b93b1cf8a0d0454b221",
+    "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+    "recipe_id": "S-BAL-L-s45",
+    "relevant_source_digest": "a0e204dc35eb146984697bf21bdeb3f8c1ddf1698bfcd9952e826cd1e931b807",
+    "source_files": {
+      "datasets/semseg.py": "c633c46a3069a93c549b64be9b94649e9c7da64145ba36555c150c45f34df6f1",
+      "datasets/task_memory_episode.py": "acbc5f293cb8d952eede8768bf3b6ddb9ac2739ae53d9fa59602f749f453f9a7",
+      "models/criterion.py": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150",
+      "models/overlap_entity_association.py": "2003641db14436de469fe4ec0be5c57051f8e32eb5aaa3729b5031f814405c68",
+      "models/perception_gain.py": "781bc9c12ea206a2ee589267cfcada4d8dffcef8e15d566ca06a07af876a6305",
+      "models/persistent_memory.py": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8",
+      "models/rescene.py": "d0088ab6a09623ac7865681929e06b315e580965bb90b1985f932eeefe64e12f",
+      "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+      "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+      "scripts/perception_gain_evaluation.py": "741c9a0d9e6a5ac49e8cca1b4531c823d314d14357d32aafe34d948a25faaf6a",
+      "scripts/perception_gain_local_evaluation.py": "23cb1bff31eb19a56e159c936fafff1695bd4f49691ff8e8f1e711e85cc1b17c",
+      "scripts/perception_gain_native_evaluation.py": "d26990bdd34ac82019f245bfc1f7407a84efff06a5b500687e986122fcc14e2e",
+      "scripts/perception_gain_profile.py": "ea4b732ebd39a0b2cca62c8a65615094501ae6e7a878363fb29ab866660d4f3c",
+      "scripts/perception_gain_v2_config.py": "ddec6a1ce0737fe4997f69fcbb8e372751fe6337af902cdfb0cc961dc044aced",
+      "scripts/perception_refiner_evaluation.py": "f121ebc13a9f4f8301160e3f2d26136bb4fdf5b20d1977dcdfa75512ee487669",
+      "scripts/prepare_perception_refiner.py": "b21e9a0a95a61bef86a9ba867674e5f575e13c0f81bfbd0803b5dbc0c7a345f4",
+      "scripts/replay_crosswindow_association.py": "05d31fa5d243ad909dc9bd0eaac0f7bfde47ca01c6b146ed6e0ddbd2ef3e5ed9",
+      "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+      "scripts/run_task_memory_controls.py": "9682d70357b191d794a0b169a0aabcd8f312312de7c67af744f2e46bca8bd01f",
+      "scripts/run_task_memory_policy_baseline.py": "9b1c3c1de2907a1b88dea1efde6b1bb184eeccc5e6e864e48401ab11cf174440",
+      "scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+      "scripts/system_comparison_metrics.py": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd",
+      "scripts/task_memory_output.py": "741f8eb6d8f54484f6c64a4ba7582f247f77b8bfd22e93f378275421c5187581",
+      "scripts/train_perception_gain.py": "d746804deb0c4f2b7b96e939d37a7ea31113da53af6a68c147ef33c7b8fe2afc",
+      "scripts/train_perception_refiner.py": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
+      "trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a",
+      "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+    },
+    "training_recipe_hash": "61524ed6d7a4a214ba34997971e0d1fec0fa67c3ae1dec1db7692ec143744498"
+  },
+  "load_audit": {
+    "loaded_key_count": 798,
+    "missing_keys": [],
+    "r1_subtree_exact": true,
+    "r1_subtree_mismatches": [],
+    "unexpected_keys": []
+  },
+  "plan": {
+    "next_global_draw_index": 0,
+    "plan_sha256": "57dc334b323b7ebfc1f1b3b999497254926b68e01ef93002e878fbef2ec872b1",
+    "rio_pair_count": 1127,
+    "scannet_scan_count": 1199,
+    "source_counts": {
+      "rio": 53388,
+      "scannet": 42612
+    },
+    "total_global_draws": 96000,
+    "train_reference_count": 376
+  },
+  "r1_checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "recipe": {
+    "architecture_variant": "S-BAL",
+    "association": "D0/LAST",
+    "base_weight_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "batch_size_per_gpu": 2,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "devices": 2,
+    "eps": 1e-08,
+    "eval_seed": 45,
+    "evaluation_updates": [
+      0,
+      250,
+      750,
+      1500,
+      2250,
+      3000
+    ],
+    "freeze": "backbone_encoder",
+    "frozen_encoder_eval": false,
+    "gradient_accumulation": 8,
+    "gradient_clip_norm": 1.0,
+    "inference_recipe_hash": "c773f59ab725f0087eb9f7d34943b4831d4955787d1b2b93b1cf8a0d0454b221",
+    "learning_rate": 1e-05,
+    "learning_rate_label": "L",
+    "minimum_lr_fraction": 0.1,
+    "nominal_dataset_weights": [
+      1.0,
+      0.8
+    ],
+    "num_workers": 2,
+    "objective": "raw_sum",
+    "optimizer_updates": 3000,
+    "precision": "32-true",
+    "publisher": "lag1/mean",
+    "query_count": 100,
+    "recipe_id": "S-BAL-L-s45",
+    "schema_version": "perception-gain-v2-recipe-v1",
+    "stage_worst_alpha": 0.5,
+    "stage_worst_beta": 0.25,
+    "state_capacity": 100,
+    "timeout_seconds": 180,
+    "train_seed": 45,
+    "training_recipe_hash": "61524ed6d7a4a214ba34997971e0d1fec0fa67c3ae1dec1db7692ec143744498",
+    "warmup_updates": 150,
+    "weight_decay": 0.01
+  },
+  "resume": false,
+  "scorer_audit": null,
+  "seed": 45,
+  "stop_after_updates": 750,
+  "variant": "S-BAL"
+}

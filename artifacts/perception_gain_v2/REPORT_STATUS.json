@@ -1,0 +1,29 @@
+{
+  "cost": {
+    "association_cpu_core_hours": 8.0876546187225,
+    "event_count": 41,
+    "prior_gpu_hours": 12.124826178494708,
+    "settled_gpu_hours": 78.94000603858385,
+    "unsettled_live_reservation_gpu_hours": 0.0,
+    "v2_gpu_hours": 66.81517986008913
+  },
+  "execution_status": "COMPLETE",
+  "handoff": "artifacts/perception_gain_v2/HANDOFF.md",
+  "note": "COMPLETE describes report generation only, not experiment or publication completion.",
+  "report": "artifacts/perception_gain_v2/FINAL_REPORT.md",
+  "source_commit": "d58420568f46070a4b3a7dcee2b4e47fc42f4c7b",
+  "status": "COMPLETE",
+  "status_fields": {
+    "association_selection": "KEEP_D0",
+    "execution_status": "COMPLETE",
+    "local_gain": false,
+    "pb_all_t_vs_d0": false,
+    "pb_all_t_vs_native_fh": false,
+    "perception_selection": "KEEP_R1",
+    "publication_status": "NOT_PUBLISHED",
+    "repair_P_selection": "NOT_APPLICABLE",
+    "repair_R1_selection": "KEEP_PARENT",
+    "replication_status": "NOT_APPLICABLE",
+    "resource_status": "IMPROVED"
+  }
+}

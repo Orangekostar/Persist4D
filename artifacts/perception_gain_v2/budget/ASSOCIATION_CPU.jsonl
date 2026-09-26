@@ -1,0 +1,22 @@
+{"config_id": "FIRST_CONFIG_PARTIAL", "cpu_core_hours": 0.3016305555555555, "event_id": "ASSOC-interrupted-4179013", "measurement": "PROC_USER_SYSTEM_AND_CHILD_CPU_TICKS", "reason": "Stop before runtime source change; preserve spent CPU and retry after exact IoU and mask-only publication correction.", "role": "CAL", "utc": "2026-09-22T16:40:57.744594+00:00"}
+{"config_id": "A0-U-tau-0.6", "cpu_core_hours": 0.4797252266636111, "cumulative_cpu_core_hours": 0.7813557822191666, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A0-U-tau-0.666666666667", "cpu_core_hours": 0.4586149848, "cumulative_cpu_core_hours": 1.2399707670191666, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A0-U-tau-0.73", "cpu_core_hours": 0.4693746466377777, "cumulative_cpu_core_hours": 1.7093454136569444, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A1-theta-0.5", "cpu_core_hours": 0.4649562392191668, "cumulative_cpu_core_hours": 2.174301652876111, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"cpu_core_hours": 0.13989711351277778, "event_id": "ASSOC-recovery-01:2026-09-22T16:46:44.449357+00:00", "measured_attempt_cpu_core_hours": 2.0125682108333334, "measurement": "RUSAGE_CHILDREN_MINUS_ALREADY_RECORDED_CONFIG_CPU", "role": "RECOVERY_OVERHEAD_OR_INTERRUPTION"}
+{"cpu_core_hours": 0.0020094782038888887, "data_role": "CAL-DIAGNOSTIC", "elapsed_seconds": 7.238789152004756, "event_id": "ASSOCIATION_STREAM_SMOKE:2026-09-22T19:34:22.259925+00:00", "status": "FAIL"}
+{"cpu_core_hours": 0.0024510741297222222, "data_role": "CAL-DIAGNOSTIC", "elapsed_seconds": 8.831911082961597, "event_id": "ASSOCIATION_STREAM_SMOKE-attempt-2:2026-09-22T19:35:42.418752+00:00", "status": "PASS"}
+{"config_id": "A0-U-tau-0.6", "cpu_core_hours": 0.4635347694569445, "cumulative_cpu_core_hours": 2.7821940881794447, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A0-U-tau-0.666666666667", "cpu_core_hours": 0.45173650611222216, "cumulative_cpu_core_hours": 3.233930594291667, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A0-U-tau-0.73", "cpu_core_hours": 0.47827336839194434, "cumulative_cpu_core_hours": 3.712203962683611, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A1-theta-0.5", "cpu_core_hours": 0.45924815919916684, "cumulative_cpu_core_hours": 4.171452121882778, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A1-theta-0.65", "cpu_core_hours": 0.4569103295052777, "cumulative_cpu_core_hours": 4.628362451388056, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A1-theta-0.8", "cpu_core_hours": 0.4686032397308332, "cumulative_cpu_core_hours": 5.096965691118889, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A2-lambda-0.25-tau-0.6", "cpu_core_hours": 0.45254471917250005, "cumulative_cpu_core_hours": 5.549510410291389, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A2-lambda-0.25-tau-0.666666666667", "cpu_core_hours": 0.44334712172999996, "cumulative_cpu_core_hours": 5.992857532021389, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A2-lambda-0.25-tau-0.73", "cpu_core_hours": 0.459229476084444, "cumulative_cpu_core_hours": 6.452087008105833, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A2-lambda-0.5-tau-0.6", "cpu_core_hours": 0.46103536368888853, "cumulative_cpu_core_hours": 6.913122371794722, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A2-lambda-0.5-tau-0.666666666667", "cpu_core_hours": 0.4658722728730562, "cumulative_cpu_core_hours": 7.378994644667777, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A2-lambda-0.5-tau-0.73", "cpu_core_hours": 0.47755881667916683, "cumulative_cpu_core_hours": 7.8565534613469445, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "CAL"}
+{"config_id": "A0-U-tau-0.73", "cpu_core_hours": 0.2291902445133332, "cumulative_cpu_core_hours": 8.085743705860278, "measurement": "PROCESS_CPU_TIME_ALL_THREADS", "role": "SEL"}
+{"cpu_core_hours": 0.00191091286222278, "event_id": "ASSOC-recovery-02:2026-09-22T20:19:57.878728+00:00", "measured_attempt_cpu_core_hours": 5.7689953, "measurement": "RUSAGE_CHILDREN_MINUS_ALREADY_RECORDED_CONFIG_CPU", "role": "RECOVERY_OVERHEAD_OR_INTERRUPTION"}

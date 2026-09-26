@@ -1,0 +1,12 @@
+{
+  "status": "INVALIDATED_PARENT_REPRODUCIBILITY",
+  "invalidated_at_utc": "2026-09-22T18:47:32+00:00",
+  "original_attempt": "ASSOC-recovery-01",
+  "reason": "The original live R1 parent predictions are not reproduced by original or current source. Nine fresh bounded evaluations and the full shared-parent repair evaluation agree with the new parent. Thread count, head presence and startup initialization probes do not explain the historical difference. The historical cause remains undetermined.",
+  "action": "Preserve these four completed CAL configuration results and all measured costs, interrupt further replay on the old parent, rerun the unchanged fixed development baseline and repeat the twelve-config search on the reproduced parent's cache.",
+  "eligibility": "Not eligible for current CAL/SEL selection or final-lock claims.",
+  "cost_accounting": "Original process CPU time and the interrupted fifth configuration remain charged in budget/ASSOCIATION_CPU.jsonl.",
+  "original_parent_CAL_sha256": "81d3b53aa9ef64ec247f742369d2ddf761654cf772333e58fdb104ee32f204bb",
+  "current_shared_parent_CAL_sha256": "fcaf9de5e3de905da6f6829baf2cbcd068895f29b99f7dc7018470bca95ce2b6",
+  "evidence": "foundation/parent-drift/DRIFT_PROBE.json; foundation/parent-drift/old-source.json; foundation/parent-drift/startup-original-CONTEXT.json; foundation/parent-drift/startup-fixed-CONTEXT.json"
+}

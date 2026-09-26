@@ -1,0 +1,48 @@
+{
+  "C0-best-native": {
+    "coverage_status": "INCOMPLETE",
+    "expected_references": 46,
+    "expected_units_per_seed": 154,
+    "mean_metrics": null,
+    "seeds": {
+      "45": {
+        "eval_seed": 45,
+        "reason": "Batch contract violation: rank=0, stage=val, batch_idx=0, file_names=['scene0003_00-scene0003_03'], reason=criterion RuntimeError: nll_loss2d_forward_out_cuda_template does not have a deterministic implementation, but you set 'torch.use_deterministic_algorithms(True)'. You can turn off determinism just for this operation, or you can use the 'warn_only=True' option, if that's acceptable for your application. You can also file an issue at https://github.com/pytorch/pytorch/issues to help us prioritize adding deterministic support for this operation.",
+        "status": "BLOCKED"
+      },
+      "46": {
+        "eval_seed": 46,
+        "reason": "Batch contract violation: rank=0, stage=val, batch_idx=0, file_names=['scene0003_00-scene0003_03'], reason=criterion RuntimeError: nll_loss2d_forward_out_cuda_template does not have a deterministic implementation, but you set 'torch.use_deterministic_algorithms(True)'. You can turn off determinism just for this operation, or you can use the 'warn_only=True' option, if that's acceptable for your application. You can also file an issue at https://github.com/pytorch/pytorch/issues to help us prioritize adding deterministic support for this operation.",
+        "status": "BLOCKED"
+      },
+      "47": {
+        "eval_seed": 47,
+        "reason": "Batch contract violation: rank=0, stage=val, batch_idx=0, file_names=['scene0003_00-scene0003_03'], reason=criterion RuntimeError: nll_loss2d_forward_out_cuda_template does not have a deterministic implementation, but you set 'torch.use_deterministic_algorithms(True)'. You can turn off determinism just for this operation, or you can use the 'warn_only=True' option, if that's acceptable for your application. You can also file an issue at https://github.com/pytorch/pytorch/issues to help us prioritize adding deterministic support for this operation.",
+        "status": "BLOCKED"
+      }
+    }
+  },
+  "FH-R1-native": {
+    "coverage_status": "INCOMPLETE",
+    "expected_references": 46,
+    "expected_units_per_seed": 154,
+    "mean_metrics": null,
+    "seeds": {
+      "45": {
+        "eval_seed": 45,
+        "reason": "Batch contract violation: rank=0, stage=val, batch_idx=0, file_names=['scene0003_00-scene0003_03'], reason=criterion RuntimeError: nll_loss2d_forward_out_cuda_template does not have a deterministic implementation, but you set 'torch.use_deterministic_algorithms(True)'. You can turn off determinism just for this operation, or you can use the 'warn_only=True' option, if that's acceptable for your application. You can also file an issue at https://github.com/pytorch/pytorch/issues to help us prioritize adding deterministic support for this operation.",
+        "status": "BLOCKED"
+      },
+      "46": {
+        "eval_seed": 46,
+        "reason": "Batch contract violation: rank=0, stage=val, batch_idx=0, file_names=['scene0003_00-scene0003_03'], reason=criterion RuntimeError: nll_loss2d_forward_out_cuda_template does not have a deterministic implementation, but you set 'torch.use_deterministic_algorithms(True)'. You can turn off determinism just for this operation, or you can use the 'warn_only=True' option, if that's acceptable for your application. You can also file an issue at https://github.com/pytorch/pytorch/issues to help us prioritize adding deterministic support for this operation.",
+        "status": "BLOCKED"
+      },
+      "47": {
+        "eval_seed": 47,
+        "reason": "Batch contract violation: rank=0, stage=val, batch_idx=0, file_names=['scene0003_00-scene0003_03'], reason=criterion RuntimeError: nll_loss2d_forward_out_cuda_template does not have a deterministic implementation, but you set 'torch.use_deterministic_algorithms(True)'. You can turn off determinism just for this operation, or you can use the 'warn_only=True' option, if that's acceptable for your application. You can also file an issue at https://github.com/pytorch/pytorch/issues to help us prioritize adding deterministic support for this operation.",
+        "status": "BLOCKED"
+      }
+    }
+  }
+}

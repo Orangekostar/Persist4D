@@ -1,0 +1,617 @@
+{
+  "cache_binding": {
+    "eval_seed": 45,
+    "executed_code_commit": "0a21848b7f29f0af7b26fc6aa6560f3292c5912c",
+    "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+    "input_manifest_hash": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6",
+    "point_order_transform": "canonical_vertices/identity_geometry",
+    "publisher": "D0/LAST/lag1/mean",
+    "relevant_source_digest": "982b2d26e8594d1501cbe5c9467d2c45780518b5d33fbc2c44358848f493f3d5",
+    "resolved_config_sha256": "3df050cee539ff68cb825afb649ab595514d96d70d19b4146d2c4129b3b38cef",
+    "role": "CAL",
+    "roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+    "weight_hash": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+  },
+  "candidate": {
+    "checkpoint": "external:r1_checkpoint",
+    "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "completed_logical_units": 23,
+    "coverage_status": "COMPLETE",
+    "expected_logical_units": 23,
+    "method_id": "C0-L-s45",
+    "metrics": {
+      "2": 0.36447855830192566,
+      "3": 0.28917190432548523,
+      "4": 0.2453894168138504,
+      "5": 0.22251984477043152
+    },
+    "new_parameter_count": 0,
+    "optimizer_update": 0
+  },
+  "candidates": {},
+  "completed_logical_unit_count": 23,
+  "completed_reference_count": 4,
+  "completed_units": [
+    "CAL:00000",
+    "CAL:00001",
+    "CAL:00002",
+    "CAL:00003",
+    "CAL:00004",
+    "CAL:00005",
+    "CAL:00006",
+    "CAL:00007",
+    "CAL:00008",
+    "CAL:00009",
+    "CAL:00010",
+    "CAL:00011",
+    "CAL:00012",
+    "CAL:00013",
+    "CAL:00014",
+    "CAL:00015",
+    "CAL:00016",
+    "CAL:00017",
+    "CAL:00018",
+    "CAL:00019",
+    "CAL:00020",
+    "CAL:00021",
+    "CAL:00022"
+  ],
+  "d0_replay_bridge_prefixes": 115,
+  "data_role": "CAL",
+  "declared_reference_count": 4,
+  "elapsed_seconds": 534.1694392230129,
+  "evaluation_input_mode": "LIVE_LOCAL_DATASET",
+  "execution_provenance": {
+    "executed_code_commit": "0a21848b7f29f0af7b26fc6aa6560f3292c5912c",
+    "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+    "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+    "recipe_id": "C0-L-s45",
+    "relevant_source_digest": "982b2d26e8594d1501cbe5c9467d2c45780518b5d33fbc2c44358848f493f3d5",
+    "source_files": {
+      "datasets/semseg.py": "c633c46a3069a93c549b64be9b94649e9c7da64145ba36555c150c45f34df6f1",
+      "datasets/task_memory_episode.py": "acbc5f293cb8d952eede8768bf3b6ddb9ac2739ae53d9fa59602f749f453f9a7",
+      "models/criterion.py": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150",
+      "models/overlap_entity_association.py": "2003641db14436de469fe4ec0be5c57051f8e32eb5aaa3729b5031f814405c68",
+      "models/perception_gain.py": "781bc9c12ea206a2ee589267cfcada4d8dffcef8e15d566ca06a07af876a6305",
+      "models/persistent_memory.py": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8",
+      "models/rescene.py": "d0088ab6a09623ac7865681929e06b315e580965bb90b1985f932eeefe64e12f",
+      "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+      "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+      "scripts/perception_gain_evaluation.py": "741c9a0d9e6a5ac49e8cca1b4531c823d314d14357d32aafe34d948a25faaf6a",
+      "scripts/perception_gain_local_evaluation.py": "cf1313b0f98b6813971a1f21e6fae5d5059478c3f597b21d88735ec4bf8c9464",
+      "scripts/perception_gain_native_evaluation.py": "d26990bdd34ac82019f245bfc1f7407a84efff06a5b500687e986122fcc14e2e",
+      "scripts/perception_gain_profile.py": "ea4b732ebd39a0b2cca62c8a65615094501ae6e7a878363fb29ab866660d4f3c",
+      "scripts/perception_gain_v2_config.py": "ddec6a1ce0737fe4997f69fcbb8e372751fe6337af902cdfb0cc961dc044aced",
+      "scripts/perception_refiner_evaluation.py": "13259ca30a03c8e88747e89daf03e9df547cd3ad210bcfe9088a1758e08b4106",
+      "scripts/prepare_perception_refiner.py": "b21e9a0a95a61bef86a9ba867674e5f575e13c0f81bfbd0803b5dbc0c7a345f4",
+      "scripts/replay_crosswindow_association.py": "05d31fa5d243ad909dc9bd0eaac0f7bfde47ca01c6b146ed6e0ddbd2ef3e5ed9",
+      "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+      "scripts/run_task_memory_controls.py": "9682d70357b191d794a0b169a0aabcd8f312312de7c67af744f2e46bca8bd01f",
+      "scripts/run_task_memory_policy_baseline.py": "9b1c3c1de2907a1b88dea1efde6b1bb184eeccc5e6e864e48401ab11cf174440",
+      "scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+      "scripts/system_comparison_metrics.py": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd",
+      "scripts/task_memory_output.py": "ad480376fafffcd7868b254a19a1b746bdeee9f802910ab014dc03be372f1fff",
+      "scripts/train_perception_gain.py": "d746804deb0c4f2b7b96e939d37a7ea31113da53af6a68c147ef33c7b8fe2afc",
+      "scripts/train_perception_refiner.py": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
+      "trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a",
+      "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+    },
+    "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329"
+  },
+  "expected_logical_unit_count": 23,
+  "expected_reference_count": 4,
+  "gpu_hours": 0.14838039978417025,
+  "gpu_name": "NVIDIA A40",
+  "incomplete_units": [],
+  "mask_change_audit": {},
+  "method_output_sha256": {
+    "PARENT": "81d3b53aa9ef64ec247f742369d2ddf761654cf772333e58fdb104ee32f204bb"
+  },
+  "metric_rows": [
+    {
+      "T": 2,
+      "current_stage_AP": 0.5117470622062683,
+      "logical_unit_count": 23,
+      "method": "PARENT",
+      "reference": "all",
+      "reference_count": 4,
+      "t_REC": 0.4708996117115021,
+      "t_mAP": 0.36447855830192566,
+      "t_mAP25": 0.7706291079521179,
+      "t_mAP50": 0.5857856273651123
+    },
+    {
+      "T": 2,
+      "current_stage_AP": 0.8333727717399597,
+      "logical_unit_count": 5,
+      "method": "PARENT",
+      "reference": "09582244-e2c2-2de1-956c-357092d949d1",
+      "reference_count": 1,
+      "t_REC": 0.7765432000160217,
+      "t_mAP": 0.70402592420578,
+      "t_mAP25": 0.9777624011039734,
+      "t_mAP50": 0.921916663646698
+    },
+    {
+      "T": 2,
+      "current_stage_AP": 0.50775146484375,
+      "logical_unit_count": 5,
+      "method": "PARENT",
+      "reference": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+      "reference_count": 1,
+      "t_REC": 0.43072786927223206,
+      "t_mAP": 0.3260344862937927,
+      "t_mAP25": 0.7756562829017639,
+      "t_mAP50": 0.5217095613479614
+    },
+    {
+      "T": 2,
+      "current_stage_AP": 0.4605109393596649,
+      "logical_unit_count": 6,
+      "method": "PARENT",
+      "reference": "10b17936-3938-2467-88ba-ba5fe2debf14",
+      "reference_count": 1,
+      "t_REC": 0.45737990736961365,
+      "t_mAP": 0.31141331791877747,
+      "t_mAP25": 0.7463223338127136,
+      "t_mAP50": 0.5753815174102783
+    },
+    {
+      "T": 2,
+      "current_stage_AP": 0.775068998336792,
+      "logical_unit_count": 7,
+      "method": "PARENT",
+      "reference": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+      "reference_count": 1,
+      "t_REC": 0.7100340723991394,
+      "t_mAP": 0.6332634091377258,
+      "t_mAP25": 0.875158965587616,
+      "t_mAP50": 0.7923239469528198
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.5127787590026855,
+      "logical_unit_count": 23,
+      "method": "PARENT",
+      "reference": "all",
+      "reference_count": 4,
+      "t_REC": 0.40384867787361145,
+      "t_mAP": 0.28917190432548523,
+      "t_mAP25": 0.6918119788169861,
+      "t_mAP50": 0.46512526273727417
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.8278888463973999,
+      "logical_unit_count": 5,
+      "method": "PARENT",
+      "reference": "09582244-e2c2-2de1-956c-357092d949d1",
+      "reference_count": 1,
+      "t_REC": 0.6957265138626099,
+      "t_mAP": 0.5970966219902039,
+      "t_mAP25": 0.8862001895904541,
+      "t_mAP50": 0.8621543049812317
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.5243254899978638,
+      "logical_unit_count": 5,
+      "method": "PARENT",
+      "reference": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+      "reference_count": 1,
+      "t_REC": 0.3253968358039856,
+      "t_mAP": 0.254845529794693,
+      "t_mAP25": 0.6594850420951843,
+      "t_mAP50": 0.4760911166667938
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.4500634968280792,
+      "logical_unit_count": 6,
+      "method": "PARENT",
+      "reference": "10b17936-3938-2467-88ba-ba5fe2debf14",
+      "reference_count": 1,
+      "t_REC": 0.3648388683795929,
+      "t_mAP": 0.23411107063293457,
+      "t_mAP25": 0.6680306792259216,
+      "t_mAP50": 0.5007203221321106
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.8150060772895813,
+      "logical_unit_count": 7,
+      "method": "PARENT",
+      "reference": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+      "reference_count": 1,
+      "t_REC": 0.6531367301940918,
+      "t_mAP": 0.6002219915390015,
+      "t_mAP25": 0.8388789296150208,
+      "t_mAP50": 0.6935839653015137
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.48686274886131287,
+      "logical_unit_count": 23,
+      "method": "PARENT",
+      "reference": "all",
+      "reference_count": 4,
+      "t_REC": 0.3506750166416168,
+      "t_mAP": 0.2453894168138504,
+      "t_mAP25": 0.6443200707435608,
+      "t_mAP50": 0.3930337131023407
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.7798239588737488,
+      "logical_unit_count": 5,
+      "method": "PARENT",
+      "reference": "09582244-e2c2-2de1-956c-357092d949d1",
+      "reference_count": 1,
+      "t_REC": 0.6629629731178284,
+      "t_mAP": 0.5405787229537964,
+      "t_mAP25": 0.8270283341407776,
+      "t_mAP50": 0.7951003909111023
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.5156741738319397,
+      "logical_unit_count": 5,
+      "method": "PARENT",
+      "reference": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+      "reference_count": 1,
+      "t_REC": 0.23068784177303314,
+      "t_mAP": 0.20352576673030853,
+      "t_mAP25": 0.6263468861579895,
+      "t_mAP50": 0.38666531443595886
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.4212697744369507,
+      "logical_unit_count": 6,
+      "method": "PARENT",
+      "reference": "10b17936-3938-2467-88ba-ba5fe2debf14",
+      "reference_count": 1,
+      "t_REC": 0.28824475407600403,
+      "t_mAP": 0.18519887328147888,
+      "t_mAP25": 0.6460797190666199,
+      "t_mAP50": 0.42157673835754395
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.8044553995132446,
+      "logical_unit_count": 7,
+      "method": "PARENT",
+      "reference": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+      "reference_count": 1,
+      "t_REC": 0.637377142906189,
+      "t_mAP": 0.5616477131843567,
+      "t_mAP25": 0.7809314131736755,
+      "t_mAP50": 0.6380566954612732
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.49330073595046997,
+      "logical_unit_count": 23,
+      "method": "PARENT",
+      "reference": "all",
+      "reference_count": 4,
+      "t_REC": 0.3074943721294403,
+      "t_mAP": 0.22251984477043152,
+      "t_mAP25": 0.5968953371047974,
+      "t_mAP50": 0.359844446182251
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.8495023250579834,
+      "logical_unit_count": 5,
+      "method": "PARENT",
+      "reference": "09582244-e2c2-2de1-956c-357092d949d1",
+      "reference_count": 1,
+      "t_REC": 0.6370370388031006,
+      "t_mAP": 0.5168967247009277,
+      "t_mAP25": 0.7786030769348145,
+      "t_mAP50": 0.7605192065238953
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.47901850938796997,
+      "logical_unit_count": 5,
+      "method": "PARENT",
+      "reference": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+      "reference_count": 1,
+      "t_REC": 0.19920635223388672,
+      "t_mAP": 0.17094996571540833,
+      "t_mAP25": 0.6033605933189392,
+      "t_mAP50": 0.33943286538124084
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.4383600354194641,
+      "logical_unit_count": 6,
+      "method": "PARENT",
+      "reference": "10b17936-3938-2467-88ba-ba5fe2debf14",
+      "reference_count": 1,
+      "t_REC": 0.22585977613925934,
+      "t_mAP": 0.15971240401268005,
+      "t_mAP25": 0.5641595721244812,
+      "t_mAP50": 0.3717185854911804
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.7864403128623962,
+      "logical_unit_count": 7,
+      "method": "PARENT",
+      "reference": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+      "reference_count": 1,
+      "t_REC": 0.6096982359886169,
+      "t_mAP": 0.5305036306381226,
+      "t_mAP25": 0.7527068853378296,
+      "t_mAP50": 0.6093016862869263
+    }
+  ],
+  "network_forward_count": 115,
+  "network_seconds": 59.27266960591078,
+  "official_metric": "pooled_t_mAP",
+  "official_metric_seconds": 201.49578068393748,
+  "optimizer_update": 0,
+  "output_policy": "D0/lag1/mean",
+  "pairing_audit": {},
+  "parent": {
+    "checkpoint": "external:r1_checkpoint",
+    "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "load_audit": {
+      "loaded_key_count": 798,
+      "missing_keys": [],
+      "r1_subtree_exact": true,
+      "r1_subtree_mismatches": [],
+      "unexpected_keys": []
+    },
+    "optimizer_update": 0,
+    "variant": "C0",
+    "weight_sources": [
+      {
+        "bytes": 754813672,
+        "role": "r1_initialization",
+        "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+      }
+    ]
+  },
+  "parent_candidate": {
+    "checkpoint": "external:r1_checkpoint",
+    "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "completed_logical_units": 23,
+    "coverage_status": "COMPLETE",
+    "expected_logical_units": 23,
+    "method_id": "PARENT",
+    "metrics": {
+      "2": 0.36447855830192566,
+      "3": 0.28917190432548523,
+      "4": 0.2453894168138504,
+      "5": 0.22251984477043152
+    },
+    "new_parameter_count": 0,
+    "optimizer_update": 0
+  },
+  "parent_metrics": {
+    "2": 0.36447855830192566,
+    "3": 0.28917190432548523,
+    "4": 0.2453894168138504,
+    "5": 0.22251984477043152
+  },
+  "population_by_horizon": {
+    "2": {
+      "logical_unit_count": 23,
+      "reference_count": 4
+    },
+    "3": {
+      "logical_unit_count": 23,
+      "reference_count": 4
+    },
+    "4": {
+      "logical_unit_count": 23,
+      "reference_count": 4
+    },
+    "5": {
+      "logical_unit_count": 23,
+      "reference_count": 4
+    }
+  },
+  "population_manifest_sha256": null,
+  "recipe": {
+    "architecture_variant": "C0",
+    "association": "D0/LAST",
+    "base_weight_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "batch_size_per_gpu": 2,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "devices": 2,
+    "eps": 1e-08,
+    "eval_seed": 45,
+    "evaluation_updates": [
+      0,
+      250,
+      750,
+      1500,
+      2250,
+      3000
+    ],
+    "freeze": "backbone_encoder",
+    "frozen_encoder_eval": false,
+    "gradient_accumulation": 8,
+    "gradient_clip_norm": 1.0,
+    "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+    "learning_rate": 1e-05,
+    "learning_rate_label": "L",
+    "minimum_lr_fraction": 0.1,
+    "nominal_dataset_weights": [
+      1.0,
+      0.8
+    ],
+    "num_workers": 2,
+    "objective": "raw_sum",
+    "optimizer_updates": 3000,
+    "precision": "32-true",
+    "publisher": "lag1/mean",
+    "query_count": 100,
+    "recipe_id": "C0-L-s45",
+    "schema_version": "perception-gain-v2-recipe-v1",
+    "stage_worst_alpha": 0.5,
+    "stage_worst_beta": 0.25,
+    "state_capacity": 100,
+    "timeout_seconds": 180,
+    "train_seed": 45,
+    "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329",
+    "warmup_updates": 150,
+    "weight_decay": 0.01
+  },
+  "refiner": {},
+  "replay_exports": [
+    {
+      "bytes": 31615738,
+      "logical_unit_id": "CAL:00000",
+      "path": "external:cache/r1-live/CAL/unit-0001.pt",
+      "sha256": "c94b49e272dd60c962b0d2675d7e9145fa8b04323cf5bd65b97c4ab70c5a5537"
+    },
+    {
+      "bytes": 30924154,
+      "logical_unit_id": "CAL:00001",
+      "path": "external:cache/r1-live/CAL/unit-0002.pt",
+      "sha256": "7a3bc30d0bb2c00d92976420fc8d954bcd37b6ac1b3899f5fa12ad6d3036cc31"
+    },
+    {
+      "bytes": 31402042,
+      "logical_unit_id": "CAL:00002",
+      "path": "external:cache/r1-live/CAL/unit-0003.pt",
+      "sha256": "ddad0dfe8fb693e1ebc7e6dce43bdc2d87f82dfd61730595b9e356080630de30"
+    },
+    {
+      "bytes": 30985274,
+      "logical_unit_id": "CAL:00003",
+      "path": "external:cache/r1-live/CAL/unit-0004.pt",
+      "sha256": "3060399bb44aed95ce1f61635a5fa2f2ab898fe62f74dc41612258a0ee092644"
+    },
+    {
+      "bytes": 31204794,
+      "logical_unit_id": "CAL:00004",
+      "path": "external:cache/r1-live/CAL/unit-0005.pt",
+      "sha256": "2a725f61c8298805dd38f8302899986a30f5c00d41cb95c6a51315620f0fe477"
+    },
+    {
+      "bytes": 173520506,
+      "logical_unit_id": "CAL:00005",
+      "path": "external:cache/r1-live/CAL/unit-0006.pt",
+      "sha256": "28a37a50b4740aea5ff83d31a77945ce9c14cc14692c7a548a0676667a4d6e42"
+    },
+    {
+      "bytes": 179321530,
+      "logical_unit_id": "CAL:00006",
+      "path": "external:cache/r1-live/CAL/unit-0007.pt",
+      "sha256": "9bb1f01b318a9c2d5204345df8a727245ba1e0434d5f0bb776f9b372093905b0"
+    },
+    {
+      "bytes": 173348858,
+      "logical_unit_id": "CAL:00007",
+      "path": "external:cache/r1-live/CAL/unit-0008.pt",
+      "sha256": "ff9936e30a000f2cff846e62418a6f509224255470fcd4328c9096e3fd7b8011"
+    },
+    {
+      "bytes": 174405050,
+      "logical_unit_id": "CAL:00008",
+      "path": "external:cache/r1-live/CAL/unit-0009.pt",
+      "sha256": "568bcfb6406863e1ce2668ae7f9ae0c099b6087f6ec960775ea54745145ae0dd"
+    },
+    {
+      "bytes": 179516346,
+      "logical_unit_id": "CAL:00009",
+      "path": "external:cache/r1-live/CAL/unit-0010.pt",
+      "sha256": "039bcf3480a1f8d18a1f372e45e8ad897dbbad8cd980a69d60926df08b45ef51"
+    },
+    {
+      "bytes": 126404602,
+      "logical_unit_id": "CAL:00010",
+      "path": "external:cache/r1-live/CAL/unit-0011.pt",
+      "sha256": "faa34c7ca64c0b597df4ca74384e946aacf7bfde04680f8e9def14f894a46c1d"
+    },
+    {
+      "bytes": 127781498,
+      "logical_unit_id": "CAL:00011",
+      "path": "external:cache/r1-live/CAL/unit-0012.pt",
+      "sha256": "bec6fb3ebb271f63848819536217863820724910585519ff560b51ff772f6cb4"
+    },
+    {
+      "bytes": 119891706,
+      "logical_unit_id": "CAL:00012",
+      "path": "external:cache/r1-live/CAL/unit-0013.pt",
+      "sha256": "7448f9d085abfa4cc02c3f0e04a777f4bf7cfd297704b77be819c78ef86baf8d"
+    },
+    {
+      "bytes": 122228602,
+      "logical_unit_id": "CAL:00013",
+      "path": "external:cache/r1-live/CAL/unit-0014.pt",
+      "sha256": "026e6adc57140901b3864d6b4dfbfb24b0e6f82ef8c9fa978f5c6562efc7c37f"
+    },
+    {
+      "bytes": 140250810,
+      "logical_unit_id": "CAL:00014",
+      "path": "external:cache/r1-live/CAL/unit-0015.pt",
+      "sha256": "7fa53ba5c057183c86e948308fd7618d6ae45a13216e7ccb0f57888024b03513"
+    },
+    {
+      "bytes": 121648058,
+      "logical_unit_id": "CAL:00015",
+      "path": "external:cache/r1-live/CAL/unit-0016.pt",
+      "sha256": "3891628f89c3430cf9d57aeffb135337d0d85791d9223e5a14de6b7e1f4277a4"
+    },
+    {
+      "bytes": 142558458,
+      "logical_unit_id": "CAL:00016",
+      "path": "external:cache/r1-live/CAL/unit-0017.pt",
+      "sha256": "921dd5da15beb5246851cf6734efd34a514e5f83193582f1156c2d8674a6dde9"
+    },
+    {
+      "bytes": 135038138,
+      "logical_unit_id": "CAL:00017",
+      "path": "external:cache/r1-live/CAL/unit-0018.pt",
+      "sha256": "414f24ab2a6e2fc6a5508cfd8a504eb0350c5d262bfd9603673696b9f3ac38b3"
+    },
+    {
+      "bytes": 145713466,
+      "logical_unit_id": "CAL:00018",
+      "path": "external:cache/r1-live/CAL/unit-0019.pt",
+      "sha256": "5840a91036bb63ec0bab71334d46c671ff512cd236c462c497c0c42857bf1480"
+    },
+    {
+      "bytes": 145760570,
+      "logical_unit_id": "CAL:00019",
+      "path": "external:cache/r1-live/CAL/unit-0020.pt",
+      "sha256": "436f4ab3bcad63a0fcc641d3dbfdb1c90960d5932de098968f94828e8e666255"
+    },
+    {
+      "bytes": 145098042,
+      "logical_unit_id": "CAL:00020",
+      "path": "external:cache/r1-live/CAL/unit-0021.pt",
+      "sha256": "bdf3e3a61283342325440bc39c44d2ab059aff136f55a3ff0d864553e760cfd5"
+    },
+    {
+      "bytes": 136111098,
+      "logical_unit_id": "CAL:00021",
+      "path": "external:cache/r1-live/CAL/unit-0022.pt",
+      "sha256": "287426881c81acb7bc9fb9d557bb136b9eda6cbc96a365e123328010da28a8ec"
+    },
+    {
+      "bytes": 139679802,
+      "logical_unit_id": "CAL:00022",
+      "path": "external:cache/r1-live/CAL/unit-0023.pt",
+      "sha256": "db09001699ca488a551d160c8c701d71c673ed939df77c1d7b1b62976c42b84b"
+    }
+  ],
+  "resolved_config_sha256": "3df050cee539ff68cb825afb649ab595514d96d70d19b4146d2c4129b3b38cef",
+  "roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+  "schema_version": "perception-refiner-evaluation-v1",
+  "smoke_maximum_units": null,
+  "source_sha256": "13259ca30a03c8e88747e89daf03e9df547cd3ad210bcfe9088a1758e08b4106",
+  "status": "PASS",
+  "variant": "C0"
+}

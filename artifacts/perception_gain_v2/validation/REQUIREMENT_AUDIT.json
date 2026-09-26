@@ -1,0 +1,161 @@
+{
+  "schema_version": "perception-gain-v2-requirement-audit-v1",
+  "status": "SCIENTIFIC_AND_LOCAL_ASSET_REVIEW_COMPLETE_PUBLICATION_PENDING",
+  "specification": "docs/0921/Persist4D_Gain_V2/Persist4D_Codex_Gain_V2_FINAL.md",
+  "specification_sha256": "9b92e302d0af269614e86a76591cd324374f83fe64b097aa4c2ffdb330c3b688",
+  "reviewed_source_commit": "d58420568f46070a4b3a7dcee2b4e47fc42f4c7b",
+  "items": [
+    {
+      "question": 1,
+      "status": "VERIFIED_WITH_LIMITATION",
+      "conclusion": "固定父提交是当前分支祖先；相对父提交 artifacts/perception_gain_v1 无改动。实际执行 commit/source digest 保存在每次执行记录，交付源码版本另列。",
+      "evidence": [
+        "EXECUTION_LOG.jsonl",
+        "RUN_STATE.json",
+        "CODE_BINDINGS.md"
+      ],
+      "limitation": "历史预测漂移原因未查明；不把新的 baseline 数值冒充 V1 原数值。"
+    },
+    {
+      "question": 2,
+      "status": "VERIFIED",
+      "conclusion": "H/L、主模型、scorer500、NEW/PAIR1500 分开。S-BAL-H 从保存的350恢复到750，379是未保存观察进度。C0-L/Q-SEM-L到3000，CAL选择250。",
+      "evidence": [
+        "tables/TRAINING.csv",
+        "training/C0-L-s45/FULL_ENDPOINT_AUDIT.json",
+        "training/Q-SEM-L-s45/FULL_ENDPOINT_AUDIT.json",
+        "refiner/R1/NEW/TRAINING.json",
+        "refiner/R1/PAIR/TRAINING.json"
+      ],
+      "limitation": "未选LR和seed46配置存在不表示实际训练。"
+    },
+    {
+      "question": 3,
+      "status": "VERIFIED",
+      "conclusion": "LOW_PAIR与REPAIR_R1独立完成；依赖闭包回归保护HIGH/scorer失败不阻断这两条路径。",
+      "evidence": [
+        "RUN_STATE.json",
+        "EXECUTION_LOG.jsonl",
+        "repository:tests/test_perception_gain_v2.py"
+      ],
+      "limitation": "测试路径相对仓库根为 tests/test_perception_gain_v2.py。"
+    },
+    {
+      "question": 4,
+      "status": "VERIFIED_WITH_LIMITATION",
+      "conclusion": "C0-L与新L臂同runtime/sample plan；NEW/PAIR同候选、相同初始化SHA、同1500步。完整CAL/SEL使用更正后的同一父cohort。",
+      "evidence": [
+        "refiner/R1/NEW/TRAINING.json",
+        "refiner/R1/PAIR/TRAINING.json",
+        "foundation/BASELINE_SUPERSESSION.json",
+        "training/C0-L-s45/FULL_ENDPOINT_AUDIT.json",
+        "training/Q-SEM-L-s45/FULL_ENDPOINT_AUDIT.json"
+      ],
+      "limitation": "不将历史不可复现数值作为当前因果控制。"
+    },
+    {
+      "question": 5,
+      "status": "VERIFIED",
+      "conclusion": "两头共享5220条训练候选、32 references、64 episodes及source_shards_hash；input_mode进入checkpoint/eval/profile/bundle。最终未部署修复头，所以最终bundle的refiner=null正确。",
+      "evidence": [
+        "refinement/PAIR_COVERAGE.csv",
+        "refiner/R1/NEW/TRAINING.json",
+        "refiner/R1/PAIR/TRAINING.json",
+        "publication/bundles/R1-D0.json",
+        "validation/FINAL_TESTS.json"
+      ],
+      "limitation": "最终无修复器，不把无修复器的profile当成已部署修复收益。"
+    },
+    {
+      "question": 6,
+      "status": "VERIFIED",
+      "conclusion": "真实postprocess zero NEW/PAIR与parent输出SHA一致；置换vertex/segment及state/score/class不变由相关回归覆盖，完整CAL的0步与parent一致。",
+      "evidence": [
+        "foundation/SMOKE.json",
+        "refiner/R1/CAL.json",
+        "refiner/R1/SEL.json",
+        "validation/FINAL_TESTS.json"
+      ],
+      "limitation": "smoke不替代完整CAL/SEL；完整结果另存。"
+    },
+    {
+      "question": 7,
+      "status": "VERIFIED_WITH_LIMITATION",
+      "conclusion": "CAL每T23/23、SEL每T24/24，D0与FH各四T。FINAL_LOCK在首轮PB之前；PB完整129/516，名称bug恢复未改锁。",
+      "evidence": [
+        "foundation/BASELINE_COVERAGE.json",
+        "selection/FINAL_LOCK.json",
+        "confirmation/PB_RECOVERY_AUDIT.json",
+        "EXECUTION_LOG.jsonl"
+      ],
+      "limitation": "baseline漂移原因UNDETERMINED；原始结果保留于foundation/original-runtime。"
+    },
+    {
+      "question": 8,
+      "status": "NOT_APPLICABLE_AS_SPECIFIED",
+      "conclusion": "P=R1，无换父模型，不重复训练P修复器；12配置关联候选独立CAL/SEL，未与感知/修复做笛卡尔积。",
+      "evidence": [
+        "refiner/P/SELECTION.json",
+        "association/SELECTION.json",
+        "selection/FINAL_LOCK.json"
+      ],
+      "limitation": "没有新P，因此不能宣称已实际执行新P重训；实现路径由回归覆盖。"
+    },
+    {
+      "question": 9,
+      "status": "VERIFIED_WITH_LIMITATION",
+      "conclusion": "账本包含V1既有费用和失败/阻塞占卡；确认保护预算、正式分配和费用独立记录。两次LOCAL导出尝试均已结算，正式补导出0.512503 GPUh，先前中断0.122002 GPUh；已记录的两次CUDA可见回归按pytest报告墙钟另记一次。",
+      "evidence": [
+        "budget/LEDGER.jsonl",
+        "budget/ALLOCATION_EVENTS.jsonl",
+        "budget/CONFIRMATION_CURRENT_ALLOCATION.json",
+        "budget/ASSOCIATION_CPU.jsonl"
+      ],
+      "limitation": "V1费用含明示估计；pytest计费不含解释器启动，未声称CUDA kernel计时。资源上限的运行配置/抽查不证明历史每一瞬间的RAM峰值。"
+    },
+    {
+      "question": 10,
+      "status": "VERIFIED",
+      "conclusion": "质量取official pooled rows；PB/ADDITIONAL/LOCAL分开，按原始完整分母；LOCAL实际46 references更正在锁前。缺失对照比较为null，完整负结果为false。",
+      "evidence": [
+        "confirmation/COVERAGE.csv",
+        "confirmation/METRICS.csv",
+        "confirmation/BY_REFERENCE.csv",
+        "foundation/LOCAL_POPULATION_AUDIT.json",
+        "validation/FINAL_TESTS.json"
+      ],
+      "limitation": "没有实现bootstrap置信区间，不报告虚构区间。"
+    },
+    {
+      "question": 11,
+      "status": "LOCAL_ASSETS_VERIFIED_PUBLICATION_TRANSACTION_PENDING",
+      "conclusion": "真实panel上FH/D0/C0-L bundle重载输出一致，所需模型包非空。六组LOCAL各154条已完整补导出，所有原指标精确复现；全部规定人口的预测包已准备，无未满足的本地资产要求。按协议先冻结A/B再实际推送，快照不预写VERIFIED。",
+      "evidence": [
+        "resources/PROFILE_SUMMARY.json",
+        "publication/ASSET_PREPARATION.json",
+        "publication/bundles/C0-L-s45.json",
+        "confirmation/LOCAL_EXPORT_MATCHED_RUNTIME_AUDIT.json",
+        "publication/PREDICTION_ASSETS.json"
+      ],
+      "limitation": "最终以external:publication/PUBLICATION_RECEIPT.json为准；无现有Release权限时允许CODE_ONLY并列出缺失资产。"
+    },
+    {
+      "question": 12,
+      "status": "VERIFIED",
+      "conclusion": "报告区分未晋级、未训练、NOT_APPLICABLE、运行错误、一般修复收益和历史证据收益。科学结论为KEEP_R1/KEEP_PARENT/KEEP_D0，无全T超过FH。",
+      "evidence": [
+        "REPORT_STATUS.json",
+        "validation/FINAL_INTERPRETATION.md",
+        "selection/SEL_COMPONENTS.csv",
+        "confirmation/CONFIRMATION_SUMMARY.json"
+      ],
+      "limitation": "科学评分和本地导出完成不等于外部发布完成；最终以单独发布回执判定实际可访问性。"
+    }
+  ],
+  "pending": [
+    "Actual Git branch/tag publication, existing-auth Release attempt and verified external receipt under the specified A/B transaction"
+  ],
+  "reproduction_commands": "validation/REPRODUCTION.md",
+  "training_source_counts": "tables/TRAINING_SOURCE_COUNTS.csv",
+  "instruction": "This record does not claim the user objective complete. Publication evidence belongs to the external final receipt to avoid a self-referential Git snapshot."
+}

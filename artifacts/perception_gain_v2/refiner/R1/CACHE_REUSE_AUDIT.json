@@ -1,0 +1,47 @@
+{
+  "consumer_commit": "b4cfcffe5affe19506d37a906a1f882e531fe6c7",
+  "dependency_bindings": {
+    "eval_seed": 45,
+    "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+    "input_manifest_hash": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6",
+    "inventory_sha256": "795c3eb8cd7873297bd929f534e048039df22f5a6b9ac57c199060b569a860db",
+    "parent_weight_hash": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "point_order_transform": "canonical_vertices/identity_geometry",
+    "publisher": "D0/lag1/mean",
+    "resolved_config_sha256": "566f074ad9b58df007b801164d4ee47804f94ef22c0ec61bc85a4fb38d677ddb",
+    "role": "TRAIN",
+    "roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b"
+  },
+  "producer_commit": "e4fdcb4d4554d94b0c12572312378efc25efd724",
+  "source_compatibility_reviews": [
+    {
+      "consumer_sha256": "23cb1bff31eb19a56e159c936fafff1695bd4f49691ff8e8f1e711e85cc1b17c",
+      "producer_sha256": "cf1313b0f98b6813971a1f21e6fae5d5059478c3f597b21d88735ec4bf8c9464",
+      "reason": "LOCAL-T2 seed parameterization and manifest binding are outside the TRAIN producer call graph. All 20 evaluation tests passed; original default seed remains 45.",
+      "scope": "TRAIN_CACHE_ONLY",
+      "source": "scripts/perception_gain_local_evaluation.py"
+    },
+    {
+      "consumer_sha256": "f121ebc13a9f4f8301160e3f2d26136bb4fdf5b20d1977dcdfa75512ee487669",
+      "producer_sha256": "ea7dd1041c50206dee79894509e4e19f1ba46119a417bf3244d03f539a958d01",
+      "reason": "TRAIN producer does not call the evaluation runner. Multihead alignment reuse, replay limits, optional parent publication template, and progress/error logging do not alter TRAIN features or targets.",
+      "scope": "TRAIN_CACHE_ONLY",
+      "source": "scripts/perception_refiner_evaluation.py"
+    },
+    {
+      "consumer_sha256": "741f8eb6d8f54484f6c64a4ba7582f247f77b8bfd22e93f378275421c5187581",
+      "producer_sha256": "81f98957812232407a573fb7c4c85a521a39ebf2c8bcbd826775233e9326018d",
+      "reason": "Sorted unique identity alignment clones directly; float64 binary matrix products produce exactly the same integer intersections/unions and IoUs as bool reductions (including permutations, duplicate IDs and empty unions). Optional reference_prefix only binds V2 evaluation output metadata and defaults to None in TRAIN; zero-head cache production is unchanged.",
+      "scope": "TRAIN_CACHE_ONLY",
+      "source": "scripts/task_memory_output.py"
+    },
+    {
+      "consumer_sha256": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
+      "producer_sha256": "ba284fa950943254cf2332de2d2d95d6039eb44b59d03eb7e32bc6491608c217",
+      "reason": "Optional alignment cache defaults to None in the producer, optional aggregate save limit defaults off, and finite training guards are outside cache generation. Default producer values and reduction order are unchanged.",
+      "scope": "TRAIN_CACHE_ONLY",
+      "source": "scripts/train_perception_refiner.py"
+    }
+  ],
+  "status": "VERIFIED"
+}

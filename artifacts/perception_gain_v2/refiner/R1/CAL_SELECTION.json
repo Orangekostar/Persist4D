@@ -1,0 +1,70 @@
+{
+  "NEW": {
+    "S_long": 0.0,
+    "S_mean": 0.0,
+    "S_min": 0.0,
+    "binding": {
+      "input_mode": "NEW_ONLY",
+      "parent_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+      "parent_weight_hash": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "residual_bound": 2,
+      "seed": 45,
+      "source_shards_hash": "53b06b0f438a558ea34968cad2fe9bb3222dac9f5ab72627d1c562932525877e"
+    },
+    "checkpoint": "external:training/refiner/R1/NEW-s45/update=0000.ckpt",
+    "checkpoint_sha256": "dd440ad0597170df34eaa07e65911b036d736ebe5ad378c545895b1dc988d556",
+    "comparison_status": "COMPLETE",
+    "completed_logical_units": 23,
+    "coverage_status": "COMPLETE",
+    "deltas": {
+      "2": 0.0,
+      "3": 0.0,
+      "4": 0.0,
+      "5": 0.0
+    },
+    "expected_logical_units": 23,
+    "method_id": "R-NEW-R1@0000",
+    "metrics": {
+      "2": 0.36262261867523193,
+      "3": 0.2918131351470947,
+      "4": 0.24670922756195068,
+      "5": 0.22270338237285614
+    },
+    "new_parameter_count": 8769,
+    "optimizer_update": 0
+  },
+  "PAIR": {
+    "S_long": 0.0,
+    "S_mean": 0.0,
+    "S_min": 0.0,
+    "binding": {
+      "input_mode": "OLD_NEW",
+      "parent_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+      "parent_weight_hash": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "residual_bound": 2,
+      "seed": 45,
+      "source_shards_hash": "53b06b0f438a558ea34968cad2fe9bb3222dac9f5ab72627d1c562932525877e"
+    },
+    "checkpoint": "external:training/refiner/R1/PAIR-s45/update=0000.ckpt",
+    "checkpoint_sha256": "0f2c907f916b51d41af23e24f73626503b9ca8054d73066e45fa1859d80cf1d4",
+    "comparison_status": "COMPLETE",
+    "completed_logical_units": 23,
+    "coverage_status": "COMPLETE",
+    "deltas": {
+      "2": 0.0,
+      "3": 0.0,
+      "4": 0.0,
+      "5": 0.0
+    },
+    "expected_logical_units": 23,
+    "method_id": "R-PAIR-R1@0000",
+    "metrics": {
+      "2": 0.36262261867523193,
+      "3": 0.2918131351470947,
+      "4": 0.24670922756195068,
+      "5": 0.22270338237285614
+    },
+    "new_parameter_count": 8769,
+    "optimizer_update": 0
+  }
+}

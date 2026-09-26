@@ -1,0 +1,5 @@
+parent,mode,trained_updates,loss,post_diagnostic_status,broken_original_correct,changed_at_exact_abs2,changed_strictly_outside_bound,corrected_original_errors,original_errors,refined_errors,segments
+R1,NEW,1500,0.9942148327827454,PASS,6799,0,0,63618,265786,208967,9370710
+R1,PAIR,1500,0.9941935539245605,PASS,6795,0,0,63616,265786,208965,9370710
+P,NEW,0,,NOT_RUN,,,,,,,
+P,PAIR,0,,NOT_RUN,,,,,,,

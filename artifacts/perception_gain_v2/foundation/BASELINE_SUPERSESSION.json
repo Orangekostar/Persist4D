@@ -1,0 +1,49 @@
+{
+  "adopted_utc": "2026-09-22T20:19:57.708870+00:00",
+  "cost_policy": "All prior, invalidated, interrupted and repeated attempts remain charged in their original ledgers.",
+  "current_baselines": {
+    "CAL/D0": {
+      "artifact": "artifacts/perception_gain_v2/foundation/CAL/D0.json",
+      "sha256": "df16c62105b92468edeb95b95322db5f041e3f29a591621d3856485cdc790a7f",
+      "status": "PASS"
+    },
+    "CAL/FH-native": {
+      "artifact": "artifacts/perception_gain_v2/foundation/CAL/FH-native.json",
+      "sha256": "11444624a73c1c90164e813bf1a7f4b4d92f5e634ceb207647d58e9c38bc670e",
+      "status": "PASS"
+    },
+    "SEL/D0": {
+      "artifact": "artifacts/perception_gain_v2/foundation/SEL/D0.json",
+      "sha256": "d8a54812ab40519249458647adfd3d149173d3b8d0195d27b87305c282fd1869",
+      "status": "PASS"
+    },
+    "SEL/FH-native": {
+      "artifact": "artifacts/perception_gain_v2/foundation/SEL/FH-native.json",
+      "sha256": "2cfd947bb0eb7cbbe6080591add912d4c28849b285f91d386e981f30c7a44f51",
+      "status": "PASS"
+    }
+  },
+  "historical_cause": "UNDETERMINED",
+  "invalidated_association": "artifacts/perception_gain_v2/association_invalidated_parent_drift",
+  "original_baselines": {
+    "CAL/D0": {
+      "path": "artifacts/perception_gain_v2/foundation/original-runtime/CAL/D0.json",
+      "sha256": "5aba4afebb678f5a7a7ddc32b0ff0e01044305f06d6e1d99bb774627d895e479"
+    },
+    "CAL/FH-native": {
+      "path": "artifacts/perception_gain_v2/foundation/original-runtime/CAL/FH-native.json",
+      "sha256": "a316e6f656f0bfb2702916cc3fcfee69df67550d0dfcdf313e8f912bc4fc111b"
+    },
+    "SEL/D0": {
+      "path": "artifacts/perception_gain_v2/foundation/original-runtime/SEL/D0.json",
+      "sha256": "64c8d92c770bef8ea3acaa8e69ccceb5d2df7fada3e8e5b50511eaa5a7aa25b0"
+    },
+    "SEL/FH-native": {
+      "path": "artifacts/perception_gain_v2/foundation/original-runtime/SEL/FH-native.json",
+      "sha256": "669f6dd6a29d8ca75730a596ba867be8cebdec124852b0391e1d4a05f4c315ce"
+    }
+  },
+  "r1_repair_parent_parity": "EXACT_CAL_AND_SEL",
+  "reason": "Original R1 parent raw predictions cannot be reproduced by original 0a21848 or current source. Ten fresh evaluations across thread counts, zero-head presence and original/fixed startup contexts agree exactly. The historical cause remains undetermined; preserve original evidence and repeat the same fixed development protocol. No PB or other confirmation data is accessed. Association search must use the reproduced parent cache.",
+  "status": "COMPLETE"
+}

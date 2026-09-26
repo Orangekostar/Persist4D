@@ -1,0 +1,19 @@
+{
+  "rows": [
+    {
+      "bytes_read": 909824,
+      "cache_advice": "POSIX_FADV_DONTNEED",
+      "input_bytes": 909824,
+      "input_read_ms": 3.700059,
+      "kernel_storage_read_bytes": 913408,
+      "method": "COMMON_INPUT_IO_ONLY",
+      "reference_scene_id": "PREVIOUSLY_EXPOSED_CAL_INPUT_SMOKE",
+      "scan_id": "scene0007_00",
+      "status": "STORAGE_READ_OBSERVED"
+    }
+  ],
+  "scope": "Single already exposed CAL input; CPU file I/O only. No model forward or confirmation population access.",
+  "source_sha256": "2e4ceeba5bef6ae38e0b0c756e76fd964fb50488fbdf0e3bdc5b082330d4d97f",
+  "status": "PASS",
+  "utc": "2026-09-22T20:12:16.956855+00:00"
+}

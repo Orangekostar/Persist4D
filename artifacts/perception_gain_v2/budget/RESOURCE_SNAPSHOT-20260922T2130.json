@@ -1,0 +1,82 @@
+{
+  "current_rss_bytes": 20202991616,
+  "data_loader_worker_limit": 8,
+  "data_loader_workers": 4,
+  "processes": [
+    {
+      "name": "python",
+      "peak_rss_bytes": 19906560,
+      "pid": 275387,
+      "ppid": 1597046,
+      "rss_bytes": 19906560
+    },
+    {
+      "name": "python",
+      "peak_rss_bytes": 6167646208,
+      "pid": 277704,
+      "ppid": 277700,
+      "rss_bytes": 3251372032
+    },
+    {
+      "name": "python",
+      "peak_rss_bytes": 21868544,
+      "pid": 351506,
+      "ppid": 275387,
+      "rss_bytes": 21807104
+    },
+    {
+      "name": "python",
+      "peak_rss_bytes": 4417359872,
+      "pid": 351510,
+      "ppid": 351506,
+      "rss_bytes": 3349450752
+    },
+    {
+      "name": "python",
+      "peak_rss_bytes": 3606208512,
+      "pid": 364113,
+      "ppid": 351510,
+      "rss_bytes": 2849095680
+    },
+    {
+      "name": "python",
+      "peak_rss_bytes": 3048652800,
+      "pid": 364875,
+      "ppid": 364113,
+      "rss_bytes": 2948169728
+    },
+    {
+      "name": "pt_data_worker",
+      "peak_rss_bytes": 2027008000,
+      "pid": 366769,
+      "ppid": 364113,
+      "rss_bytes": 1897844736
+    },
+    {
+      "name": "pt_data_worker",
+      "peak_rss_bytes": 2095276032,
+      "pid": 366770,
+      "ppid": 364875,
+      "rss_bytes": 1968517120
+    },
+    {
+      "name": "pt_data_worker",
+      "peak_rss_bytes": 2009149440,
+      "pid": 366771,
+      "ppid": 364113,
+      "rss_bytes": 1926754304
+    },
+    {
+      "name": "pt_data_worker",
+      "peak_rss_bytes": 2085957632,
+      "pid": 366774,
+      "ppid": 364875,
+      "rss_bytes": 1970073600
+    }
+  ],
+  "ram_limit_bytes": 103079215104,
+  "scope": "Current owned continuation/controller/training and association process trees only. Sum RSS includes shared pages; sum live-process peaks is a conservative bound and does not cover exited processes.",
+  "status": "PASS",
+  "sum_live_process_peak_rss_bytes": 25499033600,
+  "utc": "2026-09-22T21:30:04.486591+00:00"
+}

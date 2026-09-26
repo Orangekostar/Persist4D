@@ -1,0 +1,35 @@
+{
+  "checkpoint_update": 750,
+  "first_updates": [
+    {
+      "nonfinite_gradient_count": 0,
+      "optimizer_update": 1,
+      "total_parameter_change_norm": 0.00034025509674471497
+    },
+    {
+      "nonfinite_gradient_count": 0,
+      "optimizer_update": 2,
+      "total_parameter_change_norm": 0.0004829130237728301
+    }
+  ],
+  "frozen_scorer_exact": true,
+  "optimizer_states": 1,
+  "progress": {
+    "completed_local_batches": 6000,
+    "completed_optimizer_updates": 750,
+    "next_global_draw_index": 24000,
+    "schema_version": "perception-gain-exact-resume-v1"
+  },
+  "recipe_id": "Q-SEM-L-s45",
+  "recipe_identity": "EXACT_REGISTERED_RECIPE",
+  "rng_rank_count": 2,
+  "scheduler_last_epoch": 750,
+  "scheduler_states": 1,
+  "scope": "CPU inspection of the actual planned update750 checkpoint; no extra training or confirmation evaluation.",
+  "scorer_sha256": "5bf58cdde393493daeb29bd023cb058db51bec56e76d39ba14ff68a6f911380c",
+  "scorer_state_keys": 6,
+  "source_checkpoint": "external:training/Q-SEM-L-s45/update=0750.ckpt",
+  "source_sha256": "4f373399cf2b2b49e9c2f375e52e57f705ba3174acded564f85fd9b776424523",
+  "status": "PASS",
+  "utc": "2026-09-23T02:23:34.051704+00:00"
+}

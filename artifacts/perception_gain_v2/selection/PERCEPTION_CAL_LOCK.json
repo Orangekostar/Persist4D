@@ -1,0 +1,58 @@
+{
+  "C0-L-s45": {
+    "S_long": 0.005485467612743378,
+    "S_mean": 0.003148358315229416,
+    "S_min": -0.009058594703674316,
+    "architecture_variant": "C0",
+    "checkpoint": "external:training/C0-L-s45/update=0250.ckpt",
+    "checkpoint_sha256": "e85a2217c05d41fd2e82b996ff6676213cb050d5bc7dd48a0e37a33d26c11a1d",
+    "comparison_status": "COMPLETE",
+    "completed_logical_units": 23,
+    "coverage_status": "COMPLETE",
+    "deltas": {
+      "2": -0.009058594703674316,
+      "3": 0.010681092739105225,
+      "4": -0.0018693506717681885,
+      "5": 0.012840285897254944
+    },
+    "expected_logical_units": 23,
+    "method_id": "C0-L-s45",
+    "metrics": {
+      "2": 0.3535640239715576,
+      "3": 0.30249422788619995,
+      "4": 0.2448398768901825,
+      "5": 0.23554366827011108
+    },
+    "new_parameter_count": 0,
+    "optimizer_update": 250,
+    "recipe_id": "C0-L-s45"
+  },
+  "Q-SEM-L-s45": {
+    "S_long": 0.005399301648139954,
+    "S_mean": 0.004765920341014862,
+    "S_min": 0.000279158353805542,
+    "architecture_variant": "Q-SEM",
+    "checkpoint": "external:training/Q-SEM-L-s45/update=0250.ckpt",
+    "checkpoint_sha256": "84784c3656482a25d211dbc1cce6e3902dec595294699782d0dcc9d59c618e24",
+    "comparison_status": "COMPLETE",
+    "completed_logical_units": 23,
+    "coverage_status": "COMPLETE",
+    "deltas": {
+      "2": 0.0005218684673309326,
+      "3": 0.007743209600448608,
+      "4": 0.000279158353805542,
+      "5": 0.010519444942474365
+    },
+    "expected_logical_units": 23,
+    "method_id": "Q-SEM-L-s45",
+    "metrics": {
+      "2": 0.36314448714256287,
+      "3": 0.29955634474754333,
+      "4": 0.24698838591575623,
+      "5": 0.2332228273153305
+    },
+    "new_parameter_count": 8577,
+    "optimizer_update": 250,
+    "recipe_id": "Q-SEM-L-s45"
+  }
+}

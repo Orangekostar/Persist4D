@@ -1,0 +1,33 @@
+{
+  "rows": [
+    {
+      "completed_logical_units": 23,
+      "method_output_sha256": {
+        "PARENT": "2e16dfa9bcab37483b190fbc95d477956cfa91e6dafdea2e7f6e83ac50ff5c88"
+      },
+      "metrics_exact": true,
+      "output_sha256_exact": true,
+      "previous_result": "evaluation_invalidated_checkpoint_resave/CAL/C0-L-s45/update=0750.json",
+      "previous_result_sha256": "63aa51b5130bed2ffbeaf1ff8cb23db0ef53c3cfdf872988d39faeff0b0f5096",
+      "recipe_id": "C0-L-s45",
+      "recomputed_result": "evaluation/CAL/C0-L-s45/update=0750.json",
+      "recomputed_result_sha256": "42f4a767fec4e63659c1e5c7d28a5d31adf614347cbc26bb00bdf02cd3af1a32"
+    },
+    {
+      "completed_logical_units": 23,
+      "method_output_sha256": {
+        "PARENT": "a4e7f43e657c146c54bc71993c9f456dee55fa40a072c5eb9d68428e4f9d4994"
+      },
+      "metrics_exact": true,
+      "output_sha256_exact": true,
+      "previous_result": "evaluation_invalidated_checkpoint_resave/CAL/Q-SEM-L-s45/update=0750.json",
+      "previous_result_sha256": "8ccd33639488bc4ad079512f8f3a040508f0bbb0717cdfcf0be6eb41886cdadc",
+      "recipe_id": "Q-SEM-L-s45",
+      "recomputed_result": "evaluation/CAL/Q-SEM-L-s45/update=0750.json",
+      "recomputed_result_sha256": "c40769fb0a0a5eb8cd2c5b816fa7c1ccff2ca97e92a2d358cd93bdd3c2656cb3"
+    }
+  ],
+  "scope": "Actual full CAL outputs and pooled metrics match before/after checkpoint reserialization; does not claim arbitrary inputs or optimizer-state byte equivalence.",
+  "status": "PASS",
+  "utc": "2026-09-26T13:41:43.211207+00:00"
+}

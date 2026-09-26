@@ -1,0 +1,89 @@
+{
+  "utc": "2026-09-22T20:07:01Z",
+  "status": "PASS",
+  "scope": "Current owned core, early CAL and adoption/recovery process trees. Sum of per-process RSS includes shared pages and is a conservative upper bound. Historical exited processes are not covered.",
+  "current_rss_bytes": 14516731904,
+  "sum_live_process_peak_rss_bytes": 16095219712,
+  "data_loader_workers": 4,
+  "ram_limit_bytes": 103079215104,
+  "data_loader_worker_limit": 8,
+  "processes": [
+    {
+      "pid": 28340,
+      "ppid": 4161911,
+      "name": "python",
+      "rss_bytes": 2861727744,
+      "peak_rss_bytes": 3619606528
+    },
+    {
+      "pid": 28473,
+      "ppid": 28340,
+      "name": "python",
+      "rss_bytes": 2986856448,
+      "peak_rss_bytes": 3121094656
+    },
+    {
+      "pid": 28699,
+      "ppid": 28473,
+      "name": "pt_data_worker",
+      "rss_bytes": 1970933760,
+      "peak_rss_bytes": 2143035392
+    },
+    {
+      "pid": 28700,
+      "ppid": 28340,
+      "name": "pt_data_worker",
+      "rss_bytes": 1900937216,
+      "peak_rss_bytes": 2077310976
+    },
+    {
+      "pid": 28701,
+      "ppid": 28340,
+      "name": "pt_data_worker",
+      "rss_bytes": 1939886080,
+      "peak_rss_bytes": 2049613824
+    },
+    {
+      "pid": 28704,
+      "ppid": 28473,
+      "name": "pt_data_worker",
+      "rss_bytes": 1971023872,
+      "peak_rss_bytes": 2199191552
+    },
+    {
+      "pid": 202233,
+      "ppid": 1597046,
+      "name": "python",
+      "rss_bytes": 18567168,
+      "peak_rss_bytes": 18567168
+    },
+    {
+      "pid": 215311,
+      "ppid": 1597046,
+      "name": "python",
+      "rss_bytes": 18173952,
+      "peak_rss_bytes": 18173952
+    },
+    {
+      "pid": 272387,
+      "ppid": 202233,
+      "name": "python",
+      "rss_bytes": 809402368,
+      "peak_rss_bytes": 809402368
+    },
+    {
+      "pid": 4161892,
+      "ppid": 4160916,
+      "name": "python",
+      "rss_bytes": 20021248,
+      "peak_rss_bytes": 20021248
+    },
+    {
+      "pid": 4161911,
+      "ppid": 4161892,
+      "name": "python",
+      "rss_bytes": 19202048,
+      "peak_rss_bytes": 19202048
+    }
+  ]
+}

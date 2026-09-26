@@ -1,0 +1,908 @@
+{
+  "assets": [
+    {
+      "bytes": 40200,
+      "logical_reference": "external:publication/predictions/predictions-12a9f0f4cced3b01-97e1b61c9c0f4ef3.zip",
+      "planned_name": "predictions-12a9f0f4cced3b01-97e1b61c9c0f4ef3.zip",
+      "role": "sanitized_predictions",
+      "sha256": "6603687daae9c5c69d21c3a0516ef4fa1a5864c4c6e97ceaed1b62a2c5748568",
+      "status": "READY"
+    },
+    {
+      "bytes": 378,
+      "logical_reference": "external:publication/predictions/predictions-12a9f0f4cced3b01-97e1b61c9c0f4ef3.zip.manifest.json",
+      "planned_name": "predictions-12a9f0f4cced3b01-97e1b61c9c0f4ef3.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "7905f5f7564f1557d00afcfe4e7ba711646d62fe79d0644e7ca156aee115adc1",
+      "status": "READY"
+    },
+    {
+      "bytes": 35681,
+      "logical_reference": "external:publication/predictions/predictions-1aa655719292c523-124369be8cbdcda7.zip",
+      "planned_name": "predictions-1aa655719292c523-124369be8cbdcda7.zip",
+      "role": "sanitized_predictions",
+      "sha256": "52d42db01e307e32f80924458833a8906922f47c689c785e3ad1376c58aedf8f",
+      "status": "READY"
+    },
+    {
+      "bytes": 378,
+      "logical_reference": "external:publication/predictions/predictions-1aa655719292c523-124369be8cbdcda7.zip.manifest.json",
+      "planned_name": "predictions-1aa655719292c523-124369be8cbdcda7.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "25a11ce6d7ede33d52140ce8dbd2317a7678da074daba48140c6f40e64378006",
+      "status": "READY"
+    },
+    {
+      "bytes": 12179576,
+      "logical_reference": "external:publication/predictions/predictions-1d458ded0cc7178f-457d09ea47e68755.zip",
+      "planned_name": "predictions-1d458ded0cc7178f-457d09ea47e68755.zip",
+      "role": "sanitized_predictions",
+      "sha256": "4fc60a66314fd294b8adc3a67f3bf256850c6be1c0e10092b48faa4d4592dcc0",
+      "status": "READY"
+    },
+    {
+      "bytes": 384,
+      "logical_reference": "external:publication/predictions/predictions-1d458ded0cc7178f-457d09ea47e68755.zip.manifest.json",
+      "planned_name": "predictions-1d458ded0cc7178f-457d09ea47e68755.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "fc9b18c95a87e9a592686aecdd14f96208a569b147643c115150a6d5fff8bd2b",
+      "status": "READY"
+    },
+    {
+      "bytes": 6590783,
+      "logical_reference": "external:publication/predictions/predictions-2a4adc30c0faee95-08ad5ff9ea2e479f.zip",
+      "planned_name": "predictions-2a4adc30c0faee95-08ad5ff9ea2e479f.zip",
+      "role": "sanitized_predictions",
+      "sha256": "8b6038c037c05c878155d18b2ffe0967b95179662233b75519f8cd9766d4a943",
+      "status": "READY"
+    },
+    {
+      "bytes": 382,
+      "logical_reference": "external:publication/predictions/predictions-2a4adc30c0faee95-08ad5ff9ea2e479f.zip.manifest.json",
+      "planned_name": "predictions-2a4adc30c0faee95-08ad5ff9ea2e479f.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "9b6c20e285194d492f80808d3a925c5717df35636d653b97d77ab763790f6b52",
+      "status": "READY"
+    },
+    {
+      "bytes": 6630590,
+      "logical_reference": "external:publication/predictions/predictions-32e0f22cbc74b61c-471f8ad920efe103.zip",
+      "planned_name": "predictions-32e0f22cbc74b61c-471f8ad920efe103.zip",
+      "role": "sanitized_predictions",
+      "sha256": "88f13d6731f54335188f0d5af85d30deedc4c39f6035e91610955560f869dba3",
+      "status": "READY"
+    },
+    {
+      "bytes": 382,
+      "logical_reference": "external:publication/predictions/predictions-32e0f22cbc74b61c-471f8ad920efe103.zip.manifest.json",
+      "planned_name": "predictions-32e0f22cbc74b61c-471f8ad920efe103.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "69459c78b68cd35063e7674277aa44129f93340844d00b3db3855108efc09048",
+      "status": "READY"
+    },
+    {
+      "bytes": 6743994,
+      "logical_reference": "external:publication/predictions/predictions-428a472e0d9a6816-9d5972a29c0ffcdd.zip",
+      "planned_name": "predictions-428a472e0d9a6816-9d5972a29c0ffcdd.zip",
+      "role": "sanitized_predictions",
+      "sha256": "bf74e9820828caefa95bca17dc3ad6e66354bff10cefd8b116c5c05b8deba789",
+      "status": "READY"
+    },
+    {
+      "bytes": 382,
+      "logical_reference": "external:publication/predictions/predictions-428a472e0d9a6816-9d5972a29c0ffcdd.zip.manifest.json",
+      "planned_name": "predictions-428a472e0d9a6816-9d5972a29c0ffcdd.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "1fe47026fdb2a0d67573011564cf883a81e104696684b5aea47c733d82b6d225",
+      "status": "READY"
+    },
+    {
+      "bytes": 64345792,
+      "logical_reference": "external:publication/predictions/predictions-68d53a3cc629fc28-250489d6ea0129c5.zip",
+      "planned_name": "predictions-68d53a3cc629fc28-250489d6ea0129c5.zip",
+      "role": "sanitized_predictions",
+      "sha256": "d0710946e8c1b14bb34bca6fa32ca230edf4a389e6ce915c64c47b7f346f75d7",
+      "status": "READY"
+    },
+    {
+      "bytes": 384,
+      "logical_reference": "external:publication/predictions/predictions-68d53a3cc629fc28-250489d6ea0129c5.zip.manifest.json",
+      "planned_name": "predictions-68d53a3cc629fc28-250489d6ea0129c5.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "fb7b5d88cf6ddec9a99aa818f7ba6eaefd6a3efb034f449a457091c485d21d96",
+      "status": "READY"
+    },
+    {
+      "bytes": 6750750,
+      "logical_reference": "external:publication/predictions/predictions-73fe363a6c463d1a-273864376a30b375.zip",
+      "planned_name": "predictions-73fe363a6c463d1a-273864376a30b375.zip",
+      "role": "sanitized_predictions",
+      "sha256": "907c6c47d1188cbf55ae3915311b2a2944686baad07f1f2cffaf2206dd86a27f",
+      "status": "READY"
+    },
+    {
+      "bytes": 382,
+      "logical_reference": "external:publication/predictions/predictions-73fe363a6c463d1a-273864376a30b375.zip.manifest.json",
+      "planned_name": "predictions-73fe363a6c463d1a-273864376a30b375.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "1ddba48286de747cbc13bb216b51c53af802f78648af6ed2807f617b907e07d3",
+      "status": "READY"
+    },
+    {
+      "bytes": 36348,
+      "logical_reference": "external:publication/predictions/predictions-85cc316ff393aaf3-cdb1a612c5f39321.zip",
+      "planned_name": "predictions-85cc316ff393aaf3-cdb1a612c5f39321.zip",
+      "role": "sanitized_predictions",
+      "sha256": "132bd15c82396bb919e3d304e95472fa813ef7ec1f8ac03a8f86dd0d34aa01fb",
+      "status": "READY"
+    },
+    {
+      "bytes": 378,
+      "logical_reference": "external:publication/predictions/predictions-85cc316ff393aaf3-cdb1a612c5f39321.zip.manifest.json",
+      "planned_name": "predictions-85cc316ff393aaf3-cdb1a612c5f39321.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "42d12b7d852e08deb752bb16e105c0d0b34852c1941a2d600491354a67538827",
+      "status": "READY"
+    },
+    {
+      "bytes": 6685464,
+      "logical_reference": "external:publication/predictions/predictions-9bd88ae99aaf0a9d-f0fcc2f2b57c82dd.zip",
+      "planned_name": "predictions-9bd88ae99aaf0a9d-f0fcc2f2b57c82dd.zip",
+      "role": "sanitized_predictions",
+      "sha256": "9e0998592b1dc81c59a982e4644fb21fc08d418719b2d60c72a7047aba8418c6",
+      "status": "READY"
+    },
+    {
+      "bytes": 382,
+      "logical_reference": "external:publication/predictions/predictions-9bd88ae99aaf0a9d-f0fcc2f2b57c82dd.zip.manifest.json",
+      "planned_name": "predictions-9bd88ae99aaf0a9d-f0fcc2f2b57c82dd.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "af7672cb1ee65aeb125a906a8261356234ec57e95f002f3c29b5e22f85c1b376",
+      "status": "READY"
+    },
+    {
+      "bytes": 33888,
+      "logical_reference": "external:publication/predictions/predictions-bbe7d73e850ac6f5-dad6b2e283f462a4.zip",
+      "planned_name": "predictions-bbe7d73e850ac6f5-dad6b2e283f462a4.zip",
+      "role": "sanitized_predictions",
+      "sha256": "b0ead100b0b6cbc97b734e586438a6139b5aa4da91ca850316b2f5a05912cf99",
+      "status": "READY"
+    },
+    {
+      "bytes": 378,
+      "logical_reference": "external:publication/predictions/predictions-bbe7d73e850ac6f5-dad6b2e283f462a4.zip.manifest.json",
+      "planned_name": "predictions-bbe7d73e850ac6f5-dad6b2e283f462a4.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "2b0e5fdf4bd4214b5bd14c57fb4ec65b3f9845d33c0d6d8a3e9f8e9845061792",
+      "status": "READY"
+    },
+    {
+      "bytes": 44659236,
+      "logical_reference": "external:publication/predictions/predictions-ce6be66dab57ecfd-15c47ca82ed19989.zip",
+      "planned_name": "predictions-ce6be66dab57ecfd-15c47ca82ed19989.zip",
+      "role": "sanitized_predictions",
+      "sha256": "2f4a736dde942ceb7efc2ce3da83c5256404a68cb20f0da3439601f83a08e24a",
+      "status": "READY"
+    },
+    {
+      "bytes": 384,
+      "logical_reference": "external:publication/predictions/predictions-ce6be66dab57ecfd-15c47ca82ed19989.zip.manifest.json",
+      "planned_name": "predictions-ce6be66dab57ecfd-15c47ca82ed19989.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "b292bcee3a16d2706bbb8b2ec83d12eb87cc78e7c74a110d75ed4685ece0439d",
+      "status": "READY"
+    },
+    {
+      "bytes": 33969,
+      "logical_reference": "external:publication/predictions/predictions-cfb53e78e7f05f88-daebd606aec75cb5.zip",
+      "planned_name": "predictions-cfb53e78e7f05f88-daebd606aec75cb5.zip",
+      "role": "sanitized_predictions",
+      "sha256": "329948407f9880bc0d681943e6c44f05277c43d291f78a7f09477de5039c9eb6",
+      "status": "READY"
+    },
+    {
+      "bytes": 378,
+      "logical_reference": "external:publication/predictions/predictions-cfb53e78e7f05f88-daebd606aec75cb5.zip.manifest.json",
+      "planned_name": "predictions-cfb53e78e7f05f88-daebd606aec75cb5.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "cfde1f869e84f99373d8fd9cffb5ae694a5c7ca264e41e9d17f43c1cbcce05e8",
+      "status": "READY"
+    },
+    {
+      "bytes": 37656,
+      "logical_reference": "external:publication/predictions/predictions-d73dee68be426a64-d75562854da0a6c3.zip",
+      "planned_name": "predictions-d73dee68be426a64-d75562854da0a6c3.zip",
+      "role": "sanitized_predictions",
+      "sha256": "7aaf4a6563811638aad01ea68e5d54725b28bd9b17c35fca74f35fabd128e1d9",
+      "status": "READY"
+    },
+    {
+      "bytes": 378,
+      "logical_reference": "external:publication/predictions/predictions-d73dee68be426a64-d75562854da0a6c3.zip.manifest.json",
+      "planned_name": "predictions-d73dee68be426a64-d75562854da0a6c3.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "fd161965a40f7b5ba9173134eb5384af35d569377fa1f6f89c09146b134458eb",
+      "status": "READY"
+    },
+    {
+      "bytes": 62962156,
+      "logical_reference": "external:publication/predictions/predictions-e417cbb0142d17dd-b27056775571df85.zip",
+      "planned_name": "predictions-e417cbb0142d17dd-b27056775571df85.zip",
+      "role": "sanitized_predictions",
+      "sha256": "789253037cc2d2d094aa49ccc01316d05da76fbc9113f9316c1f621be46d09a7",
+      "status": "READY"
+    },
+    {
+      "bytes": 384,
+      "logical_reference": "external:publication/predictions/predictions-e417cbb0142d17dd-b27056775571df85.zip.manifest.json",
+      "planned_name": "predictions-e417cbb0142d17dd-b27056775571df85.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "ac4e6db56e2a6795eed991d58f338092161d5a21d2f82093c75658e4688f54ea",
+      "status": "READY"
+    },
+    {
+      "bytes": 6756170,
+      "logical_reference": "external:publication/predictions/predictions-ea42eb5eb2c16653-132cf60a8a348d8f.zip",
+      "planned_name": "predictions-ea42eb5eb2c16653-132cf60a8a348d8f.zip",
+      "role": "sanitized_predictions",
+      "sha256": "b3cf5884b2ee8bef584f41ec825b1a7a2ba2036c2407e58c91470f10850c67a2",
+      "status": "READY"
+    },
+    {
+      "bytes": 382,
+      "logical_reference": "external:publication/predictions/predictions-ea42eb5eb2c16653-132cf60a8a348d8f.zip.manifest.json",
+      "planned_name": "predictions-ea42eb5eb2c16653-132cf60a8a348d8f.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "7431ed3783f658642bfa65a1e7cdbc76987566e6f2da9d4b979a89248f6a5ba5",
+      "status": "READY"
+    },
+    {
+      "bytes": 15826025,
+      "logical_reference": "external:publication/predictions/predictions-ff0455977fd038fc-3a4fba0c2142cc85.zip",
+      "planned_name": "predictions-ff0455977fd038fc-3a4fba0c2142cc85.zip",
+      "role": "sanitized_predictions",
+      "sha256": "ea0f4dae77970688379875e6ddfa7acdcd0a3ed331d79880328fe06cb1624832",
+      "status": "READY"
+    },
+    {
+      "bytes": 384,
+      "logical_reference": "external:publication/predictions/predictions-ff0455977fd038fc-3a4fba0c2142cc85.zip.manifest.json",
+      "planned_name": "predictions-ff0455977fd038fc-3a4fba0c2142cc85.zip.manifest.json",
+      "role": "prediction_parts_manifest",
+      "sha256": "ded3405ab8164668dd59858bfcd1ff88940070a613f00049877785c42edee7aa",
+      "status": "READY"
+    }
+  ],
+  "exports": [
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 45,
+        "inference_identity": "98dfa16279cc25c817ba17f9d310846e39d43773b7bae8c8785b95ae72459c7e",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "FH-R1-native"
+      },
+      "bytes": 40200,
+      "completed_units_by_horizon": {
+        "2": 1
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "6603687daae9c5c69d21c3a0516ef4fa1a5864c4c6e97ceaed1b62a2c5748568",
+      "status": "PARTIAL"
+    },
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 47,
+        "inference_identity": "98dfa16279cc25c817ba17f9d310846e39d43773b7bae8c8785b95ae72459c7e",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "FH-R1-native"
+      },
+      "bytes": 35681,
+      "completed_units_by_horizon": {
+        "2": 1
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "52d42db01e307e32f80924458833a8906922f47c689c785e3ad1376c58aedf8f",
+      "status": "PARTIAL"
+    },
+    {
+      "binding": {
+        "data_role": "ADDITIONAL",
+        "eval_seed": 45,
+        "inference_identity": "98dfa16279cc25c817ba17f9d310846e39d43773b7bae8c8785b95ae72459c7e",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "FH-R1-native"
+      },
+      "bytes": 12179576,
+      "completed_units_by_horizon": {
+        "2": 111,
+        "3": 77,
+        "4": 32
+      },
+      "expected_units_by_horizon": {
+        "2": 111,
+        "3": 77,
+        "4": 32
+      },
+      "sha256": "4fc60a66314fd294b8adc3a67f3bf256850c6be1c0e10092b48faa4d4592dcc0",
+      "status": "COMPLETE"
+    },
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 45,
+        "execution_binding": {
+          "data_roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+          "execution_provenance": {
+            "executed_code_commit": "50572820b1a4b5c585bb1afea4593e5419a7c6ef",
+            "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+            "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+            "recipe_id": "C0-L-s45",
+            "relevant_source_digest": "74af1fe550a5db21a9e4de76d0350e0b6bb3d18716515d6a4685aaa9fbf05bc4",
+            "source_files": {
+              "datasets/semseg.py": "c633c46a3069a93c549b64be9b94649e9c7da64145ba36555c150c45f34df6f1",
+              "datasets/task_memory_episode.py": "acbc5f293cb8d952eede8768bf3b6ddb9ac2739ae53d9fa59602f749f453f9a7",
+              "models/criterion.py": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150",
+              "models/overlap_entity_association.py": "2003641db14436de469fe4ec0be5c57051f8e32eb5aaa3729b5031f814405c68",
+              "models/perception_gain.py": "781bc9c12ea206a2ee589267cfcada4d8dffcef8e15d566ca06a07af876a6305",
+              "models/persistent_memory.py": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8",
+              "models/rescene.py": "d0088ab6a09623ac7865681929e06b315e580965bb90b1985f932eeefe64e12f",
+              "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+              "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+              "scripts/perception_gain_evaluation.py": "938770aa3c9a6db2d5c8a8d5db732948a1c3d15f78eb7f7f5aa82cadd62db175",
+              "scripts/perception_gain_local_evaluation.py": "323e68f493c719b861a577fbde65e5d3bd5e6afb2ae54235f4ff54fce8c1ef19",
+              "scripts/perception_gain_native_evaluation.py": "ae2fe20eac0fb33dc87db8fbaab028928560fcbafea5a5ee95721fff444c0ec3",
+              "scripts/perception_gain_profile.py": "1fbcc919f613a07a589aec5b93aae2b0a131b14fd6010af2f3dc8651dcaba512",
+              "scripts/perception_gain_v2_config.py": "08e5a03803516d2e4c724dc7b219931e901d326be2760c9e337d687fe42f4215",
+              "scripts/perception_refiner_evaluation.py": "c7278e8cee65e49eb16d41d818ef0586ec54fdad487993fb4905e22466e4b4b2",
+              "scripts/prepare_perception_refiner.py": "b21e9a0a95a61bef86a9ba867674e5f575e13c0f81bfbd0803b5dbc0c7a345f4",
+              "scripts/replay_crosswindow_association.py": "a519901aac2644a16a1d1ab2cf600a52f9e2fa310610446d0ea925e28ea0a388",
+              "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+              "scripts/run_task_memory_controls.py": "9682d70357b191d794a0b169a0aabcd8f312312de7c67af744f2e46bca8bd01f",
+              "scripts/run_task_memory_policy_baseline.py": "9b1c3c1de2907a1b88dea1efde6b1bb184eeccc5e6e864e48401ab11cf174440",
+              "scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+              "scripts/system_comparison_metrics.py": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd",
+              "scripts/task_memory_output.py": "741f8eb6d8f54484f6c64a4ba7582f247f77b8bfd22e93f378275421c5187581",
+              "scripts/train_perception_gain.py": "913808d1eca856df4b7908df524f790664b2cc3d0a90c9e5efe64b9ef38be091",
+              "scripts/train_perception_refiner.py": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
+              "trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a",
+              "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+            },
+            "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329"
+          },
+          "exporter_sha256": "573c1f036c9e24cbdc393681c9ec7ee84dd5518655048dfb603c3c28927ee176",
+          "input_manifest_sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6"
+        },
+        "inference_identity": "998ccb67a8424d71d7a124746cee3e3a7d149bd194974aaa29036021218d2e27",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "C0-best-native",
+        "runtime_environment": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "MKL_NUM_THREADS": "2",
+          "OMP_NUM_THREADS": "2",
+          "OPENBLAS_NUM_THREADS": "2",
+          "PYTHONHASHSEED": null
+        }
+      },
+      "bytes": 6590783,
+      "completed_units_by_horizon": {
+        "2": 154
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "8b6038c037c05c878155d18b2ffe0967b95179662233b75519f8cd9766d4a943",
+      "status": "COMPLETE"
+    },
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 46,
+        "execution_binding": {
+          "data_roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+          "execution_provenance": {
+            "executed_code_commit": "50572820b1a4b5c585bb1afea4593e5419a7c6ef",
+            "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+            "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+            "recipe_id": "C0-L-s45",
+            "relevant_source_digest": "74af1fe550a5db21a9e4de76d0350e0b6bb3d18716515d6a4685aaa9fbf05bc4",
+            "source_files": {
+              "datasets/semseg.py": "c633c46a3069a93c549b64be9b94649e9c7da64145ba36555c150c45f34df6f1",
+              "datasets/task_memory_episode.py": "acbc5f293cb8d952eede8768bf3b6ddb9ac2739ae53d9fa59602f749f453f9a7",
+              "models/criterion.py": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150",
+              "models/overlap_entity_association.py": "2003641db14436de469fe4ec0be5c57051f8e32eb5aaa3729b5031f814405c68",
+              "models/perception_gain.py": "781bc9c12ea206a2ee589267cfcada4d8dffcef8e15d566ca06a07af876a6305",
+              "models/persistent_memory.py": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8",
+              "models/rescene.py": "d0088ab6a09623ac7865681929e06b315e580965bb90b1985f932eeefe64e12f",
+              "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+              "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+              "scripts/perception_gain_evaluation.py": "938770aa3c9a6db2d5c8a8d5db732948a1c3d15f78eb7f7f5aa82cadd62db175",
+              "scripts/perception_gain_local_evaluation.py": "323e68f493c719b861a577fbde65e5d3bd5e6afb2ae54235f4ff54fce8c1ef19",
+              "scripts/perception_gain_native_evaluation.py": "ae2fe20eac0fb33dc87db8fbaab028928560fcbafea5a5ee95721fff444c0ec3",
+              "scripts/perception_gain_profile.py": "1fbcc919f613a07a589aec5b93aae2b0a131b14fd6010af2f3dc8651dcaba512",
+              "scripts/perception_gain_v2_config.py": "08e5a03803516d2e4c724dc7b219931e901d326be2760c9e337d687fe42f4215",
+              "scripts/perception_refiner_evaluation.py": "c7278e8cee65e49eb16d41d818ef0586ec54fdad487993fb4905e22466e4b4b2",
+              "scripts/prepare_perception_refiner.py": "b21e9a0a95a61bef86a9ba867674e5f575e13c0f81bfbd0803b5dbc0c7a345f4",
+              "scripts/replay_crosswindow_association.py": "a519901aac2644a16a1d1ab2cf600a52f9e2fa310610446d0ea925e28ea0a388",
+              "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+              "scripts/run_task_memory_controls.py": "9682d70357b191d794a0b169a0aabcd8f312312de7c67af744f2e46bca8bd01f",
+              "scripts/run_task_memory_policy_baseline.py": "9b1c3c1de2907a1b88dea1efde6b1bb184eeccc5e6e864e48401ab11cf174440",
+              "scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+              "scripts/system_comparison_metrics.py": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd",
+              "scripts/task_memory_output.py": "741f8eb6d8f54484f6c64a4ba7582f247f77b8bfd22e93f378275421c5187581",
+              "scripts/train_perception_gain.py": "913808d1eca856df4b7908df524f790664b2cc3d0a90c9e5efe64b9ef38be091",
+              "scripts/train_perception_refiner.py": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
+              "trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a",
+              "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+            },
+            "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329"
+          },
+          "exporter_sha256": "573c1f036c9e24cbdc393681c9ec7ee84dd5518655048dfb603c3c28927ee176",
+          "input_manifest_sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6"
+        },
+        "inference_identity": "998ccb67a8424d71d7a124746cee3e3a7d149bd194974aaa29036021218d2e27",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "C0-best-native",
+        "runtime_environment": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "MKL_NUM_THREADS": "2",
+          "OMP_NUM_THREADS": "2",
+          "OPENBLAS_NUM_THREADS": "2",
+          "PYTHONHASHSEED": null
+        }
+      },
+      "bytes": 6630590,
+      "completed_units_by_horizon": {
+        "2": 154
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "88f13d6731f54335188f0d5af85d30deedc4c39f6035e91610955560f869dba3",
+      "status": "COMPLETE"
+    },
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 47,
+        "execution_binding": {
+          "data_roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+          "execution_provenance": {
+            "executed_code_commit": "50572820b1a4b5c585bb1afea4593e5419a7c6ef",
+            "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+            "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+            "recipe_id": "C0-L-s45",
+            "relevant_source_digest": "74af1fe550a5db21a9e4de76d0350e0b6bb3d18716515d6a4685aaa9fbf05bc4",
+            "source_files": {
+              "datasets/semseg.py": "c633c46a3069a93c549b64be9b94649e9c7da64145ba36555c150c45f34df6f1",
+              "datasets/task_memory_episode.py": "acbc5f293cb8d952eede8768bf3b6ddb9ac2739ae53d9fa59602f749f453f9a7",
+              "models/criterion.py": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150",
+              "models/overlap_entity_association.py": "2003641db14436de469fe4ec0be5c57051f8e32eb5aaa3729b5031f814405c68",
+              "models/perception_gain.py": "781bc9c12ea206a2ee589267cfcada4d8dffcef8e15d566ca06a07af876a6305",
+              "models/persistent_memory.py": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8",
+              "models/rescene.py": "d0088ab6a09623ac7865681929e06b315e580965bb90b1985f932eeefe64e12f",
+              "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+              "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+              "scripts/perception_gain_evaluation.py": "938770aa3c9a6db2d5c8a8d5db732948a1c3d15f78eb7f7f5aa82cadd62db175",
+              "scripts/perception_gain_local_evaluation.py": "323e68f493c719b861a577fbde65e5d3bd5e6afb2ae54235f4ff54fce8c1ef19",
+              "scripts/perception_gain_native_evaluation.py": "ae2fe20eac0fb33dc87db8fbaab028928560fcbafea5a5ee95721fff444c0ec3",
+              "scripts/perception_gain_profile.py": "1fbcc919f613a07a589aec5b93aae2b0a131b14fd6010af2f3dc8651dcaba512",
+              "scripts/perception_gain_v2_config.py": "08e5a03803516d2e4c724dc7b219931e901d326be2760c9e337d687fe42f4215",
+              "scripts/perception_refiner_evaluation.py": "c7278e8cee65e49eb16d41d818ef0586ec54fdad487993fb4905e22466e4b4b2",
+              "scripts/prepare_perception_refiner.py": "b21e9a0a95a61bef86a9ba867674e5f575e13c0f81bfbd0803b5dbc0c7a345f4",
+              "scripts/replay_crosswindow_association.py": "a519901aac2644a16a1d1ab2cf600a52f9e2fa310610446d0ea925e28ea0a388",
+              "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+              "scripts/run_task_memory_controls.py": "9682d70357b191d794a0b169a0aabcd8f312312de7c67af744f2e46bca8bd01f",
+              "scripts/run_task_memory_policy_baseline.py": "9b1c3c1de2907a1b88dea1efde6b1bb184eeccc5e6e864e48401ab11cf174440",
+              "scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+              "scripts/system_comparison_metrics.py": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd",
+              "scripts/task_memory_output.py": "741f8eb6d8f54484f6c64a4ba7582f247f77b8bfd22e93f378275421c5187581",
+              "scripts/train_perception_gain.py": "913808d1eca856df4b7908df524f790664b2cc3d0a90c9e5efe64b9ef38be091",
+              "scripts/train_perception_refiner.py": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
+              "trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a",
+              "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+            },
+            "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329"
+          },
+          "exporter_sha256": "573c1f036c9e24cbdc393681c9ec7ee84dd5518655048dfb603c3c28927ee176",
+          "input_manifest_sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6"
+        },
+        "inference_identity": "98dfa16279cc25c817ba17f9d310846e39d43773b7bae8c8785b95ae72459c7e",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "FH-R1-native",
+        "runtime_environment": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "MKL_NUM_THREADS": "2",
+          "OMP_NUM_THREADS": "2",
+          "OPENBLAS_NUM_THREADS": "2",
+          "PYTHONHASHSEED": null
+        }
+      },
+      "bytes": 6743994,
+      "completed_units_by_horizon": {
+        "2": 154
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "bf74e9820828caefa95bca17dc3ad6e66354bff10cefd8b116c5c05b8deba789",
+      "status": "COMPLETE"
+    },
+    {
+      "binding": {
+        "data_role": "PB",
+        "eval_seed": 45,
+        "inference_identity": "7da25879470d0a8edc8c98b003c23d373af73e51dc6e7ffa0335cc17eb118a91",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "R1-D0"
+      },
+      "bytes": 64345792,
+      "completed_units_by_horizon": {
+        "2": 129,
+        "3": 129,
+        "4": 129,
+        "5": 129
+      },
+      "expected_units_by_horizon": {
+        "2": 129,
+        "3": 129,
+        "4": 129,
+        "5": 129
+      },
+      "sha256": "d0710946e8c1b14bb34bca6fa32ca230edf4a389e6ce915c64c47b7f346f75d7",
+      "status": "COMPLETE"
+    },
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 45,
+        "execution_binding": {
+          "data_roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+          "execution_provenance": {
+            "executed_code_commit": "50572820b1a4b5c585bb1afea4593e5419a7c6ef",
+            "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+            "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+            "recipe_id": "C0-L-s45",
+            "relevant_source_digest": "74af1fe550a5db21a9e4de76d0350e0b6bb3d18716515d6a4685aaa9fbf05bc4",
+            "source_files": {
+              "datasets/semseg.py": "c633c46a3069a93c549b64be9b94649e9c7da64145ba36555c150c45f34df6f1",
+              "datasets/task_memory_episode.py": "acbc5f293cb8d952eede8768bf3b6ddb9ac2739ae53d9fa59602f749f453f9a7",
+              "models/criterion.py": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150",
+              "models/overlap_entity_association.py": "2003641db14436de469fe4ec0be5c57051f8e32eb5aaa3729b5031f814405c68",
+              "models/perception_gain.py": "781bc9c12ea206a2ee589267cfcada4d8dffcef8e15d566ca06a07af876a6305",
+              "models/persistent_memory.py": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8",
+              "models/rescene.py": "d0088ab6a09623ac7865681929e06b315e580965bb90b1985f932eeefe64e12f",
+              "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+              "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+              "scripts/perception_gain_evaluation.py": "938770aa3c9a6db2d5c8a8d5db732948a1c3d15f78eb7f7f5aa82cadd62db175",
+              "scripts/perception_gain_local_evaluation.py": "323e68f493c719b861a577fbde65e5d3bd5e6afb2ae54235f4ff54fce8c1ef19",
+              "scripts/perception_gain_native_evaluation.py": "ae2fe20eac0fb33dc87db8fbaab028928560fcbafea5a5ee95721fff444c0ec3",
+              "scripts/perception_gain_profile.py": "1fbcc919f613a07a589aec5b93aae2b0a131b14fd6010af2f3dc8651dcaba512",
+              "scripts/perception_gain_v2_config.py": "08e5a03803516d2e4c724dc7b219931e901d326be2760c9e337d687fe42f4215",
+              "scripts/perception_refiner_evaluation.py": "c7278e8cee65e49eb16d41d818ef0586ec54fdad487993fb4905e22466e4b4b2",
+              "scripts/prepare_perception_refiner.py": "b21e9a0a95a61bef86a9ba867674e5f575e13c0f81bfbd0803b5dbc0c7a345f4",
+              "scripts/replay_crosswindow_association.py": "a519901aac2644a16a1d1ab2cf600a52f9e2fa310610446d0ea925e28ea0a388",
+              "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+              "scripts/run_task_memory_controls.py": "9682d70357b191d794a0b169a0aabcd8f312312de7c67af744f2e46bca8bd01f",
+              "scripts/run_task_memory_policy_baseline.py": "9b1c3c1de2907a1b88dea1efde6b1bb184eeccc5e6e864e48401ab11cf174440",
+              "scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+              "scripts/system_comparison_metrics.py": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd",
+              "scripts/task_memory_output.py": "741f8eb6d8f54484f6c64a4ba7582f247f77b8bfd22e93f378275421c5187581",
+              "scripts/train_perception_gain.py": "913808d1eca856df4b7908df524f790664b2cc3d0a90c9e5efe64b9ef38be091",
+              "scripts/train_perception_refiner.py": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
+              "trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a",
+              "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+            },
+            "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329"
+          },
+          "exporter_sha256": "573c1f036c9e24cbdc393681c9ec7ee84dd5518655048dfb603c3c28927ee176",
+          "input_manifest_sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6"
+        },
+        "inference_identity": "98dfa16279cc25c817ba17f9d310846e39d43773b7bae8c8785b95ae72459c7e",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "FH-R1-native",
+        "runtime_environment": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "MKL_NUM_THREADS": "2",
+          "OMP_NUM_THREADS": "2",
+          "OPENBLAS_NUM_THREADS": "2",
+          "PYTHONHASHSEED": null
+        }
+      },
+      "bytes": 6750750,
+      "completed_units_by_horizon": {
+        "2": 154
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "907c6c47d1188cbf55ae3915311b2a2944686baad07f1f2cffaf2206dd86a27f",
+      "status": "COMPLETE"
+    },
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 45,
+        "inference_identity": "998ccb67a8424d71d7a124746cee3e3a7d149bd194974aaa29036021218d2e27",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "C0-best-native"
+      },
+      "bytes": 36348,
+      "completed_units_by_horizon": {
+        "2": 1
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "132bd15c82396bb919e3d304e95472fa813ef7ec1f8ac03a8f86dd0d34aa01fb",
+      "status": "PARTIAL"
+    },
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 47,
+        "execution_binding": {
+          "data_roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+          "execution_provenance": {
+            "executed_code_commit": "50572820b1a4b5c585bb1afea4593e5419a7c6ef",
+            "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+            "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+            "recipe_id": "C0-L-s45",
+            "relevant_source_digest": "74af1fe550a5db21a9e4de76d0350e0b6bb3d18716515d6a4685aaa9fbf05bc4",
+            "source_files": {
+              "datasets/semseg.py": "c633c46a3069a93c549b64be9b94649e9c7da64145ba36555c150c45f34df6f1",
+              "datasets/task_memory_episode.py": "acbc5f293cb8d952eede8768bf3b6ddb9ac2739ae53d9fa59602f749f453f9a7",
+              "models/criterion.py": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150",
+              "models/overlap_entity_association.py": "2003641db14436de469fe4ec0be5c57051f8e32eb5aaa3729b5031f814405c68",
+              "models/perception_gain.py": "781bc9c12ea206a2ee589267cfcada4d8dffcef8e15d566ca06a07af876a6305",
+              "models/persistent_memory.py": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8",
+              "models/rescene.py": "d0088ab6a09623ac7865681929e06b315e580965bb90b1985f932eeefe64e12f",
+              "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+              "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+              "scripts/perception_gain_evaluation.py": "938770aa3c9a6db2d5c8a8d5db732948a1c3d15f78eb7f7f5aa82cadd62db175",
+              "scripts/perception_gain_local_evaluation.py": "323e68f493c719b861a577fbde65e5d3bd5e6afb2ae54235f4ff54fce8c1ef19",
+              "scripts/perception_gain_native_evaluation.py": "ae2fe20eac0fb33dc87db8fbaab028928560fcbafea5a5ee95721fff444c0ec3",
+              "scripts/perception_gain_profile.py": "1fbcc919f613a07a589aec5b93aae2b0a131b14fd6010af2f3dc8651dcaba512",
+              "scripts/perception_gain_v2_config.py": "08e5a03803516d2e4c724dc7b219931e901d326be2760c9e337d687fe42f4215",
+              "scripts/perception_refiner_evaluation.py": "c7278e8cee65e49eb16d41d818ef0586ec54fdad487993fb4905e22466e4b4b2",
+              "scripts/prepare_perception_refiner.py": "b21e9a0a95a61bef86a9ba867674e5f575e13c0f81bfbd0803b5dbc0c7a345f4",
+              "scripts/replay_crosswindow_association.py": "a519901aac2644a16a1d1ab2cf600a52f9e2fa310610446d0ea925e28ea0a388",
+              "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+              "scripts/run_task_memory_controls.py": "9682d70357b191d794a0b169a0aabcd8f312312de7c67af744f2e46bca8bd01f",
+              "scripts/run_task_memory_policy_baseline.py": "9b1c3c1de2907a1b88dea1efde6b1bb184eeccc5e6e864e48401ab11cf174440",
+              "scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+              "scripts/system_comparison_metrics.py": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd",
+              "scripts/task_memory_output.py": "741f8eb6d8f54484f6c64a4ba7582f247f77b8bfd22e93f378275421c5187581",
+              "scripts/train_perception_gain.py": "913808d1eca856df4b7908df524f790664b2cc3d0a90c9e5efe64b9ef38be091",
+              "scripts/train_perception_refiner.py": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
+              "trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a",
+              "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+            },
+            "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329"
+          },
+          "exporter_sha256": "573c1f036c9e24cbdc393681c9ec7ee84dd5518655048dfb603c3c28927ee176",
+          "input_manifest_sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6"
+        },
+        "inference_identity": "998ccb67a8424d71d7a124746cee3e3a7d149bd194974aaa29036021218d2e27",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "C0-best-native",
+        "runtime_environment": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "MKL_NUM_THREADS": "2",
+          "OMP_NUM_THREADS": "2",
+          "OPENBLAS_NUM_THREADS": "2",
+          "PYTHONHASHSEED": null
+        }
+      },
+      "bytes": 6685464,
+      "completed_units_by_horizon": {
+        "2": 154
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "9e0998592b1dc81c59a982e4644fb21fc08d418719b2d60c72a7047aba8418c6",
+      "status": "COMPLETE"
+    },
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 46,
+        "inference_identity": "998ccb67a8424d71d7a124746cee3e3a7d149bd194974aaa29036021218d2e27",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "C0-best-native"
+      },
+      "bytes": 33888,
+      "completed_units_by_horizon": {
+        "2": 1
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "b0ead100b0b6cbc97b734e586438a6139b5aa4da91ca850316b2f5a05912cf99",
+      "status": "PARTIAL"
+    },
+    {
+      "binding": {
+        "data_role": "PB",
+        "eval_seed": 45,
+        "inference_identity": "98dfa16279cc25c817ba17f9d310846e39d43773b7bae8c8785b95ae72459c7e",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "FH-R1-native"
+      },
+      "bytes": 44659236,
+      "completed_units_by_horizon": {
+        "2": 129,
+        "3": 129,
+        "4": 129,
+        "5": 129
+      },
+      "expected_units_by_horizon": {
+        "2": 129,
+        "3": 129,
+        "4": 129,
+        "5": 129
+      },
+      "sha256": "2f4a736dde942ceb7efc2ce3da83c5256404a68cb20f0da3439601f83a08e24a",
+      "status": "COMPLETE"
+    },
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 47,
+        "inference_identity": "998ccb67a8424d71d7a124746cee3e3a7d149bd194974aaa29036021218d2e27",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "C0-best-native"
+      },
+      "bytes": 33969,
+      "completed_units_by_horizon": {
+        "2": 1
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "329948407f9880bc0d681943e6c44f05277c43d291f78a7f09477de5039c9eb6",
+      "status": "PARTIAL"
+    },
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 46,
+        "inference_identity": "98dfa16279cc25c817ba17f9d310846e39d43773b7bae8c8785b95ae72459c7e",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "FH-R1-native"
+      },
+      "bytes": 37656,
+      "completed_units_by_horizon": {
+        "2": 1
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "7aaf4a6563811638aad01ea68e5d54725b28bd9b17c35fca74f35fabd128e1d9",
+      "status": "PARTIAL"
+    },
+    {
+      "binding": {
+        "data_role": "PB",
+        "eval_seed": 45,
+        "inference_identity": "67a3425754c1c391a3fb880cf3bf972d9499431fa120c6cf2d08a95ccae78aa0",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "C0-L-s45"
+      },
+      "bytes": 62962156,
+      "completed_units_by_horizon": {
+        "2": 129,
+        "3": 129,
+        "4": 129,
+        "5": 129
+      },
+      "expected_units_by_horizon": {
+        "2": 129,
+        "3": 129,
+        "4": 129,
+        "5": 129
+      },
+      "sha256": "789253037cc2d2d094aa49ccc01316d05da76fbc9113f9316c1f621be46d09a7",
+      "status": "COMPLETE"
+    },
+    {
+      "binding": {
+        "data_role": "LOCAL-T2",
+        "eval_seed": 46,
+        "execution_binding": {
+          "data_roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+          "execution_provenance": {
+            "executed_code_commit": "50572820b1a4b5c585bb1afea4593e5419a7c6ef",
+            "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+            "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+            "recipe_id": "C0-L-s45",
+            "relevant_source_digest": "74af1fe550a5db21a9e4de76d0350e0b6bb3d18716515d6a4685aaa9fbf05bc4",
+            "source_files": {
+              "datasets/semseg.py": "c633c46a3069a93c549b64be9b94649e9c7da64145ba36555c150c45f34df6f1",
+              "datasets/task_memory_episode.py": "acbc5f293cb8d952eede8768bf3b6ddb9ac2739ae53d9fa59602f749f453f9a7",
+              "models/criterion.py": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150",
+              "models/overlap_entity_association.py": "2003641db14436de469fe4ec0be5c57051f8e32eb5aaa3729b5031f814405c68",
+              "models/perception_gain.py": "781bc9c12ea206a2ee589267cfcada4d8dffcef8e15d566ca06a07af876a6305",
+              "models/persistent_memory.py": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8",
+              "models/rescene.py": "d0088ab6a09623ac7865681929e06b315e580965bb90b1985f932eeefe64e12f",
+              "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+              "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+              "scripts/perception_gain_evaluation.py": "938770aa3c9a6db2d5c8a8d5db732948a1c3d15f78eb7f7f5aa82cadd62db175",
+              "scripts/perception_gain_local_evaluation.py": "323e68f493c719b861a577fbde65e5d3bd5e6afb2ae54235f4ff54fce8c1ef19",
+              "scripts/perception_gain_native_evaluation.py": "ae2fe20eac0fb33dc87db8fbaab028928560fcbafea5a5ee95721fff444c0ec3",
+              "scripts/perception_gain_profile.py": "1fbcc919f613a07a589aec5b93aae2b0a131b14fd6010af2f3dc8651dcaba512",
+              "scripts/perception_gain_v2_config.py": "08e5a03803516d2e4c724dc7b219931e901d326be2760c9e337d687fe42f4215",
+              "scripts/perception_refiner_evaluation.py": "c7278e8cee65e49eb16d41d818ef0586ec54fdad487993fb4905e22466e4b4b2",
+              "scripts/prepare_perception_refiner.py": "b21e9a0a95a61bef86a9ba867674e5f575e13c0f81bfbd0803b5dbc0c7a345f4",
+              "scripts/replay_crosswindow_association.py": "a519901aac2644a16a1d1ab2cf600a52f9e2fa310610446d0ea925e28ea0a388",
+              "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+              "scripts/run_task_memory_controls.py": "9682d70357b191d794a0b169a0aabcd8f312312de7c67af744f2e46bca8bd01f",
+              "scripts/run_task_memory_policy_baseline.py": "9b1c3c1de2907a1b88dea1efde6b1bb184eeccc5e6e864e48401ab11cf174440",
+              "scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+              "scripts/system_comparison_metrics.py": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd",
+              "scripts/task_memory_output.py": "741f8eb6d8f54484f6c64a4ba7582f247f77b8bfd22e93f378275421c5187581",
+              "scripts/train_perception_gain.py": "913808d1eca856df4b7908df524f790664b2cc3d0a90c9e5efe64b9ef38be091",
+              "scripts/train_perception_refiner.py": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
+              "trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a",
+              "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+            },
+            "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329"
+          },
+          "exporter_sha256": "573c1f036c9e24cbdc393681c9ec7ee84dd5518655048dfb603c3c28927ee176",
+          "input_manifest_sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6"
+        },
+        "inference_identity": "98dfa16279cc25c817ba17f9d310846e39d43773b7bae8c8785b95ae72459c7e",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "FH-R1-native",
+        "runtime_environment": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "MKL_NUM_THREADS": "2",
+          "OMP_NUM_THREADS": "2",
+          "OPENBLAS_NUM_THREADS": "2",
+          "PYTHONHASHSEED": null
+        }
+      },
+      "bytes": 6756170,
+      "completed_units_by_horizon": {
+        "2": 154
+      },
+      "expected_units_by_horizon": {
+        "2": 154
+      },
+      "sha256": "b3cf5884b2ee8bef584f41ec825b1a7a2ba2036c2407e58c91470f10850c67a2",
+      "status": "COMPLETE"
+    },
+    {
+      "binding": {
+        "data_role": "ADDITIONAL",
+        "eval_seed": 45,
+        "inference_identity": "7da25879470d0a8edc8c98b003c23d373af73e51dc6e7ffa0335cc17eb118a91",
+        "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+        "method_id": "R1-D0"
+      },
+      "bytes": 15826025,
+      "completed_units_by_horizon": {
+        "2": 111,
+        "3": 77,
+        "4": 32
+      },
+      "expected_units_by_horizon": {
+        "2": 111,
+        "3": 77,
+        "4": 32
+      },
+      "sha256": "ea0f4dae77970688379875e6ddfa7acdcd0a3ed331d79880328fe06cb1624832",
+      "status": "COMPLETE"
+    }
+  ],
+  "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+  "schema_version": "perception-gain-prediction-export-v2",
+  "status": "COMPLETE",
+  "unfulfilled_requirements": []
+}

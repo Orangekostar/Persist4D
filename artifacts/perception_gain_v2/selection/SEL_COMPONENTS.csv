@@ -1,0 +1,6 @@
+component,method,step,coverage,S_mean,S_min,S_long,selected,generic_gain,history_evidence_gain,coverage_status,selection
+perception,Q-SEM-L-s45,250,COMPLETE,-0.0005415529012680054,-0.011577129364013672,-0.006101518869400024,False,,,,
+perception,C0-L-s45,250,COMPLETE,-0.003017440438270569,-0.009738504886627197,-0.009431928396224976,False,,,,
+repair_R1,KEEP_PARENT,,,,,,,,,,
+repair_P,NOT_APPLICABLE,,,,,,,,,,
+association,A0-U-tau-0.73,,,0.0002415478229522705,-0.0003787875175476074,-0.00011113286018371582,,,,COMPLETE,KEEP_D0

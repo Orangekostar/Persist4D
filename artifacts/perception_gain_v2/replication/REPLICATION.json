@@ -1,0 +1,26 @@
+{
+  "components": {},
+  "created_utc": "2026-09-26T13:49:33.939838+00:00",
+  "deployed_seed45_system_changed": false,
+  "evaluation_seed": 45,
+  "executed_source_sha256": "ab4dac4acccbc728bd5444ea0fa6cb918d46441480dc82bb4a67d9d05a307db9",
+  "failures": {},
+  "final_lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+  "pipeline_replication": "NOT_APPLICABLE",
+  "plan": {
+    "association_replication": null,
+    "evaluation_seed": 45,
+    "perception": [],
+    "repair": null,
+    "required_deployment_components": [],
+    "scorer_condition": "The original frozen scorer500 is reused; it is not retrained for seed46.",
+    "training_endpoints": {},
+    "training_seed": 46,
+    "zero_step_perception": "NOT_APPLICABLE"
+  },
+  "replication_status": "NOT_APPLICABLE",
+  "skipped_budget": [],
+  "status": "COMPLETE",
+  "training": {},
+  "training_seed": 46
+}

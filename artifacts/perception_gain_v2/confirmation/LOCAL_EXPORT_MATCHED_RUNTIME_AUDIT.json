@@ -1,0 +1,169 @@
+{
+  "elapsed_seconds": 1845.0094772599405,
+  "end_utc": "2026-09-26T17:19:29.973697+00:00",
+  "event_id": "LOCAL_EXPORT_MATCHED_RUNTIME:2026-09-26T16:48:44.958462+00:00",
+  "exact_metrics_reproduced": true,
+  "exit_code": 0,
+  "final_lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+  "gpu_count": 1,
+  "gpu_hours": 0.5125026325722057,
+  "gpus": [
+    0
+  ],
+  "measurement": "MEASURED_PROCESS_GPU_RESERVATION_WALLTIME",
+  "original_methods_sha256": "134f369961293d0fff8686d2e04240224e0a5af72c0b14a0b12e8e7992c70f53",
+  "pid": 3135799,
+  "reason": "Legacy failed LOCAL exports shared a source-unbound cache; preserve them and re-export each fixed population into a source-bound namespace. No reselection.",
+  "results": [
+    {
+      "artifact": "confirmation/LOCAL-export-matched-runtime/FH-R1-native-seed45.json",
+      "eval_seed": 45,
+      "method": "FH-R1-native",
+      "metric_differences": {},
+      "prediction_exports": {
+        "FH-R1-native": {
+          "completed_units_by_horizon": {
+            "2": 154
+          },
+          "error": null,
+          "expected_units_by_horizon": {
+            "2": 154
+          },
+          "index": "external:cache/predictions/73fe363a6c463d1ace7463a512f69a7fba78fceae0fbe37574a528c2abc94c13/INDEX.json",
+          "index_sha256": "273864376a30b375d76ff35deef5adc7af446b48187f77ed6a4cc5276d68e80e",
+          "status": "COMPLETE"
+        }
+      },
+      "same_population": true,
+      "sha256": "c472665e5a4eed6fcd486d76a202ff6ae7e5826d79fcddcbf1e4e3325c573f80",
+      "status": "PASS"
+    },
+    {
+      "artifact": "confirmation/LOCAL-export-matched-runtime/FH-R1-native-seed46.json",
+      "eval_seed": 46,
+      "method": "FH-R1-native",
+      "metric_differences": {},
+      "prediction_exports": {
+        "FH-R1-native": {
+          "completed_units_by_horizon": {
+            "2": 154
+          },
+          "error": null,
+          "expected_units_by_horizon": {
+            "2": 154
+          },
+          "index": "external:cache/predictions/ea42eb5eb2c16653a221dea2d848423ebc3efa153d53b1c72193deba97f1ba94/INDEX.json",
+          "index_sha256": "132cf60a8a348d8fbc9da5d48927ad43a1abe35dc1efe63e2a0db9e84517e3b3",
+          "status": "COMPLETE"
+        }
+      },
+      "same_population": true,
+      "sha256": "c4fa88617819902c9dcc1764fec78502cebff47d3daeb1eee165799138fd08c4",
+      "status": "PASS"
+    },
+    {
+      "artifact": "confirmation/LOCAL-export-matched-runtime/FH-R1-native-seed47.json",
+      "eval_seed": 47,
+      "method": "FH-R1-native",
+      "metric_differences": {},
+      "prediction_exports": {
+        "FH-R1-native": {
+          "completed_units_by_horizon": {
+            "2": 154
+          },
+          "error": null,
+          "expected_units_by_horizon": {
+            "2": 154
+          },
+          "index": "external:cache/predictions/428a472e0d9a68161bcbc7e0b870957fdaea93977a4e6ba1e6c762698c36a080/INDEX.json",
+          "index_sha256": "9d5972a29c0ffcdd5c719866b121a9e0b30c2ef03f462a664eadb9e2f460be20",
+          "status": "COMPLETE"
+        }
+      },
+      "same_population": true,
+      "sha256": "fe179f646df23dd32cb5905231208862752815d7247903c1fa93c9fbc179ab7d",
+      "status": "PASS"
+    },
+    {
+      "artifact": "confirmation/LOCAL-export-matched-runtime/C0-best-native-seed45.json",
+      "eval_seed": 45,
+      "method": "C0-best-native",
+      "metric_differences": {},
+      "prediction_exports": {
+        "C0-best-native": {
+          "completed_units_by_horizon": {
+            "2": 154
+          },
+          "error": null,
+          "expected_units_by_horizon": {
+            "2": 154
+          },
+          "index": "external:cache/predictions/2a4adc30c0faee9520448456b15b2d719be33e34b0ef084a89ddc0cc60ad5fa3/INDEX.json",
+          "index_sha256": "08ad5ff9ea2e479f4fcdce0c2debd89d60b879d960c0fceb3a6fd393dcfa79ef",
+          "status": "COMPLETE"
+        }
+      },
+      "same_population": true,
+      "sha256": "3e6f4cf588f4763ac92461645ef18761055c1048b9c64b8ca532e1ccfb61f05a",
+      "status": "PASS"
+    },
+    {
+      "artifact": "confirmation/LOCAL-export-matched-runtime/C0-best-native-seed46.json",
+      "eval_seed": 46,
+      "method": "C0-best-native",
+      "metric_differences": {},
+      "prediction_exports": {
+        "C0-best-native": {
+          "completed_units_by_horizon": {
+            "2": 154
+          },
+          "error": null,
+          "expected_units_by_horizon": {
+            "2": 154
+          },
+          "index": "external:cache/predictions/32e0f22cbc74b61c314624075d983db2d11ef399f98481244bd0d7828eb22801/INDEX.json",
+          "index_sha256": "471f8ad920efe103e1f2a3a58310ac36e3d455702fca2dece4dc739902105adb",
+          "status": "COMPLETE"
+        }
+      },
+      "same_population": true,
+      "sha256": "c87e5468ceb53990f2aa7c2c59f7380526a2ae700c9a576897e152944e8354bc",
+      "status": "PASS"
+    },
+    {
+      "artifact": "confirmation/LOCAL-export-matched-runtime/C0-best-native-seed47.json",
+      "eval_seed": 47,
+      "method": "C0-best-native",
+      "metric_differences": {},
+      "prediction_exports": {
+        "C0-best-native": {
+          "completed_units_by_horizon": {
+            "2": 154
+          },
+          "error": null,
+          "expected_units_by_horizon": {
+            "2": 154
+          },
+          "index": "external:cache/predictions/9bd88ae99aaf0a9da84cd6b804492ee437249a4db106bbd52f9a602fb0a1ca20/INDEX.json",
+          "index_sha256": "f0fcc2f2b57c82dd14a819950b9b33f2ef884237dd9262a6935ae050b013c022",
+          "status": "COMPLETE"
+        }
+      },
+      "same_population": true,
+      "sha256": "6058b98a8020555899628289e98f3c3605a3c244ea32a05649792f90751f9cbf",
+      "status": "PASS"
+    }
+  ],
+  "runtime_environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "MKL_NUM_THREADS": "2",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2"
+  },
+  "scope": "V2",
+  "script_sha256": "9a4014439c41f0be26ef0e418ead6372fdcb61a5b6487108567a6d6b077accb2",
+  "source_commit": "50572820b1a4b5c585bb1afea4593e5419a7c6ef",
+  "start_utc": "2026-09-26T16:48:44.958484+00:00",
+  "status": "COMPLETE",
+  "task": "LOCAL_EXPORT_MATCHED_RUNTIME"
+}

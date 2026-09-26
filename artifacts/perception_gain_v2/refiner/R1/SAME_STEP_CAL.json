@@ -1,0 +1,138 @@
+{
+  "0": {
+    "S_long": 0.0,
+    "S_mean": 0.0,
+    "S_min": 0.0,
+    "binding": {
+      "input_mode": "OLD_NEW",
+      "parent_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+      "parent_weight_hash": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "residual_bound": 2,
+      "seed": 45,
+      "source_shards_hash": "53b06b0f438a558ea34968cad2fe9bb3222dac9f5ab72627d1c562932525877e"
+    },
+    "checkpoint": "external:training/refiner/R1/PAIR-s45/update=0000.ckpt",
+    "checkpoint_sha256": "0f2c907f916b51d41af23e24f73626503b9ca8054d73066e45fa1859d80cf1d4",
+    "comparison_status": "COMPLETE",
+    "completed_logical_units": 23,
+    "coverage_status": "COMPLETE",
+    "deltas": {
+      "2": 0.0,
+      "3": 0.0,
+      "4": 0.0,
+      "5": 0.0
+    },
+    "expected_logical_units": 23,
+    "method_id": "R-PAIR-R1@0000",
+    "metrics": {
+      "2": 0.36262261867523193,
+      "3": 0.2918131351470947,
+      "4": 0.24670922756195068,
+      "5": 0.22270338237285614
+    },
+    "new_parameter_count": 8769,
+    "optimizer_update": 0
+  },
+  "1000": {
+    "S_long": -0.0003257766366004944,
+    "S_mean": -0.0001628883183002472,
+    "S_min": -0.0006515532732009888,
+    "binding": {
+      "input_mode": "OLD_NEW",
+      "parent_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+      "parent_weight_hash": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "residual_bound": 2,
+      "seed": 45,
+      "source_shards_hash": "53b06b0f438a558ea34968cad2fe9bb3222dac9f5ab72627d1c562932525877e"
+    },
+    "checkpoint": "external:training/refiner/R1/PAIR-s45/update=1000.ckpt",
+    "checkpoint_sha256": "0a2df6ef78762bfeffdab80c3680ee149b84e11d1a6bcbcaef59df0304a12af1",
+    "comparison_status": "COMPLETE",
+    "completed_logical_units": 23,
+    "coverage_status": "COMPLETE",
+    "deltas": {
+      "2": 0.0,
+      "3": 0.0,
+      "4": 0.0,
+      "5": -0.0006515532732009888
+    },
+    "expected_logical_units": 23,
+    "method_id": "R-PAIR-R1@1000",
+    "metrics": {
+      "2": 0.35512426495552063,
+      "3": 0.2785252034664154,
+      "4": 0.23225581645965576,
+      "5": 0.2093258500099182
+    },
+    "new_parameter_count": 8769,
+    "optimizer_update": 1000
+  },
+  "1500": {
+    "S_long": -0.0003257766366004944,
+    "S_mean": -0.0001628883183002472,
+    "S_min": -0.0006515532732009888,
+    "binding": {
+      "input_mode": "OLD_NEW",
+      "parent_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+      "parent_weight_hash": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "residual_bound": 2,
+      "seed": 45,
+      "source_shards_hash": "53b06b0f438a558ea34968cad2fe9bb3222dac9f5ab72627d1c562932525877e"
+    },
+    "checkpoint": "external:training/refiner/R1/PAIR-s45/update=1500.ckpt",
+    "checkpoint_sha256": "e321f46342fc35541a7e87764c4fd748d051d0e79a4d15c848a946251b248f4a",
+    "comparison_status": "COMPLETE",
+    "completed_logical_units": 23,
+    "coverage_status": "COMPLETE",
+    "deltas": {
+      "2": 0.0,
+      "3": 0.0,
+      "4": 0.0,
+      "5": -0.0006515532732009888
+    },
+    "expected_logical_units": 23,
+    "method_id": "R-PAIR-R1@1500",
+    "metrics": {
+      "2": 0.35512426495552063,
+      "3": 0.2785252034664154,
+      "4": 0.23225581645965576,
+      "5": 0.2093258500099182
+    },
+    "new_parameter_count": 8769,
+    "optimizer_update": 1500
+  },
+  "500": {
+    "S_long": -0.0003257766366004944,
+    "S_mean": -0.0001628883183002472,
+    "S_min": -0.0006515532732009888,
+    "binding": {
+      "input_mode": "OLD_NEW",
+      "parent_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+      "parent_weight_hash": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "residual_bound": 2,
+      "seed": 45,
+      "source_shards_hash": "53b06b0f438a558ea34968cad2fe9bb3222dac9f5ab72627d1c562932525877e"
+    },
+    "checkpoint": "external:training/refiner/R1/PAIR-s45/update=0500.ckpt",
+    "checkpoint_sha256": "23a6c00ea63f970c41c3b9cecde78a0356a6bac4b6a7ea3db601b92b93a29cf5",
+    "comparison_status": "COMPLETE",
+    "completed_logical_units": 23,
+    "coverage_status": "COMPLETE",
+    "deltas": {
+      "2": 0.0,
+      "3": 0.0,
+      "4": 0.0,
+      "5": -0.0006515532732009888
+    },
+    "expected_logical_units": 23,
+    "method_id": "R-PAIR-R1@0500",
+    "metrics": {
+      "2": 0.35512426495552063,
+      "3": 0.2785252034664154,
+      "4": 0.23225581645965576,
+      "5": 0.2093258500099182
+    },
+    "new_parameter_count": 8769,
+    "optimizer_update": 500
+  }
+}

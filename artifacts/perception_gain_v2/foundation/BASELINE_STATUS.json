@@ -1,0 +1,44 @@
+{
+  "baseline_status": "BASELINES_COMPLETE",
+  "baselines": {
+    "CAL/D0": {
+      "artifact": "artifacts/perception_gain_v2/foundation/CAL/D0.json",
+      "sha256": "5aba4afebb678f5a7a7ddc32b0ff0e01044305f06d6e1d99bb774627d895e479",
+      "status": "PASS"
+    },
+    "CAL/FH-native": {
+      "artifact": "artifacts/perception_gain_v2/foundation/CAL/FH-native.json",
+      "sha256": "a316e6f656f0bfb2702916cc3fcfee69df67550d0dfcdf313e8f912bc4fc111b",
+      "status": "PASS"
+    },
+    "SEL/D0": {
+      "artifact": "artifacts/perception_gain_v2/foundation/SEL/D0.json",
+      "sha256": "64c8d92c770bef8ea3acaa8e69ccceb5d2df7fada3e8e5b50511eaa5a7aa25b0",
+      "status": "PASS"
+    },
+    "SEL/FH-native": {
+      "artifact": "artifacts/perception_gain_v2/foundation/SEL/FH-native.json",
+      "sha256": "669f6dd6a29d8ca75730a596ba867be8cebdec124852b0391e1d4a05f4c315ce",
+      "status": "PASS"
+    }
+  },
+  "smoke": {
+    "first": {
+      "PARENT": "8e1b7c29e41df2693ae0503f84835b858a2ffcdf24a15aa25674a0d95ee5c2c5",
+      "ZERO-NEW_ONLY": "8e1b7c29e41df2693ae0503f84835b858a2ffcdf24a15aa25674a0d95ee5c2c5",
+      "ZERO-OLD_NEW": "8e1b7c29e41df2693ae0503f84835b858a2ffcdf24a15aa25674a0d95ee5c2c5"
+    },
+    "network_forward_count": 10,
+    "original_d0_metrics": {
+      "2": 0.703703761100769,
+      "3": 0.6296296715736389,
+      "4": 0.5545267462730408,
+      "5": 0.5596708059310913
+    },
+    "repeated": {
+      "PARENT": "8e1b7c29e41df2693ae0503f84835b858a2ffcdf24a15aa25674a0d95ee5c2c5"
+    },
+    "status": "SMOKE_PASS"
+  },
+  "status": "COMPLETE"
+}

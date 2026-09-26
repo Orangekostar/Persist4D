@@ -1,0 +1,40 @@
+{
+  "checkpoint_update": 3000,
+  "completed_summary_checkpoint_hash_matches": true,
+  "finite_model_tensor_count": 798,
+  "first_updates": [
+    {
+      "nonfinite_gradient_count": 0,
+      "optimizer_update": 1,
+      "total_parameter_change_norm": 0.0003404032513851949
+    },
+    {
+      "nonfinite_gradient_count": 0,
+      "optimizer_update": 2,
+      "total_parameter_change_norm": 0.0004825688540803027
+    }
+  ],
+  "full_endpoint": 3000,
+  "full_resume_update": 750,
+  "next_global_draw_at_resume": 24000,
+  "nonfinite_model_tensor_keys": [],
+  "optimizer_states": 1,
+  "progress": {
+    "completed_local_batches": 24000,
+    "completed_optimizer_updates": 3000,
+    "next_global_draw_index": 96000,
+    "schema_version": "perception-gain-exact-resume-v1"
+  },
+  "recipe_id": "C0-L-s45",
+  "recipe_identity": "EXACT_REGISTERED_RECIPE",
+  "rng_rank_count": 2,
+  "sample_plan_sha256": "57dc334b323b7ebfc1f1b3b999497254926b68e01ef93002e878fbef2ec872b1",
+  "scheduler_last_epoch": 3000,
+  "scheduler_states": 1,
+  "scope": "CPU inspection of the actual planned update3000 checkpoint; no extra training or confirmation evaluation.",
+  "scorer_applicability": "NOT_APPLICABLE",
+  "source_checkpoint": "external:training/C0-L-s45/update=3000.ckpt",
+  "source_sha256": "35bc2ac56e1625507c22b83cd29fad88e3b16684f2555f614b999dff3af1d616",
+  "status": "PASS",
+  "utc": "2026-09-26T13:21:09.706817+00:00"
+}

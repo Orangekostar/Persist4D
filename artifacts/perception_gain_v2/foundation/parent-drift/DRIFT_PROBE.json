@@ -1,0 +1,69 @@
+{
+  "cached_parent_sha256": "9608aba0fbb688ac4c78e457a6e2bdbf64de94eef0b6866f6530a1fcde8790fa",
+  "cells": [
+    {
+      "hashes": {
+        "PARENT": "737cba18642c200afc2ed3bf397a33f78dc2912046fd8fdd164783cd13792d02"
+      },
+      "heads": false,
+      "metrics": {
+        "2": 0.7342480421066284,
+        "3": 0.623947262763977,
+        "4": 0.5163145661354065,
+        "5": 0.5493504405021667
+      },
+      "name": "one-noheads-a",
+      "status": "SMOKE_PASS",
+      "threads": 1
+    },
+    {
+      "hashes": {
+        "PARENT": "737cba18642c200afc2ed3bf397a33f78dc2912046fd8fdd164783cd13792d02"
+      },
+      "heads": false,
+      "metrics": {
+        "2": 0.7342480421066284,
+        "3": 0.623947262763977,
+        "4": 0.5163145661354065,
+        "5": 0.5493504405021667
+      },
+      "name": "one-noheads-b",
+      "status": "SMOKE_PASS",
+      "threads": 1
+    },
+    {
+      "hashes": {
+        "PARENT": "737cba18642c200afc2ed3bf397a33f78dc2912046fd8fdd164783cd13792d02",
+        "ZERO-NEW": "737cba18642c200afc2ed3bf397a33f78dc2912046fd8fdd164783cd13792d02",
+        "ZERO-PAIR": "737cba18642c200afc2ed3bf397a33f78dc2912046fd8fdd164783cd13792d02"
+      },
+      "heads": true,
+      "metrics": {
+        "2": 0.7342480421066284,
+        "3": 0.623947262763977,
+        "4": 0.5163145661354065,
+        "5": 0.5493504405021667
+      },
+      "name": "one-zeroheads",
+      "status": "SMOKE_PASS",
+      "threads": 1
+    },
+    {
+      "hashes": {
+        "PARENT": "737cba18642c200afc2ed3bf397a33f78dc2912046fd8fdd164783cd13792d02"
+      },
+      "heads": false,
+      "metrics": {
+        "2": 0.7342480421066284,
+        "3": 0.623947262763977,
+        "4": 0.5163145661354065,
+        "5": 0.5493504405021667
+      },
+      "name": "two-noheads",
+      "status": "SMOKE_PASS",
+      "threads": 2
+    }
+  ],
+  "scope": "First three original CAL units only; diagnostic, never a selection score.",
+  "status": "COMPLETE"
+}

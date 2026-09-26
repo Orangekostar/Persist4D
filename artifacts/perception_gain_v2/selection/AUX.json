@@ -1,0 +1,318 @@
+{
+  "arms": {
+    "A-OPEN-L-s45": {
+      "cal": [
+        {
+          "architecture_variant": "A-OPEN",
+          "checkpoint": "external:r1_checkpoint",
+          "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+          "completed_logical_units": 23,
+          "coverage_status": "COMPLETE",
+          "expected_logical_units": 23,
+          "method_id": "A-OPEN-L-s45",
+          "metrics": {
+            "2": 0.363079309463501,
+            "3": 0.292852520942688,
+            "4": 0.2449493259191513,
+            "5": 0.22158147394657135
+          },
+          "new_parameter_count": 0,
+          "optimizer_update": 0,
+          "recipe_id": "A-OPEN-L-s45"
+        },
+        {
+          "architecture_variant": "A-OPEN",
+          "checkpoint": "external:training/A-OPEN-L-s45/update=0250.ckpt",
+          "checkpoint_sha256": "0e49750cb186a0067a08c9a81779f18e0d9dcf997665dbcbf1ae1261367a6805",
+          "completed_logical_units": 23,
+          "coverage_status": "COMPLETE",
+          "expected_logical_units": 23,
+          "method_id": "A-OPEN-L-s45",
+          "metrics": {
+            "2": 0.3640836775302887,
+            "3": 0.2933122217655182,
+            "4": 0.24321681261062622,
+            "5": 0.22632616758346558
+          },
+          "new_parameter_count": 0,
+          "optimizer_update": 250,
+          "recipe_id": "A-OPEN-L-s45"
+        },
+        {
+          "architecture_variant": "A-OPEN",
+          "checkpoint": "external:training/A-OPEN-L-s45/update=0750.ckpt",
+          "checkpoint_sha256": "314c8fd885636cae6c9cb1b18a6f5753cc6bca5c6898440ec287a8a7673679a1",
+          "completed_logical_units": 23,
+          "coverage_status": "COMPLETE",
+          "expected_logical_units": 23,
+          "method_id": "A-OPEN-L-s45",
+          "metrics": {
+            "2": 0.36053740978240967,
+            "3": 0.2939961850643158,
+            "4": 0.24499990046024323,
+            "5": 0.2305554300546646
+          },
+          "new_parameter_count": 0,
+          "optimizer_update": 750,
+          "recipe_id": "A-OPEN-L-s45"
+        }
+      ],
+      "completed_global_step": 750,
+      "status": "COMPLETE"
+    },
+    "Q-SEM-L-s45": {
+      "cal": [
+        {
+          "architecture_variant": "Q-SEM",
+          "checkpoint": "external:r1_checkpoint+external:training/scorer/model/update=0500.ckpt",
+          "checkpoint_sha256": "f2c9122473ea332d55fca73ce6b01d71d58a75c0b96be7fb56e8892ca1c57173",
+          "completed_logical_units": 23,
+          "coverage_status": "COMPLETE",
+          "expected_logical_units": 23,
+          "method_id": "Q-SEM-L-s45",
+          "metrics": {
+            "2": 0.36067473888397217,
+            "3": 0.2956312298774719,
+            "4": 0.24083933234214783,
+            "5": 0.2222689390182495
+          },
+          "new_parameter_count": 8577,
+          "optimizer_update": 0,
+          "recipe_id": "Q-SEM-L-s45"
+        },
+        {
+          "architecture_variant": "Q-SEM",
+          "checkpoint": "external:training/Q-SEM-L-s45/update=0250.ckpt",
+          "checkpoint_sha256": "84784c3656482a25d211dbc1cce6e3902dec595294699782d0dcc9d59c618e24",
+          "completed_logical_units": 23,
+          "coverage_status": "COMPLETE",
+          "expected_logical_units": 23,
+          "method_id": "Q-SEM-L-s45",
+          "metrics": {
+            "2": 0.36314448714256287,
+            "3": 0.29955634474754333,
+            "4": 0.24698838591575623,
+            "5": 0.2332228273153305
+          },
+          "new_parameter_count": 8577,
+          "optimizer_update": 250,
+          "recipe_id": "Q-SEM-L-s45"
+        },
+        {
+          "architecture_variant": "Q-SEM",
+          "checkpoint": "external:training/Q-SEM-L-s45/update=0750.ckpt",
+          "checkpoint_sha256": "4f373399cf2b2b49e9c2f375e52e57f705ba3174acded564f85fd9b776424523",
+          "completed_logical_units": 23,
+          "coverage_status": "COMPLETE",
+          "expected_logical_units": 23,
+          "method_id": "Q-SEM-L-s45",
+          "metrics": {
+            "2": 0.3622657060623169,
+            "3": 0.3016703128814697,
+            "4": 0.24655169248580933,
+            "5": 0.22650672495365143
+          },
+          "new_parameter_count": 8577,
+          "optimizer_update": 750,
+          "recipe_id": "Q-SEM-L-s45"
+        }
+      ],
+      "completed_global_step": 750,
+      "status": "COMPLETE"
+    },
+    "S-WORST-L-s45": {
+      "cal": [
+        {
+          "architecture_variant": "S-WORST",
+          "checkpoint": "external:training/S-WORST-L-s45/update=0250.ckpt",
+          "checkpoint_sha256": "8794dfde5d1b5b3a73fb476cc2a4caa54906a6d2cace69b6d452a718eb51b91e",
+          "completed_logical_units": 23,
+          "coverage_status": "COMPLETE",
+          "expected_logical_units": 23,
+          "method_id": "S-WORST-L-s45",
+          "metrics": {
+            "2": 0.3605569303035736,
+            "3": 0.3001781105995178,
+            "4": 0.24331055581569672,
+            "5": 0.22899340093135834
+          },
+          "new_parameter_count": 0,
+          "optimizer_update": 250,
+          "recipe_id": "S-WORST-L-s45"
+        },
+        {
+          "architecture_variant": "S-WORST",
+          "checkpoint": "external:training/S-WORST-L-s45/update=0750.ckpt",
+          "checkpoint_sha256": "cb0ae1e6631a64bbb659b9ed1d75a9e422de7fd0ccb6ca869db8c833b355431f",
+          "completed_logical_units": 23,
+          "coverage_status": "COMPLETE",
+          "expected_logical_units": 23,
+          "method_id": "S-WORST-L-s45",
+          "metrics": {
+            "2": 0.3660038709640503,
+            "3": 0.29801589250564575,
+            "4": 0.24380254745483398,
+            "5": 0.21864162385463715
+          },
+          "new_parameter_count": 0,
+          "optimizer_update": 750,
+          "recipe_id": "S-WORST-L-s45"
+        }
+      ],
+      "completed_global_step": 750,
+      "status": "COMPLETE"
+    }
+  },
+  "learning_rate": "L",
+  "probes": {
+    "H": [
+      {
+        "architecture_variant": "C0",
+        "checkpoint": "external:inputs/imported/C0-H-s45/update=0250.ckpt",
+        "checkpoint_sha256": "362a8575fb0d011b079b60af4eb92f57fcb5734484230c76c468bb9718007b87",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "C0-H-s45",
+        "metrics": {
+          "2": 0.35375484824180603,
+          "3": 0.27594244480133057,
+          "4": 0.2354133278131485,
+          "5": 0.21766230463981628
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "C0-H-s45"
+      },
+      {
+        "architecture_variant": "C0",
+        "checkpoint": "external:inputs/imported/C0-H-s45/update=0750.ckpt",
+        "checkpoint_sha256": "384884e3e86de79b5ca92661aa887b1f34612d2d8c90e93a66bbf70b87e30143",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "C0-H-s45",
+        "metrics": {
+          "2": 0.3342858552932739,
+          "3": 0.280689001083374,
+          "4": 0.22574535012245178,
+          "5": 0.21675042808055878
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 750,
+        "recipe_id": "C0-H-s45"
+      },
+      {
+        "architecture_variant": "S-BAL",
+        "checkpoint": "external:inputs/imported/S-BAL-H-s45/update=0250.ckpt",
+        "checkpoint_sha256": "9b47b174c1048167fc8156ea2a327692dabae947265adc9193f787d6c7c857f6",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "S-BAL-H-s45",
+        "metrics": {
+          "2": 0.34864190220832825,
+          "3": 0.2776104509830475,
+          "4": 0.239545077085495,
+          "5": 0.22264978289604187
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "S-BAL-H-s45"
+      },
+      {
+        "architecture_variant": "S-BAL",
+        "checkpoint": "external:training/S-BAL-H-s45/update=0750.ckpt",
+        "checkpoint_sha256": "941e6d039e8c41b1b042a3a0a4cb3fa3d82598e1a213ba98d36dca52bcaeda9b",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "S-BAL-H-s45",
+        "metrics": {
+          "2": 0.327426016330719,
+          "3": 0.27379339933395386,
+          "4": 0.23528482019901276,
+          "5": 0.20809350907802582
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 750,
+        "recipe_id": "S-BAL-H-s45"
+      }
+    ],
+    "L": [
+      {
+        "architecture_variant": "C0",
+        "checkpoint": "external:training/C0-L-s45/update=0250.ckpt",
+        "checkpoint_sha256": "e85a2217c05d41fd2e82b996ff6676213cb050d5bc7dd48a0e37a33d26c11a1d",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "C0-L-s45",
+        "metrics": {
+          "2": 0.3535640239715576,
+          "3": 0.30249422788619995,
+          "4": 0.2448398768901825,
+          "5": 0.23554366827011108
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "C0-L-s45"
+      },
+      {
+        "architecture_variant": "C0",
+        "checkpoint": "external:training/C0-L-s45/update=0750.ckpt",
+        "checkpoint_sha256": "f89ff00798057476adb3405abdac6bf477026240396613d6f0c454c5eaf2d930",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "C0-L-s45",
+        "metrics": {
+          "2": 0.3577871322631836,
+          "3": 0.296448677778244,
+          "4": 0.24584166705608368,
+          "5": 0.2243504524230957
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 750,
+        "recipe_id": "C0-L-s45"
+      },
+      {
+        "architecture_variant": "S-BAL",
+        "checkpoint": "external:training/S-BAL-L-s45/update=0250.ckpt",
+        "checkpoint_sha256": "6faad03cf702428f33d1d347066ddf5605ddec46071cec97173cd223309041ff",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "S-BAL-L-s45",
+        "metrics": {
+          "2": 0.3629983365535736,
+          "3": 0.29093214869499207,
+          "4": 0.23279176652431488,
+          "5": 0.2211921513080597
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "S-BAL-L-s45"
+      },
+      {
+        "architecture_variant": "S-BAL",
+        "checkpoint": "external:training/S-BAL-L-s45/update=0750.ckpt",
+        "checkpoint_sha256": "f2322334abaa715b35440fec2eb9a70aa6aacd29d00fc9849f43806632082652",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "S-BAL-L-s45",
+        "metrics": {
+          "2": 0.3582857549190521,
+          "3": 0.2945186495780945,
+          "4": 0.2410450130701065,
+          "5": 0.22247296571731567
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 750,
+        "recipe_id": "S-BAL-L-s45"
+      }
+    ]
+  },
+  "status": "COMPLETE"
+}

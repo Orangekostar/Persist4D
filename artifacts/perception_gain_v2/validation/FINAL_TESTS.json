@@ -1,0 +1,54 @@
+{
+  "schema_version": "perception-gain-v2-final-tests-v1",
+  "source_commit": "d58420568f46070a4b3a7dcee2b4e47fc42f4c7b",
+  "status": "PASS_WITH_DOCUMENTED_WARNINGS",
+  "full_related_regression": {
+    "tested_source_commit": "b4d6a49",
+    "command": "CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 timeout 1800 /home/ww/miniconda3/envs/persist4d/bin/python -m pytest tests/test_perception_gain*.py tests/test_local_diagnostic_loss.py tests/test_task_memory_evaluation.py -q",
+    "exit_code": 0,
+    "passed": 202,
+    "skipped": 0,
+    "warnings": 2,
+    "reported_wall_seconds": 8.13,
+    "log": "validation/full-related-regression.txt",
+    "log_sha256": "0577988a47783edf2adc309be241b57913d26304730a9498c48b3cb2f74efa71"
+  },
+  "post_regression_fix": {
+    "reason": "Final packaging exposed a source-unbound LOCAL prediction-cache collision; added a regression and source/input cache namespace. Report adds protocol-named selection summaries.",
+    "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /home/ww/miniconda3/envs/persist4d/bin/python -m pytest tests/test_perception_gain_v2_predictions.py tests/test_perception_gain_v2_confirmation.py tests/test_perception_gain_v2_report.py -q",
+    "exit_code": 0,
+    "passed": 22,
+    "reported_wall_seconds": 2,
+    "red_evidence": "New source/input-identity test failed with unexpected execution_binding argument before the implementation; passed after implementation.",
+    "report_smoke": "Actual report CLI exit 0; external:tasks/report-delivery-smoke.log"
+  },
+  "runtime_namespace_followup": {
+    "reason": "Recovered export environment must match the original confirmation; cache keys now distinguish numerical runtime environment as well as source/input identity.",
+    "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /home/ww/miniconda3/envs/persist4d/bin/python -m pytest tests/test_perception_gain_v2_predictions.py tests/test_perception_gain_v2_confirmation.py -q",
+    "passed": 13,
+    "reported_wall_seconds": 1.98,
+    "exit_code": 0,
+    "red_evidence": "Different cuBLAS workspace configurations mapped to the same cache directory before the fix; the regression failed before and passed after adding runtime_environment."
+  },
+  "partial_report_followup": {
+    "reason": "Keep the new selection-summary table usable when a partial perception result has selected=null.",
+    "command": "OMP_NUM_THREADS=1 /home/ww/miniconda3/envs/persist4d/bin/python -m pytest tests/test_perception_gain_v2_report.py -q",
+    "passed": 9,
+    "reported_wall_seconds": 0.06,
+    "exit_code": 0
+  },
+  "lint": {
+    "status": "PASS",
+    "scope": "scripts/perception_gain_v2*.py tests/test_perception_gain_v2*.py plus train_perception_gain, local evaluator, task-memory evaluator and their related tests; all changed source files checked after latest edit"
+  },
+  "diff_check": "PASS",
+  "warnings": [
+    "Existing scipy.ndimage.filters deprecation in albumentations",
+    "Existing torch.tensor(tensor) warning in models/criterion.py"
+  ],
+  "limitations": [
+    "This is the task-related regression, not the entire repository test suite.",
+    "Scientific execution identities precede delivery-only source cleanup; raw experimental provenance is preserved.",
+    "Unit tests do not prove final prediction-export coverage or remote publication; those require the separate live recovery audit and publication receipt."
+  ]
+}

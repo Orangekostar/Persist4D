@@ -1,0 +1,16 @@
+{
+  "git_push_dry_run": {
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  "git_read": {
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  "release_api": {
+    "scope": "Existing GH_TOKEN/GITHUB_TOKEN or gh login; repository push permission checked; no credentials printed or searched elsewhere",
+    "status": "UNAVAILABLE"
+  },
+  "scope": "Read-only authorization preflight; Git push dry run does not publish any ref",
+  "utc": "2026-09-22T20:16:32.847529+00:00"
+}

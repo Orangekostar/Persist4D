@@ -1,0 +1,14 @@
+........................................................................ [ 35%]
+........................................................................ [ 71%]
+..........................................................               [100%]
+=============================== warnings summary ===============================
+../../../miniconda3/envs/persist4d/lib/python3.10/site-packages/albumentations/augmentations/geometric/functional.py:8
+  /home/ww/miniconda3/envs/persist4d/lib/python3.10/site-packages/albumentations/augmentations/geometric/functional.py:8: DeprecationWarning: Please import `gaussian_filter` from the `scipy.ndimage` namespace; the `scipy.ndimage.filters` namespace is deprecated and will be removed in SciPy 2.0.0.
+    from scipy.ndimage.filters import gaussian_filter
+
+tests/test_perception_gain_model.py::test_stage_loss_runs_on_aux_outputs_and_empty_matches_stay_connected
+  /home/ww/paper5/.worktrees/persist4d-perception-gain-v2/models/criterion.py:1093: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+    change_weights = torch.tensor(change_weights)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+202 passed, 2 warnings in 8.13s

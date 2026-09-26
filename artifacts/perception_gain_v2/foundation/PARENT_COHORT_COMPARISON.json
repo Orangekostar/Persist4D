@@ -1,0 +1,29 @@
+{
+  "rows": [
+    {
+      "comparison_status": "COMPLETE",
+      "deltas": {
+        "2": 0.0,
+        "3": 0.0,
+        "4": 0.0,
+        "5": 0.0
+      },
+      "published_output_equal": true,
+      "role": "CAL",
+      "status": "EXACT"
+    },
+    {
+      "comparison_status": "COMPLETE",
+      "deltas": {
+        "2": 0.0,
+        "3": 0.0,
+        "4": 0.0,
+        "5": 0.0
+      },
+      "published_output_equal": true,
+      "role": "SEL",
+      "status": "EXACT"
+    }
+  ],
+  "scope": "Observed equality of unchanged R1 D0 outputs across separate live runs; a mismatch requires diagnosis before cross-run selection comparisons."
+}

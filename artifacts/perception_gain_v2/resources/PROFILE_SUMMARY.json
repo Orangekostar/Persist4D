@@ -1,0 +1,274 @@
+{
+  "bundle_reload_checks": [
+    {
+      "bundle_sha256": "2b1e829b3523be6ea56711fbfa30734d9e7a19fa43c73afe1f92cfbd79132674",
+      "direct_output_sha256": "358a02fe32fea87140590644a569787b217776b320ceca451ab4ef0791f999a2",
+      "input_manifest_sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6",
+      "input_mode": null,
+      "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+      "method": "FH-R1-native",
+      "panel": {
+        "context_index": 0,
+        "logical_unit_id": "PB:00000",
+        "master_sequence_id": "scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01",
+        "reference_scene_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+      },
+      "reloaded_output_sha256": "358a02fe32fea87140590644a569787b217776b320ceca451ab4ef0791f999a2",
+      "status": "PASS"
+    },
+    {
+      "bundle_sha256": "6cf153757b72f2320f12cbddaef8e2dad9e2a971345f4c425ba1c84e62b0d295",
+      "direct_output_sha256": "ffac0c8c5e94da5ce8d31828cac17c092342c9f4b5efdc0b470a231280523e71",
+      "input_manifest_sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6",
+      "input_mode": null,
+      "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+      "method": "R1-D0",
+      "panel": {
+        "context_index": 0,
+        "logical_unit_id": "PB:00000",
+        "master_sequence_id": "scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01",
+        "reference_scene_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+      },
+      "reloaded_output_sha256": "ffac0c8c5e94da5ce8d31828cac17c092342c9f4b5efdc0b470a231280523e71",
+      "status": "PASS"
+    },
+    {
+      "bundle_sha256": "b2f059bdcdf8a048fe807babd45d2d476ae687090fb8ef92282205632bf83823",
+      "direct_output_sha256": "2f620e769bfc7181246ce3a52d0c4f169162e78216df3f4c6aa62c72b06b6c3a",
+      "input_manifest_sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6",
+      "input_mode": null,
+      "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+      "method": "C0-L-s45",
+      "panel": {
+        "context_index": 0,
+        "logical_unit_id": "PB:00000",
+        "master_sequence_id": "scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01",
+        "reference_scene_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+      },
+      "reloaded_output_sha256": "2f620e769bfc7181246ce3a52d0c4f169162e78216df3f4c6aa62c72b06b6c3a",
+      "status": "PASS"
+    }
+  ],
+  "cold_input_io": {
+    "diagnostic": "COLD_INPUT_IO_DIAGNOSTIC.csv",
+    "excluded_from_deployment_timings": true,
+    "scan_files": 30,
+    "storage_read_observed_files": 30
+  },
+  "comparison": {
+    "baseline": "FH-R1-native",
+    "candidate": "R1-D0",
+    "ratios": {
+      "latency": 0.462944896640107,
+      "memory": 0.4492861795394666
+    },
+    "scope": "Median of measured T4/T5 samples; descriptive comparison without a statistical stability claim.",
+    "status": "IMPROVED"
+  },
+  "device": "NVIDIA A40",
+  "elapsed_seconds": 498.03820482396986,
+  "failures": [],
+  "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+  "measured_full_sequences": 3,
+  "measurement_rows": 144,
+  "methods": [
+    {
+      "architecture_variant": "C0",
+      "association_config": null,
+      "eval_seed": 45,
+      "inference_identity": "98dfa16279cc25c817ba17f9d310846e39d43773b7bae8c8785b95ae72459c7e",
+      "kind": "NATIVE",
+      "method_id": "FH-R1-native",
+      "parent_checkpoint": null,
+      "parent_checkpoint_file_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "parent_optimizer_update": 0,
+      "parent_weight_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "publisher": "native",
+      "recipe": {
+        "architecture_variant": "C0",
+        "association": "D0/LAST",
+        "base_weight_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+        "batch_size_per_gpu": 2,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "devices": 2,
+        "eps": 1e-08,
+        "eval_seed": 45,
+        "evaluation_updates": [
+          0,
+          250,
+          750,
+          1500,
+          2250,
+          3000
+        ],
+        "freeze": "backbone_encoder",
+        "frozen_encoder_eval": false,
+        "gradient_accumulation": 8,
+        "gradient_clip_norm": 1.0,
+        "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+        "learning_rate": 1e-05,
+        "learning_rate_label": "L",
+        "minimum_lr_fraction": 0.1,
+        "nominal_dataset_weights": [
+          1.0,
+          0.8
+        ],
+        "num_workers": 2,
+        "objective": "raw_sum",
+        "optimizer_updates": 3000,
+        "precision": "32-true",
+        "publisher": "lag1/mean",
+        "query_count": 100,
+        "recipe_id": "C0-L-s45",
+        "schema_version": "perception-gain-v2-recipe-v1",
+        "stage_worst_alpha": 0.5,
+        "stage_worst_beta": 0.25,
+        "state_capacity": 100,
+        "timeout_seconds": 180,
+        "train_seed": 45,
+        "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329",
+        "warmup_updates": 150,
+        "weight_decay": 0.01
+      },
+      "recipe_id": "C0-L-s45",
+      "refiner": null,
+      "scorer_checkpoint": null,
+      "scorer_sha256": null,
+      "state_capacity": 100,
+      "training_seed": 45,
+      "window_size": null
+    },
+    {
+      "architecture_variant": "C0",
+      "association_config": null,
+      "eval_seed": 45,
+      "inference_identity": "7da25879470d0a8edc8c98b003c23d373af73e51dc6e7ffa0335cc17eb118a91",
+      "kind": "D0",
+      "method_id": "R1-D0",
+      "parent_checkpoint": null,
+      "parent_checkpoint_file_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "parent_optimizer_update": 0,
+      "parent_weight_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+      "publisher": "lag1/mean",
+      "recipe": {
+        "architecture_variant": "C0",
+        "association": "D0/LAST",
+        "base_weight_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+        "batch_size_per_gpu": 2,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "devices": 2,
+        "eps": 1e-08,
+        "eval_seed": 45,
+        "evaluation_updates": [
+          0,
+          250,
+          750,
+          1500,
+          2250,
+          3000
+        ],
+        "freeze": "backbone_encoder",
+        "frozen_encoder_eval": false,
+        "gradient_accumulation": 8,
+        "gradient_clip_norm": 1.0,
+        "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+        "learning_rate": 1e-05,
+        "learning_rate_label": "L",
+        "minimum_lr_fraction": 0.1,
+        "nominal_dataset_weights": [
+          1.0,
+          0.8
+        ],
+        "num_workers": 2,
+        "objective": "raw_sum",
+        "optimizer_updates": 3000,
+        "precision": "32-true",
+        "publisher": "lag1/mean",
+        "query_count": 100,
+        "recipe_id": "C0-L-s45",
+        "schema_version": "perception-gain-v2-recipe-v1",
+        "stage_worst_alpha": 0.5,
+        "stage_worst_beta": 0.25,
+        "state_capacity": 100,
+        "timeout_seconds": 180,
+        "train_seed": 45,
+        "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329",
+        "warmup_updates": 150,
+        "weight_decay": 0.01
+      },
+      "recipe_id": "C0-L-s45",
+      "refiner": null,
+      "scorer_checkpoint": null,
+      "scorer_sha256": null,
+      "state_capacity": 100,
+      "training_seed": 45,
+      "window_size": 2
+    }
+  ],
+  "population_manifest_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "profile_gpu_hour_limit": 4,
+  "resource_status": "IMPROVED",
+  "schema_version": "perception-gain-profile-v2",
+  "scope": {
+    "end_to_end": "In-memory input preparation and transfer, live networks, state, revisions and output; excludes file loading, metrics and validation hashes.",
+    "io_diagnostic": "Cold-read advice and measured kernel storage bytes are recorded once on shared staged input files, separately from all methods. Advice does not guarantee eviction; partial/cached reads are labeled. Per-method input loading is also separate and has uncontrolled OS cache state.",
+    "memory": "Absolute CUDA peaks, process RSS, actual resident/soft/archive storage. Binary history grows with T.",
+    "network_input": [
+      "input_prepare_ms",
+      "network_forward_ms",
+      "scorer_ms"
+    ],
+    "state_and_revision": [
+      "state_update_ms",
+      "refiner_ms"
+    ],
+    "usable_output": "materialize_ms"
+  },
+  "selected_sequences": [
+    {
+      "context_index": 0,
+      "logical_unit_id": "PB:00000",
+      "master_sequence_id": "scene0069_00-scene0069_02-scene0069_04-scene0069_03-scene0069_01",
+      "reference_scene_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+    },
+    {
+      "context_index": 30,
+      "logical_unit_id": "PB:00031",
+      "master_sequence_id": "scene0079_00-scene0079_09-scene0079_05-scene0079_04-scene0079_03",
+      "reference_scene_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+    },
+    {
+      "context_index": 66,
+      "logical_unit_id": "PB:00066",
+      "master_sequence_id": "scene0119_00-scene0119_02-scene0119_03-scene0119_01-scene0119_04",
+      "reference_scene_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+    },
+    {
+      "context_index": 81,
+      "logical_unit_id": "PB:00081",
+      "master_sequence_id": "scene0219_00-scene0219_03-scene0219_02-scene0219_01-scene0219_04",
+      "reference_scene_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+    },
+    {
+      "context_index": 96,
+      "logical_unit_id": "PB:00096",
+      "master_sequence_id": "scene0309_00-scene0309_02-scene0309_01-scene0309_04-scene0309_03",
+      "reference_scene_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+    },
+    {
+      "context_index": 111,
+      "logical_unit_id": "PB:00112",
+      "master_sequence_id": "scene0449_00-scene0449_04-scene0449_05-scene0449_03-scene0449_01",
+      "reference_scene_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+    }
+  ],
+  "source_sha256": "2e4ceeba5bef6ae38e0b0c756e76fd964fb50488fbdf0e3bdc5b082330d4d97f",
+  "status": "COMPLETE",
+  "warmup_full_sequences": 1
+}

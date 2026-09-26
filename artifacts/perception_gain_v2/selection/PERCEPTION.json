@@ -1,0 +1,386 @@
+{
+  "cal_selected": {
+    "C0-L-s45": {
+      "S_long": 0.005485467612743378,
+      "S_mean": 0.003148358315229416,
+      "S_min": -0.009058594703674316,
+      "architecture_variant": "C0",
+      "checkpoint": "external:training/C0-L-s45/update=0250.ckpt",
+      "checkpoint_sha256": "e85a2217c05d41fd2e82b996ff6676213cb050d5bc7dd48a0e37a33d26c11a1d",
+      "comparison_status": "COMPLETE",
+      "completed_logical_units": 23,
+      "coverage_status": "COMPLETE",
+      "deltas": {
+        "2": -0.009058594703674316,
+        "3": 0.010681092739105225,
+        "4": -0.0018693506717681885,
+        "5": 0.012840285897254944
+      },
+      "expected_logical_units": 23,
+      "method_id": "C0-L-s45",
+      "metrics": {
+        "2": 0.3535640239715576,
+        "3": 0.30249422788619995,
+        "4": 0.2448398768901825,
+        "5": 0.23554366827011108
+      },
+      "new_parameter_count": 0,
+      "optimizer_update": 250,
+      "recipe_id": "C0-L-s45"
+    },
+    "Q-SEM-L-s45": {
+      "S_long": 0.005399301648139954,
+      "S_mean": 0.004765920341014862,
+      "S_min": 0.000279158353805542,
+      "architecture_variant": "Q-SEM",
+      "checkpoint": "external:training/Q-SEM-L-s45/update=0250.ckpt",
+      "checkpoint_sha256": "84784c3656482a25d211dbc1cce6e3902dec595294699782d0dcc9d59c618e24",
+      "comparison_status": "COMPLETE",
+      "completed_logical_units": 23,
+      "coverage_status": "COMPLETE",
+      "deltas": {
+        "2": 0.0005218684673309326,
+        "3": 0.007743209600448608,
+        "4": 0.000279158353805542,
+        "5": 0.010519444942474365
+      },
+      "expected_logical_units": 23,
+      "method_id": "Q-SEM-L-s45",
+      "metrics": {
+        "2": 0.36314448714256287,
+        "3": 0.29955634474754333,
+        "4": 0.24698838591575623,
+        "5": 0.2332228273153305
+      },
+      "new_parameter_count": 8577,
+      "optimizer_update": 250,
+      "recipe_id": "Q-SEM-L-s45"
+    }
+  },
+  "completed_full": [
+    "C0-L-s45",
+    "Q-SEM-L-s45"
+  ],
+  "evaluated": [
+    {
+      "S_long": -0.006101518869400024,
+      "S_mean": -0.0005415529012680054,
+      "S_min": -0.011577129364013672,
+      "architecture_variant": "Q-SEM",
+      "checkpoint": "external:training/Q-SEM-L-s45/update=0250.ckpt",
+      "checkpoint_sha256": "84784c3656482a25d211dbc1cce6e3902dec595294699782d0dcc9d59c618e24",
+      "comparison_status": "COMPLETE",
+      "completed_logical_units": 24,
+      "coverage_status": "COMPLETE",
+      "deltas": {
+        "2": 0.01350778341293335,
+        "3": -0.0034709572792053223,
+        "4": -0.011577129364013672,
+        "5": -0.000625908374786377
+      },
+      "expected_logical_units": 24,
+      "method_id": "Q-SEM-L-s45",
+      "metrics": {
+        "2": 0.6877159476280212,
+        "3": 0.6458714604377747,
+        "4": 0.6056956648826599,
+        "5": 0.5812482833862305
+      },
+      "new_parameter_count": 8577,
+      "optimizer_update": 250,
+      "recipe_id": "Q-SEM-L-s45"
+    },
+    {
+      "S_long": -0.009431928396224976,
+      "S_mean": -0.003017440438270569,
+      "S_min": -0.009738504886627197,
+      "architecture_variant": "C0",
+      "checkpoint": "external:training/C0-L-s45/update=0250.ckpt",
+      "checkpoint_sha256": "e85a2217c05d41fd2e82b996ff6676213cb050d5bc7dd48a0e37a33d26c11a1d",
+      "comparison_status": "COMPLETE",
+      "completed_logical_units": 24,
+      "coverage_status": "COMPLETE",
+      "deltas": {
+        "2": 0.010343730449676514,
+        "3": -0.003549635410308838,
+        "4": -0.009738504886627197,
+        "5": -0.009125351905822754
+      },
+      "expected_logical_units": 24,
+      "method_id": "C0-L-s45",
+      "metrics": {
+        "2": 0.6845518946647644,
+        "3": 0.6457927823066711,
+        "4": 0.6075342893600464,
+        "5": 0.5727488398551941
+      },
+      "new_parameter_count": 0,
+      "optimizer_update": 250,
+      "recipe_id": "C0-L-s45"
+    }
+  ],
+  "failures": {},
+  "fallback": true,
+  "full_training_recipes": [
+    "C0-L-s45",
+    "Q-SEM-L-s45"
+  ],
+  "promotion": {
+    "endpoint": 3000,
+    "full_training_recipes": [
+      "C0-L-s45",
+      "Q-SEM-L-s45"
+    ],
+    "missing_controls": {},
+    "pilot_best": {
+      "A-OPEN-L-s45": {
+        "S_long": 0.0030713602900505066,
+        "S_mean": 0.0015601404011249542,
+        "S_min": -0.0020852088928222656,
+        "architecture_variant": "A-OPEN",
+        "checkpoint": "external:training/A-OPEN-L-s45/update=0750.ckpt",
+        "checkpoint_sha256": "314c8fd885636cae6c9cb1b18a6f5753cc6bca5c6898440ec287a8a7673679a1",
+        "comparison_status": "COMPLETE",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "deltas": {
+          "2": -0.0020852088928222656,
+          "3": 0.0021830499172210693,
+          "4": -0.0017093271017074585,
+          "5": 0.007852047681808472
+        },
+        "expected_logical_units": 23,
+        "method_id": "A-OPEN-L-s45",
+        "metrics": {
+          "2": 0.36053740978240967,
+          "3": 0.2939961850643158,
+          "4": 0.24499990046024323,
+          "5": 0.2305554300546646
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 750,
+        "recipe_id": "A-OPEN-L-s45"
+      },
+      "C0-H-s45": {
+        "S_long": -0.00816848874092102,
+        "S_mean": -0.010268859565258026,
+        "S_min": -0.01587069034576416,
+        "architecture_variant": "C0",
+        "checkpoint": "external:inputs/imported/C0-H-s45/update=0250.ckpt",
+        "checkpoint_sha256": "362a8575fb0d011b079b60af4eb92f57fcb5734484230c76c468bb9718007b87",
+        "comparison_status": "COMPLETE",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "deltas": {
+          "2": -0.008867770433425903,
+          "3": -0.01587069034576416,
+          "4": -0.011295899748802185,
+          "5": -0.005041077733039856
+        },
+        "expected_logical_units": 23,
+        "method_id": "C0-H-s45",
+        "metrics": {
+          "2": 0.35375484824180603,
+          "3": 0.27594244480133057,
+          "4": 0.2354133278131485,
+          "5": 0.21766230463981628
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "C0-H-s45"
+      },
+      "C0-L-s45": {
+        "S_long": 0.005485467612743378,
+        "S_mean": 0.003148358315229416,
+        "S_min": -0.009058594703674316,
+        "architecture_variant": "C0",
+        "checkpoint": "external:training/C0-L-s45/update=0250.ckpt",
+        "checkpoint_sha256": "e85a2217c05d41fd2e82b996ff6676213cb050d5bc7dd48a0e37a33d26c11a1d",
+        "comparison_status": "COMPLETE",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "deltas": {
+          "2": -0.009058594703674316,
+          "3": 0.010681092739105225,
+          "4": -0.0018693506717681885,
+          "5": 0.012840285897254944
+        },
+        "expected_logical_units": 23,
+        "method_id": "C0-L-s45",
+        "metrics": {
+          "2": 0.3535640239715576,
+          "3": 0.30249422788619995,
+          "4": 0.2448398768901825,
+          "5": 0.23554366827011108
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "C0-L-s45"
+      },
+      "Q-SEM-L-s45": {
+        "S_long": 0.005399301648139954,
+        "S_mean": 0.004765920341014862,
+        "S_min": 0.000279158353805542,
+        "architecture_variant": "Q-SEM",
+        "checkpoint": "external:training/Q-SEM-L-s45/update=0250.ckpt",
+        "checkpoint_sha256": "84784c3656482a25d211dbc1cce6e3902dec595294699782d0dcc9d59c618e24",
+        "comparison_status": "COMPLETE",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "deltas": {
+          "2": 0.0005218684673309326,
+          "3": 0.007743209600448608,
+          "4": 0.000279158353805542,
+          "5": 0.010519444942474365
+        },
+        "expected_logical_units": 23,
+        "method_id": "Q-SEM-L-s45",
+        "metrics": {
+          "2": 0.36314448714256287,
+          "3": 0.29955634474754333,
+          "4": 0.24698838591575623,
+          "5": 0.2332228273153305
+        },
+        "new_parameter_count": 8577,
+        "optimizer_update": 250,
+        "recipe_id": "Q-SEM-L-s45"
+      },
+      "S-BAL-H-s45": {
+        "S_long": -0.0036088749766349792,
+        "S_mean": -0.008850287646055222,
+        "S_min": -0.014202684164047241,
+        "architecture_variant": "S-BAL",
+        "checkpoint": "external:inputs/imported/S-BAL-H-s45/update=0250.ckpt",
+        "checkpoint_sha256": "9b47b174c1048167fc8156ea2a327692dabae947265adc9193f787d6c7c857f6",
+        "comparison_status": "COMPLETE",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "deltas": {
+          "2": -0.013980716466903687,
+          "3": -0.014202684164047241,
+          "4": -0.0071641504764556885,
+          "5": -5.359947681427002e-05
+        },
+        "expected_logical_units": 23,
+        "method_id": "S-BAL-H-s45",
+        "metrics": {
+          "2": 0.34864190220832825,
+          "3": 0.2776104509830475,
+          "4": 0.239545077085495,
+          "5": 0.22264978289604187
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "S-BAL-H-s45"
+      },
+      "S-BAL-L-s45": {
+        "S_long": -0.0029473155736923218,
+        "S_mean": -0.0018814951181411743,
+        "S_min": -0.005664214491844177,
+        "architecture_variant": "S-BAL",
+        "checkpoint": "external:training/S-BAL-L-s45/update=0750.ckpt",
+        "checkpoint_sha256": "f2322334abaa715b35440fec2eb9a70aa6aacd29d00fc9849f43806632082652",
+        "comparison_status": "COMPLETE",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "deltas": {
+          "2": -0.00433686375617981,
+          "3": 0.002705514430999756,
+          "4": -0.005664214491844177,
+          "5": -0.0002304166555404663
+        },
+        "expected_logical_units": 23,
+        "method_id": "S-BAL-L-s45",
+        "metrics": {
+          "2": 0.3582857549190521,
+          "3": 0.2945186495780945,
+          "4": 0.2410450130701065,
+          "5": 0.22247296571731567
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 750,
+        "recipe_id": "S-BAL-L-s45"
+      },
+      "S-WORST-L-s45": {
+        "S_long": 0.001445673406124115,
+        "S_mean": 0.00229765847325325,
+        "S_min": -0.0033986717462539673,
+        "architecture_variant": "S-WORST",
+        "checkpoint": "external:training/S-WORST-L-s45/update=0250.ckpt",
+        "checkpoint_sha256": "8794dfde5d1b5b3a73fb476cc2a4caa54906a6d2cace69b6d452a718eb51b91e",
+        "comparison_status": "COMPLETE",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "deltas": {
+          "2": -0.002065688371658325,
+          "3": 0.008364975452423096,
+          "4": -0.0033986717462539673,
+          "5": 0.006290018558502197
+        },
+        "expected_logical_units": 23,
+        "method_id": "S-WORST-L-s45",
+        "metrics": {
+          "2": 0.3605569303035736,
+          "3": 0.3001781105995178,
+          "4": 0.24331055581569672,
+          "5": 0.22899340093135834
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 250,
+        "recipe_id": "S-WORST-L-s45"
+      }
+    },
+    "reason": "PILOT_GATE",
+    "resume_update": 750
+  },
+  "same_update_cal": {
+    "Q-SEM-L-s45": {
+      "S_long": -8.616596460342407e-05,
+      "S_mean": 0.0016175620257854462,
+      "S_min": -0.002937883138656616,
+      "architecture_variant": "Q-SEM",
+      "checkpoint": "external:training/Q-SEM-L-s45/update=0250.ckpt",
+      "checkpoint_sha256": "84784c3656482a25d211dbc1cce6e3902dec595294699782d0dcc9d59c618e24",
+      "comparison_status": "COMPLETE",
+      "completed_logical_units": 23,
+      "coverage_status": "COMPLETE",
+      "deltas": {
+        "2": 0.009580463171005249,
+        "3": -0.002937883138656616,
+        "4": 0.0021485090255737305,
+        "5": -0.0023208409547805786
+      },
+      "expected_logical_units": 23,
+      "method_id": "Q-SEM-L-s45",
+      "metrics": {
+        "2": 0.36314448714256287,
+        "3": 0.29955634474754333,
+        "4": 0.24698838591575623,
+        "5": 0.2332228273153305
+      },
+      "new_parameter_count": 8577,
+      "optimizer_update": 250,
+      "recipe_id": "Q-SEM-L-s45"
+    }
+  },
+  "selected": {
+    "architecture_variant": "C0",
+    "checkpoint": "external:r1_checkpoint",
+    "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "completed_logical_units": 24,
+    "component_gate_passed": true,
+    "coverage_status": "COMPLETE",
+    "expected_logical_units": 24,
+    "method_id": "R1-D0",
+    "metrics": {
+      "2": 0.6742081642150879,
+      "3": 0.64934241771698,
+      "4": 0.6172727942466736,
+      "5": 0.5818741917610168
+    },
+    "new_parameter_count": 0,
+    "optimizer_update": 0,
+    "recipe_id": "C0-L-s45"
+  },
+  "status": "COMPLETE"
+}

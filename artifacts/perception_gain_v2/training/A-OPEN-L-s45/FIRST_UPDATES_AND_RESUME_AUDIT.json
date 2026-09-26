@@ -1,0 +1,32 @@
+{
+  "checkpoint_update": 250,
+  "first_updates": [
+    {
+      "nonfinite_gradient_count": 0,
+      "optimizer_update": 1,
+      "total_parameter_change_norm": 0.0003403645832997308
+    },
+    {
+      "nonfinite_gradient_count": 0,
+      "optimizer_update": 2,
+      "total_parameter_change_norm": 0.00048021428635600615
+    }
+  ],
+  "optimizer_states": 1,
+  "progress": {
+    "completed_local_batches": 2000,
+    "completed_optimizer_updates": 250,
+    "next_global_draw_index": 8000,
+    "schema_version": "perception-gain-exact-resume-v1"
+  },
+  "recipe_id": "A-OPEN-L-s45",
+  "recipe_identity": "EXACT_REGISTERED_RECIPE",
+  "rng_rank_count": 2,
+  "scheduler_last_epoch": 250,
+  "scheduler_states": 1,
+  "scope": "CPU inspection of the real planned training checkpoint; no extra training or confirmation evaluation.",
+  "source_checkpoint": "external:training/A-OPEN-L-s45/update=0250.ckpt",
+  "source_sha256": "0e49750cb186a0067a08c9a81779f18e0d9dcf997665dbcbf1ae1261367a6805",
+  "status": "PASS",
+  "utc": "2026-09-22T21:47:29.956989+00:00"
+}

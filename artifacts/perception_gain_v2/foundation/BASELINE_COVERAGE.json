@@ -1,0 +1,180 @@
+{
+  "rows": [
+    {
+      "T": 2,
+      "actual_references": 4,
+      "actual_units": 23,
+      "expected_references": 4,
+      "expected_units": 23,
+      "method": "D0",
+      "role": "CAL",
+      "status": "PASS",
+      "t_mAP": 0.36262261867523193
+    },
+    {
+      "T": 3,
+      "actual_references": 4,
+      "actual_units": 23,
+      "expected_references": 4,
+      "expected_units": 23,
+      "method": "D0",
+      "role": "CAL",
+      "status": "PASS",
+      "t_mAP": 0.2918131351470947
+    },
+    {
+      "T": 4,
+      "actual_references": 4,
+      "actual_units": 23,
+      "expected_references": 4,
+      "expected_units": 23,
+      "method": "D0",
+      "role": "CAL",
+      "status": "PASS",
+      "t_mAP": 0.24670922756195068
+    },
+    {
+      "T": 5,
+      "actual_references": 4,
+      "actual_units": 23,
+      "expected_references": 4,
+      "expected_units": 23,
+      "method": "D0",
+      "role": "CAL",
+      "status": "PASS",
+      "t_mAP": 0.22270338237285614
+    },
+    {
+      "T": 2,
+      "actual_references": 4,
+      "actual_units": 23,
+      "expected_references": 4,
+      "expected_units": 23,
+      "method": "FH-native",
+      "role": "CAL",
+      "status": "PASS",
+      "t_mAP": 0.3792975842952728
+    },
+    {
+      "T": 3,
+      "actual_references": 4,
+      "actual_units": 23,
+      "expected_references": 4,
+      "expected_units": 23,
+      "method": "FH-native",
+      "role": "CAL",
+      "status": "PASS",
+      "t_mAP": 0.3140757381916046
+    },
+    {
+      "T": 4,
+      "actual_references": 4,
+      "actual_units": 23,
+      "expected_references": 4,
+      "expected_units": 23,
+      "method": "FH-native",
+      "role": "CAL",
+      "status": "PASS",
+      "t_mAP": 0.2615334689617157
+    },
+    {
+      "T": 5,
+      "actual_references": 4,
+      "actual_units": 23,
+      "expected_references": 4,
+      "expected_units": 23,
+      "method": "FH-native",
+      "role": "CAL",
+      "status": "PASS",
+      "t_mAP": 0.23299665749073029
+    },
+    {
+      "T": 2,
+      "actual_references": 4,
+      "actual_units": 24,
+      "expected_references": 4,
+      "expected_units": 24,
+      "method": "D0",
+      "role": "SEL",
+      "status": "PASS",
+      "t_mAP": 0.6742081642150879
+    },
+    {
+      "T": 3,
+      "actual_references": 4,
+      "actual_units": 24,
+      "expected_references": 4,
+      "expected_units": 24,
+      "method": "D0",
+      "role": "SEL",
+      "status": "PASS",
+      "t_mAP": 0.64934241771698
+    },
+    {
+      "T": 4,
+      "actual_references": 4,
+      "actual_units": 24,
+      "expected_references": 4,
+      "expected_units": 24,
+      "method": "D0",
+      "role": "SEL",
+      "status": "PASS",
+      "t_mAP": 0.6172727942466736
+    },
+    {
+      "T": 5,
+      "actual_references": 4,
+      "actual_units": 24,
+      "expected_references": 4,
+      "expected_units": 24,
+      "method": "D0",
+      "role": "SEL",
+      "status": "PASS",
+      "t_mAP": 0.5818741917610168
+    },
+    {
+      "T": 2,
+      "actual_references": 4,
+      "actual_units": 24,
+      "expected_references": 4,
+      "expected_units": 24,
+      "method": "FH-native",
+      "role": "SEL",
+      "status": "PASS",
+      "t_mAP": 0.6663585305213928
+    },
+    {
+      "T": 3,
+      "actual_references": 4,
+      "actual_units": 24,
+      "expected_references": 4,
+      "expected_units": 24,
+      "method": "FH-native",
+      "role": "SEL",
+      "status": "PASS",
+      "t_mAP": 0.6002776026725769
+    },
+    {
+      "T": 4,
+      "actual_references": 4,
+      "actual_units": 24,
+      "expected_references": 4,
+      "expected_units": 24,
+      "method": "FH-native",
+      "role": "SEL",
+      "status": "PASS",
+      "t_mAP": 0.5635798573493958
+    },
+    {
+      "T": 5,
+      "actual_references": 4,
+      "actual_units": 24,
+      "expected_references": 4,
+      "expected_units": 24,
+      "method": "FH-native",
+      "role": "SEL",
+      "status": "PASS",
+      "t_mAP": 0.5343656539916992
+    }
+  ]
+}

@@ -1,0 +1,298 @@
+{
+  "control_vs_r1": {
+    "S_long": -0.0020712465047836304,
+    "S_mean": -0.004117071628570557,
+    "S_min": -0.010045081377029419,
+    "comparison_status": "COMPLETE",
+    "coverage_by_horizon": {
+      "2": {
+        "actual_logical_units": 129,
+        "actual_references": 6,
+        "expected_logical_units": 129,
+        "expected_references": 6,
+        "status": "COMPLETE"
+      },
+      "3": {
+        "actual_logical_units": 129,
+        "actual_references": 6,
+        "expected_logical_units": 129,
+        "expected_references": 6,
+        "status": "COMPLETE"
+      },
+      "4": {
+        "actual_logical_units": 129,
+        "actual_references": 6,
+        "expected_logical_units": 129,
+        "expected_references": 6,
+        "status": "COMPLETE"
+      },
+      "5": {
+        "actual_logical_units": 129,
+        "actual_references": 6,
+        "expected_logical_units": 129,
+        "expected_references": 6,
+        "status": "COMPLETE"
+      }
+    },
+    "coverage_status": "COMPLETE",
+    "deltas": {
+      "2": -0.010045081377029419,
+      "3": -0.002280712127685547,
+      "4": -0.0003758147358894348,
+      "5": -0.003766678273677826
+    },
+    "method_id": "C0-L-s45",
+    "metrics": {
+      "2": 0.23922163248062134,
+      "3": 0.1476660817861557,
+      "4": 0.08254742622375488,
+      "5": 0.055099114775657654
+    }
+  },
+  "deployment": {
+    "default_method": "R1-D0",
+    "final_vs_D0": {
+      "S_long": 0.0,
+      "S_mean": 0.0,
+      "S_min": 0.0,
+      "comparison_status": "COMPLETE",
+      "coverage_by_horizon": {
+        "2": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "3": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "4": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "5": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        }
+      },
+      "coverage_status": "COMPLETE",
+      "deltas": {
+        "2": 0.0,
+        "3": 0.0,
+        "4": 0.0,
+        "5": 0.0
+      },
+      "method_id": "R1-D0",
+      "metrics": {
+        "2": 0.24926671385765076,
+        "3": 0.14994679391384125,
+        "4": 0.08292324095964432,
+        "5": 0.05886579304933548
+      }
+    },
+    "scope": "PB only; all required prefixes and references must be covered",
+    "tmap_all_T_vs_D0": false,
+    "tmap_all_T_vs_native_FH": false
+  },
+  "final_lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+  "final_vs_native": {
+    "S_long": -0.02130064368247986,
+    "S_mean": -0.005041100084781647,
+    "S_min": -0.0213458389043808,
+    "comparison_status": "COMPLETE",
+    "coverage_by_horizon": {
+      "2": {
+        "actual_logical_units": 129,
+        "actual_references": 6,
+        "expected_logical_units": 129,
+        "expected_references": 6,
+        "status": "COMPLETE"
+      },
+      "3": {
+        "actual_logical_units": 129,
+        "actual_references": 6,
+        "expected_logical_units": 129,
+        "expected_references": 6,
+        "status": "COMPLETE"
+      },
+      "4": {
+        "actual_logical_units": 129,
+        "actual_references": 6,
+        "expected_logical_units": 129,
+        "expected_references": 6,
+        "status": "COMPLETE"
+      },
+      "5": {
+        "actual_logical_units": 129,
+        "actual_references": 6,
+        "expected_logical_units": 129,
+        "expected_references": 6,
+        "status": "COMPLETE"
+      }
+    },
+    "coverage_status": "COMPLETE",
+    "deltas": {
+      "2": 0.02217024564743042,
+      "3": 0.00026664137840270996,
+      "4": -0.02125544846057892,
+      "5": -0.0213458389043808
+    },
+    "method_id": "R1-D0",
+    "metrics": {
+      "2": 0.24926671385765076,
+      "3": 0.14994679391384125,
+      "4": 0.08292324095964432,
+      "5": 0.05886579304933548
+    }
+  },
+  "methods": {
+    "C0-L-s45": {
+      "coverage_by_horizon": {
+        "2": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "3": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "4": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "5": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        }
+      },
+      "coverage_status": "COMPLETE",
+      "method_id": "C0-L-s45",
+      "metrics": {
+        "2": 0.23922163248062134,
+        "3": 0.1476660817861557,
+        "4": 0.08254742622375488,
+        "5": 0.055099114775657654
+      }
+    },
+    "FH-R1-native": {
+      "coverage_by_horizon": {
+        "2": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "3": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "4": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "5": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        }
+      },
+      "coverage_status": "COMPLETE",
+      "method_id": "FH-R1-native",
+      "metrics": {
+        "2": 0.22709646821022034,
+        "3": 0.14968015253543854,
+        "4": 0.10417868942022324,
+        "5": 0.08021163195371628
+      }
+    },
+    "R1-D0": {
+      "coverage_by_horizon": {
+        "2": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "3": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "4": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        },
+        "5": {
+          "actual_logical_units": 129,
+          "actual_references": 6,
+          "expected_logical_units": 129,
+          "expected_references": 6,
+          "status": "COMPLETE"
+        }
+      },
+      "coverage_status": "COMPLETE",
+      "method_id": "R1-D0",
+      "metrics": {
+        "2": 0.24926671385765076,
+        "3": 0.14994679391384125,
+        "4": 0.08292324095964432,
+        "5": 0.05886579304933548
+      }
+    }
+  },
+  "scope": "Complete fixed PB only; no selection changes; live METHODS/CONFIRMATION reconciliation remains required.",
+  "sources": {
+    "C0-L-s45": {
+      "path": "confirmation/PB/456692e978aac37bfdbe834d5d4582234a749da96cbbd35e6e60b2183a372a1f.json",
+      "sha256": "b6d1f9e87352cf5d21c0dac8ab086ae297f4712f29412418ff5aaa4c31837de2"
+    },
+    "FH-R1-native": {
+      "path": "confirmation/PB/2b27d74250e0a24c523dd0b56834bd4d531374338a9dbd45d20433730b52e18c.json",
+      "sha256": "b4eefeac272d8fb5ba4bfbb3feec948697c916d0cf27ce723ea02f59fa63a425"
+    },
+    "R1-D0": {
+      "path": "confirmation/PB/32fe7aa00d264cfa40ab287206d6a5d8ae7c1543581db0a89b4a116dc61d1772.json",
+      "sha256": "9cb508a5f75fea8dbb8a40d7ac6ffcc833e70dea57595690433ebbc435e8acf2"
+    }
+  },
+  "status": "PASS",
+  "utc": "2026-09-26T15:21:47.242442+00:00"
+}

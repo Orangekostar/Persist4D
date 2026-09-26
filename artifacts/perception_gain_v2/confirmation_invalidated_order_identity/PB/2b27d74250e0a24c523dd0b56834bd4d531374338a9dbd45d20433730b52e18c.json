@@ -1,0 +1,3568 @@
+{
+  "checkpoint": "external:r1_checkpoint",
+  "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "completed_prefix_count": 180,
+  "completed_units_by_horizon": {
+    "2": [
+      "PB:00000",
+      "PB:00007",
+      "PB:00010",
+      "PB:00011",
+      "PB:00015",
+      "PB:00017",
+      "PB:00020",
+      "PB:00021",
+      "PB:00026",
+      "PB:00028",
+      "PB:00031",
+      "PB:00032",
+      "PB:00034",
+      "PB:00040",
+      "PB:00041",
+      "PB:00043",
+      "PB:00046",
+      "PB:00050",
+      "PB:00051",
+      "PB:00054",
+      "PB:00057",
+      "PB:00059",
+      "PB:00060",
+      "PB:00065",
+      "PB:00066",
+      "PB:00074",
+      "PB:00076",
+      "PB:00077",
+      "PB:00079",
+      "PB:00081",
+      "PB:00084",
+      "PB:00085",
+      "PB:00088",
+      "PB:00094",
+      "PB:00096",
+      "PB:00099",
+      "PB:00101",
+      "PB:00102",
+      "PB:00105",
+      "PB:00112",
+      "PB:00114",
+      "PB:00116",
+      "PB:00122",
+      "PB:00126",
+      "PB:00127"
+    ],
+    "3": [
+      "PB:00000",
+      "PB:00007",
+      "PB:00010",
+      "PB:00011",
+      "PB:00015",
+      "PB:00017",
+      "PB:00020",
+      "PB:00021",
+      "PB:00026",
+      "PB:00028",
+      "PB:00031",
+      "PB:00032",
+      "PB:00034",
+      "PB:00040",
+      "PB:00041",
+      "PB:00043",
+      "PB:00046",
+      "PB:00050",
+      "PB:00051",
+      "PB:00054",
+      "PB:00057",
+      "PB:00059",
+      "PB:00060",
+      "PB:00065",
+      "PB:00066",
+      "PB:00074",
+      "PB:00076",
+      "PB:00077",
+      "PB:00079",
+      "PB:00081",
+      "PB:00084",
+      "PB:00085",
+      "PB:00088",
+      "PB:00094",
+      "PB:00096",
+      "PB:00099",
+      "PB:00101",
+      "PB:00102",
+      "PB:00105",
+      "PB:00112",
+      "PB:00114",
+      "PB:00116",
+      "PB:00122",
+      "PB:00126",
+      "PB:00127"
+    ],
+    "4": [
+      "PB:00000",
+      "PB:00007",
+      "PB:00010",
+      "PB:00011",
+      "PB:00015",
+      "PB:00017",
+      "PB:00020",
+      "PB:00021",
+      "PB:00026",
+      "PB:00028",
+      "PB:00031",
+      "PB:00032",
+      "PB:00034",
+      "PB:00040",
+      "PB:00041",
+      "PB:00043",
+      "PB:00046",
+      "PB:00050",
+      "PB:00051",
+      "PB:00054",
+      "PB:00057",
+      "PB:00059",
+      "PB:00060",
+      "PB:00065",
+      "PB:00066",
+      "PB:00074",
+      "PB:00076",
+      "PB:00077",
+      "PB:00079",
+      "PB:00081",
+      "PB:00084",
+      "PB:00085",
+      "PB:00088",
+      "PB:00094",
+      "PB:00096",
+      "PB:00099",
+      "PB:00101",
+      "PB:00102",
+      "PB:00105",
+      "PB:00112",
+      "PB:00114",
+      "PB:00116",
+      "PB:00122",
+      "PB:00126",
+      "PB:00127"
+    ],
+    "5": [
+      "PB:00000",
+      "PB:00007",
+      "PB:00010",
+      "PB:00011",
+      "PB:00015",
+      "PB:00017",
+      "PB:00020",
+      "PB:00021",
+      "PB:00026",
+      "PB:00028",
+      "PB:00031",
+      "PB:00032",
+      "PB:00034",
+      "PB:00040",
+      "PB:00041",
+      "PB:00043",
+      "PB:00046",
+      "PB:00050",
+      "PB:00051",
+      "PB:00054",
+      "PB:00057",
+      "PB:00059",
+      "PB:00060",
+      "PB:00065",
+      "PB:00066",
+      "PB:00074",
+      "PB:00076",
+      "PB:00077",
+      "PB:00079",
+      "PB:00081",
+      "PB:00084",
+      "PB:00085",
+      "PB:00088",
+      "PB:00094",
+      "PB:00096",
+      "PB:00099",
+      "PB:00101",
+      "PB:00102",
+      "PB:00105",
+      "PB:00112",
+      "PB:00114",
+      "PB:00116",
+      "PB:00122",
+      "PB:00126",
+      "PB:00127"
+    ]
+  },
+  "confirmation_binding": {
+    "eval_seed": 45,
+    "group_identity": "98dfa16279cc25c817ba17f9d310846e39d43773b7bae8c8785b95ae72459c7e",
+    "input_manifest_sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6",
+    "lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+    "methods": [
+      "FH-R1-native"
+    ],
+    "relevant_source_digest": "e9eaa04980c638ada8862bc0e1a699f82fd7960c1cfbded77b9f069ed66c1fb0",
+    "role": "PB",
+    "roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b"
+  },
+  "data_role": "PB",
+  "distinct_physical_forward_count": 180,
+  "elapsed_seconds": 687.0775769979227,
+  "execution_provenance": {
+    "executed_code_commit": "1645eaca6f061ff1761640ba18bff4d92b6ad054",
+    "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+    "parent_commit": "8b5e93795817682fe70864daa545db219e1443c9",
+    "recipe_id": "C0-L-s45",
+    "relevant_source_digest": "e9eaa04980c638ada8862bc0e1a699f82fd7960c1cfbded77b9f069ed66c1fb0",
+    "source_files": {
+      "datasets/semseg.py": "c633c46a3069a93c549b64be9b94649e9c7da64145ba36555c150c45f34df6f1",
+      "datasets/task_memory_episode.py": "acbc5f293cb8d952eede8768bf3b6ddb9ac2739ae53d9fa59602f749f453f9a7",
+      "models/criterion.py": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150",
+      "models/overlap_entity_association.py": "2003641db14436de469fe4ec0be5c57051f8e32eb5aaa3729b5031f814405c68",
+      "models/perception_gain.py": "781bc9c12ea206a2ee589267cfcada4d8dffcef8e15d566ca06a07af876a6305",
+      "models/persistent_memory.py": "111da9366ad873741cff5c9481c96f39a119b84b02e13c8fbedf7a2e32c8cbf8",
+      "models/rescene.py": "d0088ab6a09623ac7865681929e06b315e580965bb90b1985f932eeefe64e12f",
+      "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+      "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+      "scripts/perception_gain_evaluation.py": "938770aa3c9a6db2d5c8a8d5db732948a1c3d15f78eb7f7f5aa82cadd62db175",
+      "scripts/perception_gain_local_evaluation.py": "2745a8ab2085bcc1823423b750a1e87bc4c81648fb5352685fce9421327b2b4a",
+      "scripts/perception_gain_native_evaluation.py": "ae2fe20eac0fb33dc87db8fbaab028928560fcbafea5a5ee95721fff444c0ec3",
+      "scripts/perception_gain_profile.py": "1fbcc919f613a07a589aec5b93aae2b0a131b14fd6010af2f3dc8651dcaba512",
+      "scripts/perception_gain_v2_config.py": "ddec6a1ce0737fe4997f69fcbb8e372751fe6337af902cdfb0cc961dc044aced",
+      "scripts/perception_refiner_evaluation.py": "c7278e8cee65e49eb16d41d818ef0586ec54fdad487993fb4905e22466e4b4b2",
+      "scripts/prepare_perception_refiner.py": "b21e9a0a95a61bef86a9ba867674e5f575e13c0f81bfbd0803b5dbc0c7a345f4",
+      "scripts/replay_crosswindow_association.py": "a519901aac2644a16a1d1ab2cf600a52f9e2fa310610446d0ea925e28ea0a388",
+      "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+      "scripts/run_task_memory_controls.py": "9682d70357b191d794a0b169a0aabcd8f312312de7c67af744f2e46bca8bd01f",
+      "scripts/run_task_memory_policy_baseline.py": "9b1c3c1de2907a1b88dea1efde6b1bb184eeccc5e6e864e48401ab11cf174440",
+      "scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+      "scripts/system_comparison_metrics.py": "87c1c7adadbf1e66a9ff2f25ee63f60e1f0745c7b0b26ab73d02efc720d9fccd",
+      "scripts/task_memory_output.py": "741f8eb6d8f54484f6c64a4ba7582f247f77b8bfd22e93f378275421c5187581",
+      "scripts/train_perception_gain.py": "d746804deb0c4f2b7b96e939d37a7ea31113da53af6a68c147ef33c7b8fe2afc",
+      "scripts/train_perception_refiner.py": "3fa2abe9ece0a7dd66bcac4c9f8fc5b88a3ca6953c3b9ef689e4f86a76f3e878",
+      "trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a",
+      "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+    },
+    "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329"
+  },
+  "expected_logical_unit_count": 129,
+  "expected_prefix_count": 516,
+  "gpu_hours": 0.19085488249942298,
+  "gpu_name": "NVIDIA A40",
+  "horizons": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "incomplete_units": [
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00001",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_00-scene0069_07-scene0069_08-scene0069_05-scene0069_09"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00001",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_00-scene0069_07-scene0069_08-scene0069_05-scene0069_09"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00001",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_00-scene0069_07-scene0069_08-scene0069_05-scene0069_09"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00001",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_00-scene0069_07-scene0069_08-scene0069_05-scene0069_09"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00002",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_03-scene0069_04-scene0069_02-scene0069_00"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00002",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_03-scene0069_04-scene0069_02-scene0069_00"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00002",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_03-scene0069_04-scene0069_02-scene0069_00"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00002",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_03-scene0069_04-scene0069_02-scene0069_00"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00003",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_03-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00003",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_03-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00003",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_03-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00003",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_03-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00004",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_00-scene0069_02"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00004",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_00-scene0069_02"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00004",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_00-scene0069_02"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00004",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_00-scene0069_02"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00005",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_02-scene0069_06"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00005",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_02-scene0069_06"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00005",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_02-scene0069_06"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00005",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_02-scene0069_06"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00006",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_09-scene0069_06"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00006",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_09-scene0069_06"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00006",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_09-scene0069_06"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00006",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_04-scene0069_03-scene0069_09-scene0069_06"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00008",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_08-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00008",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_08-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00008",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_08-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00008",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_01-scene0069_08-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00009",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_02-scene0069_00-scene0069_07-scene0069_08-scene0069_05"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00009",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_02-scene0069_00-scene0069_07-scene0069_08-scene0069_05"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00009",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_02-scene0069_00-scene0069_07-scene0069_08-scene0069_05"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00009",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_02-scene0069_00-scene0069_07-scene0069_08-scene0069_05"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00012",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_03-scene0069_04-scene0069_02-scene0069_00-scene0069_07"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00012",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_03-scene0069_04-scene0069_02-scene0069_00-scene0069_07"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00012",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_03-scene0069_04-scene0069_02-scene0069_00-scene0069_07"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00012",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_03-scene0069_04-scene0069_02-scene0069_00-scene0069_07"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00013",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_02-scene0069_00-scene0069_07-scene0069_08"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00013",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_02-scene0069_00-scene0069_07-scene0069_08"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00013",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_02-scene0069_00-scene0069_07-scene0069_08"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00013",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_02-scene0069_00-scene0069_07-scene0069_08"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00014",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_03-scene0069_00-scene0069_07-scene0069_02"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00014",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_03-scene0069_00-scene0069_07-scene0069_02"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00014",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_03-scene0069_00-scene0069_07-scene0069_02"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00014",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_03-scene0069_00-scene0069_07-scene0069_02"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00016",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_08-scene0069_00-scene0069_07-scene0069_02"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00016",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_08-scene0069_00-scene0069_07-scene0069_02"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00016",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_08-scene0069_00-scene0069_07-scene0069_02"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00016",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_04-scene0069_08-scene0069_00-scene0069_07-scene0069_02"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00018",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_05-scene0069_09-scene0069_06-scene0069_01-scene0069_03"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00018",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_05-scene0069_09-scene0069_06-scene0069_01-scene0069_03"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00018",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_05-scene0069_09-scene0069_06-scene0069_01-scene0069_03"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00018",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_05-scene0069_09-scene0069_06-scene0069_01-scene0069_03"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00019",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_06-scene0069_01-scene0069_03-scene0069_04-scene0069_02"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00019",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_06-scene0069_01-scene0069_03-scene0069_04-scene0069_02"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00019",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_06-scene0069_01-scene0069_03-scene0069_04-scene0069_02"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00019",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_06-scene0069_01-scene0069_03-scene0069_04-scene0069_02"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00022",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_07-scene0069_08-scene0069_05-scene0069_09-scene0069_06"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00022",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_07-scene0069_08-scene0069_05-scene0069_09-scene0069_06"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00022",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_07-scene0069_08-scene0069_05-scene0069_09-scene0069_06"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00022",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_07-scene0069_08-scene0069_05-scene0069_09-scene0069_06"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00023",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_00-scene0069_07-scene0069_02-scene0069_05"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00023",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_00-scene0069_07-scene0069_02-scene0069_05"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00023",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_00-scene0069_07-scene0069_02-scene0069_05"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00023",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_00-scene0069_07-scene0069_02-scene0069_05"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00024",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_00-scene0069_07-scene0069_09-scene0069_05"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00024",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_00-scene0069_07-scene0069_09-scene0069_05"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00024",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_00-scene0069_07-scene0069_09-scene0069_05"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00024",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_00-scene0069_07-scene0069_09-scene0069_05"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00025",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_05-scene0069_09-scene0069_06-scene0069_01"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00025",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_05-scene0069_09-scene0069_06-scene0069_01"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00025",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_05-scene0069_09-scene0069_06-scene0069_01"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00025",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_05-scene0069_09-scene0069_06-scene0069_01"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00027",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_07-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00027",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_07-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00027",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_07-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00027",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_08-scene0069_07-scene0069_09-scene0069_05-scene0069_06"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00029",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_09-scene0069_06-scene0069_01-scene0069_03-scene0069_04"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00029",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_09-scene0069_06-scene0069_01-scene0069_03-scene0069_04"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00029",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_09-scene0069_06-scene0069_01-scene0069_03-scene0069_04"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00029",
+      "reason": "collator changed full-history identity",
+      "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "sequence_id": "scene0069_09-scene0069_06-scene0069_01-scene0069_03-scene0069_04"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00030",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_00-scene0079_08-scene0079_02-scene0079_10-scene0079_11"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00030",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_00-scene0079_08-scene0079_02-scene0079_10-scene0079_11"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00030",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_00-scene0079_08-scene0079_02-scene0079_10-scene0079_11"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00030",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_00-scene0079_08-scene0079_02-scene0079_10-scene0079_11"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00033",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_01-scene0079_07-scene0079_03-scene0079_04-scene0079_05"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00033",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_01-scene0079_07-scene0079_03-scene0079_04-scene0079_05"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00033",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_01-scene0079_07-scene0079_03-scene0079_04-scene0079_05"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00033",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_01-scene0079_07-scene0079_03-scene0079_04-scene0079_05"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00035",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_02-scene0079_10-scene0079_11-scene0079_06-scene0079_01"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00035",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_02-scene0079_10-scene0079_11-scene0079_06-scene0079_01"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00035",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_02-scene0079_10-scene0079_11-scene0079_06-scene0079_01"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00035",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_02-scene0079_10-scene0079_11-scene0079_06-scene0079_01"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00036",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_04-scene0079_05-scene0079_09-scene0079_00"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00036",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_04-scene0079_05-scene0079_09-scene0079_00"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00036",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_04-scene0079_05-scene0079_09-scene0079_00"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00036",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_04-scene0079_05-scene0079_09-scene0079_00"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00037",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_05-scene0079_04-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00037",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_05-scene0079_04-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00037",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_05-scene0079_04-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00037",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_05-scene0079_04-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00038",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_01-scene0079_04-scene0079_06"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00038",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_01-scene0079_04-scene0079_06"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00038",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_01-scene0079_04-scene0079_06"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00038",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_01-scene0079_04-scene0079_06"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00039",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_01-scene0079_05-scene0079_04"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00039",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_01-scene0079_05-scene0079_04"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00039",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_01-scene0079_05-scene0079_04"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00039",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_01-scene0079_05-scene0079_04"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00042",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_05-scene0079_04-scene0079_09"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00042",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_05-scene0079_04-scene0079_09"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00042",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_05-scene0079_04-scene0079_09"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00042",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_03-scene0079_07-scene0079_05-scene0079_04-scene0079_09"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00044",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_04-scene0079_05-scene0079_09-scene0079_00-scene0079_08"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00044",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_04-scene0079_05-scene0079_09-scene0079_00-scene0079_08"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00044",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_04-scene0079_05-scene0079_09-scene0079_00-scene0079_08"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00044",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_04-scene0079_05-scene0079_09-scene0079_00-scene0079_08"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00045",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_02-scene0079_08-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00045",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_02-scene0079_08-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00045",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_02-scene0079_08-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00045",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_02-scene0079_08-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00047",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_04-scene0079_08-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00047",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_04-scene0079_08-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00047",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_04-scene0079_08-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00047",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_04-scene0079_08-scene0079_00-scene0079_09"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00048",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_09-scene0079_00-scene0079_08-scene0079_02"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00048",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_09-scene0079_00-scene0079_08-scene0079_02"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00048",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_09-scene0079_00-scene0079_08-scene0079_02"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00048",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_05-scene0079_09-scene0079_00-scene0079_08-scene0079_02"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00049",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_06-scene0079_01-scene0079_07-scene0079_03-scene0079_04"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00049",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_06-scene0079_01-scene0079_07-scene0079_03-scene0079_04"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00049",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_06-scene0079_01-scene0079_07-scene0079_03-scene0079_04"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00049",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_06-scene0079_01-scene0079_07-scene0079_03-scene0079_04"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00052",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_07-scene0079_03-scene0079_04-scene0079_05-scene0079_09"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00052",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_07-scene0079_03-scene0079_04-scene0079_05-scene0079_09"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00052",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_07-scene0079_03-scene0079_04-scene0079_05-scene0079_09"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00052",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_07-scene0079_03-scene0079_04-scene0079_05-scene0079_09"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00053",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_07-scene0079_10-scene0079_01-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00053",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_07-scene0079_10-scene0079_01-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00053",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_07-scene0079_10-scene0079_01-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00053",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_07-scene0079_10-scene0079_01-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00055",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_08-scene0079_02-scene0079_10-scene0079_11-scene0079_06"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00055",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_08-scene0079_02-scene0079_10-scene0079_11-scene0079_06"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00055",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_08-scene0079_02-scene0079_10-scene0079_11-scene0079_06"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00055",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_08-scene0079_02-scene0079_10-scene0079_11-scene0079_06"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00056",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_09-scene0079_00-scene0079_08-scene0079_02-scene0079_10"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00056",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_09-scene0079_00-scene0079_08-scene0079_02-scene0079_10"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00056",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_09-scene0079_00-scene0079_08-scene0079_02-scene0079_10"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00056",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_09-scene0079_00-scene0079_08-scene0079_02-scene0079_10"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00058",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_01-scene0079_02-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00058",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_01-scene0079_02-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00058",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_01-scene0079_02-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00058",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_01-scene0079_02-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00061",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_02-scene0079_08-scene0079_00-scene0079_11"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00061",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_02-scene0079_08-scene0079_00-scene0079_11"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00061",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_02-scene0079_08-scene0079_00-scene0079_11"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00061",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_02-scene0079_08-scene0079_00-scene0079_11"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00062",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_02-scene0079_08-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00062",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_02-scene0079_08-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00062",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_02-scene0079_08-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00062",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_02-scene0079_08-scene0079_06-scene0079_11"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00063",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_11-scene0079_06-scene0079_01-scene0079_07"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00063",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_11-scene0079_06-scene0079_01-scene0079_07"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00063",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_11-scene0079_06-scene0079_01-scene0079_07"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00063",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_10-scene0079_11-scene0079_06-scene0079_01-scene0079_07"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00064",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_11-scene0079_06-scene0079_01-scene0079_07-scene0079_03"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00064",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_11-scene0079_06-scene0079_01-scene0079_07-scene0079_03"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00064",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_11-scene0079_06-scene0079_01-scene0079_07-scene0079_03"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00064",
+      "reason": "collator changed full-history identity",
+      "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "sequence_id": "scene0079_11-scene0079_06-scene0079_01-scene0079_07-scene0079_03"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00067",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00067",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00067",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00067",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00068",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00068",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00068",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00068",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00069",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00069",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00069",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00069",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00070",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00070",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00070",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00070",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00071",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00071",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00071",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00071",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_03-scene0119_02-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00072",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_04-scene0119_01-scene0119_03-scene0119_02"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00072",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_04-scene0119_01-scene0119_03-scene0119_02"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00072",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_04-scene0119_01-scene0119_03-scene0119_02"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00072",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_00-scene0119_04-scene0119_01-scene0119_03-scene0119_02"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00073",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_01-scene0119_03-scene0119_02-scene0119_00-scene0119_04"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00073",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_01-scene0119_03-scene0119_02-scene0119_00-scene0119_04"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00073",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_01-scene0119_03-scene0119_02-scene0119_00-scene0119_04"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00073",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_01-scene0119_03-scene0119_02-scene0119_00-scene0119_04"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00075",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_02-scene0119_00-scene0119_04-scene0119_01-scene0119_03"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00075",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_02-scene0119_00-scene0119_04-scene0119_01-scene0119_03"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00075",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_02-scene0119_00-scene0119_04-scene0119_01-scene0119_03"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00075",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_02-scene0119_00-scene0119_04-scene0119_01-scene0119_03"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00078",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_03-scene0119_02-scene0119_00-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00078",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_03-scene0119_02-scene0119_00-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00078",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_03-scene0119_02-scene0119_00-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00078",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_03-scene0119_02-scene0119_00-scene0119_04-scene0119_01"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00080",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_04-scene0119_01-scene0119_03-scene0119_02-scene0119_00"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00080",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_04-scene0119_01-scene0119_03-scene0119_02-scene0119_00"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00080",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_04-scene0119_01-scene0119_03-scene0119_02-scene0119_00"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00080",
+      "reason": "collator changed full-history identity",
+      "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "sequence_id": "scene0119_04-scene0119_01-scene0119_03-scene0119_02-scene0119_00"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00082",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_00-scene0219_04-scene0219_01-scene0219_02-scene0219_03"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00082",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_00-scene0219_04-scene0219_01-scene0219_02-scene0219_03"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00082",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_00-scene0219_04-scene0219_01-scene0219_02-scene0219_03"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00082",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_00-scene0219_04-scene0219_01-scene0219_02-scene0219_03"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00083",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_01-scene0219_02-scene0219_03-scene0219_00-scene0219_04"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00083",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_01-scene0219_02-scene0219_03-scene0219_00-scene0219_04"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00083",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_01-scene0219_02-scene0219_03-scene0219_00-scene0219_04"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00083",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_01-scene0219_02-scene0219_03-scene0219_00-scene0219_04"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00086",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_02-scene0219_03-scene0219_00-scene0219_04-scene0219_01"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00086",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_02-scene0219_03-scene0219_00-scene0219_04-scene0219_01"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00086",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_02-scene0219_03-scene0219_00-scene0219_04-scene0219_01"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00086",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_02-scene0219_03-scene0219_00-scene0219_04-scene0219_01"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00087",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_03-scene0219_00-scene0219_04-scene0219_01-scene0219_02"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00087",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_03-scene0219_00-scene0219_04-scene0219_01-scene0219_02"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00087",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_03-scene0219_00-scene0219_04-scene0219_01-scene0219_02"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00087",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_03-scene0219_00-scene0219_04-scene0219_01-scene0219_02"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00089",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00089",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00089",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00089",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00090",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00090",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00090",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00090",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00091",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00091",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00091",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00091",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00092",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00092",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00092",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00092",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00093",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00093",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00093",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00093",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_00-scene0219_02-scene0219_01-scene0219_03"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00095",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_01-scene0219_02-scene0219_03-scene0219_00"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00095",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_01-scene0219_02-scene0219_03-scene0219_00"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00095",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_01-scene0219_02-scene0219_03-scene0219_00"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00095",
+      "reason": "collator changed full-history identity",
+      "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "sequence_id": "scene0219_04-scene0219_01-scene0219_02-scene0219_03-scene0219_00"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00097",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_00-scene0309_03-scene0309_04-scene0309_01-scene0309_02"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00097",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_00-scene0309_03-scene0309_04-scene0309_01-scene0309_02"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00097",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_00-scene0309_03-scene0309_04-scene0309_01-scene0309_02"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00097",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_00-scene0309_03-scene0309_04-scene0309_01-scene0309_02"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00098",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_01-scene0309_02-scene0309_00-scene0309_03-scene0309_04"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00098",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_01-scene0309_02-scene0309_00-scene0309_03-scene0309_04"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00098",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_01-scene0309_02-scene0309_00-scene0309_03-scene0309_04"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00098",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_01-scene0309_02-scene0309_00-scene0309_03-scene0309_04"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00100",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_02-scene0309_00-scene0309_03-scene0309_04-scene0309_01"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00100",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_02-scene0309_00-scene0309_03-scene0309_04-scene0309_01"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00100",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_02-scene0309_00-scene0309_03-scene0309_04-scene0309_01"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00100",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_02-scene0309_00-scene0309_03-scene0309_04-scene0309_01"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00103",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_03-scene0309_04-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00103",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_03-scene0309_04-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00103",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_03-scene0309_04-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00103",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_03-scene0309_04-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00104",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_01-scene0309_02-scene0309_00-scene0309_03"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00104",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_01-scene0309_02-scene0309_00-scene0309_03"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00104",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_01-scene0309_02-scene0309_00-scene0309_03"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00104",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_01-scene0309_02-scene0309_00-scene0309_03"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00106",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00106",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00106",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00106",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00107",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00107",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00107",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00107",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00108",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00108",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00108",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00108",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00109",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00109",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00109",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00109",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00110",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00110",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00110",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00110",
+      "reason": "collator changed full-history identity",
+      "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "sequence_id": "scene0309_04-scene0309_03-scene0309_01-scene0309_02-scene0309_00"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00111",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_00-scene0449_02-scene0449_01-scene0449_03-scene0449_05"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00111",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_00-scene0449_02-scene0449_01-scene0449_03-scene0449_05"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00111",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_00-scene0449_02-scene0449_01-scene0449_03-scene0449_05"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00111",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_00-scene0449_02-scene0449_01-scene0449_03-scene0449_05"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00113",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_01-scene0449_00-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00113",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_01-scene0449_00-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00113",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_01-scene0449_00-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00113",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_01-scene0449_00-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00115",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_01-scene0449_03-scene0449_05-scene0449_04-scene0449_00"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00115",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_01-scene0449_03-scene0449_05-scene0449_04-scene0449_00"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00115",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_01-scene0449_03-scene0449_05-scene0449_04-scene0449_00"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00115",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_01-scene0449_03-scene0449_05-scene0449_04-scene0449_00"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00117",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_02-scene0449_01-scene0449_03-scene0449_05-scene0449_04"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00117",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_02-scene0449_01-scene0449_03-scene0449_05-scene0449_04"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00117",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_02-scene0449_01-scene0449_03-scene0449_05-scene0449_04"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00117",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_02-scene0449_01-scene0449_03-scene0449_05-scene0449_04"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00118",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_00-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00118",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_00-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00118",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_00-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00118",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_00-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00119",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_02-scene0449_04"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00119",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_02-scene0449_04"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00119",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_02-scene0449_04"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00119",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_02-scene0449_04"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00120",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_02-scene0449_05"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00120",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_02-scene0449_05"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00120",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_02-scene0449_05"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00120",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_02-scene0449_05"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00121",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00121",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00121",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00121",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_00-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00123",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00123",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00123",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00123",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_01-scene0449_02-scene0449_04-scene0449_05"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00124",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_05-scene0449_04-scene0449_00-scene0449_02"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00124",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_05-scene0449_04-scene0449_00-scene0449_02"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00124",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_05-scene0449_04-scene0449_00-scene0449_02"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00124",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_03-scene0449_05-scene0449_04-scene0449_00-scene0449_02"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00125",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_04-scene0449_00-scene0449_02-scene0449_01-scene0449_03"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00125",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_04-scene0449_00-scene0449_02-scene0449_01-scene0449_03"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00125",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_04-scene0449_00-scene0449_02-scene0449_01-scene0449_03"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00125",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_04-scene0449_00-scene0449_02-scene0449_01-scene0449_03"
+    },
+    {
+      "T": 2,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00128",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_05-scene0449_04-scene0449_00-scene0449_02-scene0449_01"
+    },
+    {
+      "T": 3,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00128",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_05-scene0449_04-scene0449_00-scene0449_02-scene0449_01"
+    },
+    {
+      "T": 4,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00128",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_05-scene0449_04-scene0449_00-scene0449_02-scene0449_01"
+    },
+    {
+      "T": 5,
+      "error_type": "FullHistoryCacheError",
+      "logical_unit_id": "PB:00128",
+      "reason": "collator changed full-history identity",
+      "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "sequence_id": "scene0449_05-scene0449_04-scene0449_00-scene0449_02-scene0449_01"
+    }
+  ],
+  "load_audit": {
+    "loaded_key_count": 798,
+    "missing_keys": [],
+    "r1_subtree_exact": true,
+    "r1_subtree_mismatches": [],
+    "unexpected_keys": []
+  },
+  "method_id": "FH-C0-native",
+  "metric_rows": [
+    {
+      "T": 2,
+      "current_stage_AP": 0.36039432883262634,
+      "data_role": "PB",
+      "logical_unit_count": 45,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "all",
+      "reference_count": 6,
+      "status": "MEASURED",
+      "t_REC": 0.3799659311771393,
+      "t_mAP": 0.23016390204429626,
+      "t_mAP25": 0.6182106733322144,
+      "t_mAP50": 0.39509791135787964,
+      "variant": "C0"
+    },
+    {
+      "T": 2,
+      "current_stage_AP": 0.49403518438339233,
+      "data_role": "PB",
+      "logical_unit_count": 10,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.4810686409473419,
+      "t_mAP": 0.342193067073822,
+      "t_mAP25": 0.5225443243980408,
+      "t_mAP50": 0.45451074838638306,
+      "variant": "C0"
+    },
+    {
+      "T": 2,
+      "current_stage_AP": 0.44955602288246155,
+      "data_role": "PB",
+      "logical_unit_count": 14,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.4134235382080078,
+      "t_mAP": 0.31365782022476196,
+      "t_mAP25": 0.6268606781959534,
+      "t_mAP50": 0.48328882455825806,
+      "variant": "C0"
+    },
+    {
+      "T": 2,
+      "current_stage_AP": 0.6196725964546204,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.49638402462005615,
+      "t_mAP": 0.39715614914894104,
+      "t_mAP25": 0.7046194076538086,
+      "t_mAP50": 0.6326632499694824,
+      "variant": "C0"
+    },
+    {
+      "T": 2,
+      "current_stage_AP": 0.38738906383514404,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.39259257912635803,
+      "t_mAP": 0.2965775430202484,
+      "t_mAP25": 0.8310510516166687,
+      "t_mAP50": 0.49816787242889404,
+      "variant": "C0"
+    },
+    {
+      "T": 2,
+      "current_stage_AP": 0.509628176689148,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.4673600196838379,
+      "t_mAP": 0.27678513526916504,
+      "t_mAP25": 0.6696029901504517,
+      "t_mAP50": 0.4120231568813324,
+      "variant": "C0"
+    },
+    {
+      "T": 2,
+      "current_stage_AP": 0.3185776174068451,
+      "data_role": "PB",
+      "logical_unit_count": 6,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.2980217933654785,
+      "t_mAP": 0.18889743089675903,
+      "t_mAP25": 0.4889938533306122,
+      "t_mAP50": 0.39264294505119324,
+      "variant": "C0"
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.35947203636169434,
+      "data_role": "PB",
+      "logical_unit_count": 45,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "all",
+      "reference_count": 6,
+      "status": "MEASURED",
+      "t_REC": 0.2784775495529175,
+      "t_mAP": 0.14857099950313568,
+      "t_mAP25": 0.4784938097000122,
+      "t_mAP50": 0.2699018716812134,
+      "variant": "C0"
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.50957852602005,
+      "data_role": "PB",
+      "logical_unit_count": 10,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.37163612246513367,
+      "t_mAP": 0.24994118511676788,
+      "t_mAP25": 0.4507468640804291,
+      "t_mAP50": 0.3787878751754761,
+      "variant": "C0"
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.4481556713581085,
+      "data_role": "PB",
+      "logical_unit_count": 14,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.3273143768310547,
+      "t_mAP": 0.23502080142498016,
+      "t_mAP25": 0.534440279006958,
+      "t_mAP50": 0.3913416266441345,
+      "variant": "C0"
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.5360128879547119,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.42840275168418884,
+      "t_mAP": 0.3251475989818573,
+      "t_mAP25": 0.6560932993888855,
+      "t_mAP50": 0.5589609146118164,
+      "variant": "C0"
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.38387012481689453,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.30987653136253357,
+      "t_mAP": 0.24782809615135193,
+      "t_mAP25": 0.7390323281288147,
+      "t_mAP50": 0.3348768949508667,
+      "variant": "C0"
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.5166217088699341,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.2982136011123657,
+      "t_mAP": 0.17903317511081696,
+      "t_mAP25": 0.5120380520820618,
+      "t_mAP50": 0.2989377975463867,
+      "variant": "C0"
+    },
+    {
+      "T": 3,
+      "current_stage_AP": 0.3038583993911743,
+      "data_role": "PB",
+      "logical_unit_count": 6,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.18899233639240265,
+      "t_mAP": 0.11423961073160172,
+      "t_mAP25": 0.43010783195495605,
+      "t_mAP50": 0.28654998540878296,
+      "variant": "C0"
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.35079678893089294,
+      "data_role": "PB",
+      "logical_unit_count": 45,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "all",
+      "reference_count": 6,
+      "status": "MEASURED",
+      "t_REC": 0.21920481324195862,
+      "t_mAP": 0.10840139538049698,
+      "t_mAP25": 0.36956456303596497,
+      "t_mAP50": 0.2090771645307541,
+      "variant": "C0"
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.5379623770713806,
+      "data_role": "PB",
+      "logical_unit_count": 10,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.2838437855243683,
+      "t_mAP": 0.18218864500522614,
+      "t_mAP25": 0.36185547709465027,
+      "t_mAP50": 0.3093514144420624,
+      "variant": "C0"
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.4130668044090271,
+      "data_role": "PB",
+      "logical_unit_count": 14,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.25427889823913574,
+      "t_mAP": 0.17845039069652557,
+      "t_mAP25": 0.4874812364578247,
+      "t_mAP50": 0.32264792919158936,
+      "variant": "C0"
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.5297458171844482,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.39986109733581543,
+      "t_mAP": 0.32459867000579834,
+      "t_mAP25": 0.6483156681060791,
+      "t_mAP50": 0.6036850810050964,
+      "variant": "C0"
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.3814060688018799,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.28024691343307495,
+      "t_mAP": 0.22734475135803223,
+      "t_mAP25": 0.6710714101791382,
+      "t_mAP50": 0.29936790466308594,
+      "variant": "C0"
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.5117379426956177,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.23359812796115875,
+      "t_mAP": 0.13368622958660126,
+      "t_mAP25": 0.3493097424507141,
+      "t_mAP50": 0.25217217206954956,
+      "variant": "C0"
+    },
+    {
+      "T": 4,
+      "current_stage_AP": 0.2981765568256378,
+      "data_role": "PB",
+      "logical_unit_count": 6,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.13427363336086273,
+      "t_mAP": 0.07265587896108627,
+      "t_mAP25": 0.3124680519104004,
+      "t_mAP50": 0.16825208067893982,
+      "variant": "C0"
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.3407025635242462,
+      "data_role": "PB",
+      "logical_unit_count": 45,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "all",
+      "reference_count": 6,
+      "status": "MEASURED",
+      "t_REC": 0.17406998574733734,
+      "t_mAP": 0.08301898837089539,
+      "t_mAP25": 0.2902967929840088,
+      "t_mAP50": 0.15320807695388794,
+      "variant": "C0"
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.5178460478782654,
+      "data_role": "PB",
+      "logical_unit_count": 10,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "10b17940-3938-2467-8a7a-958300ba83d3",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.23729689419269562,
+      "t_mAP": 0.13502326607704163,
+      "t_mAP25": 0.3223758041858673,
+      "t_mAP50": 0.25781989097595215,
+      "variant": "C0"
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.4033031761646271,
+      "data_role": "PB",
+      "logical_unit_count": 14,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "137a8158-1db5-2cc0-8003-31c12610471e",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.2236635684967041,
+      "t_mAP": 0.1518542766571045,
+      "t_mAP25": 0.4398754835128784,
+      "t_mAP50": 0.253385454416275,
+      "variant": "C0"
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.4649311602115631,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "280d8ebb-6cc6-2788-9153-98959a2da801",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.38624998927116394,
+      "t_mAP": 0.32445037364959717,
+      "t_mAP25": 0.6360012292861938,
+      "t_mAP50": 0.6017844080924988,
+      "variant": "C0"
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.43066391348838806,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "5630cfcf-12bf-2860-8784-83d28a611a83",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.20864197611808777,
+      "t_mAP": 0.18273693323135376,
+      "t_mAP25": 0.5985732674598694,
+      "t_mAP50": 0.23918911814689636,
+      "variant": "C0"
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.4285489320755005,
+      "data_role": "PB",
+      "logical_unit_count": 5,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "8eabc45f-5af7-2f32-8528-640861d2a135",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.16022080183029175,
+      "t_mAP": 0.08074793219566345,
+      "t_mAP25": 0.21684303879737854,
+      "t_mAP50": 0.15423816442489624,
+      "variant": "C0"
+    },
+    {
+      "T": 5,
+      "current_stage_AP": 0.314142107963562,
+      "data_role": "PB",
+      "logical_unit_count": 6,
+      "method": "FH-C0-native",
+      "optimizer_update": 0,
+      "output_policy": "native",
+      "producer_id": "native-full-history-live",
+      "reference": "ddc73797-765b-241a-9e2c-097c5989baf6",
+      "reference_count": 1,
+      "status": "MEASURED",
+      "t_REC": 0.08114903420209885,
+      "t_mAP": 0.029868828132748604,
+      "t_mAP25": 0.24775680899620056,
+      "t_mAP50": 0.06539739668369293,
+      "variant": "C0"
+    }
+  ],
+  "new_parameter_count": 0,
+  "oom_retries": [],
+  "optimizer_update": 0,
+  "output_policy": "native",
+  "p6a_config_sha256": "dd7a9fccc098fc7e5faecc059d6202ca7f8a762aaee3e7182738a2d7f800aac2",
+  "population_by_horizon": {
+    "2": {
+      "logical_unit_count": 129,
+      "reference_count": 6
+    },
+    "3": {
+      "logical_unit_count": 129,
+      "reference_count": 6
+    },
+    "4": {
+      "logical_unit_count": 129,
+      "reference_count": 6
+    },
+    "5": {
+      "logical_unit_count": 129,
+      "reference_count": 6
+    }
+  },
+  "population_manifest_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "prediction_exports": {
+    "FH-R1-native": {
+      "completed_units_by_horizon": {
+        "2": 45,
+        "3": 45,
+        "4": 45,
+        "5": 45
+      },
+      "error": null,
+      "expected_units_by_horizon": {
+        "2": 129,
+        "3": 129,
+        "4": 129,
+        "5": 129
+      },
+      "index": "external:cache/predictions/ce6be66dab57ecfd7346e5eb900d69cf8c75a7a330c4414a3907f6a47f5e90ad/INDEX.json",
+      "index_sha256": "16d69491545ba03640175753c0af402302f5bcabddb6d57701f43e6e3cd8ba46",
+      "status": "PARTIAL"
+    }
+  },
+  "protocol_sha256": "246497165612699b103d0d79d5503025cb2cd14466aad3ab149d4fe82884ecbe",
+  "recipe": {
+    "architecture_variant": "C0",
+    "association": "D0/LAST",
+    "base_weight_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "batch_size_per_gpu": 2,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "devices": 2,
+    "eps": 1e-08,
+    "eval_seed": 45,
+    "evaluation_updates": [
+      0,
+      250,
+      750,
+      1500,
+      2250,
+      3000
+    ],
+    "freeze": "backbone_encoder",
+    "frozen_encoder_eval": false,
+    "gradient_accumulation": 8,
+    "gradient_clip_norm": 1.0,
+    "inference_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+    "learning_rate": 1e-05,
+    "learning_rate_label": "L",
+    "minimum_lr_fraction": 0.1,
+    "nominal_dataset_weights": [
+      1.0,
+      0.8
+    ],
+    "num_workers": 2,
+    "objective": "raw_sum",
+    "optimizer_updates": 3000,
+    "precision": "32-true",
+    "publisher": "lag1/mean",
+    "query_count": 100,
+    "recipe_id": "C0-L-s45",
+    "schema_version": "perception-gain-v2-recipe-v1",
+    "stage_worst_alpha": 0.5,
+    "stage_worst_beta": 0.25,
+    "state_capacity": 100,
+    "timeout_seconds": 180,
+    "train_seed": 45,
+    "training_recipe_hash": "655e11c446c029dd7c09b21ca7a2efa135d1c9aec00d2178bdd49ffdc1dfd329",
+    "warmup_updates": 150,
+    "weight_decay": 0.01
+  },
+  "resolved_config_sha256": "edd046a6e06015f303a563070e65abd5f560bd30bd9e8942eb452ccede4045d8",
+  "roles_sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+  "schema_version": "perception-gain-native-evaluation-v1",
+  "source_sha256": "ae2fe20eac0fb33dc87db8fbaab028928560fcbafea5a5ee95721fff444c0ec3",
+  "status": "PARTIAL",
+  "variant": "C0",
+  "weight_sources": [
+    {
+      "bytes": 754813672,
+      "role": "r1_initialization",
+      "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+    }
+  ]
+}

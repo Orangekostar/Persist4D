@@ -1,0 +1,170 @@
+{
+  "association": {
+    "S_long": -0.0024211928248405457,
+    "S_mean": -0.0016628392040729523,
+    "S_min": -0.003778114914894104,
+    "association_config": {
+      "family": "A0-U",
+      "lambda_": 0.0,
+      "mutual_margin": 0.1,
+      "overlap_theta": 0.65,
+      "tau": 0.73
+    },
+    "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "comparison_status": "COMPLETE",
+    "coverage_status": "COMPLETE",
+    "deltas": {
+      "2": 0.0,
+      "3": -0.0018089711666107178,
+      "4": -0.003778114914894104,
+      "5": -0.0010642707347869873
+    },
+    "method_id": "A0-U-tau-0.73",
+    "metrics": {
+      "2": 0.36262261867523193,
+      "3": 0.290004163980484,
+      "4": 0.24293111264705658,
+      "5": 0.22163911163806915
+    },
+    "new_parameter_count": 0,
+    "optimizer_update": 0,
+    "recipe_id": "C0-L-s45"
+  },
+  "perception": {
+    "C0-L-s45": {
+      "S_long": 0.005485467612743378,
+      "S_mean": 0.003148358315229416,
+      "S_min": -0.009058594703674316,
+      "architecture_variant": "C0",
+      "checkpoint": "external:training/C0-L-s45/update=0250.ckpt",
+      "checkpoint_sha256": "e85a2217c05d41fd2e82b996ff6676213cb050d5bc7dd48a0e37a33d26c11a1d",
+      "comparison_status": "COMPLETE",
+      "completed_logical_units": 23,
+      "coverage_status": "COMPLETE",
+      "deltas": {
+        "2": -0.009058594703674316,
+        "3": 0.010681092739105225,
+        "4": -0.0018693506717681885,
+        "5": 0.012840285897254944
+      },
+      "expected_logical_units": 23,
+      "method_id": "C0-L-s45",
+      "metrics": {
+        "2": 0.3535640239715576,
+        "3": 0.30249422788619995,
+        "4": 0.2448398768901825,
+        "5": 0.23554366827011108
+      },
+      "new_parameter_count": 0,
+      "optimizer_update": 250,
+      "recipe_id": "C0-L-s45"
+    },
+    "Q-SEM-L-s45": {
+      "S_long": 0.005399301648139954,
+      "S_mean": 0.004765920341014862,
+      "S_min": 0.000279158353805542,
+      "architecture_variant": "Q-SEM",
+      "checkpoint": "external:training/Q-SEM-L-s45/update=0250.ckpt",
+      "checkpoint_sha256": "84784c3656482a25d211dbc1cce6e3902dec595294699782d0dcc9d59c618e24",
+      "comparison_status": "COMPLETE",
+      "completed_logical_units": 23,
+      "coverage_status": "COMPLETE",
+      "deltas": {
+        "2": 0.0005218684673309326,
+        "3": 0.007743209600448608,
+        "4": 0.000279158353805542,
+        "5": 0.010519444942474365
+      },
+      "expected_logical_units": 23,
+      "method_id": "Q-SEM-L-s45",
+      "metrics": {
+        "2": 0.36314448714256287,
+        "3": 0.29955634474754333,
+        "4": 0.24698838591575623,
+        "5": 0.2332228273153305
+      },
+      "new_parameter_count": 8577,
+      "optimizer_update": 250,
+      "recipe_id": "Q-SEM-L-s45"
+    }
+  },
+  "repair": {
+    "P": {},
+    "R1": {
+      "NEW": {
+        "S_long": 0.0,
+        "S_mean": 0.0,
+        "S_min": 0.0,
+        "binding": {
+          "input_mode": "NEW_ONLY",
+          "parent_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+          "parent_weight_hash": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+          "residual_bound": 2,
+          "seed": 45,
+          "source_shards_hash": "53b06b0f438a558ea34968cad2fe9bb3222dac9f5ab72627d1c562932525877e"
+        },
+        "checkpoint": "external:training/refiner/R1/NEW-s45/update=0000.ckpt",
+        "checkpoint_sha256": "dd440ad0597170df34eaa07e65911b036d736ebe5ad378c545895b1dc988d556",
+        "comparison_status": "COMPLETE",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "deltas": {
+          "2": 0.0,
+          "3": 0.0,
+          "4": 0.0,
+          "5": 0.0
+        },
+        "expected_logical_units": 23,
+        "method_id": "R-NEW-R1@0000",
+        "metrics": {
+          "2": 0.36262261867523193,
+          "3": 0.2918131351470947,
+          "4": 0.24670922756195068,
+          "5": 0.22270338237285614
+        },
+        "new_parameter_count": 8769,
+        "optimizer_update": 0
+      },
+      "PAIR": {
+        "S_long": 0.0,
+        "S_mean": 0.0,
+        "S_min": 0.0,
+        "binding": {
+          "input_mode": "OLD_NEW",
+          "parent_recipe_hash": "17e47af26524dfb13ae6c409410a08c021476ad11895b494e70f084372e75c0a",
+          "parent_weight_hash": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+          "residual_bound": 2,
+          "seed": 45,
+          "source_shards_hash": "53b06b0f438a558ea34968cad2fe9bb3222dac9f5ab72627d1c562932525877e"
+        },
+        "checkpoint": "external:training/refiner/R1/PAIR-s45/update=0000.ckpt",
+        "checkpoint_sha256": "0f2c907f916b51d41af23e24f73626503b9ca8054d73066e45fa1859d80cf1d4",
+        "comparison_status": "COMPLETE",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "deltas": {
+          "2": 0.0,
+          "3": 0.0,
+          "4": 0.0,
+          "5": 0.0
+        },
+        "expected_logical_units": 23,
+        "method_id": "R-PAIR-R1@0000",
+        "metrics": {
+          "2": 0.36262261867523193,
+          "3": 0.2918131351470947,
+          "4": 0.24670922756195068,
+          "5": 0.22270338237285614
+        },
+        "new_parameter_count": 8769,
+        "optimizer_update": 0
+      }
+    }
+  },
+  "source_files": [
+    "selection/PERCEPTION.json",
+    "refiner/R1/CAL_SELECTION.json",
+    "refiner/P/CAL_SELECTION.json",
+    "association/SELECTION.json"
+  ]
+}

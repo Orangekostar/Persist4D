@@ -1,0 +1,71 @@
+{
+  "adoption": "ADOPTED",
+  "adoption_artifact": "artifacts/perception_gain_v2/foundation/BASELINE_SUPERSESSION.json",
+  "baselines": {
+    "CAL/D0": {
+      "candidate": {
+        "checkpoint": "external:r1_checkpoint",
+        "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+        "completed_logical_units": 23,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 23,
+        "method_id": "C0-L-s45",
+        "metrics": {
+          "2": 0.36262261867523193,
+          "3": 0.2918131351470947,
+          "4": 0.24670922756195068,
+          "5": 0.22270338237285614
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 0
+      },
+      "method_output_sha256": {
+        "PARENT": "fcaf9de5e3de905da6f6829baf2cbcd068895f29b99f7dc7018470bca95ce2b6"
+      },
+      "path": "artifacts/perception_gain_v2/foundation/rebaseline-fixed-runtime/CAL/D0.json",
+      "sha256": "df16c62105b92468edeb95b95322db5f041e3f29a591621d3856485cdc790a7f",
+      "status": "PASS"
+    },
+    "CAL/FH-native": {
+      "candidate": null,
+      "method_output_sha256": null,
+      "path": "artifacts/perception_gain_v2/foundation/rebaseline-fixed-runtime/CAL/FH-native.json",
+      "sha256": "11444624a73c1c90164e813bf1a7f4b4d92f5e634ceb207647d58e9c38bc670e",
+      "status": "PASS"
+    },
+    "SEL/D0": {
+      "candidate": {
+        "checkpoint": "external:r1_checkpoint",
+        "checkpoint_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+        "completed_logical_units": 24,
+        "coverage_status": "COMPLETE",
+        "expected_logical_units": 24,
+        "method_id": "C0-L-s45",
+        "metrics": {
+          "2": 0.6742081642150879,
+          "3": 0.64934241771698,
+          "4": 0.6172727942466736,
+          "5": 0.5818741917610168
+        },
+        "new_parameter_count": 0,
+        "optimizer_update": 0
+      },
+      "method_output_sha256": {
+        "PARENT": "96fd0e77759b938ff5fd06c23fcc442ba0952febf3bbe02648f6dde5bf5f8c72"
+      },
+      "path": "artifacts/perception_gain_v2/foundation/rebaseline-fixed-runtime/SEL/D0.json",
+      "sha256": "d8a54812ab40519249458647adfd3d149173d3b8d0195d27b87305c282fd1869",
+      "status": "PASS"
+    },
+    "SEL/FH-native": {
+      "candidate": null,
+      "method_output_sha256": null,
+      "path": "artifacts/perception_gain_v2/foundation/rebaseline-fixed-runtime/SEL/FH-native.json",
+      "sha256": "2cfd947bb0eb7cbbe6080591add912d4c28849b285f91d386e981f30c7a44f51",
+      "status": "PASS"
+    }
+  },
+  "historical_cause": "UNDETERMINED",
+  "reason": "Original R1 parent raw predictions cannot be reproduced by original 0a21848 or current source. Ten fresh evaluations across thread counts, zero-head presence and original/fixed startup contexts agree exactly. The historical cause remains undetermined; preserve original evidence and repeat the same fixed development protocol. No PB or other confirmation data is accessed. Association search must use the reproduced parent cache.",
+  "status": "COMPLETE"
+}

@@ -1,0 +1,86 @@
+{
+  "disposition_utc": "2026-09-26T16:48:27.369960+00:00",
+  "elapsed_seconds": 439.2059509929968,
+  "end_utc": "2026-09-26T16:46:46.923861+00:00",
+  "event_id": "LOCAL_PREDICTION_EXPORT_RECOVERY:2026-09-26T16:39:27.712257+00:00",
+  "excluded_export_locations": [
+    {
+      "archived_index": "external:cache/predictions_invalidated_runtime/318c067cf209cf6bddca968d4f9004d9c724a6c2fe0001a884bf626e2ba2c06e/INDEX.json",
+      "index_sha256": "1da842bc832ce0728ec4b00e51e20ffd9cceb995e54c772a894d380fd5af32f0",
+      "original_index": "external:cache/predictions/318c067cf209cf6bddca968d4f9004d9c724a6c2fe0001a884bf626e2ba2c06e/INDEX.json"
+    },
+    {
+      "archived_index": "external:cache/predictions_invalidated_runtime/93b1bf0df0ccae2010dd47e8ecc71c67ce5fe76d053c3992fbe30faa031e8998/INDEX.json",
+      "index_sha256": "b3ebc07bf4c17d7ed00e9144f46f692d8e44cd2371a717a9688c89200aec9041",
+      "original_index": "external:cache/predictions/93b1bf0df0ccae2010dd47e8ecc71c67ce5fe76d053c3992fbe30faa031e8998/INDEX.json"
+    }
+  ],
+  "exit_code": 130,
+  "final_lock_sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26",
+  "gpu_count": 1,
+  "gpu_hours": 0.12200165305361023,
+  "gpus": [
+    0
+  ],
+  "measurement": "MEASURED_PROCESS_GPU_RESERVATION_WALLTIME",
+  "original_methods_sha256": "134f369961293d0fff8686d2e04240224e0a5af72c0b14a0b12e8e7992c70f53",
+  "pid": 3131722,
+  "raw_receipt_sha256": "87fc78113d688aaa751c6f9783c644a9ad6506afe32ae8b8e161bbeb17696050",
+  "reason": "Primary agent interrupted after confirming thread counts 1 vs original 2 and unset vs original :4096:8 cuBLAS workspace. Original and attempted scores are preserved. Ledger already charged the full interrupted reservation; do not charge twice.",
+  "results": [
+    {
+      "artifact": "confirmation/LOCAL-export-recovery/FH-R1-native-seed45.json",
+      "eval_seed": 45,
+      "method": "FH-R1-native",
+      "metric_differences": {
+        "overall_mAP": {
+          "original": 0.3951302170753479,
+          "reexport": 0.39673182368278503
+        },
+        "stage1_mAP": {
+          "original": 0.4483559727668762,
+          "reexport": 0.44706377387046814
+        },
+        "stage2_mAP": {
+          "original": 0.4409385919570923,
+          "reexport": 0.44305288791656494
+        },
+        "t_mAP": {
+          "original": 0.3070814311504364,
+          "reexport": 0.3092667758464813
+        },
+        "t_mAP25": {
+          "original": 0.6479382514953613,
+          "reexport": 0.6526524424552917
+        },
+        "t_mAP50": {
+          "original": 0.5060937404632568,
+          "reexport": 0.5098438858985901
+        }
+      },
+      "prediction_exports": {
+        "FH-R1-native": {
+          "completed_units_by_horizon": {
+            "2": 154
+          },
+          "error": null,
+          "expected_units_by_horizon": {
+            "2": 154
+          },
+          "index": "external:cache/predictions/318c067cf209cf6bddca968d4f9004d9c724a6c2fe0001a884bf626e2ba2c06e/INDEX.json",
+          "index_sha256": "1da842bc832ce0728ec4b00e51e20ffd9cceb995e54c772a894d380fd5af32f0",
+          "status": "COMPLETE"
+        }
+      },
+      "same_population": true,
+      "sha256": "9a1d8fc2a1b281d402f0aee8b09e3c0f19a3b645c68b6dcb0af8c87b187815d7",
+      "status": "PASS"
+    }
+  ],
+  "scope": "V2",
+  "script_sha256": "f7f9878e083388c4959bcbcf3dd6c0b89c177a04c2c9c50ad73c8cece2f61605",
+  "source_commit": "05168ca1c521bce3cec1d96a3a5d1c49a3fc0ec4",
+  "start_utc": "2026-09-26T16:39:27.712281+00:00",
+  "status": "INTERRUPTED_RUNTIME_MISMATCH",
+  "task": "LOCAL_PREDICTION_EXPORT_RECOVERY"
+}
