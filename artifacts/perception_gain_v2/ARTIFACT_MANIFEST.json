@@ -1,0 +1,1286 @@
+{
+  "excludes": [
+    "ARTIFACT_MANIFEST.json",
+    "EXECUTION_LOG.jsonl",
+    "PREPUBLICATION_RECEIPT.json",
+    "PUBLICATION_RECEIPT.json",
+    "RECOVERY_EVENTS.jsonl",
+    "RUN_STATE.json",
+    "budget/*"
+  ],
+  "experiment_commit": "705c39898d6b2d813b5cbaa592e19b2663144fb3",
+  "files": [
+    {
+      "bytes": 16055,
+      "path": "artifacts/perception_gain_v2/CODE_BINDINGS.md",
+      "sha256": "dd7203524779aef606a90c0ecbe5d27c0ddf09251129d161907a3b59ca181dbf"
+    },
+    {
+      "bytes": 22854,
+      "path": "artifacts/perception_gain_v2/DATA_ROLES.json",
+      "sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b"
+    },
+    {
+      "bytes": 73008,
+      "path": "artifacts/perception_gain_v2/EXECUTION_INSTRUCTION.md",
+      "sha256": "9b92e302d0af269614e86a76591cd324374f83fe64b097aa4c2ffdb330c3b688"
+    },
+    {
+      "bytes": 46019,
+      "path": "artifacts/perception_gain_v2/FINAL_REPORT.md",
+      "sha256": "d1331346791db53958dfb08247b63a37d58e4031cf6df6a98dfdc808080923b9"
+    },
+    {
+      "bytes": 14445,
+      "path": "artifacts/perception_gain_v2/HANDOFF.md",
+      "sha256": "f41688db2ff787da5cdbb2dc2eea0d6e8d4056220cf8ae7f3d1dfaa227d1a078"
+    },
+    {
+      "bytes": 3322,
+      "path": "artifacts/perception_gain_v2/INPUT_MANIFEST.json",
+      "sha256": "44f824a6eeed2e5c3e5fa7d1c3208843b719c0e2251f6def0daf783bfe091a27"
+    },
+    {
+      "bytes": 196,
+      "path": "artifacts/perception_gain_v2/PUBLICATION_SNAPSHOT.json",
+      "sha256": "790a0d777eb519c2d7214cdb4aedea5002fde9e34babfdf808944707af87af8e"
+    },
+    {
+      "bytes": 17671,
+      "path": "artifacts/perception_gain_v2/RELEASE_PLAN.json",
+      "sha256": "b3d0b04d65b7c204f36b0f631f2cb7344a7f44edfb9156298506af7dbeaf280b"
+    },
+    {
+      "bytes": 1041,
+      "path": "artifacts/perception_gain_v2/REPORT_STATUS.json",
+      "sha256": "378f524f616b18b8e6a935bab204afa65157694c63799eef946d3d317cbc1345"
+    },
+    {
+      "bytes": 4971,
+      "path": "artifacts/perception_gain_v2/RUN_CONFIG.json",
+      "sha256": "2fe569e2fe82fc94416a9188c0b395716f3f7b9d30a407b7d6fad5736ba03ac6"
+    },
+    {
+      "bytes": 169144,
+      "path": "artifacts/perception_gain_v2/association/CAL/A0-U-tau-0.6.json",
+      "sha256": "07b88eeb6d2243dabc72969cdb384c579a39e3b16c3b0c8ee30a718a784fa8f1"
+    },
+    {
+      "bytes": 172151,
+      "path": "artifacts/perception_gain_v2/association/CAL/A0-U-tau-0.666666666667.json",
+      "sha256": "1a0d20feae3517d66025a6f2a3a79e16d3bc931f0790a5f48740dd0fcde9e602"
+    },
+    {
+      "bytes": 169400,
+      "path": "artifacts/perception_gain_v2/association/CAL/A0-U-tau-0.73.json",
+      "sha256": "a0b8757d87a5f77f54a38473464b918dac861f1dea5530b6b8c86b1e1b2e7c7c"
+    },
+    {
+      "bytes": 169102,
+      "path": "artifacts/perception_gain_v2/association/CAL/A1-theta-0.5.json",
+      "sha256": "28449e75d5349d68e3332027c7c8490eade01d0260e87557b3b4c06770bfb6dc"
+    },
+    {
+      "bytes": 169386,
+      "path": "artifacts/perception_gain_v2/association/CAL/A1-theta-0.65.json",
+      "sha256": "401891edd819b43b52dba8fe76dc971d37f526e8b3731fb27b1dd8966ad80c28"
+    },
+    {
+      "bytes": 169124,
+      "path": "artifacts/perception_gain_v2/association/CAL/A1-theta-0.8.json",
+      "sha256": "2c85a35284950866a595192906f90d13961dd72029ad27420d708bf865a61d33"
+    },
+    {
+      "bytes": 171833,
+      "path": "artifacts/perception_gain_v2/association/CAL/A2-lambda-0.25-tau-0.6.json",
+      "sha256": "3abd4c625292f6300961471e09450c4960d061b5e3657e374b7c0641649a2360"
+    },
+    {
+      "bytes": 174762,
+      "path": "artifacts/perception_gain_v2/association/CAL/A2-lambda-0.25-tau-0.666666666667.json",
+      "sha256": "cf4af5021871851d678a8d44a8a38a041e841c52c48b321fda475556ae841b09"
+    },
+    {
+      "bytes": 172103,
+      "path": "artifacts/perception_gain_v2/association/CAL/A2-lambda-0.25-tau-0.73.json",
+      "sha256": "2d5325e1ae27dce678e041e6845069eca0a8cadd7e0e00f9908560cabadb0729"
+    },
+    {
+      "bytes": 171700,
+      "path": "artifacts/perception_gain_v2/association/CAL/A2-lambda-0.5-tau-0.6.json",
+      "sha256": "8dd2f4953f1c21803430d919fb4dc741ee775fc3fec27d7f5e615c0351a3d394"
+    },
+    {
+      "bytes": 174699,
+      "path": "artifacts/perception_gain_v2/association/CAL/A2-lambda-0.5-tau-0.666666666667.json",
+      "sha256": "4cd2633b6d8de48542bbeed01edc1a6d0afdbb8209ee7c14c6eda08a43943992"
+    },
+    {
+      "bytes": 171959,
+      "path": "artifacts/perception_gain_v2/association/CAL/A2-lambda-0.5-tau-0.73.json",
+      "sha256": "f1b8f1b546fc9dae24ad5f0d5261a2c4c14d1ec11f85c4952600cc6411678a54"
+    },
+    {
+      "bytes": 11991,
+      "path": "artifacts/perception_gain_v2/association/CAL_LOCK.json",
+      "sha256": "29fa0b425c744a9fdfbc34fdf73f28a700bdc5f0bc3c8e0b662a705181a75edd"
+    },
+    {
+      "bytes": 2495,
+      "path": "artifacts/perception_gain_v2/association/CONFIG_RESULTS.csv",
+      "sha256": "305e34b8bf01f18acdf54703a1fccb2d58fc06b75dd7336a373d27fda46017d3"
+    },
+    {
+      "bytes": 172931,
+      "path": "artifacts/perception_gain_v2/association/SEL/A0-U-tau-0.73.json",
+      "sha256": "56f114ecf768f8e7f884319adbf2f0745751cd3970aa4f1f360ce22d39baf836"
+    },
+    {
+      "bytes": 1886,
+      "path": "artifacts/perception_gain_v2/association/SELECTION.json",
+      "sha256": "2bb71c1573a033a5cc768962c97eda319e41e8417d82fedda0ce715e3630c222"
+    },
+    {
+      "bytes": 169342,
+      "path": "artifacts/perception_gain_v2/association_invalidated_parent_drift/CAL/A0-U-tau-0.6.json",
+      "sha256": "d2db519bacd353fafe7b932b23bf654bca8aaa50ffc9f081a5e96f065b8e8295"
+    },
+    {
+      "bytes": 172306,
+      "path": "artifacts/perception_gain_v2/association_invalidated_parent_drift/CAL/A0-U-tau-0.666666666667.json",
+      "sha256": "2d13089b8531baa19b16efd8b34dfd71338f7a7d128020917325905fac996a74"
+    },
+    {
+      "bytes": 169571,
+      "path": "artifacts/perception_gain_v2/association_invalidated_parent_drift/CAL/A0-U-tau-0.73.json",
+      "sha256": "73191cf7dbb2413802a9f780772b55d142227c11e95952059889c60059ab11b8"
+    },
+    {
+      "bytes": 169284,
+      "path": "artifacts/perception_gain_v2/association_invalidated_parent_drift/CAL/A1-theta-0.5.json",
+      "sha256": "0c030681cb5925133a19186a34ab45f392e096e17dc972563b62f4108440734d"
+    },
+    {
+      "bytes": 824,
+      "path": "artifacts/perception_gain_v2/association_invalidated_parent_drift/CONFIG_RESULTS.csv",
+      "sha256": "34d2b1ceb41ab7ccfe4053c8c2037e19ffc3dc318b5cfa36c83ad2ada944f048"
+    },
+    {
+      "bytes": 1395,
+      "path": "artifacts/perception_gain_v2/association_invalidated_parent_drift/INVALIDATION.json",
+      "sha256": "d515162c5cc74ca25c62f108a9337fd4d6a3b58c184206e971592c074888a769"
+    },
+    {
+      "bytes": 41671,
+      "path": "artifacts/perception_gain_v2/confirmation/ADDITIONAL/4da20eeca66964ee0b452a5dabf444054e50d41fb07feca8dbc96808c8dc0442.json",
+      "sha256": "a165de36aabbaaa2adb674c6733da67b2785fc5c92bc010ab0f6f6cf9cb60f5c"
+    },
+    {
+      "bytes": 55409,
+      "path": "artifacts/perception_gain_v2/confirmation/ADDITIONAL/763533e47fa402d202ee8251b713e13d0fff27955c5a312b2b786fe5e43892a6.json",
+      "sha256": "0596dd7c3bedcf9c98fca66fadf8d590934d7116cf2cd6e45faa8fec6cd2589f"
+    },
+    {
+      "bytes": 79668,
+      "path": "artifacts/perception_gain_v2/confirmation/ADDITIONAL/METHODS.json",
+      "sha256": "285a62d8f21c62bd15092231873a1bd47d389fae169d3b305c0b7414a10112be"
+    },
+    {
+      "bytes": 47081,
+      "path": "artifacts/perception_gain_v2/confirmation/BY_REFERENCE.csv",
+      "sha256": "93b35f922b160e368ab64a440bf6b82f8fba67365bfa02ac4dedcc8a2af8272f"
+    },
+    {
+      "bytes": 261795,
+      "path": "artifacts/perception_gain_v2/confirmation/CONFIRMATION.json",
+      "sha256": "5d20154f19e4526a1f536c5d8a310251e2fb1c8dd5b8c8dbb9bc08258e0a5bee"
+    },
+    {
+      "bytes": 14796,
+      "path": "artifacts/perception_gain_v2/confirmation/CONFIRMATION_SUMMARY.json",
+      "sha256": "8492c6903ff6a59b1da7d6a696e926a9daeab3b18ab7ac6673b1077a374769dd"
+    },
+    {
+      "bytes": 4096,
+      "path": "artifacts/perception_gain_v2/confirmation/COVERAGE.csv",
+      "sha256": "daee590ae4428149ea49ee53fb0336c2fd5fb9579ffbe7549f2c26e2f242252d"
+    },
+    {
+      "bytes": 14435,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-T2/59b93318afd54f2e0c62a3c5638483678529ef6bef4fbc8e958bb96e4e6d18db.json",
+      "sha256": "5cc9a71a7b5ffdeb7c995ccfbdd9c709917f3f2c5a838757a51317511c7eeb9f"
+    },
+    {
+      "bytes": 101186,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-T2/METHODS.json",
+      "sha256": "134f369961293d0fff8686d2e04240224e0a5af72c0b14a0b12e8e7992c70f53"
+    },
+    {
+      "bytes": 14720,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-T2/a62086558ad0bfb12a76822a67cd7873112ed69cd5e5e7d9ac5d10f74ee1f385.json",
+      "sha256": "f307792cd8026a5bf29d796916660f28cb3ab48181f1134f576f70df2c4b090b"
+    },
+    {
+      "bytes": 14432,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-T2/c85c76a27408a4a348ea5c18ca7dec21fe0af685210785d1e1de57fee10a57ae.json",
+      "sha256": "b1c947d1a1ac746cdf3869b5c6ff3bc6bcb8f1cea61e80fe79c753f5d5bd6123"
+    },
+    {
+      "bytes": 14715,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-T2/dd60864e01fa6c7c638a976be6eace4ce869e1925857ae12033320425430a125.json",
+      "sha256": "758b3bd61b608e5a6d9d366a1009d6032de97b23955534037df28392d0e4b6d4"
+    },
+    {
+      "bytes": 14718,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-T2/f27667b18d5c3e25e2084f64da6ee748dde97c35eef1ccd3e0f2b6f51a7d8b8f.json",
+      "sha256": "b3b061f583cf4e86d67308f26a30dd544389524fcf0b92aa285d6d61fd8958df"
+    },
+    {
+      "bytes": 14434,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-T2/fb7e2aefc232fb2bf45b5246e8ba5c8b1b6a604110587c860a58229078a25715.json",
+      "sha256": "14a925d94d11e769e5f7c818730f5354601de89547b92d30f495cca96d8656f5"
+    },
+    {
+      "bytes": 18228,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-export-matched-runtime/C0-best-native-seed45.json",
+      "sha256": "3e6f4cf588f4763ac92461645ef18761055c1048b9c64b8ca532e1ccfb61f05a"
+    },
+    {
+      "bytes": 18230,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-export-matched-runtime/C0-best-native-seed46.json",
+      "sha256": "c87e5468ceb53990f2aa7c2c59f7380526a2ae700c9a576897e152944e8354bc"
+    },
+    {
+      "bytes": 18225,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-export-matched-runtime/C0-best-native-seed47.json",
+      "sha256": "6058b98a8020555899628289e98f3c3605a3c244ea32a05649792f90751f9cbf"
+    },
+    {
+      "bytes": 17942,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-export-matched-runtime/FH-R1-native-seed45.json",
+      "sha256": "c472665e5a4eed6fcd486d76a202ff6ae7e5826d79fcddcbf1e4e3325c573f80"
+    },
+    {
+      "bytes": 17945,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-export-matched-runtime/FH-R1-native-seed46.json",
+      "sha256": "c4fa88617819902c9dcc1764fec78502cebff47d3daeb1eee165799138fd08c4"
+    },
+    {
+      "bytes": 17945,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-export-matched-runtime/FH-R1-native-seed47.json",
+      "sha256": "fe179f646df23dd32cb5905231208862752815d7247903c1fa93c9fbc179ab7d"
+    },
+    {
+      "bytes": 17945,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL-export-recovery/FH-R1-native-seed45.json",
+      "sha256": "9a1d8fc2a1b281d402f0aee8b09e3c0f19a3b645c68b6dcb0af8c87b187815d7"
+    },
+    {
+      "bytes": 6186,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL_EXPORT_MATCHED_RUNTIME_AUDIT.json",
+      "sha256": "da609ad0ccbbccb608822508ab4ac284e578a1e6106c01aa825e21fe5bd06b67"
+    },
+    {
+      "bytes": 3603,
+      "path": "artifacts/perception_gain_v2/confirmation/LOCAL_EXPORT_RECOVERY_AUDIT.json",
+      "sha256": "629c9d623c317f53a5f4773b6b28c7d9d164f3c7c71831f411cfaaffba0eacec"
+    },
+    {
+      "bytes": 4096,
+      "path": "artifacts/perception_gain_v2/confirmation/METRICS.csv",
+      "sha256": "daee590ae4428149ea49ee53fb0336c2fd5fb9579ffbe7549f2c26e2f242252d"
+    },
+    {
+      "bytes": 32758,
+      "path": "artifacts/perception_gain_v2/confirmation/PB/2b27d74250e0a24c523dd0b56834bd4d531374338a9dbd45d20433730b52e18c.json",
+      "sha256": "b4eefeac272d8fb5ba4bfbb3feec948697c916d0cf27ce723ea02f59fa63a425"
+    },
+    {
+      "bytes": 21790,
+      "path": "artifacts/perception_gain_v2/confirmation/PB/32fe7aa00d264cfa40ab287206d6a5d8ae7c1543581db0a89b4a116dc61d1772.json",
+      "sha256": "9cb508a5f75fea8dbb8a40d7ac6ffcc833e70dea57595690433ebbc435e8acf2"
+    },
+    {
+      "bytes": 22108,
+      "path": "artifacts/perception_gain_v2/confirmation/PB/456692e978aac37bfdbe834d5d4582234a749da96cbbd35e6e60b2183a372a1f.json",
+      "sha256": "b6d1f9e87352cf5d21c0dac8ab086ae297f4712f29412418ff5aaa4c31837de2"
+    },
+    {
+      "bytes": 45162,
+      "path": "artifacts/perception_gain_v2/confirmation/PB/METHODS.json",
+      "sha256": "29ac13157b015f5c98357c652c372d0d6a01fd7314dc4d92fa0ef4eca8f7148b"
+    },
+    {
+      "bytes": 8537,
+      "path": "artifacts/perception_gain_v2/confirmation/PB_RECOVERY_AUDIT.json",
+      "sha256": "9cbfb50f2fe15d124596b783308efa0c76aa0e633ca57b74a31952a713d988fa"
+    },
+    {
+      "bytes": 4970,
+      "path": "artifacts/perception_gain_v2/confirmation/source_reuse/092139f2014cce2d8a751b60dfa32abdcc5907d18ca7b572a0b7643bde5d5f31.json",
+      "sha256": "4c4551e89a8efd384ee2322fe1810e14bcf3f93cfca9d390029b4ae5bed61d6b"
+    },
+    {
+      "bytes": 5002,
+      "path": "artifacts/perception_gain_v2/confirmation/source_reuse/259fe11ab1dbc19925e6bb9dd9a818ffac70a007272d5efd83631d8f9510f610.json",
+      "sha256": "9d688cd6008db6ae20c402bc5b223d27607f7a57272d56b91c1259397713185b"
+    },
+    {
+      "bytes": 4978,
+      "path": "artifacts/perception_gain_v2/confirmation/source_reuse/5dfa7cc8bc1ebb7f32cf09f249252435808ceaec3eb4b8d03dafcfda0e199148.json",
+      "sha256": "ac84e91ebe0f8fa1efab56e0b2e746d08ece382874a2f2cc41d8b61ebef3c74b"
+    },
+    {
+      "bytes": 4988,
+      "path": "artifacts/perception_gain_v2/confirmation/source_reuse/eb3588c813dea4ebb64f84926024d58515907bb6472539e4d5a8c16135777e23.json",
+      "sha256": "49ae3b79638140d8ad6932b31d3cde68df5a805fb49bf049ee03b324510f16b4"
+    },
+    {
+      "bytes": 4964,
+      "path": "artifacts/perception_gain_v2/confirmation/source_reuse/f659a37a101bbd99517dbab25ba41e89319b8c2a2bfb4e193078cf053a10903b.json",
+      "sha256": "cfe617d343fc1009e63ced4501e75c366cb1d0b7aa20789d717baff3b6b957f4"
+    },
+    {
+      "bytes": 283250,
+      "path": "artifacts/perception_gain_v2/confirmation_invalidated_local_loss/CONFIRMATION.json",
+      "sha256": "7ec330f730bdc6129ee53c20be201f330b6fb1b144a28177072b902b42573f4b"
+    },
+    {
+      "bytes": 4261,
+      "path": "artifacts/perception_gain_v2/confirmation_invalidated_local_loss/LOCAL_METHODS.json",
+      "sha256": "745b48bc5aafb6a7bf23485880a699be209b3131d1eae2bdc2a0d649d9c74091"
+    },
+    {
+      "bytes": 133207,
+      "path": "artifacts/perception_gain_v2/confirmation_invalidated_order_identity/PB/2b27d74250e0a24c523dd0b56834bd4d531374338a9dbd45d20433730b52e18c.json",
+      "sha256": "e308b373d5659ad584c26f9e29c9439cc5b1c97aad506826e8af3ed25fd27b1c"
+    },
+    {
+      "bytes": 2733805,
+      "path": "artifacts/perception_gain_v2/data/STAGING_MANIFEST.json",
+      "sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6"
+    },
+    {
+      "bytes": 16510,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/A-OPEN-L-s45/update=0000.json",
+      "sha256": "2a9674da0072d3ab4535e0e9ed2ede00636e0005fb3bfe22989aba71ae9c0899"
+    },
+    {
+      "bytes": 16877,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/A-OPEN-L-s45/update=0250.json",
+      "sha256": "1d58be370d9269c1156dc3cf2627ad88eb4628af655eb55c84cb0b01c3af6923"
+    },
+    {
+      "bytes": 16870,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/A-OPEN-L-s45/update=0750.json",
+      "sha256": "03421ac8fa80d80c57631f6d364ee966ba3a6d0459b36be4441a9905769d70cd"
+    },
+    {
+      "bytes": 16934,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/C0-H-s45/update=0250.json",
+      "sha256": "54d8070c68dc9ced3dd73cd71f8840ebe2e5c45acd315e0b5913b56bfebfaa39"
+    },
+    {
+      "bytes": 16919,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/C0-H-s45/update=0750.json",
+      "sha256": "5b59b1e865def65fad205b56f1321630143f5d10d201f3a6be4bafe260cbb6ac"
+    },
+    {
+      "bytes": 16834,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/C0-L-s45/update=0250.json",
+      "sha256": "036f3f6acab8f7da8194fe6b45f9a596e802af48aca3e1692063b3b9697d485e"
+    },
+    {
+      "bytes": 16838,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/C0-L-s45/update=0750.json",
+      "sha256": "42f4a767fec4e63659c1e5c7d28a5d31adf614347cbc26bb00bdf02cd3af1a32"
+    },
+    {
+      "bytes": 16850,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/C0-L-s45/update=1500.json",
+      "sha256": "30c2a2b3b0ba6738d8e53e6baa7351ec247d5ffbeb4db54a9a1fb70d8b464938"
+    },
+    {
+      "bytes": 16849,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/C0-L-s45/update=2250.json",
+      "sha256": "33d38ac47ab0f41973c07697be01e92c8f23243342539773a8c78922e82bf4ce"
+    },
+    {
+      "bytes": 16842,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/C0-L-s45/update=3000.json",
+      "sha256": "d1f3fd6f81b522dc5e1f07f94b9daff005b25cd3bc641f95ea2f217c4084ea78"
+    },
+    {
+      "bytes": 17288,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/Q-SEM-L-s45/update=0000.json",
+      "sha256": "5195d5b7e7b77c718e6d71213429d92f6271f7b7d1873281ad2ece791ac68b6e"
+    },
+    {
+      "bytes": 16880,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/Q-SEM-L-s45/update=0250.json",
+      "sha256": "26d953d29ba112f7bf6c5b5d4d2d79625342ed5b27c6dfb9c0a8f89f51e26867"
+    },
+    {
+      "bytes": 16872,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/Q-SEM-L-s45/update=0750.json",
+      "sha256": "c40769fb0a0a5eb8cd2c5b816fa7c1ccff2ca97e92a2d358cd93bdd3c2656cb3"
+    },
+    {
+      "bytes": 16888,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/Q-SEM-L-s45/update=1500.json",
+      "sha256": "12f080f7717d0c1c6d600a9c6da7a81299a647e5b9ce1fad48ddf05339ffb699"
+    },
+    {
+      "bytes": 16863,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/Q-SEM-L-s45/update=2250.json",
+      "sha256": "ef4c9bd3f4f01e58724a90613194663fee430ac7ca0e7ee75075fc349e566cda"
+    },
+    {
+      "bytes": 16866,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/Q-SEM-L-s45/update=3000.json",
+      "sha256": "7161408002bc9c253f18d99686262bdea9269f81cf2f3cd21eb39080dfcb0fab"
+    },
+    {
+      "bytes": 16956,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/S-BAL-H-s45/update=0250.json",
+      "sha256": "33a9eced4a493ffcc0a3bae68500dec71fa4f251c01a2541edbee9acba87314d"
+    },
+    {
+      "bytes": 16871,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/S-BAL-H-s45/update=0750.json",
+      "sha256": "eadd36e9af0b1d525b35b7ab03f31cd3ea9c2eb001526a4ac7dc4d42f534403c"
+    },
+    {
+      "bytes": 16862,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/S-BAL-L-s45/update=0250.json",
+      "sha256": "867461e6180d04144521f8fd90a9c22cee0ba6a653da7770d10d0569bb0281f7"
+    },
+    {
+      "bytes": 16868,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/S-BAL-L-s45/update=0750.json",
+      "sha256": "9d618bc014db9613a991a0cbdebfc333787faa3e8c1f5c89d4109b73b4d4485a"
+    },
+    {
+      "bytes": 16887,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/S-WORST-L-s45/update=0250.json",
+      "sha256": "8a6ebaf7b7331a1c65c5a36b2af51cb3aca7fa4312daafa646402c2e4451f56c"
+    },
+    {
+      "bytes": 16893,
+      "path": "artifacts/perception_gain_v2/evaluation/CAL/S-WORST-L-s45/update=0750.json",
+      "sha256": "f9435c3975a8ca6a75964f74c647df30666a7581282d846fdb06530b1103f96a"
+    },
+    {
+      "bytes": 16628,
+      "path": "artifacts/perception_gain_v2/evaluation/SEL/C0-L-s45/update=0250.json",
+      "sha256": "fccd8829702cc43ac57401002025977d28fb6b203eb14df1b8c7f7b32f579357"
+    },
+    {
+      "bytes": 16675,
+      "path": "artifacts/perception_gain_v2/evaluation/SEL/Q-SEM-L-s45/update=0250.json",
+      "sha256": "c1aa7198e5f2f12ab20f9f19698684a8c6502e84394e87743e45760f7820c6dd"
+    },
+    {
+      "bytes": 16838,
+      "path": "artifacts/perception_gain_v2/evaluation_invalidated_checkpoint_resave/CAL/C0-L-s45/update=0750.json",
+      "sha256": "63aa51b5130bed2ffbeaf1ff8cb23db0ef53c3cfdf872988d39faeff0b0f5096"
+    },
+    {
+      "bytes": 16875,
+      "path": "artifacts/perception_gain_v2/evaluation_invalidated_checkpoint_resave/CAL/Q-SEM-L-s45/update=0750.json",
+      "sha256": "8ccd33639488bc4ad079512f8f3a040508f0bbb0717cdfcf0be6eb41886cdadc"
+    },
+    {
+      "bytes": 7098,
+      "path": "artifacts/perception_gain_v2/foundation/ASSOCIATION_STREAM_SMOKE-attempt-2.json",
+      "sha256": "db96db00ebabf96d43fb6ed31f10521b18ae859e992e1358574ba42a61272bad"
+    },
+    {
+      "bytes": 442,
+      "path": "artifacts/perception_gain_v2/foundation/ASSOCIATION_STREAM_SMOKE.json",
+      "sha256": "aeb6356e4d70157df63adc127b60e06408c4c21e3b00039b3ddca656e8d4e7ec"
+    },
+    {
+      "bytes": 3981,
+      "path": "artifacts/perception_gain_v2/foundation/BASELINE_COVERAGE.json",
+      "sha256": "2c49498305bb59adcb8da28b6fa1d11373bd0912d3bb25c463dd0554c685dad8"
+    },
+    {
+      "bytes": 856,
+      "path": "artifacts/perception_gain_v2/foundation/BASELINE_METRICS.csv",
+      "sha256": "21e8ea7415675e727a9aef164efcf09fe201f66ebad3beeb74638a6b7e0ed2e7"
+    },
+    {
+      "bytes": 1561,
+      "path": "artifacts/perception_gain_v2/foundation/BASELINE_STATUS.json",
+      "sha256": "6c072f8af5ca9ff33749eff0c57d395d3ddfda99a4f2eb3267d08c794403c947"
+    },
+    {
+      "bytes": 2526,
+      "path": "artifacts/perception_gain_v2/foundation/BASELINE_SUPERSESSION.json",
+      "sha256": "d603f70a4a1692d6d20798b75801db6713223f432e4e71a0c9743c2c887ee0e8"
+    },
+    {
+      "bytes": 21949,
+      "path": "artifacts/perception_gain_v2/foundation/CAL/D0.json",
+      "sha256": "df16c62105b92468edeb95b95322db5f041e3f29a591621d3856485cdc790a7f"
+    },
+    {
+      "bytes": 19453,
+      "path": "artifacts/perception_gain_v2/foundation/CAL/FH-native.json",
+      "sha256": "11444624a73c1c90164e813bf1a7f4b4d92f5e634ceb207647d58e9c38bc670e"
+    },
+    {
+      "bytes": 660,
+      "path": "artifacts/perception_gain_v2/foundation/COLD_INPUT_IO_SMOKE.json",
+      "sha256": "3e7c118d4b6742fc7963b20964f8825973fdb96d099545644b2f80b2a35306da"
+    },
+    {
+      "bytes": 10677,
+      "path": "artifacts/perception_gain_v2/foundation/LOCAL_POPULATION_AUDIT.json",
+      "sha256": "5e55528dacfafff3b27ee28fefabd3f4104ba8c56e1ad2b0ec9b266ce11483f6"
+    },
+    {
+      "bytes": 641,
+      "path": "artifacts/perception_gain_v2/foundation/PARENT_COHORT_COMPARISON.json",
+      "sha256": "67a25d3c9d499a35571561dd3ca736f5bb92a3213788aef6cb94c6b2ff732c70"
+    },
+    {
+      "bytes": 7262,
+      "path": "artifacts/perception_gain_v2/foundation/PROFILE_LIVE_SMOKE.json",
+      "sha256": "5e807fb343a5b6eea97342a2b22a2149b93deec0a35bb6c8ef84ddf3029387b6"
+    },
+    {
+      "bytes": 3066,
+      "path": "artifacts/perception_gain_v2/foundation/REBASELINE_STATUS.json",
+      "sha256": "8af8616582f55e8bca3e39147eae1b333fd9321e99a478c896716dbbf1d0ffe3"
+    },
+    {
+      "bytes": 21930,
+      "path": "artifacts/perception_gain_v2/foundation/SEL/D0.json",
+      "sha256": "d8a54812ab40519249458647adfd3d149173d3b8d0195d27b87305c282fd1869"
+    },
+    {
+      "bytes": 19335,
+      "path": "artifacts/perception_gain_v2/foundation/SEL/FH-native.json",
+      "sha256": "2cfd947bb0eb7cbbe6080591add912d4c28849b285f91d386e981f30c7a44f51"
+    },
+    {
+      "bytes": 584,
+      "path": "artifacts/perception_gain_v2/foundation/SMOKE.json",
+      "sha256": "55cd793fd87e2bcd304b9a2400ce9a533eb8d986a6adc430ba50a9e75a1e8917"
+    },
+    {
+      "bytes": 21492,
+      "path": "artifacts/perception_gain_v2/foundation/original-runtime/CAL/D0.json",
+      "sha256": "5aba4afebb678f5a7a7ddc32b0ff0e01044305f06d6e1d99bb774627d895e479"
+    },
+    {
+      "bytes": 19481,
+      "path": "artifacts/perception_gain_v2/foundation/original-runtime/CAL/FH-native.json",
+      "sha256": "a316e6f656f0bfb2702916cc3fcfee69df67550d0dfcdf313e8f912bc4fc111b"
+    },
+    {
+      "bytes": 21484,
+      "path": "artifacts/perception_gain_v2/foundation/original-runtime/SEL/D0.json",
+      "sha256": "64c8d92c770bef8ea3acaa8e69ccceb5d2df7fada3e8e5b50511eaa5a7aa25b0"
+    },
+    {
+      "bytes": 19334,
+      "path": "artifacts/perception_gain_v2/foundation/original-runtime/SEL/FH-native.json",
+      "sha256": "669f6dd6a29d8ca75730a596ba867be8cebdec124852b0391e1d4a05f4c315ce"
+    },
+    {
+      "bytes": 1940,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/DRIFT_PROBE.json",
+      "sha256": "30e782cda7114be2a63f3d372e63e097024d4e65b3fd964018b25cd6edac1528"
+    },
+    {
+      "bytes": 11956,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/old-source.json",
+      "sha256": "3af0af4bbc2ddba01ddf8a68af3f364a20279153049e24086dc077d4c65aa517"
+    },
+    {
+      "bytes": 324,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/one-noheads-a-SUMMARY.json",
+      "sha256": "0f514f3e2f0b6e48b92991cc68b01bc344ed0839eb21ab5235608fc6f28eb068"
+    },
+    {
+      "bytes": 11270,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/one-noheads-a.json",
+      "sha256": "114ead3990fca196c1d03ae9dfd9bbb7c1ff96fbf99754cc7d35ea1a49eab7bf"
+    },
+    {
+      "bytes": 324,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/one-noheads-b-SUMMARY.json",
+      "sha256": "3f8d6c5c315539615b457f439a6e241a6e0fcd282a81fa2571fa877bcfc20b1f"
+    },
+    {
+      "bytes": 11268,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/one-noheads-b.json",
+      "sha256": "92e57f30566c05a8737f5781ee07b6d6890dfc7dd3847d2ba250e0b7de1a689d"
+    },
+    {
+      "bytes": 492,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/one-zeroheads-SUMMARY.json",
+      "sha256": "2c4ede105c5d6118b19ce8b82b52b0f9de68c022804c7ed47b7e5018c07c1fee"
+    },
+    {
+      "bytes": 20997,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/one-zeroheads.json",
+      "sha256": "343f1695ce475ad9f7329b9a0fe766f096970b9fd011637141577783cc5b00b0"
+    },
+    {
+      "bytes": 895,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/startup-fixed-CONTEXT.json",
+      "sha256": "9dc18ac4cf351b571687d474a254041a0af21d94791e178592dd8f5e1d6607d2"
+    },
+    {
+      "bytes": 21184,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/startup-fixed-heads.json",
+      "sha256": "ae3c8d02ddda932b1402dc55a85bdbcb8d942f9ca4fa6e4337e61f15c8f14a20"
+    },
+    {
+      "bytes": 11269,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/startup-fixed-repeat.json",
+      "sha256": "5f1f8c3298ec95904e290802a57a3ef3f6902f4e05e909cffa96b0fd98c2d7b4"
+    },
+    {
+      "bytes": 901,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/startup-original-CONTEXT.json",
+      "sha256": "2cf7f2243555048d37746790a83e9110aac083c170e7ed197bc8dbd8835e14c2"
+    },
+    {
+      "bytes": 21197,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/startup-original-heads.json",
+      "sha256": "a163c6668824b86656f80e2c2b9c59787e406c7357241665e059ac850bf86a25"
+    },
+    {
+      "bytes": 11269,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/startup-original-repeat.json",
+      "sha256": "b5ec89fb141c2ff12d672e573e3f04c14a9d0c429a6c3650ebf774b416d611e2"
+    },
+    {
+      "bytes": 322,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/two-noheads-SUMMARY.json",
+      "sha256": "52624a0610ad1f6905d955362bb005fda7800aca4931d5fe8cc7fb76b773e489"
+    },
+    {
+      "bytes": 11269,
+      "path": "artifacts/perception_gain_v2/foundation/parent-drift/two-noheads.json",
+      "sha256": "04064dd38b7ed3be606fb7f515dbb0b4aa80ca51cfb2f2c72fc87f431c914b23"
+    },
+    {
+      "bytes": 21949,
+      "path": "artifacts/perception_gain_v2/foundation/rebaseline-fixed-runtime/CAL/D0.json",
+      "sha256": "df16c62105b92468edeb95b95322db5f041e3f29a591621d3856485cdc790a7f"
+    },
+    {
+      "bytes": 19453,
+      "path": "artifacts/perception_gain_v2/foundation/rebaseline-fixed-runtime/CAL/FH-native.json",
+      "sha256": "11444624a73c1c90164e813bf1a7f4b4d92f5e634ceb207647d58e9c38bc670e"
+    },
+    {
+      "bytes": 21930,
+      "path": "artifacts/perception_gain_v2/foundation/rebaseline-fixed-runtime/SEL/D0.json",
+      "sha256": "d8a54812ab40519249458647adfd3d149173d3b8d0195d27b87305c282fd1869"
+    },
+    {
+      "bytes": 19335,
+      "path": "artifacts/perception_gain_v2/foundation/rebaseline-fixed-runtime/SEL/FH-native.json",
+      "sha256": "2cfd947bb0eb7cbbe6080591add912d4c28849b285f91d386e981f30c7a44f51"
+    },
+    {
+      "bytes": 11233,
+      "path": "artifacts/perception_gain_v2/foundation/smoke/repeated-parent.json",
+      "sha256": "bd09e6bbf81d1cb4316e9da83ff7048b5579e4e02ea9d07b14bbe61cf0388834"
+    },
+    {
+      "bytes": 21273,
+      "path": "artifacts/perception_gain_v2/foundation/smoke/zero-pair.json",
+      "sha256": "84bdb871de1320874916463280c107f8a8f5f5a7ecbbee9e96abdc71997142cc"
+    },
+    {
+      "bytes": 1427,
+      "path": "artifacts/perception_gain_v2/publication/ASSET_PREPARATION.json",
+      "sha256": "1988500c651cde9ed29efdf2abb0c557d0db61ddb14ca5b7362d789e7202786f"
+    },
+    {
+      "bytes": 464,
+      "path": "artifacts/perception_gain_v2/publication/AUTH_PREFLIGHT.json",
+      "sha256": "2c10fbaf51fb633606d9eb18815eb96102e6ec7bd907408ae3c3cc70c8a96787"
+    },
+    {
+      "bytes": 49903,
+      "path": "artifacts/perception_gain_v2/publication/PREDICTION_ASSETS.json",
+      "sha256": "9f53dbc2703d5b35f219c0c6c40560d5315f3038b84481c092d3115f9f0c2458"
+    },
+    {
+      "bytes": 30370,
+      "path": "artifacts/perception_gain_v2/publication/bundles/C0-L-s45.json",
+      "sha256": "b2510c66709e03c0e413d1ef40a8aa99f6233bb87cf3a85c9eaba3428654ee7a"
+    },
+    {
+      "bytes": 3659,
+      "path": "artifacts/perception_gain_v2/publication/bundles/FH-R1-native.json",
+      "sha256": "85411c75a65e6873f9d26f0fd7504858cbd820642622b414451a2bc74adf329f"
+    },
+    {
+      "bytes": 3634,
+      "path": "artifacts/perception_gain_v2/publication/bundles/R1-D0.json",
+      "sha256": "035a587022fcf74afbdeebb1d670c6efc85f96c895cf2c39fc46d95c5b757e0e"
+    },
+    {
+      "bytes": 3364,
+      "path": "artifacts/perception_gain_v2/publication/small-models/R1-D0.pt",
+      "sha256": "6cf153757b72f2320f12cbddaef8e2dad9e2a971345f4c425ba1c84e62b0d295"
+    },
+    {
+      "bytes": 242,
+      "path": "artifacts/perception_gain_v2/refinement/PAIR_COVERAGE.csv",
+      "sha256": "c7234f71e5091c55882e750430688b9913547f2f73e3af9e0e642cf0baeec51c"
+    },
+    {
+      "bytes": 400,
+      "path": "artifacts/perception_gain_v2/refinement/REPAIR_DIAGNOSTICS.csv",
+      "sha256": "eb8d14e7ec940eb7a479a4c6c2aed04d9b3728797361adb54c6f873d388a5dbf"
+    },
+    {
+      "bytes": 5956,
+      "path": "artifacts/perception_gain_v2/refiner/CACHE_COMPATIBILITY.json",
+      "sha256": "30ca8cc90054437dea19976ca58bde595d2a1d73ac038a7485ee01d28a47b223"
+    },
+    {
+      "bytes": 90,
+      "path": "artifacts/perception_gain_v2/refiner/P/SELECTION.json",
+      "sha256": "ad79f5984ffb48b08aea5b36f159f0caa3ac09d5543ddd01d6dd2bc2fd1af947"
+    },
+    {
+      "bytes": 3110,
+      "path": "artifacts/perception_gain_v2/refiner/R1/CACHE_REUSE_AUDIT.json",
+      "sha256": "47d550e1e1cad3d2d569d590a9f800aff5259853199023732618d6463a31ae93"
+    },
+    {
+      "bytes": 91181,
+      "path": "artifacts/perception_gain_v2/refiner/R1/CAL.json",
+      "sha256": "fd3c1a13fc95e78283c727da5b7ab9b666ba4b4b2f9d2fe58d5248cf2ec42c43"
+    },
+    {
+      "bytes": 2201,
+      "path": "artifacts/perception_gain_v2/refiner/R1/CAL_SELECTION.json",
+      "sha256": "3a572003e06c31989b228341bb4bae8db93640ffa4a5e0bcc8e4b9fdab909f7f"
+    },
+    {
+      "bytes": 53684,
+      "path": "artifacts/perception_gain_v2/refiner/R1/DATA_MANIFEST.json",
+      "sha256": "d96afac8db2e201cb9c29575ff4c92f8e45bd9d104b94db582a6e2f55d53c6cf"
+    },
+    {
+      "bytes": 37048,
+      "path": "artifacts/perception_gain_v2/refiner/R1/NEW/TRAINING.json",
+      "sha256": "8988de95507d434f8ebfe4c554360faefd88a5699cd73210abcde3aa7a74e07c"
+    },
+    {
+      "bytes": 37064,
+      "path": "artifacts/perception_gain_v2/refiner/R1/PAIR/TRAINING.json",
+      "sha256": "0181dee67c0726c8e10584e5694bfb079e28689ec8a416d0191f630aef12e8e3"
+    },
+    {
+      "bytes": 23325,
+      "path": "artifacts/perception_gain_v2/refiner/R1/POST_TRAIN_DIAGNOSTICS.json",
+      "sha256": "1a6a1da9690432e19fb017f96f441f43b10b5f8ab77a81bcd1aa188dcc7ba56f"
+    },
+    {
+      "bytes": 4632,
+      "path": "artifacts/perception_gain_v2/refiner/R1/SAME_STEP_CAL.json",
+      "sha256": "dfd569ca8726edf3e62e81f5cda8bc646d523bda8f6ebf87ed9cba654c5ba5f5"
+    },
+    {
+      "bytes": 34025,
+      "path": "artifacts/perception_gain_v2/refiner/R1/SEL.json",
+      "sha256": "8b99f9127b227bcc3720a3ad23b5752a6875c66ef9c225d6fea6b6fb42dfe9a5"
+    },
+    {
+      "bytes": 6731,
+      "path": "artifacts/perception_gain_v2/refiner/R1/SELECTION.json",
+      "sha256": "375513139638011071fe0126f446f0e9583ae0dde25e0fc5df3f30e4cc0c76bc"
+    },
+    {
+      "bytes": 40371,
+      "path": "artifacts/perception_gain_v2/refiner/R1/TRAIN_INVENTORY.json",
+      "sha256": "391c3577a9b99eb6f650898f64b9b7e406c74eb074e0cc7af366ec2b3718ea09"
+    },
+    {
+      "bytes": 889,
+      "path": "artifacts/perception_gain_v2/replication/REPLICATION.json",
+      "sha256": "ed7c1ca70d8beb8bc1b46e8af5ced8d14d78da22826a06b6bc28692d416bcc72"
+    },
+    {
+      "bytes": 4499,
+      "path": "artifacts/perception_gain_v2/resources/COLD_INPUT_IO_DIAGNOSTIC.csv",
+      "sha256": "a9cff2119df7f68657ec61b6a540a8cc0feebb330b409b20c5f46ad6a948d0de"
+    },
+    {
+      "bytes": 11039,
+      "path": "artifacts/perception_gain_v2/resources/INPUT_LOAD_DIAGNOSTIC.csv",
+      "sha256": "edf642b29fa1e3ec3cbb18524249bbd68736786812ce64e17436e9760f10b1fc"
+    },
+    {
+      "bytes": 19366,
+      "path": "artifacts/perception_gain_v2/resources/PROFILE_MEDIANS.csv",
+      "sha256": "352e979f38d9c43537af866aefaa3e0376d980bcde6a5ecdaf279b1f1f157f31"
+    },
+    {
+      "bytes": 10448,
+      "path": "artifacts/perception_gain_v2/resources/PROFILE_SUMMARY.json",
+      "sha256": "07cb6482ee01fdeefe13a95c522a770fbc8fac2b96c39082522cd583e89ff9ba"
+    },
+    {
+      "bytes": 37658,
+      "path": "artifacts/perception_gain_v2/resources/RAW_PROFILE.csv",
+      "sha256": "c4f1308350940a26a123b529ace4852ed006ca3b4a63e9c89fc4969f96b04122"
+    },
+    {
+      "bytes": 11216,
+      "path": "artifacts/perception_gain_v2/selection/AUX.json",
+      "sha256": "7c455d0ac095e398ba832833731c06107e718ce292de3c7c4aa60a7d2b071995"
+    },
+    {
+      "bytes": 1550,
+      "path": "artifacts/perception_gain_v2/selection/CAL_CHECKPOINT_RESAVE_AUDIT.json",
+      "sha256": "52362d1b78bcb29df9ae455898e16abe106d3269406284104ca54a6f1cd9f464"
+    },
+    {
+      "bytes": 5471,
+      "path": "artifacts/perception_gain_v2/selection/CAL_SELECTION.json",
+      "sha256": "31736492e3d7032d83e2fff4a4a8823269714e750f24f1501ff1d0c508b195b5"
+    },
+    {
+      "bytes": 46626,
+      "path": "artifacts/perception_gain_v2/selection/FINAL_LOCK.json",
+      "sha256": "e474309f47e856332b8c49cee10d050fd91520d8572fa789ba317ad968504d26"
+    },
+    {
+      "bytes": 6888,
+      "path": "artifacts/perception_gain_v2/selection/FULL_PROMOTION.json",
+      "sha256": "482c3b61a74de0c44b99544326e5324bb16acee645624bcadf39ec912ff64ddd"
+    },
+    {
+      "bytes": 11196,
+      "path": "artifacts/perception_gain_v2/selection/LEARNING_RATE.json",
+      "sha256": "44106a6d5cc90f8af240a5c95b74e0772a0a277a51660855aafb8cc83ad00390"
+    },
+    {
+      "bytes": 12902,
+      "path": "artifacts/perception_gain_v2/selection/PERCEPTION.json",
+      "sha256": "423b453bb4b0e604bae19d3f83150643ae317ee074d8b5f4f03b5f970f36f02d"
+    },
+    {
+      "bytes": 1787,
+      "path": "artifacts/perception_gain_v2/selection/PERCEPTION_CAL_LOCK.json",
+      "sha256": "a03832439e0aaba9b2a82255bfdcc849662b53bf345ae777525ae8424efce187"
+    },
+    {
+      "bytes": 532,
+      "path": "artifacts/perception_gain_v2/selection/SEL_COMPONENTS.csv",
+      "sha256": "b458813b11d58c6096deb6f754a2fbeab1fe1b9fa996f32417f0581d6a953a86"
+    },
+    {
+      "bytes": 4736,
+      "path": "artifacts/perception_gain_v2/tables/CHECKPOINTS.csv",
+      "sha256": "d360b740d64d93b2dfdfcfae02cecc9c2d819db543b72d95198d195fee997f0d"
+    },
+    {
+      "bytes": 6810,
+      "path": "artifacts/perception_gain_v2/tables/EXECUTED_COMMANDS.csv",
+      "sha256": "b1801629da4c5797fbd88a69ef0fbc1e6136bc4f03e1c50415ce0bd5c8fb7877"
+    },
+    {
+      "bytes": 1742,
+      "path": "artifacts/perception_gain_v2/tables/PILOTS.csv",
+      "sha256": "0465b8e4743fc3cc0fdd24259ba387d8086040d7c36b44fa1b0b728e791aaaa9"
+    },
+    {
+      "bytes": 77,
+      "path": "artifacts/perception_gain_v2/tables/PUBLICATION.csv",
+      "sha256": "3a05aef28753a2b3d1eca60f06f6aa06b0e7f00252f1bfd6c7407658ba161393"
+    },
+    {
+      "bytes": 1781,
+      "path": "artifacts/perception_gain_v2/tables/REPAIR.csv",
+      "sha256": "bfac7529840202288cb29775406cb48b3bf6be8bfdc329f51257a509b08ac391"
+    },
+    {
+      "bytes": 1015,
+      "path": "artifacts/perception_gain_v2/tables/TASKS.csv",
+      "sha256": "f2fada4ba6fcc7f4b19e569db82d657ac3ea7978017ee4bd297c9d52ccf80143"
+    },
+    {
+      "bytes": 1121,
+      "path": "artifacts/perception_gain_v2/tables/TRAINING.csv",
+      "sha256": "09d1d76e6d729688382ae9baceb2610958e6046d9d9130c23cf4bbf720490e25"
+    },
+    {
+      "bytes": 2393,
+      "path": "artifacts/perception_gain_v2/tables/TRAINING_SOURCE_COUNTS.csv",
+      "sha256": "0ebe3ec9045d02dc1bc6751827b5c2528d56429f964e1d38ed7b916a5120c966"
+    },
+    {
+      "bytes": 1220,
+      "path": "artifacts/perception_gain_v2/training/A-OPEN-H-s45/recipe.json",
+      "sha256": "d73dda87463223c57a12f3dc7dd4d1aba32561014d68ba4e6209233f43d9c7b8"
+    },
+    {
+      "bytes": 1220,
+      "path": "artifacts/perception_gain_v2/training/A-OPEN-H-s46/recipe.json",
+      "sha256": "24d3c377c6428ad70148374d119889282c4114dfb8857838dd105d574f822399"
+    },
+    {
+      "bytes": 1048,
+      "path": "artifacts/perception_gain_v2/training/A-OPEN-L-s45/FIRST_UPDATES_AND_RESUME_AUDIT.json",
+      "sha256": "40367ff8c64ccf3064303984cda820b77f951c5994d74b5bfa8746540940190f"
+    },
+    {
+      "bytes": 487,
+      "path": "artifacts/perception_gain_v2/training/A-OPEN-L-s45/checkpoint_manifest.json",
+      "sha256": "8e6b6abd625a2e1616b23c03d18291bb2b705714246351e1c459b1927c1eb893"
+    },
+    {
+      "bytes": 1420357,
+      "path": "artifacts/perception_gain_v2/training/A-OPEN-L-s45/metrics-version_0.csv",
+      "sha256": "955843c6e786863bee77e47600f6db05ca14f0c7ddb88b285bdfdd55c101b411"
+    },
+    {
+      "bytes": 1568891,
+      "path": "artifacts/perception_gain_v2/training/A-OPEN-L-s45/metrics.csv",
+      "sha256": "70bce1cc4ef7b2a4e5b48d853924d53d36de198af20e7b37d998c9575c8670d4"
+    },
+    {
+      "bytes": 1220,
+      "path": "artifacts/perception_gain_v2/training/A-OPEN-L-s45/recipe.json",
+      "sha256": "ef1950363758f749b3c43ec1b20f8724c6e6c35c445c2a528a7864092dcae049"
+    },
+    {
+      "bytes": 12005,
+      "path": "artifacts/perception_gain_v2/training/A-OPEN-L-s45/resolved_config.yaml",
+      "sha256": "efd48e6653f1cdf60e9e6c5cf3d046506706bb076a995754212eab5a6e776843"
+    },
+    {
+      "bytes": 5851,
+      "path": "artifacts/perception_gain_v2/training/A-OPEN-L-s45/run_plan.json",
+      "sha256": "6c219c6eb0bdcc88a50223d8fb3424b123243da2c2284391fb8b7a9c23dba0e7"
+    },
+    {
+      "bytes": 179900,
+      "path": "artifacts/perception_gain_v2/training/A-OPEN-L-s45/run_summary.json",
+      "sha256": "0060c85f492c24c2e9f990f0fe663736fbafd5fff255be6067eedc08caa8e0a0"
+    },
+    {
+      "bytes": 1220,
+      "path": "artifacts/perception_gain_v2/training/A-OPEN-L-s46/recipe.json",
+      "sha256": "3c367ffaa8d4c267c20acce4406948e844bd290d03b9ee1c3b93406ebec156ea"
+    },
+    {
+      "bytes": 1212,
+      "path": "artifacts/perception_gain_v2/training/C0-H-s45/recipe.json",
+      "sha256": "e9ac42d5453cc12d1dbae899f6cd9419e98757426c174d1c766a9778bffc5310"
+    },
+    {
+      "bytes": 1212,
+      "path": "artifacts/perception_gain_v2/training/C0-H-s46/recipe.json",
+      "sha256": "ca9be7e857ad6f563201c2840d60c0686bde19391d6eb061a3da800f85a692e2"
+    },
+    {
+      "bytes": 1403,
+      "path": "artifacts/perception_gain_v2/training/C0-L-s45/FULL_ENDPOINT_AUDIT.json",
+      "sha256": "69e0e92d2233292f37731057d5541d7906956d58e2dcbc9af9ac15800053fa12"
+    },
+    {
+      "bytes": 1290,
+      "path": "artifacts/perception_gain_v2/training/C0-L-s45/FULL_RESUME_AUDIT.json",
+      "sha256": "d6a2ae220702e318b769e832fb5145c604ccd05652a2b60781a67b976f295bf5"
+    },
+    {
+      "bytes": 955,
+      "path": "artifacts/perception_gain_v2/training/C0-L-s45/checkpoint_manifest.json",
+      "sha256": "1b988471b662b0a93db52c0910154b73417e0a49a64bb1dedeb560576fc23bbd"
+    },
+    {
+      "bytes": 1420101,
+      "path": "artifacts/perception_gain_v2/training/C0-L-s45/metrics-version_0.csv",
+      "sha256": "053707df93b0f5f7e924a47395a9702ec969a4fbae911431d9b061ea1b20580d"
+    },
+    {
+      "bytes": 4288935,
+      "path": "artifacts/perception_gain_v2/training/C0-L-s45/metrics-version_1.csv",
+      "sha256": "a5f09fcab7e130a3fa3422f21e47a4f4aee7cf28b6fc7c7224b85f5b7b0156bf"
+    },
+    {
+      "bytes": 6300877,
+      "path": "artifacts/perception_gain_v2/training/C0-L-s45/metrics.csv",
+      "sha256": "57273646ff843cdc2b097c77816b583b45c9bbba06359d6c9716992320fcc988"
+    },
+    {
+      "bytes": 1212,
+      "path": "artifacts/perception_gain_v2/training/C0-L-s45/recipe.json",
+      "sha256": "2725de0b13147f55b611f967ec0ca20f37ed33591c2af6beb87d6601f067a949"
+    },
+    {
+      "bytes": 11974,
+      "path": "artifacts/perception_gain_v2/training/C0-L-s45/resolved_config.yaml",
+      "sha256": "7a84d63b4ef56aa341d35f9ad3a592fb6c3cb32c062a8a56da3e3848f4ef76c0"
+    },
+    {
+      "bytes": 5696,
+      "path": "artifacts/perception_gain_v2/training/C0-L-s45/run_plan.json",
+      "sha256": "6ed23dea08a417053a011eb6bc8b2771db54968627442927b413d1652c4392ca"
+    },
+    {
+      "bytes": 180336,
+      "path": "artifacts/perception_gain_v2/training/C0-L-s45/run_summary.json",
+      "sha256": "ef4a81d6d9ad08a9d5fb2e3a23e2ab48ebe588af635e741bfdeb401ad1a48102"
+    },
+    {
+      "bytes": 1212,
+      "path": "artifacts/perception_gain_v2/training/C0-L-s46/recipe.json",
+      "sha256": "b268b7e6c9e2b385c700dd0529f940cf8f51967f5a5eeabe3916f7b2ea76fc3f"
+    },
+    {
+      "bytes": 1218,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-H-s45/recipe.json",
+      "sha256": "8055ad0a54b3e235a577b5c319f4780a89a01a4f310085031e57f4123b68a5f3"
+    },
+    {
+      "bytes": 1218,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-H-s46/recipe.json",
+      "sha256": "116d8eb40db53aa40a4db94284a6f2262f5568a030301eb984494b156f6c9c15"
+    },
+    {
+      "bytes": 1194,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s45/ENDPOINT_AUDIT.json",
+      "sha256": "6790dadd670aa942a0379d209317953e8491ab6f88cb64cf7111b989f63a0d1b"
+    },
+    {
+      "bytes": 1211,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s45/FIRST_UPDATES_AND_RESUME_AUDIT.json",
+      "sha256": "fdcb6b630707fd1b7e43233913c4ab9560819ead9c71db2b2227d234aafb0ebe"
+    },
+    {
+      "bytes": 1510,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s45/FULL_ENDPOINT_AUDIT.json",
+      "sha256": "b681d34e91f1e42c580312cadcc2fc3e1a8bd70453f66172a997a867e77dea18"
+    },
+    {
+      "bytes": 955,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s45/checkpoint_manifest.json",
+      "sha256": "52a6fbfa2ee819cc21f1aa7bc775a9819926571d88fc12410c8a5de41a2d1c49"
+    },
+    {
+      "bytes": 1420088,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s45/metrics-version_0.csv",
+      "sha256": "f6da9f4b024c649008092fa07490508871d3472185149b041b26aa3e754d058b"
+    },
+    {
+      "bytes": 4288631,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s45/metrics-version_1.csv",
+      "sha256": "75108601d0a1f096e2f50ca46ada97d4bb7cd513fae939c8ed130f52e4607f44"
+    },
+    {
+      "bytes": 6300560,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s45/metrics.csv",
+      "sha256": "7d9f764d4e6d8c88c621230713f37fe715ec38446576b412dc2bdbfe3ed7200c"
+    },
+    {
+      "bytes": 1218,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s45/recipe.json",
+      "sha256": "7c5c5249230905648c8c84c202de8d3e04ef96f488e0b7bd0782862a6b808468"
+    },
+    {
+      "bytes": 12074,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s45/resolved_config.yaml",
+      "sha256": "7b8b4dbe977100a6f31a9fcbff5df4129f496231f2d3804bb328e1c21e8dbb32"
+    },
+    {
+      "bytes": 5708,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s45/run_plan.json",
+      "sha256": "7ab7321763514688e602c329069dae81b920d4a23a86d2d15bab1e742a183ba7"
+    },
+    {
+      "bytes": 180454,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s45/run_summary.json",
+      "sha256": "7fee105e501fa0682a724a1321babb59b2f746d7c4fe087b05aee3e8d00f7943"
+    },
+    {
+      "bytes": 1218,
+      "path": "artifacts/perception_gain_v2/training/Q-SEM-L-s46/recipe.json",
+      "sha256": "0aee85c0735b50cc467ad4f1993b9dd5250141e9c88f8da97426088fbf5462ec"
+    },
+    {
+      "bytes": 331,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-H-s45/checkpoint_manifest.json",
+      "sha256": "7d9665a8ee5f5a08283a165101a21832c19df32718f9f613ab6f8c87d274b619"
+    },
+    {
+      "bytes": 761343,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-H-s45/metrics-version_0.csv",
+      "sha256": "ca9b0b8c943a049a979a609cd7480640a58594dcbfba685e6dc359834dc1b49c"
+    },
+    {
+      "bytes": 840577,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-H-s45/metrics.csv",
+      "sha256": "77fc9ab0289d737f798622005aea544f34e43e07f2885a9df8b454c735e7a52d"
+    },
+    {
+      "bytes": 1218,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-H-s45/recipe.json",
+      "sha256": "9f30d729e0a186b72c742dfa943d608bef0a1fc06f419da0ea61b1f92818258d"
+    },
+    {
+      "bytes": 23881,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-H-s45/resolved_config.yaml",
+      "sha256": "0c7d941a87ba900cbb4a4ecc033cfa7592bb5c883f47f49458e3fb481ed66fa6"
+    },
+    {
+      "bytes": 5707,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-H-s45/run_plan.json",
+      "sha256": "0bf12f71af8bc76285b1ef5d2f4eff6ef647673e01ccfc0b40adae59be8a31fb"
+    },
+    {
+      "bytes": 179605,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-H-s45/run_summary.json",
+      "sha256": "efb22d2e494610a466c8c567f800bbb9d7d737d812bb47d60f9ceb2ebd84eac4"
+    },
+    {
+      "bytes": 1218,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-H-s46/recipe.json",
+      "sha256": "ab4bf0acd2a162d6bd45308b93d06d659263dee84706a21295e0f639e6f7c52b"
+    },
+    {
+      "bytes": 487,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-L-s45/checkpoint_manifest.json",
+      "sha256": "2162354d80dbb26b5e13655373b43ed634f93792d0a6f5e7934f57560ac73fd8"
+    },
+    {
+      "bytes": 1419946,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-L-s45/metrics-version_0.csv",
+      "sha256": "5610af999a26edf3a016957ea29099cdb413d8fcb7598847798edf1ad1df0c19"
+    },
+    {
+      "bytes": 1568480,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-L-s45/metrics.csv",
+      "sha256": "2bdfd9a536e9da831c85240a7909fc29560a19115fd5292e75db2215b72ba33e"
+    },
+    {
+      "bytes": 1218,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-L-s45/recipe.json",
+      "sha256": "c8f83813b98f4beb0a818adb44fd377e17bb408e5355011da83841fe59e45a3f"
+    },
+    {
+      "bytes": 12000,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-L-s45/resolved_config.yaml",
+      "sha256": "051c2dfd6c18e2868ab235f0e8c60a0fb91a52716c666e462186b29df2571b5a"
+    },
+    {
+      "bytes": 5847,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-L-s45/run_plan.json",
+      "sha256": "984b164c446c1d059a38536bb6706679b1a345c96f24bde3642351cb9927f1db"
+    },
+    {
+      "bytes": 179877,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-L-s45/run_summary.json",
+      "sha256": "ae194317054464436ab1c320e80647a807da2303a20f49c25cb729f299958189"
+    },
+    {
+      "bytes": 1218,
+      "path": "artifacts/perception_gain_v2/training/S-BAL-L-s46/recipe.json",
+      "sha256": "2eef32ea353a950dd48011f31e6654ef55ab6475299fe97444bfeac6132ff2c0"
+    },
+    {
+      "bytes": 1222,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-H-s45/recipe.json",
+      "sha256": "469f9bb45a85bafedf10917b0f2d03bd1f8d372a6cad2ae73afd04f053668884"
+    },
+    {
+      "bytes": 1222,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-H-s46/recipe.json",
+      "sha256": "aa8ad105f0166448215f0bb1fd1ec1415a4e081de8b68f80bc90f0f218df9c59"
+    },
+    {
+      "bytes": 1099,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-L-s45/ENDPOINT_AUDIT.json",
+      "sha256": "d4a5b4448f6d4b4707536d4d626702aa420236ecdbc9d603b05db11f38a88850"
+    },
+    {
+      "bytes": 1116,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-L-s45/FIRST_UPDATES_AND_RESUME_AUDIT.json",
+      "sha256": "4d43292d3effdef967b3240de97a53103235733386061d0cf2a676df743b4603"
+    },
+    {
+      "bytes": 487,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-L-s45/checkpoint_manifest.json",
+      "sha256": "d15250d724b1023e90a06c62df70ba28d7c0d8d5d8830a937d4d15a217c2c9e9"
+    },
+    {
+      "bytes": 1419813,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-L-s45/metrics-version_0.csv",
+      "sha256": "03c1b49c5640f0a771f7fdac9234f93704cdccf74eee007adb285265546679c4"
+    },
+    {
+      "bytes": 1568347,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-L-s45/metrics.csv",
+      "sha256": "2d549c023c6dd1b2e10835d4a9b50bc548de406f5c037bc70cec0c9f18469ddf"
+    },
+    {
+      "bytes": 1222,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-L-s45/recipe.json",
+      "sha256": "eaaa338af07a83bdfdd93c68d2cbf16ea4fedc88f1cb97f380c543a8c387c307"
+    },
+    {
+      "bytes": 12013,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-L-s45/resolved_config.yaml",
+      "sha256": "b152b1f46d0af72d2de86921f5309caaf1ec51e6d47650cf032e0d0d5ea0c09f"
+    },
+    {
+      "bytes": 5855,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-L-s45/run_plan.json",
+      "sha256": "69ea917b49383e91083c1960a246007ba341f08b1991c297e303fc6dad59fdb4"
+    },
+    {
+      "bytes": 179868,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-L-s45/run_summary.json",
+      "sha256": "174cf31087d8969a02bd61e21cf6d69aaf4204147775da59ce94b05b1232c5d4"
+    },
+    {
+      "bytes": 1222,
+      "path": "artifacts/perception_gain_v2/training/S-WORST-L-s46/recipe.json",
+      "sha256": "df25346a6219c8796d93be4819c9aa80883da12b11aef7362c430926277523be"
+    },
+    {
+      "bytes": 5651,
+      "path": "artifacts/perception_gain_v2/validation/FINAL_INTERPRETATION.md",
+      "sha256": "0a471fb5f2a262cc63f397051102badb7004395b327bc839dd177dc29296bf2f"
+    },
+    {
+      "bytes": 3462,
+      "path": "artifacts/perception_gain_v2/validation/FINAL_TESTS.json",
+      "sha256": "97d76641ee0e21c7f25b1f756fafe9db3fe754f4112d521c36872ba0f7dba99a"
+    },
+    {
+      "bytes": 2948,
+      "path": "artifacts/perception_gain_v2/validation/REPRODUCTION.md",
+      "sha256": "c041e0c61d96a703e608aa92a47e970da173eb8721821fd56291b91c82c688d9"
+    },
+    {
+      "bytes": 7847,
+      "path": "artifacts/perception_gain_v2/validation/REQUIREMENT_AUDIT.json",
+      "sha256": "e2e887e6d7ad9b3b1dae45a489c59be5ba903ae300744d66732259dbbba7fba3"
+    },
+    {
+      "bytes": 1334,
+      "path": "artifacts/perception_gain_v2/validation/full-related-regression.txt",
+      "sha256": "0577988a47783edf2adc309be241b57913d26304730a9498c48b3cb2f74efa71"
+    }
+  ],
+  "publication_phase": "READY",
+  "schema_version": "perception-gain-artifact-manifest-v2"
+}
