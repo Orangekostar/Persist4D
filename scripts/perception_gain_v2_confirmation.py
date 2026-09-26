@@ -433,6 +433,7 @@ def evaluate_group(
         role=role,
         eval_seed=45,
         lock_sha256=lock_sha256,
+        execution_binding={"confirmation": binding, "execution_provenance": current_code},
         expected_units_by_horizon={
             t: value["logical_units"] for t, value in POPULATIONS[role].items()
         },
@@ -597,6 +598,12 @@ def run_confirmation(config: dict, *, external_root: Path) -> dict:
                         role="LOCAL-T2",
                         eval_seed=seed,
                         lock_sha256=lock_sha,
+                        execution_binding={
+                            "confirmation": binding,
+                            "execution_provenance": live_execution_provenance(inputs["recipe_config"]),
+                            "input_manifest_sha256": lock["input_manifest_sha256"],
+                            "data_roles_sha256": lock["data_roles_sha256"],
+                        },
                         expected_units_by_horizon={2: 154},
                         source_methods={name: "LOCAL"},
                     )

@@ -253,6 +253,7 @@ class PredictionExports:
         lock_sha256,
         expected_units_by_horizon,
         source_methods,
+        execution_binding,
     ):
         self.external_root = external_root
         self.errors, self.sinks, self.source_methods = {}, {}, source_methods
@@ -263,6 +264,7 @@ class PredictionExports:
                 "eval_seed": eval_seed,
                 "inference_identity": method["inference_identity"],
                 "lock_sha256": lock_sha256,
+                "execution_binding": execution_binding,
             }
             self.sinks[method["method_id"]] = PredictionSink(
                 external_root / "cache/predictions" / content_hash(binding),

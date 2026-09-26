@@ -5,11 +5,27 @@ import pytest
 import torch
 
 from scripts.perception_gain_v2_predictions import (
+    PredictionExports,
     PredictionSink,
     decode_prediction,
     encode_prediction,
     prepare_prediction_assets,
 )
+
+
+def test_export_cache_separates_executed_source_and_input_identity(tmp_path):
+    common = {
+        "external_root": tmp_path,
+        "methods": [{"method_id": "native", "inference_identity": "same-model"}],
+        "role": "LOCAL-T2", "eval_seed": 45, "lock_sha256": "same-lock",
+        "expected_units_by_horizon": {2: 154}, "source_methods": {"native": "LOCAL"},
+    }
+    old = PredictionExports(**common, execution_binding={"source": "old", "input": "a"})
+    new = PredictionExports(**common, execution_binding={"source": "new", "input": "a"})
+    changed_input = PredictionExports(**common, execution_binding={"source": "new", "input": "b"})
+    roots = {exports.sinks["native"].root for exports in (old, new, changed_input)}
+    assert len(roots) == 3
+    assert new.sinks["native"].binding["execution_binding"] == {"source": "new", "input": "a"}
 
 
 def test_prediction_package_roundtrips_exact_arrays_without_ground_truth():

@@ -689,6 +689,52 @@ def run_report(config: dict, *, external_root: Path) -> dict:
     if any(row["status"] == "PARENT_OUTPUT_DRIFT" for row in parent_cohorts):
         status["execution_status"] = "PARTIAL_WITH_BLOCKERS"
         status["parent_runtime_comparison"] = "PARENT_OUTPUT_DRIFT"
+    # Protocol-named summaries retain the original component evidence rather
+    # than inferring completion from the existence of a report.
+    write_json(
+        artifacts / "selection/CAL_SELECTION.json",
+        {
+            "perception": perception.get("cal_selected", {}),
+            "repair": {
+                parent: optional(artifacts / f"refiner/{parent}/CAL_SELECTION.json")
+                for parent in ("R1", "P")
+            },
+            "association": association.get("cal_selected"),
+            "source_files": [
+                "selection/PERCEPTION.json", "refiner/R1/CAL_SELECTION.json",
+                "refiner/P/CAL_SELECTION.json", "association/SELECTION.json",
+            ],
+        },
+    )
+    component_rows = [
+        {
+            "component": "perception",
+            "method": row.get("method_id"),
+            "step": row.get("optimizer_update"),
+            "coverage": row.get("coverage_status"),
+            "S_mean": row.get("S_mean"),
+            "S_min": row.get("S_min"),
+            "S_long": row.get("S_long"),
+            "selected": row.get("method_id") == perception.get("selected", {}).get("method_id"),
+        }
+        for row in perception.get("evaluated", [])
+    ]
+    for parent in ("R1", "P"):
+        repair = optional(artifacts / f"refiner/{parent}/SELECTION.json")
+        component_rows.append({
+            "component": "repair_" + parent,
+            "method": repair.get("selected_mode", status["repair_" + parent + "_selection"]),
+            "generic_gain": repair.get("base_positive"),
+            "history_evidence_gain": repair.get("history_evidence_supported"),
+        })
+    component_rows.append({
+        "component": "association",
+        "method": (association.get("sel") or {}).get("method_id"),
+        **{key: (association.get("sel") or {}).get(key)
+           for key in ("S_mean", "S_min", "S_long", "coverage_status")},
+        "selection": status["association_selection"],
+    })
+    write_csv(artifacts / "selection/SEL_COMPONENTS.csv", component_rows)
     write_json(
         artifacts / "confirmation/CONFIRMATION_SUMMARY.json",
         {
@@ -902,6 +948,9 @@ def run_report(config: dict, *, external_root: Path) -> dict:
                 else "当前控制器停止前，重跑结果暂存于 `foundation/rebaseline-fixed-runtime/`。"
             )
         )
+    interpretation = artifacts / "validation/FINAL_INTERPRETATION.md"
+    if interpretation.is_file():
+        sections.append(interpretation.read_text())
     (artifacts / "FINAL_REPORT.md").write_text("\n\n".join(sections) + "\n")
     commands = []
     for event in json_lines(artifacts / "EXECUTION_LOG.jsonl"):
