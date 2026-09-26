@@ -23,6 +23,34 @@ def _runner_module():
         pytest.fail(f"perception training runner is unavailable: {error}")
 
 
+def test_resume_does_not_resave_checkpoint_during_partial_accumulation(tmp_path):
+    runner = _runner_module()
+
+    class Trainer:
+        global_step = 750
+
+        def save_checkpoint(self, path):
+            Path(path).write_bytes(str(self.global_step).encode())
+
+    trainer = Trainer()
+    endpoint = tmp_path / "update=0750.ckpt"
+    last = tmp_path / "last.ckpt"
+    endpoint.write_bytes(b"original completed endpoint")
+    last.write_bytes(b"original exact resume")
+    callback = runner.PerceptionCheckpointCallback(tmp_path, (750, 1500))
+    callback.on_train_start(trainer, None)
+    callback.on_train_batch_end(trainer, None, None, None, 0)
+    assert endpoint.read_bytes() == b"original completed endpoint"
+    assert last.read_bytes() == b"original exact resume"
+    trainer.global_step = 800
+    callback.on_train_batch_end(trainer, None, None, None, 399)
+    assert last.read_bytes() == b"800"
+    assert endpoint.read_bytes() == b"original completed endpoint"
+    trainer.global_step = 1500
+    callback.on_train_batch_end(trainer, None, None, None, 5999)
+    assert (tmp_path / "update=1500.ckpt").read_bytes() == b"1500"
+
+
 class _TinyPerceptionModel(torch.nn.Module):
     def __init__(self, *, scorer: bool = False) -> None:
         super().__init__()

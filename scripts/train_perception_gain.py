@@ -396,6 +396,12 @@ class PerceptionCheckpointCallback(Callback):
         self.last_batch_time = None
         self.maximum_batch_interval_seconds = 0.0
 
+    def on_train_start(self, trainer, pl_module) -> None:
+        del pl_module
+        # Restored global_step persists through the first accumulation batches.
+        # Those batches must not overwrite an already completed checkpoint.
+        self.last_saved_step = int(trainer.global_step)
+
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx) -> None:
         del pl_module, outputs, batch
         if self.report_progress and trainer.is_global_zero:
