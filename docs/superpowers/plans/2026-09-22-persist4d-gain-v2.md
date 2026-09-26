@@ -88,7 +88,7 @@ Files: V2 runner/config helper, existing evaluation entry points and targeted de
 
 Files: existing profile/report/publish modules and their V2 integration.
 
-- [ ] Profile actual locked methods on6 canonical masters, 1 warmup+3 repeats, sameA40, component and cumulative latency/memory; mode-aware loader.
+- [x] Profile actual locked methods on6 canonical masters, 1 warmup+3 repeats, sameA40, component and cumulative latency/memory; mode-aware loader. PROFILE completed2026-09-26T13:58:09Z with144 unique measured rows (72 each FH-R1-native/R1-D0), no failures,0.140432 GPU-hours. T4/T5 median D0/FH latency ratio0.462945 and allocated-memory ratio0.449286; descriptive IMPROVED, not a statistical stability claim. Cold I/O separately observed storage reads for30/30 files. Real-panel bundle reload checks pass for FH, R1-D0 and C0-L-s45; direct/reloaded hashes match for each.
 - [ ] Bundle exact replacement parameters/changed buffers with base hashes and mode/recipe; validate reload on a real used panel. Include same-LR C0 and NEW control where required; package reproducible predictions without GT.
 - [ ] Generate required8 tables, all real small curves/checkpoints/scores, full denominators, literal reproduction/recovery commands and nonrecursive manifest.
 
