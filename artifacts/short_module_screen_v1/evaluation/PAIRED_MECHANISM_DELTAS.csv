@@ -1,0 +1,22 @@
+scope,seed,module,control,module_step,control_step,T2_delta,T1_delta,interpretation
+CAL_individually_selected,45,Q2,Q1,1500,1500,-0.00707012414932251,0.0024168193340301514,Mechanism contrast; engineering benefit still requires positive delta against B0
+SEL_individually_selected,45,Q2,Q1,1500,1500,0.0066280364990234375,-0.022975385189056396,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,Q2,Q1,500,500,-0.019268199801445007,-0.018296003341674805,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,Q2,Q1,1000,1000,-0.011643990874290466,-0.013021618127822876,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,Q2,Q1,1500,1500,-0.00707012414932251,0.0024168193340301514,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_individually_selected,45,Q3,Q2,1000,1500,0.022577181458473206,-0.03798684477806091,Mechanism contrast; engineering benefit still requires positive delta against B0
+SEL_individually_selected,45,Q3,Q2,1000,1500,-0.03606235980987549,-0.0428045392036438,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,Q3,Q2,500,500,-0.0013026297092437744,-0.006819337606430054,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,Q3,Q2,1000,1000,0.034311190247535706,-0.01716923713684082,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,Q3,Q2,1500,1500,0.0116090327501297,-0.024354875087738037,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_individually_selected,45,M1,M0,1000,1500,0.011421501636505127,0.010930418968200684,Mechanism contrast; engineering benefit still requires positive delta against B0
+SEL_individually_selected,45,M1,M0,1000,1500,0.0037639737129211426,-0.003634512424468994,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,M1,M0,500,500,0.022374272346496582,0.015575885772705078,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,M1,M0,1000,1000,0.011980116367340088,0.0090293288230896,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,M1,M0,1500,1500,0.007930487394332886,0.011762142181396484,Mechanism contrast; engineering benefit still requires positive delta against B0
+SEL_seed46_fixed_same_step,46,M1,M0,1000,1000,0.00014609098434448242,-0.004208803176879883,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_individually_selected,45,M2,M1,500,1000,-0.0012480616569519043,-0.00040018558502197266,Mechanism contrast; engineering benefit still requires positive delta against B0
+SEL_individually_selected,45,M2,M1,500,1000,-0.001253664493560791,0.0005913972854614258,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,M2,M1,500,500,0.0001558065414428711,0.00434422492980957,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,M2,M1,1000,1000,-0.005186736583709717,-0.001041412353515625,Mechanism contrast; engineering benefit still requires positive delta against B0
+CAL_same_step,45,M2,M1,1500,1500,-0.002066671848297119,-0.0018351078033447266,Mechanism contrast; engineering benefit still requires positive delta against B0

@@ -1,0 +1,40 @@
+{
+  "combinations_executed": false,
+  "confirmed": [],
+  "diagnostic": [],
+  "evidence_ceiling": "development_replicated",
+  "provisional": [
+    {
+      "CAL_T1_AP": 0.514626681804657,
+      "CAL_T2_AP": 0.38660842180252075,
+      "SEL_T1_AP": 0.7609483003616333,
+      "SEL_T2_AP": 0.6685848236083984,
+      "actual_updates": 1500,
+      "classification": "MODEST_GAIN",
+      "delta_T1_B0": -0.0006350278854370117,
+      "delta_T2_B0": 0.0010434389114379883,
+      "evidence_level": "MIXED_SEED",
+      "geometry_breaks_at050": 1,
+      "geometry_classification": "NONE",
+      "geometry_repairs_at050": 0,
+      "geometry_signal_only": false,
+      "joint_pass_delta_at050": 0,
+      "mechanism_SEL_T2_delta": 0.0037639737129211426,
+      "mechanism_control": "M0",
+      "median_end_to_end_seconds": 0.937279510544613,
+      "module": "M1",
+      "peak_allocated_GiB": 1.4213638305664062,
+      "peak_reserved_GiB": 2.9921875,
+      "positive_SEL_references": 2,
+      "reference_consistency": "REFERENCE_MIXED",
+      "seed": 45,
+      "seed46_T1_delta_B0": 0.0005934238433837891,
+      "seed46_T2_delta_B0": -0.0003539919853210449,
+      "selected_step": 1000,
+      "slot": "mask_only",
+      "status": "COMPLETE"
+    }
+  ],
+  "slot_policy": "ALTERNATIVES_NOT_STACKABLE",
+  "tradeoff": []
+}

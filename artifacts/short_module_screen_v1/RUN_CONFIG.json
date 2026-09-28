@@ -1,0 +1,296 @@
+{
+  "data_mode": {
+    "2": "train",
+    "5": "train"
+  },
+  "descriptor_normalization": "Q: functional LN(q), LN(mean_h); raw absolute h difference; no concatenation LN. M: parent-normalized q and raw h.",
+  "numeric_environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "MKL_NUM_THREADS": "2",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "TF32": false,
+    "eval_seed": 45,
+    "precision": "float32"
+  },
+  "official_thresholds": [
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9
+  ],
+  "parent_dimensions": {
+    "classes": 18,
+    "feature_dim": 128,
+    "probability_dim": 19,
+    "query_dim": 128
+  },
+  "parent_dimensions_status": "BOUND_REAL_NATIVE_TENSORS",
+  "prior_gpu_hours": 78.94000603858383,
+  "protocol": {
+    "artifact_root": "artifacts/short_module_screen_v1",
+    "base_commit": "1ddab2aee88e5f5d8aa50b73a7896341802b2a26",
+    "branch": "research/rescene-short-module-screen-v1",
+    "budget": {
+      "categories_gpu_hours": {
+        "evaluation_and_profile": 16,
+        "export_and_baseline": 20,
+        "heads_and_replication": 8,
+        "recovery": 4
+      },
+      "cpu_workers": 8,
+      "cumulative_cap_gpu_hours": 192,
+      "gpu_smoke_hours_target": 0.5,
+      "incremental_round_cap_gpu_hours": 48,
+      "maximum_simultaneous_gpus": 2,
+      "prior_usage_reference_gpu_hours": 78.94,
+      "ram_gib": 96,
+      "reconcile_actual_ledger_before_running": true,
+      "tests_cpu_wall_minutes_target": 20
+    },
+    "data": {
+      "cal_expected_logical_pairs": 23,
+      "cal_expected_references": 4,
+      "directed_pairs_per_reference_maximum": 4,
+      "inherit_reference_roles_from": "artifacts/perception_gain_v2/DATA_ROLES.json",
+      "minimum_legal_train_references": 8,
+      "new_feature_cache_limit_gib": 32,
+      "ordering_salt": "short-module-v1:",
+      "raw_dataset_and_ground_truth_publication": false,
+      "resample_by_module_loss": false,
+      "sampled_candidates_per_record": 4,
+      "sampling": "uniform_reference_then_record_then_candidate",
+      "sel_expected_logical_pairs": 24,
+      "sel_expected_references": 4,
+      "t1_population": "unique_physical_scan_union_of_same_role_pairs",
+      "t1_requires_separate_single_scan_forward": true,
+      "train_record_mix_per_update": {
+        "T1": 1,
+        "T2": 3
+      },
+      "train_reference_limit": 64
+    },
+    "features": {
+      "common_h": [
+        "mean_positive_segment_features",
+        "mean_region_plus_exploration_features"
+      ],
+      "empty_support_top_logit_segments": 32,
+      "exploration_segments": 32,
+      "m_inputs": [
+        "query",
+        "h",
+        "class_one_hot"
+      ],
+      "q_inputs": [
+        "query",
+        "mean_h",
+        "absolute_two_stage_h_difference",
+        "class_probability_vector",
+        "class_one_hot",
+        "parent_score",
+        "support_fraction_min_max",
+        "foreground_probability_min_max",
+        "observed_H_over_2"
+      ],
+      "region_bbox_expansion_metres": 0.1
+    },
+    "heads": {
+      "geometry_evaluation": "original_segment_logit_materialization",
+      "geometry_formula": "original_logit + 2*tanh(F_dot_a/sqrt(D) + b)",
+      "geometry_hidden_width": 128,
+      "geometry_last_layer_zero_init": true,
+      "geometry_logit_residual_bound": 2.0,
+      "geometry_output": "feature_dimension_plus_one",
+      "geometry_regularization": 0.01,
+      "geometry_training_differentiable_logits_only": true,
+      "multiply_original_score_after_quality_head": false,
+      "q1_q2_share_initial_state_per_seed": true,
+      "q3_increment_initial_bias": -4.0,
+      "q3_monotone_logits": "cumulative_negative_softplus_increments",
+      "q3_output_score": "mean_threshold_outputs",
+      "q3_thresholds": "read_bound_official_primary_temporal_ap_thresholds",
+      "quality_hidden_widths": [
+        128,
+        64
+      ]
+    },
+    "instructions": "ReScene_Round1_Single_Module_Codex_FINAL.md",
+    "labels": {
+      "geometry_assignment": "same_frozen_class_compatible_one_to_one_concat_iou_assignment",
+      "geometry_dice_smoothing": 1.0,
+      "geometry_loss_mean_denominator": "all_sampled_candidate_positions",
+      "geometry_match_minimum_iou": 0.1,
+      "geometry_maximum_segments_per_candidate_per_stage": 2048,
+      "geometry_multi_to_one_assignment": false,
+      "geometry_point_weight": "known_label_vertex_count_per_low_resolution_segment",
+      "geometry_same_gt_entity_across_stages": true,
+      "quality_assignment": "temporal_overlap_desc_then_concat_iou_desc_then_gt_stable_id",
+      "quality_labels_use_score_sorted_tp_fp": false,
+      "supervision_ambiguity": "exclude_explicit_unresolved_and_report_unavailable_metadata"
+    },
+    "modules": {
+      "M0": {
+        "mode": "mask_shared_empty",
+        "pooling": "shared",
+        "purpose": "supervision_control",
+        "slot": "mask",
+        "unmatched_target": "empty"
+      },
+      "M1": {
+        "mode": "mask_shared_preserve",
+        "pooling": "shared",
+        "slot": "mask",
+        "unmatched_target": "preserve_by_residual_regularization"
+      },
+      "M2": {
+        "mode": "mask_stage_preserve",
+        "pooling": "per_stage",
+        "slot": "mask",
+        "unmatched_target": "preserve_by_residual_regularization"
+      },
+      "Q1": {
+        "loss": "mse",
+        "mode": "quality_concat",
+        "slot": "score",
+        "target": "concat_iou_same_temporal_best_gt"
+      },
+      "Q2": {
+        "loss": "mse",
+        "mode": "quality_temporal",
+        "slot": "score",
+        "target": "official_temporal_overlap"
+      },
+      "Q3": {
+        "loss": "binary_cross_entropy",
+        "mode": "quality_threshold",
+        "slot": "score",
+        "target": "official_threshold_events"
+      }
+    },
+    "parent": {
+      "bytes": 754813672,
+      "frozen": true,
+      "infer_feature_dimensions_from_checkpoint": true,
+      "inference": "native",
+      "mode": "eval",
+      "name": "R1",
+      "prediction_queries": 100,
+      "preserve_existing_topk_and_filter": true,
+      "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+    },
+    "publication": {
+      "current_scope_has_no_combination_bundle": true,
+      "execute_git_push": true,
+      "preserve_existing_assets_and_tags": true,
+      "receipt_external_to_commit_B": true,
+      "release_asset_limit_gib": 1,
+      "small_head_git_limit_mib": 20,
+      "tag_base": "rescene-short-module-screen-v1",
+      "unavailable_release_state": "CODE_ONLY"
+    },
+    "repository": "Orangekostar/Persist4D",
+    "root_environment": "RESCENE_SHORT_MODULE_ROOT",
+    "schema": "rescene-single-module-round1-design-v1",
+    "scope": {
+      "backbone_training_allowed": false,
+      "combinations_allowed": false,
+      "deployment_replacement_allowed": false,
+      "ensembles_allowed": false,
+      "excluded": [
+        "Q4",
+        "Q5",
+        "M3",
+        "M4",
+        "D0",
+        "lag1",
+        "LoRA",
+        "epoch450_continuation",
+        "T3",
+        "T4",
+        "T5"
+      ],
+      "formal_confirmation_populations_this_round": [],
+      "maximum_active_modules_per_prediction": 1,
+      "observed_horizons": [
+        1,
+        2
+      ],
+      "train_arms": [
+        "Q1",
+        "Q2",
+        "Q3",
+        "M0",
+        "M1",
+        "M2"
+      ]
+    },
+    "selection": {
+      "all_six_arms_get_fixed_checkpoint_SEL": true,
+      "cal_rank": [
+        "T2_AP_desc",
+        "T1_AP_desc",
+        "selected_update_asc"
+      ],
+      "evidence_ceiling_this_round": "development_replicated",
+      "guard": "true_single_scan_T1_spatial_mAP",
+      "lock_all_arms_before_SEL": true,
+      "maximum_T1_drop_ap": 0.002,
+      "no_positive_modules_allowed": true,
+      "positive_SEL_references_for_consistency": 3,
+      "primary": "native_T2_official_pooled_t_mAP",
+      "replication_eligibility": "positive_T2_delta_and_complete_T1_guard",
+      "required_mechanism_controls": {
+        "M1": "M0",
+        "M2": "M1",
+        "Q2": "Q1",
+        "Q3": "Q2"
+      },
+      "shortlist_multiple": true,
+      "target_T2_delta_ap": 0.005,
+      "tie_tolerance_ap": 1e-06
+    },
+    "training": {
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "epsilon": 1e-08,
+      "eval_seed": 45,
+      "first_seed": 45,
+      "fresh_head_from_parent_for_every_arm": true,
+      "gradient_clip_norm": 1.0,
+      "last_checkpoint_every": 100,
+      "learning_rate": 0.001,
+      "minimum_learning_rate_fraction": 0.1,
+      "optimizer": "AdamW",
+      "precision": "float32",
+      "replication_schedule_horizon_remains": 1500,
+      "replication_seed": 46,
+      "saved_updates": [
+        0,
+        500,
+        1000,
+        1500
+      ],
+      "scheduler": "cosine",
+      "selectable_trained_updates": [
+        500,
+        1000,
+        1500
+      ],
+      "updates": 1500,
+      "warmup_updates": 75,
+      "weight_decay": 0.0001
+    }
+  },
+  "round_cap_gpu_hours": 48.0,
+  "runtime_data_symlink": "/home/ww/persist4d_runs/perception_gain_v2/data",
+  "status": "PREPARED",
+  "training_eligibility": "Metadata-only native directed pairs; no supervised-content filter"
+}

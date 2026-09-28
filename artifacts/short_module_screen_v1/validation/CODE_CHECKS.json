@@ -1,0 +1,82 @@
+{
+  "commands": [
+    {
+      "command": [
+        "/home/ww/miniconda3/envs/persist4d/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_short_module_data.py",
+        "tests/test_short_module_diagnostics.py",
+        "tests/test_short_module_evaluation.py",
+        "tests/test_short_module_heads.py",
+        "tests/test_short_module_native.py",
+        "tests/test_short_module_results.py",
+        "tests/test_short_module_screen.py",
+        "tests/test_short_module_training.py",
+        "tests/test_rescene_task_postprocess.py"
+      ],
+      "elapsed_seconds": 8.584712869022042,
+      "exit_code": 0,
+      "output": ".................................                                        [100%]\n=============================== warnings summary ===============================\n../../../miniconda3/envs/persist4d/lib/python3.10/site-packages/albumentations/augmentations/geometric/functional.py:8\n  /home/ww/miniconda3/envs/persist4d/lib/python3.10/site-packages/albumentations/augmentations/geometric/functional.py:8: DeprecationWarning: Please import `gaussian_filter` from the `scipy.ndimage` namespace; the `scipy.ndimage.filters` namespace is deprecated and will be removed in SciPy 2.0.0.\n    from scipy.ndimage.filters import gaussian_filter\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n33 passed, 1 warning in 5.47s\n"
+    },
+    {
+      "command": [
+        "/home/ww/miniconda3/bin/ruff",
+        "check",
+        "models/short_module_heads.py",
+        "scripts/short_module_data.py",
+        "scripts/short_module_delivery.py",
+        "scripts/short_module_diagnostics.py",
+        "scripts/short_module_evaluation.py",
+        "scripts/short_module_native.py",
+        "scripts/short_module_profile.py",
+        "scripts/short_module_results.py",
+        "scripts/short_module_screen.py",
+        "scripts/short_module_training.py",
+        "tests/test_short_module_data.py",
+        "tests/test_short_module_diagnostics.py",
+        "tests/test_short_module_evaluation.py",
+        "tests/test_short_module_heads.py",
+        "tests/test_short_module_native.py",
+        "tests/test_short_module_results.py",
+        "tests/test_short_module_screen.py",
+        "tests/test_short_module_training.py"
+      ],
+      "elapsed_seconds": 0.04552606400102377,
+      "exit_code": 0,
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "elapsed_seconds": 0.012976245023310184,
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "sources": {
+    "models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+    "scripts/short_module_data.py": "3cb3ea75469a04b7e6c50bf41da55b0b984737bbd12f8e45f283c7d78c180762",
+    "scripts/short_module_delivery.py": "b48e861042e59616ae6da08b638961b65db1e557bd96a6fe859cc7b8b8b87f36",
+    "scripts/short_module_diagnostics.py": "464867962adce5d07928f4cb5203f3227395d048775df3bc75788bde0fc409d9",
+    "scripts/short_module_evaluation.py": "51f575625201e316f2c3546e6897973702c47d1113b3d102817a78318d3a4caa",
+    "scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+    "scripts/short_module_profile.py": "9b87842f1973705ae109a4dca69cc8ecea34df47d2fd622ea64b5e95c0309d8f",
+    "scripts/short_module_results.py": "19a427a62958663fe0812047342c26677e25c85622b483377c6ca4f6f87cdfff",
+    "scripts/short_module_screen.py": "5a1df6c009ce6b785580b62548dce0cd3cd8bcdc030893db67e5f37bb9653acb",
+    "scripts/short_module_training.py": "e34df0dbc712cb19e37ee94f00a3fd0c3ce68a4aacdab5e9068482b6f1b1d288",
+    "tests/test_short_module_data.py": "665e25d4b40cac77b95d01f3a46a1047cac40ea60133bb4355e612e60a1cf5cd",
+    "tests/test_short_module_diagnostics.py": "ee6c01f1d3fac18e752882b6e255ec19812de40a06f0b5d8e14748d1afe11a6c",
+    "tests/test_short_module_evaluation.py": "d6945d2fd94f2a8c835799dad77e6a4f8df6fbdba3bfab5655c245a4aec70545",
+    "tests/test_short_module_heads.py": "b9c98c5a2aed5c9af046832802f8f13295e8ebeb870d7e228640bace50f8bcba",
+    "tests/test_short_module_native.py": "051a970de9f1066a75d17d70fc2200258e1c21435e36c893244d62082fd70dda",
+    "tests/test_short_module_results.py": "70feca32c5ff54272b46f25572aabcd634dcc36ecc8d2f730bb87f6a3c7586d2",
+    "tests/test_short_module_screen.py": "47a3d847bb89b8e57f38e6263e3ac815da29ca4eb05cab0267a701edbad15018",
+    "tests/test_short_module_training.py": "35b431be7605ed30097b00c0b3e1c108b01d50ea1933347a03fc501845eaa640"
+  },
+  "status": "VERIFIED"
+}

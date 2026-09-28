@@ -1,0 +1,14 @@
+{
+  "epoch_search": false,
+  "fixed_updates": {
+    "M0": [
+      1000
+    ],
+    "M1": [
+      1000
+    ]
+  },
+  "maximum_updates_per_arm": 1500,
+  "schedule_horizon": 1500,
+  "seed": 46
+}

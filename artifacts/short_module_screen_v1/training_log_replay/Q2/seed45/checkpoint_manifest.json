@@ -1,0 +1,82 @@
+{
+  "base_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "cache_identity_sha256": "229cc0e8b9a0960670fcb849d1b157d4ec873541f4c7289af815fc8a8f08839f",
+  "checkpoints": [
+    {
+      "bytes": 387568,
+      "path": "/home/ww/persist4d_runs/short_module_screen_v1/training_log_replay/Q2/seed45/update=0000.pt",
+      "sha256": "fea90b4c4516a1a15bd435ca45f30c32c5c3f7b7a3f078df64af5491ec7efbce",
+      "step": 0
+    },
+    {
+      "bytes": 1159358,
+      "path": "/home/ww/persist4d_runs/short_module_screen_v1/training_log_replay/Q2/seed45/update=0500.pt",
+      "sha256": "d78463320e2a7ca938e6e8d4e4932e59ece4a2720c104d49749ba9c827a32182",
+      "step": 500
+    },
+    {
+      "bytes": 1159358,
+      "path": "/home/ww/persist4d_runs/short_module_screen_v1/training_log_replay/Q2/seed45/update=1000.pt",
+      "sha256": "e337a1a4d6ac17be9a704ca734d00b7806045e283d5d9105cd87aa4518f18dbb",
+      "step": 1000
+    },
+    {
+      "bytes": 1159358,
+      "path": "/home/ww/persist4d_runs/short_module_screen_v1/training_log_replay/Q2/seed45/update=1500.pt",
+      "sha256": "c6b59e40cc9a8b2e117b7767915ac360785a2f3630039b1ca06f6246ff15b04f",
+      "step": 1500
+    }
+  ],
+  "descriptor": "Q: functional LN(q), LN(mean_h); raw absolute h difference; no concatenation LN. M: parent-normalized q and raw h.",
+  "dimensions": {
+    "classes": 18,
+    "feature_dim": 128,
+    "probability_dim": 19,
+    "query_dim": 128
+  },
+  "estimated_1500_seconds": 37.66992464661598,
+  "first20_seconds": 0.5022656619548798,
+  "initial_parameter_sha256": "6ccb4f5a68e7a0abf64bb729100b107059d3889610a21bc4f6a888e0384369fb",
+  "loss_source_sha256": "3cb3ea75469a04b7e6c50bf41da55b0b984737bbd12f8e45f283c7d78c180762",
+  "module": "Q2",
+  "optimizer_updates": 1500,
+  "parameter_count": 95873,
+  "parent_loaded_in_training": false,
+  "postprocess": "original retained candidates, no new filter",
+  "sample_plan_sha256": "2c00272b4965c41939404bda736811dc73e59ce674cc81ca85a35fc4c6f781ae",
+  "schedule_horizon": 1500,
+  "seed": 45,
+  "source_sha256": "e34df0dbc712cb19e37ee94f00a3fd0c3ce68a4aacdab5e9068482b6f1b1d288",
+  "status": "COMPLETE",
+  "supervised_gradient_checks": [
+    {
+      "gradient_norm": 0.1891271471977234,
+      "head_changed": true,
+      "parent_in_optimizer": false,
+      "update": 1
+    },
+    {
+      "gradient_norm": 0.2440650761127472,
+      "head_changed": true,
+      "parent_in_optimizer": false,
+      "update": 2
+    }
+  ],
+  "supported_horizons": [
+    1,
+    2
+  ],
+  "target_updates": 1500,
+  "thresholds": [
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9
+  ],
+  "training_seconds": 14.368871906888671
+}

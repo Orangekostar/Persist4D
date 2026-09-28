@@ -1,0 +1,13 @@
+{
+  "checked_steps": [
+    500,
+    1000,
+    1500
+  ],
+  "checkpoint_parameters_unchanged": true,
+  "elapsed_seconds_in_metrics": "Replay measured time; original measured time preserved in original_metrics.csv",
+  "loss_source_sha256": "3cb3ea75469a04b7e6c50bf41da55b0b984737bbd12f8e45f283c7d78c180762",
+  "replay_manifest": "training_log_replay/M0/seed45/checkpoint_manifest.json",
+  "source_sha256": "e34df0dbc712cb19e37ee94f00a3fd0c3ce68a4aacdab5e9068482b6f1b1d288",
+  "status": "EXACT_PARAMETER_REPLAY"
+}

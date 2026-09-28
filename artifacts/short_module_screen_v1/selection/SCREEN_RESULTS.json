@@ -1,0 +1,554 @@
+{
+  "M0": {
+    "by_reference": [
+      {
+        "AP": 0.9164897203445435,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.9178100228309631,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.8311500549316406,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.5618683695793152,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.8047427535057068,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.8690512776374817,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.7163190841674805,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.4534710645675659,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "229cc0e8b9a0960670fcb849d1b157d4ec873541f4c7289af815fc8a8f08839f",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 28.505985426018015,
+    "evaluator_sha256": "43e67da170af741d718d6b0a5b99428da4d9ba24f47cc6a1ea5bcbf1fdf6f1b0",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "b95bd4b863a75540cbea6454f05ffe8d2fd5f2615acd349a8fc0f2fb2de1e01c",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": false,
+      "score_unchanged": true
+    },
+    "metrics": {
+      "T1": 0.7645828127861023,
+      "T2": 0.6648208498954773
+    },
+    "module": "M0",
+    "result_path": "/home/ww/persist4d_runs/short_module_screen_v1/evaluation/43e67da170af741d/M0/seed45/SEL-1500.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.7538562417030334,
+      "stage2": 0.7519307136535645
+    },
+    "status": "COMPLETE",
+    "step": 1500
+  },
+  "M1": {
+    "by_reference": [
+      {
+        "AP": 0.9108426570892334,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.9224023222923279,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.8199364542961121,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.5814968943595886,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.8303107023239136,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.85736083984375,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.7204300165176392,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.4661359488964081,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "229cc0e8b9a0960670fcb849d1b157d4ec873541f4c7289af815fc8a8f08839f",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 29.562067102990113,
+    "evaluator_sha256": "43e67da170af741d718d6b0a5b99428da4d9ba24f47cc6a1ea5bcbf1fdf6f1b0",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "5f32d8ee7eb8e8815f4282d67169144aadc373f92fce663140933dbe7c6a2388",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": false,
+      "score_unchanged": true
+    },
+    "metrics": {
+      "T1": 0.7609483003616333,
+      "T2": 0.6685848236083984
+    },
+    "module": "M1",
+    "result_path": "/home/ww/persist4d_runs/short_module_screen_v1/evaluation/43e67da170af741d/M1/seed45/SEL-1000.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.7655754685401917,
+      "stage2": 0.7532922625541687
+    },
+    "status": "COMPLETE",
+    "step": 1000
+  },
+  "M2": {
+    "by_reference": [
+      {
+        "AP": 0.9113695621490479,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.9224023222923279,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.8197265267372131,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.5891973972320557,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.8288300037384033,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.856351912021637,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.7214749455451965,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.45877790451049805,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "229cc0e8b9a0960670fcb849d1b157d4ec873541f4c7289af815fc8a8f08839f",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 29.921241345000453,
+    "evaluator_sha256": "43e67da170af741d718d6b0a5b99428da4d9ba24f47cc6a1ea5bcbf1fdf6f1b0",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "2da01fc78dac4530e639248e295ea4d4f035e906e8d8ce2a64bdcf6de9687451",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": false,
+      "score_unchanged": true
+    },
+    "metrics": {
+      "T1": 0.7615396976470947,
+      "T2": 0.6673311591148376
+    },
+    "module": "M2",
+    "result_path": "/home/ww/persist4d_runs/short_module_screen_v1/evaluation/43e67da170af741d/M2/seed45/SEL-0500.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.7640709280967712,
+      "stage2": 0.7548466920852661
+    },
+    "status": "COMPLETE",
+    "step": 500
+  },
+  "Q1": {
+    "by_reference": [
+      {
+        "AP": 0.5917869806289673,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.8120918869972229,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.6863799095153809,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.4484862685203552,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.499066025018692,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.7750481963157654,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.674140453338623,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.4242085814476013,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "229cc0e8b9a0960670fcb849d1b157d4ec873541f4c7289af815fc8a8f08839f",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 26.75689411710482,
+    "evaluator_sha256": "43e67da170af741d718d6b0a5b99428da4d9ba24f47cc6a1ea5bcbf1fdf6f1b0",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "2d65b801b17bd632d539a6d4000fa02ab578e42ed4d13e0a0644e457d81a46c5",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": true,
+      "score_unchanged": false
+    },
+    "metrics": {
+      "T1": 0.5935382843017578,
+      "T2": 0.5618147253990173
+    },
+    "module": "Q1",
+    "result_path": "/home/ww/persist4d_runs/short_module_screen_v1/evaluation/43e67da170af741d/Q1/seed45/SEL-1500.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.6492679715156555,
+      "stage2": 0.6390101313591003
+    },
+    "status": "COMPLETE",
+    "step": 1500
+  },
+  "Q2": {
+    "by_reference": [
+      {
+        "AP": 0.5007253885269165,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.8254783153533936,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.6869155168533325,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.4550717771053314,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.4656461179256439,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.7612286806106567,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.6729868650436401,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.4332484006881714,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "229cc0e8b9a0960670fcb849d1b157d4ec873541f4c7289af815fc8a8f08839f",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 26.69665145489853,
+    "evaluator_sha256": "43e67da170af741d718d6b0a5b99428da4d9ba24f47cc6a1ea5bcbf1fdf6f1b0",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "3cc47b7cf9a48cdc5e27e9d835489ce09d38c3be095a2b0530ff4ed7ef43b92d",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": true,
+      "score_unchanged": false
+    },
+    "metrics": {
+      "T1": 0.5705628991127014,
+      "T2": 0.5684427618980408
+    },
+    "module": "Q2",
+    "result_path": "/home/ww/persist4d_runs/short_module_screen_v1/evaluation/43e67da170af741d/Q2/seed45/SEL-1500.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.6626418828964233,
+      "stage2": 0.635916531085968
+    },
+    "status": "COMPLETE",
+    "step": 1500
+  },
+  "Q3": {
+    "by_reference": [
+      {
+        "AP": 0.5981418490409851,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.6774446964263916,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.6322579383850098,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.47842806577682495,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.4778911769390106,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.7218102216720581,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.6643017530441284,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.4316376745700836,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "229cc0e8b9a0960670fcb849d1b157d4ec873541f4c7289af815fc8a8f08839f",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 27.06853751896415,
+    "evaluator_sha256": "43e67da170af741d718d6b0a5b99428da4d9ba24f47cc6a1ea5bcbf1fdf6f1b0",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "17ba349d52c75cd121603cb97e42dd4d6463da905b8c4dbb737c586e8f69a9ce",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": true,
+      "score_unchanged": false
+    },
+    "metrics": {
+      "T1": 0.5277583599090576,
+      "T2": 0.5323804020881653
+    },
+    "module": "Q3",
+    "result_path": "/home/ww/persist4d_runs/short_module_screen_v1/evaluation/43e67da170af741d/Q3/seed45/SEL-1000.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.6188623905181885,
+      "stage2": 0.6031092405319214
+    },
+    "status": "COMPLETE",
+    "step": 1000
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "base_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "cache_identity_sha256": "229cc0e8b9a0960670fcb849d1b157d4ec873541f4c7289af815fc8a8f08839f",
+  "checkpoints": [
+    {
+      "bytes": 389552,
+      "path": "/home/ww/persist4d_runs/short_module_screen_v1/training/Q3/seed45/update=0000.pt",
+      "sha256": "1802f23db382bb44fa25eab70cc333b03604d5e121ffc4bdc96af60e5d1ed629",
+      "step": 0
+    },
+    {
+      "bytes": 1165374,
+      "path": "/home/ww/persist4d_runs/short_module_screen_v1/training/Q3/seed45/update=0500.pt",
+      "sha256": "ea1255f721b2213999bfb6c5d63e0653fe92719c29a6b371a4bfc9c364569fa0",
+      "step": 500
+    },
+    {
+      "bytes": 1165374,
+      "path": "/home/ww/persist4d_runs/short_module_screen_v1/training/Q3/seed45/update=1000.pt",
+      "sha256": "17ba349d52c75cd121603cb97e42dd4d6463da905b8c4dbb737c586e8f69a9ce",
+      "step": 1000
+    },
+    {
+      "bytes": 1165374,
+      "path": "/home/ww/persist4d_runs/short_module_screen_v1/training/Q3/seed45/update=1500.pt",
+      "sha256": "09e78fba6ccac99d91963dd1ad1f0bbe13eccf8285c72884a53d241ea9f78814",
+      "step": 1500
+    }
+  ],
+  "descriptor": "Q: functional LN(q), LN(mean_h); raw absolute h difference; no concatenation LN. M: parent-normalized q and raw h.",
+  "dimensions": {
+    "classes": 18,
+    "feature_dim": 128,
+    "probability_dim": 19,
+    "query_dim": 128
+  },
+  "estimated_1500_seconds": 17.600578267592937,
+  "first20_seconds": 0.23467437690123916,
+  "initial_parameter_sha256": "fec6b7ca285762879f66334e4a3de8c3b98b8dce9f01fff032482e4ef6537f98",
+  "module": "Q3",
+  "optimizer_updates": 1500,
+  "parameter_count": 96393,
+  "parent_loaded_in_training": false,
+  "postprocess": "original retained candidates, no new filter",
+  "sample_plan_sha256": "2c00272b4965c41939404bda736811dc73e59ce674cc81ca85a35fc4c6f781ae",
+  "schedule_horizon": 1500,
+  "seed": 45,
+  "source_sha256": "36d36cb440dc299d2ac7b18e21575b672d7a3fbee902c23495183ff71af8d4cc",
+  "status": "COMPLETE",
+  "supervised_gradient_checks": [
+    {
+      "gradient_norm": 0.6516863107681274,
+      "head_changed": true,
+      "parent_in_optimizer": false,
+      "update": 1
+    },
+    {
+      "gradient_norm": 0.5811041593551636,
+      "head_changed": true,
+      "parent_in_optimizer": false,
+      "update": 2
+    }
+  ],
+  "supported_horizons": [
+    1,
+    2
+  ],
+  "target_updates": 1500,
+  "thresholds": [
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9
+  ],
+  "training_seconds": 13.092713175923564
+}

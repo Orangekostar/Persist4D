@@ -1,0 +1,61 @@
+{
+  "candidate_counts": [
+    {
+      "category": "duplicate",
+      "count": 631,
+      "role": "CAL"
+    },
+    {
+      "category": "low_overlap",
+      "count": 1255,
+      "role": "CAL"
+    },
+    {
+      "category": "no_same_class_gt",
+      "count": 413,
+      "role": "CAL"
+    },
+    {
+      "category": "reliable_correspondence",
+      "count": 331,
+      "role": "CAL"
+    },
+    {
+      "category": "unknown_ignore",
+      "count": 1970,
+      "role": "CAL"
+    },
+    {
+      "category": "duplicate",
+      "count": 7464,
+      "role": "TRAIN"
+    },
+    {
+      "category": "low_overlap",
+      "count": 8599,
+      "role": "TRAIN"
+    },
+    {
+      "category": "no_same_class_gt",
+      "count": 2613,
+      "role": "TRAIN"
+    },
+    {
+      "category": "reliable_correspondence",
+      "count": 2913,
+      "role": "TRAIN"
+    },
+    {
+      "category": "unknown_ignore",
+      "count": 17111,
+      "role": "TRAIN"
+    }
+  ],
+  "candidate_denominator": 43300,
+  "geometry_transition_rows": 2538,
+  "limitation": "Diagnostic geometry quantities are not realizable AP upper bounds. Empty-stage rules are the installed official matcher rules.",
+  "presence_denominator": 2058,
+  "scope": "Class-compatible official pairwise geometry; reliable means overlap strictly greater than0.5. Duplicate is a subsequent reliable candidate for the same GT in geometry/key order.",
+  "status": "COMPLETE",
+  "track_definition": "Frozen one-to-one concat-IoU>=0.10 assignment, one entity across stages; valid GT present in both stages"
+}

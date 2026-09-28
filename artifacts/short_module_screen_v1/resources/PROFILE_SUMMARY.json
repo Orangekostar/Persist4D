@@ -1,0 +1,160 @@
+{
+  "measurement_rows": 112,
+  "reload_checks": [
+    {
+      "bundle_bytes": 387622,
+      "bundle_sha256": "381ecf097523b1c5e1547a1716c9dee07036dd3fb9e1b789df6281b53e85738b",
+      "equal": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      },
+      "input_id": "f430e34a46a589cca57e617807d36545b1b92baf10eb60cdd6985bd026adabcc",
+      "module": "Q1"
+    },
+    {
+      "bundle_bytes": 387622,
+      "bundle_sha256": "140833658df917d1a8f01acacefb351d59049b63fe5a9eef499b811532290023",
+      "equal": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      },
+      "input_id": "f430e34a46a589cca57e617807d36545b1b92baf10eb60cdd6985bd026adabcc",
+      "module": "Q2"
+    },
+    {
+      "bundle_bytes": 389734,
+      "bundle_sha256": "5227fb2cecf4d4a46a7eba1ad5a920015e98c00376bf2c8e7d09065a46adb949",
+      "equal": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      },
+      "input_id": "f430e34a46a589cca57e617807d36545b1b92baf10eb60cdd6985bd026adabcc",
+      "module": "Q3"
+    },
+    {
+      "bundle_bytes": 276648,
+      "bundle_sha256": "58890863da728143bf0ae4c6d7280c0d8c8e102b88a63ce9a62b8b2f5b71b43c",
+      "equal": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      },
+      "input_id": "f430e34a46a589cca57e617807d36545b1b92baf10eb60cdd6985bd026adabcc",
+      "module": "M0"
+    },
+    {
+      "bundle_bytes": 276648,
+      "bundle_sha256": "fb06508cae463de77009c6ef71a3b4ce85ce6d71980af379bc3f237b397ef57d",
+      "equal": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      },
+      "input_id": "f430e34a46a589cca57e617807d36545b1b92baf10eb60cdd6985bd026adabcc",
+      "module": "M1"
+    },
+    {
+      "bundle_bytes": 276648,
+      "bundle_sha256": "411a1b73fc32c764c8d7b56894b34dc585fdf9b22230cd132b46580e96942eeb",
+      "equal": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      },
+      "input_id": "f430e34a46a589cca57e617807d36545b1b92baf10eb60cdd6985bd026adabcc",
+      "module": "M2"
+    }
+  ],
+  "selected_records": [
+    {
+      "context_index": 37,
+      "dataset_horizon": 5,
+      "horizon": 2,
+      "input_id": "f430e34a46a589cca57e617807d36545b1b92baf10eb60cdd6985bd026adabcc",
+      "logical_unit_id": "SEL:T2:00001",
+      "master_sequence_id": "scene0083_01-scene0083_02-scene0083_04-scene0083_00-scene0083_03",
+      "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c",
+      "role": "SEL",
+      "scan_ids": [
+        "scene0083_01",
+        "scene0083_02"
+      ],
+      "scan_indices": [
+        194,
+        195
+      ]
+    },
+    {
+      "context_index": 49,
+      "dataset_horizon": 5,
+      "horizon": 2,
+      "input_id": "93083b85dd4bd28b6e1973d648d040b66b36a88a065971c4897aa83156dabae1",
+      "logical_unit_id": "SEL:T2:00007",
+      "master_sequence_id": "scene0123_02-scene0123_04-scene0123_01-scene0123_00-scene0123_03",
+      "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2",
+      "role": "SEL",
+      "scan_ids": [
+        "scene0123_02",
+        "scene0123_04"
+      ],
+      "scan_indices": [
+        287,
+        289
+      ]
+    },
+    {
+      "context_index": 69,
+      "dataset_horizon": 5,
+      "horizon": 2,
+      "input_id": "d50272e26b05dfb5e6d9f477412573c93a7f2660e390bb227f569c4c429e0487",
+      "logical_unit_id": "SEL:T2:00010",
+      "master_sequence_id": "scene0175_00-scene0175_04-scene0175_02-scene0175_03-scene0175_07",
+      "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+      "role": "SEL",
+      "scan_ids": [
+        "scene0175_00",
+        "scene0175_04"
+      ],
+      "scan_indices": [
+        402,
+        406
+      ]
+    },
+    {
+      "context_index": 100,
+      "dataset_horizon": 5,
+      "horizon": 2,
+      "input_id": "364dc63defd585927a8db0d9c6c7791b3e5c9018777f253f20f5247c2e2f125f",
+      "logical_unit_id": "SEL:T2:00023",
+      "master_sequence_id": "scene0194_05-scene0194_02-scene0194_04-scene0194_00-scene0194_01",
+      "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0",
+      "role": "SEL",
+      "scan_ids": [
+        "scene0194_05",
+        "scene0194_02"
+      ],
+      "scan_indices": [
+        462,
+        459
+      ]
+    }
+  ],
+  "status": "COMPLETE",
+  "timing_scope": "Each method executes the full parent anew. Metrics, hashes and reload checks excluded. Disk IO reported separately.",
+  "warmup_rows": 28
+}

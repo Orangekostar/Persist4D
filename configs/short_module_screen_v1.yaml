@@ -1,0 +1,147 @@
+# 设计配置：需由 Codex 在仓库实现兼容解析；不是现有 CLI 可直接执行的配置。
+schema: rescene-single-module-round1-design-v1
+repository: Orangekostar/Persist4D
+base_commit: 1ddab2aee88e5f5d8aa50b73a7896341802b2a26
+branch: research/rescene-short-module-screen-v1
+artifact_root: artifacts/short_module_screen_v1
+root_environment: RESCENE_SHORT_MODULE_ROOT
+instructions: ReScene_Round1_Single_Module_Codex_FINAL.md
+parent:
+  name: R1
+  sha256: 629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd
+  bytes: 754813672
+  frozen: true
+  mode: eval
+  inference: native
+  prediction_queries: 100
+  infer_feature_dimensions_from_checkpoint: true
+  preserve_existing_topk_and_filter: true
+scope:
+  observed_horizons: [1, 2]
+  train_arms: [Q1, Q2, Q3, M0, M1, M2]
+  maximum_active_modules_per_prediction: 1
+  combinations_allowed: false
+  ensembles_allowed: false
+  backbone_training_allowed: false
+  deployment_replacement_allowed: false
+  formal_confirmation_populations_this_round: []
+  excluded: [Q4, Q5, M3, M4, D0, lag1, LoRA, epoch450_continuation, T3, T4, T5]
+modules:
+  Q1: {slot: score, mode: quality_concat, target: concat_iou_same_temporal_best_gt, loss: mse}
+  Q2: {slot: score, mode: quality_temporal, target: official_temporal_overlap, loss: mse}
+  Q3: {slot: score, mode: quality_threshold, target: official_threshold_events, loss: binary_cross_entropy}
+  M0: {slot: mask, mode: mask_shared_empty, pooling: shared, unmatched_target: empty, purpose: supervision_control}
+  M1: {slot: mask, mode: mask_shared_preserve, pooling: shared, unmatched_target: preserve_by_residual_regularization}
+  M2: {slot: mask, mode: mask_stage_preserve, pooling: per_stage, unmatched_target: preserve_by_residual_regularization}
+data:
+  inherit_reference_roles_from: artifacts/perception_gain_v2/DATA_ROLES.json
+  train_reference_limit: 64
+  minimum_legal_train_references: 8
+  directed_pairs_per_reference_maximum: 4
+  ordering_salt: 'short-module-v1:'
+  cal_expected_references: 4
+  cal_expected_logical_pairs: 23
+  sel_expected_references: 4
+  sel_expected_logical_pairs: 24
+  t1_population: unique_physical_scan_union_of_same_role_pairs
+  t1_requires_separate_single_scan_forward: true
+  train_record_mix_per_update: {T2: 3, T1: 1}
+  sampled_candidates_per_record: 4
+  sampling: uniform_reference_then_record_then_candidate
+  resample_by_module_loss: false
+  new_feature_cache_limit_gib: 32
+  raw_dataset_and_ground_truth_publication: false
+features:
+  region_bbox_expansion_metres: 0.10
+  empty_support_top_logit_segments: 32
+  exploration_segments: 32
+  common_h: [mean_positive_segment_features, mean_region_plus_exploration_features]
+  q_inputs: [query, mean_h, absolute_two_stage_h_difference, class_probability_vector, class_one_hot, parent_score, support_fraction_min_max, foreground_probability_min_max, observed_H_over_2]
+  m_inputs: [query, h, class_one_hot]
+heads:
+  quality_hidden_widths: [128, 64]
+  q1_q2_share_initial_state_per_seed: true
+  q3_monotone_logits: cumulative_negative_softplus_increments
+  q3_increment_initial_bias: -4.0
+  q3_thresholds: read_bound_official_primary_temporal_ap_thresholds
+  q3_output_score: mean_threshold_outputs
+  multiply_original_score_after_quality_head: false
+  geometry_hidden_width: 128
+  geometry_output: feature_dimension_plus_one
+  geometry_last_layer_zero_init: true
+  geometry_logit_residual_bound: 2.0
+  geometry_formula: 'original_logit + 2*tanh(F_dot_a/sqrt(D) + b)'
+  geometry_regularization: 0.01
+  geometry_training_differentiable_logits_only: true
+  geometry_evaluation: original_segment_logit_materialization
+labels:
+  quality_assignment: temporal_overlap_desc_then_concat_iou_desc_then_gt_stable_id
+  quality_labels_use_score_sorted_tp_fp: false
+  supervision_ambiguity: exclude_explicit_unresolved_and_report_unavailable_metadata
+  geometry_assignment: same_frozen_class_compatible_one_to_one_concat_iou_assignment
+  geometry_match_minimum_iou: 0.10
+  geometry_multi_to_one_assignment: false
+  geometry_same_gt_entity_across_stages: true
+  geometry_maximum_segments_per_candidate_per_stage: 2048
+  geometry_point_weight: known_label_vertex_count_per_low_resolution_segment
+  geometry_dice_smoothing: 1.0
+  geometry_loss_mean_denominator: all_sampled_candidate_positions
+training:
+  first_seed: 45
+  replication_seed: 46
+  eval_seed: 45
+  updates: 1500
+  saved_updates: [0, 500, 1000, 1500]
+  selectable_trained_updates: [500, 1000, 1500]
+  last_checkpoint_every: 100
+  optimizer: AdamW
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  betas: [0.9, 0.999]
+  epsilon: 0.00000001
+  warmup_updates: 75
+  scheduler: cosine
+  minimum_learning_rate_fraction: 0.1
+  gradient_clip_norm: 1.0
+  precision: float32
+  fresh_head_from_parent_for_every_arm: true
+  replication_schedule_horizon_remains: 1500
+selection:
+  primary: native_T2_official_pooled_t_mAP
+  guard: true_single_scan_T1_spatial_mAP
+  cal_rank: [T2_AP_desc, T1_AP_desc, selected_update_asc]
+  lock_all_arms_before_SEL: true
+  all_six_arms_get_fixed_checkpoint_SEL: true
+  tie_tolerance_ap: 0.000001
+  target_T2_delta_ap: 0.005
+  maximum_T1_drop_ap: 0.002
+  positive_SEL_references_for_consistency: 3
+  replication_eligibility: positive_T2_delta_and_complete_T1_guard
+  required_mechanism_controls: {Q2: Q1, Q3: Q2, M1: M0, M2: M1}
+  shortlist_multiple: true
+  no_positive_modules_allowed: true
+  evidence_ceiling_this_round: development_replicated
+budget:
+  prior_usage_reference_gpu_hours: 78.94
+  reconcile_actual_ledger_before_running: true
+  cumulative_cap_gpu_hours: 192
+  incremental_round_cap_gpu_hours: 48
+  categories_gpu_hours:
+    export_and_baseline: 20
+    heads_and_replication: 8
+    evaluation_and_profile: 16
+    recovery: 4
+  maximum_simultaneous_gpus: 2
+  cpu_workers: 8
+  ram_gib: 96
+  tests_cpu_wall_minutes_target: 20
+  gpu_smoke_hours_target: 0.5
+publication:
+  execute_git_push: true
+  tag_base: rescene-short-module-screen-v1
+  small_head_git_limit_mib: 20
+  release_asset_limit_gib: 1
+  preserve_existing_assets_and_tags: true
+  current_scope_has_no_combination_bundle: true
+  receipt_external_to_commit_B: true
+  unavailable_release_state: CODE_ONLY

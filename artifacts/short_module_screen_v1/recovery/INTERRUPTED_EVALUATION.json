@@ -1,0 +1,13 @@
+{
+  "event_id": "evaluate-cal:2026-09-28T14:49:49.205402+00:00",
+  "pid": 829941,
+  "terminal_status": "INTERRUPTED",
+  "signal": "SIGINT",
+  "reason": "Primary review identified a mask-head preservation regularization bug before CAL locking. The process was deliberately stopped and M heads were retrained from the same initialization after correction.",
+  "original_elapsed_seconds": 916.2314423000207,
+  "original_gpu_hours_retained_in_ledger": 0.25450873397222795,
+  "additional_gpu_hours": 0,
+  "CAL_lock_existed_at_interruption": false,
+  "head_SEL_had_started": false,
+  "original_event_preserved": true
+}
