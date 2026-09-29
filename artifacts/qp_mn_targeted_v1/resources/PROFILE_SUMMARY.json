@@ -1,0 +1,150 @@
+{
+  "condition": "NOAUG_NATIVE",
+  "measurement_rows": 96,
+  "record_selection": "SHA256(input_id) minimum per SEL reference",
+  "reload_checks": [
+    {
+      "bundle_bytes": 388582,
+      "bundle_sha256": "284cf9f39e78a62abd73315f4dd73a884c24b850d90421cd13d5db6af99acfcf",
+      "equal": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      },
+      "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+      "module": "Q2_F"
+    },
+    {
+      "bundle_bytes": 389734,
+      "bundle_sha256": "64d4f7291f7bef6cadfec86132c6beda3e3893d0463dc5b53d5c3a6d208c57bf",
+      "equal": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      },
+      "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+      "module": "Q_A0"
+    },
+    {
+      "bundle_bytes": 389734,
+      "bundle_sha256": "8bcf31ff838378ce960a385ed95c95fb592c2ef0c3bb57d79808a00f537ceedc",
+      "equal": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      },
+      "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+      "module": "Q_P"
+    },
+    {
+      "bundle_bytes": 278504,
+      "bundle_sha256": "1b1faa3db592f980c9a0f7f7ea9d9029d32db7ad75a997a793f7502712d77d21",
+      "equal": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      },
+      "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+      "module": "M_C"
+    },
+    {
+      "bundle_bytes": 278504,
+      "bundle_sha256": "4da855d4bc911bc15439794ad19da4b66ada1aaa0b31da4e61c82da490076c42",
+      "equal": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      },
+      "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+      "module": "M_N"
+    }
+  ],
+  "selected_records": [
+    {
+      "context_index": 40,
+      "dataset_horizon": 5,
+      "horizon": 2,
+      "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+      "logical_unit_id": "SEL:T2:00004",
+      "master_sequence_id": "scene0083_04-scene0083_00-scene0083_03-scene0083_01-scene0083_02",
+      "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c",
+      "role": "SEL",
+      "scan_ids": [
+        "scene0083_04",
+        "scene0083_00"
+      ],
+      "scan_indices": [
+        197,
+        193
+      ]
+    },
+    {
+      "context_index": 51,
+      "dataset_horizon": 5,
+      "horizon": 2,
+      "input_id": "e3709053f7fbc2aa77b559f5afea0f1a7d3f43f1bb3bae34c68a69c2f6130eb4",
+      "logical_unit_id": "SEL:T2:00009",
+      "master_sequence_id": "scene0123_04-scene0123_01-scene0123_00-scene0123_03-scene0123_02",
+      "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2",
+      "role": "SEL",
+      "scan_ids": [
+        "scene0123_04",
+        "scene0123_01"
+      ],
+      "scan_indices": [
+        289,
+        286
+      ]
+    },
+    {
+      "context_index": 71,
+      "dataset_horizon": 5,
+      "horizon": 2,
+      "input_id": "5c2ccf86c9a5f8a8f240999c3ddfb3eeba3bea4511259cf69071ad622e994621",
+      "logical_unit_id": "SEL:T2:00012",
+      "master_sequence_id": "scene0175_02-scene0175_03-scene0175_07-scene0175_01-scene0175_06",
+      "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+      "role": "SEL",
+      "scan_ids": [
+        "scene0175_02",
+        "scene0175_03"
+      ],
+      "scan_indices": [
+        404,
+        405
+      ]
+    },
+    {
+      "context_index": 99,
+      "dataset_horizon": 5,
+      "horizon": 2,
+      "input_id": "c630009772d3ac6ab4c0c3cac9013a0ec8ea0b38d57b49c71ce504b21a60d20b",
+      "logical_unit_id": "SEL:T2:00022",
+      "master_sequence_id": "scene0194_04-scene0194_00-scene0194_01-scene0194_03-scene0194_05",
+      "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0",
+      "role": "SEL",
+      "scan_ids": [
+        "scene0194_04",
+        "scene0194_00"
+      ],
+      "scan_indices": [
+        461,
+        457
+      ]
+    }
+  ],
+  "setup_replay_seconds": 130.00660378905013,
+  "status": "COMPLETE",
+  "timing_scope": "Each method executes the full parent anew. Metrics, hashes and reload checks excluded. Disk IO reported separately.",
+  "warmup_rows": 24
+}

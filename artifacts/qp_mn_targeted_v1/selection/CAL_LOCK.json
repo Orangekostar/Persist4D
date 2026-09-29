@@ -1,0 +1,76 @@
+{
+  "all_arms_locked_before_SEL": true,
+  "condition": "NOAUG_NATIVE",
+  "evidence": [
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/ad323d4c14e77036/Q2_F/seed45/CAL-0500.json",
+      "sha256": "3ac4a18973c39570529a35a6dfeb9b2dc7d06e00bc1713b06f3e8e24f345fe10"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/0de6767a51f46465/Q2_F/seed45/CAL-1000.json",
+      "sha256": "d16dbf117447b09dc60d86a866cda9cdf7279981b69ed6987060feaa7789ef85"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/851bd3581ecef122/Q2_F/seed45/CAL-1500.json",
+      "sha256": "030fc34d72e3974a6da78997a5f582142b0158abb043ce5ce12d260bc18f253a"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/b137030876eaf3ff/Q_A0/seed45/CAL-0500.json",
+      "sha256": "6e09b361a4d6137e009a404292dad5ab0daccd4ac7387dcc1783c77dc32b443b"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/d44e399540cc3aec/Q_A0/seed45/CAL-1000.json",
+      "sha256": "78f6db7ca8b3043cf2e8c2d777299100f895d8b62990fd17a024cf322328facd"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/04fd86be67fda2d5/Q_A0/seed45/CAL-1500.json",
+      "sha256": "cf6c79bdcd2a9f80bdc7e2b2eecc7fd4ab582b52430a9bb55da0fb01dafc7586"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/1ff06d84f21a4118/Q_P/seed45/CAL-0500.json",
+      "sha256": "d82cf537c1fddad9c3d46cbc1018cdf4cde9d6757527d7fec45c8bddfe63e175"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/0364b3f697cdc144/Q_P/seed45/CAL-1000.json",
+      "sha256": "1d73bb26c8edfee368620cfce5c7d99221816fdd72487b50c477e80b38665bc0"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/3f4f0c2e6060db61/Q_P/seed45/CAL-1500.json",
+      "sha256": "66354e121a6282d781052e65eade319c5523c771ae0a267fb69923bc1a2b9d1d"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/35430c1adec8d801/M_C/seed45/CAL-0500.json",
+      "sha256": "4d5e4bb35a3c292cd651ca05ff112a5334f1d111e55a30d8d9d0c07609ddfa48"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/8244eadbb80e894c/M_C/seed45/CAL-1000.json",
+      "sha256": "48d3aed2197ae8be4f5a9010a2ed07ad1f1f4bedaef37a94b9b6e4cd2c0e4986"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/74165e4fdf34b6cf/M_C/seed45/CAL-1500.json",
+      "sha256": "665b27ddf516e3db2f8dd8f8f6f6ee7eb9201941fba48c3bc62a491c377f35f9"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/5acf08758cc8b9a3/M_N/seed45/CAL-0500.json",
+      "sha256": "d8eced9bf2a2e5adbeb28e53a25634091db9f3341458388c307afbd97da3ee95"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/3a977e89cb18693e/M_N/seed45/CAL-1000.json",
+      "sha256": "f797aa9d7a206ff63ce80f4d5176418ba88da959ff40070f034cd51c9902a6e0"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/evaluation/f704e1227a90a717/M_N/seed45/CAL-1500.json",
+      "sha256": "3604cc3b74ba08492db636e8d9b35c3874a5f6d09205cdacd08cbf3882ada957"
+    }
+  ],
+  "schema": "qp-mn-cal-lock-v1",
+  "seed": 45,
+  "selected_updates": {
+    "M_C": 500,
+    "M_N": 1500,
+    "Q2_F": 1500,
+    "Q_A0": 1000,
+    "Q_P": 500
+  },
+  "selection": "T2 descending, T1 descending, earlier step; tolerance1e-6"
+}

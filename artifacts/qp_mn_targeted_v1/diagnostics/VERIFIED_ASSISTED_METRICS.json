@@ -1,0 +1,137 @@
+{
+  "rows": [
+    {
+      "H": 1,
+      "diagnostic": "B0",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/CAL-H1-B0.json",
+      "evidence_sha256": "4b9a4db77c97e453202d7d6b2e6ce9e978594523558e217f36072da467bc0646",
+      "full_input_count": 23,
+      "official_AP": 0.521016538143158,
+      "recomputed": 0.521016538143158,
+      "role": "CAL",
+      "status": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "H": 1,
+      "diagnostic": "GT_LOOSE_MASK_DIAGNOSTIC",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/CAL-H1-GT_LOOSE_MASK_DIAGNOSTIC.json",
+      "evidence_sha256": "cd7c4f781a7901f51c8adf571ec46219ca4159cd53a64bbf5ba815c26ef6965b",
+      "full_input_count": 23,
+      "official_AP": 0.6025784611701965,
+      "recomputed": 0.6025784611701965,
+      "role": "CAL",
+      "status": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "H": 1,
+      "diagnostic": "GT_QUALITY_SCORE_DIAGNOSTIC",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/CAL-H1-GT_QUALITY_SCORE_DIAGNOSTIC.json",
+      "evidence_sha256": "01479b35730b49e311795531b73760c434980dcd25ffa798293266d2a1669d46",
+      "full_input_count": 23,
+      "official_AP": 0.3471626043319702,
+      "recomputed": 0.3471626043319702,
+      "role": "CAL",
+      "status": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "H": 2,
+      "diagnostic": "B0",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/CAL-H2-B0.json",
+      "evidence_sha256": "a5dfb329613377f01113fa1d4d8df677bdaab3ba1a61c00d9d1168407d33c098",
+      "full_input_count": 23,
+      "official_AP": 0.365048885345459,
+      "recomputed": 0.365048885345459,
+      "role": "CAL",
+      "status": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "H": 2,
+      "diagnostic": "GT_LOOSE_MASK_DIAGNOSTIC",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/CAL-H2-GT_LOOSE_MASK_DIAGNOSTIC.json",
+      "evidence_sha256": "18de18320db36982d4c36ef9ccd2c7d04a000f44c83e1992b23628dd9d0b1d4a",
+      "full_input_count": 23,
+      "official_AP": 0.43635740876197815,
+      "recomputed": 0.43635740876197815,
+      "role": "CAL",
+      "status": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "H": 2,
+      "diagnostic": "GT_QUALITY_SCORE_DIAGNOSTIC",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/CAL-H2-GT_QUALITY_SCORE_DIAGNOSTIC.json",
+      "evidence_sha256": "0d94a816d29c2a0c2b48645cf8e17937d72c361d6cffc6412320df3b94236761",
+      "full_input_count": 23,
+      "official_AP": 0.29650816321372986,
+      "recomputed": 0.29650816321372986,
+      "role": "CAL",
+      "status": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "H": 1,
+      "diagnostic": "B0",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/TRAIN-H1-B0.json",
+      "evidence_sha256": "746c41cd87b0be90123141ec530e4430d7b74873cdbaf05242de79a80e686b12",
+      "full_input_count": 22,
+      "official_AP": 0.5825273990631104,
+      "recomputed": 0.5825273990631104,
+      "role": "TRAIN",
+      "status": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "H": 1,
+      "diagnostic": "GT_LOOSE_MASK_DIAGNOSTIC",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/TRAIN-H1-GT_LOOSE_MASK_DIAGNOSTIC.json",
+      "evidence_sha256": "d509b64347f80eabdb67141907799286a62861570118b62aa7e1a2a0a9eb5a96",
+      "full_input_count": 22,
+      "official_AP": 0.6665105819702148,
+      "recomputed": 0.6665105819702148,
+      "role": "TRAIN",
+      "status": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "H": 1,
+      "diagnostic": "GT_QUALITY_SCORE_DIAGNOSTIC",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/TRAIN-H1-GT_QUALITY_SCORE_DIAGNOSTIC.json",
+      "evidence_sha256": "ea5bda062fb7a31634aa8eb77457033b8213b4dd5822143ef9f16e4a3aae39b4",
+      "full_input_count": 22,
+      "official_AP": 0.3988373279571533,
+      "recomputed": 0.3988373279571533,
+      "role": "TRAIN",
+      "status": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "H": 2,
+      "diagnostic": "B0",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/TRAIN-H2-B0.json",
+      "evidence_sha256": "a3c041a982a6601174d9106a5d84c44589c783d171772b1db00f480c90837557",
+      "full_input_count": 16,
+      "official_AP": 0.4596291184425354,
+      "recomputed": 0.4596291184425354,
+      "role": "TRAIN",
+      "status": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "H": 2,
+      "diagnostic": "GT_LOOSE_MASK_DIAGNOSTIC",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/TRAIN-H2-GT_LOOSE_MASK_DIAGNOSTIC.json",
+      "evidence_sha256": "e9f4e22a78ab3f43eaeec174c8b4ab2da5bf89595f613f2a2fcd651deb233e51",
+      "full_input_count": 16,
+      "official_AP": 0.5276398658752441,
+      "recomputed": 0.5276398658752441,
+      "role": "TRAIN",
+      "status": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "H": 2,
+      "diagnostic": "GT_QUALITY_SCORE_DIAGNOSTIC",
+      "evidence_path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/diagnostics/evidence/TRAIN-H2-GT_QUALITY_SCORE_DIAGNOSTIC.json",
+      "evidence_sha256": "66767e531c4d09f38406c8196489120567137829429928dfcd3180ac933dddbb",
+      "full_input_count": 16,
+      "official_AP": 0.37672221660614014,
+      "recomputed": 0.37672221660614014,
+      "role": "TRAIN",
+      "status": "DIAGNOSTIC_ONLY"
+    }
+  ],
+  "status": "PASS"
+}

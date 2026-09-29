@@ -1,0 +1,46 @@
+{
+  "status": "RECOMMENDATIONS_ONLY",
+  "execution_authorized": false,
+  "default_remains": "B0",
+  "expected_gain": null,
+  "decisions": [
+    {
+      "candidate": "Q-R",
+      "decision": "可作为下一轮候选，先核对排序目标与重复候选处理",
+      "evidence": [
+        {"path": "diagnostics/QUALITY_RANKING.csv", "line": 12, "finding": "Q-P CAL500破坏2317个原正确排序；总体inversions从B0的5915降到4121，仍未带来AP净收益"},
+        {"path": "diagnostics/GT_ASSISTED_OFFICIAL.csv", "line": 7, "finding": "完整CAL H2 GT质量评分辅助AP为0.2965081632，低于同条件B0的0.3650488853"},
+        {"path": "diagnostics/DUPLICATE_POSITIONS.csv", "finding": "保留全部重复候选并逐输入记录query/class/retained位置"}
+      ],
+      "limitation": "标量MSE与子集排序改善不等于完整官方AP改善；未训练任何关系头，不能声称Q-R必然有效或全部评分学习不可行"
+    },
+    {
+      "candidate": "M-S",
+      "decision": "可作为下一轮监督覆盖候选，尚未验证重采样或多对一收益",
+      "evidence": [
+        {"path": "diagnostics/M_GRADIENT_COMPONENTS.csv", "lines": [2,3,4,5,6,7], "finding": "同一参数上M-N形状梯度为M-C的16/8/16倍，正则梯度未按该比例放大"},
+        {"path": "diagnostics/RESIDUAL_REACHABILITY.csv", "filter": "role=TRAIN and assigned_gt present", "finding": "固定TRAIN panel中315个合法配对候选有185个在1500步抽样中从未接受形状监督"}
+      ],
+      "limitation": "当前M-N在B0和M-C两种比较下均为负；梯度增强已验证，覆盖不足的因果贡献仍未验证。没有修改本轮assignment或采样"
+    },
+    {
+      "candidate": "M-L",
+      "decision": "可作为下一轮表示/物化边界候选，先保留容量与优化两种解释",
+      "evidence": [
+        {"path": "diagnostics/RESIDUAL_REACHABILITY.csv", "filter": "role=TRAIN and assigned_gt present", "finding": "186273个raw错误已知点位置中124594个来自严格|z|>2的错误segment；按候选位置累计，并非唯一物理点"},
+        {"path": "diagnostics/GT_ASSISTED_OFFICIAL.csv", "line": 6, "finding": "CAL H2宽松GT mask辅助AP为0.4363574088，B0为0.3650488853；不是官方AP上界"},
+        {"path": "diagnostics/probes/M_FIT_DIAGNOSTIC/GEOMETRY.csv", "finding": "固定16候选500步后15个IoU改善；平均物化IoU从0.7053965703到0.7658186965，仍有1个下降"}
+      ],
+      "limitation": "探针仅为TRAIN局部拟合；不能归因于单一容量瓶颈，不能当作泛化证据。严格边界与FP32饱和另外计数，未扩大±2残差"
+    },
+    {
+      "candidate": "M-C independent confirmation",
+      "decision": "仅建议后续独立确认，不自动组合或替换B0",
+      "evidence": [
+        {"path": "evaluation/MAIN_TABLE.csv", "line": 6, "finding": "固定500步SEL T2增益：seed45为0.0020584464，seed46为0.0061262250；T1均通过保护"},
+        {"path": "selection/SHORTLIST.json", "finding": "seed45仅2/4 reference为正，confirmed为空；M-C仅列provisional"}
+      ],
+      "limitation": "不满足DEVELOPMENT_REPLICATED门槛，不是显著性或正式测试结论；本轮不运行PB/LOCAL/ADDITIONAL和Q+M"
+    }
+  ]
+}

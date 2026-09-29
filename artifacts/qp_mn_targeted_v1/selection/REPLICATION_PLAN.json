@@ -1,0 +1,16 @@
+{
+  "candidates": [
+    "M_C"
+  ],
+  "rule": "all protected positives; methods paired at method selected step plus at most control own locked point",
+  "schedule_horizon": 1500,
+  "seed": 46,
+  "seed46_selection_allowed": false,
+  "source_lock_sha256": "5bd52e8244de451009ca274518425c6ca38d6dbeca7630a1509b6c8b72d31121",
+  "source_sel_sha256": "ee3ec4e029ce842db08d7faa25eed5545a3c1adcec8f17b76a31e1d62d070342",
+  "steps": {
+    "M_C": [
+      500
+    ]
+  }
+}

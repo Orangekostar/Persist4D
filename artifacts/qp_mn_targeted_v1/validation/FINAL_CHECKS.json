@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "command": "/home/ww/miniconda3/bin/ruff check models/qp_mn_heads.py scripts/qp_mn_*.py tests/test_qp_mn_*.py",
+      "chunk_id": "4b9a0c",
+      "wall_time_seconds": 0.00000911,
+      "exit_code": 0,
+      "original_token_count": 5,
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": "git diff --check",
+      "chunk_id": "873572",
+      "wall_time_seconds": 0.000008821,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    },
+    {
+      "command": "OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 /home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q tests/test_qp_mn_campaign.py tests/test_qp_mn_delivery.py tests/test_qp_mn_publication.py tests/test_qp_mn_results.py",
+      "chunk_id": "4c783c",
+      "wall_time_seconds": 0.000004125,
+      "exit_code": 0,
+      "original_token_count": 177,
+      "output": "....                                                                     [100%]\n=============================== warnings summary ===============================\ntests/test_qp_mn_campaign.py::test_stage_receipt_cannot_reuse_changed_output_or_dependency\n  /home/ww/miniconda3/envs/persist4d/lib/python3.10/site-packages/albumentations/augmentations/geometric/functional.py:8: DeprecationWarning: Please import `gaussian_filter` from the `scipy.ndimage` namespace; the `scipy.ndimage.filters` namespace is deprecated and will be removed in SciPy 2.0.0.\n    from scipy.ndimage.filters import gaussian_filter\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 1 warning in 4.32s\n"
+    }
+  ]
+}

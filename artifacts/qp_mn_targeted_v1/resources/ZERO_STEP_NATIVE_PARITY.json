@@ -1,0 +1,53 @@
+{
+  "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+  "native_NOAUG_cache_equal": {
+    "pred_classes": true,
+    "pred_masks": true,
+    "pred_scores": true,
+    "source_class_ids": true,
+    "source_query_ids": true
+  },
+  "rows": [
+    {
+      "module": "Q_A0",
+      "same_as_B0": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": false,
+        "source_class_ids": true,
+        "source_query_ids": true
+      }
+    },
+    {
+      "module": "Q_P",
+      "same_as_B0": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      }
+    },
+    {
+      "module": "M_C",
+      "same_as_B0": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      }
+    },
+    {
+      "module": "M_N",
+      "same_as_B0": {
+        "pred_classes": true,
+        "pred_masks": true,
+        "pred_scores": true,
+        "source_class_ids": true,
+        "source_query_ids": true
+      }
+    }
+  ],
+  "status": "PASS"
+}

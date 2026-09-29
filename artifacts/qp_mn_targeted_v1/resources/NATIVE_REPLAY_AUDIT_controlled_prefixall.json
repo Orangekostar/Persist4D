@@ -1,0 +1,1306 @@
+{
+  "environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "MKL_NUM_THREADS": "2",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2"
+  },
+  "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+  "rows": [
+    {
+      "audit": {
+        "actual_loaded_paths": [
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_04.npy",
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_00.npy"
+        ],
+        "candidate_count": 100,
+        "cuda_peak_allocated": 2600823808,
+        "descriptor_seconds": 0.058370877988636494,
+        "dimensions": {
+          "classes": 18,
+          "feature_dim": 128,
+          "probability_dim": 19,
+          "query_dim": 128
+        },
+        "elapsed_seconds": 0.7122990230564028,
+        "full_vertex_count": 24469,
+        "horizon": 2,
+        "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+        "input_seconds": 0.04277278401423246,
+        "native_equality": {
+          "pred_classes": true,
+          "pred_masks": true,
+          "pred_scores": true
+        },
+        "parent_eval": true,
+        "parent_frozen": true,
+        "parent_network_seconds": 0.3521577949868515,
+        "segment_count": 694
+      },
+      "cache_coordinates": {
+        "coordinates": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469,
+            3
+          ],
+          "shape": [
+            24469,
+            3
+          ]
+        }
+      },
+      "cache_prediction": {
+        "pred_classes": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "pred_masks": {
+          "different_values": 101805,
+          "equal": false,
+          "max_absolute_difference": 1.0,
+          "other_shape": [
+            24469,
+            100
+          ],
+          "shape": [
+            24469,
+            100
+          ]
+        },
+        "pred_scores": {
+          "different_values": 93,
+          "equal": false,
+          "max_absolute_difference": 0.003427863121032715,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 90,
+          "equal": false,
+          "max_absolute_difference": 89.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        }
+      },
+      "cache_soft": {
+        "class_probabilities": {
+          "different_values": 1900,
+          "equal": false,
+          "max_absolute_difference": 0.9990462568639487,
+          "other_shape": [
+            100,
+            19
+          ],
+          "shape": [
+            100,
+            19
+          ]
+        },
+        "full_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        },
+        "low_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            18752
+          ],
+          "shape": [
+            18752
+          ]
+        },
+        "query_features": {
+          "different_values": 12800,
+          "equal": false,
+          "max_absolute_difference": 3.813313066959381,
+          "other_shape": [
+            100,
+            128
+          ],
+          "shape": [
+            100,
+            128
+          ]
+        },
+        "segment_features": {
+          "different_values": 88826,
+          "equal": false,
+          "max_absolute_difference": 0.15524768829345703,
+          "other_shape": [
+            694,
+            128
+          ],
+          "shape": [
+            694,
+            128
+          ]
+        },
+        "segment_logits": {
+          "different_values": 69400,
+          "equal": false,
+          "max_absolute_difference": 82.32241106033325,
+          "other_shape": [
+            694,
+            100
+          ],
+          "shape": [
+            694,
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 90,
+          "equal": false,
+          "max_absolute_difference": 89.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "voxel_inverse": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        }
+      },
+      "previous_prediction": null,
+      "repeat": 0
+    },
+    {
+      "audit": {
+        "actual_loaded_paths": [
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_04.npy",
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_00.npy"
+        ],
+        "candidate_count": 100,
+        "cuda_peak_allocated": 2600823808,
+        "descriptor_seconds": 0.042408448993228376,
+        "dimensions": {
+          "classes": 18,
+          "feature_dim": 128,
+          "probability_dim": 19,
+          "query_dim": 128
+        },
+        "elapsed_seconds": 0.6639215259347111,
+        "full_vertex_count": 24469,
+        "horizon": 2,
+        "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+        "input_seconds": 0.03962417098227888,
+        "native_equality": {
+          "pred_classes": true,
+          "pred_masks": true,
+          "pred_scores": true
+        },
+        "parent_eval": true,
+        "parent_frozen": true,
+        "parent_network_seconds": 0.34862176596652716,
+        "segment_count": 694
+      },
+      "cache_coordinates": {
+        "coordinates": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469,
+            3
+          ],
+          "shape": [
+            24469,
+            3
+          ]
+        }
+      },
+      "cache_prediction": {
+        "pred_classes": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "pred_masks": {
+          "different_values": 101805,
+          "equal": false,
+          "max_absolute_difference": 1.0,
+          "other_shape": [
+            24469,
+            100
+          ],
+          "shape": [
+            24469,
+            100
+          ]
+        },
+        "pred_scores": {
+          "different_values": 93,
+          "equal": false,
+          "max_absolute_difference": 0.003427863121032715,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 90,
+          "equal": false,
+          "max_absolute_difference": 89.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        }
+      },
+      "cache_soft": {
+        "class_probabilities": {
+          "different_values": 1900,
+          "equal": false,
+          "max_absolute_difference": 0.9990462568639487,
+          "other_shape": [
+            100,
+            19
+          ],
+          "shape": [
+            100,
+            19
+          ]
+        },
+        "full_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        },
+        "low_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            18752
+          ],
+          "shape": [
+            18752
+          ]
+        },
+        "query_features": {
+          "different_values": 12800,
+          "equal": false,
+          "max_absolute_difference": 3.813313066959381,
+          "other_shape": [
+            100,
+            128
+          ],
+          "shape": [
+            100,
+            128
+          ]
+        },
+        "segment_features": {
+          "different_values": 88826,
+          "equal": false,
+          "max_absolute_difference": 0.15524768829345703,
+          "other_shape": [
+            694,
+            128
+          ],
+          "shape": [
+            694,
+            128
+          ]
+        },
+        "segment_logits": {
+          "different_values": 69400,
+          "equal": false,
+          "max_absolute_difference": 82.32241106033325,
+          "other_shape": [
+            694,
+            100
+          ],
+          "shape": [
+            694,
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 90,
+          "equal": false,
+          "max_absolute_difference": 89.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "voxel_inverse": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        }
+      },
+      "previous_prediction": {
+        "pred_classes": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "pred_masks": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469,
+            100
+          ],
+          "shape": [
+            24469,
+            100
+          ]
+        },
+        "pred_scores": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        }
+      },
+      "repeat": 1
+    },
+    {
+      "audit": {
+        "actual_loaded_paths": [
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_04.npy",
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_00.npy"
+        ],
+        "candidate_count": 100,
+        "cuda_peak_allocated": 2600823808,
+        "descriptor_seconds": 0.045240725041367114,
+        "dimensions": {
+          "classes": 18,
+          "feature_dim": 128,
+          "probability_dim": 19,
+          "query_dim": 128
+        },
+        "elapsed_seconds": 0.6167930630035698,
+        "full_vertex_count": 24469,
+        "horizon": 2,
+        "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+        "input_seconds": 0.03163520304951817,
+        "native_equality": {
+          "pred_classes": true,
+          "pred_masks": true,
+          "pred_scores": true
+        },
+        "parent_eval": true,
+        "parent_frozen": true,
+        "parent_network_seconds": 0.2899565070401877,
+        "segment_count": 694
+      },
+      "cache_coordinates": {
+        "coordinates": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469,
+            3
+          ],
+          "shape": [
+            24469,
+            3
+          ]
+        }
+      },
+      "cache_prediction": {
+        "pred_classes": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "pred_masks": {
+          "different_values": 101805,
+          "equal": false,
+          "max_absolute_difference": 1.0,
+          "other_shape": [
+            24469,
+            100
+          ],
+          "shape": [
+            24469,
+            100
+          ]
+        },
+        "pred_scores": {
+          "different_values": 93,
+          "equal": false,
+          "max_absolute_difference": 0.003427863121032715,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 90,
+          "equal": false,
+          "max_absolute_difference": 89.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        }
+      },
+      "cache_soft": {
+        "class_probabilities": {
+          "different_values": 1900,
+          "equal": false,
+          "max_absolute_difference": 0.9990462568639487,
+          "other_shape": [
+            100,
+            19
+          ],
+          "shape": [
+            100,
+            19
+          ]
+        },
+        "full_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        },
+        "low_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            18752
+          ],
+          "shape": [
+            18752
+          ]
+        },
+        "query_features": {
+          "different_values": 12800,
+          "equal": false,
+          "max_absolute_difference": 3.813313066959381,
+          "other_shape": [
+            100,
+            128
+          ],
+          "shape": [
+            100,
+            128
+          ]
+        },
+        "segment_features": {
+          "different_values": 88826,
+          "equal": false,
+          "max_absolute_difference": 0.15524768829345703,
+          "other_shape": [
+            694,
+            128
+          ],
+          "shape": [
+            694,
+            128
+          ]
+        },
+        "segment_logits": {
+          "different_values": 69400,
+          "equal": false,
+          "max_absolute_difference": 82.32241106033325,
+          "other_shape": [
+            694,
+            100
+          ],
+          "shape": [
+            694,
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 90,
+          "equal": false,
+          "max_absolute_difference": 89.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "voxel_inverse": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        }
+      },
+      "previous_prediction": {
+        "pred_classes": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "pred_masks": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469,
+            100
+          ],
+          "shape": [
+            24469,
+            100
+          ]
+        },
+        "pred_scores": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        }
+      },
+      "repeat": 2
+    },
+    {
+      "trace_differences": {
+        "model.backbone.model.dec.dec0": {
+          "coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              18752,
+              5
+            ],
+            "shape": [
+              18752,
+              5
+            ]
+          },
+          "feat": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              18752,
+              96
+            ],
+            "shape": [
+              18752,
+              96
+            ]
+          },
+          "grid_coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              18752,
+              3
+            ],
+            "shape": [
+              18752,
+              3
+            ]
+          },
+          "serialized_order": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              8,
+              18752
+            ],
+            "shape": [
+              8,
+              18752
+            ]
+          }
+        },
+        "model.backbone.model.dec.dec1": {
+          "coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              12442,
+              5
+            ],
+            "shape": [
+              12442,
+              5
+            ]
+          },
+          "feat": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              12442,
+              96
+            ],
+            "shape": [
+              12442,
+              96
+            ]
+          },
+          "grid_coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              12442,
+              3
+            ],
+            "shape": [
+              12442,
+              3
+            ]
+          },
+          "serialized_order": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              8,
+              12442
+            ],
+            "shape": [
+              8,
+              12442
+            ]
+          }
+        },
+        "model.backbone.model.dec.dec2": {
+          "coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              5305,
+              5
+            ],
+            "shape": [
+              5305,
+              5
+            ]
+          },
+          "feat": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              5305,
+              192
+            ],
+            "shape": [
+              5305,
+              192
+            ]
+          },
+          "grid_coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              5305,
+              3
+            ],
+            "shape": [
+              5305,
+              3
+            ]
+          },
+          "serialized_order": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              8,
+              5305
+            ],
+            "shape": [
+              8,
+              5305
+            ]
+          }
+        },
+        "model.backbone.model.dec.dec3": {
+          "coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              1564,
+              5
+            ],
+            "shape": [
+              1564,
+              5
+            ]
+          },
+          "feat": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              1564,
+              384
+            ],
+            "shape": [
+              1564,
+              384
+            ]
+          },
+          "grid_coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              1564,
+              3
+            ],
+            "shape": [
+              1564,
+              3
+            ]
+          },
+          "serialized_order": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              8,
+              1564
+            ],
+            "shape": [
+              8,
+              1564
+            ]
+          }
+        },
+        "model.backbone.model.embedding": {
+          "coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              18752,
+              5
+            ],
+            "shape": [
+              18752,
+              5
+            ]
+          },
+          "feat": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              18752,
+              48
+            ],
+            "shape": [
+              18752,
+              48
+            ]
+          },
+          "grid_coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              18752,
+              3
+            ],
+            "shape": [
+              18752,
+              3
+            ]
+          }
+        },
+        "model.backbone.model.enc.enc0": {
+          "coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              18752,
+              5
+            ],
+            "shape": [
+              18752,
+              5
+            ]
+          },
+          "feat": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              18752,
+              48
+            ],
+            "shape": [
+              18752,
+              48
+            ]
+          },
+          "grid_coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              18752,
+              3
+            ],
+            "shape": [
+              18752,
+              3
+            ]
+          },
+          "serialized_order": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              4,
+              18752
+            ],
+            "shape": [
+              4,
+              18752
+            ]
+          }
+        },
+        "model.backbone.model.enc.enc1": {
+          "coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              12442,
+              5
+            ],
+            "shape": [
+              12442,
+              5
+            ]
+          },
+          "feat": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              12442,
+              96
+            ],
+            "shape": [
+              12442,
+              96
+            ]
+          },
+          "grid_coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              12442,
+              3
+            ],
+            "shape": [
+              12442,
+              3
+            ]
+          },
+          "serialized_order": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              4,
+              12442
+            ],
+            "shape": [
+              4,
+              12442
+            ]
+          }
+        },
+        "model.backbone.model.enc.enc2": {
+          "coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              5305,
+              5
+            ],
+            "shape": [
+              5305,
+              5
+            ]
+          },
+          "feat": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              5305,
+              192
+            ],
+            "shape": [
+              5305,
+              192
+            ]
+          },
+          "grid_coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              5305,
+              3
+            ],
+            "shape": [
+              5305,
+              3
+            ]
+          },
+          "serialized_order": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              4,
+              5305
+            ],
+            "shape": [
+              4,
+              5305
+            ]
+          }
+        },
+        "model.backbone.model.enc.enc3": {
+          "coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              1564,
+              5
+            ],
+            "shape": [
+              1564,
+              5
+            ]
+          },
+          "feat": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              1564,
+              384
+            ],
+            "shape": [
+              1564,
+              384
+            ]
+          },
+          "grid_coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              1564,
+              3
+            ],
+            "shape": [
+              1564,
+              3
+            ]
+          },
+          "serialized_order": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              4,
+              1564
+            ],
+            "shape": [
+              4,
+              1564
+            ]
+          }
+        },
+        "model.backbone.model.enc.enc4": {
+          "coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              426,
+              5
+            ],
+            "shape": [
+              426,
+              5
+            ]
+          },
+          "feat": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              426,
+              512
+            ],
+            "shape": [
+              426,
+              512
+            ]
+          },
+          "grid_coord": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              426,
+              3
+            ],
+            "shape": [
+              426,
+              3
+            ]
+          },
+          "serialized_order": {
+            "different_values": 0,
+            "equal": true,
+            "max_absolute_difference": 0.0,
+            "other_shape": [
+              4,
+              426
+            ],
+            "shape": [
+              4,
+              426
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

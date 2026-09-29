@@ -1,0 +1,134 @@
+{
+  "base_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "checkpoints": [
+    {
+      "bytes": 291824,
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/training/M_C/seed46/update=0000.pt",
+      "sha256": "07f00ade6f3f5f1548bcb71b647fa0e111b18d84509f0b75539f9f3d13b12186",
+      "step": 0
+    },
+    {
+      "bytes": 841402,
+      "path": "/home/ww/persist4d_runs/qp_mn_targeted_v1/training/M_C/seed46/update=0500.pt",
+      "sha256": "cf85b81a6683af3a75209e6d8adfb69db265a2d077a47739e6236cb5754eebe6",
+      "step": 500
+    }
+  ],
+  "dimensions": {
+    "classes": 18,
+    "feature_dim": 128,
+    "probability_dim": 19,
+    "query_dim": 128
+  },
+  "first20_seconds": 1.263980365009047,
+  "forecast_1500_seconds": 94.79852737567853,
+  "geometry_policy": "frozen-v1",
+  "initial_parameter_sha256": "836d669ef6b1a1e5b9ec42e79afea3669cfe9ea4812829388e032e036944d8e4",
+  "label_identity_sha256": "70dced4153d5083fb832cd5d68075ca8f38c63772434c52a42ad9b29f27328a1",
+  "module": "M_C",
+  "optimizer_updates": 500,
+  "parameter_count": 68225,
+  "parent_loaded_in_training": false,
+  "sample_plan_sha256": "cf6d5c9719f4d765f01c5dcfb1cc4c2078171e70976fb26e9a3f47c12597e865",
+  "schedule_horizon": 1500,
+  "seed": 46,
+  "status": "COMPLETE",
+  "supervised_gradient_checks": [
+    {
+      "changed_parameters": {
+        "output.bias": true,
+        "output.weight": true,
+        "trunk.0.bias": false,
+        "trunk.0.weight": false
+      },
+      "parent_in_optimizer": false,
+      "preclip_gradient_norm": 0.019804587587714195,
+      "trunk_gradient_norm": 0.0,
+      "trunk_weight_decay_can_change_parameters_even_when_initial_gradient_zero": true,
+      "update": 1
+    },
+    {
+      "changed_parameters": {
+        "output.bias": true,
+        "output.weight": true,
+        "trunk.0.bias": true,
+        "trunk.0.weight": true
+      },
+      "parent_in_optimizer": false,
+      "preclip_gradient_norm": 0.04822854325175285,
+      "trunk_gradient_norm": 7.486327032707461e-05,
+      "trunk_weight_decay_can_change_parameters_even_when_initial_gradient_zero": true,
+      "update": 2
+    }
+  ],
+  "thresholds": [
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9
+  ],
+  "training_identity": {
+    "dimensions": {
+      "classes": 18,
+      "feature_dim": 128,
+      "probability_dim": 19,
+      "query_dim": 128
+    },
+    "input_index_sha256": "6867cafee47ba5a9301a4737acd72bfabe9e260965c65b4ba21e44553a8c0d77",
+    "label_identity_sha256": "70dced4153d5083fb832cd5d68075ca8f38c63772434c52a42ad9b29f27328a1",
+    "module": "M_C",
+    "parent_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+    "sample_plan_sha256": "cf6d5c9719f4d765f01c5dcfb1cc4c2078171e70976fb26e9a3f47c12597e865",
+    "schema": "qp-mn-training-v1",
+    "seed": 46,
+    "sources": {
+      "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/models/qp_mn_heads.py": "5219084ad536a5c23e97950fce2281c7a54cea5d9179fbcdb9e3b8277e916e63",
+      "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+      "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/scripts/qp_mn_adapter.py": "681f1301cc97abf79955d643829bbeb5f860b68fd1d5e6319e6dd6743366fec5",
+      "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/scripts/qp_mn_training.py": "1d5ed143449dab1103cff3ae9006fd5ca53cc7ff3602d8370231747236f71d6d",
+      "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/scripts/short_module_data.py": "660202cccd0cd20c1f91047f645620025f25dca0007a1f36d726c60ce2ef5bc1",
+      "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/scripts/short_module_training.py": "4a4da7bcb585a1bfa73475aba4968f6fb8be101a9f6698921a4ad49d7660422c",
+      "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a"
+    },
+    "training": {
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "candidates_per_record": 4,
+      "checkpoints": [
+        0,
+        500,
+        1000,
+        1500
+      ],
+      "clip_norm": 1.0,
+      "epsilon": 1e-08,
+      "last_every": 100,
+      "learning_rate": 0.001,
+      "max_segments_per_stage": 2048,
+      "minimum_lr_fraction": 0.1,
+      "precision": "float32",
+      "records_per_update": [
+        2,
+        2,
+        2,
+        1
+      ],
+      "replication_seed": 46,
+      "schedule_horizon": 1500,
+      "seed": 45,
+      "updates": 1500,
+      "warmup_updates": 75,
+      "weight_decay": 0.0001
+    }
+  },
+  "training_seconds_this_call": 20.436426666099578,
+  "updates_new": 500,
+  "updates_reused": 0
+}

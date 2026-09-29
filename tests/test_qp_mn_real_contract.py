@@ -113,3 +113,22 @@ def test_real_quality_score_column_invariance_and_official_affine_ranking(real):
         metric.update({**changed, 'pred_scores': scores}, target)
         values.append(metric.compute()['online_t-mAP'])
     assert values[0] == pytest.approx(values[1], abs=1e-8)
+
+
+def test_metric_verifier_reads_serialized_path_strings(tmp_path):
+    from types import SimpleNamespace
+
+    from scripts.qp_mn_binding import PROJECT
+    from scripts.qp_mn_results import verify_metric_states
+
+    source = PROJECT / 'artifacts/qp_mn_targeted_v1/evaluation'
+    (tmp_path / 'evaluation').mkdir()
+    for name in ('CAL_ALL', 'SEL_LOCKED', 'SEL_ENDPOINT_1500', 'SEED46_FIXED'):
+        path = source / f'{name}.json'
+        if not path.exists():
+            pytest.skip('main QP/MN evaluation not yet available')
+        (tmp_path / 'evaluation' / path.name).write_bytes(path.read_bytes())
+    result = verify_metric_states(SimpleNamespace(artifacts=tmp_path))
+    assert result['status'] == 'PASS'
+    assert result['unique_complete_results'] >= 22
+    assert result['metric_states'] == 2 * result['unique_complete_results']

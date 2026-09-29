@@ -1,0 +1,203 @@
+{
+  "rows": [
+    {
+      "bytes": 278064,
+      "module": "M_C",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/M_C/seed45/checkpoints/update=0000.pt",
+      "seed": 45,
+      "sha256": "f26c9eee91de243074816db7056a2a1565a248be5e0ba834f7055d6f370f1e7c",
+      "source_checkpoint_sha256": "f648f097c1061018d5d1138b6c8fcf7e764f42d441ac46c6abe99538e7ccf1c5",
+      "step": 0
+    },
+    {
+      "bytes": 278576,
+      "module": "M_C",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/M_C/seed45/checkpoints/update=0500.pt",
+      "seed": 45,
+      "sha256": "a41689fcd65d4fcfbb1c50f59d20533c2cfc91a21856f485aa468636d1f1d983",
+      "source_checkpoint_sha256": "dbafb238cf81143f6f22f84717f8de86ccc7bf230f7a66b9b989399968ec0801",
+      "step": 500
+    },
+    {
+      "bytes": 278576,
+      "module": "M_C",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/M_C/seed45/checkpoints/update=1000.pt",
+      "seed": 45,
+      "sha256": "2ed4468b0c942de8a3e1738363500c2d73f9ba54bb49a73338e43df65fbb669a",
+      "source_checkpoint_sha256": "1fd7d96f3828678c7eefd781ba5cc0f6113ab1e627e6e843b588b3460299c951",
+      "step": 1000
+    },
+    {
+      "bytes": 278576,
+      "module": "M_C",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/M_C/seed45/checkpoints/update=1500.pt",
+      "seed": 45,
+      "sha256": "63fb6d0168a2e30bbb8ed08947abbd527e451fc67e491aaf875ed575fbdd4fc0",
+      "source_checkpoint_sha256": "624886d8fc51d8a313cbfed570596a2b56a2f75f74d6c198cd09213516c6f49d",
+      "step": 1500
+    },
+    {
+      "bytes": 278064,
+      "module": "M_C",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/M_C/seed46/checkpoints/update=0000.pt",
+      "seed": 46,
+      "sha256": "36b65f3326c607e812b35bf8a6dc2895f8ab89e82c82b52eec0492fdea60292e",
+      "source_checkpoint_sha256": "07f00ade6f3f5f1548bcb71b647fa0e111b18d84509f0b75539f9f3d13b12186",
+      "step": 0
+    },
+    {
+      "bytes": 278576,
+      "module": "M_C",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/M_C/seed46/checkpoints/update=0500.pt",
+      "seed": 46,
+      "sha256": "725da73a2367668ad1fc3bc9fcef170e88fd0c3695f857e3518232d4c8342fdd",
+      "source_checkpoint_sha256": "cf85b81a6683af3a75209e6d8adfb69db265a2d077a47739e6236cb5754eebe6",
+      "step": 500
+    },
+    {
+      "bytes": 278064,
+      "module": "M_N",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/M_N/seed45/checkpoints/update=0000.pt",
+      "seed": 45,
+      "sha256": "d2ba16e334926b5b2e87a5a7cc5a4a1f6f364e0e23e08e1ce07ddf0e8b1bf591",
+      "source_checkpoint_sha256": "cac7bbd2e15be1664b9ade88aed8993ee3c61237a14bb33fd10692453e8c85bc",
+      "step": 0
+    },
+    {
+      "bytes": 278576,
+      "module": "M_N",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/M_N/seed45/checkpoints/update=0500.pt",
+      "seed": 45,
+      "sha256": "fdf7b8914bd6a213cead7397f85477d81a98b38e05c447f3b2cc189c96b9c6ce",
+      "source_checkpoint_sha256": "ab05c2bf569204f5ec24daa75b89e21a9384542a7b3bf12bf7627ae70d6a40bb",
+      "step": 500
+    },
+    {
+      "bytes": 278576,
+      "module": "M_N",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/M_N/seed45/checkpoints/update=1000.pt",
+      "seed": 45,
+      "sha256": "0f7bf0db6b9eaedf65cf0e8d78fb4bd19d0dad41798c538fea28b8a6d2e56b0b",
+      "source_checkpoint_sha256": "0fea89c60a375a1463f92f770654ad09284b10b4bbc7c048a06437ee69040bd7",
+      "step": 1000
+    },
+    {
+      "bytes": 278576,
+      "module": "M_N",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/M_N/seed45/checkpoints/update=1500.pt",
+      "seed": 45,
+      "sha256": "d88509f91bb0131093819263606ec293218fa0c399a135c7aeeb6bb7db490b18",
+      "source_checkpoint_sha256": "9a14db3e457b26139aa74ce082535555b8789e22ac3be04915e40fa5873a302d",
+      "step": 1500
+    },
+    {
+      "bytes": 388464,
+      "module": "Q2_F",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q2_F/seed45/checkpoints/update=0000.pt",
+      "seed": 45,
+      "sha256": "8d91a23a5ee014dbf01fc091f3a1cca3e8df4c62730bb8937490d5caacc7dfec",
+      "source_checkpoint_sha256": "4603f844236e4047b4c3369014dbe21ca07e4be03e9b37a41848c7ffb20f0015",
+      "step": 0
+    },
+    {
+      "bytes": 388656,
+      "module": "Q2_F",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q2_F/seed45/checkpoints/update=0500.pt",
+      "seed": 45,
+      "sha256": "4f24440bec1ce38ae247370b710f235f6a0ee3d0072de04b4a2270d99c794394",
+      "source_checkpoint_sha256": "33b7ab6c768a22c5b2ff3bdd076a07d7c7df900646e47f5640c6ff059ed198bd",
+      "step": 500
+    },
+    {
+      "bytes": 388656,
+      "module": "Q2_F",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q2_F/seed45/checkpoints/update=1000.pt",
+      "seed": 45,
+      "sha256": "176d1e9dd274e0fc78919a49364b77d2aa0be924779d12d64402f10eea5a4ff2",
+      "source_checkpoint_sha256": "b7743d16aeb46b2fa3056885dfbd839beb04a98c19e48385325442eb6dc4f9d7",
+      "step": 1000
+    },
+    {
+      "bytes": 388656,
+      "module": "Q2_F",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q2_F/seed45/checkpoints/update=1500.pt",
+      "seed": 45,
+      "sha256": "746fd104c9154690b5fb942e6302a70a54c8252b09b298f302a5dc6147172bee",
+      "source_checkpoint_sha256": "4612e712ea54ebe3a9eb88180b8fe207aef57937957c74143e0be04a16bab126",
+      "step": 1500
+    },
+    {
+      "bytes": 389232,
+      "module": "Q_A0",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q_A0/seed45/checkpoints/update=0000.pt",
+      "seed": 45,
+      "sha256": "448969eafc68abd369e77526bb9ea029592f0c0285247a0a9efbd171850a645d",
+      "source_checkpoint_sha256": "4d61e35c0cfa4ad993a65a09ddc3a37ab2bc13e4ff7f9cf416b721fbac2a9255",
+      "step": 0
+    },
+    {
+      "bytes": 389808,
+      "module": "Q_A0",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q_A0/seed45/checkpoints/update=0500.pt",
+      "seed": 45,
+      "sha256": "9115452c5b9c1e6fbb8dbc3f41f5d925e41fa3b87747b6943d330ce54aa59196",
+      "source_checkpoint_sha256": "101b921e5b96019d3e27834a7658498290c1ef6835a3899be36460cdda0c2853",
+      "step": 500
+    },
+    {
+      "bytes": 389808,
+      "module": "Q_A0",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q_A0/seed45/checkpoints/update=1000.pt",
+      "seed": 45,
+      "sha256": "c85dde168be19fcb8ff2a115bf3777e6016786f5dad4d889cc70d329099db72e",
+      "source_checkpoint_sha256": "9ee13bbc9bdc200e05fdbc47a64bc2c2bf02cf0fbbb5dbf5d1883a9f0e652647",
+      "step": 1000
+    },
+    {
+      "bytes": 389808,
+      "module": "Q_A0",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q_A0/seed45/checkpoints/update=1500.pt",
+      "seed": 45,
+      "sha256": "5be71a0be25ee0bc669b5c9fbf43fa4f9fc6448dbdf2a0d9e353b160d1477d50",
+      "source_checkpoint_sha256": "9fd63e3d5c33aa054e53ee4f28fbd12f6a8f22b927e6fb5d792756f6548e06ea",
+      "step": 1500
+    },
+    {
+      "bytes": 389232,
+      "module": "Q_P",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q_P/seed45/checkpoints/update=0000.pt",
+      "seed": 45,
+      "sha256": "54ac83c350f644ab4aad7f45924888529760326678e56c172e51e4c30e80709b",
+      "source_checkpoint_sha256": "e0d43fa8559c6bab6f0250ab8aab49e6d73f9cb1b44fe5c58c63cddfd9e1d61f",
+      "step": 0
+    },
+    {
+      "bytes": 389808,
+      "module": "Q_P",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q_P/seed45/checkpoints/update=0500.pt",
+      "seed": 45,
+      "sha256": "6480cfc8a490bab055d70ca71fe183b23ae8afc5c219f4195e2e0001cd37a365",
+      "source_checkpoint_sha256": "d7e88a6fe50addcca883e3837f1ac3a00191a04cd221eb97c9dc958f9c92d905",
+      "step": 500
+    },
+    {
+      "bytes": 389808,
+      "module": "Q_P",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q_P/seed45/checkpoints/update=1000.pt",
+      "seed": 45,
+      "sha256": "5ddaf91fd8b0c5ea9ab463a32e5d5d507465f1a743d7d77f32ab67652b584751",
+      "source_checkpoint_sha256": "7e902b6224ae8add7a147f8e4cddb4cde43d6f2124e59c2768b5adf7102eedad",
+      "step": 1000
+    },
+    {
+      "bytes": 389808,
+      "module": "Q_P",
+      "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/training/Q_P/seed45/checkpoints/update=1500.pt",
+      "seed": 45,
+      "sha256": "2ba7b16d76bf118e6ccc765e354a219563eeabd502f1f379a16fc83d2a913ff5",
+      "source_checkpoint_sha256": "6f2226cbe085568c5a22fbb51e28cd51a72ca6257a9bfddba6b15ee2a1a466be",
+      "step": 1500
+    }
+  ],
+  "status": "COMPLETE"
+}

@@ -1,0 +1,775 @@
+{
+  "environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "MKL_NUM_THREADS": "2",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2"
+  },
+  "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+  "rows": [
+    {
+      "audit": {
+        "actual_loaded_paths": [
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_04.npy",
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_00.npy"
+        ],
+        "candidate_count": 100,
+        "cuda_peak_allocated": 953206272,
+        "descriptor_seconds": 0.04183264099992812,
+        "dimensions": {
+          "classes": 18,
+          "feature_dim": 128,
+          "probability_dim": 19,
+          "query_dim": 128
+        },
+        "elapsed_seconds": 0.5749052190221846,
+        "full_vertex_count": 24469,
+        "horizon": 2,
+        "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+        "input_seconds": 0.029688413022086024,
+        "native_equality": {
+          "pred_classes": true,
+          "pred_masks": true,
+          "pred_scores": true
+        },
+        "parent_eval": true,
+        "parent_frozen": true,
+        "parent_network_seconds": 0.261066394043155,
+        "segment_count": 694
+      },
+      "cache_coordinates": {
+        "coordinates": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469,
+            3
+          ],
+          "shape": [
+            24469,
+            3
+          ]
+        }
+      },
+      "cache_prediction": {
+        "pred_classes": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "pred_masks": {
+          "different_values": 102062,
+          "equal": false,
+          "max_absolute_difference": 1.0,
+          "other_shape": [
+            24469,
+            100
+          ],
+          "shape": [
+            24469,
+            100
+          ]
+        },
+        "pred_scores": {
+          "different_values": 93,
+          "equal": false,
+          "max_absolute_difference": 0.0036293864250183105,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 80,
+          "equal": false,
+          "max_absolute_difference": 90.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        }
+      },
+      "cache_soft": {
+        "class_probabilities": {
+          "different_values": 1900,
+          "equal": false,
+          "max_absolute_difference": 0.9990462777932407,
+          "other_shape": [
+            100,
+            19
+          ],
+          "shape": [
+            100,
+            19
+          ]
+        },
+        "full_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        },
+        "low_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            18752
+          ],
+          "shape": [
+            18752
+          ]
+        },
+        "query_features": {
+          "different_values": 12800,
+          "equal": false,
+          "max_absolute_difference": 3.8137951493263245,
+          "other_shape": [
+            100,
+            128
+          ],
+          "shape": [
+            100,
+            128
+          ]
+        },
+        "segment_features": {
+          "different_values": 88822,
+          "equal": false,
+          "max_absolute_difference": 0.16250324249267578,
+          "other_shape": [
+            694,
+            128
+          ],
+          "shape": [
+            694,
+            128
+          ]
+        },
+        "segment_logits": {
+          "different_values": 69400,
+          "equal": false,
+          "max_absolute_difference": 83.03803586959839,
+          "other_shape": [
+            694,
+            100
+          ],
+          "shape": [
+            694,
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 80,
+          "equal": false,
+          "max_absolute_difference": 90.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "voxel_inverse": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        }
+      },
+      "previous_prediction": null,
+      "repeat": 0
+    },
+    {
+      "audit": {
+        "actual_loaded_paths": [
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_04.npy",
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_00.npy"
+        ],
+        "candidate_count": 100,
+        "cuda_peak_allocated": 953206272,
+        "descriptor_seconds": 0.042410979978740215,
+        "dimensions": {
+          "classes": 18,
+          "feature_dim": 128,
+          "probability_dim": 19,
+          "query_dim": 128
+        },
+        "elapsed_seconds": 0.5688859940273687,
+        "full_vertex_count": 24469,
+        "horizon": 2,
+        "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+        "input_seconds": 0.029357786988839507,
+        "native_equality": {
+          "pred_classes": true,
+          "pred_masks": true,
+          "pred_scores": true
+        },
+        "parent_eval": true,
+        "parent_frozen": true,
+        "parent_network_seconds": 0.25813944602850825,
+        "segment_count": 694
+      },
+      "cache_coordinates": {
+        "coordinates": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469,
+            3
+          ],
+          "shape": [
+            24469,
+            3
+          ]
+        }
+      },
+      "cache_prediction": {
+        "pred_classes": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "pred_masks": {
+          "different_values": 102062,
+          "equal": false,
+          "max_absolute_difference": 1.0,
+          "other_shape": [
+            24469,
+            100
+          ],
+          "shape": [
+            24469,
+            100
+          ]
+        },
+        "pred_scores": {
+          "different_values": 93,
+          "equal": false,
+          "max_absolute_difference": 0.0036293864250183105,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 80,
+          "equal": false,
+          "max_absolute_difference": 90.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        }
+      },
+      "cache_soft": {
+        "class_probabilities": {
+          "different_values": 1900,
+          "equal": false,
+          "max_absolute_difference": 0.9990462777932407,
+          "other_shape": [
+            100,
+            19
+          ],
+          "shape": [
+            100,
+            19
+          ]
+        },
+        "full_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        },
+        "low_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            18752
+          ],
+          "shape": [
+            18752
+          ]
+        },
+        "query_features": {
+          "different_values": 12800,
+          "equal": false,
+          "max_absolute_difference": 3.8137951493263245,
+          "other_shape": [
+            100,
+            128
+          ],
+          "shape": [
+            100,
+            128
+          ]
+        },
+        "segment_features": {
+          "different_values": 88822,
+          "equal": false,
+          "max_absolute_difference": 0.16250324249267578,
+          "other_shape": [
+            694,
+            128
+          ],
+          "shape": [
+            694,
+            128
+          ]
+        },
+        "segment_logits": {
+          "different_values": 69400,
+          "equal": false,
+          "max_absolute_difference": 83.03803586959839,
+          "other_shape": [
+            694,
+            100
+          ],
+          "shape": [
+            694,
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 80,
+          "equal": false,
+          "max_absolute_difference": 90.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "voxel_inverse": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        }
+      },
+      "previous_prediction": {
+        "pred_classes": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "pred_masks": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469,
+            100
+          ],
+          "shape": [
+            24469,
+            100
+          ]
+        },
+        "pred_scores": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        }
+      },
+      "repeat": 1
+    },
+    {
+      "audit": {
+        "actual_loaded_paths": [
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_04.npy",
+          "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/train/0083_00.npy"
+        ],
+        "candidate_count": 100,
+        "cuda_peak_allocated": 953206272,
+        "descriptor_seconds": 0.042520181043073535,
+        "dimensions": {
+          "classes": 18,
+          "feature_dim": 128,
+          "probability_dim": 19,
+          "query_dim": 128
+        },
+        "elapsed_seconds": 0.5651260630693287,
+        "full_vertex_count": 24469,
+        "horizon": 2,
+        "input_id": "312fe90f9aae09224bb95dbd1db027b422cdd63f8aa1aedf0b0846a8189e3ca5",
+        "input_seconds": 0.029699428007006645,
+        "native_equality": {
+          "pred_classes": true,
+          "pred_masks": true,
+          "pred_scores": true
+        },
+        "parent_eval": true,
+        "parent_frozen": true,
+        "parent_network_seconds": 0.2586305030854419,
+        "segment_count": 694
+      },
+      "cache_coordinates": {
+        "coordinates": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469,
+            3
+          ],
+          "shape": [
+            24469,
+            3
+          ]
+        }
+      },
+      "cache_prediction": {
+        "pred_classes": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "pred_masks": {
+          "different_values": 102062,
+          "equal": false,
+          "max_absolute_difference": 1.0,
+          "other_shape": [
+            24469,
+            100
+          ],
+          "shape": [
+            24469,
+            100
+          ]
+        },
+        "pred_scores": {
+          "different_values": 93,
+          "equal": false,
+          "max_absolute_difference": 0.0036293864250183105,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 80,
+          "equal": false,
+          "max_absolute_difference": 90.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        }
+      },
+      "cache_soft": {
+        "class_probabilities": {
+          "different_values": 1900,
+          "equal": false,
+          "max_absolute_difference": 0.9990462777932407,
+          "other_shape": [
+            100,
+            19
+          ],
+          "shape": [
+            100,
+            19
+          ]
+        },
+        "full_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        },
+        "low_point2segment": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            18752
+          ],
+          "shape": [
+            18752
+          ]
+        },
+        "query_features": {
+          "different_values": 12800,
+          "equal": false,
+          "max_absolute_difference": 3.8137951493263245,
+          "other_shape": [
+            100,
+            128
+          ],
+          "shape": [
+            100,
+            128
+          ]
+        },
+        "segment_features": {
+          "different_values": 88822,
+          "equal": false,
+          "max_absolute_difference": 0.16250324249267578,
+          "other_shape": [
+            694,
+            128
+          ],
+          "shape": [
+            694,
+            128
+          ]
+        },
+        "segment_logits": {
+          "different_values": 69400,
+          "equal": false,
+          "max_absolute_difference": 83.03803586959839,
+          "other_shape": [
+            694,
+            100
+          ],
+          "shape": [
+            694,
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 13,
+          "equal": false,
+          "max_absolute_difference": 2.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 80,
+          "equal": false,
+          "max_absolute_difference": 90.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "voxel_inverse": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469
+          ],
+          "shape": [
+            24469
+          ]
+        }
+      },
+      "previous_prediction": {
+        "pred_classes": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "pred_masks": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            24469,
+            100
+          ],
+          "shape": [
+            24469,
+            100
+          ]
+        },
+        "pred_scores": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_class_ids": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        },
+        "source_query_ids": {
+          "different_values": 0,
+          "equal": true,
+          "max_absolute_difference": 0.0,
+          "other_shape": [
+            100
+          ],
+          "shape": [
+            100
+          ]
+        }
+      },
+      "repeat": 2
+    }
+  ]
+}

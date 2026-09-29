@@ -1,0 +1,20 @@
+{
+  "root": "/home/ww/persist4d_runs/qp_mn_targeted_v1",
+  "artifacts": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1",
+  "stages": {
+    "bind": "COMPLETE",
+    "adapt-export": "COMPLETE",
+    "B0": "COMPLETE",
+    "train-pairs": "COMPLETE",
+    "CAL-lock": "COMPLETE",
+    "SEL": "COMPLETE",
+    "replicate": "COMPLETE",
+    "diagnostics": "COMPLETE",
+    "probes": "COMPLETE",
+    "profile": "COMPLETE",
+    "report": "COMPLETE",
+    "publish": "UNVERIFIED"
+  },
+  "scientific_status": "COMPLETE_WITH_PROVISIONAL_CONTROL_ONLY",
+  "publication_receipt": "/home/ww/persist4d_runs/qp_mn_targeted_v1/publication/PUBLICATION_RECEIPT.json"
+}
