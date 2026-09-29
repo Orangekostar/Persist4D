@@ -1,0 +1,655 @@
+{
+  "records": [
+    {
+      "context_index": 739,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "0cfe8e5dddcf3b1f769b98c9affcf08e9e03e2398d1a5ef85583dc6f3038e684",
+      "logical_unit_id": "TRAIN:T2:00103",
+      "master_sequence_id": "scene0304_01-scene0304_02",
+      "reference_id": "8eabc435-5af7-2f32-85c3-163c1fa6e280",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0304_01",
+        "scene0304_02"
+      ],
+      "scan_indices": [
+        739,
+        740
+      ]
+    },
+    {
+      "context_index": 738,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "00c52dab865590cac3aa2e27964c570b0f85339670bc03063daf0e6cc209f09a",
+      "logical_unit_id": "TRAIN:T2:00101",
+      "master_sequence_id": "scene0304_00-scene0304_01",
+      "reference_id": "8eabc435-5af7-2f32-85c3-163c1fa6e280",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0304_00",
+        "scene0304_01"
+      ],
+      "scan_indices": [
+        738,
+        739
+      ]
+    },
+    {
+      "context_index": 738,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "16799ad19c55f4800c4338df3116fd70a153f8c87212415a4e9284de38d8957e",
+      "logical_unit_id": "TRAIN:T1:00142",
+      "master_sequence_id": "scene0304_00-scene0304_01",
+      "reference_id": "8eabc435-5af7-2f32-85c3-163c1fa6e280",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0304_00"
+      ],
+      "scan_indices": [
+        738
+      ]
+    },
+    {
+      "context_index": 738,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "98e46f5371b3f7a188854dc508e4224f610f2c9e2677348c19b9af365ce72d21",
+      "logical_unit_id": "TRAIN:T1:00143",
+      "master_sequence_id": "scene0304_00-scene0304_01",
+      "reference_id": "8eabc435-5af7-2f32-85c3-163c1fa6e280",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0304_01"
+      ],
+      "scan_indices": [
+        739
+      ]
+    },
+    {
+      "context_index": 740,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "47daeb1d1f7a8dc89f6294ee4caabc06989e9d9600e545f986b8a5c8a2a56212",
+      "logical_unit_id": "TRAIN:T1:00144",
+      "master_sequence_id": "scene0304_02-scene0304_00",
+      "reference_id": "8eabc435-5af7-2f32-85c3-163c1fa6e280",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0304_02"
+      ],
+      "scan_indices": [
+        740
+      ]
+    },
+    {
+      "context_index": 493,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "05f076de9f9640fbc246e4d98d4fea67294382b449b7a46f8f2203337fe33fb5",
+      "logical_unit_id": "TRAIN:T2:00183",
+      "master_sequence_id": "scene0204_00-scene0204_01",
+      "reference_id": "5341b7d3-8a66-2cdd-8633-0a3da632befa",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0204_00",
+        "scene0204_01"
+      ],
+      "scan_indices": [
+        493,
+        494
+      ]
+    },
+    {
+      "context_index": 494,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "f04176ae1fd640bd1ca1b841858cc3b0cd622624fa0939ecb59c3c0b8486f516",
+      "logical_unit_id": "TRAIN:T2:00184",
+      "master_sequence_id": "scene0204_01-scene0204_00",
+      "reference_id": "5341b7d3-8a66-2cdd-8633-0a3da632befa",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0204_01",
+        "scene0204_00"
+      ],
+      "scan_indices": [
+        494,
+        493
+      ]
+    },
+    {
+      "context_index": 493,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "61a346b2918b7ec37161dc5f26527cb7ba12b7e965718fd8388a8e29cb4fc017",
+      "logical_unit_id": "TRAIN:T1:00103",
+      "master_sequence_id": "scene0204_00-scene0204_01",
+      "reference_id": "5341b7d3-8a66-2cdd-8633-0a3da632befa",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0204_00"
+      ],
+      "scan_indices": [
+        493
+      ]
+    },
+    {
+      "context_index": 493,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "8aa94847667a2b6972dd571309c8cee7c68d29a3c1a4a844ba9f7b09c713574e",
+      "logical_unit_id": "TRAIN:T1:00104",
+      "master_sequence_id": "scene0204_00-scene0204_01",
+      "reference_id": "5341b7d3-8a66-2cdd-8633-0a3da632befa",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0204_01"
+      ],
+      "scan_indices": [
+        494
+      ]
+    },
+    {
+      "context_index": 657,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "c8cf36eb10a9ee0b409199b61b3fcbaed818773e6149b8a9d6a5d4f39909363e",
+      "logical_unit_id": "TRAIN:T2:00149",
+      "master_sequence_id": "scene0272_00-scene0272_01",
+      "reference_id": "751a55a1-fe61-2c3b-8df5-925bfeac2496",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0272_00",
+        "scene0272_01"
+      ],
+      "scan_indices": [
+        657,
+        658
+      ]
+    },
+    {
+      "context_index": 659,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "ac33ce8f274c040478aa421ae8b50e9748d10bf6ddd2395df5d20ec0fcf56467",
+      "logical_unit_id": "TRAIN:T2:00150",
+      "master_sequence_id": "scene0272_02-scene0272_00",
+      "reference_id": "751a55a1-fe61-2c3b-8df5-925bfeac2496",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0272_02",
+        "scene0272_00"
+      ],
+      "scan_indices": [
+        659,
+        657
+      ]
+    },
+    {
+      "context_index": 657,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "c0b18fd5662e9221f186f4bbe096cd4cacc4308faa5c582095311d7d4fba8898",
+      "logical_unit_id": "TRAIN:T1:00131",
+      "master_sequence_id": "scene0272_00-scene0272_01",
+      "reference_id": "751a55a1-fe61-2c3b-8df5-925bfeac2496",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0272_00"
+      ],
+      "scan_indices": [
+        657
+      ]
+    },
+    {
+      "context_index": 658,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "1acd80da47fc3efcb0322f5b92c0dd3596f3448467253d8ada7f9ce495131b8f",
+      "logical_unit_id": "TRAIN:T1:00132",
+      "master_sequence_id": "scene0272_01-scene0272_02",
+      "reference_id": "751a55a1-fe61-2c3b-8df5-925bfeac2496",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0272_01"
+      ],
+      "scan_indices": [
+        658
+      ]
+    },
+    {
+      "context_index": 658,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "518cd1391e582c30b8320491e9afa644316a6f235ca9e37b88b26c642b73cf9c",
+      "logical_unit_id": "TRAIN:T1:00133",
+      "master_sequence_id": "scene0272_01-scene0272_02",
+      "reference_id": "751a55a1-fe61-2c3b-8df5-925bfeac2496",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0272_02"
+      ],
+      "scan_indices": [
+        659
+      ]
+    },
+    {
+      "context_index": 223,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "c77401d7fc7dc2721939a7fc9d0d0ca25bb02d7c1f64f8651c8cce81abb1f39c",
+      "logical_unit_id": "TRAIN:T2:00054",
+      "master_sequence_id": "scene0095_00-scene0095_02",
+      "reference_id": "1d234006-e280-2b1a-8e34-b2f670259e8d",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0095_00",
+        "scene0095_02"
+      ],
+      "scan_indices": [
+        223,
+        225
+      ]
+    },
+    {
+      "context_index": 225,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "5bd9ad40e616f953061b4e6f60ca9fe86a1ff77b841beafe6892239ca082caa7",
+      "logical_unit_id": "TRAIN:T2:00055",
+      "master_sequence_id": "scene0095_02-scene0095_01",
+      "reference_id": "1d234006-e280-2b1a-8e34-b2f670259e8d",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0095_02",
+        "scene0095_01"
+      ],
+      "scan_indices": [
+        225,
+        224
+      ]
+    },
+    {
+      "context_index": 224,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "a96bd87c3bec2c9cf6cd1acb83617ba248d89064fedc0133f233156d3a4b6d7e",
+      "logical_unit_id": "TRAIN:T1:00050",
+      "master_sequence_id": "scene0095_01-scene0095_00",
+      "reference_id": "1d234006-e280-2b1a-8e34-b2f670259e8d",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0095_00"
+      ],
+      "scan_indices": [
+        223
+      ]
+    },
+    {
+      "context_index": 224,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "99368fe9ea9126b0c6de8005b5bce4cb84945d546e62cf92ea99051b4846a7fa",
+      "logical_unit_id": "TRAIN:T1:00051",
+      "master_sequence_id": "scene0095_01-scene0095_00",
+      "reference_id": "1d234006-e280-2b1a-8e34-b2f670259e8d",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0095_01"
+      ],
+      "scan_indices": [
+        224
+      ]
+    },
+    {
+      "context_index": 223,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "f6d3742ee27d52d382560cadf66efa19dfa403d817520ad61f24d0188007cec8",
+      "logical_unit_id": "TRAIN:T1:00052",
+      "master_sequence_id": "scene0095_00-scene0095_02",
+      "reference_id": "1d234006-e280-2b1a-8e34-b2f670259e8d",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0095_02"
+      ],
+      "scan_indices": [
+        225
+      ]
+    },
+    {
+      "context_index": 389,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "a5ef142ae02ce4aa7520b1f2e74e6899940d64f3b97902745c043ac419c008b5",
+      "logical_unit_id": "TRAIN:T2:00029",
+      "master_sequence_id": "scene0171_03-scene0171_00",
+      "reference_id": "4a9a43d6-7736-2874-84c3-86ec156a3b2d",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0171_03",
+        "scene0171_00"
+      ],
+      "scan_indices": [
+        389,
+        386
+      ]
+    },
+    {
+      "context_index": 386,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "707054052ec844d0980bd2fe069a256c02fb3386dcaefa6db6bcc29b236144d6",
+      "logical_unit_id": "TRAIN:T2:00028",
+      "master_sequence_id": "scene0171_00-scene0171_01",
+      "reference_id": "4a9a43d6-7736-2874-84c3-86ec156a3b2d",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0171_00",
+        "scene0171_01"
+      ],
+      "scan_indices": [
+        386,
+        387
+      ]
+    },
+    {
+      "context_index": 386,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "857ba52f23d31e6b99a931549ef92b162c2910ee944f56b28d654f13a59f9463",
+      "logical_unit_id": "TRAIN:T1:00084",
+      "master_sequence_id": "scene0171_00-scene0171_01",
+      "reference_id": "4a9a43d6-7736-2874-84c3-86ec156a3b2d",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0171_00"
+      ],
+      "scan_indices": [
+        386
+      ]
+    },
+    {
+      "context_index": 386,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "311d4408b80a0d36e62762dc34bd4d8e290485ede84ead01e647647a58fd184a",
+      "logical_unit_id": "TRAIN:T1:00085",
+      "master_sequence_id": "scene0171_00-scene0171_01",
+      "reference_id": "4a9a43d6-7736-2874-84c3-86ec156a3b2d",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0171_01"
+      ],
+      "scan_indices": [
+        387
+      ]
+    },
+    {
+      "context_index": 389,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "4217fd01d59e45220a7875bd98d9dc26fbffa381a404b0c9509e1e917384dbea",
+      "logical_unit_id": "TRAIN:T1:00087",
+      "master_sequence_id": "scene0171_03-scene0171_00",
+      "reference_id": "4a9a43d6-7736-2874-84c3-86ec156a3b2d",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0171_03"
+      ],
+      "scan_indices": [
+        389
+      ]
+    },
+    {
+      "context_index": 955,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "6fd2a03d6faee2456a39f54d7540d1fa27320426ee43dab048259b2f0d5d8092",
+      "logical_unit_id": "TRAIN:T2:00004",
+      "master_sequence_id": "scene0394_03-scene0394_00",
+      "reference_id": "bf9a3dc9-45a5-2e80-80cc-29579f2928e6",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0394_03",
+        "scene0394_00"
+      ],
+      "scan_indices": [
+        955,
+        952
+      ]
+    },
+    {
+      "context_index": 953,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "74213db585edcb2ef98b4df50bb48d1e2ab141325cb09263c7f2bbd1c45592eb",
+      "logical_unit_id": "TRAIN:T2:00005",
+      "master_sequence_id": "scene0394_01-scene0394_02",
+      "reference_id": "bf9a3dc9-45a5-2e80-80cc-29579f2928e6",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0394_01",
+        "scene0394_02"
+      ],
+      "scan_indices": [
+        953,
+        954
+      ]
+    },
+    {
+      "context_index": 955,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "412bcea7e80f2b9e53b1bda53baf7d942d4ab3ff8b787da65ace0e6b3cc2d124",
+      "logical_unit_id": "TRAIN:T1:00177",
+      "master_sequence_id": "scene0394_03-scene0394_00",
+      "reference_id": "bf9a3dc9-45a5-2e80-80cc-29579f2928e6",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0394_00"
+      ],
+      "scan_indices": [
+        952
+      ]
+    },
+    {
+      "context_index": 953,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "db891146b82034f9432bb27c88620aa5e1c1b2a327427b448dd025399cb00b00",
+      "logical_unit_id": "TRAIN:T1:00178",
+      "master_sequence_id": "scene0394_01-scene0394_02",
+      "reference_id": "bf9a3dc9-45a5-2e80-80cc-29579f2928e6",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0394_01"
+      ],
+      "scan_indices": [
+        953
+      ]
+    },
+    {
+      "context_index": 953,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "afc97d121270a13309b8b45df4be79e28a61967db086fe022b0233c1fe1736a2",
+      "logical_unit_id": "TRAIN:T1:00179",
+      "master_sequence_id": "scene0394_01-scene0394_02",
+      "reference_id": "bf9a3dc9-45a5-2e80-80cc-29579f2928e6",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0394_02"
+      ],
+      "scan_indices": [
+        954
+      ]
+    },
+    {
+      "context_index": 955,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "82edd38e7d0fb72f3027183bd55be6a7cba8fe5224105c96a23ae891e5951b33",
+      "logical_unit_id": "TRAIN:T1:00180",
+      "master_sequence_id": "scene0394_03-scene0394_00",
+      "reference_id": "bf9a3dc9-45a5-2e80-80cc-29579f2928e6",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0394_03"
+      ],
+      "scan_indices": [
+        955
+      ]
+    },
+    {
+      "context_index": 277,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "4afa8d2f3a1a43e2768c31bcb988f751a552d9eb09b4a181e097dda9cd0cfe76",
+      "logical_unit_id": "TRAIN:T2:00136",
+      "master_sequence_id": "scene0118_00-scene0118_01",
+      "reference_id": "22312382-b828-2c09-9267-bad5dd60ac79",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0118_00",
+        "scene0118_01"
+      ],
+      "scan_indices": [
+        277,
+        278
+      ]
+    },
+    {
+      "context_index": 278,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "a2cf65bc86a4a35b24b201d848102ad22dd5eaddb3353c8b7c9abffb89e59287",
+      "logical_unit_id": "TRAIN:T2:00137",
+      "master_sequence_id": "scene0118_01-scene0118_00",
+      "reference_id": "22312382-b828-2c09-9267-bad5dd60ac79",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0118_01",
+        "scene0118_00"
+      ],
+      "scan_indices": [
+        278,
+        277
+      ]
+    },
+    {
+      "context_index": 277,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "227ff76d4e7aa1d850d5c1911b09a6a0ba293cd2f7d0d9ca3113ba5821a0b5a3",
+      "logical_unit_id": "TRAIN:T1:00065",
+      "master_sequence_id": "scene0118_00-scene0118_01",
+      "reference_id": "22312382-b828-2c09-9267-bad5dd60ac79",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0118_00"
+      ],
+      "scan_indices": [
+        277
+      ]
+    },
+    {
+      "context_index": 277,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "deee5ed6cf128efac03ea50fe2c6986477d3baf91f6fae51ca24bf4e639fd0c5",
+      "logical_unit_id": "TRAIN:T1:00066",
+      "master_sequence_id": "scene0118_00-scene0118_01",
+      "reference_id": "22312382-b828-2c09-9267-bad5dd60ac79",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0118_01"
+      ],
+      "scan_indices": [
+        278
+      ]
+    },
+    {
+      "context_index": 487,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "cc9579423f3f84861a20c67e52a38fc1fde679284361153fbc7c493432bc3f68",
+      "logical_unit_id": "TRAIN:T2:00178",
+      "master_sequence_id": "scene0201_01-scene0201_00",
+      "reference_id": "5341b7bf-8a66-2cdd-8794-026113b7c312",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0201_01",
+        "scene0201_00"
+      ],
+      "scan_indices": [
+        487,
+        486
+      ]
+    },
+    {
+      "context_index": 486,
+      "dataset_horizon": 2,
+      "horizon": 2,
+      "input_id": "265c77c6d07ef1d86ea12b37e7d6eac34593df40f0402ac63d58e789e53010b5",
+      "logical_unit_id": "TRAIN:T2:00177",
+      "master_sequence_id": "scene0201_00-scene0201_01",
+      "reference_id": "5341b7bf-8a66-2cdd-8794-026113b7c312",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0201_00",
+        "scene0201_01"
+      ],
+      "scan_indices": [
+        486,
+        487
+      ]
+    },
+    {
+      "context_index": 486,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "8eab1cad9e8d5035ea75b1e17aeca6ed6175a887f521beb4574ca207d79646ea",
+      "logical_unit_id": "TRAIN:T1:00101",
+      "master_sequence_id": "scene0201_00-scene0201_01",
+      "reference_id": "5341b7bf-8a66-2cdd-8794-026113b7c312",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0201_00"
+      ],
+      "scan_indices": [
+        486
+      ]
+    },
+    {
+      "context_index": 486,
+      "dataset_horizon": 2,
+      "horizon": 1,
+      "input_id": "90736a9da74213be7fa16e27993063233c12671067583a1c5f5d583d5e8cbd0d",
+      "logical_unit_id": "TRAIN:T1:00102",
+      "master_sequence_id": "scene0201_00-scene0201_01",
+      "reference_id": "5341b7bf-8a66-2cdd-8794-026113b7c312",
+      "role": "TRAIN",
+      "scan_ids": [
+        "scene0201_01"
+      ],
+      "scan_indices": [
+        487
+      ]
+    }
+  ],
+  "references": [
+    "8eabc435-5af7-2f32-85c3-163c1fa6e280",
+    "5341b7d3-8a66-2cdd-8633-0a3da632befa",
+    "751a55a1-fe61-2c3b-8df5-925bfeac2496",
+    "1d234006-e280-2b1a-8e34-b2f670259e8d",
+    "4a9a43d6-7736-2874-84c3-86ec156a3b2d",
+    "bf9a3dc9-45a5-2e80-80cc-29579f2928e6",
+    "22312382-b828-2c09-9267-bad5dd60ac79",
+    "5341b7bf-8a66-2cdd-8794-026113b7c312"
+  ],
+  "rule": "SHA256(reference_id), then SHA256(input_id); no outcome selection"
+}

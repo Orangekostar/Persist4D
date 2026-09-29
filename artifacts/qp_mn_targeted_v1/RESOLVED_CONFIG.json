@@ -1,0 +1,92 @@
+{
+  "arms": [
+    "Q2_F",
+    "Q_A0",
+    "Q_P",
+    "M_C",
+    "M_N"
+  ],
+  "artifact_root": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1",
+  "base_commit": "465f37a46972e81584c1563bba57e1c05c911c1a",
+  "budget": {
+    "categories_gpu_hours": {
+      "cache": 4,
+      "evaluation_replication": 4,
+      "probes": 2,
+      "profile": 1,
+      "recovery": 3,
+      "training": 2
+    },
+    "cpu_threads": 2,
+    "cpu_workers_cap": 8,
+    "cumulative_gpu_hours": 192,
+    "maximum_simultaneous_gpus": 2,
+    "new_cache_gib": 32,
+    "new_gpu_hours": 16,
+    "ram_gib": 96,
+    "reserve_gpu_hours": 3
+  },
+  "concerto_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+  "dimensions": {
+    "classes": 18,
+    "feature_dim": 128,
+    "probability_dim": 19,
+    "query_dim": 128
+  },
+  "evaluation": {
+    "condition": "NOAUG_NATIVE",
+    "minimum_positive_references": 3,
+    "selectable_steps": [
+      500,
+      1000,
+      1500
+    ],
+    "t1_guard": -0.002,
+    "target_gain": 0.005,
+    "tolerance": 1e-06
+  },
+  "historical_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+  "parent_bytes": 754813672,
+  "parent_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "publication": {
+    "branch": "research/rescene-qp-mn-targeted-v1",
+    "individual_binary_mib": 20,
+    "tag": "rescene-qp-mn-targeted-v1",
+    "total_new_binary_mib": 50
+  },
+  "repaired_root": "/home/ww/persist4d_runs/rescene_code_first_audit_v1",
+  "runtime_root": "/home/ww/persist4d_runs/qp_mn_targeted_v1",
+  "schema": "qp-mn-campaign-v1",
+  "training": {
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "candidates_per_record": 4,
+    "checkpoints": [
+      0,
+      500,
+      1000,
+      1500
+    ],
+    "clip_norm": 1.0,
+    "epsilon": 1e-08,
+    "last_every": 100,
+    "learning_rate": 0.001,
+    "max_segments_per_stage": 2048,
+    "minimum_lr_fraction": 0.1,
+    "precision": "float32",
+    "records_per_update": [
+      2,
+      2,
+      2,
+      1
+    ],
+    "replication_seed": 46,
+    "schedule_horizon": 1500,
+    "seed": 45,
+    "updates": 1500,
+    "warmup_updates": 75,
+    "weight_decay": 0.0001
+  }
+}

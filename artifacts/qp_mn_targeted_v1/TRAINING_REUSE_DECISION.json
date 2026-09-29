@@ -1,0 +1,20 @@
+{
+  "Q2_F": {
+    "decision": "REUSE_COMPLETED_TRAJECTORY",
+    "source_run": "/home/ww/persist4d_runs/rescene_code_first_audit_v1",
+    "source_module": "Q2",
+    "updates_reused": 1500,
+    "updates_new": 0,
+    "evidence": "training/Q2_F/seed45/checkpoint_manifest.json",
+    "checks": "All four checkpoint hashes, readable optimizer steps and hyperparameters, parent/input/label/plan/initial parameter identities and exact historical source files; real-batch loss and gradient comparison passed."
+  },
+  "M_C": {
+    "decision": "TRAIN_PAIRED_CONTROL_FROM_ZERO",
+    "updates_reused": 0,
+    "updates_new_planned": 1500,
+    "source_candidate": "/home/ww/persist4d_runs/short_module_screen_v1/training/M1/seed45",
+    "reason": "Historical checkpoint training source SHA256 is 06a12a38ec52ab9af482933c9e1042b50c34401fc6e65ad0a891bd8375327aa8, while the retained historical worktree source is e34df0dbc712cb19e37ee94f00a3fd0c3ce68a4aacdab5e9068482b6f1b1d288. No per-M1 exact-parameter replay receipt exists. The repository has only the published and repaired training-source revisions. Full trajectory provenance is therefore insufficient for strict reuse; real M1/M-C loss and gradient equivalence alone does not prove the whole historical optimizer trajectory.",
+    "assignment": "Keep repaired frozen-v1 M1 assignments and sampling unchanged; do not use expanded_geometry.",
+    "scope": "Only the required M_C control is retrained, paired with M_N. No M0/M2/Q1/Q3 retraining."
+  }
+}

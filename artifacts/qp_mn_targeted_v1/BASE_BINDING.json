@@ -1,0 +1,49 @@
+{
+  "actual_dimensions": {
+    "classes": 18,
+    "feature_dim": 128,
+    "probability_dim": 19,
+    "query_dim": 128
+  },
+  "assets": {
+    "concerto_pretrained": {
+      "bytes": 433987358,
+      "path": "/home/ww/.cache/persist4d/concerto/concerto_base.pth",
+      "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+    },
+    "r1_checkpoint": {
+      "bytes": 754813672,
+      "path": "/home/ww/persist4d_runs/perception_gain_v2/inputs/r1.ckpt",
+      "sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd"
+    }
+  },
+  "base_commit": "465f37a46972e81584c1563bba57e1c05c911c1a",
+  "counts": {
+    "CAL": {
+      "T1": 23,
+      "T2": 23,
+      "references": 4
+    },
+    "SEL": {
+      "T1": 24,
+      "T2": 24,
+      "references": 4
+    },
+    "TRAIN": {
+      "T1": 199,
+      "T2": 188,
+      "references": 64
+    }
+  },
+  "evaluation_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+  "known_test_exclusion": "Existing repo_reference symlink serialization; no model/label/metric effect",
+  "previous_exposure": "R1/development and historical SEL exposure; not untouched test data",
+  "reports": {
+    "CONCLUSION.md": "de7bdeeaf725060b040f702126cee848d61ad2fbec31b098714acb8d1a8ccab5",
+    "NOAUG_INPUT_PARITY.json": "f462af8730222c6448768a88ce1bac0158334ef1614344307679b7ce74f9dc2a",
+    "RELABEL_AUDIT.json": "d2436bdf9b37c074270e55634fd46b2fff7680a551fc574a7649fb093ee03bc2",
+    "REQUIREMENT_REVIEW.md": "0d14c94826d1738930465053482d22f1f485a15ef4801e3d1fe55bcf37fa2d3a",
+    "TEST_NOTES.md": "5a5fca87843055c6cfaa66112d2ee7a598740b566a88c42e49d51592e2bf1ce7"
+  },
+  "training_index_sha256": "6867cafee47ba5a9301a4737acd72bfabe9e260965c65b4ba21e44553a8c0d77"
+}

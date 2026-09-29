@@ -1,0 +1,31 @@
+{
+  "assignment": "assignment entity id >=0",
+  "dimensions": {
+    "classes": 18,
+    "feature_dim": 128,
+    "probability_dim": 19,
+    "query_dim": 128
+  },
+  "evaluation_condition": "NOAUG_NATIVE",
+  "evaluation_prediction_identity": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+  "geometry_policy": "frozen-v1",
+  "label_identity_sha256": "70dced4153d5083fb832cd5d68075ca8f38c63772434c52a42ad9b29f27328a1",
+  "quality_schema": "quality-threshold-validity-v2",
+  "quality_target": "quality.temporal",
+  "quality_weight": "quality.valid (binary)",
+  "shape_targets": "segment_targets",
+  "shape_usable": "quality.geometry_valid",
+  "shape_weights": "segment_weights",
+  "thresholds": [
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9
+  ],
+  "train_prediction_identity": "229cc0e8b9a0960670fcb849d1b157d4ec873541f4c7289af815fc8a8f08839f"
+}
