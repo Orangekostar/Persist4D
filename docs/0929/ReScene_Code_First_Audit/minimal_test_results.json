@@ -1,0 +1,95 @@
+{
+  "torch_version": "2.10.0+cpu",
+  "device": "cpu",
+  "all_assertions_passed": true,
+  "scope": "minimal counterexamples and equations, not full repository tests or GPU rescoring",
+  "results": {
+    "ignore_threshold_gap": {
+      "training_label_valid": false,
+      "ignore_proportion": 0.6,
+      "temporal_iou": 0.4,
+      "official_scored_as_false_positive_by_threshold": {
+        "0.5": false,
+        "0.55": false,
+        "0.6": true,
+        "0.65": true,
+        "0.7": true,
+        "0.75": true,
+        "0.8": true,
+        "0.85": true,
+        "0.9": true
+      },
+      "finding": "Whole-candidate exclusion at 0.50 loses labels for errors scored at higher thresholds."
+    },
+    "ignore_gap_ranking_example": {
+      "at_075_original": [
+        {
+          "candidate": "good",
+          "score": 0.9,
+          "tp": true
+        },
+        {
+          "candidate": "bad",
+          "score": 0.1,
+          "tp": false
+        }
+      ],
+      "at_075_reranked": [
+        {
+          "candidate": "bad",
+          "score": 0.95,
+          "tp": false
+        },
+        {
+          "candidate": "good",
+          "score": 0.9,
+          "tp": true
+        }
+      ],
+      "note": "Illustrates an AP-relevant ordering change; no real-data AP was computed."
+    },
+    "data_mode_independence": {
+      "network_training": false,
+      "dataset_mode": "train",
+      "augmentation_branch_taken": true
+    },
+    "mask_gradient_and_zero_init": {
+      "passed": true,
+      "steps": [
+        {
+          "output_gradient_norm": 1.104732632637024,
+          "trunk_gradient_norm": 0.0
+        },
+        {
+          "output_gradient_norm": 1.047452449798584,
+          "trunk_gradient_norm": 0.00965846423059702
+        }
+      ],
+      "scope": "equations and gradient path only; no real R1 data or trained head loaded"
+    },
+    "q3_monotonic_gradients": {
+      "passed": true,
+      "nonzero_gradient_elements": 27
+    },
+    "helper_cache_invalidation_gap": {
+      "old_result_reused_by_current_predicate": true,
+      "helper_changed": true,
+      "scope": "demonstrated reachable condition; not evidence it occurred in the recorded campaign"
+    },
+    "bounded_residual_limitation": {
+      "parent_logits": [
+        -3.0,
+        3.0
+      ],
+      "largest_attempted_correction": [
+        2.0,
+        -2.0
+      ],
+      "corrected_logits": [
+        -1.0,
+        1.0
+      ],
+      "classification": "design constraint, not code defect"
+    }
+  }
+}

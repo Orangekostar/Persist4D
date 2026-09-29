@@ -15,7 +15,7 @@ from pathlib import Path
 import yaml
 
 PROJECT = Path(__file__).resolve().parents[1]
-ARTIFACTS = PROJECT / "artifacts/short_module_screen_v1"
+ARTIFACTS = Path(os.environ.get("SHORT_MODULE_ARTIFACTS", PROJECT / "artifacts/short_module_screen_v1"))
 PACKAGE = PROJECT / "docs/0928/ReScene_Round1_Single_Module"
 V2_ROOT = Path("/home/ww/persist4d_runs/perception_gain_v2")
 V2_LIVE = Path("/home/ww/paper5/.worktrees/persist4d-perception-gain-v2/artifacts/perception_gain_v2")
@@ -226,12 +226,13 @@ def export(config: dict, root: Path, *, device: str, limit: int | None) -> dict:
     native = native_config(root, assets)
     datasets = build_datasets(native, assets)
     source_files = [PROJECT / p for p in (
-        "scripts/short_module_native.py", "models/short_module_heads.py", "models/rescene.py",
+        "scripts/short_module_screen.py", "scripts/short_module_native.py", "models/short_module_heads.py", "models/rescene.py",
         "models/perception_gain.py", "scripts/rescene_task_postprocess.py", "trainer/trainer.py",
         "datasets/semseg.py", "datasets/pointcept_utils.py", "datasets/auto_collate.py",
         "scripts/system_comparison_inference.py", "scripts/short_module_data.py")]
     source_files += [Path(inspect.getfile(m)) for m in
                      (stmetrics.instances.matcher, stmetrics.instances.evaluator)]
+    source_files.append(Path(assets["metric_dataset_spec"]))
     source_files += [Path(inspect.getfile(hydra.utils.get_class(native.backbone._target_))),
                      PROJECT / "scripts/evaluate_persist4d.py",
                      PROJECT / "scripts/evaluate_persist4d_p6a.py"]
@@ -348,8 +349,25 @@ def run_pipeline(args) -> dict:
     statuses = {}
     stages = ("prepare", "export", "baseline", "train", "evaluate-cal", "screen",
               "replicate", "diagnostics", "profile", "report", "publish")
-    if args.resume and (args.root / "publication/PUBLISH_STATE.json").exists():
-        stages = ("publish",)
+    if args.resume and (args.root / "EXPORT_INDEX.json").exists():
+        from scripts.short_module_identity import (
+            assert_export_current,
+            assert_sources_current,
+        )
+        index = assert_export_current(args.root)
+        stored = read_json(Path(index["cache"]) / "IDENTITY.json")
+        producer_project = next(Path(p).parents[1] for p in stored["sources"]
+                                if p.endswith("/scripts/short_module_native.py"))
+        # Imported manifests contain absolute paths into their producing
+        # checkout. Also compare THIS checkout, not just the preserved producer.
+        current_sources = {str(PROJECT / Path(p).relative_to(producer_project))
+                           if Path(p).is_relative_to(producer_project) else p: digest
+                           for p, digest in stored["sources"].items()}
+        assert_sources_current({"sources": current_sources})
+        if stored["input_manifest_sha256"] != sha256(ARTIFACTS / "INPUT_MANIFEST.json"):
+            raise ValueError("resume input manifest changed")
+    # Publication recovery is an explicit `publish` operation, never a reason
+    # for `run --resume` to silently bypass computation freshness checks.
     for stage in stages:
         if args.resume:
             if stage == "prepare" and (ARTIFACTS / "RUN_CONFIG.json").exists():
@@ -359,15 +377,8 @@ def run_pipeline(args) -> dict:
                     and read_json(args.root / "EXPORT_INDEX.json")["status"] == "COMPLETE"):
                 statuses[stage] = "REUSED"
                 continue
-            if stage == "train" and (args.root / "TRAINING_STATUS.json").exists():
-                trained = read_json(args.root / "TRAINING_STATUS.json")
-                if all(trained.get(arm, {}).get("status") == "COMPLETE" and
-                       trained[arm].get("optimizer_updates") == 1500 and
-                       all(Path(c["path"]).is_file() and sha256(Path(c["path"])) == c["sha256"]
-                           for c in trained[arm]["checkpoints"])
-                       for arm in ("Q1", "Q2", "Q3", "M0", "M1", "M2")):
-                    statuses[stage] = "REUSED"
-                    continue
+            # train_arm validates the complete current training identity before
+            # resuming; checkpoint presence/hashes alone cannot skip that check.
         command = [sys.executable, "-m", "scripts.short_module_screen", stage,
                    "--config", str(args.config), "--root", str(args.root), "--device", args.device]
         if args.resume:

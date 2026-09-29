@@ -1,0 +1,82 @@
+{
+  "Q_comparison": "original inputs, seed45/sample plan/1500 updates; original locked steps",
+  "R1_forwards": 0,
+  "geometry_policy": "legacy eligibility, assignment, segment targets and weights unchanged",
+  "groups": [
+    {
+      "H": 1,
+      "candidates": 2300,
+      "expanded_M_assignment_changes": 4,
+      "expanded_M_new_matches": 4,
+      "legacy_M_assignment_changes": 0,
+      "new_quality_eligible": 63,
+      "role": "CAL"
+    },
+    {
+      "H": 2,
+      "candidates": 2300,
+      "expanded_M_assignment_changes": 2,
+      "expanded_M_new_matches": 2,
+      "legacy_M_assignment_changes": 0,
+      "new_quality_eligible": 53,
+      "role": "CAL"
+    },
+    {
+      "H": 1,
+      "candidates": 2400,
+      "expanded_M_assignment_changes": 2,
+      "expanded_M_new_matches": 2,
+      "legacy_M_assignment_changes": 0,
+      "new_quality_eligible": 37,
+      "role": "SEL"
+    },
+    {
+      "H": 2,
+      "candidates": 2400,
+      "expanded_M_assignment_changes": 0,
+      "expanded_M_new_matches": 0,
+      "legacy_M_assignment_changes": 0,
+      "new_quality_eligible": 23,
+      "role": "SEL"
+    },
+    {
+      "H": 1,
+      "candidates": 19900,
+      "expanded_M_assignment_changes": 26,
+      "expanded_M_new_matches": 23,
+      "legacy_M_assignment_changes": 0,
+      "new_quality_eligible": 586,
+      "role": "TRAIN"
+    },
+    {
+      "H": 2,
+      "candidates": 18800,
+      "expanded_M_assignment_changes": 36,
+      "expanded_M_new_matches": 26,
+      "legacy_M_assignment_changes": 0,
+      "new_quality_eligible": 629,
+      "role": "TRAIN"
+    }
+  ],
+  "label_identity": {
+    "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+    "geometry_policy": "frozen-v1",
+    "prediction_identity": {
+      "baseline_commit": "4bf00902c9428795f7f47547bf462540aa304cc6",
+      "historical_cache_identity": "229cc0e8b9a0960670fcb849d1b157d4ec873541f4c7289af815fc8a8f08839f",
+      "historical_index_sha256": "762b5d1ea993a11ffd96c568d3cd5b9b22b3af89ce56607b4c020699283f0363",
+      "kind": "immutable-baseline-import"
+    },
+    "schema": "short-module-labels-v2",
+    "sources": {
+      "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+      "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_data.py": "660202cccd0cd20c1f91047f645620025f25dca0007a1f36d726c60ce2ef5bc1",
+      "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+      "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+      "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30"
+    }
+  },
+  "label_identity_sha256": "70dced4153d5083fb832cd5d68075ca8f38c63772434c52a42ad9b29f27328a1",
+  "prediction_files_reused": 481,
+  "status": "COMPLETE"
+}

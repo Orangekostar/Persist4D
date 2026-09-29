@@ -85,7 +85,9 @@ def test_incomplete_population_returns_null_without_reusing_metric_state(tmp_pat
     write_json(tmp_path / "EXPORT_INDEX.json", {"status": "COMPLETE", "cache": str(tmp_path),
         "cache_identity_sha256": "fixture", "entries": [{"input_id": "1", "prediction": {"file": "prediction.pt"},
                                                         "targets": {"file": "target.pt"}}]})
-    write_json(tmp_path / "assets.local.json", {"metric_dataset_spec": "unused"})
+    spec = tmp_path / "dataset.yaml"
+    spec.write_text("name: fixture\n")
+    write_json(tmp_path / "assets.local.json", {"metric_dataset_spec": str(spec)})
     torch.save({}, tmp_path / "prediction.pt")
     torch.save({"target": {"masks": torch.ones(1, 2, dtype=torch.bool)}}, tmp_path / "target.pt")
     parent = SimpleNamespace(pred_masks=torch.ones(2, 1, dtype=torch.bool), pred_scores=torch.ones(1),

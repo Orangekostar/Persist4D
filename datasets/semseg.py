@@ -58,6 +58,7 @@ class SemanticSegmentationDataset(Dataset):
         fail_closed: bool = False,
         known_empty_scan_policy: str = "official_substitute",
         exclude_unsupervised_sequences: bool = False,
+        apply_training_augmentation: bool = True,
     ):
 
         if known_empty_scan_policy not in {
@@ -80,6 +81,9 @@ class SemanticSegmentationDataset(Dataset):
         self.label_offset = label_offset
 
         self.mode = mode
+        if type(apply_training_augmentation) is not bool:
+            raise ValueError("apply_training_augmentation must be a boolean")
+        self.apply_training_augmentation = apply_training_augmentation
         self.data_dir = data_dir
         if type(data_dir) == str:
             self.data_dir = [self.data_dir]
@@ -574,7 +578,7 @@ class SemanticSegmentationDataset(Dataset):
             color = np.ones((len(color), 3))
 
         # volume and image augmentations for train
-        if "train" in self.mode:
+        if "train" in self.mode and self.apply_training_augmentation:
             points = np.hstack((coordinates, color, normals, labels, segments[..., None]))
 
             coordinates -= coordinates.mean(0)

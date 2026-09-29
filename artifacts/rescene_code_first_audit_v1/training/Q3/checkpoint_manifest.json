@@ -1,0 +1,89 @@
+{
+  "base_sha256": "629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd",
+  "cache_identity_sha256": "229cc0e8b9a0960670fcb849d1b157d4ec873541f4c7289af815fc8a8f08839f",
+  "checkpoints": [
+    {
+      "bytes": 390384,
+      "path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/training/Q3/seed45/update=0000.pt",
+      "sha256": "7a5685c02530282189bc9d92ce4b26ec2dce627b9162cf57af910106f7f03458",
+      "step": 0
+    },
+    {
+      "bytes": 1166334,
+      "path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/training/Q3/seed45/update=0500.pt",
+      "sha256": "4a0f43bc3aad88024f3556637f2ddeb40320b1cfbafbe78f81db984003909d40",
+      "step": 500
+    },
+    {
+      "bytes": 1166334,
+      "path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/training/Q3/seed45/update=1000.pt",
+      "sha256": "fa1e981c41f265a17904482b119d3ef09a89634fd4cab99ff5ce077739ae582c",
+      "step": 1000
+    },
+    {
+      "bytes": 1166334,
+      "path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/training/Q3/seed45/update=1500.pt",
+      "sha256": "15c90ceb95ca9f4a322bff3003234ddc8499755baafd27f45690655b7f40deee",
+      "step": 1500
+    }
+  ],
+  "descriptor": "Q: functional LN(q), LN(mean_h); raw absolute h difference; no concatenation LN. M: parent-normalized q and raw h.",
+  "dimensions": {
+    "classes": 18,
+    "feature_dim": 128,
+    "probability_dim": 19,
+    "query_dim": 128
+  },
+  "estimated_1500_seconds": 28.877669855137356,
+  "first20_seconds": 0.3850355980684981,
+  "initial_parameter_sha256": "fec6b7ca285762879f66334e4a3de8c3b98b8dce9f01fff032482e4ef6537f98",
+  "label_identity_sha256": "70dced4153d5083fb832cd5d68075ca8f38c63772434c52a42ad9b29f27328a1",
+  "loss_source_sha256": "660202cccd0cd20c1f91047f645620025f25dca0007a1f36d726c60ce2ef5bc1",
+  "module": "Q3",
+  "optimizer_updates": 1500,
+  "parameter_count": 96393,
+  "parent_loaded_in_training": false,
+  "postprocess": "original retained candidates, no new filter",
+  "sample_plan_sha256": "2c00272b4965c41939404bda736811dc73e59ce674cc81ca85a35fc4c6f781ae",
+  "schedule_horizon": 1500,
+  "seed": 45,
+  "source_sha256": "4a4da7bcb585a1bfa73475aba4968f6fb8be101a9f6698921a4ad49d7660422c",
+  "status": "COMPLETE",
+  "supervised_gradient_checks": [
+    {
+      "gradient_norm": 0.6516863107681274,
+      "head_changed": true,
+      "parent_in_optimizer": false,
+      "update": 1
+    },
+    {
+      "gradient_norm": 0.5811041593551636,
+      "head_changed": true,
+      "parent_in_optimizer": false,
+      "update": 2
+    }
+  ],
+  "supported_horizons": [
+    1,
+    2
+  ],
+  "target_updates": 1500,
+  "thresholds": [
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9
+  ],
+  "training_seconds": 16.082805623998865,
+  "training_sources": {
+    "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+    "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_data.py": "660202cccd0cd20c1f91047f645620025f25dca0007a1f36d726c60ce2ef5bc1",
+    "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_training.py": "4a4da7bcb585a1bfa73475aba4968f6fb8be101a9f6698921a4ad49d7660422c",
+    "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/perception_gain_trainer.py": "eeaea7e459fb8afbc6d7e7a9e8335c114349701df7afcb37cf26c9b47d90059a"
+  }
+}

@@ -1,0 +1,637 @@
+{
+  "bytes": 15369519,
+  "controlled_fixed_heads": 5,
+  "file": "EVIDENCE_BUNDLE.zip",
+  "members": {
+    "controlled_heads/M0.pt": {
+      "bytes": 826294,
+      "sha256": "88d14592dc5cd7b91bcbd32f4c40df17f625936d5cce3da354e7a919d9a244b0"
+    },
+    "controlled_heads/M1.pt": {
+      "bytes": 826294,
+      "sha256": "f1f966183b91f92a43e08192849ab215a741c49465b1eabf6bf3671416a9bdb4"
+    },
+    "controlled_heads/Q1.pt": {
+      "bytes": 1160190,
+      "sha256": "afdbd2cb510ecf052af64f87c535925c69432759e6663e774bbd2abe986ac6b5"
+    },
+    "controlled_heads/Q2.pt": {
+      "bytes": 1160190,
+      "sha256": "4612e712ea54ebe3a9eb88180b8fe207aef57937957c74143e0be04a16bab126"
+    },
+    "controlled_heads/Q3.pt": {
+      "bytes": 1166334,
+      "sha256": "fa1e981c41f265a17904482b119d3ef09a89634fd4cab99ff5ce077739ae582c"
+    },
+    "original_locked_heads/M0.pt": {
+      "bytes": 825526,
+      "sha256": "b95bd4b863a75540cbea6454f05ffe8d2fd5f2615acd349a8fc0f2fb2de1e01c"
+    },
+    "original_locked_heads/M1.pt": {
+      "bytes": 825526,
+      "sha256": "5f32d8ee7eb8e8815f4282d67169144aadc373f92fce663140933dbe7c6a2388"
+    },
+    "original_locked_heads/M2.pt": {
+      "bytes": 825526,
+      "sha256": "2da01fc78dac4530e639248e295ea4d4f035e906e8d8ce2a64bdcf6de9687451"
+    },
+    "original_locked_heads/Q1.pt": {
+      "bytes": 1159230,
+      "sha256": "2d65b801b17bd632d539a6d4000fa02ab578e42ed4d13e0a0644e457d81a46c5"
+    },
+    "original_locked_heads/Q2.pt": {
+      "bytes": 1159230,
+      "sha256": "3cc47b7cf9a48cdc5e27e9d835489ce09d38c3be095a2b0530ff4ed7ef43b92d"
+    },
+    "original_locked_heads/Q3.pt": {
+      "bytes": 1165374,
+      "sha256": "17ba349d52c75cd121603cb97e42dd4d6463da905b8c4dbb737c586e8f69a9ce"
+    },
+    "public/BASELINE_PROBE.json": {
+      "bytes": 999,
+      "sha256": "20741409d8f87a74b4c9fcd44b61517adda63d60e52fb171dac83da1972e0f99"
+    },
+    "public/BUDGET_CONTRACT.json": {
+      "bytes": 346,
+      "sha256": "91be6d9b4b50235501647b129ef6353f7e21e8f90dbcdf29e5a4a610e2e1d75c"
+    },
+    "public/BUDGET_LEDGER.jsonl": {
+      "bytes": 2446,
+      "sha256": "fbe5bddacfdca375119b85f52c55bf16e6e41ecbb8ffe31788aa36ce3d0f2db8"
+    },
+    "public/CONCLUSION.md": {
+      "bytes": 2660,
+      "sha256": "de7bdeeaf725060b040f702126cee848d61ad2fbec31b098714acb8d1a8ccab5"
+    },
+    "public/INPUT_MANIFEST.json": {
+      "bytes": 2515,
+      "sha256": "55cd89fc3d5cfd418b9638f2c869e99c54027bfa05c099dcb717359bf97af869"
+    },
+    "public/M_CONTROL_STATUS.json": {
+      "bytes": 388,
+      "sha256": "441658d6ca5544907ed46cc894febb5dd94e1d50bcd0a289f848d480fb050935"
+    },
+    "public/M_MATCHED_COMPARISON.json": {
+      "bytes": 48945,
+      "sha256": "abf1df98ffd23b398b681d65c6d78b53d040e5fb4e7be6aac8a4bbbce96878b6"
+    },
+    "public/M_TRAINING_STATUS.json": {
+      "bytes": 7358,
+      "sha256": "e83ad07eefc65c9dcbd25642ea03b0c9722d60ae5f7569e2761c11a910f997cb"
+    },
+    "public/NOAUG_EXPORT.json": {
+      "bytes": 373,
+      "sha256": "0f360b6e405f68cd9295471a5caaa682772503a85fd63fdbeeb0d96e836a9561"
+    },
+    "public/NOAUG_FIXED_HEADS.json": {
+      "bytes": 80456,
+      "sha256": "fc7e8ee95f6df2b6741bf42e3d5b3b5f914ca12bed8fb9b4545996c1cc3b1430"
+    },
+    "public/NOAUG_INPUT_PARITY.json": {
+      "bytes": 195,
+      "sha256": "f462af8730222c6448768a88ce1bac0158334ef1614344307679b7ce74f9dc2a"
+    },
+    "public/ORIGINAL_Q_SCORE_CROSSTAB.json": {
+      "bytes": 51425,
+      "sha256": "116584baf1a061608410e8f161d153ffabb28719a592193a94febc61cbca6967"
+    },
+    "public/Q_MATCHED_COMPARISON.json": {
+      "bytes": 108672,
+      "sha256": "84d4db0f9d5e03be16b554daa653cb54e68e7ebf1fa1eda69d0584c05b81b572"
+    },
+    "public/Q_TRAINING_STATUS.json": {
+      "bytes": 10830,
+      "sha256": "71bf50bf6d4d41adc6cdb9959c3c4714415b6a394ad3ea969d87d114f1f4c560"
+    },
+    "public/RELABEL_AUDIT.json": {
+      "bytes": 3083,
+      "sha256": "d2436bdf9b37c074270e55634fd46b2fff7680a551fc574a7649fb093ee03bc2"
+    },
+    "public/REPORT.md": {
+      "bytes": 2811,
+      "sha256": "80f83aad91060d5cd0bc13ee985a72f7f35b3722462c388865293f981aea876a"
+    },
+    "public/REQUIREMENT_REVIEW.md": {
+      "bytes": 2879,
+      "sha256": "0d14c94826d1738930465053482d22f1f485a15ef4801e3d1fe55bcf37fa2d3a"
+    },
+    "public/RUN_CONFIG.json": {
+      "bytes": 9172,
+      "sha256": "e85724b44a0d202272b11cef385f1d7451523be18b47a8aef13884f3123ac017"
+    },
+    "public/SHORT_POPULATION.json": {
+      "bytes": 231841,
+      "sha256": "8073215d0bf8d2952bb1d671a94b7cac1cd5f61adf181c636826a454d0bc873a"
+    },
+    "public/TEST_NOTES.md": {
+      "bytes": 1339,
+      "sha256": "5a5fca87843055c6cfaa66112d2ee7a598740b566a88c42e49d51592e2bf1ce7"
+    },
+    "public/VERIFIED_RESULTS.json": {
+      "bytes": 10719,
+      "sha256": "97899de7b41078f2af3c9df32ccc9a6ae804918a12dadb9ebdf25ec0ff9634d7"
+    },
+    "public/selection/CAL_LOCK.json": {
+      "bytes": 5421,
+      "sha256": "4e82f769a2a8180d061cbf9c6d09abddf43d6b021ea775c688176a8d502f8cab"
+    },
+    "public/training/M0/checkpoint_manifest.json": {
+      "bytes": 3492,
+      "sha256": "6ebf2e86f704f5fdaff402a83f9f5ab298f2610d155c4bdb09448a2a1b5a9960"
+    },
+    "public/training/M0/metrics.csv": {
+      "bytes": 2378,
+      "sha256": "1d2d03ce1aefdb73ea31105af9f2917cd41cf5198259d2cf73722f4c38fc3275"
+    },
+    "public/training/M0/resolved_config.json": {
+      "bytes": 2865,
+      "sha256": "aa6d21323e9e626badd8b4db5091142893fff830ff26e2f3bff49d0635d7baa0"
+    },
+    "public/training/M1/checkpoint_manifest.json": {
+      "bytes": 3493,
+      "sha256": "f4e6345cdfeb8d47026f2dee627bc3fbaf252f42271a41d10af97d8e2efdd8d1"
+    },
+    "public/training/M1/metrics.csv": {
+      "bytes": 2470,
+      "sha256": "cb5c4d891cbdf772d863a96ed811dd854ac13c9b25fd6d0ad74afbc7393858a2"
+    },
+    "public/training/M1/resolved_config.json": {
+      "bytes": 2865,
+      "sha256": "fcf57ce773561398d3e41643226760a13df767926bc0517b6b8d30dd2d86df59"
+    },
+    "public/training/Q1/checkpoint_manifest.json": {
+      "bytes": 3426,
+      "sha256": "4661dc8deb4fa955c5cc1147f39298d519ece1a0ee883cffcb6e48587f51a7e5"
+    },
+    "public/training/Q1/metrics.csv": {
+      "bytes": 1912,
+      "sha256": "8765218bffe2038fcf12bf429730931f1d45267f309cbc551ba577af58cc1dbc"
+    },
+    "public/training/Q1/resolved_config.json": {
+      "bytes": 2865,
+      "sha256": "cd742a1849d08e40615002832fced95aaa0c8a9bed5e40956ebeb8d7c5a4c558"
+    },
+    "public/training/Q2/checkpoint_manifest.json": {
+      "bytes": 3422,
+      "sha256": "dc3a9ed72dd7a27b4146b2f87301d7d757222804b394e75c8564f0dba3c58c04"
+    },
+    "public/training/Q2/metrics.csv": {
+      "bytes": 1908,
+      "sha256": "f29e6668dcee0fd1fe7a29f76744138825b218e8a0f4d7063af3c5d182ab33bf"
+    },
+    "public/training/Q2/resolved_config.json": {
+      "bytes": 2865,
+      "sha256": "ff32e09402c25fae0c5a686d7ea3cc21d8af1b110b7daac6590ddc1b8000bfa3"
+    },
+    "public/training/Q3/checkpoint_manifest.json": {
+      "bytes": 3424,
+      "sha256": "c1cdafe07db72947f6821c951e44bba5ad92f0ff9b8f5d3f0fe85dbfbe779e2d"
+    },
+    "public/training/Q3/metrics.csv": {
+      "bytes": 1886,
+      "sha256": "2dd14f92a6b8668c4446241c006cac14acdcb6b5b488fb269d59aea0b9479d26"
+    },
+    "public/training/Q3/resolved_config.json": {
+      "bytes": 2865,
+      "sha256": "437df20912c058fcd5169bd238fdfb5ad0287a049ba8058c271f32e7f455cbba"
+    },
+    "runtime/evaluation/00cfa3caa410206b/Q2/seed45/CAL-1500-H1-metric-state.json": {
+      "bytes": 346342,
+      "sha256": "115a9985324271e14599ec70238fb71895c0fe970f1d53a2ddf8374bd36e58a1"
+    },
+    "runtime/evaluation/00cfa3caa410206b/Q2/seed45/CAL-1500-H2-metric-state.json": {
+      "bytes": 360268,
+      "sha256": "1698dc6ecc24f3ff3fa0f5c408e2ca7e9b1f16e7f7c25be32fa7a0ea59b0ef94"
+    },
+    "runtime/evaluation/00cfa3caa410206b/Q2/seed45/CAL-1500.json": {
+      "bytes": 5516,
+      "sha256": "db8fd35599c2e2ea5d2143d3b9ee9e88230edea69baaf4be3ed3cd21f5b31806"
+    },
+    "runtime/evaluation/00cfa3caa410206b/Q2/seed45/SEL-1500-H1-metric-state.json": {
+      "bytes": 346924,
+      "sha256": "d418e2fc95740bfdfd32a0add281c93fb27a62e28a1b4fad6ce682a5fddb4541"
+    },
+    "runtime/evaluation/00cfa3caa410206b/Q2/seed45/SEL-1500-H2-metric-state.json": {
+      "bytes": 350800,
+      "sha256": "9b7e12b4c2ce94fed72bb0adea26f6249d9574d2585a90c92cd6fedb38ae1295"
+    },
+    "runtime/evaluation/00cfa3caa410206b/Q2/seed45/SEL-1500.json": {
+      "bytes": 5513,
+      "sha256": "e8e442dfbb0789ac81a52756d5d0171f171836bc25dcd345988d692781202749"
+    },
+    "runtime/evaluation/113018ccb8756992/Q3/seed45/CAL-1000-H1-metric-state.json": {
+      "bytes": 346326,
+      "sha256": "55c2209c13bf3420973e2961bd0d3237fbb8afa45173106eb3ac2d2ebd9f8383"
+    },
+    "runtime/evaluation/113018ccb8756992/Q3/seed45/CAL-1000-H2-metric-state.json": {
+      "bytes": 360268,
+      "sha256": "e796f8a249e50e432c3c2d358cddeb656cc2c5ba9bb427a37e175a9071f0f5dc"
+    },
+    "runtime/evaluation/113018ccb8756992/Q3/seed45/CAL-1000.json": {
+      "bytes": 5514,
+      "sha256": "f579d83260bdc3b2695a089657311dfac61b6b98de1013acf7613301badb9c45"
+    },
+    "runtime/evaluation/113018ccb8756992/Q3/seed45/SEL-1000-H1-metric-state.json": {
+      "bytes": 346908,
+      "sha256": "99c2cbf18b899313c7d9260751ec8dc4562e5cb2e6da3fad39626908cf5680d2"
+    },
+    "runtime/evaluation/113018ccb8756992/Q3/seed45/SEL-1000-H2-metric-state.json": {
+      "bytes": 350800,
+      "sha256": "4281ccfc4ee499fd9f72d5afb504c4d9cf9fcef3a7f82c7216ac2975a3a8b8f0"
+    },
+    "runtime/evaluation/113018ccb8756992/Q3/seed45/SEL-1000.json": {
+      "bytes": 5515,
+      "sha256": "f7e04ec9fdffd62501b0ae6fdde8c250473f73493662161ac647ffc79c9594dc"
+    },
+    "runtime/evaluation/17227a100eeb644f/M1/seed45/CAL-1000-H1-metric-state.json": {
+      "bytes": 346686,
+      "sha256": "985cd0b2661c032926082a426d7811e1317afe1221d277d767733878c1c6e4f7"
+    },
+    "runtime/evaluation/17227a100eeb644f/M1/seed45/CAL-1000-H2-metric-state.json": {
+      "bytes": 360260,
+      "sha256": "8fcede38ef4cb029207d76b6a5d4a1af89497cec082a670620d44f1a371ca2cd"
+    },
+    "runtime/evaluation/17227a100eeb644f/M1/seed45/CAL-1000.json": {
+      "bytes": 5530,
+      "sha256": "9f26957a3836f2609b63ecf332f69f73e78498ba9e35a38205fcaa687ee99b8a"
+    },
+    "runtime/evaluation/17227a100eeb644f/M1/seed45/SEL-1000-H1-metric-state.json": {
+      "bytes": 347052,
+      "sha256": "b2f42832b10a413b1d10db8027f77814507d9e0023d93b2996a0cac7f4cd5c68"
+    },
+    "runtime/evaluation/17227a100eeb644f/M1/seed45/SEL-1000-H2-metric-state.json": {
+      "bytes": 351136,
+      "sha256": "4f43c609c26b536fca9491628ecd5977e9fa1328aa6d1976ae0d0323638897a9"
+    },
+    "runtime/evaluation/17227a100eeb644f/M1/seed45/SEL-1000.json": {
+      "bytes": 5529,
+      "sha256": "490019bf5c365b5c9dc7402f4277b719373d68e206dd21ef376af833740782a7"
+    },
+    "runtime/evaluation/204db3fce06dd2b9/Q1/seed45/CAL-1500-H1-metric-state.json": {
+      "bytes": 346342,
+      "sha256": "494d83452ba96f282b03d4460f39cf4ed2eb0e80bba5a8a8050b22edefc7f32b"
+    },
+    "runtime/evaluation/204db3fce06dd2b9/Q1/seed45/CAL-1500-H2-metric-state.json": {
+      "bytes": 360276,
+      "sha256": "e7a5c1f0fbdeeabcc60260766e83aab1b2ce61e76facc0fde54a05db87298dd2"
+    },
+    "runtime/evaluation/204db3fce06dd2b9/Q1/seed45/CAL-1500.json": {
+      "bytes": 5516,
+      "sha256": "18042e82e5c4897f87ef93c2f316b4a03506229b2682ce1c3eb7689a582f6cb6"
+    },
+    "runtime/evaluation/204db3fce06dd2b9/Q1/seed45/SEL-1500-H1-metric-state.json": {
+      "bytes": 346924,
+      "sha256": "0de117ea1ddd9298056c3b1730dbb7ccf7cdd316ab6c841c199c989dd1d0c4d9"
+    },
+    "runtime/evaluation/204db3fce06dd2b9/Q1/seed45/SEL-1500-H2-metric-state.json": {
+      "bytes": 350800,
+      "sha256": "acadb845b5b2df7720ce56714c803b3c92dda41f1087482954b81518770ba49e"
+    },
+    "runtime/evaluation/204db3fce06dd2b9/Q1/seed45/SEL-1500.json": {
+      "bytes": 5512,
+      "sha256": "a2b3fd79bb74b070a20884ec1837dbd06d737500eaafa6602482f7c80d311d8f"
+    },
+    "runtime/evaluation/2faf328fa66af079/M0/seed45/CAL-1500-H1-metric-state.json": {
+      "bytes": 333988,
+      "sha256": "562131fd30f46ca9d7161d0a0d67c7b0d0d1c3794a83645a1c7708a3bc9e2079"
+    },
+    "runtime/evaluation/2faf328fa66af079/M0/seed45/CAL-1500-H2-metric-state.json": {
+      "bytes": 348264,
+      "sha256": "1904638e4c2ba617f5d604d6e45e2b0330eca7e3964240432cd7d9a31b3b7b14"
+    },
+    "runtime/evaluation/2faf328fa66af079/M0/seed45/CAL-1500.json": {
+      "bytes": 5508,
+      "sha256": "f1770fac64797926a565467745304039513d7d3f6eda71ff5339059681d907ed"
+    },
+    "runtime/evaluation/2faf328fa66af079/M0/seed45/SEL-1500-H1-metric-state.json": {
+      "bytes": 334136,
+      "sha256": "a91b11cdf04d190524a41a441ba5b9c002c2bfc91727dac8582cb37fdf5c0fe6"
+    },
+    "runtime/evaluation/2faf328fa66af079/M0/seed45/SEL-1500-H2-metric-state.json": {
+      "bytes": 337782,
+      "sha256": "46dc50aec87cc93c612e57f7c4fc0e50d5f99514511a58d80aadcec6da5b4edf"
+    },
+    "runtime/evaluation/2faf328fa66af079/M0/seed45/SEL-1500.json": {
+      "bytes": 5507,
+      "sha256": "d4074010cc95c48e6e7259e2565d3e957a2b19611bdbf0781ba1a4af44db33b6"
+    },
+    "runtime/evaluation/3e36d6ee1900f86b/Q1/seed45/CAL-1500-H1-metric-state.json": {
+      "bytes": 346342,
+      "sha256": "157038f2032bbf4e3fad7fdc89503b7fe4eb26bc15ba010bd4eb030d8dc07547"
+    },
+    "runtime/evaluation/3e36d6ee1900f86b/Q1/seed45/CAL-1500-H2-metric-state.json": {
+      "bytes": 360276,
+      "sha256": "1bae1a1c4a121b6e121a13585d212d55e4b62695962e45a5e74b274c6da3f9a7"
+    },
+    "runtime/evaluation/3e36d6ee1900f86b/Q1/seed45/CAL-1500.json": {
+      "bytes": 5514,
+      "sha256": "854a11a3a28b086547a17b519dd2ffd4b43db96982b733535dfa37e9d0fce808"
+    },
+    "runtime/evaluation/3e36d6ee1900f86b/Q1/seed45/SEL-1500-H1-metric-state.json": {
+      "bytes": 346916,
+      "sha256": "854884704468b118a7c59f8e649a714362c4c3235e0c18358d6a98e9c8eed103"
+    },
+    "runtime/evaluation/3e36d6ee1900f86b/Q1/seed45/SEL-1500-H2-metric-state.json": {
+      "bytes": 350800,
+      "sha256": "4ddcfbacb5ffe90562489086d40d28499e401988bb1f4ac9d8f2b2a9bef4117e"
+    },
+    "runtime/evaluation/3e36d6ee1900f86b/Q1/seed45/SEL-1500.json": {
+      "bytes": 5506,
+      "sha256": "90ff4ca51533b2f9bde3824a84b9036b8ca61176f1f61d58bad2cc1847ca4e8b"
+    },
+    "runtime/evaluation/70a2ff87eadf9005/M1/seed45/CAL-1000-H1-metric-state.json": {
+      "bytes": 346534,
+      "sha256": "c12349b9f9bb58e72fc9bd99467e01fcf0c2246a453f984d7bdf463f5ec3b6ba"
+    },
+    "runtime/evaluation/70a2ff87eadf9005/M1/seed45/CAL-1000-H2-metric-state.json": {
+      "bytes": 360508,
+      "sha256": "1a07db62cc32542841552a10529c935fb22f591ff2f95549a8c7f6770e45a0af"
+    },
+    "runtime/evaluation/70a2ff87eadf9005/M1/seed45/CAL-1000.json": {
+      "bytes": 5509,
+      "sha256": "13a8ecb419b7bed71fd858d06409cb71fb0d24cb53c00f590456c9213989a1c7"
+    },
+    "runtime/evaluation/70a2ff87eadf9005/M1/seed45/SEL-1000-H1-metric-state.json": {
+      "bytes": 347052,
+      "sha256": "de7e3508c50d03f7df2c0b0b444f5ba6ec4fe33ea27397458d58cd39e5200267"
+    },
+    "runtime/evaluation/70a2ff87eadf9005/M1/seed45/SEL-1000-H2-metric-state.json": {
+      "bytes": 351136,
+      "sha256": "6a491cbb1d9e7c5e84d74675ebc58cc0a00721c49ef112941601c90f81f0ca80"
+    },
+    "runtime/evaluation/70a2ff87eadf9005/M1/seed45/SEL-1000.json": {
+      "bytes": 5505,
+      "sha256": "45c1a9cb0a8e49528ae2ceb8bd99d05a0e784d1e91110ab836911edc0f67e60b"
+    },
+    "runtime/evaluation/765c7d0ddf084145/B0/seed45/CAL-0000-H1-metric-state.json": {
+      "bytes": 346334,
+      "sha256": "46ffdc737d6c7fcc46cc1a0daef690fd4838f2c2b2fd1f4162b8571d7cb076da"
+    },
+    "runtime/evaluation/765c7d0ddf084145/B0/seed45/CAL-0000-H2-metric-state.json": {
+      "bytes": 360268,
+      "sha256": "499d7dd46f6b52e6dd11b9fbf48c82ee895df53ed868c89affacd21541ebd5d6"
+    },
+    "runtime/evaluation/765c7d0ddf084145/B0/seed45/CAL-0000.json": {
+      "bytes": 5387,
+      "sha256": "a8f5d85884865c4871e9d28c6d66316ab4abe4397ada12a8e19617d2f867a455"
+    },
+    "runtime/evaluation/765c7d0ddf084145/B0/seed45/SEL-0000-H1-metric-state.json": {
+      "bytes": 346940,
+      "sha256": "e038a24d153af27376aa9ccd12500d8401bdc73b29e13e65f60d99f968f8ea62"
+    },
+    "runtime/evaluation/765c7d0ddf084145/B0/seed45/SEL-0000-H2-metric-state.json": {
+      "bytes": 350800,
+      "sha256": "bfd12195b0f6a4c1655ad3580cf723db756514eb8454171ac14e42e023b9c469"
+    },
+    "runtime/evaluation/765c7d0ddf084145/B0/seed45/SEL-0000.json": {
+      "bytes": 5382,
+      "sha256": "52e8fa8748c812ee16c23b208edef01475f6f5f24e04dea6154cdce5de7d6275"
+    },
+    "runtime/evaluation/8ff000928a380107/M0/seed45/CAL-1500-H1-metric-state.json": {
+      "bytes": 333948,
+      "sha256": "04bcef4a77dde7bcd8f47752d287d93a5c21eeade6ba376ec5ea0d1acca59e7e"
+    },
+    "runtime/evaluation/8ff000928a380107/M0/seed45/CAL-1500-H2-metric-state.json": {
+      "bytes": 348104,
+      "sha256": "cc4944cee2d3effcb1f36165c45e57e709e78a4b18f0aa47ee563997a55c766a"
+    },
+    "runtime/evaluation/8ff000928a380107/M0/seed45/CAL-1500.json": {
+      "bytes": 5531,
+      "sha256": "110cfe0bee2ba3e5c0591022d92a1d87195af2cb1c577f5b17554a33c6cb26db"
+    },
+    "runtime/evaluation/8ff000928a380107/M0/seed45/SEL-1500-H1-metric-state.json": {
+      "bytes": 333336,
+      "sha256": "5ed6675b721fe36040aa7d07e92820fcedb5ac2bb93b76d799cfba2f0f4f283f"
+    },
+    "runtime/evaluation/8ff000928a380107/M0/seed45/SEL-1500-H2-metric-state.json": {
+      "bytes": 337598,
+      "sha256": "59b3630938d78ec1a12450c8fd127594e6d0ea764d357340d5f39be8bdf75816"
+    },
+    "runtime/evaluation/8ff000928a380107/M0/seed45/SEL-1500.json": {
+      "bytes": 5531,
+      "sha256": "576169ee12c8bd63b01a7babde7062708f6acd71dcc164b702b648615d1e6b40"
+    },
+    "runtime/evaluation/adf32591ff697a4f/Q2/seed45/CAL-1500-H1-metric-state.json": {
+      "bytes": 346342,
+      "sha256": "5226b864d02f45d4f3fd5da2274397f4668f335c92b2d63cb15e987707ec84a1"
+    },
+    "runtime/evaluation/adf32591ff697a4f/Q2/seed45/CAL-1500-H2-metric-state.json": {
+      "bytes": 360268,
+      "sha256": "e27e2f0abe38fa5d97906a6b10a221f6e138c4f349393ae1b949e8188df3964a"
+    },
+    "runtime/evaluation/adf32591ff697a4f/Q2/seed45/CAL-1500.json": {
+      "bytes": 5507,
+      "sha256": "e7faf57d4af9cb40c6e86d13f43d85a888fdbcc514c7f70773d1db06709a7e66"
+    },
+    "runtime/evaluation/adf32591ff697a4f/Q2/seed45/SEL-1500-H1-metric-state.json": {
+      "bytes": 346924,
+      "sha256": "cdd148471aade7bc4125c88d8abaad0d2abf639cb89c5c5214acea0adaa29dd9"
+    },
+    "runtime/evaluation/adf32591ff697a4f/Q2/seed45/SEL-1500-H2-metric-state.json": {
+      "bytes": 350800,
+      "sha256": "a83c408821876106ad96b5459b20b8e2f0518eb99e2ff36afb05b7115dc72ff0"
+    },
+    "runtime/evaluation/adf32591ff697a4f/Q2/seed45/SEL-1500.json": {
+      "bytes": 5507,
+      "sha256": "80c4660d0838ab35297e23d2f4f08364dc8c4ec5a318147be1c9d8bae62077e6"
+    },
+    "runtime/evaluation/ed206b080b9ebb76/Q3/seed45/CAL-1000-H1-metric-state.json": {
+      "bytes": 346326,
+      "sha256": "841f16f9c8c4755882c08ea9c48895b6228e7441f42e2cc3bd0401410a376556"
+    },
+    "runtime/evaluation/ed206b080b9ebb76/Q3/seed45/CAL-1000-H2-metric-state.json": {
+      "bytes": 360268,
+      "sha256": "624e66e5fd78ef14c5385de1202c93f0fe33426aa6b36ef678f93af7b4ba1903"
+    },
+    "runtime/evaluation/ed206b080b9ebb76/Q3/seed45/CAL-1000.json": {
+      "bytes": 5509,
+      "sha256": "714a563c851cd313c163f1c6c1a8b974a6f54acc2c90217963669f179df23598"
+    },
+    "runtime/evaluation/ed206b080b9ebb76/Q3/seed45/SEL-1000-H1-metric-state.json": {
+      "bytes": 346908,
+      "sha256": "cc9e23532efbf6c0f91f90bcfffd035fd734abbdf0d2d88b0c5129b0833b79bf"
+    },
+    "runtime/evaluation/ed206b080b9ebb76/Q3/seed45/SEL-1000-H2-metric-state.json": {
+      "bytes": 350800,
+      "sha256": "678db573cebf3e93735107ce520494dc6cbf2c8914c2dd1af88db6a4a478781a"
+    },
+    "runtime/evaluation/ed206b080b9ebb76/Q3/seed45/SEL-1000.json": {
+      "bytes": 5508,
+      "sha256": "eaf682a3fa7c757b60866c291a8bc34012193b8c51f96bbacb0d047b2500a638"
+    },
+    "runtime/noaug/evaluation/1696655ac62ceb5e/B0/seed45/CAL-0000-H1-metric-state.json": {
+      "bytes": 336796,
+      "sha256": "4b9a4db77c97e453202d7d6b2e6ce9e978594523558e217f36072da467bc0646"
+    },
+    "runtime/noaug/evaluation/1696655ac62ceb5e/B0/seed45/CAL-0000-H2-metric-state.json": {
+      "bytes": 356804,
+      "sha256": "a5dfb329613377f01113fa1d4d8df677bdaab3ba1a61c00d9d1168407d33c098"
+    },
+    "runtime/noaug/evaluation/1696655ac62ceb5e/B0/seed45/CAL-0000.json": {
+      "bytes": 5386,
+      "sha256": "f8b39612cac4fc5d779e17dbe692abac59f539b6b0b6b7ad3d501e5d0c127b1b"
+    },
+    "runtime/noaug/evaluation/1696655ac62ceb5e/B0/seed45/SEL-0000-H1-metric-state.json": {
+      "bytes": 339712,
+      "sha256": "0d1fb12f76d96a91b0c2c9088b0b2d3dcf7a684aafc148597138593dd7b37dc1"
+    },
+    "runtime/noaug/evaluation/1696655ac62ceb5e/B0/seed45/SEL-0000-H2-metric-state.json": {
+      "bytes": 344260,
+      "sha256": "2e55cd18213b67ca6120d32bfeefd0a447a21da7728e9ddfb6631eb3a45ed6e4"
+    },
+    "runtime/noaug/evaluation/1696655ac62ceb5e/B0/seed45/SEL-0000.json": {
+      "bytes": 5385,
+      "sha256": "1e938514b3c0955b6a735c2b53c3ce31df47529cf961b78f1d1b1e86e3da3426"
+    },
+    "runtime/noaug/evaluation/955482e321810701/Q1/seed45/CAL-1500-H1-metric-state.json": {
+      "bytes": 336780,
+      "sha256": "e23821128a049191c86719b234e5968cc65c960ed124412364c8a9ee16223bfc"
+    },
+    "runtime/noaug/evaluation/955482e321810701/Q1/seed45/CAL-1500-H2-metric-state.json": {
+      "bytes": 356804,
+      "sha256": "4dcd94ad635bf7824b4812cb1e0555eaa0c9907934c1af60ed1a3ad1fad1dac7"
+    },
+    "runtime/noaug/evaluation/955482e321810701/Q1/seed45/CAL-1500.json": {
+      "bytes": 5517,
+      "sha256": "9d32914f22681847765404968a16c1780049526f623107386cfa4b17006a7fe5"
+    },
+    "runtime/noaug/evaluation/955482e321810701/Q1/seed45/SEL-1500-H1-metric-state.json": {
+      "bytes": 339720,
+      "sha256": "9fbf7c0c8bdd3a56434af63bed45a1c85744dd801cff3e4d003942d10d740ac3"
+    },
+    "runtime/noaug/evaluation/955482e321810701/Q1/seed45/SEL-1500-H2-metric-state.json": {
+      "bytes": 344268,
+      "sha256": "256f76ff6dcfbd5e85bed797cdac7d30ece9ee98f4e11608a75bb197db053301"
+    },
+    "runtime/noaug/evaluation/955482e321810701/Q1/seed45/SEL-1500.json": {
+      "bytes": 5513,
+      "sha256": "510e7fb6a771598d869d012b8ab4990d63390893b99f83d6fc428f1f43d36bb9"
+    },
+    "runtime/noaug/evaluation/97a47f4e67d90f58/Q2/seed45/CAL-1500-H1-metric-state.json": {
+      "bytes": 336788,
+      "sha256": "6b3b2735d50bd16ccb0e2dbdd4ef78d54033d5d289143633d9caa873054f17ca"
+    },
+    "runtime/noaug/evaluation/97a47f4e67d90f58/Q2/seed45/CAL-1500-H2-metric-state.json": {
+      "bytes": 356788,
+      "sha256": "5f60aba6cbc7341e3819e005552792029fe3323cbd356e1929c93a76147f6204"
+    },
+    "runtime/noaug/evaluation/97a47f4e67d90f58/Q2/seed45/CAL-1500.json": {
+      "bytes": 5514,
+      "sha256": "9ed103e89f3444eb4df739339d629335c2c5986351636fde8a3c70bd66f5b3da"
+    },
+    "runtime/noaug/evaluation/97a47f4e67d90f58/Q2/seed45/SEL-1500-H1-metric-state.json": {
+      "bytes": 339712,
+      "sha256": "90771e2b54f1bb61cb091d24e3904bc06da5b2aa3240a52e079a42aafc0303e5"
+    },
+    "runtime/noaug/evaluation/97a47f4e67d90f58/Q2/seed45/SEL-1500-H2-metric-state.json": {
+      "bytes": 344276,
+      "sha256": "348b67c430b2bc1401421bbf3c07e36018b57a1380c37c6c3fb990f1d8a6d49b"
+    },
+    "runtime/noaug/evaluation/97a47f4e67d90f58/Q2/seed45/SEL-1500.json": {
+      "bytes": 5512,
+      "sha256": "4451a4e4fdd23d0ae100cd0db886407c247487fb24901099f8a9d269b27aec92"
+    },
+    "runtime/noaug/evaluation/9e6f9eacc2940abc/Q3/seed45/CAL-1000-H1-metric-state.json": {
+      "bytes": 336788,
+      "sha256": "0f5b799272bf7a6938dafcbe8959c28827398c0af9e58a6c71f189880a327f25"
+    },
+    "runtime/noaug/evaluation/9e6f9eacc2940abc/Q3/seed45/CAL-1000-H2-metric-state.json": {
+      "bytes": 356788,
+      "sha256": "7082ada3046f0b41e2e492d52891ae84ad9a606a8ff1bf477426b084c988bce3"
+    },
+    "runtime/noaug/evaluation/9e6f9eacc2940abc/Q3/seed45/CAL-1000.json": {
+      "bytes": 5519,
+      "sha256": "a640baa6dd1a8fed259ea7c8cb5126ba9d7446a8e228ca0679a145777bd45b06"
+    },
+    "runtime/noaug/evaluation/9e6f9eacc2940abc/Q3/seed45/SEL-1000-H1-metric-state.json": {
+      "bytes": 339712,
+      "sha256": "2d97c2b40f297b824a9b3ab8e2b685d16e36788f8ad9d1f11b2c72aed1a93ee5"
+    },
+    "runtime/noaug/evaluation/9e6f9eacc2940abc/Q3/seed45/SEL-1000-H2-metric-state.json": {
+      "bytes": 344252,
+      "sha256": "90cac207ddb75812beb367c0e8a86739705e226b033f73bd6a06dbd682b33c36"
+    },
+    "runtime/noaug/evaluation/9e6f9eacc2940abc/Q3/seed45/SEL-1000.json": {
+      "bytes": 5512,
+      "sha256": "1d5cd1722fe45a8bc9737950ec9d9fb47f25e17d0e8a7802f627d773200cdfa2"
+    },
+    "runtime/noaug/evaluation/db964d28a651b2bd/M1/seed45/CAL-1000-H1-metric-state.json": {
+      "bytes": 336380,
+      "sha256": "7b2a9fb8dd1cc855e69575e7612b595262a3d1df2e66b883b57d3a1657420421"
+    },
+    "runtime/noaug/evaluation/db964d28a651b2bd/M1/seed45/CAL-1000-H2-metric-state.json": {
+      "bytes": 357124,
+      "sha256": "b083fc222cfb35525a03cb43fe2b2b0ad00ffc0d188b5c0a1f8955923197e2fb"
+    },
+    "runtime/noaug/evaluation/db964d28a651b2bd/M1/seed45/CAL-1000.json": {
+      "bytes": 5517,
+      "sha256": "eeb6d1edb83aa0e3d2f06c720098b1e1c5f893eccc8ec85d7bebaff5acdda998"
+    },
+    "runtime/noaug/evaluation/db964d28a651b2bd/M1/seed45/SEL-1000-H1-metric-state.json": {
+      "bytes": 340392,
+      "sha256": "629eda9acb62f460b24608bc0715af0420547dbc8b069485d0de699158025a3a"
+    },
+    "runtime/noaug/evaluation/db964d28a651b2bd/M1/seed45/SEL-1000-H2-metric-state.json": {
+      "bytes": 344652,
+      "sha256": "6e2202eb2d7e34ae6a4cdb8b8c504db6b15f87fe2258c9e6bea99e4135b8f762"
+    },
+    "runtime/noaug/evaluation/db964d28a651b2bd/M1/seed45/SEL-1000.json": {
+      "bytes": 5513,
+      "sha256": "affeaa5345f824e57b75a4509a378ee9a9494437a6d63b1b21fe66d7f1918208"
+    },
+    "runtime/noaug/evaluation/dd979cb40338b18c/M2/seed45/CAL-0500-H1-metric-state.json": {
+      "bytes": 335932,
+      "sha256": "fb80273a6789c0889fa94ec59b227a43136006a291b4aa6296836b7e02ee210e"
+    },
+    "runtime/noaug/evaluation/dd979cb40338b18c/M2/seed45/CAL-0500-H2-metric-state.json": {
+      "bytes": 356346,
+      "sha256": "e4febcf1fe81be99a35a2efdea519d1d47c2879f18ce550f3212a7fc3b9ea09d"
+    },
+    "runtime/noaug/evaluation/dd979cb40338b18c/M2/seed45/CAL-0500.json": {
+      "bytes": 5510,
+      "sha256": "619f0b72decb099f65c6a13989c095f845893a8046dbcfae39f61b3aaf9e71d4"
+    },
+    "runtime/noaug/evaluation/dd979cb40338b18c/M2/seed45/SEL-0500-H1-metric-state.json": {
+      "bytes": 339544,
+      "sha256": "4d42032b1beff00174d31c95d585e8bd6840820046984aa77e0758e005d62506"
+    },
+    "runtime/noaug/evaluation/dd979cb40338b18c/M2/seed45/SEL-0500-H2-metric-state.json": {
+      "bytes": 344876,
+      "sha256": "852ab99f3e351d4751181fedf9a16e51c49642beb22a06041aae978469801a69"
+    },
+    "runtime/noaug/evaluation/dd979cb40338b18c/M2/seed45/SEL-0500.json": {
+      "bytes": 5513,
+      "sha256": "f0760d2705ee4bb5224c122d307e5f4d959c6be68e5aeb3a420bf0a1501c76b3"
+    },
+    "runtime/noaug/evaluation/edbe0aaa82080291/M0/seed45/CAL-1500-H1-metric-state.json": {
+      "bytes": 324772,
+      "sha256": "c6a948ee07179530d9bf83be08c38ba8433c2b64dddaacc29bd0e02e144b34fa"
+    },
+    "runtime/noaug/evaluation/edbe0aaa82080291/M0/seed45/CAL-1500-H2-metric-state.json": {
+      "bytes": 345212,
+      "sha256": "518ba55342690e8a447746698398f938f225c8a91c839fe51a9c3b41eaa81458"
+    },
+    "runtime/noaug/evaluation/edbe0aaa82080291/M0/seed45/CAL-1500.json": {
+      "bytes": 5513,
+      "sha256": "04f2beea8cd8a552cfc324d4b11661f023453fe1c23bb62961761fab2fce837b"
+    },
+    "runtime/noaug/evaluation/edbe0aaa82080291/M0/seed45/SEL-1500-H1-metric-state.json": {
+      "bytes": 320164,
+      "sha256": "e7b27cdf6ea3faea7c35d56912bfd8cf5188811e6f1d00f34d389e9f80c9252a"
+    },
+    "runtime/noaug/evaluation/edbe0aaa82080291/M0/seed45/SEL-1500-H2-metric-state.json": {
+      "bytes": 330252,
+      "sha256": "0b19c5ed7af406001f3f350fc49db15449972e42b6ed629b594501cb5ae6ba2f"
+    },
+    "runtime/noaug/evaluation/edbe0aaa82080291/M0/seed45/SEL-1500.json": {
+      "bytes": 5515,
+      "sha256": "f58f0bd7446925775523ac8f68172d86ea6eac85b06f8ffa569f771ffec35dcc"
+    }
+  },
+  "metric_results": 36,
+  "metric_states": 72,
+  "original_fixed_heads": 6,
+  "raw_scan_and_feature_caches_included": false,
+  "sha256": "5edbf0151ff59a7926f85631bd44f2459bd02d57b385ec9d7382b3000dc792dd",
+  "status": "VERIFIED"
+}

@@ -1,0 +1,10 @@
+{
+  "status": "COMPLETE",
+  "execution": "Supplied probe_repository_ignore_gap.py executed before code edits, against actual baseline repository functions and installed stmetrics; terminal session 61803",
+  "gap_reproduced": true,
+  "candidate": {"points_per_stage": 250, "GT_points_per_stage": 100, "temporal_iou": 0.4, "ignore_proportion": 0.6000000238418579, "old_status": "IGNORE", "old_valid": false},
+  "official_threshold_0_5": {"bad_candidate_scored": false},
+  "official_threshold_0_75": {"bad_candidate_scored_as_false_positive": true, "score_0_1_order": [1, 0], "score_0_95_order": [0, 1]},
+  "installed_source_git_blobs": {"label_adapter_before_edit": "b1d9df2715639456981878c1638fca8c351ed58a", "matcher": "d08c1746c3d97f89ac5bebe657b3a17112d3737f", "evaluator": "6c558fad20ecc033c1763864732eb98f2902108e"},
+  "scope": "Condensed factual record of completed original probe output; full real-cache impact is independently verified in RELABEL_AUDIT.json. Not an AP causal attribution."
+}

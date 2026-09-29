@@ -9,6 +9,7 @@ from scripts.short_module_data import (
     low_segment_targets,
     quality_labels,
     select_population,
+    threshold_quality_loss,
 )
 
 
@@ -36,8 +37,11 @@ def fixture_pair():
     return prediction, target
 
 
-def test_official_labels_disappearance_strict_threshold_and_score_invariance(spec):
+@pytest.mark.parametrize("reverse_stages", [False, True])
+def test_official_labels_disappearance_strict_threshold_and_score_invariance(spec, reverse_stages):
     prediction, target = fixture_pair()
+    if reverse_stages:
+        target["temporal_stages"] = 1 - target["temporal_stages"]  # Appearance instead of disappearance.
     labels = quality_labels(prediction, target, dataset_spec=spec, min_region_size=1)
     assert torch.equal(labels["concat"], torch.tensor([1., .75, 0., 0.]))
     assert torch.equal(labels["temporal"], torch.tensor([1., .5, 0., 0.]))
@@ -64,6 +68,58 @@ def test_unknown_void_and_ambiguous_candidates_are_not_fake_negatives(spec):
     labels = quality_labels(prediction, target, dataset_spec=spec, min_region_size=1)
     assert labels["status"][1] == "AMBIGUOUS"
     assert not labels["valid"][1]
+    prediction["pred_classes"][0] = 999
+    labels = quality_labels(prediction, target, dataset_spec=spec, min_region_size=1)
+    assert labels["status"][0] == "UNKNOWN_CLASS"
+    assert not labels["threshold_valid"][0].any()
+
+
+def test_partial_void_has_threshold_validity_and_frozen_geometry_eligibility(spec):
+    target = {"masks": torch.tensor([[1] * 100 + [0] * 150], dtype=torch.bool),
+              "labels": torch.tensor([3]), "ids": torch.tensor([11]),
+              "changes": torch.zeros(1, dtype=torch.long),
+              "temporal_stages": torch.zeros(250, dtype=torch.long)}
+    prediction = {"pred_masks": torch.stack((target["masks"][0],
+                    torch.ones(250, dtype=torch.bool), ~target["masks"][0]), dim=1),
+                  "pred_scores": torch.tensor([.9, .1, .8]),
+                  "pred_classes": torch.tensor([3, 3, 3])}
+    labels = quality_labels(prediction, target, dataset_spec=spec, min_region_size=1)
+    assert labels["temporal"].tolist() == pytest.approx([1., .4, 0.])
+    assert labels["valid"].tolist() == [True, True, False]
+    assert labels["geometry_valid"].tolist() == [True, False, False]
+    assert labels["all_thresholds_unscored"].tolist() == [False, False, True]
+    thresholds = torch.tensor(labels["thresholds"])
+    assert torch.equal(labels["threshold_valid"][1], thresholds >= labels["ignore_proportion"][1])
+    assert labels["threshold_valid"][0].all()
+    assert not labels["threshold_valid"][2].any()
+    # Q eligibility can change without admitting this column into M assignment.
+    assignment = geometry_assignment(prediction, target, labels,
+                                    candidate_keys=[("input", i) for i in range(3)])
+    assert assignment.tolist() == [11, -1, -1]
+    order = torch.tensor([2, 0, 1])
+    other = quality_labels({"pred_masks": prediction["pred_masks"][:, order],
+                            "pred_scores": torch.tensor([.01, .2, .99]),
+                            "pred_classes": prediction["pred_classes"][order]},
+                           target, dataset_spec=spec, min_region_size=1)
+    for key in ("temporal", "concat", "threshold_valid", "geometry_valid"):
+        assert torch.equal(other[key], labels[key][order])
+
+
+def test_threshold_loss_excludes_only_invalid_entries_and_preserves_gradients():
+    probabilities = torch.tensor([[.2, .8], [.7, .3]], requires_grad=True)
+    targets = torch.tensor([[0., 1.], [0., 1.]])
+    valid = torch.tensor([[False, True], [True, False]])
+    loss = threshold_quality_loss(probabilities, targets, valid)
+    assert loss.item() == pytest.approx((-torch.log(torch.tensor(.8))
+                                         - torch.log(torch.tensor(.3))).item() / 2)
+    loss.backward()
+    assert torch.equal(probabilities.grad == 0, ~valid)
+    assert torch.isfinite(probabilities.grad).all()
+    probabilities.grad.zero_()
+    zero = threshold_quality_loss(probabilities, targets, torch.zeros_like(valid))
+    zero.backward()
+    assert zero.item() == 0
+    assert not probabilities.grad.any()
 
 
 def test_low_segment_targets_include_known_background_and_exclude_unknown():

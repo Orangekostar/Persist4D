@@ -1,0 +1,20 @@
+{
+  "affected_eligibility": 1215,
+  "arms": [
+    "M0",
+    "M1"
+  ],
+  "changed_assignment_columns": 62,
+  "label_identity_sha256": "6e0aeda1d1a1ac46d9065f77e7a3e1538b281984ba0d59674f3a40e9b343813a",
+  "shared_assignment": true,
+  "status": "PREPARED",
+  "unchanged": [
+    "parent",
+    "prediction",
+    "sampling",
+    "steps",
+    "loss",
+    "weights",
+    "old_locked_steps"
+  ]
+}

@@ -1,8 +1,6 @@
 """Independent official pooled metrics and CAL-only fixed-checkpoint selection."""
 
 import csv
-import hashlib
-import inspect
 import time
 from pathlib import Path
 from types import SimpleNamespace
@@ -11,6 +9,8 @@ import torch
 
 from models.short_module_heads import Module, apply_module, build_head
 from scripts.p6a_metrics import OfficialMetricAccumulator
+from scripts.short_module_eval_identity import evaluation_identity
+from scripts.short_module_identity import identity_digest
 from scripts.short_module_native import unpack_prediction
 from scripts.short_module_screen import ARTIFACTS, read_json, sha256, write_json
 from scripts.system_comparison_inference import unpack_bool_matrix
@@ -85,13 +85,15 @@ def load_head(root: Path, module: str, step: int, seed: int, device: str):
     index = read_json(root / "EXPORT_INDEX.json")
     if meta["cache_identity_sha256"] != index["cache_identity_sha256"]:
         raise ValueError("checkpoint was trained on a different input/cache identity")
+    if index.get("label_identity_sha256") is not None and meta.get("label_identity_sha256") != index["label_identity_sha256"]:
+        raise ValueError("checkpoint was trained on a different label identity")
     head = build_head(module, **meta["dimensions"], thresholds=tuple(meta["thresholds"]), seed=seed)
     head.load_state_dict(saved["head"], strict=True)
     return head.to(device).eval(), path
 
 
 def evaluate_point(root: Path, *, module: str, step: int, seed: int,
-                   role: str, device: str = "cuda:1") -> dict:
+                   role: str, device: str = "cuda:1", checkpoint_root: Path | None = None) -> dict:
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
     torch.set_float32_matmul_precision("highest")
@@ -106,9 +108,18 @@ def evaluate_point(root: Path, *, module: str, step: int, seed: int,
     index = read_json(root / "EXPORT_INDEX.json")
     if index["status"] != "COMPLETE":
         raise ValueError("full export must precede pooled evaluation")
-    head, head_path = load_head(root, module, step, seed, device)
-    semantic_sources = "\n".join(inspect.getsource(f) for f in (evaluate_point, load_head, materialization_system))
-    evaluator_sha = hashlib.sha256(semantic_sources.encode()).hexdigest()
+    for entry in index["entries"]:
+        if entry.get("record", {}).get("role", role) != role:
+            continue
+        for field in ("prediction", "targets"):
+            expected = entry[field].get("sha256")
+            if expected is not None and sha256(Path(index["cache"]) / entry[field]["file"]) != expected:
+                raise ValueError(f"evaluation input content changed: {entry['input_id']} {field}")
+    head, head_path = load_head(checkpoint_root or root, module, step, seed, device)
+    assets = read_json(root / "assets.local.json")
+    dependencies = evaluation_identity(index=index, head_path=head_path,
+                                       dataset_spec=assets["metric_dataset_spec"])
+    evaluator_sha = identity_digest(dependencies)
     result_path = root / "evaluation" / evaluator_sha[:16] / module / f"seed{seed}" / f"{role}-{step:04d}.json"
     if result_path.exists():
         previous = read_json(result_path)
@@ -187,8 +198,10 @@ def evaluate_point(root: Path, *, module: str, step: int, seed: int,
               "stage_AP_given_T2": {f"stage{stage + 1}": m.compute()["raw_local_AP"]
                                     if completed[2] == expected[2] else None for stage, m in stage_metrics.items()},
               "head_sha256": sha256(head_path) if head_path else None,
+              "checkpoint_root": str(checkpoint_root or root),
               "cache_identity_sha256": index["cache_identity_sha256"],
               "evaluator_sha256": evaluator_sha, "elapsed_seconds": time.perf_counter() - started,
+              "evaluation_identity": dependencies,
               "result_path": str(result_path)}
     write_json(result_path, result)
     for h, accumulator in pooled.items():

@@ -107,6 +107,9 @@ def quality_labels(prediction: dict, target: dict, *, dataset_spec: Path,
     concat = torch.zeros(n)
     temporal = torch.zeros(n)
     valid = torch.zeros(n, dtype=torch.bool)
+    geometry_valid = torch.zeros(n, dtype=torch.bool)
+    resolved = torch.zeros(n, dtype=torch.bool)
+    threshold_valid = torch.zeros(n, len(thresholds), dtype=torch.bool)
     status = ["EMPTY" if not prediction["pred_masks"][:, i].any() else "INVALID_PRED"
               for i in range(n)]
     gt_ids = [None] * n
@@ -124,31 +127,48 @@ def quality_labels(prediction: dict, target: dict, *, dataset_spec: Path,
                 status[i] = "EMPTY"
                 continue
             ignore[i] = evaluator._proportion_ignore(pred, *params)
-            if ignore[i] > min(thresholds):
-                status[i] = "IGNORE"
-                continue
+            resolved[i] = True
+            geometry_valid[i] = ignore[i] <= min(thresholds)
             compatible = [gt for gt in pred["matched_gt"]
                           if not gt["ambiguous"] and evaluator._valid_gt(gt, *params)]
-            valid[i] = True
             if not compatible:
                 status[i] = "VALID_NEGATIVE"
-                continue
-            best = min(compatible, key=lambda gt: (-float(evaluator._select_overlap(gt)),
+            else:
+                best = min(compatible, key=lambda gt: (-float(evaluator._select_overlap(gt)),
                                                    -float(gt["overlap"]),
                                                    int(gt["instance_id"])))
-            temporal[i] = float(evaluator._select_overlap(best))
-            concat[i] = float(best["overlap"])
-            gt_ids[i] = int(best["instance_id"])
-            status[i] = "MATCHED"
+                temporal[i] = float(evaluator._select_overlap(best))
+                concat[i] = float(best["overlap"])
+                gt_ids[i] = int(best["instance_id"])
+                status[i] = "MATCHED"
+            # Official matching scores positive matches; unmatched predictions
+            # participate only at thresholds admitting their ignored fraction.
+            threshold_valid[i] = ((temporal[i] > torch.tensor(thresholds))
+                                  | (ignore[i] <= torch.tensor(thresholds)))
+            valid[i] = threshold_valid[i].any()
+            if not valid[i]:
+                status[i] = "IGNORE"
     return {"concat": concat, "temporal": temporal,
             "events": temporal[:, None] > torch.tensor(thresholds)[None, :],
             "valid": valid, "status": status, "gt_ids": gt_ids,
+            "threshold_valid": threshold_valid, "geometry_valid": geometry_valid,
+            "resolved": resolved, "all_thresholds_unscored": resolved & ~valid,
+            "schema": "quality-threshold-validity-v2",
             "ignore_proportion": ignore, "thresholds": thresholds,
             "valid_gt_ids": sorted(int(gt["instance_id"])
                                    for rows in gt2pred.values() for gt in rows.values()
                                    if not gt["ambiguous"] and evaluator._valid_gt(gt, *params)),
             "ambiguity_metadata": ("AVAILABLE" if "ambiguities" in target
                                    else "AMBIGUITY_METADATA_UNAVAILABLE")}
+
+
+def threshold_quality_loss(probabilities: Tensor, targets: Tensor, valid: Tensor) -> Tensor:
+    """Mean BCE over eligible candidate/threshold entries, including negatives."""
+    if probabilities.shape != targets.shape or valid.shape != targets.shape or valid.dtype != torch.bool:
+        raise ValueError("quality probabilities, targets and boolean threshold mask must align")
+    if not valid.any():
+        return probabilities.sum() * 0
+    return F.binary_cross_entropy(probabilities[valid], targets[valid])
 
 
 def geometry_assignment(prediction: dict, target: dict, labels: dict, *,
@@ -161,7 +181,8 @@ def geometry_assignment(prediction: dict, target: dict, labels: dict, *,
     n = prediction["pred_scores"].numel()
     if len(candidate_keys) != n or len(set(candidate_keys)) != n:
         raise ValueError("candidate keys must uniquely identify retained columns")
-    candidates = sorted(torch.where(labels["valid"])[0].tolist(), key=lambda i: candidate_keys[i])
+    candidates = sorted(torch.where(labels["geometry_valid"])[0].tolist(),
+                        key=lambda i: candidate_keys[i])
     valid_ids = set(labels["valid_gt_ids"])
     gt_indices = sorted((i for i, v in enumerate(target["ids"].tolist()) if v in valid_ids),
                         key=lambda i: int(target["ids"][i]))

@@ -10,7 +10,8 @@ import torch
 from torch.nn import functional as F
 
 from models.short_module_heads import Module, QualityHead, build_head, quality_inputs
-from scripts.short_module_data import geometry_loss
+from scripts.short_module_data import geometry_loss, threshold_quality_loss
+from scripts.short_module_identity import source_identity
 from scripts.short_module_screen import ARTIFACTS, read_json, sha256, write_json
 
 
@@ -57,8 +58,13 @@ def load_training_records(root: Path, index: dict) -> dict:
     for entry in index["entries"]:
         if entry["record"]["role"] != "TRAIN" or entry["audit"]["candidate_count"] == 0:
             continue
+        for field in ("prediction", "targets"):
+            if sha256(cache / entry[field]["file"]) != entry[field]["sha256"]:
+                raise ValueError(f"training input changed: {entry['input_id']} {field}")
         prediction = torch.load(cache / entry["prediction"]["file"], map_location="cpu", weights_only=False)
         target = torch.load(cache / entry["targets"]["file"], map_location="cpu", weights_only=False)
+        if target["quality"].get("schema") != "quality-threshold-validity-v2":
+            raise ValueError("legacy labels require explicit v2 relabel before training")
         soft = prediction["parent"]["soft"]
         records[entry["input_id"]] = {
             "features": soft["segment_features"], "query": soft["query_features"],
@@ -127,6 +133,11 @@ def train_arm(module: str, *, seed: int, updates: int, root: Path, device: str,
                 "initial_parameter_sha256": initial_digest, "parameter_count": sum(p.numel() for p in head.parameters()),
                 "source_sha256": sha256(Path(__file__)), "optimizer_updates": 0,
                 "loss_source_sha256": sha256(Path(__file__).with_name("short_module_data.py")),
+                "label_identity_sha256": index.get("label_identity_sha256"),
+                "training_sources": source_identity([Path(__file__),
+                    Path(__file__).with_name("short_module_data.py"),
+                    Path(__file__).parents[1] / "models/short_module_heads.py",
+                    Path(__file__).parents[1] / "trainer/perception_gain_trainer.py"]),
                 "schedule_horizon": 1500, "target_updates": updates,
                 "descriptor": resolved["descriptor_normalization"],
                 "supported_horizons": [1, 2], "postprocess": "original retained candidates, no new filter",
@@ -139,8 +150,9 @@ def train_arm(module: str, *, seed: int, updates: int, root: Path, device: str,
     if last.exists():
         checkpoint = torch.load(last, map_location=device, weights_only=False)
         old = checkpoint["metadata"]
-        for name in ("module", "seed", "base_sha256", "sample_plan_sha256", "cache_identity_sha256", "initial_parameter_sha256"):
-            if old[name] != metadata[name]:
+        for name in ("module", "seed", "base_sha256", "sample_plan_sha256", "cache_identity_sha256",
+                     "initial_parameter_sha256", "label_identity_sha256", "training_sources"):
+            if old.get(name) != metadata[name]:
                 raise ValueError(f"resume identity changed: {name}")
         head.load_state_dict(checkpoint["head"])
         optimizer.load_state_dict(checkpoint["optimizer"])
@@ -171,7 +183,8 @@ def train_arm(module: str, *, seed: int, updates: int, root: Path, device: str,
             query = record["query"][selected].to(device)
             local_h = desc["h"][selected].to(device)
             one_hot = F.one_hot(record["class_ids"][selected].to(device), dimensions["classes"]).float()
-            valid = record["quality"]["valid"][selected].to(device)
+            eligibility = "valid" if isinstance(head, QualityHead) else "geometry_valid"
+            valid = record["quality"][eligibility][selected].to(device)
             matched = (record["assignment"][selected] >= 0).to(device)
             positive = ((record["quality"]["temporal"][selected].to(device) > 0)
                         if isinstance(head, QualityHead) else matched)
@@ -186,7 +199,8 @@ def train_arm(module: str, *, seed: int, updates: int, root: Path, device: str,
                 target_name = {Module.Q1: "concat", Module.Q2: "temporal", Module.Q3: "events"}[module]
                 q_inputs.append(x)
                 q_targets.append(record["quality"][target_name][selected].to(device).float())
-                q_valid.append(valid)
+                q_valid.append(record["quality"]["threshold_valid"][selected].to(device)
+                               if module is Module.Q3 else valid)
                 supervised += int(valid.sum())
             else:
                 features = record["features"].to(device)
@@ -210,7 +224,7 @@ def train_arm(module: str, *, seed: int, updates: int, root: Path, device: str,
         if isinstance(head, QualityHead):
             x, y, valid = torch.cat(q_inputs), torch.cat(q_targets), torch.cat(q_valid)
             if valid.any():
-                loss = (F.binary_cross_entropy(head.probabilities(x[valid]), y[valid]) if module is Module.Q3
+                loss = (threshold_quality_loss(head.probabilities(x), y, valid) if module is Module.Q3
                         else F.mse_loss(head(x[valid]), y[valid]))
             else:
                 loss = head(x).sum() * 0

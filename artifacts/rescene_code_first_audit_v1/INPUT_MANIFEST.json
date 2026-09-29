@@ -1,0 +1,46 @@
+{
+  "assets": {
+    "C0_H_0250": "/home/ww/persist4d_runs/perception_gain_v1/training/C0/update=0250.ckpt",
+    "C0_H_0750": "/home/ww/persist4d_runs/perception_gain_v1/training/C0/update=0750.ckpt",
+    "S_BAL_H_config": "/home/ww/persist4d_runs/perception_gain_v1/training/S-BAL/resolved_config.yaml",
+    "S_BAL_H_resume": "/home/ww/persist4d_runs/perception_gain_v1/training/S-BAL/last.ckpt",
+    "concerto_pretrained": "/home/ww/.cache/persist4d/concerto/concerto_base.pth",
+    "data_root": "/home/ww/persist4d_runs/perception_gain_v2/data",
+    "metric_dataset_spec": "/home/ww/persist4d_runs/perception_gain_v2/data/processed/rio/rio.yaml",
+    "r1_checkpoint": "/home/ww/persist4d_runs/perception_gain_v2/inputs/r1.ckpt",
+    "rio_metadata": "/home/ww/3RScan.json",
+    "scorer_checkpoint": "/home/ww/persist4d_runs/perception_gain_v1/training/scorer/model/update=0500.ckpt"
+  },
+  "population_sha256": "8073215d0bf8d2952bb1d671a94b7cac1cd5f61adf181c636826a454d0bc873a",
+  "raw_staging": {
+    "limitation": "Inherited hardlink staging manifest has null per-file SHA; not byte-immutable",
+    "new_bytes": 0,
+    "shared_existing_data": true
+  },
+  "sources": {
+    "local_population_audit": {
+      "path": "/home/ww/paper5/.worktrees/persist4d-perception-gain-v2/artifacts/perception_gain_v2/foundation/LOCAL_POPULATION_AUDIT.json",
+      "sha256": "5e55528dacfafff3b27ee28fefabd3f4104ba8c56e1ad2b0ec9b266ce11483f6"
+    },
+    "metadata": {
+      "path": "/home/ww/3RScan.json",
+      "sha256": "674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64"
+    },
+    "prior_ledger": {
+      "path": "/home/ww/paper5/.worktrees/persist4d-perception-gain-v2/artifacts/perception_gain_v2/budget/LEDGER.jsonl",
+      "sha256": "da03b22d5ba3d54de07b7751f4742b0d317b9b90459c97b7a32393471f88760f"
+    },
+    "roles": {
+      "path": "/home/ww/paper5/.worktrees/rescene-short-module-screen-v1/artifacts/perception_gain_v2/DATA_ROLES.json",
+      "sha256": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b"
+    },
+    "staging": {
+      "path": "/home/ww/paper5/.worktrees/rescene-short-module-screen-v1/artifacts/perception_gain_v2/data/STAGING_MANIFEST.json",
+      "sha256": "78bcf10d30ebd2c2f80e2e063f64b14f7da02e91c20b342978f19c5e0e937bb6"
+    },
+    "v2_inputs": {
+      "path": "/home/ww/paper5/.worktrees/rescene-short-module-screen-v1/artifacts/perception_gain_v2/INPUT_MANIFEST.json",
+      "sha256": "44f824a6eeed2e5c3e5fa7d1c3208843b719c0e2251f6def0daf783bfe091a27"
+    }
+  }
+}

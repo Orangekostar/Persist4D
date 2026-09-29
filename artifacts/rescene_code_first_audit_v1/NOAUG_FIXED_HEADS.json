@@ -1,0 +1,1752 @@
+[
+  {
+    "by_reference": [
+      {
+        "AP": 0.8424040675163269,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.48029282689094543,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.4693766236305237,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.7806937098503113,
+        "H": 1,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      },
+      {
+        "AP": 0.7236054539680481,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.34593337774276733,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.32096073031425476,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.6392719745635986,
+        "H": 2,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 23,
+      "2": 23
+    },
+    "elapsed_seconds": 36.35783605102915,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": null,
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "1696655ac62ceb5e49ac1f073c0b389280245fafbf61cd1f031662c8051245bf",
+    "expected": {
+      "1": 23,
+      "2": 23
+    },
+    "head_sha256": null,
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": true,
+      "score_unchanged": true
+    },
+    "metrics": {
+      "T1": 0.521016538143158,
+      "T2": 0.365048885345459
+    },
+    "module": "B0",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/1696655ac62ceb5e/B0/seed45/CAL-0000.json",
+    "role": "CAL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.4958258867263794,
+      "stage2": 0.5103263854980469
+    },
+    "status": "COMPLETE",
+    "step": 0
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.4327450096607208,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.38746747374534607,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.37983453273773193,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.6563301086425781,
+        "H": 1,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      },
+      {
+        "AP": 0.3476391136646271,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.23865395784378052,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.2760936915874481,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.5465793013572693,
+        "H": 2,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 23,
+      "2": 23
+    },
+    "elapsed_seconds": 37.84399483597372,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "2d65b801b17bd632d539a6d4000fa02ab578e42ed4d13e0a0644e457d81a46c5",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "955482e321810701f188fdada53f6a23e4857a5a6fe1d021dbfc8f52d0b1085e",
+    "expected": {
+      "1": 23,
+      "2": 23
+    },
+    "head_sha256": "2d65b801b17bd632d539a6d4000fa02ab578e42ed4d13e0a0644e457d81a46c5",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": true,
+      "score_unchanged": false
+    },
+    "metrics": {
+      "T1": 0.3270179331302643,
+      "T2": 0.21079054474830627
+    },
+    "module": "Q1",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/955482e321810701/Q1/seed45/CAL-1500.json",
+    "role": "CAL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.3146497309207916,
+      "stage2": 0.3316221535205841
+    },
+    "status": "COMPLETE",
+    "step": 1500
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.4099346697330475,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.3777035176753998,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.3874616324901581,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.5908750891685486,
+        "H": 1,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      },
+      {
+        "AP": 0.3203790485858917,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.23833850026130676,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.2555409073829651,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.5832228660583496,
+        "H": 2,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 23,
+      "2": 23
+    },
+    "elapsed_seconds": 37.15166212897748,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "3cc47b7cf9a48cdc5e27e9d835489ce09d38c3be095a2b0530ff4ed7ef43b92d",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "97a47f4e67d90f58f5450a5a543b3c1f6835b871c99853fa60f1bc12809281bf",
+    "expected": {
+      "1": 23,
+      "2": 23
+    },
+    "head_sha256": "3cc47b7cf9a48cdc5e27e9d835489ce09d38c3be095a2b0530ff4ed7ef43b92d",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": true,
+      "score_unchanged": false
+    },
+    "metrics": {
+      "T1": 0.3054478168487549,
+      "T2": 0.20199230313301086
+    },
+    "module": "Q2",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/97a47f4e67d90f58/Q2/seed45/CAL-1500.json",
+    "role": "CAL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.28687915205955505,
+      "stage2": 0.30096635222435
+    },
+    "status": "COMPLETE",
+    "step": 1500
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.45679816603660583,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.3864729702472687,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.3925502598285675,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.5838856101036072,
+        "H": 1,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      },
+      {
+        "AP": 0.5043108463287354,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.24556343257427216,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.28964316844940186,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.5569140911102295,
+        "H": 2,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 23,
+      "2": 23
+    },
+    "elapsed_seconds": 37.480565113946795,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "17ba349d52c75cd121603cb97e42dd4d6463da905b8c4dbb737c586e8f69a9ce",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "9e6f9eacc2940abcbeb0dec37fc1aac88edc965fe813848facc2da7c3458acc0",
+    "expected": {
+      "1": 23,
+      "2": 23
+    },
+    "head_sha256": "17ba349d52c75cd121603cb97e42dd4d6463da905b8c4dbb737c586e8f69a9ce",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": true,
+      "score_unchanged": false
+    },
+    "metrics": {
+      "T1": 0.30905529856681824,
+      "T2": 0.22947996854782104
+    },
+    "module": "Q3",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/9e6f9eacc2940abc/Q3/seed45/CAL-1000.json",
+    "role": "CAL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.3324182629585266,
+      "stage2": 0.3262607157230377
+    },
+    "status": "COMPLETE",
+    "step": 1000
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.8460861444473267,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.5230869054794312,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.4779590368270874,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.7814868688583374,
+        "H": 1,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      },
+      {
+        "AP": 0.7041300535202026,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.35702040791511536,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.3271785080432892,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.6382245421409607,
+        "H": 2,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 23,
+      "2": 23
+    },
+    "elapsed_seconds": 42.28210608498193,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "b95bd4b863a75540cbea6454f05ffe8d2fd5f2615acd349a8fc0f2fb2de1e01c",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "edbe0aaa82080291bf7140ee5b350376e574197eaf4b8c196eef0aa801c04fae",
+    "expected": {
+      "1": 23,
+      "2": 23
+    },
+    "head_sha256": "b95bd4b863a75540cbea6454f05ffe8d2fd5f2615acd349a8fc0f2fb2de1e01c",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": false,
+      "score_unchanged": true
+    },
+    "metrics": {
+      "T1": 0.533393919467926,
+      "T2": 0.3657658100128174
+    },
+    "module": "M0",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/edbe0aaa82080291/M0/seed45/CAL-1500.json",
+    "role": "CAL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.5064685344696045,
+      "stage2": 0.5085782408714294
+    },
+    "status": "COMPLETE",
+    "step": 1500
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.8396041989326477,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.48659417033195496,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.46980905532836914,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.7821487784385681,
+        "H": 1,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      },
+      {
+        "AP": 0.7216076254844666,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.3404594361782074,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.318074494600296,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.6448444128036499,
+        "H": 2,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 23,
+      "2": 23
+    },
+    "elapsed_seconds": 44.787253101938404,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "5f32d8ee7eb8e8815f4282d67169144aadc373f92fce663140933dbe7c6a2388",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "db964d28a651b2bdb6161dba375df0fe748111379b978f4057eb0fcdde40566e",
+    "expected": {
+      "1": 23,
+      "2": 23
+    },
+    "head_sha256": "5f32d8ee7eb8e8815f4282d67169144aadc373f92fce663140933dbe7c6a2388",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": false,
+      "score_unchanged": true
+    },
+    "metrics": {
+      "T1": 0.5237115621566772,
+      "T2": 0.36498045921325684
+    },
+    "module": "M1",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/db964d28a651b2bd/M1/seed45/CAL-1000.json",
+    "role": "CAL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.49758145213127136,
+      "stage2": 0.5106692314147949
+    },
+    "status": "COMPLETE",
+    "step": 1000
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.8453638553619385,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.4802962839603424,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.4679555296897888,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.7799567580223083,
+        "H": 1,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      },
+      {
+        "AP": 0.7242379188537598,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "09582244-e2c2-2de1-956c-357092d949d1"
+      },
+      {
+        "AP": 0.3324801027774811,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c"
+      },
+      {
+        "AP": 0.3238045275211334,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "10b17936-3938-2467-88ba-ba5fe2debf14"
+      },
+      {
+        "AP": 0.6411847472190857,
+        "H": 2,
+        "completed": 7,
+        "expected": 7,
+        "reference_id": "4acaebba-6c10-2a2a-8650-34c2f160db99"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 23,
+      "2": 23
+    },
+    "elapsed_seconds": 44.55075034289621,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "2da01fc78dac4530e639248e295ea4d4f035e906e8d8ce2a64bdcf6de9687451",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "dd979cb40338b18cb661cd3bac33f0f5a4e140fe62c9f550e3544b9798d05d00",
+    "expected": {
+      "1": 23,
+      "2": 23
+    },
+    "head_sha256": "2da01fc78dac4530e639248e295ea4d4f035e906e8d8ce2a64bdcf6de9687451",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": false,
+      "score_unchanged": true
+    },
+    "metrics": {
+      "T1": 0.5207409858703613,
+      "T2": 0.36456099152565
+    },
+    "module": "M2",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/dd979cb40338b18c/M2/seed45/CAL-0500.json",
+    "role": "CAL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.4976758062839508,
+      "stage2": 0.5097265243530273
+    },
+    "status": "COMPLETE",
+    "step": 500
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.9209333062171936,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.9452767968177795,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.815407931804657,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.6007452011108398,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.8251363039016724,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.9262951016426086,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.7100837826728821,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.5003483891487122,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 24.840999774984084,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": null,
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "1696655ac62ceb5e49ac1f073c0b389280245fafbf61cd1f031662c8051245bf",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": null,
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": true,
+      "score_unchanged": true
+    },
+    "metrics": {
+      "T1": 0.7850342988967896,
+      "T2": 0.7029517889022827
+    },
+    "module": "B0",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/1696655ac62ceb5e/B0/seed45/SEL-0000.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.7851465940475464,
+      "stage2": 0.7792962789535522
+    },
+    "status": "COMPLETE",
+    "step": 0
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.5824692845344543,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.8043291568756104,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.7382723093032837,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.4612608551979065,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.5426021814346313,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.781869649887085,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.6602760553359985,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.47804445028305054,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 25.399134280974977,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "2d65b801b17bd632d539a6d4000fa02ab578e42ed4d13e0a0644e457d81a46c5",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "955482e321810701f188fdada53f6a23e4857a5a6fe1d021dbfc8f52d0b1085e",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "2d65b801b17bd632d539a6d4000fa02ab578e42ed4d13e0a0644e457d81a46c5",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": true,
+      "score_unchanged": false
+    },
+    "metrics": {
+      "T1": 0.602975070476532,
+      "T2": 0.6118320822715759
+    },
+    "module": "Q1",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/955482e321810701/Q1/seed45/SEL-1500.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.6777548789978027,
+      "stage2": 0.6828728318214417
+    },
+    "status": "COMPLETE",
+    "step": 1500
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.43416452407836914,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.847385048866272,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.7608205676078796,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.502394437789917,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.5642945170402527,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.8051100373268127,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.6733730435371399,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.4704841077327728,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 25.484317963011563,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "3cc47b7cf9a48cdc5e27e9d835489ce09d38c3be095a2b0530ff4ed7ef43b92d",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "97a47f4e67d90f58f5450a5a543b3c1f6835b871c99853fa60f1bc12809281bf",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "3cc47b7cf9a48cdc5e27e9d835489ce09d38c3be095a2b0530ff4ed7ef43b92d",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": true,
+      "score_unchanged": false
+    },
+    "metrics": {
+      "T1": 0.6083744168281555,
+      "T2": 0.621819794178009
+    },
+    "module": "Q2",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/97a47f4e67d90f58/Q2/seed45/SEL-1500.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.6838674545288086,
+      "stage2": 0.6938196420669556
+    },
+    "status": "COMPLETE",
+    "step": 1500
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.6334834098815918,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.7398160099983215,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.6949337124824524,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.5086873173713684,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.5657672882080078,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.7795708179473877,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.659294605255127,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.4720531105995178,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 25.24681053205859,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "17ba349d52c75cd121603cb97e42dd4d6463da905b8c4dbb737c586e8f69a9ce",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "9e6f9eacc2940abcbeb0dec37fc1aac88edc965fe813848facc2da7c3458acc0",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "17ba349d52c75cd121603cb97e42dd4d6463da905b8c4dbb737c586e8f69a9ce",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": true,
+      "score_unchanged": false
+    },
+    "metrics": {
+      "T1": 0.6093716621398926,
+      "T2": 0.5813916921615601
+    },
+    "module": "Q3",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/9e6f9eacc2940abc/Q3/seed45/SEL-1000.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.6392284035682678,
+      "stage2": 0.6488597989082336
+    },
+    "status": "COMPLETE",
+    "step": 1000
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.9133052825927734,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.9105610847473145,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.8211150169372559,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.5911875367164612,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.8426213264465332,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.8944549560546875,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.7238262295722961,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.49324271082878113,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 26.669478124007583,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "b95bd4b863a75540cbea6454f05ffe8d2fd5f2615acd349a8fc0f2fb2de1e01c",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "edbe0aaa82080291bf7140ee5b350376e574197eaf4b8c196eef0aa801c04fae",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "b95bd4b863a75540cbea6454f05ffe8d2fd5f2615acd349a8fc0f2fb2de1e01c",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": false,
+      "score_unchanged": true
+    },
+    "metrics": {
+      "T1": 0.7811440825462341,
+      "T2": 0.7023366689682007
+    },
+    "module": "M0",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/edbe0aaa82080291/M0/seed45/SEL-1500.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.7804780602455139,
+      "stage2": 0.7809516787528992
+    },
+    "status": "COMPLETE",
+    "step": 1500
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.9209333062171936,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.9419070482254028,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.8165644407272339,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.610615611076355,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.8278682231903076,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.9262951016426086,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.7198737859725952,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.5053823590278625,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 28.179098939988762,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "5f32d8ee7eb8e8815f4282d67169144aadc373f92fce663140933dbe7c6a2388",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "db964d28a651b2bdb6161dba375df0fe748111379b978f4057eb0fcdde40566e",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "5f32d8ee7eb8e8815f4282d67169144aadc373f92fce663140933dbe7c6a2388",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": false,
+      "score_unchanged": true
+    },
+    "metrics": {
+      "T1": 0.7870896458625793,
+      "T2": 0.7072668671607971
+    },
+    "module": "M1",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/db964d28a651b2bd/M1/seed45/SEL-1000.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.7916038632392883,
+      "stage2": 0.7803078889846802
+    },
+    "status": "COMPLETE",
+    "step": 1000
+  },
+  {
+    "by_reference": [
+      {
+        "AP": 0.9210688471794128,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.9412406086921692,
+        "H": 1,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.8132965564727783,
+        "H": 1,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.6091219782829285,
+        "H": 1,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      },
+      {
+        "AP": 0.8278682231903076,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "1776ad7e-4db7-2333-89e1-66854e82170c"
+      },
+      {
+        "AP": 0.9262951016426086,
+        "H": 2,
+        "completed": 5,
+        "expected": 5,
+        "reference_id": "2e36952b-e133-204c-911e-7644cb34e8b2"
+      },
+      {
+        "AP": 0.7205516695976257,
+        "H": 2,
+        "completed": 8,
+        "expected": 8,
+        "reference_id": "4acaebc0-6c10-2a2a-852e-0226d6539299"
+      },
+      {
+        "AP": 0.5081790685653687,
+        "H": 2,
+        "completed": 6,
+        "expected": 6,
+        "reference_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0"
+      }
+    ],
+    "cache_identity_sha256": "5bfb3df3083c7570ee7accbd726177e6b9cc545fadf86443b4966739ef351e63",
+    "checkpoint_root": "/home/ww/persist4d_runs/short_module_screen_v1",
+    "completed": {
+      "1": 24,
+      "2": 24
+    },
+    "elapsed_seconds": 27.882884194958024,
+    "evaluation_identity": {
+      "dataset_spec_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "head_sha256": "2da01fc78dac4530e639248e295ea4d4f035e906e8d8ce2a64bdcf6de9687451",
+      "input_index_sha256": "c012bdc667d4d3248280cfbae4b44495a8ba9c0c2edc1aa3e93575f8a5220883",
+      "schema": "short-module-evaluation-v2",
+      "sources": {
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/models/short_module_heads.py": "993fadd47151068e333494599c6ef1719d55b5546db94c62f017981c38541fdb",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_eval_identity.py": "99145e4a154d0552d2aeb61f19f95a6a6b686e5b7359c2ee91f487bbe66e9b65",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_evaluation.py": "35d93a24f760471cbe2047858d5308211bef5fcb98fbe791ff4eeaadcbc1b9c8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_identity.py": "3a15a4c4325b5b2590a34d136c94f4be44eaaf696e6ff7032b991d648981a6a8",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/short_module_native.py": "147ccabd329a190d99b30174085e0b6e8c0779f459850b1559b284346d48cb2c",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/scripts/system_comparison_inference.py": "0cd868681311bbad622cd8d21c8282604433662121b3b2c6a883bab431a5e468",
+        "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/__init__.py": "94144eb0aa3f840e5619e199111b6ae211eff6f3e0e5fa1910f3faaefad0aea1",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/__init__.py": "8df63a703a7db9b067eb078103b9c6a4a453f66e23e7c568a26f8b88209c843b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/ap_math.py": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/evaluator.py": "3aeeb04f67f64c11d75d9443a12a87e6f6e6d872d96863fe0afa0399b42fe7bf",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/instance_metrics.py": "24792f506d4e02a8aedbf48bba21dedaaa2f8c5ebad066a5e3ae77a44425a146",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/matcher.py": "ba9410d044a06f7da55b00f8334fe7c6f133b8ad14052960e8746a6e73904d30",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/sim_math.py": "2bf98b250a71f428350ab836264424c39eda3ab5690137385eefe4af87376d9d",
+        "/home/ww/paper5/third_party/stmetrics/stmetrics/instances/state.py": "c9461f5fcf0287358fa85399048a2011f8415c5a744645ee76dd7441b6c56d0c"
+      },
+      "versions": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "stmetrics": "0.1.0",
+        "torch": "2.6.0+cu126",
+        "torchmetrics": "1.9.0"
+      }
+    },
+    "evaluator_sha256": "dd979cb40338b18cb661cd3bac33f0f5a4e140fe62c9f550e3544b9798d05d00",
+    "expected": {
+      "1": 24,
+      "2": 24
+    },
+    "head_sha256": "2da01fc78dac4530e639248e295ea4d4f035e906e8d8ce2a64bdcf6de9687451",
+    "incomplete": [],
+    "isolation": {
+      "class_lineage_unchanged": true,
+      "mask_unchanged": false,
+      "score_unchanged": true
+    },
+    "metrics": {
+      "T1": 0.7869782447814941,
+      "T2": 0.7079885005950928
+    },
+    "module": "M2",
+    "result_path": "/home/ww/persist4d_runs/rescene_code_first_audit_v1/noaug/evaluation/dd979cb40338b18c/M2/seed45/SEL-0500.json",
+    "role": "SEL",
+    "seed": 45,
+    "stage_AP_given_T2": {
+      "stage1": 0.7894788980484009,
+      "stage2": 0.7817175984382629
+    },
+    "status": "COMPLETE",
+    "step": 500
+  }
+]

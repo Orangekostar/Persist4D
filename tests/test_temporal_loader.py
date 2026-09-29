@@ -183,6 +183,26 @@ def _make_dataset(
     return SemanticSegmentationDataset(**kwargs)
 
 
+def test_disable_training_augmentation_preserves_discovery_and_targets(tmp_path):
+    processed, _ = _make_three_scan_fixture(tmp_path)
+    dataset = _make_dataset(processed)
+    reference = dataset.load_scan_indices(context_idx=0, scan_indices=[0, 1], change_file=None)
+    discovery = (list(dataset.sequence_names), list(dataset.data))
+    dataset.mode = "train"
+    dataset.apply_training_augmentation = False
+
+    def forbidden(**kwargs):
+        raise AssertionError("training augmentation executed")
+
+    dataset.volume_augmentations = forbidden
+    dataset.image_augmentations = forbidden
+    actual = dataset.load_scan_indices(context_idx=0, scan_indices=[0, 1], change_file=None)
+    for field in (0, 1, 2, 4, 5, 6):
+        np.testing.assert_array_equal(actual[field], reference[field])
+    assert (dataset.sequence_names, dataset.data) == discovery
+    assert dataset.mode == "train"
+
+
 def _load_with_seed(loader):
     random.seed(45)
     np.random.seed(45)
