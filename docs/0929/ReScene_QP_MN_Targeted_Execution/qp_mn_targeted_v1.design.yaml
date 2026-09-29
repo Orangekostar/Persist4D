@@ -1,0 +1,148 @@
+schema: rescene-qp-mn-targeted-design-v1
+kind: execution_design_not_experimental_result
+date: '2026-09-29'
+authoritative_instruction: ReScene_QP_MN_Codex_FINAL.md
+repository: Orangekostar/Persist4D
+base:
+  requested_local_ref: 465f37a
+  remote_read_reference: 4bf00902c9428795f7f47547bf462540aa304cc6
+  repaired_full_sha: RESOLVE_FROM_LOCAL_GIT_BEFORE_TRAINING
+  fallback_to_remote_old_labels_allowed: false
+  required_reports:
+    - artifacts/rescene_code_first_audit_v1/CONCLUSION.md
+    - artifacts/rescene_code_first_audit_v1/REQUIREMENT_REVIEW.md
+branch: research/rescene-qp-mn-targeted-v1
+tag: rescene-qp-mn-targeted-v1
+artifact_root: artifacts/qp_mn_targeted_v1
+root_environment: RESCENE_QPMN_ROOT
+parent:
+  name: R1_epoch390
+  sha256: 629ff7624dcac15e6022906e808e2e05b3ec61c60a1116ab0e278f0cfd2368dd
+  bytes: 754813672
+  concerto_sha256: 845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07
+  frozen: true
+  eval: true
+  dimensions: read_actual_tensor_then_lock
+scope:
+  mandatory_paired_arms: [Q_A0, Q_P, M_C, M_N]
+  bridge_reference: Q2_F
+  bridge_training: reuse_if_exact_else_one_1500_step_run
+  maximum_active_modules_per_prediction: 1
+  main_horizons: [1, 2]
+  formal_test_populations: []
+  excluded_execution: [Q_R, M_S, M_L, Q_plus_M, ensembles, D0, lag1, T3, T4, T5, epoch450_continuation, LoRA]
+data:
+  inherit_population: repaired_short_module_population
+  train_inputs: repaired_controlled_training_parent_cache
+  main_cal_sel_condition: NOAUG_NATIVE
+  secondary_condition: inherited_augmented_fixed_points_only
+  t1: independent_single_scan_forward_unique_physical_scans
+  candidate_key: [input_id, source_query_id, source_class_id, retained_index]
+  known_previous_counts:
+    TRAIN: {references: 64, T2: 188, T1: 199}
+    CAL: {references: 4, T2: 23, T1: 23}
+    SEL: {references: 4, T2: 24, T1: 24}
+  counts_policy: verify_actual_do_not_prefill_pass
+quality:
+  inputs: unchanged_repaired_quality_inputs
+  target_and_weight: unchanged_repaired_Q2_scalar_contract
+  loss: weighted_mse
+  hidden_widths: [128, 64]
+  activation: GELU
+  arms:
+    Q2_F: {output: sigmoid, initialization: inherited_corrected_Q2}
+    Q_A0: {output: raw_linear, last_layer_initialization: zero, parent_score_skip: false}
+    Q_P: {output: raw_linear, last_layer_initialization: zero, parent_score_skip: true}
+  qa0_qp_identical_initial_parameters: true
+  score_residual_regularization: 0.0
+  clip_output: false
+  rerun_topk_filter_nms: false
+  finite_real_scores_allowed: true
+mask:
+  architecture: unchanged_repaired_M1_shared_head
+  original_logit_residual_bound: 2.0
+  same_assignment_all_arms: true
+  new_multi_to_one: false
+  new_resampling: false
+  trainable_parameters: head_only
+  shape:
+    terms: [weighted_BCE, weighted_soft_Dice]
+    dice_smoothing: 1.0
+    stage_reduction: mean_over_observed_stages_with_valid_sampled_points
+    M_C_denominator: all_16_sampled_candidate_positions
+    M_N_denominator: actual_supervised_candidate_positions_in_whole_16_slot_batch
+    zero_positive_policy: connected_zero_shape_plus_unchanged_regularizer
+  regularization:
+    coefficient: 0.01
+    expression: mean_over_4_records_of_mean_delta_squared_over_all_segments_and_sampled_slots
+    includes_unknown_and_unmatched_finite_inputs: true
+    scale_with_positive_ratio: false
+  inference_scores_classes_candidates: unchanged
+training:
+  first_seed: 45
+  replication_seed: 46
+  optimizer: AdamW
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  betas: [0.9, 0.999]
+  epsilon: 0.00000001
+  updates: 1500
+  scheduler_horizon: 1500
+  warmup_updates: 75
+  minimum_lr_fraction: 0.1
+  gradient_clip_norm: 1.0
+  precision: float32
+  records_per_update: [2, 2, 2, 1]
+  candidates_per_record: 4
+  max_segments_per_stage: 2048
+  checkpoints: [0, 500, 1000, 1500]
+  last_every: 100
+  replication_stop: max_required_locked_step_not_new_epoch_search
+selection:
+  main_metric: official_pooled_native_T2_t_mAP_NOAUG
+  guard: real_single_scan_T1_spatial_mAP_NOAUG
+  selectable_steps: [500, 1000, 1500]
+  rank: [T2_desc, T1_desc, earlier_step]
+  lock_all_before_SEL: true
+  paired_SEL_fixed_endpoint: 1500
+  endpoint_selectable_after_SEL: false
+  tolerance_ap: 0.000001
+  maximum_T1_drop_ap: 0.002
+  target_magnitude_T2_gain_ap: 0.005
+  positive_reference_count_for_consistency: 3
+  replication_eligible: positive_d2_and_T1_guard
+  controls_may_have_engineering_gain: true
+  deployment_replacement: false
+  combinations: false
+budget:
+  cumulative_cap_gpu_hours: 192.0
+  prior_reference_gpu_hours: 79.982308
+  prior_reference_is_not_current_balance: true
+  include_local_repair_costs: true
+  incremental_cap_gpu_hours: 16.0
+  categories_gpu_hours:
+    cache_and_export: 4.0
+    main_training: 2.0
+    development_evaluation_and_replication: 4.0
+    conditional_diagnostic_probes: 2.0
+    profile_and_reload: 1.0
+    recovery: 3.0
+  reserve_before_exploration_gpu_hours: 3.0
+  maximum_simultaneous_gpus: 2
+  cpu_workers: 8
+  ram_gib: 96
+  new_cache_limit_gib: 32
+  targeted_tests_wall_minutes: 20
+  gpu_smoke_target_hours: 0.25
+publication:
+  actual_git_push: true
+  immutable_old_tags: true
+  small_head_and_metric_package_direct_git: true
+  small_asset_limit_mib: 20
+  total_new_binary_limit_mib: 50
+  raw_parent_weights_or_GT_publication: false
+  required_asset_availability_not_release_existence: true
+  all_required_assets_in_git_status: GIT_COMPLETE
+  missing_required_large_asset_status: CODE_ONLY
+  release_when_all_required_assets_in_git: NOT_REQUIRED
+  publication_receipt: external_to_commit_B

@@ -1,0 +1,234 @@
+{
+  "scope": "instruction package static checks and synthetic CPU formula examples only",
+  "not_executed": [
+    "user_repository_regression",
+    "stmetrics_evaluation",
+    "R1_forward",
+    "GPU_training",
+    "GitHub_push"
+  ],
+  "checks": [
+    {
+      "check": "local_repaired_base_required",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required_local_reports",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "only_four_paired_arms",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no_combinations_or_formal_tests",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "one_module_per_prediction",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen_parent",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "real_single_scan_T1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "noaug_primary",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "common_fixed_training_inputs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "qa0_qp_only_skip_difference",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no_extra_score_regularizer_or_clip",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unchanged_M_assignment_sampling",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "M_regularizer_not_scaled",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "same_bound_M_control",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "steps_and_schedule",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "batch_16_slots",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "CAL_train_points_only",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "SEL_endpoint_no_selection",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "fixed_replication_steps",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "budget_sum_16",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "prior_costs_not_reset",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "bounded_cpu_gpu_checks",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "small_metrics_can_publish_git",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no_GT_or_parent_redistribution",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "source_index_complete",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "full_sections_present",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "code_not_claimed_implemented",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "M_probe_deduplicated",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "identical_QA0_QP_initial_tensors",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "QP_zero_equals_B0",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "QA0_zero_not_B0",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "QP_output_first_step_has_gradient",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "QP_trunk_first_step_zero_expected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "QP_trunk_second_step_has_gradient",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "MC_normalization_value",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "MN_normalization_value",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "regularizer_gradient_unchanged",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "MN_only_positive_shape_gradients",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "zero_positive_finite_regularizer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "all_positive_formulas_identical",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "bounded_residual_cannot_flip_strong_errors",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "finite_real_score_affine_order",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "AP_unit_conversion",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "historical_supervised_fraction_derivation",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "passed": 44,
+  "failed": 0
+}
