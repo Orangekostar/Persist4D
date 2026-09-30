@@ -1,12 +1,12 @@
 # Native Long Retrain Handoff
 
-Experiment A: `9ea09b3484f6c030b103c70b524ff90f0765bbd6`. Branch: `research/rescene-native-long-retrain-v1`. Delivery tag: `rescene-native-long-retrain-v1`. Base: `c6e9d01edfe2b3c832374a424fc45e44bdadfb68`.
+Experiment A: `ca9f3416cf01f403d306b75c207f52c38bc70ad5`. Branch: `research/rescene-native-long-retrain-v1`. Delivery tag: `rescene-native-long-retrain-v1-r2`. Base: `c6e9d01edfe2b3c832374a424fc45e44bdadfb68`.
 
 Scientific status is PARTIAL_FULL_RETRAIN_BUDGET; publication is CODE_ONLY. All four arms have zero actual training updates. No main AP, CAL/SEL lock, seed46, formal confirmation, trained profile or gain exists. The measured full E0 forecast already exceeds the remaining lifetime budget. Do not shrink U or convert temporary preflight optimizer updates into a training result.
 
 Runtime: `/home/ww/persist4d_runs/native_long_retrain_v1`. Read FINAL_REPORT.md, REQUIREMENT_REVIEW.md, CODE_BINDINGS.md and RUNTIME_NOTE.md. The encoder is the separately obtained fixed Concerto SHA in SOURCE_AND_INITIALIZATION.json. Initialization contains no old task warm start. Current encoder has zero registered buffers; the loader explicitly preserves every nonencoder tensor and any registered encoder buffers.
 
-Git includes untrained F initialization parameters and official initialized TRAIN-A sufficient statistics. Nonencoder task initialization bundle remains local: `/home/ww/persist4d_runs/native_long_retrain_v1/initialization/task_reload_initialization.pt`, 106912359 bytes, SHA `3790a88856ccef2b08a3619911ae56870043d8fd65cf958fd58314864943edcb`. It is not a trained deployment model. No Release authorization was available; no trained weights were generated. Raw data, raw GT and original pretrained files are not redistributed.
+Git includes untrained F initialization parameters and official initialized TRAIN-A sufficient statistics. Nonencoder task initialization bundle remains local: `/home/ww/persist4d_runs/native_long_retrain_v1/initialization/task_reload_initialization.pt`, 106912359 bytes, SHA `5301d1189dfa8cde6d953f4e0151168b1d0220c23753b94f39bc53e079f9649b`. It is not a trained deployment model. No Release authorization was available; no trained weights were generated. Raw data, raw GT and original pretrained files are not redistributed.
 
 Commands with the existing persist4d environment, from this worktree:
 

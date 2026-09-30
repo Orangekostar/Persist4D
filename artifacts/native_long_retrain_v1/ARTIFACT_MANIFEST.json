@@ -13,9 +13,9 @@
       "sha256": "600ebf1d0fe820ef3327f777d925cfe594bb2285f5f1c3db9bab372135833a86"
     },
     {
-      "bytes": 9416,
+      "bytes": 9648,
       "path": "COST_LEDGER.jsonl",
-      "sha256": "977fc370344f43ed124ac75167bc79322f099628cd027d2c6351601f46e96754"
+      "sha256": "37f5513566ac45316be102fff21cf9e13ef657de12a4067a164d6c912dba25e9"
     },
     {
       "bytes": 1018550,
@@ -33,9 +33,9 @@
       "sha256": "9bc8234b4f8c21cb6d70ee021799fa5b5f0e28e42aebff76cd5cec67f4a83657"
     },
     {
-      "bytes": 3037,
+      "bytes": 3040,
       "path": "HANDOFF.md",
-      "sha256": "9fcb627163cb3318d623124fd3b0652b06878191ca5a4625df78227acf4382e5"
+      "sha256": "a9e5959767500b5ef5f835fa93e12a0ccf1a66999eeee2c3e426bad43af11d3f"
     },
     {
       "bytes": 394172,
@@ -43,9 +43,9 @@
       "sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8"
     },
     {
-      "bytes": 12414,
+      "bytes": 12950,
       "path": "PRIMARY_REVIEW.json",
-      "sha256": "39c640906fdfc26c0fbeb6c8af3d64b040d09080bc21308efe51e0c09fcb97f9"
+      "sha256": "b8ad5ec4415b8ee97dadcde125711d69c61cd38f387ca7976d469b59c2e36256"
     },
     {
       "bytes": 2486,
@@ -65,17 +65,17 @@
     {
       "bytes": 2598,
       "path": "RUN_STATE.json",
-      "sha256": "157f9452a97e3754fddfc150404d679750b9d26df1963abe767e671f660f22ab"
+      "sha256": "0d8cfed0cc43128ccf68fd6c84a00cbf52b800b1aad47aed3ebd3447aadec181"
     },
     {
       "bytes": 316456,
       "path": "SOURCE_AND_INITIALIZATION.json",
-      "sha256": "80fe62e5d1d2c7a1ecf16483b5ae8427cfb05a5b2e6c598a766977c8256c941b"
+      "sha256": "688d57326e785e40110fc749cadb3c0b840e911751883c06877e3dc29bd125ee"
     },
     {
-      "bytes": 3465,
+      "bytes": 4299,
       "path": "VERIFICATION.md",
-      "sha256": "ba3a195bb7c60fc74418503796f2feee220a0a2f52f2218645419abc9749c6a7"
+      "sha256": "9d88d061f85eab3e20d781dce926fdc512d66a1861e08ed86bc709d67b5f21d0"
     },
     {
       "bytes": 491,
@@ -140,7 +140,7 @@
     {
       "bytes": 2776,
       "path": "initialization/TASK_BUNDLE_RELOAD_AUDIT.json",
-      "sha256": "c6a2c45bd4d33148971f225c9448de7986f64e52edfa036077463c4e99c8dace"
+      "sha256": "b4c8e0b0688a4933591f842a0d82aca39e8879c18d485eb8dca4209b0e074c26"
     },
     {
       "bytes": 799610,
@@ -151,6 +151,11 @@
       "bytes": 4569,
       "path": "protocol.yaml",
       "sha256": "d1e73f4bdcc60f83e7ee6b05addafb78a9bc424effb5df596194162fae6ea318"
+    },
+    {
+      "bytes": 584,
+      "path": "resources/BUDGET_RESUME_AUDIT.json",
+      "sha256": "995f9f8aad80195f57654804d0c2ddbb170f1571f9f1f509bda4228c2d40480d"
     },
     {
       "bytes": 712,
