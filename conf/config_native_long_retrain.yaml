@@ -1,0 +1,119 @@
+defaults:
+  - config_base_instance_segmentation
+  - override data/datasets: mix
+  - override model: rescene
+  - override backbone: concerto
+  - override serialization: mixed
+  - override optimizer: adamw
+  - override scheduler: onecyclelr
+  - override trainer: trainer
+  - override logging: local_csv
+  - override callbacks: native_long
+  - override matcher: hungarian_matcher
+  - override loss: set_criterion
+  - override loss/contrastive: infoNCE
+  - _self_
+
+aux_metric: null
+
+general:
+  train_mode: true
+  seed: 45
+  freeze: backbone_encoder
+  frozen_encoder_eval: false
+  gpus: 2
+  project_name: native_long_retrain_v1
+  workspace: null
+  experiment_name: ${native_long.arm}
+  save_dir: ${oc.env:RESCENE_NATIVE_LONG_ROOT,${oc.env:HOME}/persist4d_runs/native_long_retrain_v1}/training/${native_long.arm}/seed${general.seed}
+  rootcause_objective_mode: raw_sum
+  rootcause_fail_closed_runtime: true
+  p2_weighted_objective: false
+  matmul_precision: highest
+  compile_model: false
+
+data:
+  batch_size: 2
+  voxel_size: 0.02
+  num_workers: 0
+  train_dataset:
+    filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: false
+    fail_closed: true
+    known_empty_scan_policy: allow_actual
+  validation_dataset:
+    filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: false
+    fail_closed: true
+    known_empty_scan_policy: allow_actual
+    apply_training_augmentation: false
+  test_dataset:
+    filter_out_classes: [0, 1, 255]
+    exclude_unsupervised_sequences: false
+    fail_closed: true
+    known_empty_scan_policy: allow_actual
+    apply_training_augmentation: false
+
+backbone:
+  name: ${oc.env:CONCERTO_CHECKPOINT,${oc.env:HOME}/.cache/persist4d/concerto/concerto_base.pth}
+  pretrained_scope: encoder_only
+
+model:
+  num_queries: 100
+  non_parametric_queries: true
+  random_query_both: false
+  random_normal: false
+  random_queries: false
+  use_np_features: false
+  scatter_type: mean
+  temporal_masking: false
+  native_long_sampling: false
+  native_long_feedback: false
+  native_long_sampling_seed: ${general.seed}
+  config:
+    temporal_window: 2
+
+loss:
+  eos_coef: 0.2
+
+optimizer:
+  lr: 0.0005
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.01
+  amsgrad: false
+
+scheduler:
+  scheduler:
+    total_steps: 29700
+    pct_start: 0.3
+    anneal_strategy: cos
+    cycle_momentum: true
+    base_momentum: 0.85
+    max_momentum: 0.95
+    div_factor: 25.0
+    final_div_factor: 10000.0
+    three_phase: false
+    last_epoch: -1
+
+trainer:
+  max_steps: 29700
+  max_epochs: -1
+  min_epochs: 0
+  accumulate_grad_batches: 8
+  precision: 32-true
+  gradient_clip_val: 1.0
+  num_sanity_val_steps: 0
+  strategy: ddp_find_unused_parameters_true
+
+native_long:
+  arm: E0
+  total_updates: 29700
+  effective_batch: 32
+  evaluation_interval: 2970
+  checkpoint_interval: 990
+  pilot_end_update: 11880
+  sampling_seed: 45
+  data_root: ${oc.env:HOME}/persist4d_runs/perception_gain_v2/data
+  population_file: artifacts/native_long_retrain_v1/POPULATION.json
+  runtime_root: ${oc.env:RESCENE_NATIVE_LONG_ROOT,${oc.env:HOME}/persist4d_runs/native_long_retrain_v1}

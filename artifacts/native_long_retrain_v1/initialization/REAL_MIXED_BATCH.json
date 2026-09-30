@@ -1,0 +1,46 @@
+{
+  "A+B": [
+    {
+      "empty_stage_instance_pairs": 0,
+      "full_points": 8977,
+      "gt_instances": 2,
+      "horizon": 2,
+      "input_id": "PREFLIGHT:20c993c5-698f-29c5-8604-3248ede4091f:T2",
+      "inverse_and_time": "PASS",
+      "low_points": 5476,
+      "segments": 430
+    },
+    {
+      "empty_stage_instance_pairs": 0,
+      "full_points": 871725,
+      "gt_instances": 31,
+      "horizon": 5,
+      "input_id": "PREFLIGHT:d7d40d62-7a5d-2b36-955e-86a394caeabb:T5",
+      "inverse_and_time": "PASS",
+      "low_points": 581498,
+      "segments": 31952
+    }
+  ],
+  "B+SCANNET": [
+    {
+      "empty_stage_instance_pairs": 0,
+      "full_points": 871725,
+      "gt_instances": 31,
+      "horizon": 5,
+      "input_id": "PREFLIGHT:d7d40d62-7a5d-2b36-955e-86a394caeabb:T5",
+      "inverse_and_time": "PASS",
+      "low_points": 581498,
+      "segments": 31952
+    },
+    {
+      "empty_stage_instance_pairs": 0,
+      "full_points": 81369,
+      "gt_instances": 27,
+      "horizon": 1,
+      "input_id": "PREFLIGHT:SCANNET:0",
+      "inverse_and_time": "PASS",
+      "low_points": 79967,
+      "segments": 668
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "completed": 0,
+  "formal_sources": {
+    "DATA_ROLES.json": "463aca5eda2ad2281bdcb00d5b448b990169350fc99a9e8291164382cfdea79b",
+    "INPUT_MANIFEST.json": "44f824a6eeed2e5c3e5fa7d1c3208843b719c0e2251f6def0daf783bfe091a27"
+  },
+  "input_denominators": null,
+  "reason": "no lockable trained checkpoint; formal input materialization and evaluation not executed",
+  "reference_counts": {
+    "ADDITIONAL": 41,
+    "LOCAL-T2": 41,
+    "PB": 6
+  },
+  "status": "NOT_RUN_NO_TRAINED_MODELS"
+}

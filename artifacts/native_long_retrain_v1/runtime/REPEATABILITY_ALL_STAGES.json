@@ -1,0 +1,43 @@
+{
+  "raw_trace_sha256": {
+    "A-0": "27d59092f3bd53cbf03d76cfd7feedafa836e4435a08fbf07519a50973d437f5",
+    "A-1": "33410362187cebd828954e6f8746baed52a7a662d45d5a712b5a0815e494c4d9",
+    "ABA-0": "bd92bf87d55427cfbee53a69eb3a9f4a9296378dcac076a81c76628637d4678a",
+    "ABA-1": "0bb3b1d95cc3aacbdb2448ae611bce682a4e7a1002a444925a29b2d0f1d22133",
+    "BA-0": "6d4a649323de98b24e59dabc3ef1c96cbb4daf39b66fffa4e3574eeec7996f1e",
+    "BA-1": "7d774eb467ad1a211b5139c6b78b1823784a0f3b8ce16a480adf035a416ba355"
+  },
+  "rows": {
+    "A": {
+      "decoder": true,
+      "embedding": true,
+      "encoder": true,
+      "final": true,
+      "input": true,
+      "mapping": true,
+      "maskF": true,
+      "query": true
+    },
+    "ABA": {
+      "decoder": true,
+      "embedding": true,
+      "encoder": true,
+      "final": true,
+      "input": true,
+      "mapping": true,
+      "maskF": true,
+      "query": true
+    },
+    "BA": {
+      "decoder": true,
+      "embedding": true,
+      "encoder": true,
+      "final": true,
+      "input": true,
+      "mapping": true,
+      "maskF": true,
+      "query": true
+    }
+  },
+  "status": "EXACT_ALL_RECORDED_TENSORS_WITHIN_PROTOCOL"
+}

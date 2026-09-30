@@ -1,0 +1,149 @@
+version: native-long-retrain-v1
+base_commit: c6e9d01edfe2b3c832374a424fc45e44bdadfb68
+repository: Orangekostar/Persist4D
+branch: research/rescene-native-long-retrain-v1
+tag: rescene-native-long-retrain-v1
+artifact_root: artifacts/native_long_retrain_v1
+runtime_root_default: ~/persist4d_runs/native_long_retrain_v1
+scope:
+  arms: [E0, E1, E2, E3]
+  E0: native_short_control
+  E1: native_long_curriculum_control
+  E2: native_long_stage_stratified_sampling
+  E3: native_long_query_conditioned_mask_feedback
+  parent_finetuning: false
+  pretrained_encoder: true
+  combinations: false
+  excluded: [D0, lag1, QP, MN, LoRA, backbone_replacement, point_level_output, external_object_memory]
+initialization:
+  seed: 45
+  replication_seed: 46
+  common_state_generated_fresh: true
+  restore_r1_task_weights: false
+  freeze_encoder_weights: true
+  frozen_encoder_eval_during_training: false
+  load_pretrained_decoder: false
+  concerto_sha256: 845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07
+  concerto_bytes: 433987358
+baseline:
+  hidden_dim: 128
+  num_queries: 100
+  num_heads: 8
+  decoder_repetitions: 3
+  levels: [0, 1, 2, 3]
+  sample_sizes: [200, 800, 3200, 12800, 51200]
+  shared_decoder: true
+  query_content: zeros
+  query_positioning: fps
+  train_on_segments: true
+  scatter_type: mean
+  temporal_masking: false
+  serialization: [standard, temporal_overlay]
+  voxel_size: 0.02
+  objective_mode: raw_sum
+  eos_coef: 0.2
+  changes_head: false
+  mask_loss_mode: legacy
+  info_nce: inherit_verified_r1
+population:
+  dev_from_official_training_refs: true
+  cal_target_refs: 8
+  sel_target_refs: 8
+  minimum_each_dev_refs: 4
+  holdout_hash_seed: 7001
+  exclude_previous_holdouts_and_formal_refs_from_fit: true
+  generation_uses_metadata_not_model_scores: true
+  input_ratio_rio_scannet: [1.0, 0.8]
+  reference_first_rio_sampling: true
+  canonical_orders: 3
+  evaluation_augmentation: false
+  evaluation_rng_seed: 9001
+  maximum_train_horizon: 5
+training:
+  total_optimizer_updates: 29700
+  effective_batch: 32
+  preferred_world_size: 2
+  preferred_per_rank_batch: 2
+  preferred_accumulation: 8
+  fallback_per_rank_batch: 1
+  fallback_accumulation_two_gpu: 16
+  optimizer: AdamW
+  max_lr: 0.0005
+  weight_decay: 0.01
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  scheduler: OneCycleLR
+  pct_start: 0.3
+  div_factor: 25.0
+  final_div_factor: 10000.0
+  cycle_momentum: true
+  base_momentum: 0.85
+  max_momentum: 0.95
+  precision: fp32
+  gradient_clip: inherit_verified_full_r1
+  curriculum_start_fraction: 0.10
+  curriculum_full_fraction: 0.25
+  mature_horizon_weights: {2: 0.25, 3: 0.25, 4: 0.25, 5: 0.25}
+  checkpoint_interval: 990
+  evaluation_interval: 2970
+  pilot_end_update: 11880
+  resume_at_optimizer_boundary_only: true
+  cache_entire_r1_training_features: false
+stage_sampler:
+  enabled_arm: E2
+  same_total_cap: true
+  allocation: round_robin_waterfill_in_stage_order
+  remainder_order: ascending_stage
+  without_replacement: true
+  change_eval_sampling: false
+  selection_uses_gt: false
+feedback:
+  enabled_arm: E3
+  after_execution_stage_index: 7
+  width: 128
+  heads: 8
+  ffn_width: 512
+  attention_dropout: 0.0
+  output_projection_zero_init: true
+  ffn_last_zero_init: true
+  extra_zero_multiplicative_gate: false
+  chunk_segments: 512
+  update_future_mask_and_attention_features: true
+  preserve_original_segment_contrastive_input: true
+  add_contrastive_loss: false
+  point_level_output: false
+  soft_or_gt_mask_gate: false
+selection:
+  primary: mean_T3_T4_T5_official_pooled_AP
+  tie_tolerance: 0.000001
+  t2_guard_delta: -0.002
+  t1_guard_delta: -0.002
+  per_long_horizon_guard_delta: -0.002
+  target_mean_long_delta: 0.005
+  positive_epsilon: 0.000001
+  cal_only_checkpoint_selection: true
+  sel_all_locked_arms: true
+  replication_positive_new_module_only: true
+  replication_uses_fixed_seed45_updates: true
+  runtime_sensitivity_runs_per_order: 2
+budget:
+  lifetime_gpu_hours_cap: 192.0
+  last_reported_prior_gpu_hours: 80.7350387502
+  must_reconcile_new_costs: true
+  preflight_gpu_hours_cap: 1.0
+  numerical_debug_gpu_hours_cap: 0.5
+  reserve_confirmation_profile_gpu_hours: 8.0
+  forecast_multiplier: 1.25
+  automatic_cap_increase: false
+  automatic_full_schedule_shortening: false
+  second_seed_after_complete_first_seed: true
+publication:
+  git_small_asset_limit_MiB: 20
+  git_new_binary_total_limit_MiB: 50
+  full_checkpoint_release_or_lfs: true
+  split_weights_to_evade_git_limits: false
+  raw_data_or_gt_upload: false
+  commit_A_then_B_then_external_receipt: true
+  force_push: false
+  merge_main: false
+  required_remote_verification: true

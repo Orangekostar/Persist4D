@@ -1,0 +1,81 @@
+{
+  "differences_from_A": {
+    "ABA": {
+      "candidate_lineage_equal": true,
+      "changed_bool_mask_entries": 0,
+      "score_max_abs": 0.0,
+      "single_input_t_AP_delta": 0.0
+    },
+    "BA": {
+      "candidate_lineage_equal": false,
+      "changed_bool_mask_entries": null,
+      "score_max_abs": null,
+      "single_input_t_AP_delta": 0.0
+    }
+  },
+  "gain_assessment": "NO_TRAINED_CANDIDATE",
+  "rows": [
+    {
+      "candidates": 100,
+      "completed": 1,
+      "eligible_GT_region_count": 2,
+      "evidence": {
+        "path": "evidence/INITIALIZED_TRAIN_A_A_official_state.json",
+        "sha256": "0bb0a6efdb8dce2977e8602443fc0fe452a487be95b440733f340f3b3cd60413"
+      },
+      "expected": 1,
+      "horizon": 2,
+      "metric_status": "FINITE",
+      "metrics": {
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "protocol": "A",
+      "role": "TRAIN_DIAGNOSTIC",
+      "trained_updates": 0
+    },
+    {
+      "candidates": 100,
+      "completed": 1,
+      "eligible_GT_region_count": 2,
+      "evidence": {
+        "path": "evidence/INITIALIZED_TRAIN_A_BA_official_state.json",
+        "sha256": "0bb0a6efdb8dce2977e8602443fc0fe452a487be95b440733f340f3b3cd60413"
+      },
+      "expected": 1,
+      "horizon": 2,
+      "metric_status": "FINITE",
+      "metrics": {
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "protocol": "BA",
+      "role": "TRAIN_DIAGNOSTIC",
+      "trained_updates": 0
+    },
+    {
+      "candidates": 100,
+      "completed": 1,
+      "eligible_GT_region_count": 2,
+      "evidence": {
+        "path": "evidence/INITIALIZED_TRAIN_A_ABA_official_state.json",
+        "sha256": "0bb0a6efdb8dce2977e8602443fc0fe452a487be95b440733f340f3b3cd60413"
+      },
+      "expected": 1,
+      "horizon": 2,
+      "metric_status": "FINITE",
+      "metrics": {
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "protocol": "ABA",
+      "role": "TRAIN_DIAGNOSTIC",
+      "trained_updates": 0
+    }
+  ],
+  "scope": "one fixed TRAIN T2 at initialization; not CAL/SEL/confirmation",
+  "status": "DIAGNOSTIC_ONLY"
+}

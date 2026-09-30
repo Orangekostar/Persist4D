@@ -16,8 +16,12 @@ class PointceptBackbone(nn.Module):
     """
     PLANES = [48, 96, 192, 384, 512, 384, 192, 96, 96]
 
-    def __init__(self, name, repo_id, model_lib=None, custom_config={}, **kwargs):
+    def __init__(self, name, repo_id, model_lib=None, custom_config={},
+                 pretrained_scope="legacy", **kwargs):
         super().__init__()
+        if pretrained_scope not in {"legacy", "encoder_only"}:
+            raise ValueError("pretrained_scope must be legacy or encoder_only")
+        self.pretrained_scope = pretrained_scope
         
         # Determine which library to use
         if model_lib is None:
@@ -112,7 +116,29 @@ class PointceptBackbone(nn.Module):
     
     def _load_state_dict(self, ckpt):
         """Load state dict with handling for missing keys"""
-        # Filter out decoder weights if loading encoder-only
+        if self.pretrained_scope == "encoder_only":
+            prefixes = ("embedding.", "enc.")
+            expected = {key for key in self.model.state_dict() if key.startswith(prefixes)}
+            selected = {key: value for key, value in ckpt["state_dict"].items()
+                        if key.startswith(prefixes)}
+            if set(selected) != expected:
+                raise ValueError(
+                    f"encoder pretrained coverage differs: missing={sorted(expected - set(selected))}, "
+                    f"unexpected={sorted(set(selected) - expected)}"
+                )
+            for name in ("embedding", "enc"):
+                prefix = name + "."
+                getattr(self.model, name).load_state_dict(
+                    {key[len(prefix):]: value for key, value in selected.items()
+                     if key.startswith(prefix)}, strict=True
+                )
+            self.pretrained_load_audit = {
+                "scope": "encoder_only", "loaded_keys": sorted(selected),
+                "excluded_pretrained_keys": sorted(set(ckpt["state_dict"]) - set(selected)),
+                "fresh_task_keys": sorted(set(self.model.state_dict()) - expected),
+                "missing_encoder_keys": [], "unexpected_encoder_keys": [],
+            }
+            return
         missing_keys, unexpected_keys = self.model.load_state_dict(ckpt["state_dict"], strict=False)
         
         if missing_keys:

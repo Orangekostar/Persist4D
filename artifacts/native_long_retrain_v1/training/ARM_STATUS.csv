@@ -1,0 +1,5 @@
+arm,seed,optimizer_updates,required_full_updates,status,initialization,T1_AP,T2_t_AP,T3_t_AP,T4_t_AP,T5_t_AP,delta_vs_E0,delta_vs_E1,curriculum,sampling,mask_feature_feedback,training_seed46
+E0,45,0,29700,NOT_RUN_BUDGET,new encoder-only common seed45,,,,,,,,ScanNet T1 + rio T2,native capped,False,NOT_REPLICATED
+E1,45,0,29700,NOT_RUN_BUDGET,new encoder-only common seed45,,,,,,,,ScanNet T1 + rio T2-T5,native capped,False,NOT_REPLICATED
+E2,45,0,29700,NOT_RUN_BUDGET,new encoder-only common seed45,,,,,,,,ScanNet T1 + rio T2-T5,stage-stratified,False,NOT_REPLICATED
+E3,45,0,29700,NOT_RUN_BUDGET,new encoder-only common seed45,,,,,,,,ScanNet T1 + rio T2-T5,native capped,True,NOT_REPLICATED

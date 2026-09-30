@@ -1,0 +1,76 @@
+{
+  "CUDA_construction_rng_unchanged": true,
+  "common_tensor_audit": {
+    "bytes": 540941360,
+    "new_tensor_names": [
+      "model.native_long_feedback.attention.in_proj_bias",
+      "model.native_long_feedback.attention.in_proj_weight",
+      "model.native_long_feedback.attention.out_proj.bias",
+      "model.native_long_feedback.attention.out_proj.weight",
+      "model.native_long_feedback.feature_norm.bias",
+      "model.native_long_feedback.feature_norm.weight",
+      "model.native_long_feedback.ffn.0.bias",
+      "model.native_long_feedback.ffn.0.weight",
+      "model.native_long_feedback.ffn.2.bias",
+      "model.native_long_feedback.ffn.2.weight",
+      "model.native_long_feedback.ffn_norm.bias",
+      "model.native_long_feedback.ffn_norm.weight",
+      "model.native_long_feedback.query_norm.bias",
+      "model.native_long_feedback.query_norm.weight"
+    ],
+    "reference": "external:native-long/common/seed45/8d3dfbc4e5c78d707ae5d6cb913123727456698c06d7c1e5077d944772c423e1",
+    "sha256": "8d3dfbc4e5c78d707ae5d6cb913123727456698c06d7c1e5077d944772c423e1",
+    "shared_content_sha256": "2949cc5ec1022aa2bd50cfeb2a97e8bca23e3913353e6b2ffd33738f89669abd",
+    "shared_tensor_count": 798,
+    "status": "pass"
+  },
+  "results": {
+    "A": {
+      "actual_feature_update": [
+        {
+          "execution_stage": 7,
+          "update_norm": 0.0
+        }
+      ],
+      "initial_final_equal": {
+        "classes": true,
+        "masks": true
+      }
+    },
+    "B": {
+      "actual_feature_update": [
+        {
+          "execution_stage": 7,
+          "update_norm": 0.0
+        }
+      ],
+      "initial_final_equal": {
+        "classes": true,
+        "masks": true
+      }
+    },
+    "active": {
+      "aux_equal": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_mask_max_abs": 1.3259377479553223,
+      "update": [
+        {
+          "execution_stage": 7,
+          "update_norm": 25.154327392578125
+        }
+      ]
+    }
+  }
+}

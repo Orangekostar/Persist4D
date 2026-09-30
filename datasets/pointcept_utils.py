@@ -179,7 +179,9 @@ def voxelize(
     # split required to be list per batch
     batch_offset = sonata.utils.batch2offset((point["batch_idx"]).int())[:-1].detach().cpu()
     point["labels"] = torch.tensor_split(point["labels"], batch_offset, dim=0)
-    point["inverse_maps"] = torch.tensor_split(point["batch_inverse"], batch_offset, dim=0)
+    # Inverse entries index FULL vertices, unlike LOW labels/features above.
+    full_batch_offset = np.cumsum([len(value) for value in original_coordinates])[:-1]
+    point["inverse_maps"] = torch.tensor_split(point["batch_inverse"], full_batch_offset.tolist(), dim=0)
     point["temporal_stages"] = torch.tensor_split(point["t"], batch_offset, dim=0)
     point['features'] = point['feat']
             

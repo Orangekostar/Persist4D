@@ -1,0 +1,197 @@
+{
+  "IO_measurement_sha256": "afc14f12f09fd214b4c531f2f43ce3f21d7e7ccc7dfc5f5ec013c7bf44cbedd0",
+  "actual_after_preflight": {
+    "campaign_gpu_hours": 0.21820966691858162,
+    "lifetime_gpu_hours": 80.95324841715825,
+    "remaining_gpu_hours": 111.04675158284175
+  },
+  "current_campaign_gpu_hours": 0.21820966691858162,
+  "forecast": {
+    "cal_gpu_hours_separate_conservative_full_step_proxy": {
+      "E0": 0.3225956690737264,
+      "E1": 0.3225956690737264,
+      "E2": 0.33569692999351863,
+      "E3": 0.3345569776167482
+    },
+    "costs_gpu_hours": {
+      "E0": 379.97159882815447,
+      "E1": 400.3050247484042,
+      "E2": 410.48968621495186,
+      "E3": 416.37494490323206
+    },
+    "integrated_horizon_mass": {
+      "1": 0.4444444444444444,
+      "2": 0.4082776232339496,
+      "3": 0.10789200833735822,
+      "4": 0.03018116326824488,
+      "5": 0.009204760714968651
+    },
+    "integrated_points_per_draw_by_horizon": {
+      "1": 64520.34748820427,
+      "2": 41147.105904038646,
+      "3": 16929.46536031568,
+      "4": 6789.767509546968,
+      "5": 2304.2605577976237
+    },
+    "limitations": [
+      "finite median native inputs; linear full-point scaling is approximate",
+      "two ranks may have imbalance; 25% training margin applied once",
+      "raw_sum gradient audit timing excluded from speed estimate"
+    ],
+    "mean_to_measured_point_scaling": {
+      "1": 1.1020328083842679,
+      "2": 1.1581764806841968,
+      "3": 1.1149945153741463,
+      "4": 1.1699820766947948,
+      "5": 1.516419502093889
+    },
+    "per_draw_gpu_occupancy_seconds_including_serial_IO": {
+      "E0": 1.150451524724487,
+      "E1": 1.2120679669070622,
+      "E2": 1.242890876621086,
+      "E3": 1.2607284482594405
+    },
+    "training_gpu_hours_with_single_1_25_margin": {
+      "E0": 379.64900315908073,
+      "E1": 399.9824290793305,
+      "E2": 410.15398928495836,
+      "E3": 416.04038792561533
+    }
+  },
+  "forecast_multiplier": 1.25,
+  "forecast_training_gpu_hours": 0.0,
+  "frozen_before_training_results": true,
+  "full_arms": [],
+  "lifetime_cap_gpu_hours": 192.0,
+  "measurement_sha256": "dd270252806666c9390dc3e29625273eca3ddec175c63cf3319fa8a3a9f5c886",
+  "mode": "BASELINE_RECOVERY_ONLY",
+  "physical_batch": {
+    "accumulation": 16,
+    "effective": 32,
+    "per_rank_batch": 1,
+    "world_size": 2
+  },
+  "pilot_arms": [],
+  "pre_result_forecast_correction": {
+    "prior_lock_sha256": "46726eec2eb2884171120da92dd16fb839393a58a3636dede6ee5d6e624b01c3",
+    "reason": "preserve reference-size/curriculum correlation in metadata cost integration",
+    "selection_scores_seen": 0,
+    "training_updates_seen": 0
+  },
+  "prior": {
+    "event_ids": [
+      "AUX:2026-09-22T20:51:10.107530+00:00",
+      "AUX:2026-09-22T23:24:09.356661+00:00",
+      "BASELINE:2026-09-22T15:55:40.049268+00:00",
+      "CONFIRM:2026-09-26T13:49:33.875053+00:00",
+      "CONFIRM:2026-09-26T15:52:27.671174+00:00",
+      "EARLY_FIXED_CAL:2026-09-22T19:59:03.178171+00:00",
+      "FINAL_CUDA_VISIBLE_REGRESSION:final-regression-20260926.log",
+      "FINAL_CUDA_VISIBLE_REGRESSION:final-regression-lint-fixed-20260926.log",
+      "HIGH_CONT:2026-09-22T14:37:16.819978+00:00",
+      "LAST_FIXED_CAL:2026-09-22T20:22:23.023765+00:00",
+      "LOCAL_EXPORT_MATCHED_RUNTIME:2026-09-26T16:48:44.958462+00:00",
+      "LOCAL_PREDICTION_EXPORT_RECOVERY:2026-09-26T16:39:27.712257+00:00",
+      "LOCK:2026-09-26T13:49:13.615661+00:00",
+      "LOW_PAIR:2026-09-22T15:50:45.994544+00:00",
+      "NATIVE_PB_IDENTITY_RECOVERY:2026-09-26T14:06:25.829631+00:00",
+      "PARENT_CONTEXT:2026-09-22T18:37:23.296746+00:00",
+      "PARENT_DRIFT:2026-09-22T18:11:24.098294+00:00",
+      "PARENT_DRIFT_OLD_SOURCE:2026-09-22T18:19:27.840587+00:00",
+      "PARENT_DRIFT_OLD_SOURCE_RERUN:2026-09-22T18:21:18.935609+00:00",
+      "PERCEPTION:2026-09-22T23:15:49.680936+00:00",
+      "PERCEPTION:2026-09-23T05:13:19.807023+00:00",
+      "PERCEPTION:2026-09-26T13:26:11.006845+00:00",
+      "PROFILE:2026-09-26T13:49:44.076502+00:00",
+      "PROFILE_LIVE_SMOKE:2026-09-22T19:21:16.013039+00:00",
+      "PROFILE_LIVE_SMOKE:2026-09-22T19:25:07.543692+00:00",
+      "PUBLISH:2026-09-26T17:22:30.927886+00:00",
+      "R1-post-train-diagnostics:2026-09-22T18:09:24.561541+00:00",
+      "REBASELINE_FIXED_RUNTIME:2026-09-22T18:59:11.088055+00:00",
+      "REPAIR_P:2026-09-26T13:49:03.467545+00:00",
+      "REPAIR_R1-recovery-01:2026-09-22T16:20:52.737373+00:00",
+      "REPAIR_R1-recovery-02:2026-09-22T16:46:43.240384+00:00",
+      "REPAIR_R1:2026-09-22T15:50:45.978089+00:00",
+      "REPAIR_R1_CACHE:2026-09-22T14:49:04.951381+00:00",
+      "REPAIR_R1_CACHE:2026-09-22T15:07:11.552286+00:00",
+      "REPLICATE:2026-09-26T13:49:33.840886+00:00",
+      "REPORT:2026-09-26T15:45:56.490981+00:00",
+      "V1-published-total",
+      "V1-smoke-exact2_continuous",
+      "V1-smoke-exact2_split",
+      "V1-smoke-exact_continuous",
+      "V1-smoke-exact_split",
+      "V1-smoke-task8",
+      "baseline:2026-09-28T14:42:16.167788+00:00",
+      "conditional-fixed-probes:2026-09-29T14:21:09.902867+00:00",
+      "diagnostics:2026-09-28T15:29:52.714736+00:00",
+      "evaluate-cal:2026-09-28T14:49:49.205402+00:00",
+      "evaluate-cal:2026-09-28T15:15:57.781990+00:00",
+      "evaluate-cal:2026-09-28T15:26:15.719366+00:00",
+      "evaluate-m:2026-09-29T04:08:10.834119+00:00",
+      "evaluate-noaug:2026-09-29T04:13:15.628893+00:00",
+      "evaluate-q:2026-09-29T03:48:29.230080+00:00",
+      "evaluate-q:2026-09-29T04:00:21.252317+00:00",
+      "export-noaug:2026-09-29T03:58:09.996880+00:00",
+      "export:2026-09-28T14:24:15.067416+00:00",
+      "export:2026-09-28T14:25:55.781472+00:00",
+      "main-cal-lock-sel:2026-09-29T14:01:18.989926+00:00",
+      "native-deployment-profile:2026-09-29T14:23:04.776156+00:00",
+      "native-replay-audit:2026-09-29T14:29:54.211871+00:00",
+      "native-replay-audit:2026-09-29T14:31:25.663030+00:00",
+      "native-replay-audit:2026-09-29T14:34:11.824921+00:00",
+      "native-replay-audit:2026-09-29T14:36:44.381593+00:00",
+      "native-replay-audit:2026-09-29T14:38:51.162769+00:00",
+      "profile-native-ordered:2026-09-29T14:43:24.033075+00:00",
+      "profile:2026-09-28T15:26:16.944895+00:00",
+      "profile:2026-09-28T15:27:11.009004+00:00",
+      "replicate-seed46-training:2026-09-29T14:17:17.115925+00:00",
+      "replicate:2026-09-28T15:29:51.475624+00:00",
+      "screen:2026-09-28T15:26:21.522033+00:00",
+      "train-cal-diagnostics:2026-09-29T14:12:23.142246+00:00",
+      "train-m:2026-09-29T03:54:18.704743+00:00",
+      "train-pairs-seed45:2026-09-29T13:58:04.490380+00:00",
+      "train-q:2026-09-29T03:47:13.733497+00:00",
+      "train:2026-09-28T14:44:50.302220+00:00",
+      "train:2026-09-28T15:10:37.360030+00:00",
+      "train:2026-09-28T15:12:47.897050+00:00",
+      "train:2026-09-28T15:13:56.229212+00:00",
+      "train:2026-09-28T15:16:10.265430+00:00",
+      "train:2026-09-28T15:16:33.397598+00:00",
+      "train:2026-09-28T15:16:55.966215+00:00",
+      "train:2026-09-28T15:17:22.372031+00:00"
+    ],
+    "excluded_subtotals": [
+      "inherited-v2-final"
+    ],
+    "gpu_hours": 80.73503875023967,
+    "sources": [
+      {
+        "path": "/home/ww/paper5/.worktrees/persist4d-perception-gain-v2/artifacts/perception_gain_v2/budget/LEDGER.jsonl",
+        "rows": 42,
+        "sha256": "da03b22d5ba3d54de07b7751f4742b0d317b9b90459c97b7a32393471f88760f"
+      },
+      {
+        "path": "/home/ww/paper5/.worktrees/rescene-short-module-screen-v1/artifacts/short_module_screen_v1/BUDGET_LEDGER.jsonl",
+        "rows": 20,
+        "sha256": "195da02671d858588b2611cf55d8f4085ca4049b14043b7a72a1e31aae7b83d6"
+      },
+      {
+        "path": "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/artifacts/rescene_code_first_audit_v1/BUDGET_LEDGER.jsonl",
+        "rows": 7,
+        "sha256": "fbe5bddacfdca375119b85f52c55bf16e6e41ecbb8ffe31788aa36ce3d0f2db8"
+      },
+      {
+        "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/BUDGET_LEDGER.jsonl",
+        "rows": 12,
+        "sha256": "820d1013f678ae09630fe98be0145f98155b0c228a0d49aa84a38aae323f8e91"
+      }
+    ],
+    "unique_events": 80
+  },
+  "remaining_at_plan_gpu_hours": 111.04675158284175,
+  "remaining_before_preflight_gpu_hours": 111.26496124976033,
+  "reserve_confirmation_gpu_hours": 8.0,
+  "reserve_gpu_hours": 8.0,
+  "scientific_status": "PARTIAL_FULL_RETRAIN_BUDGET"
+}

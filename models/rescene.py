@@ -46,6 +46,9 @@ class ReScene(nn.Module):
         semantic_query_positioning=False,
         semantic_query_fraction=0.75,
         open_first_cross_attention=False,
+        native_long_sampling=False,
+        native_long_feedback=False,
+        native_long_sampling_seed=None,
     ):
         super().__init__()
 
@@ -228,6 +231,20 @@ class ReScene(nn.Module):
             self.ffn_attention.append(tmp_ffn_attention)
             self.lin_squeeze.append(tmp_squeeze_attention)
         self.decoder_norm = nn.LayerNorm(hidden_dim)
+        self.native_long_sampling = bool(native_long_sampling)
+        self.native_long_sampling_seed = native_long_sampling_seed
+        self.native_long_draw_ids = None
+        self.native_long_sampling_stats = []
+        self.native_long_feedback_stats = []
+        self.native_long_feedback = None
+        if native_long_feedback:
+            from models.native_long_modules import QueryConditionedMaskFeedback
+
+            with torch.random.fork_rng(devices=[]):
+                torch.random.default_generator.manual_seed(
+                    1945 if native_long_sampling_seed is None
+                    else int(native_long_sampling_seed) + 1900)
+                self.native_long_feedback = QueryConditionedMaskFeedback(width=hidden_dim)
 
     def initialize_queries(
         self,
@@ -368,7 +385,8 @@ class ReScene(nn.Module):
         return queries, query_pos, sampled_coords
 
     def sample_and_batch_features(
-        self, decomposed_feat, curr_sample_max=None, is_eval=False, extra=None
+        self, decomposed_feat, curr_sample_max=None, is_eval=False, extra=None,
+        stage_ids=None, sampling_stage_idx=None,
     ):
         # stack and sample features
         device = decomposed_feat[0].device
@@ -407,9 +425,30 @@ class ReScene(nn.Module):
             else:
                 # we have more points in pcd as we like to sample
                 # take a subset (no padding or masking needed)
-                idx = torch.randperm(decomposed_feat[k].shape[0], device=device)[
-                    :curr_sample_size
-                ]
+                generator = None
+                if self.native_long_sampling_seed is not None and sampling_stage_idx is not None:
+                    from datasets.native_long_dataset import stable_seed
+
+                    draw = k if self.native_long_draw_ids is None else self.native_long_draw_ids[k]
+                    generator = torch.Generator(device=device).manual_seed(stable_seed(
+                        self.native_long_sampling_seed, "attention", draw, sampling_stage_idx))
+                stages = None if stage_ids is None else stage_ids[k]
+                if self.native_long_sampling and not is_eval and stages is not None and stages.unique().numel() > 1:
+                    from models.native_long_modules import stage_stratified_indices
+
+                    if stages.numel() != pcd_size:
+                        raise ValueError("hierarchical stage IDs do not align with features")
+                    idx = stage_stratified_indices(stages, curr_sample_size, generator=generator)
+                else:
+                    idx = torch.randperm(pcd_size, device=device, generator=generator)[:curr_sample_size]
+                if sampling_stage_idx is not None and stages is not None:
+                    selected_stages, counts = torch.unique(stages[idx], sorted=True, return_counts=True)
+                    self.native_long_sampling_stats.append({
+                        "execution_stage": sampling_stage_idx, "sample": k,
+                        "available": pcd_size, "selected": curr_sample_size,
+                        "stages": selected_stages.tolist(), "counts": counts.tolist(),
+                        "stratified": bool(self.native_long_sampling and stages.unique().numel() > 1),
+                    })
                 midx = torch.zeros(
                     curr_sample_size,
                     dtype=torch.bool,
@@ -471,7 +510,30 @@ class ReScene(nn.Module):
         """Protected parameter-free extension point after each decoder FFN."""
         return queries
 
+    def update_mask_features(self, queries, mask_features, padding_mask, execution_stage_idx):
+        if self.native_long_feedback is None or execution_stage_idx != 7:
+            return mask_features
+        updated = self.native_long_feedback(queries, mask_features, padding_mask)
+        self.native_long_feedback_stats = [{"execution_stage": execution_stage_idx,
+                                           "update_norm": float((updated - mask_features).detach().norm())}]
+        return updated
+
+    def _native_long_stage_ids(self, coords):
+        if self.native_long_sampling_seed is None and not self.native_long_sampling:
+            return None
+        result = []
+        for coordinates in coords:
+            if coordinates.shape[1] != 4:
+                raise ValueError("native long sampling requires real xyz+t at each spatial hierarchy")
+            time = coordinates[:, -1]
+            if not torch.equal(time, time.long().to(time.dtype)):
+                raise ValueError("spatial hierarchy mixed temporal stages")
+            result.append(time.long())
+        return result
+
     def forward(self, x, point2segment=None, raw_coordinates=None, is_eval=False):
+        self.native_long_sampling_stats = []
+        self.native_long_feedback_stats = []
         if not self.train_on_segments:
             point2segment = None  # ensure no point2segment is used
 
@@ -575,6 +637,8 @@ class ReScene(nn.Module):
                             attn_masks,
                             pos_encodings_pcd[hlevel][0],
                         ],  # also batched attn and pos enc
+                        stage_ids=self._native_long_stage_ids(coords[hlevel]),
+                        sampling_stage_idx=execution_stage_idx,
                     )
                 )
 
@@ -622,6 +686,9 @@ class ReScene(nn.Module):
                     decoder_features=batched_features,
                     decoder_padding_mask=batch_map,
                     point2segment=point2segment,
+                )
+                batched_features = self.update_mask_features(
+                    queries, batched_features, batch_map, execution_stage_idx
                 )
                 execution_stage_idx += 1
 

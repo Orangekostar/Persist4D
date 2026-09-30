@@ -1,0 +1,164 @@
+{
+  "differences": [
+    {
+      "max_abs": 7.152557373046875e-07,
+      "module": "enc0.block0.cpe.0",
+      "value": "features"
+    },
+    {
+      "max_abs": 2.980232238769531e-07,
+      "module": "enc0.block0.cpe.1",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 6.332993507385254e-08,
+      "module": "enc0.block0.cpe.2",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 6.332993507385254e-08,
+      "module": "enc0.block0.cpe",
+      "value": "feat"
+    },
+    {
+      "max_abs": 7.152557373046875e-07,
+      "module": "enc0.block0.norm1.0",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 7.152557373046875e-07,
+      "module": "enc0.block0.norm1",
+      "value": "feat"
+    },
+    {
+      "max_abs": 1.430511474609375e-06,
+      "module": "enc0.block0.attn.qkv",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 3.7319958209991455e-05,
+      "module": "enc0.block0.attn.proj",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 3.7319958209991455e-05,
+      "module": "enc0.block0.attn.proj_drop",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 3.7319958209991455e-05,
+      "module": "enc0.block0.attn",
+      "value": "feat"
+    },
+    {
+      "max_abs": 3.7319958209991455e-05,
+      "module": "enc0.block0.ls1.0",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 3.7319958209991455e-05,
+      "module": "enc0.block0.ls1",
+      "value": "feat"
+    },
+    {
+      "max_abs": 7.586926221847534e-05,
+      "module": "enc0.block0.drop_path.0",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 7.586926221847534e-05,
+      "module": "enc0.block0.drop_path",
+      "value": "feat"
+    },
+    {
+      "max_abs": 0.00021851062774658203,
+      "module": "enc0.block0.norm2.0",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 0.00021851062774658203,
+      "module": "enc0.block0.norm2",
+      "value": "feat"
+    },
+    {
+      "max_abs": 0.00013402104377746582,
+      "module": "enc0.block0.mlp.0.fc1",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 9.146332740783691e-05,
+      "module": "enc0.block0.mlp.0.act",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 7.586926221847534e-05,
+      "module": "enc0.block0.mlp.0.drop",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 7.586926221847534e-05,
+      "module": "enc0.block0.mlp.0.fc2",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 7.586926221847534e-05,
+      "module": "enc0.block0.mlp.0",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 7.586926221847534e-05,
+      "module": "enc0.block0.mlp",
+      "value": "feat"
+    },
+    {
+      "max_abs": 7.586926221847534e-05,
+      "module": "enc0.block0.ls2.0",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 7.586926221847534e-05,
+      "module": "enc0.block0.ls2",
+      "value": "feat"
+    },
+    {
+      "max_abs": 0.0004239082336425781,
+      "module": "encoder",
+      "value": "feat"
+    },
+    {
+      "max_abs": 0.0013974905014038086,
+      "module": "decoder",
+      "value": "feat"
+    },
+    {
+      "max_abs": 0.0007399320602416992,
+      "module": "maskF",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 0.07892805337905884,
+      "module": "query",
+      "value": "tensor"
+    },
+    {
+      "max_abs": 0.03074173629283905,
+      "module": "final",
+      "value": "classes"
+    },
+    {
+      "max_abs": 0.2447504997253418,
+      "module": "final",
+      "value": "masks"
+    }
+  ],
+  "first": {
+    "max_abs": 7.152557373046875e-07,
+    "module": "enc0.block0.cpe.0",
+    "value": "features"
+  },
+  "raw_trace_sha256": [
+    "72237a19e81cd7a1f21e3134ce813b219c7526abde55af3aebb2ecca532c962a",
+    "06a990d3f7f6f94dade0c5eb5738fdd33dc7120ea533deb9545c0f5a2529191e"
+  ],
+  "scope": "bounded original native deep A/BA probe"
+}

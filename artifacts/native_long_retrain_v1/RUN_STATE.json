@@ -1,0 +1,49 @@
+{
+  "actual_campaign_gpu_hours": 0.21820966691858162,
+  "arms": {
+    "E0": {
+      "seed45_updates": 0,
+      "status": "NOT_RUN_BUDGET"
+    },
+    "E1": {
+      "seed45_updates": 0,
+      "status": "NOT_RUN_BUDGET"
+    },
+    "E2": {
+      "seed45_updates": 0,
+      "status": "NOT_RUN_BUDGET"
+    },
+    "E3": {
+      "seed45_updates": 0,
+      "status": "NOT_RUN_BUDGET"
+    }
+  },
+  "budget_mode": "BASELINE_RECOVERY_ONLY",
+  "code": {
+    "conf/config_native_long_retrain.yaml": "7ceec3261f81cc4454a2f0febb92eccb0c35c65b8830e46e27c08457443d1fff",
+    "datasets/native_long_dataset.py": "5f78968d95000e1ac92e41d20b73f21127b7fb528947014e40148ede787cba20",
+    "datasets/pointcept_utils.py": "12dc773c74c1d2c28b0c1c0326633a3ce9b3527330648302c2c080e0883976e1",
+    "datasets/semseg.py": "c5ec2c1254ef85f0cf1a91a3f794f6f21ca695698a33a6717f42c5ad25d9b1bb",
+    "models/criterion.py": "53f5200754d5ce9b17be6244836f817b76b8b240e64fa08175f1bb38c6afa150",
+    "models/matcher.py": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc",
+    "models/native_long_modules.py": "fa1cfc3ebf977fbf84c6190133a2b6a5e85fe9334761ddb4473fd0d5989f9167",
+    "models/pointcept.py": "88945a48faf0edf949a7ff9ac0fea3d90cc431609569532bb5f221e1d4628007",
+    "models/rescene.py": "1522c801f3ffee2cec4a267665b5002f50b04bd4d878a873e7926543c52fef96",
+    "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
+    "scripts/native_long_assets.py": "8bf95bcb325da4cda7dfe3569194d2b2fddb77cd85faea664be7e4ec510ea255",
+    "scripts/native_long_campaign.py": "4f041785ed3849494519e1491b47076ef94f1623cca59a41c27700d7f4324e62",
+    "scripts/native_long_execution.py": "aef07289afe5f5986106e95062849316ee6508302daea52a74575aaaec1896a7",
+    "scripts/native_long_runtime.py": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
+    "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+    "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+    "trainer/native_long_trainer.py": "c09b6fd79d622ac1dfa31be9886e4f0473916223568880a79561034cdb46dd83",
+    "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+  },
+  "lifetime_gpu_hours": 80.95324841715825,
+  "native_runtime_status": "RUNTIME_CONDITIONAL",
+  "population_status": "READY",
+  "publication_status": "CODE_ONLY",
+  "required_full_training_completed": false,
+  "scientific_status": "PARTIAL_FULL_RETRAIN_BUDGET",
+  "stage": "BUDGET_LIMITED_DEVELOPMENT_DELIVERY"
+}

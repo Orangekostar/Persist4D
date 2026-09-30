@@ -1,0 +1,616 @@
+{
+  "TF32": false,
+  "deterministic_algorithms": "warn_only",
+  "precision": "FP32",
+  "protocol": "per-input seed hash(9001,input_id); construction independent",
+  "rows": [
+    {
+      "differences_from_A0": {
+        "decoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "embedding": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "encoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "final": {
+          "classes": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "masks": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "input": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "mapping": {
+          "inverse": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "point2segment": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "maskF": {
+          "tensor": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "query": {
+          "tensor": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        }
+      },
+      "run": "A-0"
+    },
+    {
+      "differences_from_A0": {
+        "decoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "embedding": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "encoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "final": {
+          "classes": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "masks": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "input": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "mapping": {
+          "inverse": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "point2segment": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "maskF": {
+          "tensor": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "query": {
+          "tensor": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        }
+      },
+      "run": "A-1"
+    },
+    {
+      "differences_from_A0": {
+        "decoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": false,
+            "max_abs": 0.0013974905014038086
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "embedding": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "encoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": false,
+            "max_abs": 0.0004239082336425781
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "final": {
+          "classes": {
+            "equal": false,
+            "max_abs": 0.03074173629283905
+          },
+          "masks": {
+            "equal": false,
+            "max_abs": 0.2447504997253418
+          }
+        },
+        "input": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "mapping": {
+          "inverse": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "point2segment": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "maskF": {
+          "tensor": {
+            "equal": false,
+            "max_abs": 0.0007399320602416992
+          }
+        },
+        "query": {
+          "tensor": {
+            "equal": false,
+            "max_abs": 0.07892805337905884
+          }
+        }
+      },
+      "run": "BA-0"
+    },
+    {
+      "differences_from_A0": {
+        "decoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": false,
+            "max_abs": 0.0013974905014038086
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "embedding": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "encoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": false,
+            "max_abs": 0.0004239082336425781
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "final": {
+          "classes": {
+            "equal": false,
+            "max_abs": 0.03074173629283905
+          },
+          "masks": {
+            "equal": false,
+            "max_abs": 0.2447504997253418
+          }
+        },
+        "input": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "mapping": {
+          "inverse": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "point2segment": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "maskF": {
+          "tensor": {
+            "equal": false,
+            "max_abs": 0.0007399320602416992
+          }
+        },
+        "query": {
+          "tensor": {
+            "equal": false,
+            "max_abs": 0.07892805337905884
+          }
+        }
+      },
+      "run": "BA-1"
+    },
+    {
+      "differences_from_A0": {
+        "decoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "embedding": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "encoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "final": {
+          "classes": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "masks": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "input": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "mapping": {
+          "inverse": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "point2segment": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "maskF": {
+          "tensor": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "query": {
+          "tensor": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        }
+      },
+      "run": "ABA-0"
+    },
+    {
+      "differences_from_A0": {
+        "decoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "embedding": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "encoder": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "serialized_order": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "final": {
+          "classes": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "masks": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "input": {
+          "coord": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "feat": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "grid_coord": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "mapping": {
+          "inverse": {
+            "equal": true,
+            "max_abs": 0.0
+          },
+          "point2segment": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "maskF": {
+          "tensor": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        },
+        "query": {
+          "tensor": {
+            "equal": true,
+            "max_abs": 0.0
+          }
+        }
+      },
+      "run": "ABA-1"
+    }
+  ],
+  "status": "RUNTIME_CONDITIONAL",
+  "within_protocol_repeatable": true
+}
