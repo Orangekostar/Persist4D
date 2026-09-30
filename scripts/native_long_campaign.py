@@ -105,8 +105,10 @@ def freeze_cost_plan(root):
     memory = read_json(root / "resources/CHECKPOINT_MEMORY_PROBE.json")
     if memory["status"] == "PASS" and measured["per_rank_batch"] == 1:
         raise ValueError("batch2 checkpoint success requires a batch2 cost measurement before planning")
-    forecast = forecast_costs(measured, read_json(root / "resources/IO_MEASUREMENTS.json"),
-                              read_json(root / "POPULATION.json"))
+    # JSON stores horizon keys as strings; compare that same representation on resume.
+    forecast = json.loads(json.dumps(forecast_costs(
+        measured, read_json(root / "resources/IO_MEASUREMENTS.json"),
+        read_json(root / "POPULATION.json")), allow_nan=False))
     plan = read_json(root / "RESOURCE_PLAN.json")
     used = sum(json.loads(line)["gpu_hours"] for line in (root / "COST_LEDGER.jsonl").read_text().splitlines())
     remaining = 192. - plan["prior"]["gpu_hours"] - used

@@ -1,0 +1,14 @@
+{
+  "actual_cli_resume_repeats": 2,
+  "budget_lock_sha256_after": "847d3edf1e552874d7f216bf242cb1b59022309f1329602f1af716c0eb9bba94",
+  "budget_lock_sha256_before": "847d3edf1e552874d7f216bf242cb1b59022309f1329602f1af716c0eb9bba94",
+  "prior_delivery_B_retained": "6e393786b974f79ca5416f7a7712698e6d9efc99",
+  "repair": "Normalize forecast horizon keys to the persisted JSON representation before comparison; preserve the original pre-result correction record.",
+  "status": "PASS_BYTE_IDENTICAL_LOCK",
+  "training_updates": {
+    "E0": 0,
+    "E1": 0,
+    "E2": 0,
+    "E3": 0
+  }
+}
