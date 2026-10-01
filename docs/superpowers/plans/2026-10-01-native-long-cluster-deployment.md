@@ -38,7 +38,7 @@ encoder, common state and SHA-bound data. Keep isolated worker roots and quotas.
 - [x] Amend the unstarted lock, stage and SHA-verify data/weights/code per worker.
 - [x] Launch workers and verify each actual native two-GPU preflight and progress.
 - [x] Start a persistent monitor, verify liveness and merged cost accounting.
-- [ ] Publish verified deployment changes and record exact running/pending state.
+- [x] Publish verified deployment changes and record exact running/pending state.
 
 ## Startup Failure Recovery
 
@@ -69,6 +69,11 @@ E0/E1/E2=10, E3=12, with committed updates0 before checkpoint990. Eight assigned
 A40 GPUs are computing. Detached monitor PID3271783 uses an exact code copy,
 keeps live reports outside Git and has advanced across repeated status polls.
 The startup failure consumed0.4121425855261946 GPUh; all costs are retained.
+
+Published deployment/code commit4dce94c623f5d5d89ae5a0737bd375dc49302f6a
+to the authorized research branch. Subsequent live observation: E0/E1/E2=29,
+E3=32; all workers and the persistent monitor remain running. Full experimental
+results are still pending.
 
 ## Validation
 
