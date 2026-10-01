@@ -28,7 +28,7 @@
 - [x] Make existing run/status/report route cluster plans correctly without invoking the empty-plan report.
 - [x] Apply the new lock to the actual runtime, preserve old scientific results and record remote readiness.
 - [x] Run focused tests, lint/compile/diff checks and personally review failure/recovery paths.
-- [ ] Publish the verified code changes to the research branch and cluster tag.
+- [x] Publish the verified code changes to the research branch.
 
 ## Acceptance
 
@@ -42,3 +42,8 @@ GPUh, has byte-identical repeated planning, and matches the final code closure.
 All six hosts pass SSH and idle dual-A40 checks. Their configured default Python
 and dedicated data/weight/code paths are unprepared. Long training was not
 started; all four official update counts remain0.
+
+Code publication: `79a55a2e3b22ff622eb730061387004938a43d32` was pushed
+and verified on `research/rescene-native-long-retrain-v1`. The final branch/tag
+verification receipt is stored outside Git at
+`/home/ww/persist4d_runs/native_long_retrain_v1/publication/CLUSTER_CODE_RECEIPT.json`.
