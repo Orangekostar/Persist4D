@@ -12,11 +12,13 @@ from pathlib import Path
 import yaml
 
 from datasets.native_long_dataset import assign_development_roles, evaluation_inputs
+from scripts.native_long_budget import budget_cap
 from scripts.short_module_screen import read_json, sha256, write_json
 
 PROJECT = Path(__file__).resolve().parents[1]
 BASE = "c6e9d01edfe2b3c832374a424fc45e44bdadfb68"
-ARTIFACTS = PROJECT / "artifacts/native_long_retrain_v1"
+ARTIFACTS = Path(os.environ.get("RESCENE_NATIVE_LONG_ARTIFACTS",
+                               PROJECT / "artifacts/native_long_retrain_v1")).resolve()
 
 
 def choose_budget_mode(costs, *, remaining, reserve):
@@ -111,8 +113,9 @@ def freeze_cost_plan(root):
         read_json(root / "POPULATION.json")), allow_nan=False))
     plan = read_json(root / "RESOURCE_PLAN.json")
     used = sum(json.loads(line)["gpu_hours"] for line in (root / "COST_LEDGER.jsonl").read_text().splitlines())
-    remaining = 192. - plan["prior"]["gpu_hours"] - used
-    selected = choose_budget_mode(forecast["costs_gpu_hours"], remaining=remaining, reserve=8.)
+    remaining = budget_cap(plan) - plan["prior"]["gpu_hours"] - used
+    selected = choose_budget_mode(forecast["costs_gpu_hours"], remaining=remaining,
+                                  reserve=plan.get("reserve_gpu_hours", 8.))
     frozen = {**plan, **selected, "forecast": forecast, "current_campaign_gpu_hours": used,
               "remaining_at_plan_gpu_hours": remaining,
               "physical_batch": {"world_size": measured["world_size_planned"],
@@ -162,8 +165,13 @@ def compose_config(path, *, root, arm="E0", seed=45):
         config.general.save_dir = str(root / "training" / arm / f"seed{seed}")
         config.model.native_long_sampling = arm == "E2"
         config.model.native_long_feedback = arm == "E3"
-        config.instance_metric.dataset = str(Path(config.native_long.data_root) / "processed/rio/rio.yaml")
         config.native_long.population_file = str(root / "POPULATION.json")
+        worker = root / "WORKER_SPEC.json"
+        if worker.exists():
+            spec = read_json(worker)
+            config.native_long.data_root = spec["data_root"]
+            config.backbone.name = spec["encoder"]
+        config.instance_metric.dataset = str(Path(config.native_long.data_root) / "processed/rio/rio.yaml")
         lock = root / "selection/BUDGET_LOCK.json"
         if lock.exists():
             physical = read_json(lock)["physical_batch"]
@@ -185,6 +193,7 @@ def code_identity():
              "models/native_long_modules.py", "models/criterion.py", "models/matcher.py",
              "datasets/native_long_dataset.py", "datasets/semseg.py", "datasets/pointcept_utils.py",
              "trainer/trainer.py", "trainer/native_long_trainer.py", "scripts/native_long_campaign.py",
+             "scripts/native_long_budget.py", "scripts/native_long_cluster.py",
              "scripts/native_long_runtime.py", "scripts/native_long_execution.py", "scripts/native_long_assets.py",
              "scripts/rescene_task_postprocess.py", "scripts/p6a_metrics.py", "scripts/evaluate_persist4d_p6a.py",
              "conf/config_native_long_retrain.yaml")]
@@ -411,6 +420,14 @@ def main():
     if root == Path.home() or root == PROJECT or root.name in {
             "perception_gain_v2", "qp_mn_targeted_v1", "short_module_screen_v1", "rescene_code_first_audit_v1"}:
         raise ValueError("refusing historical/protected runtime root")
+    lock = root / "selection/BUDGET_LOCK.json"
+    if lock.exists() and read_json(lock).get("execution_mode") == "SSH_CLUSTER":
+        from scripts.native_long_cluster import cluster_command
+
+        if args.command == "publish":
+            raise ValueError("cluster development requires its own current review; old empty-plan publisher is historical")
+        print(json.dumps(cluster_command(root, args.command, through=args.through), indent=2))
+        return
     if args.command == "status":
         print(json.dumps(read_json(root / "RUN_STATE.json"), indent=2))
         return

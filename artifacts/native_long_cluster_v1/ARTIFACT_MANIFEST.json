@@ -1,0 +1,48 @@
+{
+  "binary_bytes": 0,
+  "binary_count": 0,
+  "files": [
+    {
+      "bytes": 25173,
+      "path": "BUDGET_LOCK.json",
+      "sha256": "ed7f147851926c84b01d1134d237ec7d318e79a8e180d17c28216d261d283805"
+    },
+    {
+      "bytes": 25173,
+      "path": "PREVIOUS_BUDGET_LOCK.json",
+      "sha256": "8dad9d0e2070fdacf4f2a6b6f73877c75560bcb8aba08ddbff5d0896dfa18dea"
+    },
+    {
+      "bytes": 3090,
+      "path": "READINESS.json",
+      "sha256": "42da6740372eb71ee6d58018b7885d6c8d85fb0241b7b243ca876b969c0e2ee7"
+    },
+    {
+      "bytes": 846,
+      "path": "REPORT.md",
+      "sha256": "b141a281f92ebd34d470301e442dda5e69a454389c57b868fa4f2bc0ab3f51c6"
+    },
+    {
+      "bytes": 2190,
+      "path": "REVIEW.md",
+      "sha256": "f84571aa073388417a73e1a016499e48a847abcd79a35abeece8c2f3787ec557"
+    },
+    {
+      "bytes": 2810,
+      "path": "RUN_STATE.json",
+      "sha256": "070231d8968cf39fb4d7750fc5f8ee9a520a16ca7025e6cd043e6b9867cfd673"
+    },
+    {
+      "bytes": 1066,
+      "path": "STATUS.json",
+      "sha256": "aa4f19bc0288d7155bfdd8f7df8071b6614ea7fee370327c8a86ade23ccc6547"
+    },
+    {
+      "bytes": 2608,
+      "path": "VERIFICATION.md",
+      "sha256": "7120043e5aba90a7c96eed7e97e45c731c9e8bcfa7e6b0470a00a969a7ae83a4"
+    }
+  ],
+  "schema": 1,
+  "self_excluded": true
+}

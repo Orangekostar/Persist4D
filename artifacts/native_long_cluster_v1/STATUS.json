@@ -1,0 +1,46 @@
+{
+  "arms": [
+    {
+      "SEL": [],
+      "arm": "E0",
+      "host": "192.168.100.101",
+      "quota_gpu_hours": 405.9479728281545,
+      "status": "NOT_STARTED",
+      "updates": 0
+    },
+    {
+      "SEL": [],
+      "arm": "E1",
+      "host": "192.168.100.102",
+      "quota_gpu_hours": 426.28139874840423,
+      "status": "NOT_STARTED",
+      "updates": 0
+    },
+    {
+      "SEL": [],
+      "arm": "E2",
+      "host": "192.168.100.103",
+      "quota_gpu_hours": 436.4660602149519,
+      "status": "NOT_STARTED",
+      "updates": 0
+    },
+    {
+      "SEL": [],
+      "arm": "E3",
+      "host": "192.168.100.104",
+      "quota_gpu_hours": 442.3513189032321,
+      "status": "NOT_STARTED",
+      "updates": 0
+    }
+  ],
+  "execution_mode": "SSH_CLUSTER",
+  "gain": null,
+  "lifetime_cap_gpu_hours": 1800.0,
+  "lifetime_gpu_hours": 80.95324841715825,
+  "live_gpu_hours": 0.0,
+  "mode": "FULL_FOUR",
+  "remaining_gpu_hours": 1719.0467515828418,
+  "reserve_gpu_hours": 8.0,
+  "scientific_status": "IN_PROGRESS_OR_NOT_STARTED",
+  "seed46_formal_profile": "NOT_RUN"
+}

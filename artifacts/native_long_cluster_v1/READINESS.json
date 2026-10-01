@@ -1,0 +1,138 @@
+{
+  "long_training_started": false,
+  "nodes": [
+    {
+      "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
+      "hardware_ready": true,
+      "host": "192.168.100.101",
+      "missing_packages": [
+        "torch",
+        "pytorch_lightning",
+        "spconv",
+        "concerto",
+        "sonata",
+        "stmetrics"
+      ],
+      "paths": {
+        "common": false,
+        "data_root": false,
+        "encoder": false,
+        "repo": false
+      },
+      "ready": false,
+      "ssh": "PASS",
+      "staged": false
+    },
+    {
+      "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
+      "hardware_ready": true,
+      "host": "192.168.100.102",
+      "missing_packages": [
+        "torch",
+        "pytorch_lightning",
+        "spconv",
+        "concerto",
+        "sonata",
+        "stmetrics"
+      ],
+      "paths": {
+        "common": false,
+        "data_root": false,
+        "encoder": false,
+        "repo": false
+      },
+      "ready": false,
+      "ssh": "PASS",
+      "staged": false
+    },
+    {
+      "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
+      "hardware_ready": true,
+      "host": "192.168.100.103",
+      "missing_packages": [
+        "torch",
+        "pytorch_lightning",
+        "spconv",
+        "concerto",
+        "sonata",
+        "stmetrics"
+      ],
+      "paths": {
+        "common": false,
+        "data_root": false,
+        "encoder": false,
+        "repo": false
+      },
+      "ready": false,
+      "ssh": "PASS",
+      "staged": false
+    },
+    {
+      "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
+      "hardware_ready": true,
+      "host": "192.168.100.104",
+      "missing_packages": [
+        "torch",
+        "pytorch_lightning",
+        "spconv",
+        "concerto",
+        "sonata",
+        "stmetrics"
+      ],
+      "paths": {
+        "common": false,
+        "data_root": false,
+        "encoder": false,
+        "repo": false
+      },
+      "ready": false,
+      "ssh": "PASS",
+      "staged": false
+    },
+    {
+      "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
+      "hardware_ready": true,
+      "host": "192.168.100.105",
+      "missing_packages": [
+        "torch",
+        "pytorch_lightning",
+        "spconv",
+        "concerto",
+        "sonata",
+        "stmetrics"
+      ],
+      "paths": {
+        "common": false,
+        "data_root": false,
+        "encoder": false,
+        "repo": false
+      },
+      "ready": false,
+      "ssh": "PASS",
+      "staged": false
+    },
+    {
+      "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
+      "hardware_ready": true,
+      "host": "192.168.100.106",
+      "missing_packages": [
+        "torch",
+        "pytorch_lightning",
+        "spconv",
+        "concerto",
+        "sonata",
+        "stmetrics"
+      ],
+      "paths": {
+        "common": false,
+        "data_root": false,
+        "encoder": false,
+        "repo": false
+      },
+      "ready": false,
+      "ssh": "PASS",
+      "staged": false
+    }
+  ],
+  "status": "PREPARATION_REQUIRED"
+}

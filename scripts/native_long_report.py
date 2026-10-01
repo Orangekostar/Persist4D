@@ -6,6 +6,7 @@ import zipfile
 
 from omegaconf import OmegaConf
 
+from scripts.native_long_budget import budget_cap
 from scripts.native_long_campaign import (
     ARTIFACTS,
     PROJECT,
@@ -26,17 +27,21 @@ def write_csv(path, rows):
 
 
 def generate_report(root):
+    plan = read_json(root / "selection/BUDGET_LOCK.json")
+    if plan.get("execution_mode") == "SSH_CLUSTER":
+        from scripts.native_long_cluster import cluster_report
+
+        return cluster_report(root)
     state = read_json(root / "RUN_STATE.json")
     if any(entry["seed45_updates"] for entry in state["arms"].values()):
         raise ValueError("budget-limited development report cannot overwrite trained results; complete trained-result stage integration first")
     population = read_json(root / "POPULATION.json")
-    plan = read_json(root / "selection/BUDGET_LOCK.json")
     source = read_json(root / "SOURCE_AND_INITIALIZATION.json")
     events = [json.loads(line) for line in (root / "COST_LEDGER.jsonl").read_text().splitlines()]
     campaign_hours = sum(r["gpu_hours"] for r in events)
     lifetime = plan["prior"]["gpu_hours"] + campaign_hours
     current_plan = {**plan, "actual_after_preflight": {"campaign_gpu_hours": campaign_hours,
-                   "lifetime_gpu_hours": lifetime, "remaining_gpu_hours": 192 - lifetime}}
+                   "lifetime_gpu_hours": lifetime, "remaining_gpu_hours": budget_cap(plan) - lifetime}}
     write_json(root / "RESOURCE_PLAN.json", current_plan)
     write_json(ARTIFACTS / "RESOURCE_PLAN.json", current_plan)
     config = compose_config(PROJECT / "conf/config_native_long_retrain.yaml", root=root)
@@ -175,7 +180,7 @@ def generate_report(root):
         "Temporary optimizer updates only measure feasibility/cost and do not count toward these trajectories.\n\n"
         f"Budget mode: **{plan['mode']}**, authorized full arms `{plan['full_arms']}`. "
         f"Prior {plan['prior']['gpu_hours']:.9f} GPUh; this campaign {campaign_hours:.9f} GPUh; "
-        f"lifetime {lifetime:.9f}/192 GPUh; current remainder {192 - lifetime:.9f} GPUh. "
+        f"lifetime {lifetime:.9f}/{budget_cap(plan):g} GPUh; current remainder {budget_cap(plan) - lifetime:.9f} GPUh. "
         "At least 8 GPUh is reserved.\n\n"
         "Full forecasts include the single 1.25 training margin and separate CAL proxy:\n\n"
         + "".join(f"- {arm}: {hours:.2f} GPUh.\n" for arm, hours in plan["forecast"]["costs_gpu_hours"].items())

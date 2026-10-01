@@ -1,8 +1,8 @@
 """Native checkpoint evaluation and optimizer-boundary Lightning execution."""
 
-import json
 import math
 import os
+import signal
 import subprocess
 import sys
 import time
@@ -14,6 +14,8 @@ import torch
 from omegaconf import OmegaConf
 
 from datasets.native_long_dataset import NativeLongCollator, isolated_rng, stable_seed
+from scripts.native_long_budget import remaining_budget
+from scripts.native_long_budget import write_json_atomic as write_json
 from scripts.native_long_campaign import (
     ARTIFACTS,
     PROJECT,
@@ -28,7 +30,7 @@ from scripts.native_long_runtime import (
     move_batch,
     system_from_common,
 )
-from scripts.short_module_screen import append_event, read_json, sha256, write_json
+from scripts.short_module_screen import append_event, read_json, sha256
 
 
 def select_cal_points(rows, arms):
@@ -75,9 +77,10 @@ def rank_pilot(rows):
 
 def native_training_identity(root, config):
     verify_data_content(root)
+    data = read_json(root / "DATA_CONTENT_BINDING.json")
     return {"schema": 1, "config": OmegaConf.to_container(config, resolve=True), "code": code_identity(),
             "population_sha256": sha256(root / "POPULATION.json"),
-            "data_content_sha256": sha256(root / "DATA_CONTENT_BINDING.json"),
+            "data_content_sha256": data.get("portable_sha256", sha256(root / "DATA_CONTENT_BINDING.json")),
             "initialization_sha256": read_json(root / "SOURCE_AND_INITIALIZATION.json")["initialization"][
                 str(config.general.seed)]["sha256"]}
 
@@ -164,24 +167,50 @@ def evaluate_checkpoint(root, arm, seed, step, role="CAL"):
     return result
 
 
-def charged_process(root, command, *, phase, cards):
-    before = sum(json.loads(line)["gpu_hours"] for line in (root / "COST_LEDGER.jsonl").read_text().splitlines())
-    prior = read_json(root / "RESOURCE_PLAN.json")["prior"]["gpu_hours"]
-    if prior + before >= 192.:
+def charged_process(root, command, *, phase, cards, max_gpu_hours=None):
+    active_path = root / "ACTIVE_PROCESS.json"
+    if active_path.exists():
+        raise RuntimeError("unreconciled process reservation; inspect its PID and ledger before resuming")
+    plan = read_json(root / "selection/BUDGET_LOCK.json")
+    remaining = remaining_budget(root, plan)
+    if max_gpu_hours is not None:
+        remaining = min(remaining, max_gpu_hours)
+    if remaining <= 0:
         raise RuntimeError("lifetime GPU budget exhausted")
     started = time.perf_counter()
+    event_id = f"native-long:{phase}:{time.time_ns()}"
+    reservation = {"event_id": event_id, "phase": phase, "cards": cards,
+                   "started_unix": time.time(), "limit_gpu_hours": remaining}
+    write_json(active_path, reservation)
     exit_code = -1
     try:
-        result = subprocess.run(command, cwd=PROJECT, env={**os.environ, "CUDA_VISIBLE_DEVICES": "0,1" if cards == 2 else "0",
+        process = subprocess.Popen(command, cwd=PROJECT, start_new_session=True,
+            env={**os.environ, "CUDA_VISIBLE_DEVICES": "0,1" if cards == 2 else "0",
             "OMP_NUM_THREADS": "2", "MKL_NUM_THREADS": "2", "OPENBLAS_NUM_THREADS": "2",
-            "CUBLAS_WORKSPACE_CONFIG": ":4096:8"}, check=False)
-        exit_code = result.returncode
+            "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+            "RESCENE_NATIVE_PROCESS_GPUH_LIMIT": str(remaining),
+            "RESCENE_NATIVE_PROCESS_STARTED_MONOTONIC": str(started)})
+        try:
+            write_json(active_path, {**reservation, "pid": process.pid})
+            exit_code = process.wait(timeout=remaining * 3600 / cards)
+        except BaseException:
+            try:
+                os.killpg(process.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.wait()
+            raise
     finally:
         seconds = time.perf_counter() - started
-        event = {"event_id": f"native-long:{phase}:{time.time_ns()}", "phase": phase, "seconds": seconds,
+        event = {"event_id": event_id, "phase": phase, "seconds": seconds,
                  "cards": cards, "gpu_hours": cards * seconds / 3600, "exit_code": exit_code}
         append_event(root / "COST_LEDGER.jsonl", event)
         append_event(ARTIFACTS / "COST_LEDGER.jsonl", event)
+        active_path.unlink(missing_ok=True)
     if exit_code:
         raise RuntimeError(f"{phase} failed; actual GPU reservation recorded")
 
@@ -190,6 +219,11 @@ class UpdateBoundary(pl.Callback):
     def __init__(self, root, arm, seed, endpoint):
         self.root, self.arm, self.seed, self.endpoint = root, arm, seed, endpoint
         self.last_step = -1
+        progress = root / "TRAIN_PROGRESS.json"
+        self.checkpoint_step = read_json(progress).get("checkpoint_updates", 0) if progress.exists() else 0
+        self.started = float(os.environ.get("RESCENE_NATIVE_PROCESS_STARTED_MONOTONIC", time.perf_counter()))
+        limit = os.environ.get("RESCENE_NATIVE_PROCESS_GPUH_LIMIT")
+        self.gpu_hour_limit = float(limit) if limit else None
 
     def on_train_batch_end(self, trainer, module, outputs, batch, batch_idx):
         step = trainer.global_step
@@ -197,10 +231,24 @@ class UpdateBoundary(pl.Callback):
             return
         self.last_step = step
         directory = self.root / "training" / self.arm / f"seed{self.seed}"
-        if step % 990 == 0 or step == self.endpoint:
+        budget_stop = (self.gpu_hour_limit is not None and
+                       trainer.world_size * (time.perf_counter() - self.started) / 3600
+                       >= max(0., self.gpu_hour_limit - .05))
+        if self.gpu_hour_limit is not None and torch.distributed.is_initialized():
+            stop = torch.tensor(int(budget_stop), device=module.device)
+            torch.distributed.all_reduce(stop, op=torch.distributed.ReduceOp.MAX)
+            budget_stop = bool(stop.item())
+        if step % 990 == 0 or step == self.endpoint or budget_stop:
             directory.mkdir(parents=True, exist_ok=True)
             trainer.save_checkpoint(directory / "last.ckpt")
             trainer.save_checkpoint(directory / f"update={step:05d}.ckpt")
+            self.checkpoint_step = step
+        if trainer.is_global_zero:
+            write_json(self.root / "TRAIN_PROGRESS.json", {"arm": self.arm, "seed": self.seed,
+                       "updates": step, "checkpoint_updates": self.checkpoint_step,
+                       "status": "BUDGET_STOP" if budget_stop else "TRAINING"})
+        if budget_stop:
+            trainer.should_stop = True
         if step % 100 == 0 and trainer.is_global_zero:
             append_event(directory / "diagnostics.jsonl", {"step": step,
                 "sampling": module.model.native_long_sampling_stats,
@@ -232,6 +280,25 @@ def train_process(root, arm, seed, endpoint):
     trainer.fit(system, ckpt_path=str(checkpoint) if checkpoint.exists() else None, weights_only=False)
 
 
+def ddp_preflight_process(root, arm):
+    from pytorch_lightning.strategies import DDPStrategy
+
+    configure_numeric()
+    config = compose_config(PROJECT / "conf/config_native_long_retrain.yaml", root=root, arm=arm)
+    system, _ = system_from_common(root, config)
+    system.native_identity = native_training_identity(root, config)
+    trainer = pl.Trainer(accelerator="gpu", devices=2, max_steps=2, max_epochs=-1,
+        accumulate_grad_batches=16, precision="32-true", gradient_clip_val=1.,
+        num_sanity_val_steps=0, use_distributed_sampler=False,
+        strategy=DDPStrategy(find_unused_parameters=True, timeout=timedelta(minutes=5)),
+        enable_checkpointing=False, logger=False, enable_progress_bar=False)
+    trainer.fit(system)
+    if trainer.is_global_zero:
+        write_json(root / "DDP_PREFLIGHT.json", {"status": "PASS", "optimizer_updates": trainer.global_step,
+            "official_training_updates": 0, "code": code_identity(), "world_size": 2,
+            "effective_batch": 32, "scheduler_total_steps": 29700})
+
+
 def checkpoint_manifest(root, arm):
     directory = root / "training" / arm / "seed45"
     checkpoints = [{"step": int(p.stem.split("=")[1]), "path": str(p), "bytes": p.stat().st_size,
@@ -251,6 +318,10 @@ def checkpoint_manifest(root, arm):
 
 def execute_authorized_plan(root):
     plan = read_json(root / "selection/BUDGET_LOCK.json")
+    if plan.get("execution_mode") == "SSH_CLUSTER":
+        from scripts.native_long_cluster import start_cluster
+
+        return start_cluster(root)
     arms = plan["full_arms"] + plan["pilot_arms"]
     if not arms:
         return {"status": "NOT_RUN_BUDGET", "authorized_arms": [], "full_updates": 29700}
@@ -300,17 +371,19 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("phase", choices=("train", "evaluate"))
+    parser.add_argument("phase", choices=("train", "evaluate", "preflight"))
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--arm", choices=("E0", "E1", "E2", "E3"), required=True)
-    parser.add_argument("--step", type=int, required=True)
+    parser.add_argument("--step", type=int, default=29700)
     parser.add_argument("--seed", type=int, default=45)
     parser.add_argument("--role", choices=("CAL", "SEL"), default="CAL")
     args = parser.parse_args()
     if args.phase == "train":
         train_process(args.root, args.arm, args.seed, args.step)
-    else:
+    elif args.phase == "evaluate":
         evaluate_checkpoint(args.root, args.arm, args.seed, args.step, args.role)
+    else:
+        ddp_preflight_process(args.root, args.arm)
 
 
 if __name__ == "__main__":
