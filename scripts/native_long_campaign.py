@@ -192,6 +192,7 @@ def code_identity():
     paths = [PROJECT / p for p in ("models/rescene.py", "models/pointcept.py",
              "models/native_long_modules.py", "models/criterion.py", "models/matcher.py",
              "datasets/native_long_dataset.py", "datasets/semseg.py", "datasets/pointcept_utils.py",
+             "third_party/pointnet2/pointnet2_utils.py", "third_party/pointnet2/pytorch_utils.py",
              "trainer/trainer.py", "trainer/native_long_trainer.py", "scripts/native_long_campaign.py",
              "scripts/native_long_budget.py", "scripts/native_long_cluster.py",
              "scripts/native_long_runtime.py", "scripts/native_long_execution.py", "scripts/native_long_assets.py",

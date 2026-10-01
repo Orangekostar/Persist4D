@@ -26,10 +26,23 @@ This checks every old worker over SSH and refuses amendments after any charged
 work, optimizer updates or unresolved reservation. An unavailable worker also
 prevents amendment.
 
-Before staging, set up each assigned host's Python environment with the original
-Torch/Lightning versions and the bound Concerto/Sonata/stmetrics source trees.
-The configured `python3` must resolve to that environment. Staging transfers only
-the code, fixed encoder, common initialization and SHA-bound data/metadata.
+After a verified startup failure affecting all four jobs, a separate reviewed
+recovery can use `plan --replace-failed-uncheckpointed --root "$NATIVE_LONG_ROOT"`.
+It requires every old worker to be FAILED, stopped, unreserved and without any
+checkpoint or CAL/SEL evidence. New code/runtime directories must be separate;
+hosts, environment, assets, population, initialization and lifetime cap are
+preserved. Old snapshots/logs/controller receipts are archived under
+`cluster/failures/<old-lock-sha>/`; old remote directories remain intact. All
+failed cost events are merged before replacement quotas are allocated.
+
+Each assigned host uses `/home/pluto/native_long_cluster_v1/env/bin/python`,
+cloned from its existing version-matched environment without changing the source.
+Staging transfers the code, fixed encoder, common initialization, SHA-bound
+data/metadata and native Concerto/Sonata/stmetrics/Detectron2/PointNet2 sources.
+The worker's `PYTHONPATH` resolves these staged sources. SSH and rsync share a
+dedicated multiplexed connection to limit authentication handshakes.
+The launcher sets the worker's working directory to the staged repository so
+relative augmentation configuration resolves correctly.
 It refuses to overwrite active workers or workers that have trained.
 Bootstrap checks all data/weight content, package versions and library sources.
 The actual two-GPU native DDP preflight runs before each arm's first training.
@@ -53,6 +66,15 @@ selected step; seed45 gains remain unconfirmed until the separate confirmation
 stages. Seed46, formal confirmation and profiling are not run by this scheduler.
 Partial SEL-dispatch failures are recorded per node and retried with the same
 CAL lock, including while other selected workers are already evaluating.
+It retries a busy controller lock on its next poll. The deployment leaves this
+monitor running independently of the interactive terminal; its PID and log are
+`cluster/MONITOR_PID.json` and `cluster/monitor.log` in the runtime root.
+It runs an exact dedicated code copy under `cluster/controller-code`; its live
+report is `cluster/controller-code/artifacts/native_long_cluster_v1/REPORT.md`.
+The Git artifact report is a publication snapshot; live polling updates runtime
+files without modifying that snapshot.
+`cluster/STATUS.json` distinguishes observed optimizer updates from updates
+committed to a restart checkpoint; the first regular checkpoint is update990.
 
 For a one-shot refresh or cached report:
 
@@ -64,5 +86,5 @@ python -m scripts.native_long_campaign report --root "$NATIVE_LONG_ROOT"
 Controller receipts/evidence live under `cluster/` in the runtime root.
 The published development report is `artifacts/native_long_cluster_v1/REPORT.md`.
 Historical `artifacts/native_long_retrain_v1` records retain the old budget state.
-The implementation task changes the budget and scheduler without starting long
-training. Remote preparation must pass before a subsequent start.
+The deployment verification records actual readiness, DDP preflight and running
+progress separately from completed scientific results.

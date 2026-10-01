@@ -344,3 +344,179 @@ def test_partial_sel_dispatch_retries_without_reselecting_cal(tmp_path, monkeypa
     second = cluster.finalize_cluster(tmp_path)
     assert second["SEL_dispatch"]["E0"]["status"] == "LAUNCHED"
     assert (tmp_path / "selection/CAL_LOCK.json").read_bytes() == before
+
+
+def test_remote_pythonpath_resolves_staged_native_dependencies():
+    from scripts.native_long_cluster import remote_module
+
+    job = planned()["jobs"][0]
+    command = remote_module(job, "worker")
+    value = next(p.split("=", 1)[1] for p in command if p.startswith("PYTHONPATH="))
+    paths = value.split(":")
+    assert paths[0] == job["repo"]
+    assert all(f"{job['repo']}/third_party/{name}" in paths
+               for name in ("concerto", "sonata", "stmetrics", "detectron2"))
+
+
+def test_native_dependency_sources_use_bound_library_trees(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    from scripts import native_long_cluster as cluster
+    from scripts.short_module_screen import write_json
+
+    libraries = {name: {"source": str(tmp_path / "bound" / name / name / "__init__.py")}
+                 for name in ("concerto", "sonata", "stmetrics")}
+    write_json(tmp_path / "SOURCE_AND_INITIALIZATION.json", {"installed_libraries": libraries})
+    import importlib.util
+    monkeypatch.setattr(importlib.util, "find_spec", lambda name: SimpleNamespace(
+        origin=str(tmp_path / "bound" / name / name / "__init__.py")))
+    sources = cluster.native_dependency_sources(tmp_path)
+    assert set(sources) == {"concerto", "sonata", "stmetrics", "detectron2", "pointnet2"}
+    assert sources["concerto"] == tmp_path / "bound/concerto"
+    assert sources["detectron2"] == tmp_path / "bound/detectron2"
+    assert sources["pointnet2"] == cluster.PROJECT / "third_party/pointnet2"
+
+
+def test_monitor_retries_when_another_controller_holds_lock(tmp_path, monkeypatch):
+    from scripts import native_long_cluster as cluster
+    from scripts.short_module_screen import write_json
+
+    write_json(tmp_path / "selection/BUDGET_LOCK.json", planned())
+    calls, slept = [], []
+    def collect(root):
+        calls.append(1)
+        if len(calls) == 1:
+            with (cluster.exclusive(root / "cluster/controller.lock"),
+                  cluster.exclusive(root / "cluster/controller.lock")):
+                pytest.fail("concurrent controller lock acquired")
+        return {"snapshots": {a: {"status": "NOT_STARTED"} for a in cluster.ARMS}}
+    monkeypatch.setattr(cluster, "collect_cluster", collect)
+    monkeypatch.setattr(cluster, "cluster_report", lambda root: {"gain": None})
+    monkeypatch.setattr(cluster.time, "sleep", slept.append)
+    result = cluster.watch_cluster(tmp_path, interval=1)
+    assert result["status"] == "NO_RUNNING_WORKERS_CHECK_READINESS"
+    assert len(calls) == 2 and slept == [1]
+
+
+def test_ssh_and_rsync_reuse_the_same_cluster_connection(monkeypatch):
+    from types import SimpleNamespace
+
+    from scripts import native_long_cluster as cluster
+
+    commands = []
+    def run(command, **kwargs):
+        commands.append(command)
+        return SimpleNamespace(stdout="ok")
+    monkeypatch.setattr(cluster.subprocess, "run", run)
+    cluster.ssh(planned()["jobs"][0], ["true"])
+    assert "ControlMaster=auto" in commands[0]
+    assert "ControlPath=/tmp/rescene-native-long-%C" in commands[0]
+    cluster.rsync(["-az", "local", "remote:path"])
+    transport = commands[1][commands[1].index("-e") + 1]
+    assert "ControlMaster=auto" in transport and "ControlPath=/tmp/rescene-native-long-%C" in transport
+
+
+def test_worker_starts_in_staged_code_directory(tmp_path, monkeypatch):
+    import subprocess
+    import sys
+    import time
+    from pathlib import Path
+
+    from scripts import native_long_cluster as cluster
+    from scripts.short_module_screen import write_json
+
+    job = {**planned()["jobs"][0], "repo": str(tmp_path / "code"), "root": str(tmp_path / "runtime")}
+    root, repo = Path(job["root"]), Path(job["repo"])
+    repo.mkdir()
+    write_json(root / "WORKER_SPEC.json", job)
+    receipt = tmp_path / "child-cwd.txt"
+    command = [sys.executable, "-c",
+               f"from pathlib import Path;Path({str(receipt)!r}).write_text(str(Path.cwd()))"]
+    monkeypatch.setattr(cluster, "remote_module", lambda *args: command)
+    monkeypatch.setattr(cluster, "ssh", lambda node, argv: subprocess.run(
+        argv, cwd=tmp_path, capture_output=True, text=True, check=True).stdout)
+    assert cluster.launch_worker(job)["status"] == "LAUNCHED"
+    deadline = time.monotonic() + 5
+    while not receipt.exists() and time.monotonic() < deadline:
+        time.sleep(.01)
+    assert receipt.read_text() == str(repo)
+
+
+def failed_recovery_fixture(tmp_path, monkeypatch):
+    from scripts import native_long_cluster as cluster
+    from scripts.short_module_screen import append_event, sha256, write_json
+
+    write_json(tmp_path / "POPULATION.json", {"references": []})
+    write_json(tmp_path / "SOURCE_AND_INITIALIZATION.json", {"initialization": {"45": {"sha256": "common"}}})
+    write_json(tmp_path / "RUN_STATE.json", {"arms": {a: {"seed45_updates": 0} for a in cluster.ARMS}})
+    plan = planned()
+    for job in plan["jobs"]:
+        job["identity"]["population_sha256"] = sha256(tmp_path / "POPULATION.json")
+    write_json(tmp_path / "selection/BUDGET_LOCK.json", plan)
+    append_event(tmp_path / "COST_LEDGER.jsonl", {"event_id": "controller", "gpu_hours": .2})
+    snapshots = {}
+    for job in plan["jobs"]:
+        row = complete_snapshot(job)
+        row.update(status="FAILED", updates=0, observed_optimizer_updates=2, active=None,
+                   cal=[], sel=[], events=[{"event_id": job["arm"], "job_id": job["job_id"], "gpu_hours": 1.}])
+        snapshots[job["arm"]] = row
+        write_json(tmp_path / f"cluster/snapshots/{job['arm']}.json", row)
+    write_json(tmp_path / "cluster/STATUS.json", {"snapshots": snapshots})
+    config = cluster_config()
+    for node in config["nodes"]:
+        node.update(root=node["root"] + "-retry", repo=node["repo"] + "-retry")
+    monkeypatch.setattr(cluster, "ssh", lambda job, argv: json.dumps(snapshots[job["arm"]]) if argv[0] == "env" else "")
+    monkeypatch.setattr(cluster, "portable_data", lambda root: {"sha256": plan["jobs"][0]["identity"]["data_content_sha256"]})
+    return cluster, plan, config, snapshots
+
+
+def test_failed_uncheckpointed_replacement_preserves_costs_and_history(tmp_path, monkeypatch):
+    from scripts.native_long_budget import ledger_events
+    from scripts.short_module_screen import sha256
+
+    cluster, previous, config, _ = failed_recovery_fixture(tmp_path, monkeypatch)
+    before = (tmp_path / "selection/BUDGET_LOCK.json").read_bytes()
+    old_sha = sha256(tmp_path / "selection/BUDGET_LOCK.json")
+    replacement = cluster.amend_budget(tmp_path, config, artifacts=tmp_path / "artifacts",
+                                      code={"x": "fixed"}, replace_failed_uncheckpointed=True)
+    assert replacement["current_campaign_gpu_hours"] == pytest.approx(4.2)
+    events = ledger_events(tmp_path / "COST_LEDGER.jsonl")
+    assert {e["event_id"] for e in events} == {"controller", *cluster.ARMS}
+    assert (tmp_path / f"selection/budget_history/{old_sha}.json").read_bytes() == before
+    archive = tmp_path / f"cluster/failures/{old_sha}"
+    assert (archive / "snapshots/E0.json").exists() and (archive / "STATUS.json").exists()
+    assert not (tmp_path / "cluster/snapshots").exists()
+    assert not (tmp_path / "cluster/STATUS.json").exists()
+    assert replacement["recovery"]["previous_job_ids"] == {j["arm"]: j["job_id"] for j in previous["jobs"]}
+    quotas = sum(j["quota_gpu_hours"] for j in replacement["jobs"])
+    assert quotas + replacement["reserve_gpu_hours"] + previous["prior"]["gpu_hours"] + 4.2 <= 1800
+    assert cluster.amend_budget(tmp_path, config, artifacts=tmp_path / "artifacts", code={"x": "fixed"},
+                                replace_failed_uncheckpointed=True) == replacement
+
+
+@pytest.mark.parametrize("unsafe", ["running", "checkpoint", "active", "evidence", "stale"])
+def test_failed_replacement_rejects_unsafe_trajectory(tmp_path, monkeypatch, unsafe):
+    cluster, _, config, snapshots = failed_recovery_fixture(tmp_path, monkeypatch)
+    row = snapshots["E0"]
+    if unsafe == "running":
+        row["status"] = "TRAIN_CAL_RUNNING"
+    elif unsafe == "checkpoint":
+        row["updates"] = 990
+    elif unsafe == "active":
+        row["active"] = {}
+    elif unsafe == "evidence":
+        row["cal"] = [{"uncompleted": True}]
+    else:
+        row["stale"] = True
+    before = (tmp_path / "selection/BUDGET_LOCK.json").read_bytes()
+    with pytest.raises(ValueError, match="failed.*uncheckpointed"):
+        cluster.amend_budget(tmp_path, config, artifacts=tmp_path / "artifacts",
+                             code={"x": "fixed"}, replace_failed_uncheckpointed=True)
+    assert (tmp_path / "selection/BUDGET_LOCK.json").read_bytes() == before
+
+
+def test_failed_replacement_requires_separate_code_and_worker_roots(tmp_path, monkeypatch):
+    cluster, _, _, _ = failed_recovery_fixture(tmp_path, monkeypatch)
+    with pytest.raises(ValueError, match="separate"):
+        cluster.amend_budget(tmp_path, cluster_config(), artifacts=tmp_path / "artifacts",
+                             code={"x": "fixed"}, replace_failed_uncheckpointed=True)

@@ -475,12 +475,6 @@ def infoNCE_chunked_loss(
     total = torch.zeros((), device=device, dtype=dtype)
     counted = 0
 
-    # Enable TF32 for faster matmul on Ampere+ (optional)
-    try:
-        torch.backends.cuda.matmul.allow_tf32 = True
-    except Exception:
-        pass
-
     logit_scale_t = torch.as_tensor(logit_scale, device=device, dtype=dtype)
     bias_t = torch.as_tensor(bias, device=device, dtype=dtype)
     if candidate_chunk_size is not None and candidate_chunk_size <= 0:
@@ -1315,6 +1309,13 @@ class SetCriterion(nn.Module):
         for batch_id, (map_id, target_id) in enumerate(indices):
             map = outputs["pred_masks"][batch_id][:, map_id].T
             target_mask = targets[batch_id][mask_type][target_id]
+
+            if target_mask.shape[0] == 0:
+                # Empty GT still receives no-object classification supervision.
+                zero = map.sum() * 0
+                loss_masks.append(zero)
+                loss_dices.append(zero)
+                continue
 
             # Drop any prediction queries whose mask contains non-finite values
             finite_rows = torch.isfinite(map).all(dim=1)

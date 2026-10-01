@@ -6,9 +6,9 @@ authorization: user_2026-10-01_adjust_budget_and_scheduler
 node_defaults: &node
   user: pluto
   gpus: 2
-  python: python3
-  repo: /home/pluto/native_long_cluster_v1/code
-  root: /home/pluto/native_long_cluster_v1/runtime
+  python: /home/pluto/native_long_cluster_v1/env/bin/python
+  repo: /home/pluto/native_long_cluster_v1/code-empty-mask-v2
+  root: /home/pluto/native_long_cluster_v1/runtime-empty-mask-v2
   data_root: /home/pluto/native_long_cluster_v1/data
   encoder: /home/pluto/native_long_cluster_v1/assets/concerto_base.pth
   common: /home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt

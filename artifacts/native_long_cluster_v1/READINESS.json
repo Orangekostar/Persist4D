@@ -5,134 +5,76 @@
       "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
       "hardware_ready": true,
       "host": "192.168.100.101",
-      "missing_packages": [
-        "torch",
-        "pytorch_lightning",
-        "spconv",
-        "concerto",
-        "sonata",
-        "stmetrics"
-      ],
+      "missing_packages": [],
       "paths": {
-        "common": false,
-        "data_root": false,
-        "encoder": false,
-        "repo": false
+        "common": true,
+        "data_root": true,
+        "encoder": true,
+        "repo": true
       },
-      "ready": false,
+      "ready": true,
       "ssh": "PASS",
-      "staged": false
+      "staged": true
     },
     {
       "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
       "hardware_ready": true,
       "host": "192.168.100.102",
-      "missing_packages": [
-        "torch",
-        "pytorch_lightning",
-        "spconv",
-        "concerto",
-        "sonata",
-        "stmetrics"
-      ],
+      "missing_packages": [],
       "paths": {
-        "common": false,
-        "data_root": false,
-        "encoder": false,
-        "repo": false
+        "common": true,
+        "data_root": true,
+        "encoder": true,
+        "repo": true
       },
-      "ready": false,
+      "ready": true,
       "ssh": "PASS",
-      "staged": false
+      "staged": true
     },
     {
       "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
       "hardware_ready": true,
       "host": "192.168.100.103",
-      "missing_packages": [
-        "torch",
-        "pytorch_lightning",
-        "spconv",
-        "concerto",
-        "sonata",
-        "stmetrics"
-      ],
+      "missing_packages": [],
       "paths": {
-        "common": false,
-        "data_root": false,
-        "encoder": false,
-        "repo": false
+        "common": true,
+        "data_root": true,
+        "encoder": true,
+        "repo": true
       },
-      "ready": false,
+      "ready": true,
       "ssh": "PASS",
-      "staged": false
+      "staged": true
     },
     {
       "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
       "hardware_ready": true,
       "host": "192.168.100.104",
-      "missing_packages": [
-        "torch",
-        "pytorch_lightning",
-        "spconv",
-        "concerto",
-        "sonata",
-        "stmetrics"
-      ],
+      "missing_packages": [],
       "paths": {
-        "common": false,
-        "data_root": false,
-        "encoder": false,
-        "repo": false
+        "common": true,
+        "data_root": true,
+        "encoder": true,
+        "repo": true
       },
-      "ready": false,
+      "ready": true,
       "ssh": "PASS",
-      "staged": false
+      "staged": true
     },
     {
-      "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
-      "hardware_ready": true,
+      "error": "Command '['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8', '-o', 'ControlMaster=auto', '-o', 'ControlPersist=600', '-o', 'ControlPath=/tmp/rescene-native-long-%C', 'pluto@192.168.100.105', 'env PYTHONPATH=/home/pluto/native_long_cluster_v1/code-empty-mask-v2:/home/pluto/native_long_cluster_v1/code-empty-mask-v2/third_party/concerto:/home/pluto/native_long_cluster_v1/code-empty-mask-v2/third_party/sonata:/home/pluto/native_long_cluster_v1/code-empty-mask-v2/third_party/stmetrics:/home/pluto/native_long_cluster_v1/code-empty-mask-v2/third_party/detectron2 /home/pluto/native_long_cluster_v1/env/bin/python -c \\'import csv,io,json,importlib.util,importlib.metadata,subprocess;from pathlib import Path;node=json.loads(\"{\\\\\"arm\\\\\": null, \\\\\"common\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt\\\\\", \\\\\"data_root\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/data\\\\\", \\\\\"encoder\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/assets/concerto_base.pth\\\\\", \\\\\"gpus\\\\\": 2, \\\\\"host\\\\\": \\\\\"192.168.100.105\\\\\", \\\\\"python\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/env/bin/python\\\\\", \\\\\"repo\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/code-empty-mask-v2\\\\\", \\\\\"root\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2\\\\\", \\\\\"user\\\\\": \\\\\"pluto\\\\\"}\");packages=[\\'\"\\'\"\\'torch\\'\"\\'\"\\',\\'\"\\'\"\\'pytorch_lightning\\'\"\\'\"\\',\\'\"\\'\"\\'spconv\\'\"\\'\"\\',\\'\"\\'\"\\'concerto\\'\"\\'\"\\',\\'\"\\'\"\\'sonata\\'\"\\'\"\\',\\'\"\\'\"\\'stmetrics\\'\"\\'\"\\'];missing=[p for p in packages if importlib.util.find_spec(p) is None];paths={k:Path(node[k]).exists() for k in [\\'\"\\'\"\\'repo\\'\"\\'\"\\',\\'\"\\'\"\\'data_root\\'\"\\'\"\\',\\'\"\\'\"\\'encoder\\'\"\\'\"\\',\\'\"\\'\"\\'common\\'\"\\'\"\\']};gpu=subprocess.check_output([\\'\"\\'\"\\'nvidia-smi\\'\"\\'\"\\',\\'\"\\'\"\\'--query-gpu=index,name,memory.total,memory.used,utilization.gpu\\'\"\\'\"\\',\\'\"\\'\"\\'--format=csv,noheader,nounits\\'\"\\'\"\\'],text=True);cards=list(csv.reader(io.StringIO(gpu)));hardware=len(cards)>=2 and all(\\'\"\\'\"\\'A40\\'\"\\'\"\\' in r[1] and float(r[2])>=43000 and float(r[3])<=512 and float(r[4])==0 for r in cards[:2]);spec=Path(node[\\'\"\\'\"\\'root\\'\"\\'\"\\'])/\\'\"\\'\"\\'WORKER_SPEC.json\\'\"\\'\"\\';staged=spec.exists() and json.loads(spec.read_text()).get(\\'\"\\'\"\\'job_id\\'\"\\'\"\\')==node.get(\\'\"\\'\"\\'job_id\\'\"\\'\"\\');print(json.dumps({\\'\"\\'\"\\'paths\\'\"\\'\"\\':paths,\\'\"\\'\"\\'missing_packages\\'\"\\'\"\\':missing,\\'\"\\'\"\\'gpu\\'\"\\'\"\\':gpu,\\'\"\\'\"\\'hardware_ready\\'\"\\'\"\\':hardware,\\'\"\\'\"\\'staged\\'\"\\'\"\\':staged,\\'\"\\'\"\\'ready\\'\"\\'\"\\':not missing and all(paths.values()) and hardware and staged}))\\'']' returned non-zero exit status 127.",
       "host": "192.168.100.105",
-      "missing_packages": [
-        "torch",
-        "pytorch_lightning",
-        "spconv",
-        "concerto",
-        "sonata",
-        "stmetrics"
-      ],
-      "paths": {
-        "common": false,
-        "data_root": false,
-        "encoder": false,
-        "repo": false
-      },
       "ready": false,
-      "ssh": "PASS",
-      "staged": false
+      "ssh": "FAILED",
+      "stderr": "env: \u2018/home/pluto/native_long_cluster_v1/env/bin/python\u2019: No such file or directory\n"
     },
     {
-      "gpu": "0, NVIDIA A40, 46068, 0, 0\n1, NVIDIA A40, 46068, 0, 0\n",
-      "hardware_ready": true,
+      "error": "Command '['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8', '-o', 'ControlMaster=auto', '-o', 'ControlPersist=600', '-o', 'ControlPath=/tmp/rescene-native-long-%C', 'pluto@192.168.100.106', 'env PYTHONPATH=/home/pluto/native_long_cluster_v1/code-empty-mask-v2:/home/pluto/native_long_cluster_v1/code-empty-mask-v2/third_party/concerto:/home/pluto/native_long_cluster_v1/code-empty-mask-v2/third_party/sonata:/home/pluto/native_long_cluster_v1/code-empty-mask-v2/third_party/stmetrics:/home/pluto/native_long_cluster_v1/code-empty-mask-v2/third_party/detectron2 /home/pluto/native_long_cluster_v1/env/bin/python -c \\'import csv,io,json,importlib.util,importlib.metadata,subprocess;from pathlib import Path;node=json.loads(\"{\\\\\"arm\\\\\": null, \\\\\"common\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt\\\\\", \\\\\"data_root\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/data\\\\\", \\\\\"encoder\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/assets/concerto_base.pth\\\\\", \\\\\"gpus\\\\\": 2, \\\\\"host\\\\\": \\\\\"192.168.100.106\\\\\", \\\\\"python\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/env/bin/python\\\\\", \\\\\"repo\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/code-empty-mask-v2\\\\\", \\\\\"root\\\\\": \\\\\"/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2\\\\\", \\\\\"user\\\\\": \\\\\"pluto\\\\\"}\");packages=[\\'\"\\'\"\\'torch\\'\"\\'\"\\',\\'\"\\'\"\\'pytorch_lightning\\'\"\\'\"\\',\\'\"\\'\"\\'spconv\\'\"\\'\"\\',\\'\"\\'\"\\'concerto\\'\"\\'\"\\',\\'\"\\'\"\\'sonata\\'\"\\'\"\\',\\'\"\\'\"\\'stmetrics\\'\"\\'\"\\'];missing=[p for p in packages if importlib.util.find_spec(p) is None];paths={k:Path(node[k]).exists() for k in [\\'\"\\'\"\\'repo\\'\"\\'\"\\',\\'\"\\'\"\\'data_root\\'\"\\'\"\\',\\'\"\\'\"\\'encoder\\'\"\\'\"\\',\\'\"\\'\"\\'common\\'\"\\'\"\\']};gpu=subprocess.check_output([\\'\"\\'\"\\'nvidia-smi\\'\"\\'\"\\',\\'\"\\'\"\\'--query-gpu=index,name,memory.total,memory.used,utilization.gpu\\'\"\\'\"\\',\\'\"\\'\"\\'--format=csv,noheader,nounits\\'\"\\'\"\\'],text=True);cards=list(csv.reader(io.StringIO(gpu)));hardware=len(cards)>=2 and all(\\'\"\\'\"\\'A40\\'\"\\'\"\\' in r[1] and float(r[2])>=43000 and float(r[3])<=512 and float(r[4])==0 for r in cards[:2]);spec=Path(node[\\'\"\\'\"\\'root\\'\"\\'\"\\'])/\\'\"\\'\"\\'WORKER_SPEC.json\\'\"\\'\"\\';staged=spec.exists() and json.loads(spec.read_text()).get(\\'\"\\'\"\\'job_id\\'\"\\'\"\\')==node.get(\\'\"\\'\"\\'job_id\\'\"\\'\"\\');print(json.dumps({\\'\"\\'\"\\'paths\\'\"\\'\"\\':paths,\\'\"\\'\"\\'missing_packages\\'\"\\'\"\\':missing,\\'\"\\'\"\\'gpu\\'\"\\'\"\\':gpu,\\'\"\\'\"\\'hardware_ready\\'\"\\'\"\\':hardware,\\'\"\\'\"\\'staged\\'\"\\'\"\\':staged,\\'\"\\'\"\\'ready\\'\"\\'\"\\':not missing and all(paths.values()) and hardware and staged}))\\'']' returned non-zero exit status 127.",
       "host": "192.168.100.106",
-      "missing_packages": [
-        "torch",
-        "pytorch_lightning",
-        "spconv",
-        "concerto",
-        "sonata",
-        "stmetrics"
-      ],
-      "paths": {
-        "common": false,
-        "data_root": false,
-        "encoder": false,
-        "repo": false
-      },
       "ready": false,
-      "ssh": "PASS",
-      "staged": false
+      "ssh": "FAILED",
+      "stderr": "env: \u2018/home/pluto/native_long_cluster_v1/env/bin/python\u2019: No such file or directory\n"
     }
   ],
-  "status": "PREPARATION_REQUIRED"
+  "status": "READY"
 }

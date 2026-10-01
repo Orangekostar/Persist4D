@@ -28,7 +28,50 @@ Base: a3830a1f1efe66a55df8b147d86941b85165c4cc.
   native-long scientific artifacts are preserved.
 
 No unresolved issue blocks publishing the budget/scheduler implementation.
-Runtime preparation and actual DDP/long-run behavior remain unverified remotely.
+At the initial code-only delivery, runtime preparation and actual DDP/long-run
+behavior remained unverified remotely.
 The prior native runtime protocol was conditional; this change supplies no new
 numerical-repeatability evidence. Forced supervisor termination requires PID
 inspection and ledger reconciliation before restarting a charged process.
+
+## Deployment Review, 2026-10-01
+
+- Dedicated environments preserve the checked Torch2.6.0+cu126 and Lightning2.6.5
+  versions; the original remote projects/environments were not modified.
+- Staged library sources resolve through an explicit worker PYTHONPATH. Content
+  verification covers3575 data/metadata files, bound numerical library sources,
+  frozen encoder, common initialization and identical population bytes.
+- A real CPU sample-loading check reproduced missing relative augmentation
+  configuration because the launcher inherited the SSH home directory. The
+  launcher now uses the staged repository as its working directory. Its
+  regression test launches a real child and verifies the child's directory.
+- Task-specific SSH multiplexing addresses the observed MaxStartups rejection
+  without changing the server or unrelated connections. SSH and rsync reuse
+  the same transport; the connection regression passes.
+- All four native world2 preflights passed two disposable optimizer updates
+  with effective batch32 and scheduler U29700. They are separately charged,
+  excluded from official progress, and bound to the final worker code.
+- Four detached training supervisors and a detached controller monitor were
+  started. Controller lock contention is retried, and real monitor status has
+  advanced across polls. Quotas and the1800 GPUh lifetime cap remain enforced.
+
+The first official startup subsequently failed in all arms at rank1 draw65,
+with observed update2 and no committed checkpoint. Its real target contains0
+instances; legacy mask/Dice normalization divided by0. Empty matches now produce
+graph-connected zero mask losses while preserving no-object classification.
+Tests verify finite gradients, auxiliary losses and an unchanged nonempty mask
+objective. Removed an internal InfoNCE override of the caller's TF32 setting.
+
+Explicit failed-job replacement verifies all four remote jobs are stopped,
+unreserved and uncheckpointed, retains their original code/spec/log/ledger
+directories, archives controller snapshots, and merges every failed cost event
+before allocating replacement quotas. Replacement hosts, data, weights,
+population, seed45 state and lifetime cap remain bound to the original values.
+The replacement deployment uses new code/runtime directories. A separate exact
+controller code copy owns persistent live reports outside the Git worktree.
+
+The deployment receipt records observed optimizer progress separately from
+checkpointed progress. Full-U completion, CAL/SEL gains, seed46 confirmation,
+formal confirmation and profiling remain pending. Passing the startup preflight
+does not establish numerical repeatability or successful completion of a
+multi-day trajectory.

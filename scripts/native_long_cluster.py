@@ -8,6 +8,7 @@ import json
 import math
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 import time
@@ -20,10 +21,14 @@ import yaml
 from scripts.native_long_budget import budget_cap, ledger_events, merge_events
 from scripts.native_long_budget import write_json_atomic as write_json
 from scripts.native_long_campaign import PROJECT, code_identity
-from scripts.short_module_screen import read_json, sha256
+from scripts.short_module_screen import append_event, read_json, sha256
 
 ARMS = ("E0", "E1", "E2", "E3")
 ARTIFACTS = PROJECT / "artifacts/native_long_cluster_v1"
+
+
+class LockBusyError(RuntimeError):
+    pass
 
 
 def digest(value):
@@ -37,7 +42,7 @@ def exclusive(path):
         try:
             fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError as error:
-            raise RuntimeError(f"another controller/worker holds {path}") from error
+            raise LockBusyError(f"another controller/worker holds {path}") from error
         try:
             yield
         finally:
@@ -103,19 +108,60 @@ def build_cluster_plan(previous, config, *, current_gpu_hours, population_sha256
                               "maximum_concurrent_gpus": config["max_concurrent_gpus"]}}
 
 
-def amend_budget(root, config, *, artifacts=ARTIFACTS, code=None, amend_unstarted=False):
+def failed_replacement_snapshots(root, previous, config):
+    validate_config(config)
+    if config["lifetime_budget_gpu_hours"] != budget_cap(previous):
+        raise ValueError("failed recovery must preserve the lifetime cap")
+    monitor_path = root / "cluster/MONITOR_PID.json"
+    if monitor_path.exists():
+        pid = read_json(monitor_path).get("pid", 0)
+        proc = Path("/proc") / str(pid) / "cmdline"
+        if pid and proc.exists() and str(root).encode() in proc.read_bytes():
+            raise ValueError("stop the old controller monitor before recovery")
+    snapshots = {}
+    for job in previous["jobs"]:
+        node = next(n for n in config["nodes"] if n.get("arm") == job["arm"])
+        new_root = Path(node["root"]) / job["arm"] / "seed45"
+        for old, new in ((Path(job["root"]), new_root), (Path(job["repo"]), Path(node["repo"]))):
+            if old == new or old in new.parents or new in old.parents:
+                raise ValueError("failed recovery requires separate code and worker roots")
+        if any(node[k] != job[k] for k in ("host", "user", "python", "data_root", "encoder", "common")):
+            raise ValueError("failed recovery must preserve bound hosts, environment and assets")
+        row = json.loads(ssh(job, remote_module(job, "snapshot")))
+        if (row.get("status") != "FAILED" or row.get("stale") or row.get("updates") != 0
+                or row.get("active") is not None or row.get("cal") or row.get("sel")):
+            raise ValueError("replacement requires failed, inactive, uncheckpointed trajectories without evaluation")
+        validate_snapshot(row, job)
+        guard = ("import json;from pathlib import Path;"
+                 f"root=Path({job['root']!r});new=Path({str(new_root)!r});"
+                 "pid=json.loads((root/'WORKER_PID.json').read_text()).get('pid',0);"
+                 "proc=Path('/proc')/str(pid)/'cmdline';"
+                 "alive=pid>0 and proc.exists() and str(root).encode() in proc.read_bytes();"
+                 "assert not alive and not (root/'ACTIVE_PROCESS.json').exists() "
+                 "and not any(root.rglob('*.ckpt')),'old worker is alive, reserved or checkpointed';"
+                 "assert not new.exists() or not any(new.iterdir()),'replacement worker root is not empty'")
+        ssh(job, ["python3", "-c", guard])
+        snapshots[job["arm"]] = row
+    return snapshots
+
+
+def amend_budget(root, config, *, artifacts=ARTIFACTS, code=None, amend_unstarted=False,
+                 replace_failed_uncheckpointed=False):
     with exclusive(root / "cluster/controller.lock"):
         path = root / "selection/BUDGET_LOCK.json"
         previous = read_json(path)
         identity = code_identity() if code is None else code
+        recovery_snapshots = None
         if previous.get("execution_mode") == "SSH_CLUSTER":
             changed = previous["cluster_config_sha256"] != digest(config) or previous["jobs"][0]["identity"]["code"] != identity
             if not changed:
                 return previous
-            if not amend_unstarted:
+            if replace_failed_uncheckpointed:
+                recovery_snapshots = failed_replacement_snapshots(root, previous, config)
+            elif not amend_unstarted:
                 raise ValueError("cluster lock/config/code changed; create an explicit reviewed amendment")
             validate_config(config)
-            for job in previous["jobs"]:
+            for job in previous["jobs"] if recovery_snapshots is None else []:
                 program = ("import json;from pathlib import Path;"
                            f"root=Path({job['root']!r});pid=root/'WORKER_PID.json';progress=root/'TRAIN_PROGRESS.json';"
                            "number=json.loads(pid.read_text()).get('pid',0) if pid.exists() else 0;"
@@ -130,8 +176,16 @@ def amend_budget(root, config, *, artifacts=ARTIFACTS, code=None, amend_unstarte
         state = read_json(root / "RUN_STATE.json")
         if any(r["seed45_updates"] for r in state["arms"].values()) or (root / "selection/CAL_LOCK.json").exists():
             raise ValueError("cannot amend a trained/selected trajectory as a fresh cluster plan")
-        events = merge_events([ledger_events(root / "COST_LEDGER.jsonl")])
+        old_events = ledger_events(root / "COST_LEDGER.jsonl")
+        events = merge_events([old_events, *[r["events"] for r in (recovery_snapshots or {}).values()]])
         portable_sha = portable_data(root)["sha256"] if (root / "DATA_CONTENT_BINDING.json").exists() else None
+        if recovery_snapshots is not None:
+            old_identity = previous["jobs"][0]["identity"]
+            if (sha256(root / "POPULATION.json") != old_identity["population_sha256"]
+                    or portable_sha != old_identity["data_content_sha256"]
+                    or read_json(root / "SOURCE_AND_INITIALIZATION.json")["initialization"]["45"]["sha256"]
+                    != old_identity["initialization_sha256"]):
+                raise ValueError("failed recovery must preserve population, data and common initialization")
         plan = build_cluster_plan(previous, config, current_gpu_hours=sum(r["gpu_hours"] for r in events),
                                   population_sha256=sha256(root / "POPULATION.json"),
                                   initialization_sha256=read_json(root / "SOURCE_AND_INITIALIZATION.json")[
@@ -142,6 +196,27 @@ def amend_budget(root, config, *, artifacts=ARTIFACTS, code=None, amend_unstarte
         archive.parent.mkdir(parents=True, exist_ok=True)
         archive.write_bytes(path.read_bytes())
         plan["previous_budget_lock_sha256"] = old_sha
+        if recovery_snapshots is not None:
+            failure = root / f"cluster/failures/{old_sha}"
+            failure.mkdir(parents=True, exist_ok=True)
+            for name in ("SOURCE_AND_INITIALIZATION.json", "RUN_STATE.json", "COST_LEDGER.jsonl"):
+                shutil.copy2(root / name, failure / name)
+            write_json(failure / "WORKER_SNAPSHOTS.json", recovery_snapshots)
+            for name in ("snapshots", "STATUS.json", "READINESS.json", "STAGING.json", "DISPATCH.json",
+                         "DEPLOYMENT_READINESS.json", "DEPLOYMENT_OBSERVATION.json", "readiness",
+                         "MONITOR_PID.json", "monitor.log"):
+                old = root / "cluster" / name
+                if old.exists():
+                    old.rename(failure / name)
+            existing_ids = {r["event_id"] for r in old_events}
+            for event in events:
+                if event["event_id"] not in existing_ids:
+                    append_event(root / "COST_LEDGER.jsonl", event)
+            plan["recovery"] = {"kind": "REPLACE_ALL_FAILED_UNCHECKPOINTED",
+                                "previous_job_ids": {j["arm"]: j["job_id"] for j in previous["jobs"]},
+                                "failure_archive": str(failure), "carried_campaign_gpu_hours": sum(r["gpu_hours"] for r in events)}
+            write_json(failure / "RECOVERY.json", plan["recovery"])
+            write_json(root / "cluster/LATEST_RECOVERY.json", plan["recovery"])
         write_json(path, plan)
         write_json(root / "RESOURCE_PLAN.json", plan)
         write_json(artifacts / "BUDGET_LOCK.json", plan)
@@ -239,18 +314,32 @@ def sel_comparisons(plan, snapshots, population, lock):
     return comparisons
 
 
+def ssh_transport():
+    return ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", "-o", "ControlMaster=auto",
+            "-o", "ControlPersist=600", "-o", "ControlPath=/tmp/rescene-native-long-%C"]
+
+
 def ssh(node, argv, *, timeout=60):
-    return subprocess.run(["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8",
+    return subprocess.run([*ssh_transport(),
                            f"{node['user']}@{node['host']}", shlex.join([str(a) for a in argv])],
                           check=True, capture_output=True, text=True, timeout=timeout).stdout
 
 
+def rsync(argv, **kwargs):
+    return subprocess.run(["rsync", "-e", shlex.join(ssh_transport()), *argv], check=True, **kwargs)
+
+
 def remote_module(job, phase, *args):
-    env = ["env", f"PYTHONPATH={job['repo']}",
+    env = ["env", f"PYTHONPATH={remote_pythonpath(job)}",
            f"RESCENE_NATIVE_LONG_ARTIFACTS={job['root']}/artifacts", "OMP_NUM_THREADS=2",
            "MKL_NUM_THREADS=2", "OPENBLAS_NUM_THREADS=2"]
     return [*env, job["python"], "-m", "scripts.native_long_cluster", phase,
             "--root", job["root"], *args]
+
+
+def remote_pythonpath(node):
+    return ":".join([node["repo"], *[f"{node['repo']}/third_party/{name}"
+                    for name in ("concerto", "sonata", "stmetrics", "detectron2")]])
 
 
 def probe_node(node):
@@ -270,7 +359,8 @@ def probe_node(node):
         "'staged':staged,'ready':not missing and all(paths.values()) and hardware and staged}))"
     )
     try:
-        return {"host": node["host"], "ssh": "PASS", **json.loads(ssh(node, [node["python"], "-c", program]))}
+        return {"host": node["host"], "ssh": "PASS", **json.loads(ssh(node,
+            ["env", f"PYTHONPATH={remote_pythonpath(node)}", node["python"], "-c", program]))}
     except (subprocess.SubprocessError, json.JSONDecodeError) as error:
         return {"host": node["host"], "ssh": "FAILED", "ready": False, "error": str(error),
                 "stderr": getattr(error, "stderr", None)}
@@ -304,10 +394,22 @@ def portable_data(root):
     return {"files": rows, "sha256": digest(rows)}
 
 
+def native_dependency_sources(root):
+    import importlib.util
+
+    libraries = read_json(root / "SOURCE_AND_INITIALIZATION.json")["installed_libraries"]
+    sources = {name: Path(libraries[name]["source"]).parent.parent
+               for name in ("concerto", "sonata", "stmetrics")}
+    sources["detectron2"] = Path(importlib.util.find_spec("detectron2").origin).parent.parent
+    sources["pointnet2"] = PROJECT / "third_party/pointnet2"
+    return sources
+
+
 def stage_cluster(root, *, with_data=False):
     plan = read_json(root / "selection/BUDGET_LOCK.json")
     source = read_json(root / "SOURCE_AND_INITIALIZATION.json")
     data = portable_data(root)
+    dependencies = native_dependency_sources(root)
     outcomes = {}
     with exclusive(root / "cluster/controller.lock"):
         for job in plan["jobs"]:
@@ -325,14 +427,17 @@ def stage_cluster(root, *, with_data=False):
                          "active=number>0 and cmd.exists() and str(root).encode() in cmd.read_bytes();"
                          "assert not active and updates==0,'cannot stage over an active/trained worker'")
                 ssh(job, ["python3", "-c", guard])
-                ssh(job, ["mkdir", "-p", job["repo"], job["root"], str(Path(job["encoder"]).parent),
+                ssh(job, ["mkdir", "-p", job["repo"], f"{job['repo']}/third_party", job["root"], str(Path(job["encoder"]).parent),
                           str(Path(job["common"]).parent)])
-                subprocess.run(["rsync", "-az", "--safe-links", "--exclude=__pycache__", "--exclude=*.pyc",
+                rsync(["-az", "--safe-links", "--exclude=__pycache__", "--exclude=*.pyc",
                     *[str(PROJECT / d) for d in ("models", "datasets", "trainer", "utils", "scripts", "conf")],
-                    f"{remote}:{shlex.quote(job['repo'])}/"], check=True)
+                    f"{remote}:{shlex.quote(job['repo'])}/"])
+                rsync(["-az", "--safe-links", "--exclude=.git", "--exclude=__pycache__", "--exclude=*.pyc",
+                    *[str(path) for path in dependencies.values()],
+                    f"{remote}:{shlex.quote(job['repo'])}/third_party/"])
                 for name, local in (("encoder", source["weights"]["concerto_pretrained"]["path"]),
                                     ("common", source["initialization"]["45"]["path"])):
-                    subprocess.run(["rsync", "-az", local, f"{remote}:{shlex.quote(job[name])}"], check=True)
+                    rsync(["-az", local, f"{remote}:{shlex.quote(job[name])}"])
                 if with_data:
                     ssh(job, ["mkdir", "-p", job["data_root"]])
                     bundle = root / "cluster/data_bundle"
@@ -341,15 +446,14 @@ def stage_cluster(root, *, with_data=False):
                         link.parent.mkdir(parents=True, exist_ok=True)
                         if not link.is_symlink():
                             link.symlink_to(row["source"])
-                    subprocess.run(["rsync", "-azL", str(bundle) + "/",
-                                    f"{remote}:{shlex.quote(job['data_root'])}/"], check=True)
+                    rsync(["-azL", str(bundle) + "/", f"{remote}:{shlex.quote(job['data_root'])}/"])
                 spec = {**job, "data": data, "population": read_json(root / "POPULATION.json"),
                         "source": {"initialization": source["initialization"],
                                    "weights": source["weights"], "versions": source["versions"],
                                    "installed_libraries": source["installed_libraries"]}}
                 path = root / f"cluster/specs/{job['arm']}.json"
                 write_json(path, spec)
-                subprocess.run(["rsync", "-az", str(path), f"{remote}:{shlex.quote(job['root'])}/WORKER_SPEC.json"], check=True)
+                rsync(["-az", str(path), f"{remote}:{shlex.quote(job['root'])}/WORKER_SPEC.json"])
                 outcomes[job["arm"]] = {"status": "STAGED", "job_id": job["job_id"]}
             except (subprocess.SubprocessError, AssertionError, ValueError) as error:
                 outcomes[job["arm"]] = {"status": "STAGE_FAILED", "error": str(error)}
@@ -505,7 +609,7 @@ with (root/'launch.lock').open('a') as lock:
         row={{'status':'ALREADY_COMPLETE'}}
     else:
         with (root/'worker.log').open('a') as log:
-            process=subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+            process=subprocess.Popen(command,cwd={job['repo']!r},stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         row={{'pid':process.pid,'phase':phase,'status':'LAUNCHED'}}
         temporary=path.with_suffix('.tmp')
         temporary.write_text(json.dumps(row))
@@ -544,8 +648,7 @@ def collect_evidence(root, job, snapshot):
             local = root / "cluster/evidence" / job["arm"] / "seed45" / remote.name
             local.parent.mkdir(parents=True, exist_ok=True)
             if not local.exists() or sha256(local) != evidence["sha256"]:
-                subprocess.run(["rsync", "-az", f"{job['user']}@{job['host']}:{shlex.quote(str(remote))}",
-                                str(local)], check=True, timeout=60)
+                rsync(["-az", f"{job['user']}@{job['host']}:{shlex.quote(str(remote))}", str(local)], timeout=60)
             if sha256(local) != evidence["sha256"]:
                 raise ValueError("collected official evidence SHA differs from the worker snapshot")
 
@@ -614,8 +717,7 @@ def finalize_cluster(root, *, payload=None):
             write_json(directory / "SEL_REQUESTS.json", {"steps": sorted(steps)})
             try:
                 ssh(job, ["mkdir", "-p", str(Path(job["root"]) / "selection")])
-                subprocess.run(["rsync", "-az", str(directory) + "/",
-                                f"{job['user']}@{job['host']}:{shlex.quote(job['root'])}/selection/"], check=True)
+                rsync(["-az", str(directory) + "/", f"{job['user']}@{job['host']}:{shlex.quote(job['root'])}/selection/"])
                 outcomes[job["arm"]] = launch_worker(job, evaluate_only=True)
             except (subprocess.SubprocessError, OSError) as error:
                 outcomes[job["arm"]] = {"status": "SEL_DISPATCH_FAILED", "error": str(error)}
@@ -670,7 +772,11 @@ def cluster_command(root, command, *, through="publish"):
 
 def watch_cluster(root, *, interval=30):
     while True:
-        status = collect_cluster(root)
+        try:
+            status = collect_cluster(root)
+        except LockBusyError:
+            time.sleep(interval)
+            continue
         report = cluster_report(root)
         if report["gain"] is not None:
             return report
@@ -699,10 +805,12 @@ def main():
     parser.add_argument("--config", type=Path, default=PROJECT / "conf/native_long_cluster.yaml")
     parser.add_argument("--with-data", action="store_true")
     parser.add_argument("--amend-unstarted", action="store_true")
+    parser.add_argument("--replace-failed-uncheckpointed", action="store_true")
     args = parser.parse_args()
     root = args.root.resolve()
     if args.command == "plan":
-        result = amend_budget(root, yaml.safe_load(args.config.read_text()), amend_unstarted=args.amend_unstarted)
+        result = amend_budget(root, yaml.safe_load(args.config.read_text()), amend_unstarted=args.amend_unstarted,
+                              replace_failed_uncheckpointed=args.replace_failed_uncheckpointed)
     elif args.command == "probe":
         result = probe_cluster(root)
     elif args.command == "stage":

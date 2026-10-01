@@ -1,5 +1,8 @@
 # Verification
 
+The original code-only verification below is retained as history. Current
+deployment evidence is in `DEPLOYMENT_VERIFICATION.json` and the final section.
+
 Date: 2026-10-01. Scope: budget amendment and four-host scheduling code.
 
 ```bash
@@ -49,3 +52,46 @@ formal confirmation or profiling result is claimed.
 The SEL-dispatch regression reproduces one failed SSH dispatch, verifies the
 other three jobs still dispatch, then retries while a sibling is already in
 SEL_RUNNING. The central CAL-lock bytes remain unchanged across that retry.
+
+## Deployment Verification, 2026-10-01
+
+The initial deployment focused command passed51 tests in14.19 seconds. After
+the real empty-target startup failure, expanded validation passed200 tests,
+with2 CUDA-dependent skips and four existing warnings, in138.84 seconds:
+
+```bash
+env CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 \
+  /home/ww/miniconda3/envs/persist4d/bin/python -m pytest -q \
+  tests/test_native_long_*.py tests/test_objective_semantics.py \
+  tests/test_perception_gain_native_retry.py tests/test_contrastive_streaming.py \
+  tests/test_task_memory_criterion.py tests/test_local_diagnostic_loss.py \
+  tests/test_p2_ddp_batch_contract.py
+```
+
+Regressions cover deployment paths/transport/locks, real child cwd, empty-target
+losses/gradients, nonempty-objective equality, TF32 policy preservation, cost
+carryover and rejection of unsafe failed-job replacements. Ruff passed changed
+scripts/tests. Criterion Ruff has17 pre-existing diagnostics and no new ones
+(baseline19). Compilation and diff checks passed.
+
+Assigned .101-.104 workers are staged and READY. Each passed CPU verification
+of3575 files, numerical library sources, encoder/common-state hashes, population
+bytes and real ScanNet/RIO training samples. No CUDA context was created by
+those CPU checks. Existing environments were cloned into dedicated roots.
+
+All four actual native two-A40 preflights record PASS, world2, effective batch32,
+two disposable optimizer updates, official updates0 and scheduler U29700.
+Their reservation time is recorded in worker ledgers and merged centrally.
+Official training is running under four detached supervisors. The persistent
+controller monitor uses30-second polls; its actual PID/liveness and advancing
+status timestamps are recorded in the deployment receipt.
+
+The first startup failed at draw65 after two official observed updates, without
+a checkpoint. Recovery carries0.6303522524447762 campaign GPUh, including all
+failure costs, into the new lock. Original worker directories and controller
+failure evidence remain intact. All four replacement CPU checks also verify
+the actual empty draw65, finite zero mask losses/gradients and TF32-off.
+
+The receipt distinguishes observed optimizer updates from committed checkpoint
+updates. Until update990, committed progress can remain0 while training runs.
+No full-U completion or scientific gain is claimed by this deployment.
