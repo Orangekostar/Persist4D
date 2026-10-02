@@ -25,7 +25,7 @@
 - [x] Implement audited repair migration and historical event provenance; test rejection and idempotence.
 - [x] Verify remote checkpoint positions and payload integrity; deploy and launch CAL recomputation.
 - [x] Restore supervised monitoring and verify all four workers pass update2970 and save a subsequent boundary.
-- [ ] Publish the change and verified recovery receipt.
+- [x] Publish the change and verified recovery receipt.
 
 Validation: CPU pytest native-long/resume/cluster tests, Ruff, diff checks, actual two-GPU resumes, metadata/tensor payload hashes and fresh controller snapshots.
 
@@ -45,3 +45,9 @@ existing numerical protocol uses deterministic algorithms with `warn_only=True`;
 logs report unsupported deterministic CUDA operations. This does not establish
 the cause of the E3 evaluation difference. Repeat-evaluation reproducibility is
 still an evidence gap, separate from the repaired optimizer-boundary crash.
+
+Published code commit: `ceb6c4aa49fbfa0c6ff66e113e7cb76a562fc7a9`.
+Every bound Git blob SHA matches the staged workers/controller. Archived
+official CAL evidence was also copied to the controller repair archive and
+verified against all original snapshot SHAs. Prefix mappings are recorded in
+`artifacts/native_long_cluster_v1/RESUME_REPAIR_VERIFICATION.json`.

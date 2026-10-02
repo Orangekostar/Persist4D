@@ -8,6 +8,9 @@ optimizer-boundary validation remains enabled.
 All original2970 checkpoints, CAL evidence, code, specs and ledgers are archived
 under remote `repairs/3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787/`.
 Controller history is under the corresponding runtime `cluster/repairs/` folder.
+The original official CAL evidence also has a verified controller archive copy.
+Archived JSON retains its original absolute paths; use the recorded prefix
+mappings in the verification JSON to resolve those paths to preserved files.
 The explicit amendment preserves job quotas,1800 GPUh lifetime cap, prior costs,
 world2, accumulation16, batch32, U29700 and common seed45 initialization. The
 metadata migration changes only code identity; numerical, loop, RNG and config

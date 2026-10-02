@@ -45,6 +45,29 @@
       }
     ]
   },
+  "archived_evidence_prefix_mappings": {
+    "E0": {
+      "controller_archive_prefix": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/repairs/3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787/archived-evaluation/E0",
+      "original_prefix": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E0/seed45/evaluation/E0",
+      "remote_archive_prefix": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E0/seed45/repairs/3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787/evaluation/E0"
+    },
+    "E1": {
+      "controller_archive_prefix": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/repairs/3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787/archived-evaluation/E1",
+      "original_prefix": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E1/seed45/evaluation/E1",
+      "remote_archive_prefix": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E1/seed45/repairs/3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787/evaluation/E1"
+    },
+    "E2": {
+      "controller_archive_prefix": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/repairs/3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787/archived-evaluation/E2",
+      "original_prefix": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E2/seed45/evaluation/E2",
+      "remote_archive_prefix": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E2/seed45/repairs/3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787/evaluation/E2"
+    },
+    "E3": {
+      "controller_archive_prefix": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/repairs/3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787/archived-evaluation/E3",
+      "original_prefix": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E3/seed45/evaluation/E3",
+      "remote_archive_prefix": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E3/seed45/repairs/3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787/evaluation/E3"
+    }
+  },
+  "archived_official_evidence_SHA_checks": "PASS",
   "broad_tests": {
     "passed": 213,
     "seconds": 178.67,
@@ -76,6 +99,7 @@
     "trainer/native_long_trainer.py": "c09b6fd79d622ac1dfa31be9886e4f0473916223568880a79561034cdb46dd83",
     "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
   },
+  "code_commit": "ceb6c4aa49fbfa0c6ff66e113e7cb76a562fc7a9",
   "code_sha256": "ce386ddc4b37c1df3dd59b5cd41a9813e2e825dbd685d494e5fc24aaea5c3da9",
   "cold_SSH_without_agent_or_multiplexing": "PASS",
   "final_focused_tests": {
