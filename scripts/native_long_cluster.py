@@ -237,7 +237,9 @@ def validate_snapshot(snapshot, job):
         raise ValueError("worker identity differs from the immutable cluster job")
     if not 0 <= snapshot["updates"] <= 29700:
         raise ValueError("worker optimizer position is invalid")
-    if any(event.get("job_id") != job["job_id"] for event in snapshot["events"]):
+    carried = job.get("repair", {}).get("carried_events", {})
+    if any(event.get("job_id") != carried.get(event["event_id"], job["job_id"])
+           for event in snapshot["events"]):
         raise ValueError("worker ledger contains an event from a different job")
     for row in snapshot.get("cal", []) + snapshot.get("sel", []):
         training = row["identity"]["training"]
@@ -515,7 +517,7 @@ def worker_snapshot(root):
     spec = read_json(root / "WORKER_SPEC.json")
     status = read_json(root / "WORKER_STATE.json") if (root / "WORKER_STATE.json").exists() else {"status": "NOT_STARTED"}
     progress = read_json(root / "TRAIN_PROGRESS.json") if (root / "TRAIN_PROGRESS.json").exists() else {"updates": 0}
-    events = [{**r, "job_id": spec["job_id"]} for r in ledger_events(root / "COST_LEDGER.jsonl")]
+    events = [{"job_id": spec["job_id"], **r} for r in ledger_events(root / "COST_LEDGER.jsonl")]
     cal, sel = [], []
     for role, rows in (("CAL", cal), ("SEL", sel)):
         for path in sorted((root / "evaluation" / spec["arm"] / "seed45").glob(f"{role}-?????.json")):
@@ -542,6 +544,8 @@ def run_worker(root, *, evaluate_only=False):
     from scripts.native_long_execution import charged_process, checkpoint_manifest
 
     with exclusive(root / "worker.lock"):
+        if (root / "REPAIR_PENDING.json").exists():
+            raise RuntimeError("finish the reviewed checkpoint repair before launching work")
         state_path = root / "WORKER_STATE.json"
         stage = "SEL" if evaluate_only else "TRAIN_CAL"
         write_json(state_path, {"status": "SEL_RUNNING" if evaluate_only else "TRAIN_CAL_RUNNING", "stage": stage})
@@ -590,6 +594,7 @@ root=Path({job['root']!r})
 command={command!r}
 spec=json.loads((root/'WORKER_SPEC.json').read_text())
 assert spec['job_id']=={job['job_id']!r},'staged worker job differs'
+assert not (root/'REPAIR_PENDING.json').exists(),'checkpoint repair is pending'
 with (root/'launch.lock').open('a') as lock:
     fcntl.flock(lock,fcntl.LOCK_EX)
     path=root/'WORKER_PID.json'
@@ -792,6 +797,8 @@ def watch_cluster(root, *, interval=30):
             finalize_cluster(root, payload=status)
         elif all(snapshots.get(a, {}).get("status") in {"FULL_U_COMPLETE", "FAILED"}
                and not snapshots[a].get("stale") and not snapshots[a].get("active") for a in ARMS):
+            if all(snapshots[a]["status"] == "FAILED" for a in ARMS):
+                return {**report, "status": "ALL_TRAINING_FAILED_CHECK_WORKER_LOGS"}
             finalize_cluster(root, payload=status)
         if status["lifetime_gpu_hours"] + status["live_gpu_hours"] >= budget_cap(plan):
             return {**report, "status": "BUDGET_EXHAUSTED"}

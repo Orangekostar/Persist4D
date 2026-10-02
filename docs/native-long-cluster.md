@@ -35,6 +35,40 @@ preserved. Old snapshots/logs/controller receipts are archived under
 `cluster/failures/<old-lock-sha>/`; old remote directories remain intact. All
 failed cost events are merged before replacement quotas are allocated.
 
+For the reviewed optimizer-boundary callback repair after committed training,
+stop the controller monitor and use:
+
+```bash
+python -m scripts.native_long_repair repair --root "$NATIVE_LONG_ROOT"
+```
+
+This accepts only stopped, checkpointed FAILED workers without active reservations
+or selection locks. Model, dataset and configuration sources cannot change.
+The controller archives its original budget/state and snapshots under
+`cluster/repairs/<repair-id>/`; each worker archives code, original checkpoints,
+CAL evidence, specs and costs under `repairs/<repair-id>/`. The checkpoint
+migration changes only the code identity and verifies numerical, loop, RNG and
+configuration content with a deterministic SHA before/after serialization. Job quotas and the lifetime
+cap are unchanged. Old cost events retain their original job IDs with an explicit
+event-to-job mapping in the amended plan. CAL is recomputed using the repaired
+checkpoint/code SHA; original results remain in the archive.
+
+The boundary callback initializes from Lightning's restored `global_step`, so
+accumulated microbatches cannot resave the loaded checkpoint before an optimizer
+update. Its existing strict checkpoint-boundary validation remains active.
+
+The controller now runs as `persist4d-native-long-cluster.service` using the
+reviewed code copy `cluster/controller-code-resume-v3`. The unit template is
+`docs/native-long-cluster-monitor.service`. The user manager has lingering
+enabled. Unexpected exits restart after15 seconds; diagnostics are retained in
+the user journal. If all workers fail, the monitor reports the failure without
+attempting an invalid CAL selection.
+
+```bash
+systemctl --user status persist4d-native-long-cluster.service --no-pager
+journalctl --user -u persist4d-native-long-cluster.service -n 30 --no-pager
+```
+
 Each assigned host uses `/home/pluto/native_long_cluster_v1/env/bin/python`,
 cloned from its existing version-matched environment without changing the source.
 Staging transfers the code, fixed encoder, common initialization, SHA-bound

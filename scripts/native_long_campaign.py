@@ -196,6 +196,7 @@ def code_identity():
              "trainer/trainer.py", "trainer/native_long_trainer.py", "scripts/native_long_campaign.py",
              "scripts/native_long_budget.py", "scripts/native_long_cluster.py",
              "scripts/native_long_runtime.py", "scripts/native_long_execution.py", "scripts/native_long_assets.py",
+             "scripts/native_long_repair.py",
              "scripts/rescene_task_postprocess.py", "scripts/p6a_metrics.py", "scripts/evaluate_persist4d_p6a.py",
              "conf/config_native_long_retrain.yaml")]
     return {str(p.relative_to(PROJECT)): sha256(p) for p in paths if p.is_file()}

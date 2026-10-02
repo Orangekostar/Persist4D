@@ -184,9 +184,10 @@
           "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
           "scripts/native_long_assets.py": "8bf95bcb325da4cda7dfe3569194d2b2fddb77cd85faea664be7e4ec510ea255",
           "scripts/native_long_budget.py": "e6260105be081cb8cc557078671ec3b2c1af68b6a69b2a610ac6d182f67a2dbd",
-          "scripts/native_long_campaign.py": "03d7630cacf2442b0563ccabe5b7a9ada5b4fd5656c748c5c9a9ee7272087fc5",
-          "scripts/native_long_cluster.py": "ccc60e1c6869c88c3270aa1d75c59b9378ec8d77793ef0ef26864b9f030324a0",
-          "scripts/native_long_execution.py": "1d1493f7b3907bfe720b9e4d5d4ba4dd2466b2212ac3ac31fd98407142125a8d",
+          "scripts/native_long_campaign.py": "f9e8ca3cfd62e3af521595a308e077d8e07a91d936d392a8c94d7576e707a826",
+          "scripts/native_long_cluster.py": "06009a9c53264301f28bb30ad3469ea98b29deeb1c1cd9684c67f8de6c4c410f",
+          "scripts/native_long_execution.py": "77fc5edd2d20a445adbce104de5297cbc0ca7a2db55c0f5682b066b0231f886b",
+          "scripts/native_long_repair.py": "46167ad1d6ef9609a74f08b273a42645802ab6cee52ebe00e9f1ae3a5af63ab6",
           "scripts/native_long_runtime.py": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
           "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
           "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
@@ -199,9 +200,19 @@
         "initialization_sha256": "8d3dfbc4e5c78d707ae5d6cb913123727456698c06d7c1e5077d944772c423e1",
         "population_sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8"
       },
-      "job_id": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5",
+      "job_id": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080",
       "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
       "quota_gpu_hours": 405.84493682815446,
+      "repair": {
+        "carried_events": {
+          "native-long:CAL:E0:2970:1790933791435818352": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5",
+          "native-long:DDP_PREFLIGHT:E0:1790861848860499855": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5",
+          "native-long:train:E0:2970:1790861945674888745": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5",
+          "native-long:train:E0:5940:1790934026181721673": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5"
+        },
+        "previous_job_id": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5",
+        "resume_update": 2970
+      },
       "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
       "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E0/seed45",
       "seed": 45,
@@ -230,9 +241,10 @@
           "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
           "scripts/native_long_assets.py": "8bf95bcb325da4cda7dfe3569194d2b2fddb77cd85faea664be7e4ec510ea255",
           "scripts/native_long_budget.py": "e6260105be081cb8cc557078671ec3b2c1af68b6a69b2a610ac6d182f67a2dbd",
-          "scripts/native_long_campaign.py": "03d7630cacf2442b0563ccabe5b7a9ada5b4fd5656c748c5c9a9ee7272087fc5",
-          "scripts/native_long_cluster.py": "ccc60e1c6869c88c3270aa1d75c59b9378ec8d77793ef0ef26864b9f030324a0",
-          "scripts/native_long_execution.py": "1d1493f7b3907bfe720b9e4d5d4ba4dd2466b2212ac3ac31fd98407142125a8d",
+          "scripts/native_long_campaign.py": "f9e8ca3cfd62e3af521595a308e077d8e07a91d936d392a8c94d7576e707a826",
+          "scripts/native_long_cluster.py": "06009a9c53264301f28bb30ad3469ea98b29deeb1c1cd9684c67f8de6c4c410f",
+          "scripts/native_long_execution.py": "77fc5edd2d20a445adbce104de5297cbc0ca7a2db55c0f5682b066b0231f886b",
+          "scripts/native_long_repair.py": "46167ad1d6ef9609a74f08b273a42645802ab6cee52ebe00e9f1ae3a5af63ab6",
           "scripts/native_long_runtime.py": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
           "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
           "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
@@ -245,9 +257,19 @@
         "initialization_sha256": "8d3dfbc4e5c78d707ae5d6cb913123727456698c06d7c1e5077d944772c423e1",
         "population_sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8"
       },
-      "job_id": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53",
+      "job_id": "7ab9790336d6c0bfe1743d636872f019493fa30cf0d60b5a3bda9439af56359d",
       "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
       "quota_gpu_hours": 426.1783627484042,
+      "repair": {
+        "carried_events": {
+          "native-long:CAL:E1:2970:1790930477769122087": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53",
+          "native-long:DDP_PREFLIGHT:E1:1790861845604132262": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53",
+          "native-long:train:E1:2970:1790861942846790134": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53",
+          "native-long:train:E1:5940:1790930704240962697": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53"
+        },
+        "previous_job_id": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53",
+        "resume_update": 2970
+      },
       "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
       "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E1/seed45",
       "seed": 45,
@@ -276,9 +298,10 @@
           "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
           "scripts/native_long_assets.py": "8bf95bcb325da4cda7dfe3569194d2b2fddb77cd85faea664be7e4ec510ea255",
           "scripts/native_long_budget.py": "e6260105be081cb8cc557078671ec3b2c1af68b6a69b2a610ac6d182f67a2dbd",
-          "scripts/native_long_campaign.py": "03d7630cacf2442b0563ccabe5b7a9ada5b4fd5656c748c5c9a9ee7272087fc5",
-          "scripts/native_long_cluster.py": "ccc60e1c6869c88c3270aa1d75c59b9378ec8d77793ef0ef26864b9f030324a0",
-          "scripts/native_long_execution.py": "1d1493f7b3907bfe720b9e4d5d4ba4dd2466b2212ac3ac31fd98407142125a8d",
+          "scripts/native_long_campaign.py": "f9e8ca3cfd62e3af521595a308e077d8e07a91d936d392a8c94d7576e707a826",
+          "scripts/native_long_cluster.py": "06009a9c53264301f28bb30ad3469ea98b29deeb1c1cd9684c67f8de6c4c410f",
+          "scripts/native_long_execution.py": "77fc5edd2d20a445adbce104de5297cbc0ca7a2db55c0f5682b066b0231f886b",
+          "scripts/native_long_repair.py": "46167ad1d6ef9609a74f08b273a42645802ab6cee52ebe00e9f1ae3a5af63ab6",
           "scripts/native_long_runtime.py": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
           "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
           "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
@@ -291,9 +314,19 @@
         "initialization_sha256": "8d3dfbc4e5c78d707ae5d6cb913123727456698c06d7c1e5077d944772c423e1",
         "population_sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8"
       },
-      "job_id": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8",
+      "job_id": "1867cae900c5023fc5a5adcf34463ceb2ad2910940d893c864eb28fdd79bfec1",
       "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
       "quota_gpu_hours": 436.36302421495185,
+      "repair": {
+        "carried_events": {
+          "native-long:CAL:E2:2970:1790929389738351399": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8",
+          "native-long:DDP_PREFLIGHT:E2:1790861844895551997": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8",
+          "native-long:train:E2:2970:1790861940218170898": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8",
+          "native-long:train:E2:5940:1790929604208680650": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8"
+        },
+        "previous_job_id": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8",
+        "resume_update": 2970
+      },
       "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
       "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E2/seed45",
       "seed": 45,
@@ -322,9 +355,10 @@
           "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
           "scripts/native_long_assets.py": "8bf95bcb325da4cda7dfe3569194d2b2fddb77cd85faea664be7e4ec510ea255",
           "scripts/native_long_budget.py": "e6260105be081cb8cc557078671ec3b2c1af68b6a69b2a610ac6d182f67a2dbd",
-          "scripts/native_long_campaign.py": "03d7630cacf2442b0563ccabe5b7a9ada5b4fd5656c748c5c9a9ee7272087fc5",
-          "scripts/native_long_cluster.py": "ccc60e1c6869c88c3270aa1d75c59b9378ec8d77793ef0ef26864b9f030324a0",
-          "scripts/native_long_execution.py": "1d1493f7b3907bfe720b9e4d5d4ba4dd2466b2212ac3ac31fd98407142125a8d",
+          "scripts/native_long_campaign.py": "f9e8ca3cfd62e3af521595a308e077d8e07a91d936d392a8c94d7576e707a826",
+          "scripts/native_long_cluster.py": "06009a9c53264301f28bb30ad3469ea98b29deeb1c1cd9684c67f8de6c4c410f",
+          "scripts/native_long_execution.py": "77fc5edd2d20a445adbce104de5297cbc0ca7a2db55c0f5682b066b0231f886b",
+          "scripts/native_long_repair.py": "46167ad1d6ef9609a74f08b273a42645802ab6cee52ebe00e9f1ae3a5af63ab6",
           "scripts/native_long_runtime.py": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
           "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
           "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
@@ -337,9 +371,19 @@
         "initialization_sha256": "8d3dfbc4e5c78d707ae5d6cb913123727456698c06d7c1e5077d944772c423e1",
         "population_sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8"
       },
-      "job_id": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06",
+      "job_id": "f995d85d8888ccee3e0084e69687e63a51fdf3d6eb1ed84f43b6f9a4be11c8eb",
       "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
       "quota_gpu_hours": 442.24828290323205,
+      "repair": {
+        "carried_events": {
+          "native-long:CAL:E3:2970:1790926950233806901": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06",
+          "native-long:DDP_PREFLIGHT:E3:1790861844733097190": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06",
+          "native-long:train:E3:2970:1790861931211472837": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06",
+          "native-long:train:E3:5940:1790927151168613905": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06"
+        },
+        "previous_job_id": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06",
+        "resume_update": 2970
+      },
       "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
       "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E3/seed45",
       "seed": 45,
@@ -362,7 +406,7 @@
     "selection_scores_seen": 0,
     "training_updates_seen": 0
   },
-  "previous_budget_lock_sha256": "9d6507f5e109419260c1d5b81cf7c3ffff5e65781725fe5654027f2d6f5e761c",
+  "previous_budget_lock_sha256": "33f0bc09540575a8ec72d6a94e0093faf468a561eb657805c9216bf56b032ffc",
   "prior": {
     "event_ids": [
       "AUX:2026-09-22T20:51:10.107530+00:00",
@@ -489,5 +533,16 @@
   "remaining_before_preflight_gpu_hours": 1719.2649612497603,
   "reserve_confirmation_gpu_hours": 8.0,
   "reserve_gpu_hours": 8.0,
-  "scientific_status": "PARTIAL_FULL_RETRAIN_BUDGET"
+  "scientific_status": "PARTIAL_FULL_RETRAIN_BUDGET",
+  "trained_repair": {
+    "changed_files": [
+      "scripts/native_long_campaign.py",
+      "scripts/native_long_cluster.py",
+      "scripts/native_long_execution.py",
+      "scripts/native_long_repair.py"
+    ],
+    "kind": "EXECUTION_CONTROL_METADATA_REPAIR",
+    "preserve_training_state_and_costs": true,
+    "recompute_CAL": true
+  }
 }

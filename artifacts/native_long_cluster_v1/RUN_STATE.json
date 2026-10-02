@@ -2,20 +2,24 @@
   "actual_campaign_gpu_hours": 0.21820966691858162,
   "arms": {
     "E0": {
-      "seed45_updates": 0,
-      "status": "READY_CLUSTER"
+      "observed_optimizer_updates": 2987,
+      "seed45_updates": 2972,
+      "status": "TRAIN_CAL_RUNNING"
     },
     "E1": {
-      "seed45_updates": 0,
-      "status": "READY_CLUSTER"
+      "observed_optimizer_updates": 2987,
+      "seed45_updates": 2972,
+      "status": "TRAIN_CAL_RUNNING"
     },
     "E2": {
-      "seed45_updates": 0,
-      "status": "READY_CLUSTER"
+      "observed_optimizer_updates": 2989,
+      "seed45_updates": 2972,
+      "status": "TRAIN_CAL_RUNNING"
     },
     "E3": {
-      "seed45_updates": 0,
-      "status": "READY_CLUSTER"
+      "observed_optimizer_updates": 2990,
+      "seed45_updates": 2972,
+      "status": "TRAIN_CAL_RUNNING"
     }
   },
   "budget_mode": "FULL_FOUR",
@@ -32,9 +36,10 @@
     "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
     "scripts/native_long_assets.py": "8bf95bcb325da4cda7dfe3569194d2b2fddb77cd85faea664be7e4ec510ea255",
     "scripts/native_long_budget.py": "e6260105be081cb8cc557078671ec3b2c1af68b6a69b2a610ac6d182f67a2dbd",
-    "scripts/native_long_campaign.py": "03d7630cacf2442b0563ccabe5b7a9ada5b4fd5656c748c5c9a9ee7272087fc5",
-    "scripts/native_long_cluster.py": "ccc60e1c6869c88c3270aa1d75c59b9378ec8d77793ef0ef26864b9f030324a0",
-    "scripts/native_long_execution.py": "1d1493f7b3907bfe720b9e4d5d4ba4dd2466b2212ac3ac31fd98407142125a8d",
+    "scripts/native_long_campaign.py": "f9e8ca3cfd62e3af521595a308e077d8e07a91d936d392a8c94d7576e707a826",
+    "scripts/native_long_cluster.py": "06009a9c53264301f28bb30ad3469ea98b29deeb1c1cd9684c67f8de6c4c410f",
+    "scripts/native_long_execution.py": "77fc5edd2d20a445adbce104de5297cbc0ca7a2db55c0f5682b066b0231f886b",
+    "scripts/native_long_repair.py": "46167ad1d6ef9609a74f08b273a42645802ab6cee52ebe00e9f1ae3a5af63ab6",
     "scripts/native_long_runtime.py": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
     "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
     "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
@@ -49,6 +54,6 @@
   "population_status": "READY",
   "publication_status": "CODE_ONLY",
   "required_full_training_completed": false,
-  "scientific_status": "NOT_RUN_CLUSTER_READY_PENDING",
-  "stage": "CLUSTER_PLANNED"
+  "scientific_status": "SEED45_IN_PROGRESS",
+  "stage": "CLUSTER_TRAIN_CAL_RUNNING"
 }

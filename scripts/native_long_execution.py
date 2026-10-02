@@ -225,6 +225,10 @@ class UpdateBoundary(pl.Callback):
         limit = os.environ.get("RESCENE_NATIVE_PROCESS_GPUH_LIMIT")
         self.gpu_hour_limit = float(limit) if limit else None
 
+    def on_train_start(self, trainer, module):
+        # The restored step precedes every accumulated batch of the next update.
+        self.last_step = trainer.global_step
+
     def on_train_batch_end(self, trainer, module, outputs, batch, batch_idx):
         step = trainer.global_step
         if step == self.last_step or not step:

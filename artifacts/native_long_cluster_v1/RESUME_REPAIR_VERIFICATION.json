@@ -1,0 +1,374 @@
+{
+  "E3_CAL_reproducibility": "UNRESOLVED; maximum absolute AP delta0.004661515355110168; checkpoint payload unchanged; no cause claimed",
+  "accounted_lifetime_gpu_hours": 234.183179158332,
+  "actual_resume_probes": {
+    "workers": [
+      {
+        "arm": "E0",
+        "committed_update": 2972,
+        "next_global_draw": 95104,
+        "resumed_from_update": 2970,
+        "rng_ranks": 2,
+        "scheduler_total_steps": 29700,
+        "status": "PASS",
+        "world_size": 2
+      },
+      {
+        "arm": "E1",
+        "committed_update": 2972,
+        "next_global_draw": 95104,
+        "resumed_from_update": 2970,
+        "rng_ranks": 2,
+        "scheduler_total_steps": 29700,
+        "status": "PASS",
+        "world_size": 2
+      },
+      {
+        "arm": "E2",
+        "committed_update": 2972,
+        "next_global_draw": 95104,
+        "resumed_from_update": 2970,
+        "rng_ranks": 2,
+        "scheduler_total_steps": 29700,
+        "status": "PASS",
+        "world_size": 2
+      },
+      {
+        "arm": "E3",
+        "committed_update": 2972,
+        "next_global_draw": 95104,
+        "resumed_from_update": 2970,
+        "rng_ranks": 2,
+        "scheduler_total_steps": 29700,
+        "status": "PASS",
+        "world_size": 2
+      }
+    ]
+  },
+  "broad_tests": {
+    "passed": 213,
+    "seconds": 178.67,
+    "skipped_requires_CUDA": 2
+  },
+  "budget_lock_sha256": "2e32ad7f3be324555f916343ff692f6b028be8f0079da2b7bac4968afbc3dfce",
+  "code": {
+    "conf/config_native_long_retrain.yaml": "7ceec3261f81cc4454a2f0febb92eccb0c35c65b8830e46e27c08457443d1fff",
+    "datasets/native_long_dataset.py": "5f78968d95000e1ac92e41d20b73f21127b7fb528947014e40148ede787cba20",
+    "datasets/pointcept_utils.py": "12dc773c74c1d2c28b0c1c0326633a3ce9b3527330648302c2c080e0883976e1",
+    "datasets/semseg.py": "c5ec2c1254ef85f0cf1a91a3f794f6f21ca695698a33a6717f42c5ad25d9b1bb",
+    "models/criterion.py": "b61bbc4a712db297f094080ffb1f4346d23651bab7e3a8622731f0a4b34b2820",
+    "models/matcher.py": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc",
+    "models/native_long_modules.py": "fa1cfc3ebf977fbf84c6190133a2b6a5e85fe9334761ddb4473fd0d5989f9167",
+    "models/pointcept.py": "88945a48faf0edf949a7ff9ac0fea3d90cc431609569532bb5f221e1d4628007",
+    "models/rescene.py": "1522c801f3ffee2cec4a267665b5002f50b04bd4d878a873e7926543c52fef96",
+    "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
+    "scripts/native_long_assets.py": "8bf95bcb325da4cda7dfe3569194d2b2fddb77cd85faea664be7e4ec510ea255",
+    "scripts/native_long_budget.py": "e6260105be081cb8cc557078671ec3b2c1af68b6a69b2a610ac6d182f67a2dbd",
+    "scripts/native_long_campaign.py": "f9e8ca3cfd62e3af521595a308e077d8e07a91d936d392a8c94d7576e707a826",
+    "scripts/native_long_cluster.py": "06009a9c53264301f28bb30ad3469ea98b29deeb1c1cd9684c67f8de6c4c410f",
+    "scripts/native_long_execution.py": "77fc5edd2d20a445adbce104de5297cbc0ca7a2db55c0f5682b066b0231f886b",
+    "scripts/native_long_repair.py": "46167ad1d6ef9609a74f08b273a42645802ab6cee52ebe00e9f1ae3a5af63ab6",
+    "scripts/native_long_runtime.py": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
+    "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+    "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+    "third_party/pointnet2/pointnet2_utils.py": "a1f369b2576916651d9334e1c83a8f9d4dade9a3868e6f4a69201f0306e37a73",
+    "third_party/pointnet2/pytorch_utils.py": "5271aa91f7951663ce7a1db137a3a75edda65bc49a113d9106ecf48e0a13737c",
+    "trainer/native_long_trainer.py": "c09b6fd79d622ac1dfa31be9886e4f0473916223568880a79561034cdb46dd83",
+    "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+  },
+  "code_sha256": "ce386ddc4b37c1df3dd59b5cd41a9813e2e825dbd685d494e5fc24aaea5c3da9",
+  "cold_SSH_without_agent_or_multiplexing": "PASS",
+  "final_focused_tests": {
+    "passed": 45,
+    "seconds": 16.01
+  },
+  "full_training_complete": false,
+  "lifetime_cap_gpu_hours": 1800.0,
+  "live_gpu_hours": 0.9222511686219109,
+  "locked_SEL_complete": false,
+  "monitor": {
+    "manager": "systemd-user",
+    "pid": 2109412,
+    "service": "persist4d-native-long-cluster.service",
+    "status": "RUNNING"
+  },
+  "observed_at_utc": "2026-10-02T13:01:52.319574+00:00",
+  "remaining_gpu_hours": 1564.8945696730461,
+  "repair_id": "3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787",
+  "ruff": "PASS",
+  "schema": 1,
+  "seed46_confirmation": "NOT_RUN",
+  "service_properties": "MainPID=2109412\nNRestarts=6\nActiveState=active\nSubState=running\n",
+  "service_restart_test": {
+    "after_pid": 2109412,
+    "before_pid": 2108591,
+    "passed": true,
+    "restart_delay_seconds": 15,
+    "signal": "SIGKILL"
+  },
+  "systemd_unit_verify": "PASS",
+  "worker_migrations": {
+    "E0": {
+      "archived_CAL_count": 1,
+      "checkpoints": {
+        "last.ckpt": {
+          "migrated_sha256": "9303c3a71fefe70bca7820f1fef2bbe56b5b585dbc406fd548a8e3354f86bef7",
+          "next_global_draw": 95040,
+          "original_sha256": "75e56681f89698369cbec56f6b285d379398348d863f0a526dd81cade25b992d",
+          "state_sha256": "f17e51e38d8c783b72afc8981c91f91d02499257bf1095a4cd9c1a2c6a624db3",
+          "step": 2970
+        },
+        "update=02970.ckpt": {
+          "migrated_sha256": "a5decbb2df88d9707ce5e58bcdeea68e02efc8e1195a3a43f7666eb387808105",
+          "next_global_draw": 95040,
+          "original_sha256": "75e56681f89698369cbec56f6b285d379398348d863f0a526dd81cade25b992d",
+          "state_sha256": "f17e51e38d8c783b72afc8981c91f91d02499257bf1095a4cd9c1a2c6a624db3",
+          "step": 2970
+        }
+      },
+      "new_job_id": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080",
+      "old_job_id": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5",
+      "preserved_gpu_hours": 40.06234637233616,
+      "repair_id": "3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787"
+    },
+    "E1": {
+      "archived_CAL_count": 1,
+      "checkpoints": {
+        "last.ckpt": {
+          "migrated_sha256": "ee941fc285ed5d3d0070909fa3bdc48f4e200ff98b3be45865eafd56ad38657d",
+          "next_global_draw": 95040,
+          "original_sha256": "0b947e1148411e42a2bbbefe2c8c3f596eddc5cf430688157d978fff407ee268",
+          "state_sha256": "f32f88048e67f504038a7d08fbbb500935222e34c56ff09b006d57a66c3cbd25",
+          "step": 2970
+        },
+        "update=02970.ckpt": {
+          "migrated_sha256": "227503ed50aaca7bfd6e89466bfd984648fec1cf3333768626998dc0ba43e25b",
+          "next_global_draw": 95040,
+          "original_sha256": "0b947e1148411e42a2bbbefe2c8c3f596eddc5cf430688157d978fff407ee268",
+          "state_sha256": "f32f88048e67f504038a7d08fbbb500935222e34c56ff09b006d57a66c3cbd25",
+          "step": 2970
+        }
+      },
+      "new_job_id": "7ab9790336d6c0bfe1743d636872f019493fa30cf0d60b5a3bda9439af56359d",
+      "old_job_id": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53",
+      "preserved_gpu_hours": 38.22020995651727,
+      "repair_id": "3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787"
+    },
+    "E2": {
+      "archived_CAL_count": 1,
+      "checkpoints": {
+        "last.ckpt": {
+          "migrated_sha256": "7200c41329b01e608d131fe22dbd7850ce8d38564048fee6feef413463e752d7",
+          "next_global_draw": 95040,
+          "original_sha256": "ec27201ca55cf9fbc3bd86aa600f3b847089cf559eee20c56d8b5c26734d355c",
+          "state_sha256": "4e7f31c521bdafa45e599f7d4276ef78fb80c2bb3328bf986a2044baa7f0a1ac",
+          "step": 2970
+        },
+        "update=02970.ckpt": {
+          "migrated_sha256": "3590ed0feb24915ad617c2cc6ddb08da98cfed4ed08cf0ca02e8f5eade2c42f8",
+          "next_global_draw": 95040,
+          "original_sha256": "ec27201ca55cf9fbc3bd86aa600f3b847089cf559eee20c56d8b5c26734d355c",
+          "state_sha256": "4e7f31c521bdafa45e599f7d4276ef78fb80c2bb3328bf986a2044baa7f0a1ac",
+          "step": 2970
+        }
+      },
+      "new_job_id": "1867cae900c5023fc5a5adcf34463ceb2ad2910940d893c864eb28fdd79bfec1",
+      "old_job_id": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8",
+      "preserved_gpu_hours": 37.61233685634804,
+      "repair_id": "3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787"
+    },
+    "E3": {
+      "archived_CAL_count": 1,
+      "checkpoints": {
+        "last.ckpt": {
+          "migrated_sha256": "6cb064ea51dd12e63b696a7ab99fc84ac4ae6f5737dc3860fee21fa1579725c8",
+          "next_global_draw": 95040,
+          "original_sha256": "5c0f0ddd8cc69e3c99a8f06a8e3db33c53103d8dc5efafdd4be96e8f3bf568e1",
+          "state_sha256": "54163400d1394d123eafbfa04e0a2063ab86abe444ca232b56f13c92cf00eb39",
+          "step": 2970
+        },
+        "update=02970.ckpt": {
+          "migrated_sha256": "34359a84fe00e4417acaddeca5832b2e893df997dcf6cfb2d73ad31e704cda5a",
+          "next_global_draw": 95040,
+          "original_sha256": "5c0f0ddd8cc69e3c99a8f06a8e3db33c53103d8dc5efafdd4be96e8f3bf568e1",
+          "state_sha256": "54163400d1394d123eafbfa04e0a2063ab86abe444ca232b56f13c92cf00eb39",
+          "step": 2970
+        }
+      },
+      "new_job_id": "f995d85d8888ccee3e0084e69687e63a51fdf3d6eb1ed84f43b6f9a4be11c8eb",
+      "old_job_id": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06",
+      "preserved_gpu_hours": 36.25113692113108,
+      "repair_id": "3c70ae4378557be51af09617efb359e512bf49da3b5d87d928393576cb0cc787"
+    }
+  },
+  "workers": [
+    {
+      "CAL_counts": {
+        "T1": 31,
+        "T2": 19,
+        "T3": 14,
+        "T4": 14,
+        "T5": 6
+      },
+      "CAL_delta": {
+        "S_long": 0.0,
+        "T1": 0.0,
+        "T2": 0.0,
+        "T3": 0.0,
+        "T4": 0.0,
+        "T5": 0.0
+      },
+      "CAL_matches_original_exactly": true,
+      "CAL_original": {
+        "S_long": 0.08711335559686025,
+        "T1": 0.2752308249473572,
+        "T2": 0.17812716960906982,
+        "T3": 0.09006906300783157,
+        "T4": 0.06871867924928665,
+        "T5": 0.10255232453346252
+      },
+      "CAL_recomputed": {
+        "S_long": 0.08711335559686025,
+        "T1": 0.2752308249473572,
+        "T2": 0.17812716960906982,
+        "T3": 0.09006906300783157,
+        "T4": 0.06871867924928665,
+        "T5": 0.10255232453346252
+      },
+      "CAL_recomputed_complete": true,
+      "active_phase": "train:E0:5940",
+      "arm": "E0",
+      "committed_updates": 2972,
+      "host": "192.168.100.101",
+      "job_id": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080",
+      "observed_optimizer_updates": 2987,
+      "status": "TRAIN_CAL_RUNNING"
+    },
+    {
+      "CAL_counts": {
+        "T1": 31,
+        "T2": 19,
+        "T3": 14,
+        "T4": 14,
+        "T5": 6
+      },
+      "CAL_delta": {
+        "S_long": 0.0,
+        "T1": 0.0,
+        "T2": 0.0,
+        "T3": 0.0,
+        "T4": 0.0,
+        "T5": 0.0
+      },
+      "CAL_matches_original_exactly": true,
+      "CAL_original": {
+        "S_long": 0.1000204732020696,
+        "T1": 0.2682460844516754,
+        "T2": 0.1834818422794342,
+        "T3": 0.09052760154008865,
+        "T4": 0.07365477830171585,
+        "T5": 0.1358790397644043
+      },
+      "CAL_recomputed": {
+        "S_long": 0.1000204732020696,
+        "T1": 0.2682460844516754,
+        "T2": 0.1834818422794342,
+        "T3": 0.09052760154008865,
+        "T4": 0.07365477830171585,
+        "T5": 0.1358790397644043
+      },
+      "CAL_recomputed_complete": true,
+      "active_phase": "train:E1:5940",
+      "arm": "E1",
+      "committed_updates": 2972,
+      "host": "192.168.100.102",
+      "job_id": "7ab9790336d6c0bfe1743d636872f019493fa30cf0d60b5a3bda9439af56359d",
+      "observed_optimizer_updates": 2987,
+      "status": "TRAIN_CAL_RUNNING"
+    },
+    {
+      "CAL_counts": {
+        "T1": 31,
+        "T2": 19,
+        "T3": 14,
+        "T4": 14,
+        "T5": 6
+      },
+      "CAL_delta": {
+        "S_long": 0.0,
+        "T1": 0.0,
+        "T2": 0.0,
+        "T3": 0.0,
+        "T4": 0.0,
+        "T5": 0.0
+      },
+      "CAL_matches_original_exactly": true,
+      "CAL_original": {
+        "S_long": 0.09261706223090489,
+        "T1": 0.26816537976264954,
+        "T2": 0.10436666011810303,
+        "T3": 0.08905129134654999,
+        "T4": 0.08259458094835281,
+        "T5": 0.10620531439781189
+      },
+      "CAL_recomputed": {
+        "S_long": 0.09261706223090489,
+        "T1": 0.26816537976264954,
+        "T2": 0.10436666011810303,
+        "T3": 0.08905129134654999,
+        "T4": 0.08259458094835281,
+        "T5": 0.10620531439781189
+      },
+      "CAL_recomputed_complete": true,
+      "active_phase": "train:E2:5940",
+      "arm": "E2",
+      "committed_updates": 2972,
+      "host": "192.168.100.103",
+      "job_id": "1867cae900c5023fc5a5adcf34463ceb2ad2910940d893c864eb28fdd79bfec1",
+      "observed_optimizer_updates": 2989,
+      "status": "TRAIN_CAL_RUNNING"
+    },
+    {
+      "CAL_counts": {
+        "T1": 31,
+        "T2": 19,
+        "T3": 14,
+        "T4": 14,
+        "T5": 6
+      },
+      "CAL_delta": {
+        "S_long": -0.0005247294902801514,
+        "T1": 0.0002466738224029541,
+        "T2": 0.0019383430480957031,
+        "T3": 0.0008511096239089966,
+        "T4": -0.0046615153551101685,
+        "T5": 0.0022362172603607178
+      },
+      "CAL_matches_original_exactly": false,
+      "CAL_original": {
+        "S_long": 0.14113114029169083,
+        "T1": 0.2860220968723297,
+        "T2": 0.2113572657108307,
+        "T3": 0.11506939679384232,
+        "T4": 0.09771820902824402,
+        "T5": 0.21060581505298615
+      },
+      "CAL_recomputed": {
+        "S_long": 0.14060641080141068,
+        "T1": 0.28626877069473267,
+        "T2": 0.2132956087589264,
+        "T3": 0.11592050641775131,
+        "T4": 0.09305669367313385,
+        "T5": 0.21284203231334686
+      },
+      "CAL_recomputed_complete": true,
+      "active_phase": "train:E3:5940",
+      "arm": "E3",
+      "committed_updates": 2972,
+      "host": "192.168.100.104",
+      "job_id": "f995d85d8888ccee3e0084e69687e63a51fdf3d6eb1ed84f43b6f9a4be11c8eb",
+      "observed_optimizer_updates": 2990,
+      "status": "TRAIN_CAL_RUNNING"
+    }
+  ]
+}

@@ -6,7 +6,7 @@
       "host": "192.168.100.101",
       "quota_gpu_hours": 405.84493682815446,
       "status": "TRAIN_CAL_RUNNING",
-      "updates": 0
+      "updates": 2972
     },
     {
       "SEL": [],
@@ -14,7 +14,7 @@
       "host": "192.168.100.102",
       "quota_gpu_hours": 426.1783627484042,
       "status": "TRAIN_CAL_RUNNING",
-      "updates": 0
+      "updates": 2972
     },
     {
       "SEL": [],
@@ -22,7 +22,7 @@
       "host": "192.168.100.103",
       "quota_gpu_hours": 436.36302421495185,
       "status": "TRAIN_CAL_RUNNING",
-      "updates": 0
+      "updates": 2972
     },
     {
       "SEL": [],
@@ -30,16 +30,16 @@
       "host": "192.168.100.104",
       "quota_gpu_hours": 442.24828290323205,
       "status": "TRAIN_CAL_RUNNING",
-      "updates": 0
+      "updates": 2972
     }
   ],
   "execution_mode": "SSH_CLUSTER",
   "gain": null,
   "lifetime_cap_gpu_hours": 1800.0,
-  "lifetime_gpu_hours": 81.57419497231477,
-  "live_gpu_hours": 1.0402899962001377,
+  "lifetime_gpu_hours": 234.183179158332,
+  "live_gpu_hours": 0.9222511686219109,
   "mode": "FULL_FOUR",
-  "remaining_gpu_hours": 1717.3855150314853,
+  "remaining_gpu_hours": 1564.8945696730461,
   "reserve_gpu_hours": 8.0,
   "scientific_status": "IN_PROGRESS_OR_NOT_STARTED",
   "seed46_formal_profile": "NOT_RUN"

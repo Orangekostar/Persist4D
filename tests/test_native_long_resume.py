@@ -2,12 +2,14 @@
 
 from pathlib import Path
 
+import pytest
 import pytorch_lightning as pl
 import torch
 from omegaconf import OmegaConf
 from torch.utils.data import DataLoader, Dataset
 
 from datasets.native_long_dataset import GlobalDrawSampler
+from scripts.native_long_execution import UpdateBoundary
 from trainer.native_long_trainer import NativeLongTrainer
 from trainer.task_memory_trainer import restore_task_memory_rng_state
 
@@ -61,11 +63,11 @@ class ResumeFixture(NativeLongTrainer):
         pass
 
 
-def fit(model, steps, path=None):
+def fit(model, steps, path=None, callbacks=None):
     trainer = pl.Trainer(accelerator="cpu", devices=1, max_steps=steps, max_epochs=-1,
                          accumulate_grad_batches=16, logger=False, enable_checkpointing=False,
                          enable_progress_bar=False, enable_model_summary=False,
-                         num_sanity_val_steps=0)
+                         num_sanity_val_steps=0, callbacks=callbacks)
     trainer.fit(model, ckpt_path=str(path) if path else None, weights_only=False)
     return trainer
 
@@ -87,3 +89,45 @@ def test_optimizer_boundary_resume_preserves_draw_lr_and_parameters(tmp_path: Pa
     assert full.optimizers[0].param_groups[0]["lr"] == final.optimizers[0].param_groups[0]["lr"]
     assert full.lr_scheduler_configs[0].scheduler.state_dict() == final.lr_scheduler_configs[0].scheduler.state_dict()
     assert all(torch.equal(v, resumed.state_dict()[k]) for k, v in continuous.state_dict().items())
+
+
+@pytest.mark.parametrize("budget_stop", [False, True])
+def test_resumed_callback_waits_for_next_optimizer_boundary(tmp_path, budget_stop):
+    torch.manual_seed(45)
+    continuous = ResumeFixture()
+    full = fit(continuous, 4)
+    torch.manual_seed(45)
+    first = ResumeFixture()
+    split = fit(first, 2)
+    checkpoint = tmp_path / "boundary.ckpt"
+    split.save_checkpoint(checkpoint)
+    resumed = ResumeFixture()
+    callback = UpdateBoundary(tmp_path, "E0", 45, 4)
+    if budget_stop:
+        callback.gpu_hour_limit = .001
+    final = fit(resumed, 4, checkpoint, [callback])
+    expected = 3 if budget_stop else 4
+    assert final.global_step == expected
+    assert first.draws + resumed.draws == list(range(expected * 32))
+    saved = torch.load(tmp_path / "training/E0/seed45/last.ckpt", weights_only=False)
+    assert saved["global_step"] == expected
+    assert saved["native_long_resume"]["next_global_draw"] == expected * 32
+    assert saved["lr_schedulers"][0]["last_epoch"] == expected
+    if not budget_stop:
+        assert full.lr_scheduler_configs[0].scheduler.state_dict() == final.lr_scheduler_configs[0].scheduler.state_dict()
+        assert all(torch.equal(v, resumed.state_dict()[k]) for k, v in continuous.state_dict().items())
+
+
+def test_periodic_checkpoint_resume_with_actual_lightning_callback(tmp_path):
+    torch.manual_seed(45)
+    first = ResumeFixture()
+    split = fit(first, 990)
+    checkpoint = tmp_path / "periodic.ckpt"
+    split.save_checkpoint(checkpoint)
+    resumed = ResumeFixture()
+    final = fit(resumed, 992, checkpoint, [UpdateBoundary(tmp_path, "E0", 45, 992)])
+    assert final.global_step == 992
+    assert first.draws + resumed.draws == list(range(992 * 32))
+    saved = torch.load(tmp_path / "training/E0/seed45/last.ckpt", weights_only=False)
+    assert saved["global_step"] == saved["lr_schedulers"][0]["last_epoch"] == 992
+    assert saved["native_long_resume"]["next_global_draw"] == 992 * 32

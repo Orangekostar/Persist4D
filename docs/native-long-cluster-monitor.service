@@ -1,0 +1,22 @@
+[Unit]
+Description=Persist4D native long cluster controller
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=/home/ww/persist4d_runs/native_long_retrain_v1/cluster/controller-code-resume-v3
+Environment=CUDA_VISIBLE_DEVICES=
+Environment=OMP_NUM_THREADS=2
+Environment=MKL_NUM_THREADS=2
+Environment=OPENBLAS_NUM_THREADS=2
+Environment=PYTHONPATH=/home/ww/persist4d_runs/native_long_retrain_v1/cluster/controller-code-resume-v3
+ExecStart=/home/ww/miniconda3/envs/persist4d/bin/python -u -m scripts.native_long_cluster watch --root /home/ww/persist4d_runs/native_long_retrain_v1
+ExecStartPost=/home/ww/miniconda3/envs/persist4d/bin/python -c "import sys; from pathlib import Path; from scripts.native_long_budget import write_json_atomic; write_json_atomic(Path('/home/ww/persist4d_runs/native_long_retrain_v1/cluster/MONITOR_PID.json'), {'pid': int(sys.argv[1]), 'manager': 'systemd-user', 'service': 'persist4d-native-long-cluster.service', 'status': 'RUNNING'})" ${MAINPID}
+Restart=on-failure
+RestartSec=15
+TimeoutStopSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
