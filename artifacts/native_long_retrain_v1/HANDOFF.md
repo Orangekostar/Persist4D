@@ -6,7 +6,7 @@
 当前结果见[实验报告](../native_long_postselection_v1/REPORT.md)及
 [逐项验收](../native_long_postselection_v1/REQUIREMENT_REVIEW.md)。
 新分支为`research/persist4d-cvpr-evidence-20261011`，新tag为`persist4d-cvpr-evidence-20261011-v1`。
-实验A与交接、下载和复现命令见[本轮最终交接](../native_long_postselection_v1/HANDOFF.md)。
+实验A为`8146b95de8b0973814bf1adb213f65a86f0ee286`。交接、下载和复现命令见[本轮最终交接](../native_long_postselection_v1/HANDOFF.md)。
 原训练控制器和全部评估队列正常结束，已无活动GPU任务。
 实际远端提交SHA由仓库外最终发布回执记录；本页不嵌入自身提交SHA。
 

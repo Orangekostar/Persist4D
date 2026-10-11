@@ -1,0 +1,824 @@
+{
+  "branch": "research/persist4d-cvpr-evidence-20261011",
+  "created_utc": "2026-10-11T05:54:41.741459+00:00",
+  "cvpr_readiness": "NOT_READY_FOR_CVPR",
+  "excludes": [
+    "artifacts/native_long_postselection_v1/ARTIFACT_MANIFEST.json"
+  ],
+  "experiment_commit_a": "8146b95de8b0973814bf1adb213f65a86f0ee286",
+  "file_count": 134,
+  "files": [
+    {
+      "bytes": 676,
+      "path": ".gitattributes",
+      "sha256": "a178e725d435049fb5a34b0b39958323ead1cf3f02a5213bd5e5f8cd45cd5a04",
+      "storage": "git"
+    },
+    {
+      "bytes": 462404,
+      "path": "artifacts/native_long_postselection_v1/ANALYSIS.json",
+      "sha256": "9ffa29ddee06b4c0251ffc30c231fb912d1bfec3440c303bba67d7db14f195ec",
+      "storage": "git"
+    },
+    {
+      "bytes": 153786,
+      "path": "artifacts/native_long_postselection_v1/BY_REFERENCE.csv",
+      "sha256": "55f728fc8b381ae16a9e5f874b000453ee21b7514c9f44cf29eaa66d8eefc0c3",
+      "storage": "git"
+    },
+    {
+      "bytes": 8178,
+      "path": "artifacts/native_long_postselection_v1/CAL_ALL.csv",
+      "sha256": "a54715d4eb5f3fed4409a19d082ae9191d8395d2f02eba5d606da78c7e6c5ab5",
+      "storage": "git"
+    },
+    {
+      "bytes": 4256,
+      "path": "artifacts/native_long_postselection_v1/CODE_BINDINGS.md",
+      "sha256": "8111ad2fcd69438fb16af3212ec3474cf33b988ee8281eb8bec4f2c302159f8b",
+      "storage": "git"
+    },
+    {
+      "bytes": 8874,
+      "path": "artifacts/native_long_postselection_v1/FEEDBACK_PAIRS.csv",
+      "sha256": "475b94ebda9e054feecd455bc8ed2acc214a13b7a73c2adbbb47c69b54f4f9ff",
+      "storage": "git"
+    },
+    {
+      "bytes": 110781,
+      "path": "artifacts/native_long_postselection_v1/FEEDBACK_STAGE_DIFFERENCES.csv",
+      "sha256": "deed364cf7e790eeb07aae500c3ffe97259ad66731db822cb2ae5b58e5090a70",
+      "storage": "git"
+    },
+    {
+      "bytes": 45106,
+      "path": "artifacts/native_long_postselection_v1/FORMAL_BY_REFERENCE.csv",
+      "sha256": "c12245b6d55869a31e937de5066dfac190c7d3be3a133fad03dc5821b5130b68",
+      "storage": "git"
+    },
+    {
+      "bytes": 1693,
+      "path": "artifacts/native_long_postselection_v1/FORMAL_DELTAS.csv",
+      "sha256": "340b1408b7d8a87183afa11ca28781f0536d5b7f2d9c66284161fad434c25d68",
+      "storage": "git"
+    },
+    {
+      "bytes": 2039,
+      "path": "artifacts/native_long_postselection_v1/FORMAL_METRICS.csv",
+      "sha256": "1dd820483a6bd01b3c39c8cca86e8ef86f1c3266a4bb090914c99ef867c2270d",
+      "storage": "git"
+    },
+    {
+      "bytes": 755,
+      "path": "artifacts/native_long_postselection_v1/FORMAL_PLAN.json",
+      "sha256": "a3240f887479cd10e0ae099aec43666b73494cb5cc8478c49a30a466784e285b",
+      "storage": "git"
+    },
+    {
+      "bytes": 1138,
+      "path": "artifacts/native_long_postselection_v1/GRADIENT_GROUPS.csv",
+      "sha256": "4c0d4c63bc118a18fbe00fa54e7b6af0f0510c1df345e16140e12e27f051d417",
+      "storage": "git"
+    },
+    {
+      "bytes": 4390,
+      "path": "artifacts/native_long_postselection_v1/HANDOFF.md",
+      "sha256": "c7da22c0d3f10005656a06a2eab868010d8164c276bdb80dd77e2311ed79519a",
+      "storage": "git"
+    },
+    {
+      "bytes": 18141,
+      "path": "artifacts/native_long_postselection_v1/MECHANISM_BY_REFERENCE.csv",
+      "sha256": "b031bc68ddf37e40aacc1efbc088749c3e4aaabfa9d9f44e64db6f123009076d",
+      "storage": "git"
+    },
+    {
+      "bytes": 7366,
+      "path": "artifacts/native_long_postselection_v1/MECHANISM_METRICS.csv",
+      "sha256": "8c5bc6458e9f7360c7a86d5116fdeb2f1cc70f470d8d7f4abcffc99ca84c01f4",
+      "storage": "git"
+    },
+    {
+      "bytes": 40880,
+      "path": "artifacts/native_long_postselection_v1/MEMORY_BY_REFERENCE.csv",
+      "sha256": "ab2e7281f746b47c5fc151e1b404b629d12cad05ec306b943e1204eca0e7b707",
+      "storage": "git"
+    },
+    {
+      "bytes": 110,
+      "path": "artifacts/native_long_postselection_v1/MEMORY_CAPACITY.csv",
+      "sha256": "25397391fd673c4f19611c41c06393542af617085e5f7c33f953e39a4a8770d6",
+      "storage": "git"
+    },
+    {
+      "bytes": 6721,
+      "path": "artifacts/native_long_postselection_v1/MEMORY_METRICS.csv",
+      "sha256": "af89cf8ce806c54dfe3e560c5d09d4bd2584c0ba555d10f72b08c99c653a7fc9",
+      "storage": "git"
+    },
+    {
+      "bytes": 8177,
+      "path": "artifacts/native_long_postselection_v1/MEMORY_PAIRED_IDENTITY.csv",
+      "sha256": "fc9703136debf2b34aca18b39bc9e1af5eff25a6b8c4f54a068276adefc9bb5a",
+      "storage": "git"
+    },
+    {
+      "bytes": 11121,
+      "path": "artifacts/native_long_postselection_v1/MEMORY_PROFILE.csv",
+      "sha256": "4f2e4901eca966a6f4afc811492f11adb641a30eb6e899d614aeada125cf6200",
+      "storage": "git"
+    },
+    {
+      "bytes": 2200,
+      "path": "artifacts/native_long_postselection_v1/MEMORY_RAW_CURRENT.csv",
+      "sha256": "6275e25c42b6fb143a186d1c27050f3719f7c571738d65f29bbcb96eb52e9e5e",
+      "storage": "git"
+    },
+    {
+      "bytes": 92373,
+      "path": "artifacts/native_long_postselection_v1/NESTED_PREFIX.csv",
+      "sha256": "ef103ca8124877ac87d179fe75359a36102af2fa9f7a15963b567c3294dcd07d",
+      "storage": "git"
+    },
+    {
+      "bytes": 6304,
+      "path": "artifacts/native_long_postselection_v1/PAIRED_DELTAS.csv",
+      "sha256": "39ddb3e8ee1a2945c7613c1c424324196fccaff7b606a6b63a52dc3796d9c459",
+      "storage": "git"
+    },
+    {
+      "bytes": 5340,
+      "path": "artifacts/native_long_postselection_v1/PROFILE.csv",
+      "sha256": "53c1d0251d86f5d84c04cf54830793f1c9bb352e5fbcae7e715efe31632ab8fc",
+      "storage": "git"
+    },
+    {
+      "bytes": 14502,
+      "path": "artifacts/native_long_postselection_v1/PROFILE_RAW.csv",
+      "sha256": "38d3644ae046d98456686122845cdfff1bf0a329a1e5a7dc1cda1c2f4fe8e351",
+      "storage": "git"
+    },
+    {
+      "bytes": 545,
+      "path": "artifacts/native_long_postselection_v1/PROFILE_SETUP.csv",
+      "sha256": "607a582bc61c8752cc4f9f0e02cf37c1dcb57b7de825445aa78919be6eacad84",
+      "storage": "git"
+    },
+    {
+      "bytes": 12178,
+      "path": "artifacts/native_long_postselection_v1/REPORT.md",
+      "sha256": "f550a745b5f83393d6fd0489f3403324fa6fa583c8182ad867e0424c74f7b020",
+      "storage": "git"
+    },
+    {
+      "bytes": 4800,
+      "path": "artifacts/native_long_postselection_v1/REQUIREMENT_REVIEW.md",
+      "sha256": "3eceb7e90b7ffb1a9e7b5a2e6d88da5394f779072f0cda91239b2c1ba5385f04",
+      "storage": "git"
+    },
+    {
+      "bytes": 55643,
+      "path": "artifacts/native_long_postselection_v1/SAMPLING.csv",
+      "sha256": "5f80a82a53938e7f1064296e03c8ddfacfc4536f66cb7ce2e14d63f471cd79ea",
+      "storage": "git"
+    },
+    {
+      "bytes": 1289,
+      "path": "artifacts/native_long_postselection_v1/SEL_LOCKED.csv",
+      "sha256": "329449d29d006d3aa5f2afb5e9e374f4cf81e75e0877fa46f3387ed8fa4967c0",
+      "storage": "git"
+    },
+    {
+      "bytes": 24405,
+      "path": "artifacts/native_long_postselection_v1/SHORTLIST.json",
+      "sha256": "d6a3e9ade77faaee9a96b0d542341aa8d78865e9bbff8666ff4d76471deeaf70",
+      "storage": "git"
+    },
+    {
+      "bytes": 93836,
+      "path": "artifacts/native_long_postselection_v1/TRAINING_LOSS.csv",
+      "sha256": "fedc3ec9755f2eabed91627338e47823bac1273d18996bfa53549191d396b94a",
+      "storage": "git"
+    },
+    {
+      "bytes": 20407,
+      "path": "artifacts/native_long_postselection_v1/deployment/E0-05940.json",
+      "sha256": "dd0c987648adb2bdb1e4ba94b03104570afb41278aaa2cb3eb553e3617155dcf",
+      "storage": "git"
+    },
+    {
+      "bytes": 106906589,
+      "path": "artifacts/native_long_postselection_v1/deployment/E0-05940.pt",
+      "sha256": "16822b8c35803dac30f99af32bc6105f49b67bcb6ae43e9951e9b6e623626a6f",
+      "storage": "git-lfs"
+    },
+    {
+      "bytes": 20407,
+      "path": "artifacts/native_long_postselection_v1/deployment/E1-02970.json",
+      "sha256": "1e238f1c06b6384dddef9160b0cdadf5525821395fe52c4a610c6c4c8fc36f29",
+      "storage": "git"
+    },
+    {
+      "bytes": 106906589,
+      "path": "artifacts/native_long_postselection_v1/deployment/E1-02970.pt",
+      "sha256": "1ded877d95842202055eaedd64bff239c49da709fa5cd5a6421c3b87b6e989ef",
+      "storage": "git-lfs"
+    },
+    {
+      "bytes": 20405,
+      "path": "artifacts/native_long_postselection_v1/deployment/E1-23760.json",
+      "sha256": "fdef22769103faa95d28e46548221259acabf35eaccc5819837ddfef72c40fb6",
+      "storage": "git"
+    },
+    {
+      "bytes": 106906589,
+      "path": "artifacts/native_long_postselection_v1/deployment/E1-23760.pt",
+      "sha256": "8c9d0d57044ce23c7964ddb1e7a2d8bd18e388e6ee657a7f4b02b1368b5b3a98",
+      "storage": "git-lfs"
+    },
+    {
+      "bytes": 20412,
+      "path": "artifacts/native_long_postselection_v1/deployment/E2-29700.json",
+      "sha256": "3d8d414905607341fb0f9846a3fd2d5e9f6a50df3b0297823168531ffb2a0cb8",
+      "storage": "git"
+    },
+    {
+      "bytes": 106906589,
+      "path": "artifacts/native_long_postselection_v1/deployment/E2-29700.pt",
+      "sha256": "83b701e6259559c6b331cece7382e645dc807968184b70586f291b3475d59dc6",
+      "storage": "git-lfs"
+    },
+    {
+      "bytes": 20406,
+      "path": "artifacts/native_long_postselection_v1/deployment/E3-02970.json",
+      "sha256": "b8da2774e84d6b16ed69eff44b3f2b95c554128c6c4aa5649a87abf3dc5db128",
+      "storage": "git"
+    },
+    {
+      "bytes": 107705167,
+      "path": "artifacts/native_long_postselection_v1/deployment/E3-02970.pt",
+      "sha256": "7eef8600daf76356c2743b4da961fdf7d49abbd077b3d44763d7a2b3db22486a",
+      "storage": "git-lfs"
+    },
+    {
+      "bytes": 1004,
+      "path": "artifacts/native_long_postselection_v1/deployment/LFS_MODEL_DOWNLOAD_RECEIPT.json",
+      "sha256": "8e23389f44ecc05717bdad12c47985fe2494f5fcbff08c2dd73903abba514ed5",
+      "storage": "git"
+    },
+    {
+      "bytes": 2649,
+      "path": "artifacts/native_long_postselection_v1/deployment/MODEL_ASSET_MANIFEST.json",
+      "sha256": "50154c0b95466fe9d1d2d635177ed5d0b7f35ddffae355deb5a33c2416c64ab7",
+      "storage": "git"
+    },
+    {
+      "bytes": 2698,
+      "path": "artifacts/native_long_postselection_v1/deployment/PORTABLE_ASSET_AUDIT.json",
+      "sha256": "208d0389bf7eacb973958ac377da72c698d78f0081612893cccbe1e40ea79c82",
+      "storage": "git"
+    },
+    {
+      "bytes": 3530,
+      "path": "artifacts/native_long_postselection_v1/deployment/README.md",
+      "sha256": "bbc5f76f5ee7382800ba8a554ecdbbda0b3c707e44619dbcb4eb2c5d46f06147",
+      "storage": "git"
+    },
+    {
+      "bytes": 427,
+      "path": "artifacts/native_long_postselection_v1/deployment/rio.yaml",
+      "sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+      "storage": "git"
+    },
+    {
+      "bytes": 362652,
+      "path": "artifacts/native_long_postselection_v1/evidence/BRIDGE_AUDIT.json",
+      "sha256": "1d6926b90ece1e98ba2963ed1674749b524887ec6d88681edec470b3a8b8596a",
+      "storage": "git"
+    },
+    {
+      "bytes": 1362,
+      "path": "artifacts/native_long_postselection_v1/evidence/COST_AUDIT.json",
+      "sha256": "3e4bf6633bf7510a67f27891157be46264f6eea5f1066a3876b43dea53bb5e92",
+      "storage": "git"
+    },
+    {
+      "bytes": 40222,
+      "path": "artifacts/native_long_postselection_v1/evidence/COST_LEDGER_POSTSELECTION.jsonl",
+      "sha256": "aab9929b5af57182afc57a53c5cd7d94f6ecbf8bf45f0e869a1a0bbbc6ea5387",
+      "storage": "git"
+    },
+    {
+      "bytes": 1217,
+      "path": "artifacts/native_long_postselection_v1/evidence/ENVIRONMENT_SOURCES.json",
+      "sha256": "5edd91bc792acd86d7ccc309692c4ce75ad81217104ce3a1769e772b84d1eeae",
+      "storage": "git"
+    },
+    {
+      "bytes": 156000,
+      "path": "artifacts/native_long_postselection_v1/evidence/FORMAL_AUDIT.json",
+      "sha256": "8d34b44e99cf62ce38eae18f5359d81312e9a85730f2b774d949f3bcdb64ef13",
+      "storage": "git"
+    },
+    {
+      "bytes": 1051,
+      "path": "artifacts/native_long_postselection_v1/evidence/FRESH_PROCESS_RUNTIME_LIMITATION.json",
+      "sha256": "64ce98d1fd3a9aa4b7bab25a4f28e44a5feced4d065b5a94270d53618fffbd25",
+      "storage": "git"
+    },
+    {
+      "bytes": 463,
+      "path": "artifacts/native_long_postselection_v1/evidence/LFS_STATISTICS_DOWNLOAD_RECEIPT.json",
+      "sha256": "d7e3748cf314c901106cf841ca81801e3adb8194fbb293ad72b09fa72fd38fb3",
+      "storage": "git"
+    },
+    {
+      "bytes": 78827,
+      "path": "artifacts/native_long_postselection_v1/evidence/MEASUREMENT_RECORDS_MANIFEST.json",
+      "sha256": "44fd52339924266f86115f76695ba720ae0939b89ff306f70bf09805390501c7",
+      "storage": "git"
+    },
+    {
+      "bytes": 761100,
+      "path": "artifacts/native_long_postselection_v1/evidence/MECHANISM_AUDIT.json",
+      "sha256": "a9fa2a1636b47403c069b94199730fb7b88db1368d258a49dd8a2b5041bb66a7",
+      "storage": "git"
+    },
+    {
+      "bytes": 1871,
+      "path": "artifacts/native_long_postselection_v1/evidence/MECHANISM_CONNECTIVITY.json",
+      "sha256": "9938dc46a5e5ec0e14c966b29c55b663d9adde5094a886a4bf9f47b1f465e257",
+      "storage": "git"
+    },
+    {
+      "bytes": 1807,
+      "path": "artifacts/native_long_postselection_v1/evidence/MECHANISM_PAIR_MISMATCH_DIAGNOSTIC.json",
+      "sha256": "d28c57e9a2fcb71ea7bfd3f431ce5672d73660c4ae11eeaa8c8e5810faff25a0",
+      "storage": "git"
+    },
+    {
+      "bytes": 236114,
+      "path": "artifacts/native_long_postselection_v1/evidence/MECHANISM_REPLAY_AUDIT.json",
+      "sha256": "1bc0868848784fac2ea1664e9af8422503b7a6df448befe20c63242ebf99ad32",
+      "storage": "git"
+    },
+    {
+      "bytes": 2004,
+      "path": "artifacts/native_long_postselection_v1/evidence/NUMERICAL_PRECISION_SCOPE.json",
+      "sha256": "881529a201e6bc9076fdb50df0103f69c15784e72521ef11a2d48e38bcb38032",
+      "storage": "git"
+    },
+    {
+      "bytes": 509344,
+      "path": "artifacts/native_long_postselection_v1/evidence/OFFICIAL_METRIC_STATES_MANIFEST.json",
+      "sha256": "22e1eb9d193b7911c6c5f51e3cacff17c4166d3a11640369a69473d041e2a6f5",
+      "storage": "git"
+    },
+    {
+      "bytes": 5643,
+      "path": "artifacts/native_long_postselection_v1/evidence/README.md",
+      "sha256": "e8e1926968e8352fd4892f32b376ee4cf15b8a5c8796f62922eee61d99dd5952",
+      "storage": "git"
+    },
+    {
+      "bytes": 58701,
+      "path": "artifacts/native_long_postselection_v1/evidence/RUNTIME_AUDIT.json",
+      "sha256": "54ae680b4ef4610601b73b77fa35ff141443256d3de0f9e1269903d550f91201",
+      "storage": "git"
+    },
+    {
+      "bytes": 808,
+      "path": "artifacts/native_long_postselection_v1/evidence/SELECTED_CHECKPOINT_CURRICULUM.json",
+      "sha256": "34c0f9880ee78a159c9e1b9f893ca0789d427d10c25f3cb137aded8a22cfa121",
+      "storage": "git"
+    },
+    {
+      "bytes": 13362,
+      "path": "artifacts/native_long_postselection_v1/evidence/TRAINING_LOG_COLLECTION_AUDIT.json",
+      "sha256": "ff48e8eb429737a5a588088f4c1dc7633ed800b336454694fe166634de493214",
+      "storage": "git"
+    },
+    {
+      "bytes": 20278,
+      "path": "artifacts/native_long_postselection_v1/evidence/TRAINING_LOG_MANIFEST.json",
+      "sha256": "440a9f35ed6184fa8ea476eb18276c724d4d62e218dc0865517ee4f27cf3da49",
+      "storage": "git"
+    },
+    {
+      "bytes": 3782,
+      "path": "artifacts/native_long_postselection_v1/evidence/TRAINING_MECHANISM_TRACE_AUDIT.json",
+      "sha256": "f92de7405dc38c7dc6a6c2baa40b5c437b7733ca839e5f73fb942dd53a5cb013",
+      "storage": "git"
+    },
+    {
+      "bytes": 1523,
+      "path": "artifacts/native_long_postselection_v1/evidence/VALIDATION.json",
+      "sha256": "e07faf8e80162c0810e516c63db399cbc8344f32e829ba886c98aeda17f9bf23",
+      "storage": "git"
+    },
+    {
+      "bytes": 4286468,
+      "path": "artifacts/native_long_postselection_v1/evidence/measurement_records.zip",
+      "sha256": "e4b304c142121d856aaf72b5192dde7ee7d936954db0b1b311e05866afb9e0a8",
+      "storage": "git"
+    },
+    {
+      "bytes": 76909444,
+      "path": "artifacts/native_long_postselection_v1/evidence/official_metric_states.zip",
+      "sha256": "bd828bf241e1540a49b7762d59b20e918f9ae7f9dcbcfaaeff73df0606a911e2",
+      "storage": "git-lfs"
+    },
+    {
+      "bytes": 8866709,
+      "path": "artifacts/native_long_postselection_v1/evidence/training_logs.zip",
+      "sha256": "d1c61cc0a0dbc6fcc689f1af55efd0a9383f7782d27812ae517fece32c7b110c",
+      "storage": "git"
+    },
+    {
+      "bytes": 301511,
+      "path": "artifacts/native_long_postselection_v1/protocol/BRIDGE_CPU_ALIGNMENT.json",
+      "sha256": "6ae45d2d1f88e73fac6d3ac91a57c5f77d59dad077a08554c9f3b076433119cb",
+      "storage": "git"
+    },
+    {
+      "bytes": 18629,
+      "path": "artifacts/native_long_postselection_v1/protocol/BRIDGE_PLAN.json",
+      "sha256": "d9673bfeef1c45019a50bda54661210bab2fe3ae6cd222210342debf75131515",
+      "storage": "git"
+    },
+    {
+      "bytes": 33459,
+      "path": "artifacts/native_long_postselection_v1/protocol/BUDGET_LOCK.json",
+      "sha256": "ba1cdf28e8c057315f7a883d43490e2a41e1d1f94f7d566d515f03f72f5d9c5d",
+      "storage": "git"
+    },
+    {
+      "bytes": 663,
+      "path": "artifacts/native_long_postselection_v1/protocol/CAL_LOCK.json",
+      "sha256": "9f8ab1fb98fb9186755d18ff588fa552a82b41d0b2afec8c2bf48993e9104b85",
+      "storage": "git"
+    },
+    {
+      "bytes": 809,
+      "path": "artifacts/native_long_postselection_v1/protocol/FORMAL_LOCK.json",
+      "sha256": "b045ef1ce3b9e7ac363e5e45595d27fa294a2d1d19573e333e4dcc3efd522a82",
+      "storage": "git"
+    },
+    {
+      "bytes": 818004,
+      "path": "artifacts/native_long_postselection_v1/protocol/FORMAL_POPULATION.json",
+      "sha256": "6af1cdc5a7ce9160178425839f38887b3e4c10d9ca369ac8425efb1518b7b944",
+      "storage": "git"
+    },
+    {
+      "bytes": 14211,
+      "path": "artifacts/native_long_postselection_v1/protocol/MECHANISM_CPU_PREFLIGHT.json",
+      "sha256": "fb510e340a0c3fad5d7b7ffcd3e89575fc8aacd337403f06347cb2826c1c339b",
+      "storage": "git"
+    },
+    {
+      "bytes": 96333,
+      "path": "artifacts/native_long_postselection_v1/protocol/MECHANISM_PLAN.json",
+      "sha256": "027111798bc74aa727af45bf1e569ecb34a6c172f2fa9467a9e9a7289c534154",
+      "storage": "git"
+    },
+    {
+      "bytes": 32403,
+      "path": "artifacts/native_long_postselection_v1/protocol/MECHANISM_REPLAY_PLAN.json",
+      "sha256": "c7f44fdf120df328742ac04e1970118325f38ac72c83442e9446193adfb4b06e",
+      "storage": "git"
+    },
+    {
+      "bytes": 394172,
+      "path": "artifacts/native_long_postselection_v1/protocol/POPULATION.json",
+      "sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8",
+      "storage": "git"
+    },
+    {
+      "bytes": 4038,
+      "path": "artifacts/native_long_postselection_v1/protocol/RUNTIME_PLAN.json",
+      "sha256": "26b34937f657c07ed20bd0c7e5d98c62c035b2f73503972f980cdf9e7f354898",
+      "storage": "git"
+    },
+    {
+      "bytes": 316456,
+      "path": "artifacts/native_long_postselection_v1/protocol/SOURCE_AND_INITIALIZATION.json",
+      "sha256": "688d57326e785e40110fc749cadb3c0b840e911751883c06877e3dc29bd125ee",
+      "storage": "git"
+    },
+    {
+      "bytes": 652,
+      "path": "artifacts/native_long_retrain_v1/ARTIFACT_MANIFEST.json",
+      "sha256": "5a21a738194109fb2cd22083be396837336cc16cf462575e83c11ed516e21535",
+      "storage": "git"
+    },
+    {
+      "bytes": 1075,
+      "path": "artifacts/native_long_retrain_v1/FINAL_REPORT.md",
+      "sha256": "306f5ff00b782c89dc635148785797602c6433aa303c364a9e7b586a6ae13c42",
+      "storage": "git"
+    },
+    {
+      "bytes": 1098,
+      "path": "artifacts/native_long_retrain_v1/HANDOFF.md",
+      "sha256": "b546b1a4846f53701eed8a3daaabb5ff7d98ac6a46f31151ed1df8f2d26760e5",
+      "storage": "git"
+    },
+    {
+      "bytes": 677,
+      "path": "artifacts/native_long_retrain_v1/REQUIREMENT_REVIEW.md",
+      "sha256": "1c57d33317be019b10896ccba106a0227f900ee890b8f83d39528dcd35ab34be",
+      "storage": "git"
+    },
+    {
+      "bytes": 1730,
+      "path": "artifacts/native_long_retrain_v1/RUNTIME_NOTE.md",
+      "sha256": "ce3c276a7b8218f382617e63e544bd38381b3bbf18a224602ebdc5a12886bf71",
+      "storage": "git"
+    },
+    {
+      "bytes": 7801,
+      "path": "ccfa-review-reports/2026-10-11-cvpr-readiness.md",
+      "sha256": "08c40d98151bc94cef32f311f2fa063fa64309c3e2621187178c682229a93c16",
+      "storage": "git"
+    },
+    {
+      "bytes": 6601,
+      "path": "docs/superpowers/plans/2026-10-11-cvpr-evidence-closure.md",
+      "sha256": "478f17fae4340636a1adec8cf3903dae4b414b0be686868dd8bdaba79ea76b31",
+      "storage": "git"
+    },
+    {
+      "bytes": 4664,
+      "path": "docs/superpowers/specs/2026-10-11-cvpr-evidence-closure-design.md",
+      "sha256": "45bdaf64444723744a7a3b3c47129a67ac8b68027a8e79504a176d23a710d37e",
+      "storage": "git"
+    },
+    {
+      "bytes": 5342,
+      "path": "docs/superpowers/specs/2026-10-11-trained-mechanism-diagnostics.md",
+      "sha256": "579d3e9fb2c51190328b8348c598bdfab500e669bff4043653e6f4a7544412a8",
+      "storage": "git"
+    },
+    {
+      "bytes": 5613,
+      "path": "docs/superpowers/specs/2026-10-11-trained-memory-bridge.md",
+      "sha256": "fa8f83d630ff81e5658e59cf5c03ecdb52d953bdc1d1c1e00710d05f1e2ec45c",
+      "storage": "git"
+    },
+    {
+      "bytes": 56,
+      "path": "manuscript_updates/native_long/.gitignore",
+      "sha256": "7ac865d0bdb49ce8b7c9d4d1e96dd6d0821c633ff0c805db4e37958190d2675a",
+      "storage": "git"
+    },
+    {
+      "bytes": 1941,
+      "path": "manuscript_updates/native_long/EVIDENCE_BINDINGS.json",
+      "sha256": "ad126041b62ee26bc9ceded195a80991b9497af554b95466951b7b6363d24209",
+      "storage": "git"
+    },
+    {
+      "bytes": 1770,
+      "path": "manuscript_updates/native_long/README.md",
+      "sha256": "ee14d4e37a0350ecbcf31cc1b462477c01d50f68be21ce4fa81e943c9c77bdb3",
+      "storage": "git"
+    },
+    {
+      "bytes": 771,
+      "path": "manuscript_updates/native_long/formal_table.tex",
+      "sha256": "262c5b6415501fa92b788ebb6e4641a226753bea523e91b6ee80a42db4ffcade",
+      "storage": "git"
+    },
+    {
+      "bytes": 286121,
+      "path": "manuscript_updates/native_long/main.pdf",
+      "sha256": "28b5817c38a6445af904a642a4dc07e294ea31fd0e48de1b9f6e2fe4e2f02b08",
+      "storage": "git"
+    },
+    {
+      "bytes": 9168,
+      "path": "manuscript_updates/native_long/main.tex",
+      "sha256": "52aae77cc802eba6fdbfb2758632d3c1dcc0f38df03da316d2dfc53fae198ab8",
+      "storage": "git"
+    },
+    {
+      "bytes": 2495,
+      "path": "manuscript_updates/native_long/mechanism_results.tex",
+      "sha256": "9558ddf79aac535c9f238258ce1d440a3c29886445d3e33fa14db9ea0b292af8",
+      "storage": "git"
+    },
+    {
+      "bytes": 827,
+      "path": "manuscript_updates/native_long/references.bib",
+      "sha256": "af9e41ec4817826eb9c1eb5a7a90162794eb011ca4cbba99f2b9f16cce17a217",
+      "storage": "git"
+    },
+    {
+      "bytes": 1232,
+      "path": "manuscript_updates/native_long/runtime_repeat_results.tex",
+      "sha256": "88cb22b254d46db4470be78de9c6fd6d6e33e084d5414b825d80e6ab3b729c9f",
+      "storage": "git"
+    },
+    {
+      "bytes": 2559,
+      "path": "manuscript_updates/native_long/trained_memory_results.tex",
+      "sha256": "e068d304a34c4de2e2ad4935e8ccc1272aa888f39a498ac734b1aac0d44fbe8d",
+      "storage": "git"
+    },
+    {
+      "bytes": 17127,
+      "path": "scripts/native_long_bridge_audit.py",
+      "sha256": "618dc464b3dbf00613442c238b6cf5712a130091e749318d2d617822748e55ee",
+      "storage": "git"
+    },
+    {
+      "bytes": 11854,
+      "path": "scripts/native_long_confirmation.py",
+      "sha256": "000f6a1e5b6925533dc9f15c7fef38fb723ccbe34cedfd9c7cc16fefc74cc749",
+      "storage": "git"
+    },
+    {
+      "bytes": 9187,
+      "path": "scripts/native_long_confirmation_audit.py",
+      "sha256": "88293b79fcae417e669bcd3a5f585f004c6b3bb0cab4b58a96e9364782adbfcf",
+      "storage": "git"
+    },
+    {
+      "bytes": 10855,
+      "path": "scripts/native_long_confirmation_inference.py",
+      "sha256": "bbd8314db14f41343d12137d00fd2ff7d15de8bb857cc09f2c6fe7dc50d0af26",
+      "storage": "git"
+    },
+    {
+      "bytes": 4599,
+      "path": "scripts/native_long_confirmation_worker.py",
+      "sha256": "6a511b2880eab4f5c68633e1aaec5171e81fac226e817fc43b3a21f63649c769",
+      "storage": "git"
+    },
+    {
+      "bytes": 8706,
+      "path": "scripts/native_long_delivery.py",
+      "sha256": "1062eb31d58500343514a093013e4ef69202ca3563e063008c9f18504e4a94db",
+      "storage": "git"
+    },
+    {
+      "bytes": 11562,
+      "path": "scripts/native_long_deployment_validation.py",
+      "sha256": "1993ce273f9f76ff73cbb2a99203d8850269ed27e2d0892b925e637599861048",
+      "storage": "git"
+    },
+    {
+      "bytes": 5285,
+      "path": "scripts/native_long_deployment_worker.py",
+      "sha256": "fb9c94663a93a5a01f9b2a2f3ce4242a8d164c103bb7e329af2cc5809eb1ec73",
+      "storage": "git"
+    },
+    {
+      "bytes": 6073,
+      "path": "scripts/native_long_evidence_package.py",
+      "sha256": "a61aaad2aeb5375f3987f548a3c19b8d1fc611350b695057ec8a21612d2e2aa2",
+      "storage": "git"
+    },
+    {
+      "bytes": 16102,
+      "path": "scripts/native_long_mechanism.py",
+      "sha256": "8f5233833a31df79e778e3a67e6cca78c8acc26f08149849b8277b4178c06921",
+      "storage": "git"
+    },
+    {
+      "bytes": 19788,
+      "path": "scripts/native_long_mechanism_audit.py",
+      "sha256": "f7ee1e70108c93f55b572bcedfb4d595d540c4319149857de2e2485722ce17a3",
+      "storage": "git"
+    },
+    {
+      "bytes": 5118,
+      "path": "scripts/native_long_mechanism_replay.py",
+      "sha256": "166b00ae9da883c9795ad4848c14fdd3b65bba545305a86ae0beae4fd166cc4d",
+      "storage": "git"
+    },
+    {
+      "bytes": 6707,
+      "path": "scripts/native_long_mechanism_replay_audit.py",
+      "sha256": "6cfabaa5cba143baa3ce6a53aa99dd45e673982c5f0668cc14cb882eba24261d",
+      "storage": "git"
+    },
+    {
+      "bytes": 4318,
+      "path": "scripts/native_long_mechanism_worker.py",
+      "sha256": "18abc4bd471de7ef7facbb1eb85becec7abd1cdc771b965f149105f065bc87a0",
+      "storage": "git"
+    },
+    {
+      "bytes": 22981,
+      "path": "scripts/native_long_memory_bridge.py",
+      "sha256": "24d649a2ab133c9cc3e96e34e3fca8837ff7a8873a25ca9e2afa94f1677d5ac2",
+      "storage": "git"
+    },
+    {
+      "bytes": 5310,
+      "path": "scripts/native_long_memory_bridge_preflight.py",
+      "sha256": "89a49751fedff7e8be5cad71a4707cc544687d84d11f3c956022ce44be777602",
+      "storage": "git"
+    },
+    {
+      "bytes": 5026,
+      "path": "scripts/native_long_memory_bridge_worker.py",
+      "sha256": "eac46c206e2b4ec4883a6d99e4a27471bc49f967983425aebefc84f7df1c14b5",
+      "storage": "git"
+    },
+    {
+      "bytes": 17891,
+      "path": "scripts/native_long_postselection.py",
+      "sha256": "5ee9a0a0c02845368f001a1f8c2d5f807fce17875eca1c2f7662519060d76f92",
+      "storage": "git"
+    },
+    {
+      "bytes": 6653,
+      "path": "scripts/native_long_runtime_audit.py",
+      "sha256": "ae4619161658c810d93535654f7edf611f434c77814ecffb523fbf4203fe8d58",
+      "storage": "git"
+    },
+    {
+      "bytes": 1611,
+      "path": "tests/test_native_long_bridge_audit.py",
+      "sha256": "3f386c12f3557d190db30e50e3f38367f295dd62035e3658ac1653eee5a3d511",
+      "storage": "git"
+    },
+    {
+      "bytes": 2248,
+      "path": "tests/test_native_long_confirmation.py",
+      "sha256": "f2b3e6579fcf589cc48aea16dcdea741aa64212c6c543c026a8e70d5c5ac7f22",
+      "storage": "git"
+    },
+    {
+      "bytes": 1125,
+      "path": "tests/test_native_long_confirmation_inference.py",
+      "sha256": "e309ddc2c7d1539a4f9a5be79939d12501c131345a8b4f888b01083f834aba8d",
+      "storage": "git"
+    },
+    {
+      "bytes": 2009,
+      "path": "tests/test_native_long_delivery.py",
+      "sha256": "ad6b8b09d8fcb1652504c9ad04e51f4639cb91fc6ccd90fe1005b946bb43086c",
+      "storage": "git"
+    },
+    {
+      "bytes": 1323,
+      "path": "tests/test_native_long_deployment_validation.py",
+      "sha256": "e798a8c57db1be259fd5349e6dcb19757184fc1655583e26691f851a8c9088b1",
+      "storage": "git"
+    },
+    {
+      "bytes": 603,
+      "path": "tests/test_native_long_evidence_package.py",
+      "sha256": "d027734877f6575045541cce8dce61d8d988b8f2a6da263e6c93ba5fce92c1d2",
+      "storage": "git"
+    },
+    {
+      "bytes": 4689,
+      "path": "tests/test_native_long_mechanism.py",
+      "sha256": "dd458f29ecb243f9baeb0350d4f433870babc7decc87c2c1e807068cbb7228f6",
+      "storage": "git"
+    },
+    {
+      "bytes": 5249,
+      "path": "tests/test_native_long_mechanism_audit.py",
+      "sha256": "f8b554dbb4acd8912c9745c75e4c7c2828779f1cb96acf0f63b6e036fbeffb26",
+      "storage": "git"
+    },
+    {
+      "bytes": 1397,
+      "path": "tests/test_native_long_mechanism_replay.py",
+      "sha256": "76af2f7c954848313f6754aee85af4cc0cc0dd8738952b54aa10d57411cb4a36",
+      "storage": "git"
+    },
+    {
+      "bytes": 8918,
+      "path": "tests/test_native_long_memory_bridge.py",
+      "sha256": "67396a85fd723ad98188c56951015e376d45edb0c41df4ecd9b53214c48906bc",
+      "storage": "git"
+    },
+    {
+      "bytes": 3906,
+      "path": "tests/test_native_long_postselection.py",
+      "sha256": "6393f6e116994e3d55402752e2cb087b5d6080f7bafa344b8646976541cbe7ff",
+      "storage": "git"
+    },
+    {
+      "bytes": 648,
+      "path": "tests/test_native_long_runtime_audit.py",
+      "sha256": "33c591aba08bae9cd4b2e22cc695f031624fb0cd61d1344d830efda68cff6bac",
+      "storage": "git"
+    }
+  ],
+  "lfs_asset_bytes": 612240967,
+  "publication_identity": "Commit B and actual remote branch/tag verification are recorded only in external runtime publication/PUBLICATION_RECEIPT.json",
+  "regular_binary_bytes": 13439298,
+  "schema": 1,
+  "scientific_status": "COMPLETE_WITH_PROVISIONAL_GAIN",
+  "status": "COMPLETE_PACKAGE_REMOTE_LFS_BYTES_VERIFIED",
+  "tag": "persist4d-cvpr-evidence-20261011-v1",
+  "total_artifact_bytes": 631576376
+}
