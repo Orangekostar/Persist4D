@@ -1,1 +1,7 @@
 docs/task_memory_v2/Persist4D_Codex_TaskMemory_Retention_V2.md -whitespace
+artifacts/native_long_postselection_v1/deployment/E2-29700.pt filter=lfs diff=lfs merge=lfs -text
+artifacts/native_long_postselection_v1/deployment/E3-02970.pt filter=lfs diff=lfs merge=lfs -text
+artifacts/native_long_postselection_v1/deployment/E0-05940.pt filter=lfs diff=lfs merge=lfs -text
+artifacts/native_long_postselection_v1/deployment/E1-23760.pt filter=lfs diff=lfs merge=lfs -text
+artifacts/native_long_postselection_v1/deployment/E1-02970.pt filter=lfs diff=lfs merge=lfs -text
+artifacts/native_long_postselection_v1/evidence/official_metric_states.zip filter=lfs diff=lfs merge=lfs -text

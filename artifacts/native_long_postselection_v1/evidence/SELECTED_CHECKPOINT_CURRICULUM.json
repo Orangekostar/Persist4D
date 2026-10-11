@@ -1,0 +1,18 @@
+{
+  "completed_training_updates_per_arm": 29700,
+  "matched_E1_step": 2970,
+  "next_global_draw_after_selected_checkpoint": 95040,
+  "rio_horizons_with_nonzero_probability_before_selected_checkpoint": [
+    2
+  ],
+  "scannet_horizon": 1,
+  "scope": "All four full trajectories completed, but E3/2970 and E1/2970 checkpoints precede positive-probability T3-T5 training. Their long-input metrics test transfer from the T2 phase, not learned long-prefix supervision at that checkpoint.",
+  "selected_E3_step": 2970,
+  "selected_checkpoint_completed_zero_based_updates": [
+    0,
+    2969
+  ],
+  "source": "datasets/native_long_dataset.py:horizon_weights, NativeDrawPlan.draw",
+  "source_sha256": "5f78968d95000e1ac92e41d20b73f21127b7fb528947014e40148ede787cba20",
+  "status": "VERIFIED_FROM_BOUND_CURRICULUM"
+}

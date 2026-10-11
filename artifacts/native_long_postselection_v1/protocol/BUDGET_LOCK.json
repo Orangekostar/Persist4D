@@ -1,0 +1,590 @@
+{
+  "IO_measurement_sha256": "afc14f12f09fd214b4c531f2f43ce3f21d7e7ccc7dfc5f5ec013c7bf44cbedd0",
+  "authorization": {
+    "maximum_concurrent_gpus": 12,
+    "selected_lifetime_cap_gpu_hours": 1800.0,
+    "source": "user_2026-10-01_adjust_budget_and_scheduler",
+    "supersedes_lifetime_cap_gpu_hours": 1800.0
+  },
+  "cluster_config": {
+    "authorization": "user_2026-10-01_adjust_budget_and_scheduler",
+    "lifetime_budget_gpu_hours": 1800.0,
+    "max_concurrent_gpus": 12,
+    "node_defaults": {
+      "common": "/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt",
+      "data_root": "/home/pluto/native_long_cluster_v1/data",
+      "encoder": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+      "gpus": 2,
+      "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
+      "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
+      "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2",
+      "user": "pluto"
+    },
+    "nodes": [
+      {
+        "arm": null,
+        "common": "/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt",
+        "data_root": "/home/pluto/native_long_cluster_v1/data",
+        "encoder": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+        "gpus": 2,
+        "host": "192.168.100.101",
+        "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
+        "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
+        "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2",
+        "user": "pluto"
+      },
+      {
+        "arm": "E1",
+        "common": "/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt",
+        "data_root": "/home/pluto/native_long_cluster_v1/data",
+        "encoder": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+        "gpus": 2,
+        "host": "192.168.100.102",
+        "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
+        "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
+        "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2",
+        "user": "pluto"
+      },
+      {
+        "arm": "E2",
+        "common": "/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt",
+        "data_root": "/home/pluto/native_long_cluster_v1/data",
+        "encoder": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+        "gpus": 2,
+        "host": "192.168.100.103",
+        "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
+        "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
+        "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2",
+        "user": "pluto"
+      },
+      {
+        "arm": "E3",
+        "common": "/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt",
+        "data_root": "/home/pluto/native_long_cluster_v1/data",
+        "encoder": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+        "gpus": 2,
+        "host": "192.168.100.104",
+        "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
+        "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
+        "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2",
+        "user": "pluto"
+      },
+      {
+        "arm": "E0",
+        "common": "/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt",
+        "data_root": "/home/pluto/native_long_cluster_v1/data",
+        "encoder": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+        "gpus": 2,
+        "host": "192.168.100.105",
+        "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
+        "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
+        "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2",
+        "user": "pluto"
+      },
+      {
+        "arm": null,
+        "common": "/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt",
+        "data_root": "/home/pluto/native_long_cluster_v1/data",
+        "encoder": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+        "gpus": 2,
+        "host": "192.168.100.106",
+        "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
+        "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
+        "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2",
+        "user": "pluto"
+      }
+    ],
+    "reserve_gpu_hours": 8.0
+  },
+  "cluster_config_sha256": "56d188bb880ed0fde6dd0a93a0485a9335c88d6cf5e6c285a9546a51217307ce",
+  "current_campaign_gpu_hours": 0.6303522524447762,
+  "execution_mode": "SSH_CLUSTER",
+  "forecast": {
+    "cal_gpu_hours_separate_conservative_full_step_proxy": {
+      "E0": 0.3225956690737264,
+      "E1": 0.3225956690737264,
+      "E2": 0.33569692999351863,
+      "E3": 0.3345569776167482
+    },
+    "costs_gpu_hours": {
+      "E0": 379.97159882815447,
+      "E1": 400.3050247484042,
+      "E2": 410.48968621495186,
+      "E3": 416.37494490323206
+    },
+    "integrated_horizon_mass": {
+      "1": 0.4444444444444444,
+      "2": 0.4082776232339496,
+      "3": 0.10789200833735822,
+      "4": 0.03018116326824488,
+      "5": 0.009204760714968651
+    },
+    "integrated_points_per_draw_by_horizon": {
+      "1": 64520.34748820427,
+      "2": 41147.105904038646,
+      "3": 16929.46536031568,
+      "4": 6789.767509546968,
+      "5": 2304.2605577976237
+    },
+    "limitations": [
+      "finite median native inputs; linear full-point scaling is approximate",
+      "two ranks may have imbalance; 25% training margin applied once",
+      "raw_sum gradient audit timing excluded from speed estimate"
+    ],
+    "mean_to_measured_point_scaling": {
+      "1": 1.1020328083842679,
+      "2": 1.1581764806841968,
+      "3": 1.1149945153741463,
+      "4": 1.1699820766947948,
+      "5": 1.516419502093889
+    },
+    "per_draw_gpu_occupancy_seconds_including_serial_IO": {
+      "E0": 1.150451524724487,
+      "E1": 1.2120679669070622,
+      "E2": 1.242890876621086,
+      "E3": 1.2607284482594405
+    },
+    "training_gpu_hours_with_single_1_25_margin": {
+      "E0": 379.64900315908073,
+      "E1": 399.9824290793305,
+      "E2": 410.15398928495836,
+      "E3": 416.04038792561533
+    }
+  },
+  "forecast_multiplier": 1.25,
+  "forecast_training_gpu_hours": 1607.1412546947427,
+  "frozen_before_training_results": true,
+  "full_arms": [
+    "E0",
+    "E1",
+    "E2",
+    "E3"
+  ],
+  "jobs": [
+    {
+      "arm": "E0",
+      "cards": 2,
+      "common": "/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt",
+      "data_root": "/home/pluto/native_long_cluster_v1/data",
+      "encoder": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+      "endpoint": 29700,
+      "gpus": 2,
+      "host": "192.168.100.105",
+      "identity": {
+        "code": {
+          "conf/config_native_long_retrain.yaml": "7ceec3261f81cc4454a2f0febb92eccb0c35c65b8830e46e27c08457443d1fff",
+          "datasets/native_long_dataset.py": "5f78968d95000e1ac92e41d20b73f21127b7fb528947014e40148ede787cba20",
+          "datasets/pointcept_utils.py": "12dc773c74c1d2c28b0c1c0326633a3ce9b3527330648302c2c080e0883976e1",
+          "datasets/semseg.py": "c5ec2c1254ef85f0cf1a91a3f794f6f21ca695698a33a6717f42c5ad25d9b1bb",
+          "models/criterion.py": "b61bbc4a712db297f094080ffb1f4346d23651bab7e3a8622731f0a4b34b2820",
+          "models/matcher.py": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc",
+          "models/native_long_modules.py": "fa1cfc3ebf977fbf84c6190133a2b6a5e85fe9334761ddb4473fd0d5989f9167",
+          "models/pointcept.py": "88945a48faf0edf949a7ff9ac0fea3d90cc431609569532bb5f221e1d4628007",
+          "models/rescene.py": "1522c801f3ffee2cec4a267665b5002f50b04bd4d878a873e7926543c52fef96",
+          "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
+          "scripts/native_long_assets.py": "8bf95bcb325da4cda7dfe3569194d2b2fddb77cd85faea664be7e4ec510ea255",
+          "scripts/native_long_budget.py": "e6260105be081cb8cc557078671ec3b2c1af68b6a69b2a610ac6d182f67a2dbd",
+          "scripts/native_long_campaign.py": "f9e8ca3cfd62e3af521595a308e077d8e07a91d936d392a8c94d7576e707a826",
+          "scripts/native_long_cluster.py": "06009a9c53264301f28bb30ad3469ea98b29deeb1c1cd9684c67f8de6c4c410f",
+          "scripts/native_long_execution.py": "77fc5edd2d20a445adbce104de5297cbc0ca7a2db55c0f5682b066b0231f886b",
+          "scripts/native_long_repair.py": "46167ad1d6ef9609a74f08b273a42645802ab6cee52ebe00e9f1ae3a5af63ab6",
+          "scripts/native_long_runtime.py": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
+          "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+          "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+          "third_party/pointnet2/pointnet2_utils.py": "a1f369b2576916651d9334e1c83a8f9d4dade9a3868e6f4a69201f0306e37a73",
+          "third_party/pointnet2/pytorch_utils.py": "5271aa91f7951663ce7a1db137a3a75edda65bc49a113d9106ecf48e0a13737c",
+          "trainer/native_long_trainer.py": "c09b6fd79d622ac1dfa31be9886e4f0473916223568880a79561034cdb46dd83",
+          "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+        },
+        "data_content_sha256": "65bbc1dc57a13c2cc565117b8d5d3e2ae63af82018ceeeb6146e91421fdbab20",
+        "initialization_sha256": "8d3dfbc4e5c78d707ae5d6cb913123727456698c06d7c1e5077d944772c423e1",
+        "population_sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8"
+      },
+      "job_id": "6d20be5481cc2131c349c06f27ba024616bc32983efc0685ee392f180fda0316",
+      "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
+      "quota_gpu_hours": 393.84493682815446,
+      "relocation": {
+        "external_gpu_pid": 3620610,
+        "fault_draw": 286262,
+        "kind": "HOST_ONLY_EXTERNAL_GPU_CONTENTION",
+        "preserve_checkpoint_bytes": true,
+        "previous_host": "192.168.100.101",
+        "previous_job_id": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080",
+        "resume_update": 8910
+      },
+      "repair": {
+        "carried_events": {
+          "native-long:CAL:E0:2970:1790933791435818352": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5",
+          "native-long:CAL:E0:2970:1790945436477168854": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080",
+          "native-long:CAL:E0:5940:1791017350835649526": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080",
+          "native-long:CAL:E0:8910:1791088902815083246": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080",
+          "native-long:DDP_PREFLIGHT:E0:1790861848860499855": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5",
+          "native-long:DDP_PREFLIGHT:E0:1790945182603710673": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080",
+          "native-long:RESUME_PROBE:E0:2972:1790945279875515203": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080",
+          "native-long:train:E0:11880:1791089131427966269": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080",
+          "native-long:train:E0:2970:1790861945674888745": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5",
+          "native-long:train:E0:5940:1790934026181721673": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5",
+          "native-long:train:E0:5940:1790945662143883522": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080",
+          "native-long:train:E0:8910:1791017577810885862": "de3f6b276caa980828f3254886858f4b391aee08ea1500d2c85d13c1abab9080"
+        },
+        "previous_job_id": "bc6ce8b6f57f176d9c4c86719e06adf17d565aefa60f067076b577abdec74bd5",
+        "resume_update": 2970
+      },
+      "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
+      "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E0/seed45",
+      "seed": 45,
+      "user": "pluto"
+    },
+    {
+      "arm": "E1",
+      "cards": 2,
+      "common": "/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt",
+      "data_root": "/home/pluto/native_long_cluster_v1/data",
+      "encoder": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+      "endpoint": 29700,
+      "gpus": 2,
+      "host": "192.168.100.102",
+      "identity": {
+        "code": {
+          "conf/config_native_long_retrain.yaml": "7ceec3261f81cc4454a2f0febb92eccb0c35c65b8830e46e27c08457443d1fff",
+          "datasets/native_long_dataset.py": "5f78968d95000e1ac92e41d20b73f21127b7fb528947014e40148ede787cba20",
+          "datasets/pointcept_utils.py": "12dc773c74c1d2c28b0c1c0326633a3ce9b3527330648302c2c080e0883976e1",
+          "datasets/semseg.py": "c5ec2c1254ef85f0cf1a91a3f794f6f21ca695698a33a6717f42c5ad25d9b1bb",
+          "models/criterion.py": "b61bbc4a712db297f094080ffb1f4346d23651bab7e3a8622731f0a4b34b2820",
+          "models/matcher.py": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc",
+          "models/native_long_modules.py": "fa1cfc3ebf977fbf84c6190133a2b6a5e85fe9334761ddb4473fd0d5989f9167",
+          "models/pointcept.py": "88945a48faf0edf949a7ff9ac0fea3d90cc431609569532bb5f221e1d4628007",
+          "models/rescene.py": "1522c801f3ffee2cec4a267665b5002f50b04bd4d878a873e7926543c52fef96",
+          "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
+          "scripts/native_long_assets.py": "8bf95bcb325da4cda7dfe3569194d2b2fddb77cd85faea664be7e4ec510ea255",
+          "scripts/native_long_budget.py": "e6260105be081cb8cc557078671ec3b2c1af68b6a69b2a610ac6d182f67a2dbd",
+          "scripts/native_long_campaign.py": "f9e8ca3cfd62e3af521595a308e077d8e07a91d936d392a8c94d7576e707a826",
+          "scripts/native_long_cluster.py": "06009a9c53264301f28bb30ad3469ea98b29deeb1c1cd9684c67f8de6c4c410f",
+          "scripts/native_long_execution.py": "77fc5edd2d20a445adbce104de5297cbc0ca7a2db55c0f5682b066b0231f886b",
+          "scripts/native_long_repair.py": "46167ad1d6ef9609a74f08b273a42645802ab6cee52ebe00e9f1ae3a5af63ab6",
+          "scripts/native_long_runtime.py": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
+          "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+          "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+          "third_party/pointnet2/pointnet2_utils.py": "a1f369b2576916651d9334e1c83a8f9d4dade9a3868e6f4a69201f0306e37a73",
+          "third_party/pointnet2/pytorch_utils.py": "5271aa91f7951663ce7a1db137a3a75edda65bc49a113d9106ecf48e0a13737c",
+          "trainer/native_long_trainer.py": "c09b6fd79d622ac1dfa31be9886e4f0473916223568880a79561034cdb46dd83",
+          "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+        },
+        "data_content_sha256": "65bbc1dc57a13c2cc565117b8d5d3e2ae63af82018ceeeb6146e91421fdbab20",
+        "initialization_sha256": "8d3dfbc4e5c78d707ae5d6cb913123727456698c06d7c1e5077d944772c423e1",
+        "population_sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8"
+      },
+      "job_id": "7ab9790336d6c0bfe1743d636872f019493fa30cf0d60b5a3bda9439af56359d",
+      "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
+      "quota_gpu_hours": 438.1783627484042,
+      "repair": {
+        "carried_events": {
+          "native-long:CAL:E1:2970:1790930477769122087": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53",
+          "native-long:DDP_PREFLIGHT:E1:1790861845604132262": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53",
+          "native-long:train:E1:2970:1790861942846790134": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53",
+          "native-long:train:E1:5940:1790930704240962697": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53"
+        },
+        "previous_job_id": "03d2f91ce5ebfc383980aecff95080d42c8937c7921ea395b37a8bd66fcacd53",
+        "resume_update": 2970
+      },
+      "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
+      "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E1/seed45",
+      "seed": 45,
+      "user": "pluto"
+    },
+    {
+      "arm": "E2",
+      "cards": 2,
+      "common": "/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt",
+      "data_root": "/home/pluto/native_long_cluster_v1/data",
+      "encoder": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+      "endpoint": 29700,
+      "gpus": 2,
+      "host": "192.168.100.103",
+      "identity": {
+        "code": {
+          "conf/config_native_long_retrain.yaml": "7ceec3261f81cc4454a2f0febb92eccb0c35c65b8830e46e27c08457443d1fff",
+          "datasets/native_long_dataset.py": "5f78968d95000e1ac92e41d20b73f21127b7fb528947014e40148ede787cba20",
+          "datasets/pointcept_utils.py": "12dc773c74c1d2c28b0c1c0326633a3ce9b3527330648302c2c080e0883976e1",
+          "datasets/semseg.py": "c5ec2c1254ef85f0cf1a91a3f794f6f21ca695698a33a6717f42c5ad25d9b1bb",
+          "models/criterion.py": "b61bbc4a712db297f094080ffb1f4346d23651bab7e3a8622731f0a4b34b2820",
+          "models/matcher.py": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc",
+          "models/native_long_modules.py": "fa1cfc3ebf977fbf84c6190133a2b6a5e85fe9334761ddb4473fd0d5989f9167",
+          "models/pointcept.py": "88945a48faf0edf949a7ff9ac0fea3d90cc431609569532bb5f221e1d4628007",
+          "models/rescene.py": "1522c801f3ffee2cec4a267665b5002f50b04bd4d878a873e7926543c52fef96",
+          "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
+          "scripts/native_long_assets.py": "8bf95bcb325da4cda7dfe3569194d2b2fddb77cd85faea664be7e4ec510ea255",
+          "scripts/native_long_budget.py": "e6260105be081cb8cc557078671ec3b2c1af68b6a69b2a610ac6d182f67a2dbd",
+          "scripts/native_long_campaign.py": "f9e8ca3cfd62e3af521595a308e077d8e07a91d936d392a8c94d7576e707a826",
+          "scripts/native_long_cluster.py": "06009a9c53264301f28bb30ad3469ea98b29deeb1c1cd9684c67f8de6c4c410f",
+          "scripts/native_long_execution.py": "77fc5edd2d20a445adbce104de5297cbc0ca7a2db55c0f5682b066b0231f886b",
+          "scripts/native_long_repair.py": "46167ad1d6ef9609a74f08b273a42645802ab6cee52ebe00e9f1ae3a5af63ab6",
+          "scripts/native_long_runtime.py": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
+          "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+          "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+          "third_party/pointnet2/pointnet2_utils.py": "a1f369b2576916651d9334e1c83a8f9d4dade9a3868e6f4a69201f0306e37a73",
+          "third_party/pointnet2/pytorch_utils.py": "5271aa91f7951663ce7a1db137a3a75edda65bc49a113d9106ecf48e0a13737c",
+          "trainer/native_long_trainer.py": "c09b6fd79d622ac1dfa31be9886e4f0473916223568880a79561034cdb46dd83",
+          "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+        },
+        "data_content_sha256": "65bbc1dc57a13c2cc565117b8d5d3e2ae63af82018ceeeb6146e91421fdbab20",
+        "initialization_sha256": "8d3dfbc4e5c78d707ae5d6cb913123727456698c06d7c1e5077d944772c423e1",
+        "population_sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8"
+      },
+      "job_id": "1867cae900c5023fc5a5adcf34463ceb2ad2910940d893c864eb28fdd79bfec1",
+      "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
+      "quota_gpu_hours": 436.36302421495185,
+      "repair": {
+        "carried_events": {
+          "native-long:CAL:E2:2970:1790929389738351399": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8",
+          "native-long:DDP_PREFLIGHT:E2:1790861844895551997": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8",
+          "native-long:train:E2:2970:1790861940218170898": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8",
+          "native-long:train:E2:5940:1790929604208680650": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8"
+        },
+        "previous_job_id": "6cdc05ba9f4cbdbb7e40cd25082d81d253ba87ec0efd6135255e30bd4a4c70a8",
+        "resume_update": 2970
+      },
+      "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
+      "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E2/seed45",
+      "seed": 45,
+      "user": "pluto"
+    },
+    {
+      "arm": "E3",
+      "cards": 2,
+      "common": "/home/pluto/native_long_cluster_v1/assets/new_common_seed45.pt",
+      "data_root": "/home/pluto/native_long_cluster_v1/data",
+      "encoder": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+      "endpoint": 29700,
+      "gpus": 2,
+      "host": "192.168.100.104",
+      "identity": {
+        "code": {
+          "conf/config_native_long_retrain.yaml": "7ceec3261f81cc4454a2f0febb92eccb0c35c65b8830e46e27c08457443d1fff",
+          "datasets/native_long_dataset.py": "5f78968d95000e1ac92e41d20b73f21127b7fb528947014e40148ede787cba20",
+          "datasets/pointcept_utils.py": "12dc773c74c1d2c28b0c1c0326633a3ce9b3527330648302c2c080e0883976e1",
+          "datasets/semseg.py": "c5ec2c1254ef85f0cf1a91a3f794f6f21ca695698a33a6717f42c5ad25d9b1bb",
+          "models/criterion.py": "b61bbc4a712db297f094080ffb1f4346d23651bab7e3a8622731f0a4b34b2820",
+          "models/matcher.py": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc",
+          "models/native_long_modules.py": "fa1cfc3ebf977fbf84c6190133a2b6a5e85fe9334761ddb4473fd0d5989f9167",
+          "models/pointcept.py": "88945a48faf0edf949a7ff9ac0fea3d90cc431609569532bb5f221e1d4628007",
+          "models/rescene.py": "1522c801f3ffee2cec4a267665b5002f50b04bd4d878a873e7926543c52fef96",
+          "scripts/evaluate_persist4d_p6a.py": "844cb976529bd541d3d3ac02bcd2e118cb527e05b02ae590544b078186de8614",
+          "scripts/native_long_assets.py": "8bf95bcb325da4cda7dfe3569194d2b2fddb77cd85faea664be7e4ec510ea255",
+          "scripts/native_long_budget.py": "e6260105be081cb8cc557078671ec3b2c1af68b6a69b2a610ac6d182f67a2dbd",
+          "scripts/native_long_campaign.py": "f9e8ca3cfd62e3af521595a308e077d8e07a91d936d392a8c94d7576e707a826",
+          "scripts/native_long_cluster.py": "06009a9c53264301f28bb30ad3469ea98b29deeb1c1cd9684c67f8de6c4c410f",
+          "scripts/native_long_execution.py": "77fc5edd2d20a445adbce104de5297cbc0ca7a2db55c0f5682b066b0231f886b",
+          "scripts/native_long_repair.py": "46167ad1d6ef9609a74f08b273a42645802ab6cee52ebe00e9f1ae3a5af63ab6",
+          "scripts/native_long_runtime.py": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
+          "scripts/p6a_metrics.py": "62a72900d47425a0cac5df9075d5327fe239fc0e066831a5a78111dd4fb58d62",
+          "scripts/rescene_task_postprocess.py": "dc3ff34a1e3a82e1e43dbb51e96e13892721a3e124a37f962616b0be07e4cdd6",
+          "third_party/pointnet2/pointnet2_utils.py": "a1f369b2576916651d9334e1c83a8f9d4dade9a3868e6f4a69201f0306e37a73",
+          "third_party/pointnet2/pytorch_utils.py": "5271aa91f7951663ce7a1db137a3a75edda65bc49a113d9106ecf48e0a13737c",
+          "trainer/native_long_trainer.py": "c09b6fd79d622ac1dfa31be9886e4f0473916223568880a79561034cdb46dd83",
+          "trainer/trainer.py": "699926f22b5ba4fdd55d64d8960ba292fd2af606d99d5e41d74afe21f30ac122"
+        },
+        "data_content_sha256": "65bbc1dc57a13c2cc565117b8d5d3e2ae63af82018ceeeb6146e91421fdbab20",
+        "initialization_sha256": "8d3dfbc4e5c78d707ae5d6cb913123727456698c06d7c1e5077d944772c423e1",
+        "population_sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8"
+      },
+      "job_id": "f995d85d8888ccee3e0084e69687e63a51fdf3d6eb1ed84f43b6f9a4be11c8eb",
+      "python": "/home/pluto/native_long_cluster_v1/env/bin/python",
+      "quota_gpu_hours": 442.24828290323205,
+      "repair": {
+        "carried_events": {
+          "native-long:CAL:E3:2970:1790926950233806901": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06",
+          "native-long:DDP_PREFLIGHT:E3:1790861844733097190": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06",
+          "native-long:train:E3:2970:1790861931211472837": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06",
+          "native-long:train:E3:5940:1790927151168613905": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06"
+        },
+        "previous_job_id": "8ea520f7035455ad000cee09b57bcd9e38191e439534e78015e6ecd2d1e02e06",
+        "resume_update": 2970
+      },
+      "repo": "/home/pluto/native_long_cluster_v1/code-empty-mask-v2",
+      "root": "/home/pluto/native_long_cluster_v1/runtime-empty-mask-v2/E3/seed45",
+      "seed": 45,
+      "user": "pluto"
+    }
+  ],
+  "lifetime_cap_gpu_hours": 1800.0,
+  "measurement_sha256": "dd270252806666c9390dc3e29625273eca3ddec175c63cf3319fa8a3a9f5c886",
+  "mode": "FULL_FOUR",
+  "operational_quota_amendments": [
+    {
+      "active_process_limit_unchanged_requires_saved_boundary_resume": true,
+      "authorization": "user_adjust_budget_and_scheduler_and_complete_autonomously",
+      "cal_or_sel_scores_used": false,
+      "donor": "E0",
+      "job_ids_and_scientific_identities_unchanged": true,
+      "kind": "RESOURCE_ONLY_QUOTA_TRANSFER_PRESERVE_TRAJECTORY_AND_EVENT_IDS",
+      "ledger_events_and_prior_unchanged": true,
+      "lifetime_cap_gpu_hours": 1800,
+      "new_quota_gpu_hours": {
+        "E0": 393.84493682815446,
+        "E1": 438.1783627484042
+      },
+      "previous_budget_lock_sha256": "874a63011fe3982d3febc8e2e0a3b36b204fddecd566e9c344d78ce368b82e2a",
+      "previous_quota_gpu_hours": {
+        "E0": 405.84493682815446,
+        "E1": 426.1783627484042
+      },
+      "recipient": "E1",
+      "reserve_gpu_hours": 8.0,
+      "time_unix": 1791644402.6742249,
+      "transfer_gpu_hours": 12.0
+    }
+  ],
+  "physical_batch": {
+    "accumulation": 16,
+    "effective": 32,
+    "per_rank_batch": 1,
+    "world_size": 2
+  },
+  "pilot_arms": [],
+  "pre_result_forecast_correction": {
+    "prior_lock_sha256": "46726eec2eb2884171120da92dd16fb839393a58a3636dede6ee5d6e624b01c3",
+    "reason": "preserve reference-size/curriculum correlation in metadata cost integration",
+    "selection_scores_seen": 0,
+    "training_updates_seen": 0
+  },
+  "previous_budget_lock_sha256": "874a63011fe3982d3febc8e2e0a3b36b204fddecd566e9c344d78ce368b82e2a",
+  "prior": {
+    "event_ids": [
+      "AUX:2026-09-22T20:51:10.107530+00:00",
+      "AUX:2026-09-22T23:24:09.356661+00:00",
+      "BASELINE:2026-09-22T15:55:40.049268+00:00",
+      "CONFIRM:2026-09-26T13:49:33.875053+00:00",
+      "CONFIRM:2026-09-26T15:52:27.671174+00:00",
+      "EARLY_FIXED_CAL:2026-09-22T19:59:03.178171+00:00",
+      "FINAL_CUDA_VISIBLE_REGRESSION:final-regression-20260926.log",
+      "FINAL_CUDA_VISIBLE_REGRESSION:final-regression-lint-fixed-20260926.log",
+      "HIGH_CONT:2026-09-22T14:37:16.819978+00:00",
+      "LAST_FIXED_CAL:2026-09-22T20:22:23.023765+00:00",
+      "LOCAL_EXPORT_MATCHED_RUNTIME:2026-09-26T16:48:44.958462+00:00",
+      "LOCAL_PREDICTION_EXPORT_RECOVERY:2026-09-26T16:39:27.712257+00:00",
+      "LOCK:2026-09-26T13:49:13.615661+00:00",
+      "LOW_PAIR:2026-09-22T15:50:45.994544+00:00",
+      "NATIVE_PB_IDENTITY_RECOVERY:2026-09-26T14:06:25.829631+00:00",
+      "PARENT_CONTEXT:2026-09-22T18:37:23.296746+00:00",
+      "PARENT_DRIFT:2026-09-22T18:11:24.098294+00:00",
+      "PARENT_DRIFT_OLD_SOURCE:2026-09-22T18:19:27.840587+00:00",
+      "PARENT_DRIFT_OLD_SOURCE_RERUN:2026-09-22T18:21:18.935609+00:00",
+      "PERCEPTION:2026-09-22T23:15:49.680936+00:00",
+      "PERCEPTION:2026-09-23T05:13:19.807023+00:00",
+      "PERCEPTION:2026-09-26T13:26:11.006845+00:00",
+      "PROFILE:2026-09-26T13:49:44.076502+00:00",
+      "PROFILE_LIVE_SMOKE:2026-09-22T19:21:16.013039+00:00",
+      "PROFILE_LIVE_SMOKE:2026-09-22T19:25:07.543692+00:00",
+      "PUBLISH:2026-09-26T17:22:30.927886+00:00",
+      "R1-post-train-diagnostics:2026-09-22T18:09:24.561541+00:00",
+      "REBASELINE_FIXED_RUNTIME:2026-09-22T18:59:11.088055+00:00",
+      "REPAIR_P:2026-09-26T13:49:03.467545+00:00",
+      "REPAIR_R1-recovery-01:2026-09-22T16:20:52.737373+00:00",
+      "REPAIR_R1-recovery-02:2026-09-22T16:46:43.240384+00:00",
+      "REPAIR_R1:2026-09-22T15:50:45.978089+00:00",
+      "REPAIR_R1_CACHE:2026-09-22T14:49:04.951381+00:00",
+      "REPAIR_R1_CACHE:2026-09-22T15:07:11.552286+00:00",
+      "REPLICATE:2026-09-26T13:49:33.840886+00:00",
+      "REPORT:2026-09-26T15:45:56.490981+00:00",
+      "V1-published-total",
+      "V1-smoke-exact2_continuous",
+      "V1-smoke-exact2_split",
+      "V1-smoke-exact_continuous",
+      "V1-smoke-exact_split",
+      "V1-smoke-task8",
+      "baseline:2026-09-28T14:42:16.167788+00:00",
+      "conditional-fixed-probes:2026-09-29T14:21:09.902867+00:00",
+      "diagnostics:2026-09-28T15:29:52.714736+00:00",
+      "evaluate-cal:2026-09-28T14:49:49.205402+00:00",
+      "evaluate-cal:2026-09-28T15:15:57.781990+00:00",
+      "evaluate-cal:2026-09-28T15:26:15.719366+00:00",
+      "evaluate-m:2026-09-29T04:08:10.834119+00:00",
+      "evaluate-noaug:2026-09-29T04:13:15.628893+00:00",
+      "evaluate-q:2026-09-29T03:48:29.230080+00:00",
+      "evaluate-q:2026-09-29T04:00:21.252317+00:00",
+      "export-noaug:2026-09-29T03:58:09.996880+00:00",
+      "export:2026-09-28T14:24:15.067416+00:00",
+      "export:2026-09-28T14:25:55.781472+00:00",
+      "main-cal-lock-sel:2026-09-29T14:01:18.989926+00:00",
+      "native-deployment-profile:2026-09-29T14:23:04.776156+00:00",
+      "native-replay-audit:2026-09-29T14:29:54.211871+00:00",
+      "native-replay-audit:2026-09-29T14:31:25.663030+00:00",
+      "native-replay-audit:2026-09-29T14:34:11.824921+00:00",
+      "native-replay-audit:2026-09-29T14:36:44.381593+00:00",
+      "native-replay-audit:2026-09-29T14:38:51.162769+00:00",
+      "profile-native-ordered:2026-09-29T14:43:24.033075+00:00",
+      "profile:2026-09-28T15:26:16.944895+00:00",
+      "profile:2026-09-28T15:27:11.009004+00:00",
+      "replicate-seed46-training:2026-09-29T14:17:17.115925+00:00",
+      "replicate:2026-09-28T15:29:51.475624+00:00",
+      "screen:2026-09-28T15:26:21.522033+00:00",
+      "train-cal-diagnostics:2026-09-29T14:12:23.142246+00:00",
+      "train-m:2026-09-29T03:54:18.704743+00:00",
+      "train-pairs-seed45:2026-09-29T13:58:04.490380+00:00",
+      "train-q:2026-09-29T03:47:13.733497+00:00",
+      "train:2026-09-28T14:44:50.302220+00:00",
+      "train:2026-09-28T15:10:37.360030+00:00",
+      "train:2026-09-28T15:12:47.897050+00:00",
+      "train:2026-09-28T15:13:56.229212+00:00",
+      "train:2026-09-28T15:16:10.265430+00:00",
+      "train:2026-09-28T15:16:33.397598+00:00",
+      "train:2026-09-28T15:16:55.966215+00:00",
+      "train:2026-09-28T15:17:22.372031+00:00"
+    ],
+    "excluded_subtotals": [
+      "inherited-v2-final"
+    ],
+    "gpu_hours": 80.73503875023967,
+    "sources": [
+      {
+        "path": "/home/ww/paper5/.worktrees/persist4d-perception-gain-v2/artifacts/perception_gain_v2/budget/LEDGER.jsonl",
+        "rows": 42,
+        "sha256": "da03b22d5ba3d54de07b7751f4742b0d317b9b90459c97b7a32393471f88760f"
+      },
+      {
+        "path": "/home/ww/paper5/.worktrees/rescene-short-module-screen-v1/artifacts/short_module_screen_v1/BUDGET_LEDGER.jsonl",
+        "rows": 20,
+        "sha256": "195da02671d858588b2611cf55d8f4085ca4049b14043b7a72a1e31aae7b83d6"
+      },
+      {
+        "path": "/home/ww/paper5/.worktrees/rescene-code-first-audit-v1/artifacts/rescene_code_first_audit_v1/BUDGET_LEDGER.jsonl",
+        "rows": 7,
+        "sha256": "fbe5bddacfdca375119b85f52c55bf16e6e41ecbb8ffe31788aa36ce3d0f2db8"
+      },
+      {
+        "path": "/home/ww/paper5/.worktrees/rescene-qp-mn-targeted-v1/artifacts/qp_mn_targeted_v1/BUDGET_LEDGER.jsonl",
+        "rows": 12,
+        "sha256": "820d1013f678ae09630fe98be0145f98155b0c228a0d49aa84a38aae323f8e91"
+      }
+    ],
+    "unique_events": 80
+  },
+  "recovery": {
+    "carried_campaign_gpu_hours": 0.6303522524447762,
+    "failure_archive": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/failures/9d6507f5e109419260c1d5b81cf7c3ffff5e65781725fe5654027f2d6f5e761c",
+    "kind": "REPLACE_ALL_FAILED_UNCHECKPOINTED",
+    "previous_job_ids": {
+      "E0": "cc3c833ecab83825061dff9486a7b539d63c1958ed614de7f918747fc6e6aca1",
+      "E1": "4eea4f3819cf30fbce2bd5f4da4ce1811fadd8b9388b5740d1949c8b5a52acfa",
+      "E2": "1e92e8ea51b9f4c0bb04da9f40127e2aa1247a5ad2c943c447affc2bb716c914",
+      "E3": "94bad6393e305f6a119e48dd66456eee5472486b2551b2c1608c988f5c557847"
+    }
+  },
+  "remaining_at_plan_gpu_hours": 1718.6346089973156,
+  "remaining_before_preflight_gpu_hours": 1719.2649612497603,
+  "reserve_confirmation_gpu_hours": 8.0,
+  "reserve_gpu_hours": 8.0,
+  "scientific_status": "PARTIAL_FULL_RETRAIN_BUDGET",
+  "trained_repair": {
+    "changed_files": [
+      "scripts/native_long_campaign.py",
+      "scripts/native_long_cluster.py",
+      "scripts/native_long_execution.py",
+      "scripts/native_long_repair.py"
+    ],
+    "kind": "EXECUTION_CONTROL_METADATA_REPAIR",
+    "preserve_training_state_and_costs": true,
+    "recompute_CAL": true
+  }
+}

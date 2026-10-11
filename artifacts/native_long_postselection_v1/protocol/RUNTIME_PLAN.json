@@ -1,0 +1,152 @@
+{
+  "evaluation_seed": 9001,
+  "formal_lock_sha256": "b045ef1ce3b9e7ac363e5e45595d27fa294a2d1d19573e333e4dcc3efd522a82",
+  "gpu_index": 0,
+  "host": "192.168.100.105",
+  "order_check": {
+    "A_horizon": 2,
+    "B_horizon": 5,
+    "arms": [
+      "E1",
+      "E3"
+    ],
+    "matched_step": 2970,
+    "orders": [
+      "A",
+      "BA"
+    ],
+    "repeats": 2
+  },
+  "population_sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8",
+  "producer_sha256": "1993ce273f9f76ff73cbb2a99203d8850269ed27e2d0892b925e637599861048",
+  "profile": {
+    "all_rows": true,
+    "horizons": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "measure": 3,
+    "warmup": 1
+  },
+  "records": [
+    {
+      "domain": "rio",
+      "horizon": 1,
+      "input_id": "CAL:T1:0cac7549-8d6f-2d13-8d56-b895956f571a",
+      "reference_id": "0cac7549-8d6f-2d13-8d56-b895956f571a",
+      "scan_ids": [
+        "0cac7549-8d6f-2d13-8d56-b895956f571a"
+      ],
+      "scan_indices": [
+        54
+      ]
+    },
+    {
+      "domain": "rio",
+      "horizon": 2,
+      "input_id": "CAL:0629f2e7e4392911a74be301",
+      "reference_id": "0cac7597-8d6f-2d13-8c9c-6f8542021d5c",
+      "scan_ids": [
+        "0cac7597-8d6f-2d13-8c9c-6f8542021d5c",
+        "0cac7595-8d6f-2d13-8cad-f51af4c9aba2"
+      ],
+      "scan_indices": [
+        75,
+        76
+      ]
+    },
+    {
+      "domain": "rio",
+      "horizon": 3,
+      "input_id": "CAL:000b4a0c7ee7c04e80289e8b",
+      "reference_id": "fcf66d94-622d-291c-85fc-284b68d64c81",
+      "scan_ids": [
+        "fcf66d96-622d-291c-842c-836d61a13779",
+        "fcf66d94-622d-291c-85fc-284b68d64c81",
+        "fcf66d82-622d-291c-87be-78d421381146"
+      ],
+      "scan_indices": [
+        1155,
+        1153,
+        1156
+      ]
+    },
+    {
+      "domain": "rio",
+      "horizon": 4,
+      "input_id": "CAL:356b877b1e1fa6cceb155500",
+      "reference_id": "531cff08-0021-28f6-8e08-ba2eeb945e09",
+      "scan_ids": [
+        "55551091-36f1-29c0-8bae-687acbf664a0",
+        "754e884e-ea24-2175-88bf-5fd89d996e36",
+        "e2847ff3-a506-2b60-876a-e16960aa5fb2",
+        "e2847ff7-a506-2b60-869c-2780e8694ae0"
+      ],
+      "scan_indices": [
+        485,
+        483,
+        481,
+        482
+      ]
+    },
+    {
+      "domain": "rio",
+      "horizon": 5,
+      "input_id": "CAL:5090d7174e9ec486ffb51af9",
+      "reference_id": "531cff08-0021-28f6-8e08-ba2eeb945e09",
+      "scan_ids": [
+        "55551091-36f1-29c0-8bae-687acbf664a0",
+        "754e884e-ea24-2175-88bf-5fd89d996e36",
+        "e2847ff3-a506-2b60-876a-e16960aa5fb2",
+        "e2847ff7-a506-2b60-869c-2780e8694ae0",
+        "aa20278c-8bc8-2c5b-9d18-016312e4463a"
+      ],
+      "scan_indices": [
+        485,
+        483,
+        481,
+        482,
+        484
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "arm": "E0",
+      "bundle_name": "E0-05940.pt",
+      "checkpoint_sha256": "a040be5e3337bdac556d36cb41a17a415ad90dc8e226d6f8476ee8365d43cf5c",
+      "kind": "CAL_SELECTED",
+      "sha256": "16822b8c35803dac30f99af32bc6105f49b67bcb6ae43e9951e9b6e623626a6f",
+      "step": 5940
+    },
+    {
+      "arm": "E1",
+      "bundle_name": "E1-23760.pt",
+      "checkpoint_sha256": "d767086021690d9e74f9024a5b56dc85b43682e2b5e5277036e4ea02ae3b1887",
+      "kind": "CAL_SELECTED",
+      "sha256": "8c9d0d57044ce23c7964ddb1e7a2d8bd18e388e6ee657a7f4b02b1368b5b3a98",
+      "step": 23760
+    },
+    {
+      "arm": "E3",
+      "bundle_name": "E3-02970.pt",
+      "checkpoint_sha256": "34359a84fe00e4417acaddeca5832b2e893df997dcf6cfb2d73ad31e704cda5a",
+      "kind": "CAL_SELECTED",
+      "sha256": "7eef8600daf76356c2743b4da961fdf7d49abbd077b3d44763d7a2b3db22486a",
+      "step": 2970
+    },
+    {
+      "arm": "E1",
+      "bundle_name": "E1-02970.pt",
+      "checkpoint_sha256": "227503ed50aaca7bfd6e89466bfd984648fec1cf3333768626998dc0ba43e25b",
+      "kind": "MATCHED_STEP_CONTROL",
+      "sha256": "1ded877d95842202055eaedd64bff239c49da709fa5cd5a6421c3b87b6e989ef",
+      "step": 2970
+    }
+  ],
+  "schema": 1,
+  "status": "LOCKED_PENDING_EXECUTION"
+}

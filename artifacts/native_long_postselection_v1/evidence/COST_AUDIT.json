@@ -1,0 +1,41 @@
+{
+  "baseline_analysis_sha256": "9ffa29ddee06b4c0251ffc30c231fb912d1bfec3440c303bba67d7db14f195ec",
+  "baseline_gpu_hours": 1707.342516592207,
+  "by_phase": {
+    "formal": {
+      "events": 12,
+      "failed_events": 0,
+      "gpu_hours": 2.3164759281143135
+    },
+    "mechanism": {
+      "events": 163,
+      "failed_events": 1,
+      "gpu_hours": 1.0767066946467252
+    },
+    "memory-bridge": {
+      "events": 4,
+      "failed_events": 2,
+      "gpu_hours": 3.0269980830908105
+    },
+    "postruntime": {
+      "events": 12,
+      "failed_events": 0,
+      "gpu_hours": 0.12035743110256994
+    }
+  },
+  "cap_gpu_hours": 1800,
+  "complete_seed46_pair_forecast_gpu_hours": 1034.5019,
+  "failures_included": true,
+  "ledger_events": 191,
+  "ledger_sha256": "aab9929b5af57182afc57a53c5cd7d94f6ecbf8bf45f0e869a1a0bbbc6ea5387",
+  "live_gpu_hours": 0,
+  "observed_utc": "2026-10-11T05:40:23.207874+00:00",
+  "postselection_gpu_hours": 6.540538136954422,
+  "remaining_after_reserve_gpu_hours": 78.11694527083863,
+  "remaining_gpu_hours": 86.11694527083863,
+  "replication_status": "NOT_REPLICATED_BUDGET",
+  "retained_reserve_gpu_hours": 8,
+  "scope": "Historical full audit plus deduplicated new phase events; not a sum of node ledgers that omits controller history",
+  "status": "VERIFIED_FINAL_NO_ACTIVE_RESERVATIONS",
+  "total_gpu_hours": 1713.8830547291614
+}

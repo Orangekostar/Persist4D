@@ -1,29 +1,14 @@
-# Native Long Retrain Handoff
+# 当前交接入口
 
-Experiment A: `ca9f3416cf01f403d306b75c207f52c38bc70ad5`. Branch: `research/rescene-native-long-retrain-v1`. Delivery tag: `rescene-native-long-retrain-v1-r2`. Base: `c6e9d01edfe2b3c832374a424fc45e44bdadfb68`.
+此文件此前描述初始预检交付。后续用户授权1800 GPUh集群预算后，四条轨迹均已完成29,700更新，
+不再是零步训练或仅代码交付。五份任务权重已实际上传LFS并独立下载核验。
 
-Scientific status is PARTIAL_FULL_RETRAIN_BUDGET; publication is CODE_ONLY. All four arms have zero actual training updates. No main AP, CAL/SEL lock, seed46, formal confirmation, trained profile or gain exists. The measured full E0 forecast already exceeds the remaining lifetime budget. Do not shrink U or convert temporary preflight optimizer updates into a training result.
+当前结果见[实验报告](../native_long_postselection_v1/REPORT.md)及
+[逐项验收](../native_long_postselection_v1/REQUIREMENT_REVIEW.md)。
+新分支为`research/persist4d-cvpr-evidence-20261011`，新tag为`persist4d-cvpr-evidence-20261011-v1`。
+实验A与交接、下载和复现命令见[本轮最终交接](../native_long_postselection_v1/HANDOFF.md)。
+原训练控制器和全部评估队列正常结束，已无活动GPU任务。
+实际远端提交SHA由仓库外最终发布回执记录；本页不嵌入自身提交SHA。
 
-Runtime: `/home/ww/persist4d_runs/native_long_retrain_v1`. Read FINAL_REPORT.md, REQUIREMENT_REVIEW.md, CODE_BINDINGS.md and RUNTIME_NOTE.md. The encoder is the separately obtained fixed Concerto SHA in SOURCE_AND_INITIALIZATION.json. Initialization contains no old task warm start. Current encoder has zero registered buffers; the loader explicitly preserves every nonencoder tensor and any registered encoder buffers.
-
-Git includes untrained F initialization parameters and official initialized TRAIN-A sufficient statistics. Nonencoder task initialization bundle remains local: `/home/ww/persist4d_runs/native_long_retrain_v1/initialization/task_reload_initialization.pt`, 106912359 bytes, SHA `5301d1189dfa8cde6d953f4e0151168b1d0220c23753b94f39bc53e079f9649b`. It is not a trained deployment model. No Release authorization was available; no trained weights were generated. Raw data, raw GT and original pretrained files are not redistributed.
-
-Commands with the existing persist4d environment, from this worktree:
-
-```bash
-export RESCENE_NATIVE_LONG_ROOT='/home/ww/persist4d_runs/native_long_retrain_v1'
-python -m scripts.native_long_campaign status --root "$RESCENE_NATIVE_LONG_ROOT"
-python -m scripts.native_long_campaign run --root "$RESCENE_NATIVE_LONG_ROOT" --resume
-python -m scripts.native_long_campaign report --root "$RESCENE_NATIVE_LONG_ROOT"
-python -m scripts.native_long_campaign publish --root "$RESCENE_NATIVE_LONG_ROOT" --resume
-```
-
-The run command revalidates bindings and retains the empty budget-authorized trajectory set. A new training budget needs an explicit new plan; current authorization cannot sustain full retraining. Seed45 training/CAL/SEL code has no production-run validation; positive-plan replication/formal/profile and trained-result reporting remain outstanding. These are not certified as complete.
-
-Once Release authorization is explicitly available, the existing GitHubReleaseClient can upload the single task initialization package with its manifest bytes/SHA; an empty Release or an LFS pointer is not delivery. Current missing-asset details are in the external receipt.
-
-```bash
-python -m scripts.native_long_campaign publish --root "$RESCENE_NATIVE_LONG_ROOT" --resume --upload-assets
-```
-
-B is recorded only in the external publication/PUBLICATION_RECEIPT.json after actual push. ARTIFACT_MANIFEST.json excludes itself; this handoff does not contain its own commit SHA.
+[历史预检交付](https://github.com/Orangekostar/Persist4D/blob/rescene-native-long-retrain-v1-r2/artifacts/native_long_retrain_v1/HANDOFF.md)
+仍由旧tag保存；不改写旧tag，也不沿用其中的零步/旧预算/恢复命令作为当前状态。

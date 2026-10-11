@@ -1,0 +1,36 @@
+{
+  "CAL_LOCK_sha256": "9f8ab1fb98fb9186755d18ff588fa552a82b41d0b2afec8c2bf48993e9104b85",
+  "evaluation_seed": 9001,
+  "population_materialization": "PENDING_EXACT_MANIFEST_AND_TRAIN_DISJOINTNESS_AUDIT",
+  "populations": [
+    "PB",
+    "LOCAL-T2",
+    "ADDITIONAL"
+  ],
+  "post_hoc_checkpoint_reselection_allowed": false,
+  "rows": [
+    {
+      "arm": "E0",
+      "kind": "CAL_SELECTED",
+      "step": 5940
+    },
+    {
+      "arm": "E1",
+      "kind": "CAL_SELECTED",
+      "step": 23760
+    },
+    {
+      "arm": "E3",
+      "kind": "CAL_SELECTED",
+      "step": 2970
+    },
+    {
+      "arm": "E1",
+      "kind": "MATCHED_STEP_CONTROL",
+      "step": 2970
+    }
+  ],
+  "selected_module": "E3",
+  "status": "PLANNED_NOT_RUN",
+  "training_seed": 45
+}

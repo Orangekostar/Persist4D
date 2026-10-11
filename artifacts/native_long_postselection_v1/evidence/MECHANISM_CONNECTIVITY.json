@@ -1,0 +1,88 @@
+{
+  "confounded_pairs_retained_in_full_panel": 2,
+  "nonzero_computed_feedback_pairs": 28,
+  "per_stage_changes": [
+    {
+      "logits_changed": 0,
+      "masks_changed": 0,
+      "paired_inputs": 28,
+      "stage": 0
+    },
+    {
+      "logits_changed": 0,
+      "masks_changed": 0,
+      "paired_inputs": 28,
+      "stage": 1
+    },
+    {
+      "logits_changed": 0,
+      "masks_changed": 0,
+      "paired_inputs": 28,
+      "stage": 2
+    },
+    {
+      "logits_changed": 0,
+      "masks_changed": 0,
+      "paired_inputs": 28,
+      "stage": 3
+    },
+    {
+      "logits_changed": 0,
+      "masks_changed": 0,
+      "paired_inputs": 28,
+      "stage": 4
+    },
+    {
+      "logits_changed": 0,
+      "masks_changed": 0,
+      "paired_inputs": 28,
+      "stage": 5
+    },
+    {
+      "logits_changed": 0,
+      "masks_changed": 0,
+      "paired_inputs": 28,
+      "stage": 6
+    },
+    {
+      "logits_changed": 0,
+      "masks_changed": 0,
+      "paired_inputs": 28,
+      "stage": 7
+    },
+    {
+      "logits_changed": 0,
+      "masks_changed": 28,
+      "paired_inputs": 28,
+      "stage": 8
+    },
+    {
+      "logits_changed": 28,
+      "masks_changed": 28,
+      "paired_inputs": 28,
+      "stage": 9
+    },
+    {
+      "logits_changed": 28,
+      "masks_changed": 28,
+      "paired_inputs": 28,
+      "stage": 10
+    },
+    {
+      "logits_changed": 28,
+      "masks_changed": 28,
+      "paired_inputs": 28,
+      "stage": 11
+    },
+    {
+      "logits_changed": 28,
+      "masks_changed": 28,
+      "paired_inputs": 28,
+      "stage": 12
+    }
+  ],
+  "scope": "Exact tensor connectivity among 28 aligned original pairs; not an accuracy, parameter-count-control or independent-replication claim",
+  "source_audit_sha256": "a9fa2a1636b47403c069b94199730fb7b88db1368d258a49dd8a2b5041bb66a7",
+  "status": "VERIFIED_AGGREGATION",
+  "strict_alignment_pairs": 28
+}

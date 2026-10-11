@@ -1,24 +1,9 @@
-# Requirement Review
+# 当前逐项验收入口
 
-Primary-agent review against EXECUTION_INSTRUCTION.md sections 0-15.
+后续集群预算与全部实际训练结果已经取代初始“零步训练”的状态。
+当前逐项验收见[REQUIREMENT_REVIEW.md](../native_long_postselection_v1/REQUIREMENT_REVIEW.md)。
+四条轨迹均29,700更新，正式确认、机制诊断及两个检查点的记忆对照均已完成并审计。
+全部GPU队列退出、ACTIVE清空；Git提交身份和实际发布核验见最终交接及仓库外回执。
 
-| Section | Status | Evidence and boundary |
-|---|---|---|
-| 0 | PARTIAL_BUDGET | Four independent implementations; zero authorized full trajectories, no gain claim. |
-| 1 | PASS_BINDING | Exact base, mandatory historical materials and fixed encoder/R1 SHA; isolated branch. |
-| 2 | PASS_DEVELOPMENT | Code bindings and actual preflight evidence; training effects remain unmeasured. |
-| 3 | PASS_POPULATION | 361 TRAIN, 8 CAL, 8 SEL; unique scans/global IDs/paired draws, T5 available. |
-| 4 | PASS_INITIALIZATION | New seed45 common state, encoder-only, frozen train mode, raw_sum scalar/gradient and 12aux. |
-| 5 | RUNTIME_CONDITIONAL | Six fresh-process A/BA/ABA probes; history sensitivity; complete largest backward and OOM fallback. |
-| 6 | PASS_PREFLIGHT_ONLY | S activates all 12 T5 capped layers with fixed totals; extras/T1/no-cap/padding covered. |
-| 7 | PASS_PREFLIGHT_ONLY | Initial identity, two-step real gradients, exactly later four outputs/final mask change; chunk/checkpoint parity. |
-| 8 | PARTIAL_BUDGET | U/scheduler/global batch retained; actual Lightning split-resume fixture passed, native full training not run. |
-| 9 | NOT_RUN_BUDGET | No CAL lock/SEL/seed46/formal confirmation; exact internal expected denominators and null scores. |
-| 10 | PASS_PLAN_WITH_FIXED_DEVIATION | Prior/failures/CPU-test CUDA overcapture charged; serial IO and reference-size/curriculum integrated; empty mode locked before results. |
-| 11 | PARTIAL_PREFLIGHT | Actual temporary S/F diagnostics; trained nested failures/order AP/full deployment profile deferred. |
-| 12 | PASS_DEVELOPMENT_REVIEW | Focused regression/lint/compile/diff checks recorded separately; no scientific PASS inferred from tests. |
-| 13 | PARTIAL_STAGE_SUPPORT | run/status/report/publish current budget path tested; seed45 Lightning/CAL/SEL path provided but not real-run validated; later positive-plan stages need validation. |
-| 14 | CODE_ONLY | A/B/tag and verified Git receipt; F initialization is small Git asset, task initialization package remains local without Release authorization. |
-| 15 | PASS_EVIDENCE_BOUNDARY | S/F are unconfirmed engineering hypotheses; no reproduction/official-performance claim. |
-
-This is a budget-limited development delivery, not completion of the four-arm retraining study. No full training, CAL/SEL, replication, formal confirmation or trained-model profile is marked PASS.
+此目录保留原始预检配置/账本/状态快照，它们不是当前集群的累计训练状态。
+固定新进程仍有数值非重复；测试通过不表示方法优于最佳基线，也不表示CVPR投稿就绪。

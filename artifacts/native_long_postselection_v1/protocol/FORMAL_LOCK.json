@@ -1,0 +1,33 @@
+{
+  "CAL_LOCK_sha256": "9f8ab1fb98fb9186755d18ff588fa552a82b41d0b2afec8c2bf48993e9104b85",
+  "FORMAL_POPULATION_sha256": "6af1cdc5a7ce9160178425839f38887b3e4c10d9ca369ac8425efb1518b7b944",
+  "evaluation_seed": 9001,
+  "formal_results_used_for_selection": false,
+  "rows": [
+    {
+      "arm": "E0",
+      "kind": "CAL_SELECTED",
+      "step": 5940
+    },
+    {
+      "arm": "E1",
+      "kind": "CAL_SELECTED",
+      "step": 23760
+    },
+    {
+      "arm": "E3",
+      "kind": "CAL_SELECTED",
+      "step": 2970
+    },
+    {
+      "arm": "E1",
+      "kind": "MATCHED_STEP_CONTROL",
+      "step": 2970
+    }
+  ],
+  "schema": 1,
+  "selected_module": "E3",
+  "source_plan_sha256": "a3240f887479cd10e0ae099aec43666b73494cb5cc8478c49a30a466784e285b",
+  "status": "LOCKED_PENDING_EXECUTION",
+  "training_seed": 45
+}

@@ -1,0 +1,67 @@
+{
+  "assets": [
+    {
+      "asset": "E0-05940.pt",
+      "backbone_custom_config": {
+        "enc_mode": false
+      },
+      "task_float_tensor_dtypes": {
+        "torch.float32": 345
+      },
+      "trainer_precision": "32-true"
+    },
+    {
+      "asset": "E1-02970.pt",
+      "backbone_custom_config": {
+        "enc_mode": false
+      },
+      "task_float_tensor_dtypes": {
+        "torch.float32": 345
+      },
+      "trainer_precision": "32-true"
+    },
+    {
+      "asset": "E1-23760.pt",
+      "backbone_custom_config": {
+        "enc_mode": false
+      },
+      "task_float_tensor_dtypes": {
+        "torch.float32": 345
+      },
+      "trainer_precision": "32-true"
+    },
+    {
+      "asset": "E2-29700.pt",
+      "backbone_custom_config": {
+        "enc_mode": false
+      },
+      "task_float_tensor_dtypes": {
+        "torch.float32": 345
+      },
+      "trainer_precision": "32-true"
+    },
+    {
+      "asset": "E3-02970.pt",
+      "backbone_custom_config": {
+        "enc_mode": false
+      },
+      "task_float_tensor_dtypes": {
+        "torch.float32": 359
+      },
+      "trainer_precision": "32-true"
+    }
+  ],
+  "causal_scope": "This documents the preserved implementation, not an attribution of the observed numerical nonrepeatability to FlashAttention.",
+  "concerto_config": {
+    "enable_flash": true,
+    "shuffle_orders": true,
+    "upcast_attention": false,
+    "upcast_softmax": false
+  },
+  "concerto_model_source_sha256": "72b7c523d26fa0567c9c834d557156e31db51c05d42037cedb197990024be999",
+  "configuration_changed": false,
+  "native_numeric_source_sha256": "37eabca349a05ca46664a9f1c92d2692f9391c92983edc3ac9de2ecedf4be5a9",
+  "precision_scope": "Lightning 32-true, no trainer AMP; original enabled Concerto FlashAttention explicitly casts qkv to float16 and casts outputs back to qkv dtype. Not every kernel is FP32.",
+  "pretrained_encoder_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+  "status": "VERIFIED_CONFIG_AND_BOUND_SOURCE"
+}

@@ -1,0 +1,61 @@
+{
+  "cpu_seconds": 27.306768705137074,
+  "encoder_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+  "loader_sha256": "1062eb31d58500343514a093013e4ef69202ca3563e063008c9f18504e4a94db",
+  "reference_initialization_sha256": "8d3dfbc4e5c78d707ae5d6cb913123727456698c06d7c1e5077d944772c423e1",
+  "rows": [
+    {
+      "arm": "E0",
+      "bundle_sha256": "16822b8c35803dac30f99af32bc6105f49b67bcb6ae43e9951e9b6e623626a6f",
+      "checkpoint_sha256": "a040be5e3337bdac556d36cb41a17a415ad90dc8e226d6f8476ee8365d43cf5c",
+      "frozen_encoder_parameter_entries": 453,
+      "mutable_encoder_buffers": 0,
+      "status": "EXACT_TENSOR_RELOAD_WITH_RELOCATED_ENCODER_AND_TAXONOMY",
+      "step": 5940,
+      "tensor_entries": 798
+    },
+    {
+      "arm": "E1",
+      "bundle_sha256": "8c9d0d57044ce23c7964ddb1e7a2d8bd18e388e6ee657a7f4b02b1368b5b3a98",
+      "checkpoint_sha256": "d767086021690d9e74f9024a5b56dc85b43682e2b5e5277036e4ea02ae3b1887",
+      "frozen_encoder_parameter_entries": 453,
+      "mutable_encoder_buffers": 0,
+      "status": "EXACT_TENSOR_RELOAD_WITH_RELOCATED_ENCODER_AND_TAXONOMY",
+      "step": 23760,
+      "tensor_entries": 798
+    },
+    {
+      "arm": "E1",
+      "bundle_sha256": "1ded877d95842202055eaedd64bff239c49da709fa5cd5a6421c3b87b6e989ef",
+      "checkpoint_sha256": "227503ed50aaca7bfd6e89466bfd984648fec1cf3333768626998dc0ba43e25b",
+      "frozen_encoder_parameter_entries": 453,
+      "mutable_encoder_buffers": 0,
+      "status": "EXACT_TENSOR_RELOAD_WITH_RELOCATED_ENCODER_AND_TAXONOMY",
+      "step": 2970,
+      "tensor_entries": 798
+    },
+    {
+      "arm": "E2",
+      "bundle_sha256": "83b701e6259559c6b331cece7382e645dc807968184b70586f291b3475d59dc6",
+      "checkpoint_sha256": "2dce3660bfe08e85e647e3f421f55dba6de17075ba96251989690b3f9cd6480c",
+      "frozen_encoder_parameter_entries": 453,
+      "mutable_encoder_buffers": 0,
+      "status": "EXACT_TENSOR_RELOAD_WITH_RELOCATED_ENCODER_AND_TAXONOMY",
+      "step": 29700,
+      "tensor_entries": 798
+    },
+    {
+      "arm": "E3",
+      "bundle_sha256": "7eef8600daf76356c2743b4da961fdf7d49abbd077b3d44763d7a2b3db22486a",
+      "checkpoint_sha256": "34359a84fe00e4417acaddeca5832b2e893df997dcf6cfb2d73ad31e704cda5a",
+      "frozen_encoder_parameter_entries": 453,
+      "mutable_encoder_buffers": 0,
+      "status": "EXACT_TENSOR_RELOAD_WITH_RELOCATED_ENCODER_AND_TAXONOMY",
+      "step": 2970,
+      "tensor_entries": 812
+    }
+  ],
+  "scope": "all trained task parameters/buffers plus all frozen encoder parameters; CPU tensors, no runtime-invariance claim",
+  "status": "VERIFIED",
+  "taxonomy_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba"
+}

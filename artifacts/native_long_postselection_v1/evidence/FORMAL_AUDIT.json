@@ -1,0 +1,4733 @@
+{
+  "comparisons": [
+    {
+      "comparison": "selected_E1_vs_E0",
+      "delta": {
+        "S_long": 0.018416853000720337,
+        "T2": 0.0205724835395813,
+        "T3": 0.023007646203041077,
+        "T4": 0.016638629138469696,
+        "T5": 0.015604283660650253
+      },
+      "reference_diagnostics": {
+        "estimand": "per physical reference, mean delta over its available T3\u2013T5; not pooled S_long",
+        "horizon_rows": [
+          {
+            "AP": 0.2796361744403839,
+            "control_AP": 0.2179764360189438,
+            "delta": 0.061659738421440125,
+            "horizon": 2,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.2602294087409973,
+            "control_AP": 0.23418956995010376,
+            "delta": 0.026039838790893555,
+            "horizon": 2,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.43374788761138916,
+            "control_AP": 0.23414288461208344,
+            "delta": 0.19960500299930573,
+            "horizon": 2,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.23133254051208496,
+            "control_AP": 0.23187853395938873,
+            "delta": -0.000545993447303772,
+            "horizon": 2,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.23467238247394562,
+            "control_AP": 0.2348848432302475,
+            "delta": -0.00021246075630187988,
+            "horizon": 2,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.15208299458026886,
+            "control_AP": 0.10699748992919922,
+            "delta": 0.04508550465106964,
+            "horizon": 2,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.21967275440692902,
+            "control_AP": 0.13265937566757202,
+            "delta": 0.087013378739357,
+            "horizon": 3,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.16377468407154083,
+            "control_AP": 0.14148083329200745,
+            "delta": 0.022293850779533386,
+            "horizon": 3,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.3917563259601593,
+            "control_AP": 0.1689554899930954,
+            "delta": 0.2228008359670639,
+            "horizon": 3,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.20253640413284302,
+            "control_AP": 0.18902833759784698,
+            "delta": 0.013508066534996033,
+            "horizon": 3,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.16733421385288239,
+            "control_AP": 0.15725669264793396,
+            "delta": 0.010077521204948425,
+            "horizon": 3,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.10571923851966858,
+            "control_AP": 0.05906006321310997,
+            "delta": 0.04665917530655861,
+            "horizon": 3,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.15344925224781036,
+            "control_AP": 0.11485403776168823,
+            "delta": 0.03859521448612213,
+            "horizon": 4,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.12788787484169006,
+            "control_AP": 0.10608327388763428,
+            "delta": 0.021804600954055786,
+            "horizon": 4,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.3448635935783386,
+            "control_AP": 0.14762486517429352,
+            "delta": 0.1972387284040451,
+            "horizon": 4,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.1334279179573059,
+            "control_AP": 0.1268427073955536,
+            "delta": 0.006585210561752319,
+            "horizon": 4,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.09229324758052826,
+            "control_AP": 0.10415555536746979,
+            "delta": -0.011862307786941528,
+            "horizon": 4,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.06395384669303894,
+            "control_AP": 0.03650343418121338,
+            "delta": 0.02745041251182556,
+            "horizon": 4,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.12747716903686523,
+            "control_AP": 0.09348542988300323,
+            "delta": 0.033991739153862,
+            "horizon": 5,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.09827722609043121,
+            "control_AP": 0.07779788970947266,
+            "delta": 0.020479336380958557,
+            "horizon": 5,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.2862260639667511,
+            "control_AP": 0.12164592742919922,
+            "delta": 0.16458013653755188,
+            "horizon": 5,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.11841359734535217,
+            "control_AP": 0.112649105489254,
+            "delta": 0.005764491856098175,
+            "horizon": 5,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.07672177255153656,
+            "control_AP": 0.07566162198781967,
+            "delta": 0.0010601505637168884,
+            "horizon": 5,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.03496742621064186,
+            "control_AP": 0.021926624700427055,
+            "delta": 0.013040801510214806,
+            "horizon": 5,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          }
+        ],
+        "long_reference_rows": [
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": 0.05320011079311371,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": 0.02152592937151591,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": 0.1948732336362203,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": 0.008619256317615509,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": -0.00024154533942540488,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": 0.029050129776199658,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          }
+        ],
+        "long_reference_signs": {
+          "negative": 1,
+          "positive": 5,
+          "zero": 0
+        }
+      },
+      "role": "PB"
+    },
+    {
+      "comparison": "matched_step_E3_vs_E1",
+      "delta": {
+        "S_long": 0.004847234735886247,
+        "T2": 0.00527055561542511,
+        "T3": 0.004409663379192352,
+        "T4": 0.006019432097673416,
+        "T5": 0.004112608730792999
+      },
+      "reference_diagnostics": {
+        "estimand": "per physical reference, mean delta over its available T3\u2013T5; not pooled S_long",
+        "horizon_rows": [
+          {
+            "AP": 0.269279420375824,
+            "control_AP": 0.20729774236679077,
+            "delta": 0.0619816780090332,
+            "horizon": 2,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.2383696734905243,
+            "control_AP": 0.23433518409729004,
+            "delta": 0.004034489393234253,
+            "horizon": 2,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.1621263027191162,
+            "control_AP": 0.2149561196565628,
+            "delta": -0.052829816937446594,
+            "horizon": 2,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.34212952852249146,
+            "control_AP": 0.2971077561378479,
+            "delta": 0.045021772384643555,
+            "horizon": 2,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.16436362266540527,
+            "control_AP": 0.16540935635566711,
+            "delta": -0.0010457336902618408,
+            "horizon": 2,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.082970529794693,
+            "control_AP": 0.07565423101186752,
+            "delta": 0.00731629878282547,
+            "horizon": 2,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.18690715730190277,
+            "control_AP": 0.1391015201807022,
+            "delta": 0.04780563712120056,
+            "horizon": 3,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.1379765123128891,
+            "control_AP": 0.13760274648666382,
+            "delta": 0.00037376582622528076,
+            "horizon": 3,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.14045441150665283,
+            "control_AP": 0.1862013339996338,
+            "delta": -0.04574692249298096,
+            "horizon": 3,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.24123071134090424,
+            "control_AP": 0.24064330756664276,
+            "delta": 0.0005874037742614746,
+            "horizon": 3,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.09799709916114807,
+            "control_AP": 0.11194846034049988,
+            "delta": -0.013951361179351807,
+            "horizon": 3,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.04852898418903351,
+            "control_AP": 0.04001070559024811,
+            "delta": 0.0085182785987854,
+            "horizon": 3,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.14819462597370148,
+            "control_AP": 0.10878349840641022,
+            "delta": 0.03941112756729126,
+            "horizon": 4,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.11091919243335724,
+            "control_AP": 0.10759767144918442,
+            "delta": 0.003321520984172821,
+            "horizon": 4,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.10953504592180252,
+            "control_AP": 0.15614023804664612,
+            "delta": -0.0466051921248436,
+            "horizon": 4,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.17361631989479065,
+            "control_AP": 0.2155621200799942,
+            "delta": -0.04194580018520355,
+            "horizon": 4,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.05753759667277336,
+            "control_AP": 0.04601096361875534,
+            "delta": 0.01152663305401802,
+            "horizon": 4,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.031025998294353485,
+            "control_AP": 0.023665348067879677,
+            "delta": 0.007360650226473808,
+            "horizon": 4,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.1208009347319603,
+            "control_AP": 0.0937691330909729,
+            "delta": 0.027031801640987396,
+            "horizon": 5,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.1001816987991333,
+            "control_AP": 0.08897770941257477,
+            "delta": 0.011203989386558533,
+            "horizon": 5,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.09228596091270447,
+            "control_AP": 0.1455988585948944,
+            "delta": -0.05331289768218994,
+            "horizon": 5,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.21889778971672058,
+            "control_AP": 0.215317502617836,
+            "delta": 0.0035802870988845825,
+            "horizon": 5,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.0577622652053833,
+            "control_AP": 0.04360733553767204,
+            "delta": 0.014154929667711258,
+            "horizon": 5,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.012187439016997814,
+            "control_AP": 0.01180329080671072,
+            "delta": 0.0003841482102870941,
+            "horizon": 5,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          }
+        ],
+        "long_reference_rows": [
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": 0.03808285544315974,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": 0.004966425398985545,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": -0.04855500410000483,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": -0.012592703104019165,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": 0.003910067180792491,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": 0.005421025678515434,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          }
+        ],
+        "long_reference_signs": {
+          "negative": 2,
+          "positive": 4,
+          "zero": 0
+        }
+      },
+      "role": "PB"
+    },
+    {
+      "comparison": "selected_E3_vs_best_E1",
+      "delta": {
+        "S_long": -0.016915275404850647,
+        "T2": -0.0296238511800766,
+        "T3": -0.032057471573352814,
+        "T4": -0.013122588396072388,
+        "T5": -0.005565766245126724
+      },
+      "reference_diagnostics": {
+        "estimand": "per physical reference, mean delta over its available T3\u2013T5; not pooled S_long",
+        "horizon_rows": [
+          {
+            "AP": 0.269279420375824,
+            "control_AP": 0.2796361744403839,
+            "delta": -0.010356754064559937,
+            "horizon": 2,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.2383696734905243,
+            "control_AP": 0.2602294087409973,
+            "delta": -0.021859735250473022,
+            "horizon": 2,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.1621263027191162,
+            "control_AP": 0.43374788761138916,
+            "delta": -0.27162158489227295,
+            "horizon": 2,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.34212952852249146,
+            "control_AP": 0.23133254051208496,
+            "delta": 0.1107969880104065,
+            "horizon": 2,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.16436362266540527,
+            "control_AP": 0.23467238247394562,
+            "delta": -0.07030875980854034,
+            "horizon": 2,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.082970529794693,
+            "control_AP": 0.15208299458026886,
+            "delta": -0.06911246478557587,
+            "horizon": 2,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.18690715730190277,
+            "control_AP": 0.21967275440692902,
+            "delta": -0.032765597105026245,
+            "horizon": 3,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.1379765123128891,
+            "control_AP": 0.16377468407154083,
+            "delta": -0.025798171758651733,
+            "horizon": 3,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.14045441150665283,
+            "control_AP": 0.3917563259601593,
+            "delta": -0.25130191445350647,
+            "horizon": 3,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.24123071134090424,
+            "control_AP": 0.20253640413284302,
+            "delta": 0.03869430720806122,
+            "horizon": 3,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.09799709916114807,
+            "control_AP": 0.16733421385288239,
+            "delta": -0.06933711469173431,
+            "horizon": 3,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.04852898418903351,
+            "control_AP": 0.10571923851966858,
+            "delta": -0.05719025433063507,
+            "horizon": 3,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.14819462597370148,
+            "control_AP": 0.15344925224781036,
+            "delta": -0.005254626274108887,
+            "horizon": 4,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.11091919243335724,
+            "control_AP": 0.12788787484169006,
+            "delta": -0.016968682408332825,
+            "horizon": 4,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.10953504592180252,
+            "control_AP": 0.3448635935783386,
+            "delta": -0.2353285476565361,
+            "horizon": 4,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.17361631989479065,
+            "control_AP": 0.1334279179573059,
+            "delta": 0.04018840193748474,
+            "horizon": 4,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.05753759667277336,
+            "control_AP": 0.09229324758052826,
+            "delta": -0.0347556509077549,
+            "horizon": 4,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.031025998294353485,
+            "control_AP": 0.06395384669303894,
+            "delta": -0.032927848398685455,
+            "horizon": 4,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.1208009347319603,
+            "control_AP": 0.12747716903686523,
+            "delta": -0.006676234304904938,
+            "horizon": 5,
+            "inputs": 30,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.1001816987991333,
+            "control_AP": 0.09827722609043121,
+            "delta": 0.0019044727087020874,
+            "horizon": 5,
+            "inputs": 36,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.09228596091270447,
+            "control_AP": 0.2862260639667511,
+            "delta": -0.19394010305404663,
+            "horizon": 5,
+            "inputs": 15,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.21889778971672058,
+            "control_AP": 0.11841359734535217,
+            "delta": 0.10048419237136841,
+            "horizon": 5,
+            "inputs": 15,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.0577622652053833,
+            "control_AP": 0.07672177255153656,
+            "delta": -0.01895950734615326,
+            "horizon": 5,
+            "inputs": 15,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.012187439016997814,
+            "control_AP": 0.03496742621064186,
+            "delta": -0.022779987193644047,
+            "horizon": 5,
+            "inputs": 18,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          }
+        ],
+        "long_reference_rows": [
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": -0.014898819228013357,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": -0.01362079381942749,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": -0.2268568550546964,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": 0.05978896717230479,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": -0.04101742431521416,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "available_horizons": [
+              3,
+              4,
+              5
+            ],
+            "mean_available_delta": -0.03763269664098819,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          }
+        ],
+        "long_reference_signs": {
+          "negative": 5,
+          "positive": 1,
+          "zero": 0
+        }
+      },
+      "role": "PB"
+    },
+    {
+      "comparison": "selected_E1_vs_E0",
+      "delta": {
+        "T2": 0.062180131673812866
+      },
+      "reference_diagnostics": {
+        "estimand": "per physical reference, mean delta over its available T3\u2013T5; not pooled S_long",
+        "horizon_rows": [
+          {
+            "AP": 0.3465910255908966,
+            "control_AP": 0.3253450095653534,
+            "delta": 0.021246016025543213,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.44603654742240906,
+            "control_AP": 0.3414214849472046,
+            "delta": 0.10461506247520447,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.37586963176727295,
+            "control_AP": 0.11904522776603699,
+            "delta": 0.25682440400123596,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "AP": 0.3209891617298126,
+            "control_AP": 0.27114808559417725,
+            "delta": 0.049841076135635376,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7584-8d6f-2d13-8df8-c05e4307b418"
+          },
+          {
+            "AP": 0.5845358967781067,
+            "control_AP": 0.4818856716156006,
+            "delta": 0.1026502251625061,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac75dc-8d6f-2d13-8d08-9c497bd6acdc"
+          },
+          {
+            "AP": 0.05667437985539436,
+            "control_AP": 0.0805647000670433,
+            "delta": -0.02389032021164894,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7676-8d6f-2d13-8f3a-d7bf7f03e721"
+          },
+          {
+            "AP": 0.3347626328468323,
+            "control_AP": 0.29842478036880493,
+            "delta": 0.036337852478027344,
+            "horizon": 2,
+            "inputs": 10,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.23728902637958527,
+            "control_AP": 0.23862610757350922,
+            "delta": -0.0013370811939239502,
+            "horizon": 2,
+            "inputs": 12,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.507797360420227,
+            "control_AP": 0.3751583695411682,
+            "delta": 0.13263899087905884,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "1d233fe8-e280-2b1a-8fac-c3646a1cd64a"
+          },
+          {
+            "AP": 0.3868170976638794,
+            "control_AP": 0.3499176800251007,
+            "delta": 0.036899417638778687,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "AP": 0.32210350036621094,
+            "control_AP": 0.31784188747406006,
+            "delta": 0.004261612892150879,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "20c993b7-698f-29c5-847d-c8cb8a685f5a"
+          },
+          {
+            "AP": 0.41191768646240234,
+            "control_AP": 0.24784255027770996,
+            "delta": 0.16407513618469238,
+            "horizon": 2,
+            "inputs": 5,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.2458859384059906,
+            "control_AP": 0.27016204595565796,
+            "delta": -0.02427610754966736,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "321c8680-a5a8-2a84-85c2-816a26d59516"
+          },
+          {
+            "AP": 0.142785906791687,
+            "control_AP": 0.14144732058048248,
+            "delta": 0.0013385862112045288,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "AP": 0.05162569507956505,
+            "control_AP": 0.1027006134390831,
+            "delta": -0.05107491835951805,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "AP": 0.19907407462596893,
+            "control_AP": 0.29629629850387573,
+            "delta": -0.0972222238779068,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "422885b3-192d-25fc-84c9-9b80eea1752d"
+          },
+          {
+            "AP": 0.17757777869701385,
+            "control_AP": 0.2317133992910385,
+            "delta": -0.05413562059402466,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.6631870865821838,
+            "control_AP": 0.6274377703666687,
+            "delta": 0.03574931621551514,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "AP": 0.4050687849521637,
+            "control_AP": 0.37043946981430054,
+            "delta": 0.03462931513786316,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4a9a43d2-7736-2874-874d-d0fad0570e19"
+          },
+          {
+            "AP": 0.4079689681529999,
+            "control_AP": 0.34164777398109436,
+            "delta": 0.06632119417190552,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4d3d82b0-8cf4-2e04-80a8-c955ea964c2f"
+          },
+          {
+            "AP": 0.3449464738368988,
+            "control_AP": 0.07564650475978851,
+            "delta": 0.2692999690771103,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.4043289124965668,
+            "control_AP": 0.44049274921417236,
+            "delta": -0.03616383671760559,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b79f-8a66-2cdd-84d5-6dba6525dd75"
+          },
+          {
+            "AP": 0.25323155522346497,
+            "control_AP": 0.170388326048851,
+            "delta": 0.08284322917461395,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b7e3-8a66-2cdd-8709-66a2159f0017"
+          },
+          {
+            "AP": 0.2398070991039276,
+            "control_AP": 0.23716440796852112,
+            "delta": 0.002642691135406494,
+            "horizon": 2,
+            "inputs": 5,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.34961655735969543,
+            "control_AP": 0.4068264067173004,
+            "delta": -0.05720984935760498,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.6516998410224915,
+            "control_AP": 0.3566064238548279,
+            "delta": 0.2950934171676636,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "AP": 0.6986972689628601,
+            "control_AP": 0.4632640480995178,
+            "delta": 0.23543322086334229,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.10921236872673035,
+            "control_AP": 0.25,
+            "delta": -0.14078763127326965,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "75c25975-9ca2-2844-9769-84677f46d4cf"
+          },
+          {
+            "AP": 0.15574170649051666,
+            "control_AP": 0.10641670972108841,
+            "delta": 0.04932499676942825,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "AP": 0.6163536310195923,
+            "control_AP": 0.5565359592437744,
+            "delta": 0.05981767177581787,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "AP": 0.21084319055080414,
+            "control_AP": 0.22325536608695984,
+            "delta": -0.0124121755361557,
+            "horizon": 2,
+            "inputs": 5,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.3051829934120178,
+            "control_AP": 0.312339186668396,
+            "delta": -0.007156193256378174,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "AP": 0.2730453312397003,
+            "control_AP": 0.05355607345700264,
+            "delta": 0.21948925778269768,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "AP": 0.28141868114471436,
+            "control_AP": 0.278109610080719,
+            "delta": 0.0033090710639953613,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.5918076038360596,
+            "control_AP": 0.41690996289253235,
+            "delta": 0.17489764094352722,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "AP": 0.2996833324432373,
+            "control_AP": 0.5526430606842041,
+            "delta": -0.2529597282409668,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "b1f23308-d255-2761-94da-981d962c6bf8"
+          },
+          {
+            "AP": 0.26047128438949585,
+            "control_AP": 0.20706385374069214,
+            "delta": 0.05340743064880371,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "ba6fdaaa-a4c1-2dca-8163-a52b18bf6b64"
+          },
+          {
+            "AP": 0.0,
+            "control_AP": 0.0,
+            "delta": 0.0,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "bcb0fe06-4f39-2c70-9c24-a8dd7496c2f8"
+          },
+          {
+            "AP": 0.001974328886717558,
+            "control_AP": 0.00034293552744202316,
+            "delta": 0.0016313933592755347,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "AP": 0.19835107028484344,
+            "control_AP": 0.223396897315979,
+            "delta": -0.02504582703113556,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "AP": 0.21432682871818542,
+            "control_AP": 0.2849680483341217,
+            "delta": -0.07064121961593628,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "AP": 0.6240602135658264,
+            "control_AP": 0.4189086854457855,
+            "delta": 0.2051515281200409,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "AP": 0.5932195782661438,
+            "control_AP": 0.4050866961479187,
+            "delta": 0.1881328821182251,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          },
+          {
+            "AP": 0.17899826169013977,
+            "control_AP": 0.1287703663110733,
+            "delta": 0.05022789537906647,
+            "horizon": 2,
+            "inputs": 6,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.3581973910331726,
+            "control_AP": 0.24859550595283508,
+            "delta": 0.10960188508033752,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "e61b0e04-bada-2f31-82d6-72831a602ba7"
+          },
+          {
+            "AP": 0.42780449986457825,
+            "control_AP": 0.3072916567325592,
+            "delta": 0.12051284313201904,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "fcf66d7b-622d-291c-86b8-7db96aebcee3"
+          }
+        ],
+        "long_reference_rows": [],
+        "long_reference_signs": {
+          "negative": 0,
+          "positive": 0,
+          "zero": 0
+        }
+      },
+      "role": "LOCAL-T2"
+    },
+    {
+      "comparison": "matched_step_E3_vs_E1",
+      "delta": {
+        "T2": 0.001337781548500061
+      },
+      "reference_diagnostics": {
+        "estimand": "per physical reference, mean delta over its available T3\u2013T5; not pooled S_long",
+        "horizon_rows": [
+          {
+            "AP": 0.2795287072658539,
+            "control_AP": 0.3592049777507782,
+            "delta": -0.07967627048492432,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.36172953248023987,
+            "control_AP": 0.303679883480072,
+            "delta": 0.05804964900016785,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.03295620530843735,
+            "control_AP": 0.04392563924193382,
+            "delta": -0.010969433933496475,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "AP": 0.3736546039581299,
+            "control_AP": 0.32399940490722656,
+            "delta": 0.04965519905090332,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7584-8d6f-2d13-8df8-c05e4307b418"
+          },
+          {
+            "AP": 0.36744561791419983,
+            "control_AP": 0.39125514030456543,
+            "delta": -0.0238095223903656,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac75dc-8d6f-2d13-8d08-9c497bd6acdc"
+          },
+          {
+            "AP": 0.0694444477558136,
+            "control_AP": 0.05066287890076637,
+            "delta": 0.018781568855047226,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7676-8d6f-2d13-8f3a-d7bf7f03e721"
+          },
+          {
+            "AP": 0.28667107224464417,
+            "control_AP": 0.27639955282211304,
+            "delta": 0.010271519422531128,
+            "horizon": 2,
+            "inputs": 10,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.2431335151195526,
+            "control_AP": 0.22136828303337097,
+            "delta": 0.02176523208618164,
+            "horizon": 2,
+            "inputs": 12,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.28277623653411865,
+            "control_AP": 0.2777777910232544,
+            "delta": 0.004998445510864258,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "1d233fe8-e280-2b1a-8fac-c3646a1cd64a"
+          },
+          {
+            "AP": 0.3409022092819214,
+            "control_AP": 0.3659716248512268,
+            "delta": -0.02506941556930542,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "AP": 0.5555555820465088,
+            "control_AP": 0.5015432834625244,
+            "delta": 0.054012298583984375,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "20c993b7-698f-29c5-847d-c8cb8a685f5a"
+          },
+          {
+            "AP": 0.20597927272319794,
+            "control_AP": 0.25958502292633057,
+            "delta": -0.05360575020313263,
+            "horizon": 2,
+            "inputs": 5,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.24814815819263458,
+            "control_AP": 0.23333333432674408,
+            "delta": 0.014814823865890503,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "321c8680-a5a8-2a84-85c2-816a26d59516"
+          },
+          {
+            "AP": 0.09480904787778854,
+            "control_AP": 0.083803690969944,
+            "delta": 0.011005356907844543,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "AP": 0.024010811001062393,
+            "control_AP": 0.02004881016910076,
+            "delta": 0.003962000831961632,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "AP": 0.18518517911434174,
+            "control_AP": 0.22685185074806213,
+            "delta": -0.0416666716337204,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "422885b3-192d-25fc-84c9-9b80eea1752d"
+          },
+          {
+            "AP": 0.24666231870651245,
+            "control_AP": 0.2091652899980545,
+            "delta": 0.03749702870845795,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.40086236596107483,
+            "control_AP": 0.3851572275161743,
+            "delta": 0.015705138444900513,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "AP": 0.2752702832221985,
+            "control_AP": 0.22877702116966248,
+            "delta": 0.04649326205253601,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4a9a43d2-7736-2874-874d-d0fad0570e19"
+          },
+          {
+            "AP": 0.3986411690711975,
+            "control_AP": 0.30873486399650574,
+            "delta": 0.08990630507469177,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4d3d82b0-8cf4-2e04-80a8-c955ea964c2f"
+          },
+          {
+            "AP": 0.2870529890060425,
+            "control_AP": 0.29671409726142883,
+            "delta": -0.009661108255386353,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.47896113991737366,
+            "control_AP": 0.4421296715736389,
+            "delta": 0.03683146834373474,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b79f-8a66-2cdd-84d5-6dba6525dd75"
+          },
+          {
+            "AP": 0.0515873022377491,
+            "control_AP": 0.06303858011960983,
+            "delta": -0.011451277881860733,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b7e3-8a66-2cdd-8709-66a2159f0017"
+          },
+          {
+            "AP": 0.3622601330280304,
+            "control_AP": 0.29413196444511414,
+            "delta": 0.06812816858291626,
+            "horizon": 2,
+            "inputs": 5,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.2523753345012665,
+            "control_AP": 0.19911307096481323,
+            "delta": 0.05326226353645325,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.5082878470420837,
+            "control_AP": 0.5189006328582764,
+            "delta": -0.010612785816192627,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "AP": 0.37885811924934387,
+            "control_AP": 0.3922163248062134,
+            "delta": -0.013358205556869507,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.20931421220302582,
+            "control_AP": 0.1877562701702118,
+            "delta": 0.021557942032814026,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "75c25975-9ca2-2844-9769-84677f46d4cf"
+          },
+          {
+            "AP": 0.1224675253033638,
+            "control_AP": 0.09173275530338287,
+            "delta": 0.030734769999980927,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "AP": 0.5735030770301819,
+            "control_AP": 0.5616110563278198,
+            "delta": 0.01189202070236206,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "AP": 0.13134658336639404,
+            "control_AP": 0.15684345364570618,
+            "delta": -0.025496870279312134,
+            "horizon": 2,
+            "inputs": 5,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.2284969985485077,
+            "control_AP": 0.20543108880519867,
+            "delta": 0.02306590974330902,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "AP": 0.127519428730011,
+            "control_AP": 0.06540635973215103,
+            "delta": 0.062113068997859955,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "AP": 0.237571582198143,
+            "control_AP": 0.2414126843214035,
+            "delta": -0.003841102123260498,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.3823124170303345,
+            "control_AP": 0.3451228141784668,
+            "delta": 0.037189602851867676,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "AP": 0.3991454839706421,
+            "control_AP": 0.47020938992500305,
+            "delta": -0.07106390595436096,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "b1f23308-d255-2761-94da-981d962c6bf8"
+          },
+          {
+            "AP": 0.1404522955417633,
+            "control_AP": 0.10286947339773178,
+            "delta": 0.037582822144031525,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "ba6fdaaa-a4c1-2dca-8163-a52b18bf6b64"
+          },
+          {
+            "AP": 0.0,
+            "control_AP": 0.0,
+            "delta": 0.0,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "bcb0fe06-4f39-2c70-9c24-a8dd7496c2f8"
+          },
+          {
+            "AP": 0.0023701521568000317,
+            "control_AP": 0.0035590690094977617,
+            "delta": -0.00118891685269773,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "AP": 0.16530632972717285,
+            "control_AP": 0.15516236424446106,
+            "delta": 0.010143965482711792,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "AP": 0.15465159714221954,
+            "control_AP": 0.13278929889202118,
+            "delta": 0.021862298250198364,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "AP": 0.41443631052970886,
+            "control_AP": 0.4038536846637726,
+            "delta": 0.01058262586593628,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "AP": 0.45435088872909546,
+            "control_AP": 0.4425470232963562,
+            "delta": 0.011803865432739258,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          },
+          {
+            "AP": 0.08050170540809631,
+            "control_AP": 0.07597646117210388,
+            "delta": 0.004525244235992432,
+            "horizon": 2,
+            "inputs": 6,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.24717754125595093,
+            "control_AP": 0.16276229918003082,
+            "delta": 0.0844152420759201,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "e61b0e04-bada-2f31-82d6-72831a602ba7"
+          },
+          {
+            "AP": 0.32114750146865845,
+            "control_AP": 0.31398648023605347,
+            "delta": 0.0071610212326049805,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "fcf66d7b-622d-291c-86b8-7db96aebcee3"
+          }
+        ],
+        "long_reference_rows": [],
+        "long_reference_signs": {
+          "negative": 0,
+          "positive": 0,
+          "zero": 0
+        }
+      },
+      "role": "LOCAL-T2"
+    },
+    {
+      "comparison": "selected_E3_vs_best_E1",
+      "delta": {
+        "T2": -0.06976626813411713
+      },
+      "reference_diagnostics": {
+        "estimand": "per physical reference, mean delta over its available T3\u2013T5; not pooled S_long",
+        "horizon_rows": [
+          {
+            "AP": 0.2795287072658539,
+            "control_AP": 0.3465910255908966,
+            "delta": -0.06706231832504272,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.36172953248023987,
+            "control_AP": 0.44603654742240906,
+            "delta": -0.08430701494216919,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.03295620530843735,
+            "control_AP": 0.37586963176727295,
+            "delta": -0.3429134264588356,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "AP": 0.3736546039581299,
+            "control_AP": 0.3209891617298126,
+            "delta": 0.05266544222831726,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7584-8d6f-2d13-8df8-c05e4307b418"
+          },
+          {
+            "AP": 0.36744561791419983,
+            "control_AP": 0.5845358967781067,
+            "delta": -0.21709027886390686,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac75dc-8d6f-2d13-8d08-9c497bd6acdc"
+          },
+          {
+            "AP": 0.0694444477558136,
+            "control_AP": 0.05667437985539436,
+            "delta": 0.012770067900419235,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7676-8d6f-2d13-8f3a-d7bf7f03e721"
+          },
+          {
+            "AP": 0.28667107224464417,
+            "control_AP": 0.3347626328468323,
+            "delta": -0.04809156060218811,
+            "horizon": 2,
+            "inputs": 10,
+            "reference_id": "10b17940-3938-2467-8a7a-958300ba83d3"
+          },
+          {
+            "AP": 0.2431335151195526,
+            "control_AP": 0.23728902637958527,
+            "delta": 0.005844488739967346,
+            "horizon": 2,
+            "inputs": 12,
+            "reference_id": "137a8158-1db5-2cc0-8003-31c12610471e"
+          },
+          {
+            "AP": 0.28277623653411865,
+            "control_AP": 0.507797360420227,
+            "delta": -0.2250211238861084,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "1d233fe8-e280-2b1a-8fac-c3646a1cd64a"
+          },
+          {
+            "AP": 0.3409022092819214,
+            "control_AP": 0.3868170976638794,
+            "delta": -0.04591488838195801,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "AP": 0.5555555820465088,
+            "control_AP": 0.32210350036621094,
+            "delta": 0.23345208168029785,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "20c993b7-698f-29c5-847d-c8cb8a685f5a"
+          },
+          {
+            "AP": 0.20597927272319794,
+            "control_AP": 0.41191768646240234,
+            "delta": -0.2059384137392044,
+            "horizon": 2,
+            "inputs": 5,
+            "reference_id": "280d8ebb-6cc6-2788-9153-98959a2da801"
+          },
+          {
+            "AP": 0.24814815819263458,
+            "control_AP": 0.2458859384059906,
+            "delta": 0.002262219786643982,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "321c8680-a5a8-2a84-85c2-816a26d59516"
+          },
+          {
+            "AP": 0.09480904787778854,
+            "control_AP": 0.142785906791687,
+            "delta": -0.04797685891389847,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "AP": 0.024010811001062393,
+            "control_AP": 0.05162569507956505,
+            "delta": -0.027614884078502655,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "AP": 0.18518517911434174,
+            "control_AP": 0.19907407462596893,
+            "delta": -0.013888895511627197,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "422885b3-192d-25fc-84c9-9b80eea1752d"
+          },
+          {
+            "AP": 0.24666231870651245,
+            "control_AP": 0.17757777869701385,
+            "delta": 0.0690845400094986,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.40086236596107483,
+            "control_AP": 0.6631870865821838,
+            "delta": -0.262324720621109,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "AP": 0.2752702832221985,
+            "control_AP": 0.4050687849521637,
+            "delta": -0.1297985017299652,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4a9a43d2-7736-2874-874d-d0fad0570e19"
+          },
+          {
+            "AP": 0.3986411690711975,
+            "control_AP": 0.4079689681529999,
+            "delta": -0.009327799081802368,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4d3d82b0-8cf4-2e04-80a8-c955ea964c2f"
+          },
+          {
+            "AP": 0.2870529890060425,
+            "control_AP": 0.3449464738368988,
+            "delta": -0.05789348483085632,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.47896113991737366,
+            "control_AP": 0.4043289124965668,
+            "delta": 0.07463222742080688,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b79f-8a66-2cdd-84d5-6dba6525dd75"
+          },
+          {
+            "AP": 0.0515873022377491,
+            "control_AP": 0.25323155522346497,
+            "delta": -0.20164425298571587,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b7e3-8a66-2cdd-8709-66a2159f0017"
+          },
+          {
+            "AP": 0.3622601330280304,
+            "control_AP": 0.2398070991039276,
+            "delta": 0.12245303392410278,
+            "horizon": 2,
+            "inputs": 5,
+            "reference_id": "5630cfcf-12bf-2860-8784-83d28a611a83"
+          },
+          {
+            "AP": 0.2523753345012665,
+            "control_AP": 0.34961655735969543,
+            "delta": -0.09724122285842896,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.5082878470420837,
+            "control_AP": 0.6516998410224915,
+            "delta": -0.14341199398040771,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "AP": 0.37885811924934387,
+            "control_AP": 0.6986972689628601,
+            "delta": -0.31983914971351624,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.20931421220302582,
+            "control_AP": 0.10921236872673035,
+            "delta": 0.10010184347629547,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "75c25975-9ca2-2844-9769-84677f46d4cf"
+          },
+          {
+            "AP": 0.1224675253033638,
+            "control_AP": 0.15574170649051666,
+            "delta": -0.03327418118715286,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "AP": 0.5735030770301819,
+            "control_AP": 0.6163536310195923,
+            "delta": -0.0428505539894104,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "AP": 0.13134658336639404,
+            "control_AP": 0.21084319055080414,
+            "delta": -0.0794966071844101,
+            "horizon": 2,
+            "inputs": 5,
+            "reference_id": "8eabc45f-5af7-2f32-8528-640861d2a135"
+          },
+          {
+            "AP": 0.2284969985485077,
+            "control_AP": 0.3051829934120178,
+            "delta": -0.07668599486351013,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "AP": 0.127519428730011,
+            "control_AP": 0.2730453312397003,
+            "delta": -0.14552590250968933,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "AP": 0.237571582198143,
+            "control_AP": 0.28141868114471436,
+            "delta": -0.04384709894657135,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.3823124170303345,
+            "control_AP": 0.5918076038360596,
+            "delta": -0.2094951868057251,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "AP": 0.3991454839706421,
+            "control_AP": 0.2996833324432373,
+            "delta": 0.09946215152740479,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "b1f23308-d255-2761-94da-981d962c6bf8"
+          },
+          {
+            "AP": 0.1404522955417633,
+            "control_AP": 0.26047128438949585,
+            "delta": -0.12001898884773254,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "ba6fdaaa-a4c1-2dca-8163-a52b18bf6b64"
+          },
+          {
+            "AP": 0.0,
+            "control_AP": 0.0,
+            "delta": 0.0,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "bcb0fe06-4f39-2c70-9c24-a8dd7496c2f8"
+          },
+          {
+            "AP": 0.0023701521568000317,
+            "control_AP": 0.001974328886717558,
+            "delta": 0.00039582327008247375,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "AP": 0.16530632972717285,
+            "control_AP": 0.19835107028484344,
+            "delta": -0.03304474055767059,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "AP": 0.15465159714221954,
+            "control_AP": 0.21432682871818542,
+            "delta": -0.05967523157596588,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "AP": 0.41443631052970886,
+            "control_AP": 0.6240602135658264,
+            "delta": -0.20962390303611755,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "AP": 0.45435088872909546,
+            "control_AP": 0.5932195782661438,
+            "delta": -0.13886868953704834,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          },
+          {
+            "AP": 0.08050170540809631,
+            "control_AP": 0.17899826169013977,
+            "delta": -0.09849655628204346,
+            "horizon": 2,
+            "inputs": 6,
+            "reference_id": "ddc73797-765b-241a-9e2c-097c5989baf6"
+          },
+          {
+            "AP": 0.24717754125595093,
+            "control_AP": 0.3581973910331726,
+            "delta": -0.11101984977722168,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "e61b0e04-bada-2f31-82d6-72831a602ba7"
+          },
+          {
+            "AP": 0.32114750146865845,
+            "control_AP": 0.42780449986457825,
+            "delta": -0.1066569983959198,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "fcf66d7b-622d-291c-86b8-7db96aebcee3"
+          }
+        ],
+        "long_reference_rows": [],
+        "long_reference_signs": {
+          "negative": 0,
+          "positive": 0,
+          "zero": 0
+        }
+      },
+      "role": "LOCAL-T2"
+    },
+    {
+      "comparison": "selected_E1_vs_E0",
+      "delta": {
+        "T2": 0.05471882224082947,
+        "T3": 0.09836916625499725,
+        "T4": 0.05675502121448517
+      },
+      "reference_diagnostics": {
+        "estimand": "per physical reference, mean delta over its available T3\u2013T5; not pooled S_long",
+        "horizon_rows": [
+          {
+            "AP": 0.27607738971710205,
+            "control_AP": 0.26462364196777344,
+            "delta": 0.011453747749328613,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.4906494915485382,
+            "control_AP": 0.45459115505218506,
+            "delta": 0.03605833649635315,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.3698948621749878,
+            "control_AP": 0.12314813584089279,
+            "delta": 0.246746726334095,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "AP": 0.3273559808731079,
+            "control_AP": 0.27234914898872375,
+            "delta": 0.055006831884384155,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7584-8d6f-2d13-8df8-c05e4307b418"
+          },
+          {
+            "AP": 0.4871649444103241,
+            "control_AP": 0.41354483366012573,
+            "delta": 0.07362011075019836,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac75dc-8d6f-2d13-8d08-9c497bd6acdc"
+          },
+          {
+            "AP": 0.0364583320915699,
+            "control_AP": 0.06410916894674301,
+            "delta": -0.02765083685517311,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7676-8d6f-2d13-8f3a-d7bf7f03e721"
+          },
+          {
+            "AP": 0.5345485806465149,
+            "control_AP": 0.3708994686603546,
+            "delta": 0.16364911198616028,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "1d233fe8-e280-2b1a-8fac-c3646a1cd64a"
+          },
+          {
+            "AP": 0.4321431517601013,
+            "control_AP": 0.3372601866722107,
+            "delta": 0.09488296508789062,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "AP": 0.4396057426929474,
+            "control_AP": 0.33796295523643494,
+            "delta": 0.10164278745651245,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "20c993b7-698f-29c5-847d-c8cb8a685f5a"
+          },
+          {
+            "AP": 0.2238772064447403,
+            "control_AP": 0.23435457050800323,
+            "delta": -0.01047736406326294,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "321c8680-a5a8-2a84-85c2-816a26d59516"
+          },
+          {
+            "AP": 0.13613580167293549,
+            "control_AP": 0.13472291827201843,
+            "delta": 0.0014128834009170532,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "AP": 0.07868672907352448,
+            "control_AP": 0.12228584289550781,
+            "delta": -0.04359911382198334,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "AP": 0.2222222238779068,
+            "control_AP": 0.29629629850387573,
+            "delta": -0.07407407462596893,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "422885b3-192d-25fc-84c9-9b80eea1752d"
+          },
+          {
+            "AP": 0.17328032851219177,
+            "control_AP": 0.21743227541446686,
+            "delta": -0.044151946902275085,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.6925858855247498,
+            "control_AP": 0.6382952332496643,
+            "delta": 0.05429065227508545,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "AP": 0.39998623728752136,
+            "control_AP": 0.36697492003440857,
+            "delta": 0.03301131725311279,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4a9a43d2-7736-2874-874d-d0fad0570e19"
+          },
+          {
+            "AP": 0.4773929715156555,
+            "control_AP": 0.3069491684436798,
+            "delta": 0.1704438030719757,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4d3d82b0-8cf4-2e04-80a8-c955ea964c2f"
+          },
+          {
+            "AP": 0.3368556797504425,
+            "control_AP": 0.12445766478776932,
+            "delta": 0.2123980149626732,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.3856271207332611,
+            "control_AP": 0.5052909851074219,
+            "delta": -0.11966386437416077,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b79f-8a66-2cdd-84d5-6dba6525dd75"
+          },
+          {
+            "AP": 0.17714397609233856,
+            "control_AP": 0.17502190172672272,
+            "delta": 0.0021220743656158447,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b7e3-8a66-2cdd-8709-66a2159f0017"
+          },
+          {
+            "AP": 0.4822502136230469,
+            "control_AP": 0.3685664236545563,
+            "delta": 0.1136837899684906,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.5544211268424988,
+            "control_AP": 0.3952093720436096,
+            "delta": 0.15921175479888916,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "AP": 0.6760908365249634,
+            "control_AP": 0.45458030700683594,
+            "delta": 0.22151052951812744,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.05332132801413536,
+            "control_AP": 0.23073741793632507,
+            "delta": -0.1774160899221897,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "75c25975-9ca2-2844-9769-84677f46d4cf"
+          },
+          {
+            "AP": 0.1600877195596695,
+            "control_AP": 0.10705648362636566,
+            "delta": 0.05303123593330383,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "AP": 0.5714336037635803,
+            "control_AP": 0.5105828046798706,
+            "delta": 0.06085079908370972,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "AP": 0.34883913397789,
+            "control_AP": 0.2503938376903534,
+            "delta": 0.09844529628753662,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "AP": 0.27228298783302307,
+            "control_AP": 0.06855150312185287,
+            "delta": 0.2037314847111702,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "AP": 0.26405012607574463,
+            "control_AP": 0.24106603860855103,
+            "delta": 0.022984087467193604,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.4562331736087799,
+            "control_AP": 0.23869763314723969,
+            "delta": 0.21753554046154022,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "AP": 0.2976449728012085,
+            "control_AP": 0.32031023502349854,
+            "delta": -0.02266526222229004,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "b1f23308-d255-2761-94da-981d962c6bf8"
+          },
+          {
+            "AP": 0.20830890536308289,
+            "control_AP": 0.21715515851974487,
+            "delta": -0.008846253156661987,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "ba6fdaaa-a4c1-2dca-8163-a52b18bf6b64"
+          },
+          {
+            "AP": 0.0,
+            "control_AP": 0.0,
+            "delta": 0.0,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "bcb0fe06-4f39-2c70-9c24-a8dd7496c2f8"
+          },
+          {
+            "AP": 0.009173943661153316,
+            "control_AP": 0.007641302887350321,
+            "delta": 0.0015326407738029957,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "AP": 0.23392486572265625,
+            "control_AP": 0.19391518831253052,
+            "delta": 0.04000967741012573,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "AP": 0.21662437915802002,
+            "control_AP": 0.2826758623123169,
+            "delta": -0.06605148315429688,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "AP": 0.617644190788269,
+            "control_AP": 0.3799663186073303,
+            "delta": 0.23767787218093872,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "AP": 0.5386645197868347,
+            "control_AP": 0.47772759199142456,
+            "delta": 0.060936927795410156,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          },
+          {
+            "AP": 0.35621345043182373,
+            "control_AP": 0.2355869710445404,
+            "delta": 0.12062647938728333,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "e61b0e04-bada-2f31-82d6-72831a602ba7"
+          },
+          {
+            "AP": 0.4368055462837219,
+            "control_AP": 0.29884257912635803,
+            "delta": 0.1379629671573639,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "fcf66d7b-622d-291c-86b8-7db96aebcee3"
+          },
+          {
+            "AP": 0.37017372250556946,
+            "control_AP": 0.2386435866355896,
+            "delta": 0.13153013586997986,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.39180341362953186,
+            "control_AP": 0.31953802704811096,
+            "delta": 0.0722653865814209,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.31604328751564026,
+            "control_AP": 0.07760283350944519,
+            "delta": 0.23844045400619507,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "AP": 0.35725751519203186,
+            "control_AP": 0.2611686885356903,
+            "delta": 0.09608882665634155,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "AP": 0.09071120619773865,
+            "control_AP": 0.10380963981151581,
+            "delta": -0.01309843361377716,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "AP": 0.012573938816785812,
+            "control_AP": 0.09685483574867249,
+            "delta": -0.08428089693188667,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "AP": 0.16419026255607605,
+            "control_AP": 0.1744326949119568,
+            "delta": -0.010242432355880737,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.6639654636383057,
+            "control_AP": 0.6179272532463074,
+            "delta": 0.04603821039199829,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "AP": 0.3337448537349701,
+            "control_AP": 0.08768068999052048,
+            "delta": 0.24606416374444962,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.24336081743240356,
+            "control_AP": 0.11832217127084732,
+            "delta": 0.12503864616155624,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.4354546070098877,
+            "control_AP": 0.21634580194950104,
+            "delta": 0.21910880506038666,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "AP": 0.6332025527954102,
+            "control_AP": 0.5357553958892822,
+            "delta": 0.09744715690612793,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.11481071263551712,
+            "control_AP": 0.09005581587553024,
+            "delta": 0.024754896759986877,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "AP": 0.5428667664527893,
+            "control_AP": 0.5090427398681641,
+            "delta": 0.033824026584625244,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "AP": 0.26901787519454956,
+            "control_AP": 0.16353508830070496,
+            "delta": 0.1054827868938446,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "AP": 0.257590115070343,
+            "control_AP": 0.018377354368567467,
+            "delta": 0.23921276070177555,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "AP": 0.24259702861309052,
+            "control_AP": 0.1960790902376175,
+            "delta": 0.04651793837547302,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.35755860805511475,
+            "control_AP": 0.1839897781610489,
+            "delta": 0.17356882989406586,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "AP": 0.0,
+            "control_AP": 0.0,
+            "delta": 0.0,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "AP": 0.1097407191991806,
+            "control_AP": 0.13791070878505707,
+            "delta": -0.028169989585876465,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "AP": 0.20447242259979248,
+            "control_AP": 0.19119662046432495,
+            "delta": 0.01327580213546753,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "AP": 0.48788100481033325,
+            "control_AP": 0.25866127014160156,
+            "delta": 0.2292197346687317,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "AP": 0.5619929432868958,
+            "control_AP": 0.31678178906440735,
+            "delta": 0.2452111542224884,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          },
+          {
+            "AP": 0.40918880701065063,
+            "control_AP": 0.22521430253982544,
+            "delta": 0.1839745044708252,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.35328128933906555,
+            "control_AP": 0.23628097772598267,
+            "delta": 0.11700031161308289,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.16552680730819702,
+            "control_AP": 0.17289669811725616,
+            "delta": -0.007369890809059143,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.2600141763687134,
+            "control_AP": 0.0701623484492302,
+            "delta": 0.18985182791948318,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.15622839331626892,
+            "control_AP": 0.059535205364227295,
+            "delta": 0.09669318795204163,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.5286829471588135,
+            "control_AP": 0.3557352125644684,
+            "delta": 0.1729477345943451,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.1918441355228424,
+            "control_AP": 0.20141907036304474,
+            "delta": -0.009574934840202332,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.06866742670536041,
+            "control_AP": 0.09226076304912567,
+            "delta": -0.02359333634376526,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          }
+        ],
+        "long_reference_rows": [
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": 0.15775232017040253,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": 0.09463284909725189,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.23844045400619507,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.09608882665634155,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.01309843361377716,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.08428089693188667,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.00880616158246994,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.04603821039199829,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": 0.2179579958319664,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": 0.11086591705679893,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.21910880506038666,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": 0.1351974457502365,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.024754896759986877,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.033824026584625244,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.1054827868938446,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.23921276070177555,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": 0.018471501767635345,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.17356882989406586,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.0,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.025881662964820862,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.01327580213546753,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.2292197346687317,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.2452111542224884,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          }
+        ],
+        "long_reference_signs": {
+          "negative": 4,
+          "positive": 18,
+          "zero": 1
+        }
+      },
+      "role": "ADDITIONAL"
+    },
+    {
+      "comparison": "matched_step_E3_vs_E1",
+      "delta": {
+        "T2": 0.011760115623474121,
+        "T3": -0.008474096655845642,
+        "T4": 0.002069905400276184
+      },
+      "reference_diagnostics": {
+        "estimand": "per physical reference, mean delta over its available T3\u2013T5; not pooled S_long",
+        "horizon_rows": [
+          {
+            "AP": 0.37100932002067566,
+            "control_AP": 0.4072872996330261,
+            "delta": -0.036277979612350464,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.3910788595676422,
+            "control_AP": 0.3637111485004425,
+            "delta": 0.027367711067199707,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.04502442106604576,
+            "control_AP": 0.03773505985736847,
+            "delta": 0.007289361208677292,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "AP": 0.3988184630870819,
+            "control_AP": 0.32037416100502014,
+            "delta": 0.07844430208206177,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7584-8d6f-2d13-8df8-c05e4307b418"
+          },
+          {
+            "AP": 0.3737432062625885,
+            "control_AP": 0.39153140783309937,
+            "delta": -0.017788201570510864,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac75dc-8d6f-2d13-8d08-9c497bd6acdc"
+          },
+          {
+            "AP": 0.0789930522441864,
+            "control_AP": 0.05787036940455437,
+            "delta": 0.021122682839632034,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7676-8d6f-2d13-8f3a-d7bf7f03e721"
+          },
+          {
+            "AP": 0.2843800187110901,
+            "control_AP": 0.2777777910232544,
+            "delta": 0.006602227687835693,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "1d233fe8-e280-2b1a-8fac-c3646a1cd64a"
+          },
+          {
+            "AP": 0.3300301730632782,
+            "control_AP": 0.328390508890152,
+            "delta": 0.0016396641731262207,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "AP": 0.5370370149612427,
+            "control_AP": 0.5555555820465088,
+            "delta": -0.018518567085266113,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "20c993b7-698f-29c5-847d-c8cb8a685f5a"
+          },
+          {
+            "AP": 0.2509259283542633,
+            "control_AP": 0.24484126269817352,
+            "delta": 0.006084665656089783,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "321c8680-a5a8-2a84-85c2-816a26d59516"
+          },
+          {
+            "AP": 0.11950609087944031,
+            "control_AP": 0.07797235995531082,
+            "delta": 0.041533730924129486,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "AP": 0.08784371614456177,
+            "control_AP": 0.05416802316904068,
+            "delta": 0.03367569297552109,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "AP": 0.18518517911434174,
+            "control_AP": 0.1924382597208023,
+            "delta": -0.007253080606460571,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "422885b3-192d-25fc-84c9-9b80eea1752d"
+          },
+          {
+            "AP": 0.23407572507858276,
+            "control_AP": 0.1873575896024704,
+            "delta": 0.046718135476112366,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.3407655358314514,
+            "control_AP": 0.37868359684944153,
+            "delta": -0.03791806101799011,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "AP": 0.35324084758758545,
+            "control_AP": 0.23865634202957153,
+            "delta": 0.11458450555801392,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4a9a43d2-7736-2874-874d-d0fad0570e19"
+          },
+          {
+            "AP": 0.4125533401966095,
+            "control_AP": 0.31408730149269104,
+            "delta": 0.09846603870391846,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4d3d82b0-8cf4-2e04-80a8-c955ea964c2f"
+          },
+          {
+            "AP": 0.32053643465042114,
+            "control_AP": 0.30494481325149536,
+            "delta": 0.015591621398925781,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.48932892084121704,
+            "control_AP": 0.47550153732299805,
+            "delta": 0.013827383518218994,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b79f-8a66-2cdd-84d5-6dba6525dd75"
+          },
+          {
+            "AP": 0.0476190485060215,
+            "control_AP": 0.07879527658224106,
+            "delta": -0.03117622807621956,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b7e3-8a66-2cdd-8709-66a2159f0017"
+          },
+          {
+            "AP": 0.3409569263458252,
+            "control_AP": 0.1724729984998703,
+            "delta": 0.1684839278459549,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.4755343794822693,
+            "control_AP": 0.4627448618412018,
+            "delta": 0.012789517641067505,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "AP": 0.4198766052722931,
+            "control_AP": 0.41190004348754883,
+            "delta": 0.007976561784744263,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.25784555077552795,
+            "control_AP": 0.15851688385009766,
+            "delta": 0.0993286669254303,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "75c25975-9ca2-2844-9769-84677f46d4cf"
+          },
+          {
+            "AP": 0.13352179527282715,
+            "control_AP": 0.12375685572624207,
+            "delta": 0.009764939546585083,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "AP": 0.5731642842292786,
+            "control_AP": 0.5346163511276245,
+            "delta": 0.03854793310165405,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "AP": 0.2121780663728714,
+            "control_AP": 0.14897030591964722,
+            "delta": 0.06320776045322418,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "AP": 0.10768084973096848,
+            "control_AP": 0.06135721877217293,
+            "delta": 0.04632363095879555,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "AP": 0.2030598372220993,
+            "control_AP": 0.22391794621944427,
+            "delta": -0.02085810899734497,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.4180697500705719,
+            "control_AP": 0.25575438141822815,
+            "delta": 0.16231536865234375,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "AP": 0.4178481698036194,
+            "control_AP": 0.4929153621196747,
+            "delta": -0.0750671923160553,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "b1f23308-d255-2761-94da-981d962c6bf8"
+          },
+          {
+            "AP": 0.1253739893436432,
+            "control_AP": 0.07263804972171783,
+            "delta": 0.052735939621925354,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "ba6fdaaa-a4c1-2dca-8163-a52b18bf6b64"
+          },
+          {
+            "AP": 0.0,
+            "control_AP": 0.0,
+            "delta": 0.0,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "bcb0fe06-4f39-2c70-9c24-a8dd7496c2f8"
+          },
+          {
+            "AP": 0.0012654560850933194,
+            "control_AP": 0.007783969398587942,
+            "delta": -0.006518513313494623,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "AP": 0.16895562410354614,
+            "control_AP": 0.13933075964450836,
+            "delta": 0.02962486445903778,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "AP": 0.12690691649913788,
+            "control_AP": 0.14477038383483887,
+            "delta": -0.01786346733570099,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "AP": 0.4454176127910614,
+            "control_AP": 0.3651747405529022,
+            "delta": 0.08024287223815918,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "AP": 0.4555250406265259,
+            "control_AP": 0.44919273257255554,
+            "delta": 0.006332308053970337,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          },
+          {
+            "AP": 0.26273438334465027,
+            "control_AP": 0.13889916241168976,
+            "delta": 0.12383522093296051,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "e61b0e04-bada-2f31-82d6-72831a602ba7"
+          },
+          {
+            "AP": 0.3100299835205078,
+            "control_AP": 0.30376848578453064,
+            "delta": 0.006261497735977173,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "fcf66d7b-622d-291c-86b8-7db96aebcee3"
+          },
+          {
+            "AP": 0.27309414744377136,
+            "control_AP": 0.3328458070755005,
+            "delta": -0.059751659631729126,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.349944531917572,
+            "control_AP": 0.37354952096939087,
+            "delta": -0.023604989051818848,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.010666290298104286,
+            "control_AP": 0.007285683415830135,
+            "delta": 0.003380606882274151,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "AP": 0.34486329555511475,
+            "control_AP": 0.3382490277290344,
+            "delta": 0.006614267826080322,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "AP": 0.09672949463129044,
+            "control_AP": 0.07413654774427414,
+            "delta": 0.022592946887016296,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "AP": 0.06080247461795807,
+            "control_AP": 0.010354839265346527,
+            "delta": 0.05044763535261154,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "AP": 0.17708419263362885,
+            "control_AP": 0.17361880838871002,
+            "delta": 0.0034653842449188232,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.3343965709209442,
+            "control_AP": 0.322684109210968,
+            "delta": 0.011712461709976196,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "AP": 0.2858560383319855,
+            "control_AP": 0.2584179937839508,
+            "delta": 0.027438044548034668,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.09138833731412888,
+            "control_AP": 0.013208871707320213,
+            "delta": 0.07817946560680866,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.2456236034631729,
+            "control_AP": 0.30861181020736694,
+            "delta": -0.06298820674419403,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "AP": 0.3483555018901825,
+            "control_AP": 0.3327576518058777,
+            "delta": 0.01559785008430481,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.08451075106859207,
+            "control_AP": 0.10100030153989792,
+            "delta": -0.016489550471305847,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "AP": 0.5,
+            "control_AP": 0.5020576119422913,
+            "delta": -0.0020576119422912598,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "AP": 0.06487899273633957,
+            "control_AP": 0.10427431017160416,
+            "delta": -0.03939531743526459,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "AP": 0.09008073806762695,
+            "control_AP": 0.05962158739566803,
+            "delta": 0.030459150671958923,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "AP": 0.16565148532390594,
+            "control_AP": 0.16200679540634155,
+            "delta": 0.003644689917564392,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.3996325731277466,
+            "control_AP": 0.37602725625038147,
+            "delta": 0.023605316877365112,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "AP": 0.0015172298299148679,
+            "control_AP": 0.004792932420969009,
+            "delta": -0.0032757025910541415,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "AP": 0.09827969968318939,
+            "control_AP": 0.06845792382955551,
+            "delta": 0.02982177585363388,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "AP": 0.1226586252450943,
+            "control_AP": 0.10217760503292084,
+            "delta": 0.020481020212173462,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "AP": 0.332227885723114,
+            "control_AP": 0.37633106112480164,
+            "delta": -0.04410317540168762,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "AP": 0.3332538902759552,
+            "control_AP": 0.3726131021976471,
+            "delta": -0.039359211921691895,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          },
+          {
+            "AP": 0.2892403304576874,
+            "control_AP": 0.23144859075546265,
+            "delta": 0.05779173970222473,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.3056977689266205,
+            "control_AP": 0.345608651638031,
+            "delta": -0.03991088271141052,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.20117369294166565,
+            "control_AP": 0.18518517911434174,
+            "delta": 0.015988513827323914,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.19702737033367157,
+            "control_AP": 0.25932058691978455,
+            "delta": -0.062293216586112976,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.0794064998626709,
+            "control_AP": 0.0026781668420881033,
+            "delta": 0.0767283330205828,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.3216579556465149,
+            "control_AP": 0.3160744905471802,
+            "delta": 0.005583465099334717,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.1502837836742401,
+            "control_AP": 0.15944625437259674,
+            "delta": -0.009162470698356628,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.06509286165237427,
+            "control_AP": 0.06690721213817596,
+            "delta": -0.0018143504858016968,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          }
+        ],
+        "long_reference_rows": [
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.0009799599647521973,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.031757935881614685,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.003380606882274151,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.006614267826080322,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.022592946887016296,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.05044763535261154,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": 0.009726949036121368,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.011712461709976196,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.017427586019039154,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": 0.07745389931369573,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.06298820674419403,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": 0.010590657591819763,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.016489550471305847,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.0020576119422912598,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.03939531743526459,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.030459150671958923,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.002758890390396118,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.023605316877365112,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.0032757025910541415,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": 0.014003712683916092,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.020481020212173462,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.04410317540168762,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.039359211921691895,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          }
+        ],
+        "long_reference_signs": {
+          "negative": 11,
+          "positive": 12,
+          "zero": 0
+        }
+      },
+      "role": "ADDITIONAL"
+    },
+    {
+      "comparison": "selected_E3_vs_best_E1",
+      "delta": {
+        "T2": -0.06666427850723267,
+        "T3": -0.08930006623268127,
+        "T4": -0.055408984422683716
+      },
+      "reference_diagnostics": {
+        "estimand": "per physical reference, mean delta over its available T3\u2013T5; not pooled S_long",
+        "horizon_rows": [
+          {
+            "AP": 0.37100932002067566,
+            "control_AP": 0.27607738971710205,
+            "delta": 0.09493193030357361,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.3910788595676422,
+            "control_AP": 0.4906494915485382,
+            "delta": -0.099570631980896,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.04502442106604576,
+            "control_AP": 0.3698948621749878,
+            "delta": -0.32487044110894203,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "AP": 0.3988184630870819,
+            "control_AP": 0.3273559808731079,
+            "delta": 0.071462482213974,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7584-8d6f-2d13-8df8-c05e4307b418"
+          },
+          {
+            "AP": 0.3737432062625885,
+            "control_AP": 0.4871649444103241,
+            "delta": -0.1134217381477356,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac75dc-8d6f-2d13-8d08-9c497bd6acdc"
+          },
+          {
+            "AP": 0.0789930522441864,
+            "control_AP": 0.0364583320915699,
+            "delta": 0.0425347201526165,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "0cac7676-8d6f-2d13-8f3a-d7bf7f03e721"
+          },
+          {
+            "AP": 0.2843800187110901,
+            "control_AP": 0.5345485806465149,
+            "delta": -0.2501685619354248,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "1d233fe8-e280-2b1a-8fac-c3646a1cd64a"
+          },
+          {
+            "AP": 0.3300301730632782,
+            "control_AP": 0.4321431517601013,
+            "delta": -0.10211297869682312,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "AP": 0.5370370149612427,
+            "control_AP": 0.4396057426929474,
+            "delta": 0.09743127226829529,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "20c993b7-698f-29c5-847d-c8cb8a685f5a"
+          },
+          {
+            "AP": 0.2509259283542633,
+            "control_AP": 0.2238772064447403,
+            "delta": 0.02704872190952301,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "321c8680-a5a8-2a84-85c2-816a26d59516"
+          },
+          {
+            "AP": 0.11950609087944031,
+            "control_AP": 0.13613580167293549,
+            "delta": -0.016629710793495178,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "AP": 0.08784371614456177,
+            "control_AP": 0.07868672907352448,
+            "delta": 0.009156987071037292,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "AP": 0.18518517911434174,
+            "control_AP": 0.2222222238779068,
+            "delta": -0.037037044763565063,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "422885b3-192d-25fc-84c9-9b80eea1752d"
+          },
+          {
+            "AP": 0.23407572507858276,
+            "control_AP": 0.17328032851219177,
+            "delta": 0.06079539656639099,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.3407655358314514,
+            "control_AP": 0.6925858855247498,
+            "delta": -0.35182034969329834,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "AP": 0.35324084758758545,
+            "control_AP": 0.39998623728752136,
+            "delta": -0.04674538969993591,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4a9a43d2-7736-2874-874d-d0fad0570e19"
+          },
+          {
+            "AP": 0.4125533401966095,
+            "control_AP": 0.4773929715156555,
+            "delta": -0.06483963131904602,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "4d3d82b0-8cf4-2e04-80a8-c955ea964c2f"
+          },
+          {
+            "AP": 0.32053643465042114,
+            "control_AP": 0.3368556797504425,
+            "delta": -0.016319245100021362,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.48932892084121704,
+            "control_AP": 0.3856271207332611,
+            "delta": 0.10370180010795593,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b79f-8a66-2cdd-84d5-6dba6525dd75"
+          },
+          {
+            "AP": 0.0476190485060215,
+            "control_AP": 0.17714397609233856,
+            "delta": -0.12952492758631706,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "5341b7e3-8a66-2cdd-8709-66a2159f0017"
+          },
+          {
+            "AP": 0.3409569263458252,
+            "control_AP": 0.4822502136230469,
+            "delta": -0.14129328727722168,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.4755343794822693,
+            "control_AP": 0.5544211268424988,
+            "delta": -0.07888674736022949,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "AP": 0.4198766052722931,
+            "control_AP": 0.6760908365249634,
+            "delta": -0.2562142312526703,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.25784555077552795,
+            "control_AP": 0.05332132801413536,
+            "delta": 0.2045242227613926,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "75c25975-9ca2-2844-9769-84677f46d4cf"
+          },
+          {
+            "AP": 0.13352179527282715,
+            "control_AP": 0.1600877195596695,
+            "delta": -0.026565924286842346,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "AP": 0.5731642842292786,
+            "control_AP": 0.5714336037635803,
+            "delta": 0.0017306804656982422,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "AP": 0.2121780663728714,
+            "control_AP": 0.34883913397789,
+            "delta": -0.13666106760501862,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "AP": 0.10768084973096848,
+            "control_AP": 0.27228298783302307,
+            "delta": -0.1646021381020546,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "AP": 0.2030598372220993,
+            "control_AP": 0.26405012607574463,
+            "delta": -0.060990288853645325,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.4180697500705719,
+            "control_AP": 0.4562331736087799,
+            "delta": -0.03816342353820801,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "AP": 0.4178481698036194,
+            "control_AP": 0.2976449728012085,
+            "delta": 0.12020319700241089,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "b1f23308-d255-2761-94da-981d962c6bf8"
+          },
+          {
+            "AP": 0.1253739893436432,
+            "control_AP": 0.20830890536308289,
+            "delta": -0.0829349160194397,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "ba6fdaaa-a4c1-2dca-8163-a52b18bf6b64"
+          },
+          {
+            "AP": 0.0,
+            "control_AP": 0.0,
+            "delta": 0.0,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "bcb0fe06-4f39-2c70-9c24-a8dd7496c2f8"
+          },
+          {
+            "AP": 0.0012654560850933194,
+            "control_AP": 0.009173943661153316,
+            "delta": -0.007908487576059997,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "AP": 0.16895562410354614,
+            "control_AP": 0.23392486572265625,
+            "delta": -0.06496924161911011,
+            "horizon": 2,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "AP": 0.12690691649913788,
+            "control_AP": 0.21662437915802002,
+            "delta": -0.08971746265888214,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "AP": 0.4454176127910614,
+            "control_AP": 0.617644190788269,
+            "delta": -0.17222657799720764,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "AP": 0.4555250406265259,
+            "control_AP": 0.5386645197868347,
+            "delta": -0.08313947916030884,
+            "horizon": 2,
+            "inputs": 3,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          },
+          {
+            "AP": 0.26273438334465027,
+            "control_AP": 0.35621345043182373,
+            "delta": -0.09347906708717346,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "e61b0e04-bada-2f31-82d6-72831a602ba7"
+          },
+          {
+            "AP": 0.3100299835205078,
+            "control_AP": 0.4368055462837219,
+            "delta": -0.1267755627632141,
+            "horizon": 2,
+            "inputs": 2,
+            "reference_id": "fcf66d7b-622d-291c-86b8-7db96aebcee3"
+          },
+          {
+            "AP": 0.27309414744377136,
+            "control_AP": 0.37017372250556946,
+            "delta": -0.0970795750617981,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.349944531917572,
+            "control_AP": 0.39180341362953186,
+            "delta": -0.04185888171195984,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.010666290298104286,
+            "control_AP": 0.31604328751564026,
+            "delta": -0.305376997217536,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "AP": 0.34486329555511475,
+            "control_AP": 0.35725751519203186,
+            "delta": -0.012394219636917114,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "AP": 0.09672949463129044,
+            "control_AP": 0.09071120619773865,
+            "delta": 0.006018288433551788,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "AP": 0.06080247461795807,
+            "control_AP": 0.012573938816785812,
+            "delta": 0.048228535801172256,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "AP": 0.17708419263362885,
+            "control_AP": 0.16419026255607605,
+            "delta": 0.012893930077552795,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.3343965709209442,
+            "control_AP": 0.6639654636383057,
+            "delta": -0.32956889271736145,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "AP": 0.2858560383319855,
+            "control_AP": 0.3337448537349701,
+            "delta": -0.04788881540298462,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.09138833731412888,
+            "control_AP": 0.24336081743240356,
+            "delta": -0.1519724801182747,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.2456236034631729,
+            "control_AP": 0.4354546070098877,
+            "delta": -0.18983100354671478,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "AP": 0.3483555018901825,
+            "control_AP": 0.6332025527954102,
+            "delta": -0.28484705090522766,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.08451075106859207,
+            "control_AP": 0.11481071263551712,
+            "delta": -0.03029996156692505,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "AP": 0.5,
+            "control_AP": 0.5428667664527893,
+            "delta": -0.04286676645278931,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "AP": 0.06487899273633957,
+            "control_AP": 0.26901787519454956,
+            "delta": -0.20413888245821,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "AP": 0.09008073806762695,
+            "control_AP": 0.257590115070343,
+            "delta": -0.16750937700271606,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "AP": 0.16565148532390594,
+            "control_AP": 0.24259702861309052,
+            "delta": -0.07694554328918457,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.3996325731277466,
+            "control_AP": 0.35755860805511475,
+            "delta": 0.042073965072631836,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "AP": 0.0015172298299148679,
+            "control_AP": 0.0,
+            "delta": 0.0015172298299148679,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "AP": 0.09827969968318939,
+            "control_AP": 0.1097407191991806,
+            "delta": -0.011461019515991211,
+            "horizon": 3,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "AP": 0.1226586252450943,
+            "control_AP": 0.20447242259979248,
+            "delta": -0.08181379735469818,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "AP": 0.332227885723114,
+            "control_AP": 0.48788100481033325,
+            "delta": -0.15565311908721924,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "AP": 0.3332538902759552,
+            "control_AP": 0.5619929432868958,
+            "delta": -0.22873905301094055,
+            "horizon": 3,
+            "inputs": 3,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          },
+          {
+            "AP": 0.2892403304576874,
+            "control_AP": 0.40918880701065063,
+            "delta": -0.11994847655296326,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "AP": 0.3056977689266205,
+            "control_AP": 0.35328128933906555,
+            "delta": -0.04758352041244507,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "AP": 0.20117369294166565,
+            "control_AP": 0.16552680730819702,
+            "delta": 0.03564688563346863,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "AP": 0.19702737033367157,
+            "control_AP": 0.2600141763687134,
+            "delta": -0.06298680603504181,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "AP": 0.0794064998626709,
+            "control_AP": 0.15622839331626892,
+            "delta": -0.07682189345359802,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "AP": 0.3216579556465149,
+            "control_AP": 0.5286829471588135,
+            "delta": -0.20702499151229858,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "AP": 0.1502837836742401,
+            "control_AP": 0.1918441355228424,
+            "delta": -0.041560351848602295,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "AP": 0.06509286165237427,
+            "control_AP": 0.06866742670536041,
+            "delta": -0.003574565052986145,
+            "horizon": 4,
+            "inputs": 4,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          }
+        ],
+        "long_reference_rows": [
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.10851402580738068,
+            "reference_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.044721201062202454,
+            "reference_id": "0988ea72-eb32-2e61-8344-99e2283c2728"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.305376997217536,
+            "reference_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.012394219636917114,
+            "reference_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.006018288433551788,
+            "reference_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.048228535801172256,
+            "reference_id": "4138582f-a238-2435-8332-6902542c2823"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": 0.02427040785551071,
+            "reference_id": "4238490c-60a7-271e-9f38-3c651e3b3912"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.32956889271736145,
+            "reference_id": "43b8cae1-6678-2e38-9865-c19c07c25015"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.055437810719013214,
+            "reference_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.11439718678593636,
+            "reference_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.18983100354671478,
+            "reference_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.24593602120876312,
+            "reference_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.03029996156692505,
+            "reference_id": "7747a50c-9431-24e8-877d-e60c3a341cc2"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.04286676645278931,
+            "reference_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.20413888245821,
+            "reference_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.16750937700271606,
+            "reference_id": "ab835fae-54c6-29a1-995e-b06cfc555786"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.05925294756889343,
+            "reference_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.042073965072631836,
+            "reference_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": 0.0015172298299148679,
+            "reference_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe"
+          },
+          {
+            "available_horizons": [
+              3,
+              4
+            ],
+            "mean_available_delta": -0.007517792284488678,
+            "reference_id": "bf9a3de9-45a5-2e80-8022-277108d67404"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.08181379735469818,
+            "reference_id": "c7895f27-339c-2d13-836b-c12dca280261"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.15565311908721924,
+            "reference_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6"
+          },
+          {
+            "available_horizons": [
+              3
+            ],
+            "mean_available_delta": -0.22873905301094055,
+            "reference_id": "c92fb5b5-f771-2064-8570-dbe16cb33764"
+          }
+        ],
+        "long_reference_signs": {
+          "negative": 18,
+          "positive": 5,
+          "zero": 0
+        }
+      },
+      "role": "ADDITIONAL"
+    }
+  ],
+  "formal_lock_sha256": "b045ef1ce3b9e7ac363e5e45595d27fa294a2d1d19573e333e4dcc3efd522a82",
+  "official_states_verified": 596,
+  "pending": [],
+  "pooled_states_recomputed": 32,
+  "rows": [
+    {
+      "arm": "E0",
+      "inputs": 516,
+      "kind": "CAL_SELECTED",
+      "metrics": {
+        "S_long": 0.06812855477134387,
+        "T2": 0.15694226324558258,
+        "T3": 0.09757895767688751,
+        "T4": 0.06320653110742569,
+        "T5": 0.0436001755297184
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.33238163590431213,
+          "online_t-REC25": 0.7293534874916077,
+          "online_t-REC50": 0.5352163910865784,
+          "online_t-mAP": 0.15694226324558258,
+          "online_t-mAP25": 0.5373252630233765,
+          "online_t-mAP50": 0.3052239418029785
+        },
+        "T3": {
+          "online_t-REC": 0.24188140034675598,
+          "online_t-REC25": 0.6201188564300537,
+          "online_t-REC50": 0.4005531966686249,
+          "online_t-mAP": 0.09757895767688751,
+          "online_t-mAP25": 0.4014178514480591,
+          "online_t-mAP50": 0.1979183703660965
+        },
+        "T4": {
+          "online_t-REC": 0.17391864955425262,
+          "online_t-REC25": 0.48379752039909363,
+          "online_t-REC50": 0.29550909996032715,
+          "online_t-mAP": 0.06320653110742569,
+          "online_t-mAP25": 0.26034829020500183,
+          "online_t-mAP50": 0.12941299378871918
+        },
+        "T5": {
+          "online_t-REC": 0.13106590509414673,
+          "online_t-REC25": 0.40493953227996826,
+          "online_t-REC50": 0.23760126531124115,
+          "online_t-mAP": 0.0436001755297184,
+          "online_t-mAP25": 0.19740113615989685,
+          "online_t-mAP50": 0.09198605269193649
+        }
+      },
+      "role": "PB",
+      "step": 5940
+    },
+    {
+      "arm": "E0",
+      "inputs": 154,
+      "kind": "CAL_SELECTED",
+      "metrics": {
+        "S_long": null,
+        "T2": 0.21199306845664978
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.36616870760917664,
+          "online_t-REC25": 0.7700050473213196,
+          "online_t-REC50": 0.5884023904800415,
+          "online_t-mAP": 0.21199306845664978,
+          "online_t-mAP25": 0.6026429533958435,
+          "online_t-mAP50": 0.3804858922958374
+        }
+      },
+      "role": "LOCAL-T2",
+      "step": 5940
+    },
+    {
+      "arm": "E0",
+      "inputs": 220,
+      "kind": "CAL_SELECTED",
+      "metrics": {
+        "S_long": null,
+        "T2": 0.21238768100738525,
+        "T3": 0.168854758143425,
+        "T4": 0.16001677513122559
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.3607887327671051,
+          "online_t-REC25": 0.7574670314788818,
+          "online_t-REC50": 0.5731075406074524,
+          "online_t-mAP": 0.21238768100738525,
+          "online_t-mAP25": 0.6144198179244995,
+          "online_t-mAP50": 0.38232341408729553
+        },
+        "T3": {
+          "online_t-REC": 0.3217615783214569,
+          "online_t-REC25": 0.7232224941253662,
+          "online_t-REC50": 0.5288549661636353,
+          "online_t-mAP": 0.168854758143425,
+          "online_t-mAP25": 0.536381721496582,
+          "online_t-mAP50": 0.3013547360897064
+        },
+        "T4": {
+          "online_t-REC": 0.3003200888633728,
+          "online_t-REC25": 0.7504730820655823,
+          "online_t-REC50": 0.5208562612533569,
+          "online_t-mAP": 0.16001677513122559,
+          "online_t-mAP25": 0.5197945833206177,
+          "online_t-mAP50": 0.29041582345962524
+        }
+      },
+      "role": "ADDITIONAL",
+      "step": 5940
+    },
+    {
+      "arm": "E1",
+      "inputs": 516,
+      "kind": "CAL_SELECTED",
+      "metrics": {
+        "S_long": 0.08654540777206421,
+        "T2": 0.17751474678516388,
+        "T3": 0.12058660387992859,
+        "T4": 0.07984516024589539,
+        "T5": 0.05920445919036865
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.3804786801338196,
+          "online_t-REC25": 0.7893086075782776,
+          "online_t-REC50": 0.5904430150985718,
+          "online_t-mAP": 0.17751474678516388,
+          "online_t-mAP25": 0.5775220394134521,
+          "online_t-mAP50": 0.3169137239456177
+        },
+        "T3": {
+          "online_t-REC": 0.28992775082588196,
+          "online_t-REC25": 0.6728811264038086,
+          "online_t-REC50": 0.4618220329284668,
+          "online_t-mAP": 0.12058660387992859,
+          "online_t-mAP25": 0.4452959895133972,
+          "online_t-mAP50": 0.22407516837120056
+        },
+        "T4": {
+          "online_t-REC": 0.2041739523410797,
+          "online_t-REC25": 0.5395882725715637,
+          "online_t-REC50": 0.35485875606536865,
+          "online_t-mAP": 0.07984516024589539,
+          "online_t-mAP25": 0.30076175928115845,
+          "online_t-mAP50": 0.1551661342382431
+        },
+        "T5": {
+          "online_t-REC": 0.16324415802955627,
+          "online_t-REC25": 0.4700665771961212,
+          "online_t-REC50": 0.2855801582336426,
+          "online_t-mAP": 0.05920445919036865,
+          "online_t-mAP25": 0.23902882635593414,
+          "online_t-mAP50": 0.11666154116392136
+        }
+      },
+      "role": "PB",
+      "step": 23760
+    },
+    {
+      "arm": "E1",
+      "inputs": 154,
+      "kind": "CAL_SELECTED",
+      "metrics": {
+        "S_long": null,
+        "T2": 0.27417320013046265
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.42159271240234375,
+          "online_t-REC25": 0.7984591722488403,
+          "online_t-REC50": 0.6422260999679565,
+          "online_t-mAP": 0.27417320013046265,
+          "online_t-mAP25": 0.6432690620422363,
+          "online_t-mAP50": 0.46133676171302795
+        }
+      },
+      "role": "LOCAL-T2",
+      "step": 23760
+    },
+    {
+      "arm": "E1",
+      "inputs": 220,
+      "kind": "CAL_SELECTED",
+      "metrics": {
+        "S_long": null,
+        "T2": 0.2671065032482147,
+        "T3": 0.26722392439842224,
+        "T4": 0.21677179634571075
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.39499345421791077,
+          "online_t-REC25": 0.7565369009971619,
+          "online_t-REC50": 0.6122188568115234,
+          "online_t-mAP": 0.2671065032482147,
+          "online_t-mAP25": 0.6361852288246155,
+          "online_t-mAP50": 0.46478572487831116
+        },
+        "T3": {
+          "online_t-REC": 0.3756203055381775,
+          "online_t-REC25": 0.7195321917533875,
+          "online_t-REC50": 0.5690931677818298,
+          "online_t-mAP": 0.26722392439842224,
+          "online_t-mAP25": 0.5756978988647461,
+          "online_t-mAP50": 0.40737026929855347
+        },
+        "T4": {
+          "online_t-REC": 0.3412185311317444,
+          "online_t-REC25": 0.7135568857192993,
+          "online_t-REC50": 0.5503166913986206,
+          "online_t-mAP": 0.21677179634571075,
+          "online_t-mAP25": 0.5503442287445068,
+          "online_t-mAP50": 0.37036794424057007
+        }
+      },
+      "role": "ADDITIONAL",
+      "step": 23760
+    },
+    {
+      "arm": "E3",
+      "inputs": 516,
+      "kind": "CAL_SELECTED",
+      "metrics": {
+        "S_long": 0.06963013236721356,
+        "T2": 0.14789089560508728,
+        "T3": 0.08852913230657578,
+        "T4": 0.066722571849823,
+        "T5": 0.05363869294524193
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.3023291230201721,
+          "online_t-REC25": 0.7271431088447571,
+          "online_t-REC50": 0.47466689348220825,
+          "online_t-mAP": 0.14789089560508728,
+          "online_t-mAP25": 0.540073812007904,
+          "online_t-mAP50": 0.2639693319797516
+        },
+        "T3": {
+          "online_t-REC": 0.22289030253887177,
+          "online_t-REC25": 0.6121313571929932,
+          "online_t-REC50": 0.37714883685112,
+          "online_t-mAP": 0.08852913230657578,
+          "online_t-mAP25": 0.40497034788131714,
+          "online_t-mAP50": 0.17894262075424194
+        },
+        "T4": {
+          "online_t-REC": 0.16901633143424988,
+          "online_t-REC25": 0.48478448390960693,
+          "online_t-REC50": 0.3063125014305115,
+          "online_t-mAP": 0.066722571849823,
+          "online_t-mAP25": 0.2949875593185425,
+          "online_t-mAP50": 0.14064599573612213
+        },
+        "T5": {
+          "online_t-REC": 0.134683296084404,
+          "online_t-REC25": 0.4243767559528351,
+          "online_t-REC50": 0.2524767518043518,
+          "online_t-mAP": 0.05363869294524193,
+          "online_t-mAP25": 0.2482433170080185,
+          "online_t-mAP50": 0.11771270632743835
+        }
+      },
+      "role": "PB",
+      "step": 2970
+    },
+    {
+      "arm": "E3",
+      "inputs": 154,
+      "kind": "CAL_SELECTED",
+      "metrics": {
+        "S_long": null,
+        "T2": 0.20440693199634552
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.3393799066543579,
+          "online_t-REC25": 0.7477942705154419,
+          "online_t-REC50": 0.5579637885093689,
+          "online_t-mAP": 0.20440693199634552,
+          "online_t-mAP25": 0.571467399597168,
+          "online_t-mAP50": 0.3774780035018921
+        }
+      },
+      "role": "LOCAL-T2",
+      "step": 2970
+    },
+    {
+      "arm": "E3",
+      "inputs": 220,
+      "kind": "CAL_SELECTED",
+      "metrics": {
+        "S_long": null,
+        "T2": 0.20044222474098206,
+        "T3": 0.17792385816574097,
+        "T4": 0.16136281192302704
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.32868847250938416,
+          "online_t-REC25": 0.7345823049545288,
+          "online_t-REC50": 0.5765775442123413,
+          "online_t-mAP": 0.20044222474098206,
+          "online_t-mAP25": 0.5898192524909973,
+          "online_t-mAP50": 0.3880813419818878
+        },
+        "T3": {
+          "online_t-REC": 0.3036406338214874,
+          "online_t-REC25": 0.7102724313735962,
+          "online_t-REC50": 0.4989204704761505,
+          "online_t-mAP": 0.17792385816574097,
+          "online_t-mAP25": 0.5198590755462646,
+          "online_t-mAP50": 0.3176954388618469
+        },
+        "T4": {
+          "online_t-REC": 0.25785765051841736,
+          "online_t-REC25": 0.7613553404808044,
+          "online_t-REC50": 0.4704136252403259,
+          "online_t-mAP": 0.16136281192302704,
+          "online_t-mAP25": 0.5897120833396912,
+          "online_t-mAP50": 0.31484290957450867
+        }
+      },
+      "role": "ADDITIONAL",
+      "step": 2970
+    },
+    {
+      "arm": "E1",
+      "inputs": 516,
+      "kind": "MATCHED_STEP_CONTROL",
+      "metrics": {
+        "S_long": 0.06478289763132732,
+        "T2": 0.14262033998966217,
+        "T3": 0.08411946892738342,
+        "T4": 0.06070313975214958,
+        "T5": 0.04952608421444893
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.2998627722263336,
+          "online_t-REC25": 0.6922734379768372,
+          "online_t-REC50": 0.48577767610549927,
+          "online_t-mAP": 0.14262033998966217,
+          "online_t-mAP25": 0.49453163146972656,
+          "online_t-mAP50": 0.2598300576210022
+        },
+        "T3": {
+          "online_t-REC": 0.21431349217891693,
+          "online_t-REC25": 0.5848677158355713,
+          "online_t-REC50": 0.3707480728626251,
+          "online_t-mAP": 0.08411946892738342,
+          "online_t-mAP25": 0.35856857895851135,
+          "online_t-mAP50": 0.161192387342453
+        },
+        "T4": {
+          "online_t-REC": 0.1606408953666687,
+          "online_t-REC25": 0.4547267258167267,
+          "online_t-REC50": 0.29279258847236633,
+          "online_t-mAP": 0.06070313975214958,
+          "online_t-mAP25": 0.24793100357055664,
+          "online_t-mAP50": 0.12654386460781097
+        },
+        "T5": {
+          "online_t-REC": 0.12939107418060303,
+          "online_t-REC25": 0.3908601999282837,
+          "online_t-REC50": 0.2359883338212967,
+          "online_t-mAP": 0.04952608421444893,
+          "online_t-mAP25": 0.1905435025691986,
+          "online_t-mAP50": 0.09893255680799484
+        }
+      },
+      "role": "PB",
+      "step": 2970
+    },
+    {
+      "arm": "E1",
+      "inputs": 154,
+      "kind": "MATCHED_STEP_CONTROL",
+      "metrics": {
+        "S_long": null,
+        "T2": 0.20306915044784546
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.3258059024810791,
+          "online_t-REC25": 0.724602997303009,
+          "online_t-REC50": 0.5284478664398193,
+          "online_t-mAP": 0.20306915044784546,
+          "online_t-mAP25": 0.5510287284851074,
+          "online_t-mAP50": 0.3659476041793823
+        }
+      },
+      "role": "LOCAL-T2",
+      "step": 2970
+    },
+    {
+      "arm": "E1",
+      "inputs": 220,
+      "kind": "MATCHED_STEP_CONTROL",
+      "metrics": {
+        "S_long": null,
+        "T2": 0.18868210911750793,
+        "T3": 0.1863979548215866,
+        "T4": 0.15929290652275085
+      },
+      "official_metrics": {
+        "T2": {
+          "online_t-REC": 0.29494303464889526,
+          "online_t-REC25": 0.7242721319198608,
+          "online_t-REC50": 0.5145038366317749,
+          "online_t-mAP": 0.18868210911750793,
+          "online_t-mAP25": 0.5736154317855835,
+          "online_t-mAP50": 0.35486817359924316
+        },
+        "T3": {
+          "online_t-REC": 0.29459697008132935,
+          "online_t-REC25": 0.6958885192871094,
+          "online_t-REC50": 0.4753037691116333,
+          "online_t-mAP": 0.1863979548215866,
+          "online_t-mAP25": 0.5052441358566284,
+          "online_t-mAP50": 0.27879515290260315
+        },
+        "T4": {
+          "online_t-REC": 0.25921133160591125,
+          "online_t-REC25": 0.7067269682884216,
+          "online_t-REC50": 0.452903687953949,
+          "online_t-mAP": 0.15929290652275085,
+          "online_t-mAP25": 0.4742515981197357,
+          "online_t-mAP50": 0.24425290524959564
+        }
+      },
+      "role": "ADDITIONAL",
+      "step": 2970
+    }
+  ],
+  "runtime_status": "RUNTIME_CONDITIONAL",
+  "source_receipts": [
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E0/evaluation/E0/seed45/PB-05940.json",
+      "sha256": "ae3dd8fd4ec7e85b016df6ff16df820a174837098ded2baaf7dce428cf97e277"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E0/evaluation/E0/seed45/LOCAL-T2-05940.json",
+      "sha256": "d461d976193f6caa93fb7c703d73b18a162c55acff4ee4fe92c509a70a2ab995"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E0/evaluation/E0/seed45/ADDITIONAL-05940.json",
+      "sha256": "926e2fc3b491ac80a2b2f5ed65cc75fca2f2e7f533fec5981d2ac4380398c00d"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E1/evaluation/E1/seed45/PB-23760.json",
+      "sha256": "c410c3c1e4532c19d7081caefb26bb171ac76759f92c98aa1de29a7170c8e651"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E1/evaluation/E1/seed45/LOCAL-T2-23760.json",
+      "sha256": "c6d4a56bcd629d4f692279c0cbcaf5b994806b83b1c388c971a35f01dab51448"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E1/evaluation/E1/seed45/ADDITIONAL-23760.json",
+      "sha256": "ff9f7017489669a4d2f10011e436ab94dfc7a2693fc510dd539ba01851f7a995"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E3/evaluation/E3/seed45/PB-02970.json",
+      "sha256": "bfba048acd168cae26787298dabbe9550f914f458cec1659236e608c110cdb9e"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E3/evaluation/E3/seed45/LOCAL-T2-02970.json",
+      "sha256": "6a6e761978a7645d36dba9df183f21367b2c2f3118b47de64933e04b153a5f7e"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E3/evaluation/E3/seed45/ADDITIONAL-02970.json",
+      "sha256": "cc4aaadacb41cee7f76497c6bd8215313adfa70bc69ed37f3be33517d4ab6a0f"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E1/evaluation/E1/seed45/PB-02970.json",
+      "sha256": "a8f6a066c0a9313aa3ab676069113baea09a91f9d709e690331a23d823c695fc"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E1/evaluation/E1/seed45/LOCAL-T2-02970.json",
+      "sha256": "b4e416a43c70d505f0706801be4b71f28161e4b29239f245cfc35b8ff8c9e02a"
+    },
+    {
+      "path": "/home/ww/persist4d_runs/native_long_retrain_v1/cluster/postselection/collected/E1/evaluation/E1/seed45/ADDITIONAL-02970.json",
+      "sha256": "11f7862093b2f856a772be0188c86bca59a7ca5a8d0f7eb339b59a9f09d504e5"
+    }
+  ],
+  "status": "COMPLETE"
+}

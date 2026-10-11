@@ -1,0 +1,20 @@
+{
+  "all_planned_trajectories_stopped_before_SEL": true,
+  "cluster_job_ids": {
+    "E0": "6d20be5481cc2131c349c06f27ba024616bc32983efc0685ee392f180fda0316",
+    "E1": "7ab9790336d6c0bfe1743d636872f019493fa30cf0d60b5a3bda9439af56359d",
+    "E2": "1867cae900c5023fc5a5adcf34463ceb2ad2910940d893c864eb28fdd79bfec1",
+    "E3": "f995d85d8888ccee3e0084e69687e63a51fdf3d6eb1ed84f43b6f9a4be11c8eb"
+  },
+  "excluded_failed_arms": [],
+  "population_sha256": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8",
+  "schema": 1,
+  "seed": 45,
+  "selected_updates": {
+    "E0": 5940,
+    "E1": 23760,
+    "E2": 29700,
+    "E3": 2970
+  },
+  "tolerance": 1e-06
+}

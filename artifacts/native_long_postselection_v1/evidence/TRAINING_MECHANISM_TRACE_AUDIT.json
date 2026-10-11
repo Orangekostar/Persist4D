@@ -1,0 +1,133 @@
+{
+  "status": "VERIFIED_WITH_REPEATED_ATTEMPT_TRACE_DIFFERENCES",
+  "time_unix": 1791687738.6367912,
+  "arms": {
+    "E1": {
+      "source_sha256": "c2a6aee225a2716382a0ce3215baf8d63b056e28c7713429f0385f37f7d6365f",
+      "records_all_attempts": 301,
+      "unique_logged_updates": 297,
+      "repeated_steps": [
+        4000,
+        4100,
+        4200,
+        4300
+      ],
+      "differing_feedback_versions": {},
+      "sampling_duplicate_records_exact": true,
+      "cap_triggered_stage_records_unique_steps": 3453,
+      "multi_stage_selected_records": 1917,
+      "stratified_records": 0,
+      "feedback_records_all_attempts": 0,
+      "feedback_execution_stages": [],
+      "feedback_norm_all_attempts": null
+    },
+    "E2": {
+      "source_sha256": "d0fff4dcd8ce9cc4bf22a7042d5b4073f49b5819bb50d00e5b8085072bb135da",
+      "records_all_attempts": 301,
+      "unique_logged_updates": 297,
+      "repeated_steps": [
+        4000,
+        4100,
+        4200,
+        4300
+      ],
+      "differing_feedback_versions": {},
+      "sampling_duplicate_records_exact": true,
+      "cap_triggered_stage_records_unique_steps": 3453,
+      "multi_stage_selected_records": 1917,
+      "stratified_records": 1917,
+      "feedback_records_all_attempts": 0,
+      "feedback_execution_stages": [],
+      "feedback_norm_all_attempts": null
+    },
+    "E3": {
+      "source_sha256": "6939d49cdf31691eb0eb8c93b522f513d70fe858f365c86e1f94f0f5e0c7fc8e",
+      "records_all_attempts": 301,
+      "unique_logged_updates": 297,
+      "repeated_steps": [
+        4000,
+        4100,
+        4200,
+        4300
+      ],
+      "differing_feedback_versions": {
+        "4000": [
+          [
+            {
+              "execution_stage": 7,
+              "update_norm": 126.1831283569336
+            }
+          ],
+          [
+            {
+              "execution_stage": 7,
+              "update_norm": 127.1136703491211
+            }
+          ]
+        ],
+        "4100": [
+          [
+            {
+              "execution_stage": 7,
+              "update_norm": 99.98174285888672
+            }
+          ],
+          [
+            {
+              "execution_stage": 7,
+              "update_norm": 100.77032470703125
+            }
+          ]
+        ],
+        "4200": [
+          [
+            {
+              "execution_stage": 7,
+              "update_norm": 295.7191162109375
+            }
+          ],
+          [
+            {
+              "execution_stage": 7,
+              "update_norm": 295.63800048828125
+            }
+          ]
+        ],
+        "4300": [
+          [
+            {
+              "execution_stage": 7,
+              "update_norm": 72.734375
+            }
+          ],
+          [
+            {
+              "execution_stage": 7,
+              "update_norm": 77.97467041015625
+            }
+          ]
+        ]
+      },
+      "sampling_duplicate_records_exact": true,
+      "cap_triggered_stage_records_unique_steps": 3453,
+      "multi_stage_selected_records": 1917,
+      "stratified_records": 0,
+      "feedback_records_all_attempts": 301,
+      "feedback_execution_stages": [
+        7
+      ],
+      "feedback_norm_all_attempts": {
+        "min": 11.346863746643066,
+        "median": 558.2218017578125,
+        "max": 2966.810791015625,
+        "nonzero": 301
+      }
+    }
+  },
+  "limitations": [
+    "Sampling traces contain selected-stage counts, not full available-stage histograms; missing-stage coverage is not inferred.",
+    "Every100 updates logs the last observed microbatch; this is not an exhaustive draw trace.",
+    "E3 repeated steps4000\u20134300 have different feedback norms; all versions are preserved, not claimed as byte-identical training replay.",
+    "Training trace activity does not establish accuracy improvements."
+  ]
+}

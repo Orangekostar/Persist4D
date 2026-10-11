@@ -1,0 +1,65 @@
+{
+  "assets": [
+    {
+      "arm": "E0",
+      "availability": "LFS_OBJECT_REMOTE_VERIFIED",
+      "bytes": 106906589,
+      "checkpoint_sha256": "a040be5e3337bdac556d36cb41a17a415ad90dc8e226d6f8476ee8365d43cf5c",
+      "name": "E0-05940.pt",
+      "path": "artifacts/native_long_postselection_v1/deployment/E0-05940.pt",
+      "sha256": "16822b8c35803dac30f99af32bc6105f49b67bcb6ae43e9951e9b6e623626a6f",
+      "step": 5940,
+      "storage": "git-lfs"
+    },
+    {
+      "arm": "E1",
+      "availability": "LFS_OBJECT_REMOTE_VERIFIED",
+      "bytes": 106906589,
+      "checkpoint_sha256": "d767086021690d9e74f9024a5b56dc85b43682e2b5e5277036e4ea02ae3b1887",
+      "name": "E1-23760.pt",
+      "path": "artifacts/native_long_postselection_v1/deployment/E1-23760.pt",
+      "sha256": "8c9d0d57044ce23c7964ddb1e7a2d8bd18e388e6ee657a7f4b02b1368b5b3a98",
+      "step": 23760,
+      "storage": "git-lfs"
+    },
+    {
+      "arm": "E1",
+      "availability": "LFS_OBJECT_REMOTE_VERIFIED",
+      "bytes": 106906589,
+      "checkpoint_sha256": "227503ed50aaca7bfd6e89466bfd984648fec1cf3333768626998dc0ba43e25b",
+      "name": "E1-02970.pt",
+      "path": "artifacts/native_long_postselection_v1/deployment/E1-02970.pt",
+      "sha256": "1ded877d95842202055eaedd64bff239c49da709fa5cd5a6421c3b87b6e989ef",
+      "step": 2970,
+      "storage": "git-lfs"
+    },
+    {
+      "arm": "E2",
+      "availability": "LFS_OBJECT_REMOTE_VERIFIED",
+      "bytes": 106906589,
+      "checkpoint_sha256": "2dce3660bfe08e85e647e3f421f55dba6de17075ba96251989690b3f9cd6480c",
+      "name": "E2-29700.pt",
+      "path": "artifacts/native_long_postselection_v1/deployment/E2-29700.pt",
+      "sha256": "83b701e6259559c6b331cece7382e645dc807968184b70586f291b3475d59dc6",
+      "step": 29700,
+      "storage": "git-lfs"
+    },
+    {
+      "arm": "E3",
+      "availability": "LFS_OBJECT_REMOTE_VERIFIED",
+      "bytes": 107705167,
+      "checkpoint_sha256": "34359a84fe00e4417acaddeca5832b2e893df997dcf6cfb2d73ad31e704cda5a",
+      "name": "E3-02970.pt",
+      "path": "artifacts/native_long_postselection_v1/deployment/E3-02970.pt",
+      "sha256": "7eef8600daf76356c2743b4da961fdf7d49abbd077b3d44763d7a2b3db22486a",
+      "step": 2970,
+      "storage": "git-lfs"
+    }
+  ],
+  "encoder_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+  "loader": "scripts/native_long_delivery.py",
+  "pretrained_encoder_redistributed": false,
+  "roundtrip_audit_sha256": "208d0389bf7eacb973958ac377da72c698d78f0081612893cccbe1e40ea79c82",
+  "status": "REMOTE_LFS_BYTES_VERIFIED",
+  "taxonomy_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba"
+}

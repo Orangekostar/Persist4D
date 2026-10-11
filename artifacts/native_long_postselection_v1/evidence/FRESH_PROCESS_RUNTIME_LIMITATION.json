@@ -1,0 +1,17 @@
+{
+  "affected_original_pairs": [
+    21,
+    25
+  ],
+  "bounded_repeat_jobs": 8,
+  "new_training_authorized_by_this_diagnostic": false,
+  "original_results_replaced": false,
+  "original_total_pairs": 30,
+  "repeat_audit_sha256": "1bc0868848784fac2ea1664e9af8422503b7a6df448befe20c63242ebf99ad32",
+  "repeat_plan_sha256": "c7f44fdf120df328742ac04e1970118325f38ac72c83442e9446193adfb4b06e",
+  "root_cause_scope": "Upstream mask logits differ by saved auxiliary stage 0 while its logits remain identical; exact earlier operator not localized. Do not attribute to a specific CUDA kernel.",
+  "same_mode_metrics_equal_on_two_flagged_inputs": true,
+  "scientific_scope": "Retain trained observations with explicit nonrepeatability caveat; do not claim fixed fresh-process protocol guarantees tensor repeatability, isolated full-panel feedback causality, or independently replicated small gains. No new training until native correctness is resolved.",
+  "status": "FRESH_PROCESS_NONREPEATABILITY_OBSERVED",
+  "strict_alignment_eligible_original_pairs": 28
+}

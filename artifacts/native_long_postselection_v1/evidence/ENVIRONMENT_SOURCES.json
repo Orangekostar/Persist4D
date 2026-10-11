@@ -1,0 +1,39 @@
+{
+  "controller_package_versions": {
+    "hydra-core": "1.3.4",
+    "numpy": "2.2.6",
+    "omegaconf": "2.3.1",
+    "pytorch-lightning": "2.6.5",
+    "scipy": "1.15.3",
+    "spconv-cu126": "2.3.8",
+    "torch": "2.6.0+cu126"
+  },
+  "python": "3.10.20",
+  "scope": "controller CPU audit/loading environment; trained remote source bytes bound separately by source/init and execution receipts",
+  "third_party_source_repositories": [
+    {
+      "commit": "10a7d17cff4dddff028f1522c2e72de4c4515df7",
+      "modified_files": [],
+      "origin": "https://github.com/Pointcept/Concerto.git",
+      "package": "concerto"
+    },
+    {
+      "commit": "18c09ff8d713494f78a8213792262b910977a65d",
+      "modified_files": [],
+      "origin": "https://github.com/facebookresearch/sonata.git",
+      "package": "sonata"
+    },
+    {
+      "commit": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f",
+      "modified_files": [],
+      "origin": "https://github.com/GradientSpaces/stmetrics.git",
+      "package": "stmetrics"
+    },
+    {
+      "commit": "b4a4a3bd136852dae5fb1de37978dee412653e31",
+      "modified_files": [],
+      "origin": "https://github.com/facebookresearch/detectron2.git",
+      "package": "detectron2"
+    }
+  ]
+}
