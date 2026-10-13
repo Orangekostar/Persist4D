@@ -1,0 +1,19 @@
+{
+  "LOCAL_T2": {
+    "distinct_ordered_scan_pairs": 154,
+    "inputs": 154,
+    "references": 46
+  },
+  "LOCAL_only_ordered_scan_pairs": 138,
+  "PB_T2": {
+    "distinct_ordered_scan_pairs": 97,
+    "inputs": 129,
+    "references": 6
+  },
+  "PB_only_ordered_scan_pairs": 81,
+  "common_ordered_scan_pairs": 16,
+  "comparison_boundary": "Same base dataset does not imply identical input populations or temporal protocols.",
+  "original_paper_sample_identity_verified": false,
+  "source_sha256": "6af1cdc5a7ce9160178425839f38887b3e4c10d9ca369ac8425efb1518b7b944",
+  "status": "LOCAL_POPULATION_IDENTITY_COMPARED"
+}

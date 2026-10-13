@@ -531,7 +531,15 @@ class ReScene(nn.Module):
             result.append(time.long())
         return result
 
-    def forward(self, x, point2segment=None, raw_coordinates=None, is_eval=False):
+    def before_first_mask(
+        self, queries, query_pos, sampled_coords, *, dense_features,
+        padding_mask, raw_coordinates, point2segment, stage_meta=None, coords=None,
+    ):
+        """Parameter-free extension point; the original model is an exact no-op."""
+        return queries, query_pos, sampled_coords
+
+    def forward(self, x, point2segment=None, raw_coordinates=None, is_eval=False,
+                *, stage_meta=None, backbone_outputs=None):
         self.native_long_sampling_stats = []
         self.native_long_feedback_stats = []
         if not self.train_on_segments:
@@ -541,7 +549,8 @@ class ReScene(nn.Module):
         x.point2segment = point2segment
 
         # backbone and positional encodings
-        pcd_features, aux, coords = self.backbone(x)
+        pcd_features, aux, coords = (self.backbone(x) if backbone_outputs is None
+                                    else backbone_outputs)
         pos_encodings_pcd = self.get_pos_encs(coords)
 
         # mask feature head and aggregation to segments if needed
@@ -602,6 +611,11 @@ class ReScene(nn.Module):
             pcd_features=pcd_features,
             coords=coords,
             **semantic_inputs,
+        )
+        queries, query_pos, sampled_coords = self.before_first_mask(
+            queries, query_pos, sampled_coords, dense_features=batched_features,
+            padding_mask=batch_map, raw_coordinates=raw_coordinates,
+            point2segment=point2segment, stage_meta=stage_meta, coords=coords,
         )
 
         predictions_class = []

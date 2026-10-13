@@ -1,0 +1,268 @@
+{
+  "actual_gpu_gradient_check": {
+    "evidence": "P0_GRADIENT_CHECK.json",
+    "frozen_parent_unchanged": true,
+    "scope": "M6 P0 connectivity only; other-arm pilots and formal training not yet executed",
+    "stage_forwards": 42,
+    "updates": 3,
+    "used_adapter_changed": true,
+    "variant": "M6"
+  },
+  "delta_reload": "EXACT_ALL_PARENT_AND_NEW_STATE_TENSORS_CPU_DEBUG_ONLY",
+  "elapsed_seconds": 26.306102002999978,
+  "scope": "CPU real parent construction/load; no GPU or training claim",
+  "status": "EXACT_PARENT_AND_ADAPTER_CONSTRUCTION_CPU_VERIFIED",
+  "variants": {
+    "M0": {
+      "frozen_parent_eval": true,
+      "included_encoder_buffers": [],
+      "loaded_task_entries": 345,
+      "new_parameter_names": [],
+      "new_state_entries": [],
+      "omitted_encoder_entries": 453,
+      "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE",
+      "trainable_parameter_names": [],
+      "trainable_parameters": 0
+    },
+    "M1": {
+      "frozen_parent_eval": true,
+      "included_encoder_buffers": [],
+      "loaded_task_entries": 345,
+      "new_parameter_names": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "new_state_entries": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "omitted_encoder_entries": 453,
+      "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE",
+      "trainable_parameter_names": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "trainable_parameters": 84224
+    },
+    "M2": {
+      "frozen_parent_eval": true,
+      "included_encoder_buffers": [],
+      "loaded_task_entries": 345,
+      "new_parameter_names": [
+        "model.mpr_read.attention_scale",
+        "model.mpr_read.gate_projection.bias",
+        "model.mpr_read.gate_projection.weight",
+        "model.mpr_read.key_projection.bias",
+        "model.mpr_read.key_projection.weight",
+        "model.mpr_read.null_key",
+        "model.mpr_read.output_projection.bias",
+        "model.mpr_read.output_projection.weight",
+        "model.mpr_read.query_projection.bias",
+        "model.mpr_read.query_projection.weight",
+        "model.mpr_read.value_projection.bias",
+        "model.mpr_read.value_projection.weight"
+      ],
+      "new_state_entries": [
+        "model.mpr_read.attention_scale",
+        "model.mpr_read.gate_projection.bias",
+        "model.mpr_read.gate_projection.weight",
+        "model.mpr_read.key_projection.bias",
+        "model.mpr_read.key_projection.weight",
+        "model.mpr_read.null_key",
+        "model.mpr_read.output_projection.bias",
+        "model.mpr_read.output_projection.weight",
+        "model.mpr_read.query_projection.bias",
+        "model.mpr_read.query_projection.weight",
+        "model.mpr_read.value_projection.bias",
+        "model.mpr_read.value_projection.weight"
+      ],
+      "omitted_encoder_entries": 453,
+      "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE",
+      "trainable_parameter_names": [
+        "model.mpr_read.attention_scale",
+        "model.mpr_read.gate_projection.bias",
+        "model.mpr_read.gate_projection.weight",
+        "model.mpr_read.key_projection.bias",
+        "model.mpr_read.key_projection.weight",
+        "model.mpr_read.null_key",
+        "model.mpr_read.output_projection.bias",
+        "model.mpr_read.output_projection.weight",
+        "model.mpr_read.query_projection.bias",
+        "model.mpr_read.query_projection.weight",
+        "model.mpr_read.value_projection.bias",
+        "model.mpr_read.value_projection.weight"
+      ],
+      "trainable_parameters": 99073
+    },
+    "M3": {
+      "frozen_parent_eval": true,
+      "included_encoder_buffers": [],
+      "loaded_task_entries": 345,
+      "new_parameter_names": [
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "new_state_entries": [
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "omitted_encoder_entries": 453,
+      "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE",
+      "trainable_parameter_names": [
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "trainable_parameters": 51200
+    },
+    "M4": {
+      "frozen_parent_eval": true,
+      "included_encoder_buffers": [],
+      "loaded_task_entries": 345,
+      "new_parameter_names": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "new_state_entries": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "omitted_encoder_entries": 453,
+      "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE",
+      "trainable_parameter_names": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "trainable_parameters": 84224
+    },
+    "M5": {
+      "frozen_parent_eval": true,
+      "included_encoder_buffers": [],
+      "loaded_task_entries": 345,
+      "new_parameter_names": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "new_state_entries": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "omitted_encoder_entries": 453,
+      "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE",
+      "trainable_parameter_names": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight"
+      ],
+      "trainable_parameters": 84224
+    },
+    "M6": {
+      "frozen_parent_eval": true,
+      "included_encoder_buffers": [],
+      "loaded_task_entries": 345,
+      "new_parameter_names": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight",
+        "model.mpr_support.layers.0.bias",
+        "model.mpr_support.layers.0.weight",
+        "model.mpr_support.layers.2.bias",
+        "model.mpr_support.layers.2.weight"
+      ],
+      "new_state_entries": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight",
+        "model.mpr_support.layers.0.bias",
+        "model.mpr_support.layers.0.weight",
+        "model.mpr_support.layers.2.bias",
+        "model.mpr_support.layers.2.weight"
+      ],
+      "omitted_encoder_entries": 453,
+      "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE",
+      "trainable_parameter_names": [
+        "model.mpr_prompt.Wk.bias",
+        "model.mpr_prompt.Wk.weight",
+        "model.mpr_prompt.Wq.bias",
+        "model.mpr_prompt.Wq.weight",
+        "model.mpr_prompt.input_layer.bias",
+        "model.mpr_prompt.input_layer.weight",
+        "model.mpr_prompt.output_layer.bias",
+        "model.mpr_prompt.output_layer.weight",
+        "model.mpr_support.layers.0.bias",
+        "model.mpr_support.layers.0.weight",
+        "model.mpr_support.layers.2.bias",
+        "model.mpr_support.layers.2.weight"
+      ],
+      "trainable_parameters": 101761
+    }
+  }
+}

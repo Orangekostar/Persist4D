@@ -1,0 +1,164 @@
+{
+  "adapter_seeds": [
+    146,
+    147
+  ],
+  "asset_hashes": {
+    "encoder": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+    "formal_population": "6af1cdc5a7ce9160178425839f38887b3e4c10d9ca369ac8425efb1518b7b944",
+    "parent": "8c9d0d57044ce23c7964ddb1e7a2d8bd18e388e6ee657a7f4b02b1368b5b3a98",
+    "population": "cb479a1d5ec901e46fc281ed3fad7b793d00ea66fd6781a3738f3f78e1cb8ec8",
+    "taxonomy": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba"
+  },
+  "base_commit": "6b1b779172afdeb51e2719a737cd05e7eeeca982",
+  "branch": "research/persist4d-mpr-v1-20261013",
+  "budget": {
+    "authorization": "user instruction; original cap and audited predecessor receipt",
+    "historical_cost_sha256": "3e4bf6633bf7510a67f27891157be46264f6eea5f1066a3876b43dea53bb5e92",
+    "historical_ledger_sha256": "aab9929b5af57182afc57a53c5cd7d94f6ecbf8bf45f0e869a1a0bbbc6ea5387",
+    "lifetime_cap_gpu_hours": 1800,
+    "new_cap_gpu_hours": 78.0,
+    "prior_gpu_hours": 1713.8830547291614,
+    "reserve_gpu_hours": 8.0
+  },
+  "configuration_overrides": {
+    "per_endpoint": {
+      "general.seed": [
+        146,
+        147
+      ],
+      "model.mpr_seed": [
+        146,
+        147
+      ],
+      "model.mpr_variant": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6"
+      ]
+    },
+    "resolved_parent_diff": [
+      {
+        "mpr": "<encoder_path>",
+        "parent": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+        "path": "backbone.name"
+      },
+      {
+        "mpr": null,
+        "parent": "backbone_encoder",
+        "path": "general.freeze"
+      },
+      {
+        "mpr": true,
+        "parent": false,
+        "path": "general.frozen_encoder_eval"
+      },
+      {
+        "mpr": 1,
+        "parent": 2,
+        "path": "general.gpus"
+      },
+      {
+        "mpr": 146,
+        "parent": 45,
+        "path": "general.seed"
+      },
+      {
+        "mpr": "<taxonomy_path>",
+        "parent": "/home/pluto/native_long_cluster_v1/data/processed/rio/rio.yaml",
+        "path": "instance_metric.dataset"
+      },
+      {
+        "mpr": "models.revisit_prompt.RevisitPromptReScene",
+        "parent": "models.ReScene",
+        "path": "model._target_"
+      },
+      {
+        "mpr": "<encoder_path>",
+        "parent": "/home/pluto/native_long_cluster_v1/assets/concerto_base.pth",
+        "path": "model.config.backbone.name"
+      },
+      {
+        "mpr": 146,
+        "parent": null,
+        "path": "model.mpr_seed"
+      },
+      {
+        "mpr": "M4",
+        "parent": null,
+        "path": "model.mpr_variant"
+      },
+      {
+        "mpr": true,
+        "parent": null,
+        "path": "model.return_query_features"
+      }
+    ],
+    "runtime_policies": {
+      "adaptation_dataset": "rio / 3RScan original TRAIN; no ScanNet adaptation",
+      "autocast": false,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "clip_grad_norm": 1.0,
+      "episode_horizons": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "episodes_per_optimizer_update": 4,
+      "eps": 1e-08,
+      "internal_attention_dtype": "Parent FlashAttention FP16 implementation retained",
+      "lr": 0.0001,
+      "lr_schedule": "warmup 5% followed by cosine to 0.1 multiplier",
+      "microbatch_episodes": 1,
+      "optimizer": "AdamW",
+      "parent_freeze": "all parent parameters and buffers; evaluation mode",
+      "random_data_augmentation": false,
+      "tf32": false,
+      "trainable_namespaces": [
+        "model.mpr_prompt.",
+        "model.mpr_read.",
+        "model.mpr_support."
+      ],
+      "weight_decay": 0.01
+    },
+    "source": "Actual resolved parent_config diff for M4/seed146; runtime policies below come from the custom loader/trainer, which owns optimizer execution."
+  },
+  "data_counts": {
+    "CAL": {
+      "1": 31,
+      "2": 19,
+      "3": 14,
+      "4": 14,
+      "5": 6
+    },
+    "PB": {
+      "2": 129,
+      "3": 129,
+      "4": 129,
+      "5": 129
+    },
+    "SEL": {
+      "1": 39,
+      "2": 21,
+      "3": 21,
+      "4": 15,
+      "5": 15
+    }
+  },
+  "data_scope": "TRAIN/CAL/SEL=train indices; PB=validation indices",
+  "instruction_sha256": "08cf2d2c83f1bd93d3120623f3ea9884fddd0f1fb13af843677b92160cc0070e",
+  "local_paths_public": false,
+  "original_parent_loader_status": "STRICT_ORIGINAL_LOADER_VERIFIED",
+  "parent_seed": 45,
+  "publication_status": "PENDING_EXTERNAL_VERIFICATION",
+  "schema": 1,
+  "status": "ASSETS_AND_PRIOR_BOUND"
+}

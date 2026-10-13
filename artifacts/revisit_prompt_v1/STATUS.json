@@ -1,0 +1,40 @@
+{
+  "adapter_seeds": [
+    146,
+    147
+  ],
+  "code_status": "IMPLEMENTED_P0_CONNECTED",
+  "cpu_verified": [
+    "exact parent task and encoder construction for M0 through M6",
+    "specified new parameter counts",
+    "untrained M4 parent/encoder/delta tensor reconstruction",
+    "native causal CAL/PB data replay",
+    "selector: 15 cases passed",
+    "training/evaluation/publishing help and honest pilot/baseline/publication dry-runs",
+    "official reference-state pooling matches direct accumulation and preserves duplicate bootstrap clusters",
+    "CPU private initialization avoids CUDA seeding calls and preserves the CPU generator",
+    "seed147 CLI preserves the main locks and snapshots its input CSV"
+  ],
+  "experiment_status": "P0_COMPLETE_P1_PENDING",
+  "formal_N": null,
+  "formal_training_started": false,
+  "formal_training_steps": 0,
+  "gpu_training_started": true,
+  "new_gpu_hours": 0.1699878438752745,
+  "next_task": "Three independent M0 full-CAL evaluations, six actual cost pilots if numerical gate passes, then full-matrix budget admission.",
+  "numeric_root_cause": "NUMERICAL_ROOT_CAUSE_UNRESOLVED",
+  "numerical_status": "NONBITWISE_RUNTIME_OBSERVED",
+  "parent": "E1-23760 seed45",
+  "pending": [
+    "P1 full-CAL repeat variance and six cost pilots",
+    "Maximal-N admission / exact blocked branch",
+    "Formal six-arm matrix and conditional replication",
+    "Locked confirmation / bootstrap / mechanism / profile / deployment",
+    "Final primary audit and A/B remote publication"
+  ],
+  "phase": "B",
+  "publication_status": "NOT_PUBLISHED",
+  "schema": 1,
+  "scientific_status": "EXPERIMENT_INCOMPLETE",
+  "status": "P0_COMPLETE_P1_PENDING"
+}

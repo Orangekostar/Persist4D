@@ -1,0 +1,569 @@
+{
+  "additional_execution_reads": [
+    {
+      "base_commit": "6b1b779172afdeb51e2719a737cd05e7eeeca982",
+      "git_blob_sha": "4512e6bfb9a45b6904742dbd69163556e163520d",
+      "inspected_ranges": [
+        "306-364",
+        "425-500"
+      ],
+      "path": "scripts/system_comparison_metrics.py",
+      "purpose": "reuse original prediction-logical-ID event definitions",
+      "symbols": "match_identity_update; compute_deployment_identity_metrics"
+    }
+  ],
+  "base_commit": "6b1b779172afdeb51e2719a737cd05e7eeeca982",
+  "literature": [
+    {
+      "date": "2026-09-21",
+      "id": "P01",
+      "scope": "Geometry conditions mask decoding; not an implemented teacher or point-cloud plug-in in this task.",
+      "title": "SAM-V: Geometry-Aware Segment Anything for Multi-View Instance Segmentation",
+      "url": "https://arxiv.org/abs/2609.25490"
+    },
+    {
+      "date": "2021-05-07 (first submission)",
+      "id": "P02",
+      "scope": "Track query propagation is prior art; not our new contribution.",
+      "title": "MOTR: End-to-End Multiple-Object Tracking with Transformer",
+      "url": "https://arxiv.org/abs/2105.03247"
+    },
+    {
+      "date": "2026-09-29; v2 2026-10-03",
+      "id": "P03",
+      "scope": "Persistent object queries over shared visual geometry are prior art.",
+      "title": "S4VY: Segment Anything in Feed-Forward 4D Visual Geometry",
+      "url": "https://arxiv.org/abs/2609.36875"
+    }
+  ],
+  "references": [
+    {
+      "design_decision": "\u4fdd\u7559\u6b63\u8d1f\u7ed3\u679c\uff1b\u65b0\u7814\u7a76\u4e0d\u91cd\u7528\u65e7\u8868\u6765\u5ba3\u79f0\u65b0\u6a21\u5757\u6709\u6548\u3002",
+      "id": "R01",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "01d1dc90d736b18d22427e3f69d03c67c837f115",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "01d1dc90d736b18d22427e3f69d03c67c837f115",
+          "inspected_ranges": [
+            "\u62a5\u544a\u4e3b\u4f53\uff1b130\u884c\u8d77\u672b\u5c3e"
+          ],
+          "path": "artifacts/native_long_postselection_v1/REPORT.md",
+          "symbols": "\u5b9e\u9a8c\u3001\u8d44\u6e90\u3001\u6295\u7a3f\u5224\u65ad",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_postselection_v1/REPORT.md"
+        }
+      ],
+      "verified_observation": "\u672c\u8f6eE0\u2013E3\u7ed3\u679c\u3001\u6570\u503c\u9650\u5236\u3001\u8bb0\u5fc6\u6865\u63a5\u548c\u6700\u7ec8\u603b\u6210\u672c\u3002"
+    },
+    {
+      "design_decision": "\u53ea\u7ee7\u627f\u53ef\u8bc1\u5b9e\u8d44\u4ea7\uff1b\u5b9e\u9645\u989d\u5ea6\u6267\u884c\u524d\u91cd\u65b0\u7ed1\u5b9a\u3002",
+      "id": "R02",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "8665de5e4530d0cb82aacae1b8f99ae7542a7389",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "8665de5e4530d0cb82aacae1b8f99ae7542a7389",
+          "inspected_ranges": [
+            "\u5168\u6587"
+          ],
+          "path": "artifacts/native_long_postselection_v1/HANDOFF.md",
+          "symbols": "\u4ea4\u63a5\u3001\u4e0b\u8f7d\u3001\u540e\u7eed\u79d1\u7814\u8fb9\u754c",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_postselection_v1/HANDOFF.md"
+        }
+      ],
+      "verified_observation": "\u5b8c\u6210\u6001\u4ea4\u63a5\u3001\u7236\u6743\u91cd\u4ea4\u4ed8\u4e0e\u5386\u53f2\u9884\u7b97\u4f59\u989d\u3002"
+    },
+    {
+      "design_decision": "\u65b0\u589e\u9ed8\u8ba4\u7a7a\u64cd\u4f5c\u7684\u9996mask\u524dhook\uff0c\u4e0d\u628a\u540e\u7eed\u8bfb\u53d6\u6362\u540d\u4e3a\u65b0\u673a\u5236\u3002",
+      "id": "R03",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "b2044426fe75af46675aa924cb118067c96278f8",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "b2044426fe75af46675aa924cb118067c96278f8",
+          "inspected_ranges": [
+            "1\u2013230",
+            "230\u2013530",
+            "530\u884c\u8d77forward\u53ca\u76f8\u5173\u5c3e\u90e8\u51fd\u6570"
+          ],
+          "path": "models/rescene.py",
+          "symbols": "ReScene.__init__; initialize_queries; forward; mask_module; aggregate_features; after_decoder_stage",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/rescene.py"
+        }
+      ],
+      "verified_observation": "\u539fReScene\u5728\u521d\u59cb\u5316query\u540e\u751f\u6210\u9996\u6b21mask\uff1b\u5176\u540e\u624d\u6267\u884ccross/self attention\u4e0eafter_decoder_stage\u3002"
+    },
+    {
+      "design_decision": "M2\u91cd\u7528\u5df2\u6709\u8bfb\u53d6\u6a21\u5757\uff1b\u4e0d\u80fd\u58f0\u79f0\u9996\u6b21attention\u8bb0\u5fc6\u3002",
+      "id": "R04",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "271bb327eca16acdfafc232f535d1c89447ca34d",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "271bb327eca16acdfafc232f535d1c89447ca34d",
+          "inspected_ranges": [
+            "1\u884c\u8d77\u81f3\u6587\u4ef6\u672b\u5c3e"
+          ],
+          "path": "models/task_memory_read.py",
+          "symbols": "TaskMemoryRead.forward",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/task_memory_read.py"
+        }
+      ],
+      "verified_observation": "\u5355\u4e2a\u8def\u7531\u5386\u53f2\u69fd\u4e0enull\u5206\u652f\u7ade\u4e89\uff0c\u518d\u95e8\u63a7\u66f4\u65b0query\u3002"
+    },
+    {
+      "design_decision": "\u7ed1\u5b9aM2\u7684\u771f\u5b9e\u63d2\u5165\u4f4d\u7f6e\uff1b\u6ce8\u660e\u6700\u7ec8\u91cd\u65b0\u5173\u8054\u7684\u534f\u8bae\u5dee\u5f02\u3002",
+      "id": "R05",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "9b5d4b416831920919bb4fe83a63908100adf054",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "9b5d4b416831920919bb4fe83a63908100adf054",
+          "inspected_ranges": [
+            "1\u2013220",
+            "210\u884c\u8d77\u540e\u7eedforward/hook\u5b9e\u73b0"
+          ],
+          "path": "models/persist4d_task_memory.py",
+          "symbols": "Persist4DTaskMemory; _build_pre_observation; after_decoder_stage; forward",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/persist4d_task_memory.py"
+        }
+      ],
+      "verified_observation": "\u9996\u8f6ehlevels\u672b\u5c3e\u7528\u521d\u6b65mask\u6784\u9020observation\u3001route\u548ctask_read\u3002"
+    },
+    {
+      "design_decision": "\u4e0d\u91cd\u590d\u5f00\u53d1\u666e\u901a\u591a\u4ee3\u8868\u8bb0\u5fc6\u5e76\u79f0\u521b\u65b0\u3002",
+      "id": "R06",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "0a0849300445c9142143025b7ca8bbfd4c3a4676",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "0a0849300445c9142143025b7ca8bbfd4c3a4676",
+          "inspected_ranges": [
+            "1\u2013140"
+          ],
+          "path": "models/object_visual_memory.py",
+          "symbols": "VisualCandidate; ObjectVisualState",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/object_visual_memory.py"
+        }
+      ],
+      "verified_observation": "\u5df2\u7ecf\u6709K100\u3001r8\u3001D128\u7684\u6709\u754c\u591a\u4ee3\u8868\u89c6\u89c9\u8bb0\u5fc6\u3002"
+    },
+    {
+      "design_decision": "\u4e0d\u7eed\u8bad\u8be5\u65e7\u8def\u7ebf\uff1b\u4e0d\u62fc\u63a5\u8de8\u534f\u8bae\u6570\u503c\u3002",
+      "id": "R07",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "5b09341c5dfe7265708fc745b266439a0af83a1c",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "5b09341c5dfe7265708fc745b266439a0af83a1c",
+          "inspected_ranges": [
+            "\u5168\u6587"
+          ],
+          "path": "artifacts/task_memory_retention_v2/FINAL_REPORT.md",
+          "symbols": "Protocol-B tMAP; Strict comparisons; Limitations",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/task_memory_retention_v2/FINAL_REPORT.md"
+        }
+      ],
+      "verified_observation": "M3-V-CORE\u5728\u65e7\u7814\u7a76\u4e2d\u8f93\u7ed9\u591a\u4e2a\u66f4\u5f3a\u5bf9\u7167\uff0c\u4e14\u65e7\u53d1\u5e03\u653f\u7b56\u4e0d\u540c\u3002"
+    },
+    {
+      "design_decision": "\u4fdd\u7559\u7269\u7406\u89d2\u8272\u548c\u771f\u5b9eUUID\uff1b\u4e0d\u8981\u76f4\u63a5\u590d\u7528\u65e7scene\u540d\u6b63\u5219\u3002",
+      "id": "R08",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "6fe32307f9feb239f4bf342a368dfece686b289e",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "6fe32307f9feb239f4bf342a368dfece686b289e",
+          "inspected_ranges": [
+            "1\u2013100"
+          ],
+          "path": "artifacts/native_long_retrain_v1/POPULATION.json",
+          "symbols": "counts; evaluation_counts; evaluation_inputs",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_retrain_v1/POPULATION.json"
+        }
+      ],
+      "verified_observation": "\u539f\u6e05\u5355\u89d2\u8272\u8ba1\u6570361/8/8\u3001CAL/SEL\u8f93\u5165\u8ba1\u6570\uff0c\u626b\u63cf\u4e3aUUID\u3002"
+    },
+    {
+      "design_decision": "\u9009\u62e9E1-23760\uff0c\u68c0\u67e5\u7236\u8d44\u4ea7\u800c\u4e0d\u5047\u79f0optimizer\u6062\u590d\u3002",
+      "id": "R09",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "9f874b60ccb9b23e9c66b944149325d168168767",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "9f874b60ccb9b23e9c66b944149325d168168767",
+          "inspected_ranges": [
+            "\u5168\u6587"
+          ],
+          "path": "artifacts/native_long_postselection_v1/deployment/README.md",
+          "symbols": "Trained native-long task bundles; portable loading",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_postselection_v1/deployment/README.md"
+        }
+      ],
+      "verified_observation": "\u90e8\u7f72\u8d44\u4ea7\u662f\u975e\u7f16\u7801\u5668\u4efb\u52a1\u53c2\u6570\u548c\u7f13\u51b2\u533a\uff1b\u7f16\u7801\u5668\u72ec\u7acb\uff1b\u6709\u6e90\u7801\u4e0e\u6570\u503c\u9650\u5236\u3002"
+    },
+    {
+      "design_decision": "\u65b0\u8fc1\u79fb\u5668\u6838\u9a8c\u7236\u8eab\u4efd\uff0c\u540c\u65f6\u7ed1\u5b9a\u65b0\u4ee3\u7801\uff1b\u4e0d\u5220\u9664\u65e7\u68c0\u67e5\u3002",
+      "id": "R10",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "f89d7edf9166fb970b3d3c129848bd77fab37654",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "f89d7edf9166fb970b3d3c129848bd77fab37654",
+          "inspected_ranges": [
+            "1\u884c\u8d77\u5b8c\u6574\u52a0\u8f7d\u53ca\u90e8\u7f72\u5ba1\u67e5\u5b9e\u73b0"
+          ],
+          "path": "scripts/native_long_delivery.py",
+          "symbols": "portable_config; load_portable_bundle",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_delivery.py"
+        }
+      ],
+      "verified_observation": "portable loader\u6821\u9a8c\u65e7\u6570\u503ccode identity\u3001\u7236\u8d44\u4ea7\u4e0e\u4e24\u5904backbone\u8def\u5f84\u3002"
+    },
+    {
+      "design_decision": "\u65b0UUID episode + \u539fnative loader\uff1b\u77ed\u9002\u914d\u4ece\u7b2c\u4e00\u66f4\u65b0\u542b\u56db\u4e2a\u957f\u5ea6\u3002",
+      "id": "R11",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "8865049d5566f819bd188bc832828f00b60ada80",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "8865049d5566f819bd188bc832828f00b60ada80",
+          "inspected_ranges": [
+            "1\u884c\u8d77\u5b8c\u6574\u5b9e\u73b0"
+          ],
+          "path": "datasets/native_long_dataset.py",
+          "symbols": "stable_seed; isolated_rng; horizon_weights; NativeLongCollator; build_native_datasets",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/datasets/native_long_dataset.py"
+        },
+        {
+          "actual_base_git_blob_sha": "64ebc4eab1d933bb9d23e2e3b6368d3d2f56537f",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "64ebc4eab1d933bb9d23e2e3b6368d3d2f56537f",
+          "inspected_ranges": [
+            "1\u2013190",
+            "190\u2013355"
+          ],
+          "path": "datasets/task_memory_episode.py",
+          "symbols": "NativeEpisodeMaster; TaskMemoryEpisodeSpec; StageMeta",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/datasets/task_memory_episode.py"
+        }
+      ],
+      "verified_observation": "native\u6570\u636e\u6709\u7a33\u5b9a\u79cd\u5b50\u3001UUID\u6e05\u5355\u548c\u521d\u59cbT2\u8bfe\u7a0b\uff1b\u65e7episode spec\u6821\u9a8cscene\u6b63\u5219\uff0cStageMeta\u4fdd\u7559\u51e0\u4f55\u6620\u5c04\u3002"
+    },
+    {
+      "design_decision": "\u590d\u7528\u5fc5\u8981\u601d\u60f3/\u52a9\u624b\uff0c\u4e0d\u673a\u68b0\u7ee7\u627f\u65e7variant\u68af\u5ea6\u5ba1\u8ba1\u548c\u8bad\u7ec3\u7ea6\u675f\u3002",
+      "id": "R12",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "5257e59bb1d28efa0928c7b21d169085d863d23e",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "5257e59bb1d28efa0928c7b21d169085d863d23e",
+          "inspected_ranges": [
+            "1\u2013260",
+            "380\u2013670"
+          ],
+          "path": "trainer/task_memory_trainer.py",
+          "symbols": "stage_mean_coefficients; task_memory_lr_multiplier; commit_task_memory_stage; bind_training_births; TaskMemoryTrainer",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/trainer/task_memory_trainer.py"
+        }
+      ],
+      "verified_observation": "\u65e7trainer\u6709stage\u5e73\u5747\u3001TBPTT\u3001\u6700\u7ec8observation\u3001commit\u4e0e\u72ec\u7acb\u8bad\u7ec3birth ledger\u3002"
+    },
+    {
+      "design_decision": "\u6700\u7ec8\u7edf\u4e00route/commit\u4e00\u6b21\uff1bquery\u6765\u6e90\u4e0d\u662f\u6700\u7ec8ID\uff1b\u51e0\u4f55sidecar\u53ea\u7531\u9884\u6d4b\u66f4\u65b0\u3002",
+      "id": "R13",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "7a0e2dcb6d40fc81a58ff8d8c23bffaa71c5388b",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "7a0e2dcb6d40fc81a58ff8d8c23bffaa71c5388b",
+          "inspected_ranges": [
+            "1\u2013150",
+            "235\u2013530"
+          ],
+          "path": "models/task_memory_routing.py",
+          "symbols": "PredictionObservation; EntityRoute; route_entities; commit_entities",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/task_memory_routing.py"
+        },
+        {
+          "actual_base_git_blob_sha": "9d4bf687c6a66529d3eabc466b3c53d9af44afd6",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "9d4bf687c6a66529d3eabc466b3c53d9af44afd6",
+          "inspected_ranges": [
+            "1\u2013155"
+          ],
+          "path": "models/task_memory_state.py",
+          "symbols": "TaskMemoryConfig; TaskMemoryState.empty",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/task_memory_state.py"
+        }
+      ],
+      "verified_observation": "\u5b9e\u4f53\u72b6\u6001\u6709logical ID/generation\uff1broute\u5173\u8054\u65e7\u72b6\u6001\uff0ccommit\u53ea\u63a5\u53d7\u5f53\u524d\u6709\u6548\u89c2\u6d4b\u5e76\u5206\u914d\u51fa\u751f\u3002"
+    },
+    {
+      "design_decision": "\u4e3b\u6bd4\u8f83\u7edf\u4e00\u72ec\u7acb\u5339\u914d\uff1b\u65b0\u589e\u76d1\u7763\u5728loss\u4fa7\uff0c\u4e0d\u628aTALA route\u76f4\u63a5\u5957\u7ed9preproposal\u63d0\u793a\u3002",
+      "id": "R14",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "d215cfdb215881321a9eadaaa8e40543527157eb",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "d215cfdb215881321a9eadaaa8e40543527157eb",
+          "inspected_ranges": [
+            "1\u2013220"
+          ],
+          "path": "models/task_memory_criterion.py",
+          "symbols": "TaskMemoryCriterion; _assignment; _safe_mask_losses; _empty_current_loss",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/task_memory_criterion.py"
+        }
+      ],
+      "verified_observation": "\u65e7criterion\u6709\u72ec\u7acb\u5339\u914d\u4e0eTALA\u5206\u652f\uff0c\u7a7a\u96c6mask loss\u4e0eGT ledger\u8981\u6c42\u4e0d\u540c\u3002"
+    },
+    {
+      "design_decision": "\u53e6\u5199\u8bad\u7ec3\u5165\u53e3\uff0c\u4e0d\u66f4\u6362\u5e38\u6570\u5192\u5145\u539f\u5b9e\u9a8c\u3002",
+      "id": "R15",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "828dc0488a2298ec20ca8a78fcf6da78627777b1",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "828dc0488a2298ec20ca8a78fcf6da78627777b1",
+          "inspected_ranges": [
+            "1\u2013210"
+          ],
+          "path": "scripts/train_task_memory.py",
+          "symbols": "R1_SHA256; VARIANTS; validate_run_budget; compose_variant_config",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/train_task_memory.py"
+        }
+      ],
+      "verified_observation": "\u65e7\u8bad\u7ec3\u5165\u53e3\u786c\u7ed1\u5b9aR1\u5b57\u8282/\u54c8\u5e0c\u3001\u65e7\u53d8\u4f53\u30013000/1500\u6b65\u548c120GPUh\u3002"
+    },
+    {
+      "design_decision": "\u7528\u660e\u786e\u5019\u9009\u8c31\u7cfb\u6620\u5c04ID\uff0c\u5206\u6e05\u5c40\u90e8t\u548c\u7edd\u5bf9t\u3002",
+      "id": "R16",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "64c262ae5ca27704d835fcf94702043f67da689c",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "64c262ae5ca27704d835fcf94702043f67da689c",
+          "inspected_ranges": [
+            "1\u2013190"
+          ],
+          "path": "scripts/rescene_task_postprocess.py",
+          "symbols": "OfficialTaskPrediction; OfficialTaskSoftEvidence",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/rescene_task_postprocess.py"
+        }
+      ],
+      "verified_observation": "\u5b98\u65b9\u5019\u9009\u643a\u5e26source_query_ids/source_class_ids\u53ca\u5c40\u90e8latest-stage masks\u3002"
+    },
+    {
+      "design_decision": "\u56fa\u5b9acommit0/mean\uff0c\u4fdd\u7559\u672a\u5173\u8054\u5b98\u65b9\u5019\u9009\u3002",
+      "id": "R17",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "ada48c0cabf5db0a8e98cbe2640aa689d993a61f",
+          "execution_inspected_ranges": [
+            "70-230"
+          ],
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "ada48c0cabf5db0a8e98cbe2640aa689d993a61f",
+          "inspected_ranges": [
+            "1\u884c\u8d77\u5b8c\u6574\u5b9e\u73b0"
+          ],
+          "path": "scripts/system_comparison_v2_inference.py",
+          "symbols": "CandidateTrajectoryKey; OfficialCandidateTrajectoryAccumulator.add_stage; snapshot",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/system_comparison_v2_inference.py"
+        }
+      ],
+      "verified_observation": "\u8f68\u8ff9\u7d2f\u8ba1\u5668\u4f7f\u7528persistent/ephemeral\u952e\u3001stage_id\u3001source_query_ids\u548cmean/latest/max reducer\u3002"
+    },
+    {
+      "design_decision": "\u590d\u7528\u516c\u5171\u771f\u503c\u5bf9\u9f50\u539f\u5219\uff1b\u4e0d\u76f4\u63a5\u590d\u7528\u786c\u7f16\u7801129\u6761/E\u81c2\u7684\u5de5\u4f5c\u8fdb\u7a0b\u3002",
+      "id": "R18",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "3cde90d8521898e9c2dfbfb7d8e7a75f64c7fe8f",
+          "execution_inspected_ranges": [
+            "1-90",
+            "280-325"
+          ],
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "3cde90d8521898e9c2dfbfb7d8e7a75f64c7fe8f",
+          "inspected_ranges": [
+            "1\u2013210"
+          ],
+          "path": "scripts/native_long_memory_bridge.py",
+          "symbols": "context_record; current_target; audit_current_alignment; project_common_truth; assert_same_temporal_truth",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_memory_bridge.py"
+        }
+      ],
+      "verified_observation": "\u8bb0\u5fc6\u6865\u63a5\u6309\u5c40\u90e8/\u5b8c\u6574\u4e0a\u4e0b\u6587\u6784\u9020\u8bb0\u5f55\uff0c\u5e76\u6838\u5b9e\u516c\u5171GT\u548c\u5f53\u524d\u70b9\u7d22\u5f15\u3002"
+    },
+    {
+      "design_decision": "\u65b0selector\u4fdd\u6301\u6b63\u786e\u6307\u6807\u8bed\u4e49\uff0c\u79fb\u9664\u65e7\u4efb\u52a1\u786c\u7ed1\u5b9a\u4f46\u4e0d\u91cd\u5199\u5b98\u65b9AP\u3002",
+      "id": "R19",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "5c3e80e6038ca8446d4e781ec8c49c493a844acc",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "5c3e80e6038ca8446d4e781ec8c49c493a844acc",
+          "inspected_ranges": [
+            "1\u2013175"
+          ],
+          "path": "scripts/native_long_execution.py",
+          "symbols": "select_cal_points; evaluate_checkpoint; charged_process\u5165\u53e3",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_execution.py"
+        }
+      ],
+      "verified_observation": "\u65e7CAL\u9009\u62e9\u8981\u6c42\u5b8c\u6574\u5b98\u65b9\u603b\u4f53\u5e76\u7528pooled T3\u2013T5\u5e73\u5747\uff1b\u5165\u53e3\u7ed1\u5b9a\u65e7E\u81c2/seed45\u3002"
+    },
+    {
+      "design_decision": "\u5fc5\u987b\u663e\u5f0f\u7ed1\u5b9a\u603b\u4e0a\u9650\u548cprior\uff0c\u907f\u514d\u91cd\u7f6e\u65e7\u6d88\u8d39\u6216\u91cd\u590d\u6536\u8d39\u3002",
+      "id": "R20",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "003eb3559ac77655f6b091660c9d981588e31207",
+          "execution_inspected_ranges": [
+            "1-90"
+          ],
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "003eb3559ac77655f6b091660c9d981588e31207",
+          "inspected_ranges": [
+            "\u5168\u6587"
+          ],
+          "path": "scripts/native_long_budget.py",
+          "symbols": "budget_cap; merge_events; remaining_budget; write_json_atomic",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_budget.py"
+        }
+      ],
+      "verified_observation": "\u6210\u672c\u5de5\u5177\u4ee5prior+\u65b0\u4e8b\u4ef6\u8ba1\u7b97\u4f59\u989d\uff0c\u7f3a\u7701cap\u53ef\u843d\u56de192\u3002"
+    },
+    {
+      "design_decision": "\u53d1\u5e03\u65b0\u7ed3\u679c\u6cbf\u7528\u53ef\u8ffd\u6eaf\u539f\u5219\uff0c\u4f46\u4e0d\u5efa\u8bbe\u65b0\u5ba1\u8ba1\u5e73\u53f0\u3002",
+      "id": "R21",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "cc15d0919362dab9d4e87d44352ec4f2ad46a177",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "cc15d0919362dab9d4e87d44352ec4f2ad46a177",
+          "inspected_ranges": [
+            "\u5168\u6587"
+          ],
+          "path": "artifacts/native_long_postselection_v1/CODE_BINDINGS.md",
+          "symbols": "\u4ee3\u7801\u4e0e\u5b9e\u6d4b\u8bc1\u636e\u7684\u5bf9\u5e94",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_postselection_v1/CODE_BINDINGS.md"
+        }
+      ],
+      "verified_observation": "\u5df2\u6709\u4ee3\u7801/\u7ed3\u679c\u7ed1\u5b9a\u660e\u786e\u8bc4\u4ef7\u3001\u4ea4\u63a5\u3001LFS\u548c\u5916\u90e8\u56de\u6267\u8303\u56f4\u3002"
+    },
+    {
+      "design_decision": "\u4ece\u5bfc\u51fa\u89e3\u6790\u914d\u7f6e\u8fc1\u79fb\u5e76\u5355\u5217\u672c\u8f6e\u51bb\u7ed3\u5168\u90e8\u7236\u6a21\u578b\u7684\u6539\u53d8\u3002",
+      "id": "R22",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "e4365424a6429420a7b13b5f464907ec29cad83e",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "e4365424a6429420a7b13b5f464907ec29cad83e",
+          "inspected_ranges": [
+            "\u5168\u6587"
+          ],
+          "path": "conf/config_native_long_retrain.yaml",
+          "symbols": "general; data; model; optimizer; native_long",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/conf/config_native_long_retrain.yaml"
+        }
+      ],
+      "verified_observation": "\u539f\u914d\u65b9\u8bbeQ100\u3001native flags\u548c\u51bb\u7ed3\u653f\u7b56\uff1bYAML\u9ed8\u8ba4batch\u4e0d\u7b49\u4e8e\u8fd0\u884c\u540e\u5b9e\u9645fallback\u3002"
+    },
+    {
+      "design_decision": "\u4e0d\u80fd\u6f0f\u6389Concerto\u4efb\u52a1decoder\uff1b\u65b0delta\u5fc5\u987b\u4f9d\u8d56\u5b8c\u6574\u7236\u5305\u3002",
+      "id": "R23",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "48513edfc16b398d23610aa930a9b4f94abed5d9",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "48513edfc16b398d23610aa930a9b4f94abed5d9",
+          "inspected_ranges": [
+            "\u5168\u6587"
+          ],
+          "path": "scripts/native_long_assets.py",
+          "symbols": "ENCODER_PREFIXES; export_task_bundle; load_task_bundle",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_assets.py"
+        }
+      ],
+      "verified_observation": "\u4efb\u52a1\u5305\u53ea\u7701\u7565\u7f16\u7801\u5668\u53c2\u6570\uff0c\u4fdd\u5b58\u4efb\u52a1\u6743\u91cd\u53ca\u7f13\u51b2\u533a\uff0c\u52a0\u8f7d\u6821\u9a8c\u6e90\u7801\u8eab\u4efd\u3002"
+    },
+    {
+      "design_decision": "\u51bb\u7ed3\u7236\u6a21\u578b\u4ecd\u5305\u542b\u5df2\u8bad\u7ec3\u4efb\u52a1decoder\uff1b\u673a\u5236\u7f13\u5b58\u4e0d\u5f97\u5047\u8bbe\u53ea\u9700\u4e00\u4e2a\u88f8\u7279\u5f81\u77e9\u9635\u3002",
+      "id": "R24",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "d73c630bca06ac9d44fcb965812a2f0aa4f11d27",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "d73c630bca06ac9d44fcb965812a2f0aa4f11d27",
+          "inspected_ranges": [
+            "1\u2013190",
+            "430\u2013695"
+          ],
+          "path": "models/pointcept.py",
+          "symbols": "PointceptBackbone; _load_state_dict; forward; encoder; serialization helpers",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/pointcept.py"
+        }
+      ],
+      "verified_observation": "PointceptBackbone\u5206\u522b\u7f16\u7801\u548c\u89e3\u7801\uff0cencoder_only\u4ec5\u52a0\u8f7dembedding/enc\u9884\u8bad\u7ec3\u3002"
+    },
+    {
+      "design_decision": "\u660e\u786e\u5206\u79bbtrain\u4e0evalidation\u7d22\u5f15\u7a7a\u95f4\uff1bPB\u4e0d\u590d\u7528\u8bad\u7ec3index\u5b9a\u4f4d\u3002",
+      "id": "R25",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "41ccdd1730b2e9985254535f835a6d6495efb94e",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "41ccdd1730b2e9985254535f835a6d6495efb94e",
+          "inspected_ranges": [
+            "1\u2013130"
+          ],
+          "path": "scripts/native_long_confirmation_inference.py",
+          "symbols": "formal_dataset; formal_samples",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_confirmation_inference.py"
+        },
+        {
+          "actual_base_git_blob_sha": "8e724742780c196316d480d28353acaecb235bbd",
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "git_blob_sha": "8e724742780c196316d480d28353acaecb235bbd",
+          "inspected_ranges": [
+            "1\u201345"
+          ],
+          "path": "artifacts/native_long_postselection_v1/protocol/FORMAL_POPULATION.json",
+          "symbols": "claim_boundary; coverage",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_postselection_v1/protocol/FORMAL_POPULATION.json"
+        }
+      ],
+      "verified_observation": "\u6b63\u5f0f\u6570\u636eloader\u4f7f\u7528validation\u6a21\u5f0f\u53cavalidation_aliases\u6620\u5c04\uff0cPB\u6709\u5355\u72ecambiguities\u3002"
+    },
+    {
+      "design_decision": "\u5b98\u65b9\u5145\u5206\u72b6\u6001\u4e0e\u8fd0\u884c\u9884\u6d4b\u9700\u5206\u522b\u7ed1\u5b9a\uff1b\u4e0d\u5e73\u5747\u573a\u666fAP\u5192\u5145\u603b\u4f53\u3002",
+      "id": "R26",
+      "sources": [
+        {
+          "actual_base_git_blob_sha": "9e0af22ae161066dd6dc466b149ceb8600f5b83f",
+          "execution_inspected_ranges": [
+            "910-1060",
+            "1201-1432",
+            "1492-1623"
+          ],
+          "execution_reading_status": "REFERENCE_VERIFIED; executor reads relevant symbols before implementation",
+          "execution_symbols": "OfficialMetricAccumulator.update/compute/export_evidence; original sufficient-state reconstruction and pooling",
+          "git_blob_sha": "9e0af22ae161066dd6dc466b149ceb8600f5b83f",
+          "inspected_ranges": [
+            "1\u2013220"
+          ],
+          "path": "scripts/p6a_metrics.py",
+          "symbols": "FrozenRawObservation; assert_shared_raw_predictions; adapt_raw_local_prediction",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/p6a_metrics.py"
+        }
+      ],
+      "verified_observation": "\u5b98\u65b9\u6307\u6807\u5305\u88c5\u6709FrozenRawObservation\u3001\u5019\u9009\u6307\u7eb9\u3001raw_local\u548cstrict_online\u76f8\u5173\u8def\u5f84\u3002"
+    }
+  ],
+  "repository": "Orangekostar/Persist4D",
+  "review_date": "2026-10-13",
+  "schema": 1,
+  "verification_scope": "Local BASE Git blob identities verified; reading scope and implementation evidence are recorded in PROMPT_AUDIT.md."
+}

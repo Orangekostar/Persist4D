@@ -1,0 +1,32 @@
+{
+  "exit_code": 0,
+  "identity": {
+    "numeric_sources": {
+      "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
+      "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
+      "models/rescene.py": "cb8008610dd248f4e9a80de924d6883e4ca0d41dda16801e9e1621ebe54def9b",
+      "models/revisit_prompt.py": "e8eb01f17f1c21caadf85db0b0820d7351043e913ccccc975dc590d1c6ac75ee",
+      "models/revisit_prompt_loss.py": "ea0aa0b36131e235a3f10a647852a7103e24d03391256aa6347b129983c762e6",
+      "models/revisit_prompt_modules.py": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
+      "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
+      "scripts/evaluate_revisit_prompt.py": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
+      "scripts/revisit_prompt_assets.py": "145d40d72933fabca07107e6a40f8ee4b7c358ef6147126ae6001f83217ea16e",
+      "scripts/revisit_prompt_campaign.py": "a1af501284caa02937b0763720d2a71166fee7010e44ee827779cc319061cf68",
+      "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
+      "scripts/select_revisit_prompt.py": "2ab50193500a125f98388b31223adb80399cfd5d7582c4db1ff47eed09fabc03",
+      "scripts/train_revisit_prompt.py": "58dc60049a5f9fc0f5ebb2119b1597614d76a73c5cc916603f6467dda6c8456f",
+      "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d"
+    },
+    "test_sha256": "680f0bb21904a89ce61b82f30a5e8288133ce30bcaef4dcc4659df23c125162b"
+  },
+  "output_tail": ".....                                                                    [100%]\n=============================== warnings summary ===============================\ntests/test_revisit_prompt.py::test_T07_absolute_trajectory_adapter_preserves_class_expansion_and_ephemeral_candidates\n  <user_home>/miniconda3/envs/persist4d/lib/python3.10/site-packages/albumentations/augmentations/geometric/functional.py:8: DeprecationWarning: Please import `gaussian_filter` from the `scipy.ndimage` namespace; the `scipy.ndimage.filters` namespace is deprecated and will be removed in SciPy 2.0.0.\n    from scipy.ndimage.filters import gaussian_filter\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n5 passed, 1 warning in 5.50s\n",
+  "seconds": 8.264530647000356,
+  "selectors": [
+    "tests/test_revisit_prompt.py::test_T07_absolute_trajectory_adapter_preserves_class_expansion_and_ephemeral_candidates",
+    "tests/test_revisit_prompt.py::test_T07_reference_states_repool_official_ap_instead_of_averaging_scene_ap",
+    "tests/test_revisit_prompt.py::test_T08_evaluation_current_truth_retains_empty_targets_and_change_labels",
+    "tests/test_revisit_prompt.py::test_T08_empty_official_population_retains_input_count_and_reports_na",
+    "tests/test_revisit_prompt.py::test_T08_mask_diagnostic_counts_unbound_candidates_once_and_preserves_losses"
+  ],
+  "status": "PASSED"
+}
