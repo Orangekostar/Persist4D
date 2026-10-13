@@ -15,13 +15,13 @@
     "CPU private initialization avoids CUDA seeding calls and preserves the CPU generator",
     "seed147 CLI preserves the main locks and snapshots its input CSV"
   ],
-  "experiment_status": "P0_COMPLETE_P1_PENDING",
+  "experiment_status": "P0_REVISION_AFTER_P1_ROLE_ERROR",
   "formal_N": null,
   "formal_training_started": false,
   "formal_training_steps": 0,
   "gpu_training_started": true,
-  "new_gpu_hours": 0.1699878438752745,
-  "next_task": "Three independent M0 full-CAL evaluations, six actual cost pilots if numerical gate passes, then full-matrix budget admission.",
+  "new_gpu_hours": 0.17873200585833027,
+  "next_task": "Current-source P0 replay then bind implementation revision and rerun full M0 CAL. No prior evaluation numbers exist to combine.",
   "numeric_root_cause": "NUMERICAL_ROOT_CAUSE_UNRESOLVED",
   "numerical_status": "NONBITWISE_RUNTIME_OBSERVED",
   "parent": "E1-23760 seed45",
@@ -36,5 +36,5 @@
   "publication_status": "NOT_PUBLISHED",
   "schema": 1,
   "scientific_status": "EXPERIMENT_INCOMPLETE",
-  "status": "P0_COMPLETE_P1_PENDING"
+  "status": "P0_REVISION_AFTER_P1_ROLE_ERROR"
 }

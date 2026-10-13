@@ -137,6 +137,8 @@ def publish(assets, *, execute):
             raise ValueError("publication retry identity differs from the prepared A/B commits")
     else:
         git("lfs","install","--local")
+        status = {**status,"publication_status":"PENDING_EXTERNAL_VERIFICATION"}
+        write_json_atomic(status_path,status)
         patterns = ("artifacts/revisit_prompt_v1/deployment/*.pt",
                     "artifacts/revisit_prompt_v1/resume/*.pt",
                     "artifacts/revisit_prompt_v1/evidence/official_states.zip")
@@ -203,7 +205,24 @@ def publish(assets, *, execute):
             verified_utc=datetime.now(timezone.utc).isoformat())
         write_json_atomic(root/"PUBLICATION_RECEIPT.json",receipt)
         if shutil.which("gh") is None:
-            receipt["release_error"] = "gh CLI unavailable; no Release receipt upload was performed"
+            capability = dict(gh_cli_available=False,
+                environment_api_token_available=any(bool(os.environ.get(key)) for key in ("GH_TOKEN","GITHUB_TOKEN")),
+                noninteractive_git_credential_available=False)
+            try:
+                check = subprocess.run(["git","credential","fill"],
+                    input="protocol=https\nhost=github.com\n\n",cwd=PROJECT,
+                    env={**os.environ,"GIT_TERMINAL_PROMPT":"0","GIT_ASKPASS":"false","SSH_ASKPASS":"false"},
+                    capture_output=True,text=True,timeout=10)
+                credentials = dict(line.split("=",1) for line in check.stdout.splitlines() if "=" in line)
+                capability["noninteractive_git_credential_available"] = bool(credentials.get("password"))
+                capability["credential_helper_exit_code"] = check.returncode
+            except subprocess.TimeoutExpired:
+                capability["credential_helper_status"] = "TIMEOUT"
+            receipt["release_capability"] = capability
+            receipt["release_error"] = (
+                "gh CLI unavailable and no API credential found in the environment or noninteractive git helper; Release receipt remains local"
+                if not capability["environment_api_token_available"] and not capability["noninteractive_git_credential_available"]
+                else "gh CLI unavailable; API authentication is present but Release upload has not been performed")
         else:
             try:
                 subprocess.run(["gh","release","create",TAG,"--title","Persist4D MPR-V1",
@@ -214,9 +233,10 @@ def publish(assets, *, execute):
                 subprocess.run(["gh","release","upload",TAG,str(root/"PUBLICATION_RECEIPT.json"),"--clobber"],
                     cwd=PROJECT,check=True,capture_output=True,text=True)
             except subprocess.CalledProcessError as error:
-                receipt.update(status="CODE_AND_LFS_PUSH_VERIFIED_RELEASE_RECEIPT_LOCAL_ONLY",release_error=error.stderr)
+                receipt.update(status="CODE_AND_LFS_PUSH_VERIFIED_RELEASE_RECEIPT_LOCAL_ONLY",
+                    release_error=public_error(Exception(error.stderr),assets))
     except Exception as error:
-        receipt.update(status="PUSH_FAILED",error_type=type(error).__name__,error=str(error))
+        receipt.update(status="PUSH_FAILED",error_type=type(error).__name__,error=public_error(error,assets))
     write_json_atomic(root/"PUBLICATION_RECEIPT.json",receipt)
     return receipt
 

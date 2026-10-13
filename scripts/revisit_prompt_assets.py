@@ -242,7 +242,7 @@ def resolve_assets():
     records = {role: sorted(population["evaluation_inputs"][role], key=lambda x: (x["horizon"], x["input_id"]))
                for role in ("CAL", "SEL")}
     for role in ("CAL", "SEL"):
-        records[role] = [{**r, "dataset_scope": "train"} for r in records[role]]
+        records[role] = [{**r, "role": role, "dataset_scope": "train"} for r in records[role]]
     records["PB"] = [{**r, "scan_ids": r["physical_scan_ids"], "dataset_scope": "validation"}
                      for r in formal["records"]["PB"]]
     data_manifest = {"schema": 1, "exposure": "HISTORICALLY_EXPOSED",

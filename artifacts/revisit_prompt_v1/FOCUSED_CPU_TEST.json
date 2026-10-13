@@ -91,7 +91,7 @@
     "datasets/revisit_prompt_episode.py",
     "scripts/evaluate_revisit_prompt.py"
   ],
-  "diagnostic_gpu_evidence_sha256": "304317bc36a35062167ed8bae3e5b177f7afa3f1726a17516603b5323cc2ccdf",
+  "diagnostic_gpu_evidence_sha256": "df054e5bcf4cbbf29f76be1ac114ced4b42c5c5ee675d3b44c111801a667a04d",
   "diagnostic_revision": "r003-parent-output-comparison",
   "diagnostic_validation_status": "EXECUTED_REQUIRED_GPU_CHECK_WITH_NONBITWISE_RUNTIME_OBSERVED",
   "exit_code": 0,
@@ -105,7 +105,7 @@
       "models/revisit_prompt_modules.py": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
       "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
       "scripts/evaluate_revisit_prompt.py": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
-      "scripts/revisit_prompt_assets.py": "145d40d72933fabca07107e6a40f8ee4b7c358ef6147126ae6001f83217ea16e",
+      "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
       "scripts/revisit_prompt_campaign.py": "c21c87b87eac61e0cc94f75997ecbf1c8cb83219fd1ab02dce0718e121633939",
       "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
       "scripts/select_revisit_prompt.py": "2ab50193500a125f98388b31223adb80399cfd5d7582c4db1ff47eed09fabc03",
@@ -117,7 +117,10 @@
   "output_tail": ".....                                                                    [100%]\n=============================== warnings summary ===============================\ntests/test_revisit_prompt.py::test_T07_absolute_trajectory_adapter_preserves_class_expansion_and_ephemeral_candidates\n  <user_home>/miniconda3/envs/persist4d/lib/python3.10/site-packages/albumentations/augmentations/geometric/functional.py:8: DeprecationWarning: Please import `gaussian_filter` from the `scipy.ndimage` namespace; the `scipy.ndimage.filters` namespace is deprecated and will be removed in SciPy 2.0.0.\n    from scipy.ndimage.filters import gaussian_filter\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n5 passed, 1 warning in 5.50s\n",
   "primary_diagnostic_scope_review": "AST comparison proves only compare_raw_outputs changed. Shared task fields are compared directly with finite, shape and dtype checks; the original parent does not have the MPR-only support field. Model/loader/trainer and MPR repeat fingerprints are unchanged. No additional focused CPU repair round was run; actual required GPU parent comparison remains pending.",
   "primary_scope_review": "Native Int32 target IDs are normalized to Int64 without changing values or masks. Evaluator reads the original integer state_bytes property instead of calling it. Only affected tests were repeated; full suite was not rerun. Actual P0 checks are rerun under current full source identity.",
+  "required_P0_current_source_validation": "COMPLETE_CURRENT_SOURCE_3_UPDATES_AND_12_NEW_PROCESS_PROBES",
+  "resolver_role_revision": "r004-evaluation-role",
+  "resolver_validation_evidence": "DATA_ROLE_BINDING_CHECK.json",
   "seconds": 8.264530647000356,
   "status": "PASSED",
-  "validation_strategy": "BASELINE_SUITE_PLUS_TWO_AFFECTED_CPU_REPAIR_ROUNDS_AND_REQUIRED_GPU_DIAGNOSTIC_PENDING"
+  "validation_strategy": "BASELINE_SUITE_PLUS_TWO_AFFECTED_CPU_REPAIR_ROUNDS_AND_BOUNDED_RESOLVER_METADATA_CHECK"
 }

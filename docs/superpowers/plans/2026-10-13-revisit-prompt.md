@@ -65,3 +65,11 @@ replays show floating differences and one T5 input has official scalar differenc
 so numerical repeatability is not claimed.
 P1 CAL repeats and six cost pilots, maximal-N admission, the formal matrix,
 confirmation, deployment, and A/B remote publication remain incomplete.
+
+Resolver revision r004 adds explicit CAL/SEL roles without changing scan lists,
+indices, order, or runtime asset bindings. All 711 evaluation records parse. The
+current-source real P0 replay completed 3 M6 updates and all 12 probe processes;
+its input structures agree, but numerical root cause remains unresolved. The prior
+P1 role failures completed zero CAL inputs and remain archived and charged.
+A reviewed implementation revision is bound before restarting P1; no additional
+whole CPU suite or affected repair round was run for this metadata change.
