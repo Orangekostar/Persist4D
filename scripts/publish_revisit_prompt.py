@@ -60,8 +60,10 @@ def write_handoff(assets, *, commit_a, status, models):
         "python -m scripts.revisit_prompt_campaign summarize",
         "python -m scripts.publish_revisit_prompt --execute",
     ]
-    (ARTIFACTS/"COMMANDS.md").write_text("# MPR-V1 commands\n\nRun in the bound original environment.\n\n```sh\n"+
+    (ARTIFACTS/"COMMANDS.md").write_text("# MPR-V1 commands\n\nRun from the repository root in the resolver-bound original Python 3.10 environment. These are the campaign interfaces, not authorization to change the frozen budget.\n\n```sh\n"+
         "\n".join(commands)+"\n```\n\nThe resolver binds local licensed data and the original encoder; these assets are not redistributed.\n")
+    with (ARTIFACTS/"COMMANDS.md").open("a") as stream:
+        stream.write("\nCurrent terminal state: BLOCKED_FULL_MATRIX_BUDGET. Resolve/preflight/plan/summarize were actually run; formal run --resume was not started. Preserve published A/B and their tables. A future budget change requires a new admission and publication identity; do not edit this RUN_LOCK or overwrite the frozen report to bypass it.\n\nParent retrieval from origin uses the exact Git/LFS path:\n\n```sh\ngit lfs pull --include=artifacts/native_long_postselection_v1/deployment/E1-23760.pt --exclude=\n```\n\nOfficial states: unzip evidence/official_states.zip in an offline directory and use scripts.evaluate_revisit_prompt.pool_official_states with the bound taxonomy; OFFICIAL_REPOOL_CHECK.json records the 30 actual exact checks. No formal MPR delta or optimizer resume exists in this blocked publication.\n")
     text = f"""# MPR-V1 final handoff
 
 Publication state in this commit: PENDING_EXTERNAL_VERIFICATION.
@@ -78,11 +80,23 @@ retained in the bound run root's `publication/PUBLICATION_RECEIPT.json`.
   retained reserve: {assets['budget']['reserve_gpu_hours']:.9f}.
 - No MPR GPU reservation remains active at publication preparation.
 
+Completed: current-source P0 connectivity/numerical panel, three complete M0
+CAL processes, six eight-update P1 cost pilots, and saved-state metric repooling.
+Formal N is null; M1–M6 formal trajectories, quarter checkpoint selection,
+seed147 replication, SEL/PB confirmation, bootstrap, mechanism/profile, and
+formal deployment reload were not executed because the complete matrix did
+not fit the frozen budget. There is no actual winner or formal MPR checkpoint.
+P0/P1 updates use adapter seed146; seed147 has no trajectory in this run.
+
 Parent dependency: `artifacts/native_long_postselection_v1/deployment/E1-23760.pt`,
 SHA256 `{assets['hashes']['parent']}`. The Concerto encoder is separately obtained
 under its original terms, SHA256 `{assets['hashes']['encoder']}`. Raw 3RScan data,
 point-level GT and the encoder are not part of this release. Bind available data,
 encoder and original environment with the resolver before model construction.
+Acquire 3RScan under its original terms via the upstream source listed in
+MODEL_MANIFEST and follow this repository's README preprocessing instructions.
+The same manifest gives the parent's exact existing Git/LFS location and the
+original Concerto distribution. No dependency is silently replaced.
 
 `MODEL_MANIFEST.json` lists each actually produced delta/resume and its bytes,
 hash, variant, seed and step. Reconstruct via
@@ -90,6 +104,9 @@ hash, variant, seed and step. Reconstruct via
 the delta depends on the exact parent and encoder. Resume only from listed resume
 files with the frozen RUN_LOCK and the same training identity; a deployment delta
 does not include optimizer state. Seeds146/147 adapt the same seed45 parent.
+In this budget-blocked run MODEL_MANIFEST lists only the real official-state
+archive. Missing formal deltas/resumes are explicitly NOT_PRODUCED; the CPU
+debug delta check is not a published trained model or a real deployment forward.
 
 Selection uses complete three-repeat CAL quarter checkpoints, then S_long,
 S_current, T2, fewer parameters and variant name; within a family, earlier steps

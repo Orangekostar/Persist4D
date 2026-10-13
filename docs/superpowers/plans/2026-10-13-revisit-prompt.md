@@ -28,10 +28,10 @@
 - [x] B4 Implement evaluator and selector, focusing T07/T09 and official sufficient state; help commands must import without fabricating success.
 - [x] B5 Implement campaign charged_job and P0–P5 handlers, cost forecast/run locks, resume identity and bounded retries. CPU checks passed; actual phase completion is recorded separately below.
 - [x] C Complete real M6 four-horizon gradient/freeze check and four-input three-process P0 panel. Input structures agree, output floats differ; numerical root cause remains unresolved. P1 admission is still required.
-- [ ] D Run full M0 CAL repeats and six adapter cost pilots under P1; forecast full queues and lock unique maximal feasible N or truthful blocking state.
+- [x] D Run full M0 CAL repeats and six adapter cost pilots under P1; forecast full queues and lock unique maximal feasible N or truthful blocking state.
 - [ ] E–I Execute full six-arm matrix, four CAL points, conditional full seed147 pair, locked SEL/PB, CPU bootstrap, mechanism/profile/deployment reload; follow every fixed branch.
 - [ ] J Implement final reports/manifests/delta/resume packaging and `publish_revisit_prompt --execute`; verify branch/tag and fresh-cache asset bytes.
-- [ ] Audit all §17 deliverables, T01–T10, phases A–J and the 12 questions in §19 against current-state evidence before completion.
+- [x] Audit all §17 deliverables, T01–T10, phases A–J and the 12 questions in §19 against current-state evidence before completion.
 
 ## Verification commands
 
@@ -73,3 +73,9 @@ its input structures agree, but numerical root cause remains unresolved. The pri
 P1 role failures completed zero CAL inputs and remain archived and charged.
 A reviewed implementation revision is bound before restarting P1; no additional
 whole CPU suite or affected repair round was run for this metadata change.
+
+## Terminal admission and report review
+
+P1 completed all three 84-input M0 CAL repeats and all six eight-update pilots. epsilon_run=0.0562697649pp passes only numerical admission; RUN_LOCK is BLOCKED_FULL_MATRIX_BUDGET with N=null. Minimum N400 training+worst replication estimate20.071985750 GPUh exceeds P2 allocation4.621674757 by15.450310993. E–I remain NOT_EXECUTED under the required stop branch. Current-source51 pilot/smoke updates are not formal training. The final twelve-question primary content review is in PROMPT_AUDIT.md. J remote publication remains pending until the external receipt.
+
+The content audit is complete, with blocked and partial evidence explicitly retained. Publication checks found no private payloads or absolute run paths. Remote publication is pending at A/B preparation; only the external receipt can establish J completion. Two offline check-script assumptions (YAML parsed as Python; wrong historical ledger path) were corrected without numerical-code changes or extra pytest rounds.

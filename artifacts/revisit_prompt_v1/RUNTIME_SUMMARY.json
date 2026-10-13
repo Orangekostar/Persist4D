@@ -1,4 +1,40 @@
 {
+  "M0_CAL_repeat_AP": [
+    [
+      0.42538589239120483,
+      0.42482319474220276,
+      0.42538589239120483
+    ],
+    [
+      0.27786120772361755,
+      0.27786120772361755,
+      0.2778344750404358
+    ],
+    [
+      0.1366797238588333,
+      0.1366797238588333,
+      0.13667981326580048
+    ],
+    [
+      0.12231989204883575,
+      0.12231989204883575,
+      0.12231989204883575
+    ],
+    [
+      0.13514739274978638,
+      0.13514739274978638,
+      0.13514739274978638
+    ]
+  ],
+  "P1_admitted": true,
+  "P1_admitted_scope": "numerical admission only; does not authorize formal training",
+  "P1_status": "COMPLETE_COST_MEASUREMENT_BUDGET_BLOCK",
+  "actual_CAL_inputs_per_process": 84,
+  "actual_CAL_processes": 3,
+  "actual_CAL_stage_forwards": 591,
+  "actual_P0_P1_optimizer_updates": 51,
+  "actual_P0_P1_training_stage_forwards": 714,
+  "budget_admission": false,
   "comparisons": [
     {
       "candidate_differences": {
@@ -33642,6 +33678,7 @@
     "parent_tensor_sha256_after": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
     "parent_unchanged": true
   },
+  "epsilon_run_pp": 0.05626976490020752,
   "formal_training_started": false,
   "gradient_status": "SMOKE_COMPLETE_NOT_A_FORMAL_MODEL",
   "numeric_sources": {
@@ -33660,7 +33697,9 @@
     "scripts/train_revisit_prompt.py": "58dc60049a5f9fc0f5ebb2119b1597614d76a73c5cc916603f6467dda6c8456f",
     "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d"
   },
+  "numerical_admission": true,
   "numerical_status": "NONBITWISE_RUNTIME_OBSERVED",
+  "official_repool_check": "OFFICIAL_REPOOL_CHECK.json",
   "root_cause": "NUMERICAL_ROOT_CAUSE_UNRESOLVED",
   "status": "COMPLETE"
 }

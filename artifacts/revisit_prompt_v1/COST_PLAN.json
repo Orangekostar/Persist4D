@@ -1,0 +1,186 @@
+{
+  "N": null,
+  "baseline_repeats": 3,
+  "budget": {
+    "authorization": "user instruction; original cap and audited predecessor receipt",
+    "historical_cost_sha256": "3e4bf6633bf7510a67f27891157be46264f6eea5f1066a3876b43dea53bb5e92",
+    "historical_ledger_sha256": "aab9929b5af57182afc57a53c5cd7d94f6ecbf8bf45f0e869a1a0bbbc6ea5387",
+    "lifetime_cap_gpu_hours": 1800,
+    "new_cap_gpu_hours": 78.0,
+    "prior_gpu_hours": 1713.8830547291614,
+    "reserve_gpu_hours": 8.0
+  },
+  "cap_P2_available_gpu_hours": 4.621674756945126,
+  "checkpoint_steps": [],
+  "epsilon_run_pp": 0.05626976490020752,
+  "forecast_policy": "training max six timed updates x1.25; evaluation full populations x1.5; startup included",
+  "measured_evaluation": {
+    "seconds_per_input": 4.547738039261839,
+    "seconds_per_stage": 1.3070398115989224,
+    "startup_seconds": 17.99315675199614
+  },
+  "measured_pilots": {
+    "M1": {
+      "actual_optimizer_steps": 8,
+      "adapter_changed": {
+        "model.mpr_prompt.Wk.bias": true,
+        "model.mpr_prompt.Wk.weight": true,
+        "model.mpr_prompt.Wq.bias": true,
+        "model.mpr_prompt.Wq.weight": true,
+        "model.mpr_prompt.input_layer.bias": true,
+        "model.mpr_prompt.input_layer.weight": true,
+        "model.mpr_prompt.output_layer.bias": true,
+        "model.mpr_prompt.output_layer.weight": true
+      },
+      "attempts": 1,
+      "startup_seconds": 17.085306245011452,
+      "timed_updates": 6,
+      "update_seconds": 19.183091034996323,
+      "warmup_updates": 2
+    },
+    "M2": {
+      "actual_optimizer_steps": 8,
+      "adapter_changed": {
+        "model.mpr_read.attention_scale": true,
+        "model.mpr_read.gate_projection.bias": true,
+        "model.mpr_read.gate_projection.weight": true,
+        "model.mpr_read.key_projection.bias": true,
+        "model.mpr_read.key_projection.weight": true,
+        "model.mpr_read.null_key": true,
+        "model.mpr_read.output_projection.bias": true,
+        "model.mpr_read.output_projection.weight": true,
+        "model.mpr_read.query_projection.bias": true,
+        "model.mpr_read.query_projection.weight": true,
+        "model.mpr_read.value_projection.bias": true,
+        "model.mpr_read.value_projection.weight": true
+      },
+      "attempts": 1,
+      "startup_seconds": 16.216273113983334,
+      "timed_updates": 6,
+      "update_seconds": 17.63834959900123,
+      "warmup_updates": 2
+    },
+    "M3": {
+      "actual_optimizer_steps": 8,
+      "adapter_changed": {
+        "model.mpr_prompt.input_layer.bias": true,
+        "model.mpr_prompt.input_layer.weight": true,
+        "model.mpr_prompt.output_layer.bias": true,
+        "model.mpr_prompt.output_layer.weight": true
+      },
+      "attempts": 1,
+      "startup_seconds": 17.33957330100384,
+      "timed_updates": 6,
+      "update_seconds": 17.671684613000252,
+      "warmup_updates": 2
+    },
+    "M4": {
+      "actual_optimizer_steps": 8,
+      "adapter_changed": {
+        "model.mpr_prompt.Wk.bias": true,
+        "model.mpr_prompt.Wk.weight": true,
+        "model.mpr_prompt.Wq.bias": true,
+        "model.mpr_prompt.Wq.weight": true,
+        "model.mpr_prompt.input_layer.bias": true,
+        "model.mpr_prompt.input_layer.weight": true,
+        "model.mpr_prompt.output_layer.bias": true,
+        "model.mpr_prompt.output_layer.weight": true
+      },
+      "attempts": 1,
+      "startup_seconds": 17.361610109997855,
+      "timed_updates": 6,
+      "update_seconds": 17.157406496000476,
+      "warmup_updates": 2
+    },
+    "M5": {
+      "actual_optimizer_steps": 8,
+      "adapter_changed": {
+        "model.mpr_prompt.Wk.bias": true,
+        "model.mpr_prompt.Wk.weight": true,
+        "model.mpr_prompt.Wq.bias": true,
+        "model.mpr_prompt.Wq.weight": true,
+        "model.mpr_prompt.input_layer.bias": true,
+        "model.mpr_prompt.input_layer.weight": true,
+        "model.mpr_prompt.output_layer.bias": true,
+        "model.mpr_prompt.output_layer.weight": true
+      },
+      "attempts": 1,
+      "startup_seconds": 17.654316902000573,
+      "timed_updates": 6,
+      "update_seconds": 17.864150701003382,
+      "warmup_updates": 2
+    },
+    "M6": {
+      "actual_optimizer_steps": 8,
+      "adapter_changed": {
+        "model.mpr_prompt.Wk.bias": true,
+        "model.mpr_prompt.Wk.weight": true,
+        "model.mpr_prompt.Wq.bias": true,
+        "model.mpr_prompt.Wq.weight": true,
+        "model.mpr_prompt.input_layer.bias": true,
+        "model.mpr_prompt.input_layer.weight": true,
+        "model.mpr_prompt.output_layer.bias": true,
+        "model.mpr_prompt.output_layer.weight": true,
+        "model.mpr_support.layers.0.bias": true,
+        "model.mpr_support.layers.0.weight": true,
+        "model.mpr_support.layers.2.bias": true,
+        "model.mpr_support.layers.2.weight": true
+      },
+      "attempts": 1,
+      "startup_seconds": 17.467573094007093,
+      "timed_updates": 6,
+      "update_seconds": 17.61171252699569,
+      "warmup_updates": 2
+    }
+  },
+  "minimum_additional_gpu_hours": 15.450310992607598,
+  "numeric_sources": {
+    "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
+    "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
+    "models/rescene.py": "cb8008610dd248f4e9a80de924d6883e4ca0d41dda16801e9e1621ebe54def9b",
+    "models/revisit_prompt.py": "e8eb01f17f1c21caadf85db0b0820d7351043e913ccccc975dc590d1c6ac75ee",
+    "models/revisit_prompt_loss.py": "ea0aa0b36131e235a3f10a647852a7103e24d03391256aa6347b129983c762e6",
+    "models/revisit_prompt_modules.py": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
+    "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
+    "scripts/evaluate_revisit_prompt.py": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
+    "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
+    "scripts/revisit_prompt_campaign.py": "c21c87b87eac61e0cc94f75997ecbf1c8cb83219fd1ab02dce0718e121633939",
+    "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
+    "scripts/select_revisit_prompt.py": "2ab50193500a125f98388b31223adb80399cfd5d7582c4db1ff47eed09fabc03",
+    "scripts/train_revisit_prompt.py": "58dc60049a5f9fc0f5ebb2119b1597614d76a73c5cc916603f6467dda6c8456f",
+    "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d"
+  },
+  "phase_caps_gpu_hours": {
+    "P0": 4.0,
+    "P1": 4.0,
+    "P2": 4.621674756945126,
+    "P3": 26.299599797399132,
+    "P4": 35.07872544565574,
+    "P5": 4.0
+  },
+  "status": "BLOCKED_FULL_MATRIX_BUDGET",
+  "training_estimates_gpu_hours": {
+    "1200": 60.12021816816302,
+    "1600": 80.14433437746816,
+    "400": 20.071985749552724,
+    "800": 40.09610195885787
+  },
+  "worst_replication_variants": {
+    "1200": [
+      "M1",
+      "M5"
+    ],
+    "1600": [
+      "M1",
+      "M5"
+    ],
+    "400": [
+      "M1",
+      "M5"
+    ],
+    "800": [
+      "M1",
+      "M5"
+    ]
+  }
+}

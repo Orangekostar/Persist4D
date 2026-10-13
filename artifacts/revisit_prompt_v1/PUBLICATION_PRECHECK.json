@@ -1,0 +1,51 @@
+{
+  "check_script_corrections": [
+    {
+      "error": "Attempted Python AST parsing on the YAML numerical config",
+      "numeric_code_changed": false,
+      "resolution": "Parse .py as AST and .yaml with safe_load"
+    },
+    {
+      "error": "Compared postselection ledger hash to the older native training ledger",
+      "numeric_code_changed": false,
+      "resolution": "Use the resolver-bound published COST_LEDGER_POSTSELECTION.jsonl; exact expected SHA and BASE bytes match"
+    }
+  ],
+  "current_implementation_commit": "c880ba7912a9ac8e416ba4ed3ca98474111409fc",
+  "current_publisher_help_exit_code": 0,
+  "focused_cpu_scope": "26-case baseline once; affected repair rounds3 and5 cases under their recorded source identities. No claim of fresh whole-suite passing at C2.",
+  "formal_models_status": "NOT_PRODUCED_BUDGET_BLOCK",
+  "git_diff_check_exit_code": 0,
+  "historical_ledger_bytes_equal_BASE": true,
+  "historical_ledger_path": "artifacts/native_long_postselection_v1/evidence/COST_LEDGER_POSTSELECTION.jsonl",
+  "historical_ledger_sha256": "aab9929b5af57182afc57a53c5cd7d94f6ecbf8bf45f0e869a1a0bbbc6ea5387",
+  "new_lfs_asset_bytes": 3652522,
+  "numeric_sources_unchanged_from_actual_P0_P1": true,
+  "official_archive_files": 198,
+  "phase_A_scope_files_before_this_receipt": 68,
+  "pre_A_B_required_files_checked": 28,
+  "publication_preparation_failure": {
+    "error": "git diff --cached --check flagged CRLF CSV line endings",
+    "extra_pytest_rounds": 0,
+    "files": [
+      "SEL_LOCKED.csv",
+      "PB_LOCKED.csv",
+      "TRAINING.csv",
+      "MECHANISM.csv",
+      "PROFILE.csv",
+      "CAL_ALL.csv",
+      "P0_P1_TRAINING.csv",
+      "IDENTITY_EVENTS_SUMMARY.csv",
+      "BY_REFERENCE.csv"
+    ],
+    "gpu_restarts": 0,
+    "numeric_code_changed": false,
+    "parsed_CSV_records_before_after_exact": true,
+    "repair": "convert selected CSV CRLF to LF only",
+    "stage": "before commit A"
+  },
+  "raw_data_encoder_credentials_or_absolute_run_paths_found": false,
+  "remote_verification_status": "PENDING_EXTERNAL_VERIFICATION",
+  "scope": "One focused review of selected diff/files, required blocked-stage tables, hashes, saved official states, CLI import/help and prior focused-test evidence. No extra pytest round or whole-history scan.",
+  "status": "PASSED_WITH_DOCUMENTED_CHECK_SCRIPT_CORRECTIONS"
+}

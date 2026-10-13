@@ -1,0 +1,10 @@
+{
+  "matching": "all official candidates, class-aware one-to-one IoU>=0.5",
+  "moving_subset": {
+    "reason": "no verified moving-annotation correspondence bound to this diagnostic",
+    "status": "NOT_AVAILABLE"
+  },
+  "reason": "BLOCKED_FULL_MATRIX_BUDGET; no formal N admitted; no paired locked candidate evaluations",
+  "rows": [],
+  "status": "NOT_AVAILABLE"
+}
