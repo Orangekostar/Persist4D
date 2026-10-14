@@ -1,0 +1,36 @@
+{
+  "FPS_stress": {
+    "calls": 200,
+    "identical_input": true,
+    "input_shape": [
+      1,
+      41730,
+      4
+    ],
+    "status": "COMPLETE_DIAGNOSTIC",
+    "unique_counts": {
+      "c3d37331ee0267ff9f7f313810231e2a4acd17b01168ccf79ec541a7c4132d67": 200
+    }
+  },
+  "controller_fix_commit": "b0b2b66",
+  "controller_validation": "8 CPU tests passed",
+  "first_input_class_hash_count": 2,
+  "first_input_logit_hash_count": 2,
+  "first_input_occupied_slots": [
+    21,
+    23
+  ],
+  "first_input_official_mask_hash_count": 2,
+  "first_input_probes_complete": 15,
+  "formal_queue_held": true,
+  "fresh_M0_epsilon_run_pp": 2.888917922973633,
+  "full_CAL_diagnostic": "diagnostics/m0-variance-20261014/full_cal_capture/STATUS.json",
+  "limit_pp": 0.2,
+  "main_models_complete": 6,
+  "numerical_source_changes": false,
+  "official_repeats_discarded": false,
+  "scope": "First-input and sampling checks do not resolve the original full-panel outlier.",
+  "status": "DIAGNOSIS_RUNNING_ROOT_CAUSE_UNRESOLVED",
+  "updated_unix": 1791982928.0970361,
+  "updates_per_model": 400
+}
