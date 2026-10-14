@@ -1,0 +1,182 @@
+{
+  "adapter_seed": 146,
+  "baseline_M0": {
+    "AP": {
+      "T1": 0.42538589239120483,
+      "T2": 0.27786120772361755,
+      "T3": 0.1366797238588333,
+      "T4": 0.12231989204883575,
+      "T5": 0.13514739274978638
+    },
+    "AP_ranges": {
+      "T1": 0.0,
+      "T2": 0.0,
+      "T3": 0.0,
+      "T4": 0.0,
+      "T5": 0.0
+    },
+    "S_current": 0.3968664010365804,
+    "S_long": 0.13138233621915182,
+    "S_long_range": 0.0,
+    "adapter_seed": 146,
+    "current_AP": {
+      "T1": 0.42538589239120483,
+      "T2": 0.40421366691589355,
+      "T3": 0.3825426995754242,
+      "T4": 0.376890629529953,
+      "T5": 0.431165874004364
+    },
+    "guard_pass": true,
+    "parameters": 0,
+    "step": 0,
+    "variant": "M0"
+  },
+  "checkpoint_metrics": [
+    {
+      "S_current": 0.3924183150132497,
+      "S_current_range_pp": 0.00011324882507324219,
+      "S_long": 0.1270143911242485,
+      "S_long_range_pp": 0.0,
+      "checkpoint_sha256": "95e73e238841b9bec1faea146f4d09d07f20f5ad72cf97ba046fc3c6bd9f2985",
+      "max_AP_range_pp": 0.001481175422668457,
+      "max_current_AP_range_pp": 0.0009208917617797852,
+      "result_evidence": [
+        {
+          "repeat": 0,
+          "results_sha256": "99df8f1eefb001a90e31813dfab2dbec1ed8fd406e3645a10bd1ab2b6db2b807"
+        },
+        {
+          "repeat": 1,
+          "results_sha256": "1fe098cebf5a1d606b0bc2d7e0df9dca33147c1752f329dd9037ba1c2496b225"
+        },
+        {
+          "repeat": 2,
+          "results_sha256": "68d86f93f50c916ff7d074e22dd2dd86641fea04f80b920e111e88eeae3eb259"
+        }
+      ],
+      "step": 100
+    },
+    {
+      "S_current": 0.40616309973928666,
+      "S_current_range_pp": 0.11584659417470666,
+      "S_long": 0.12114055454730988,
+      "S_long_range_pp": 0.0,
+      "checkpoint_sha256": "fec9df4caecf098ee50c20f5de0d7057d57a040a1e3a38f7daae220d346a66b9",
+      "max_AP_range_pp": 0.07611513137817383,
+      "max_current_AP_range_pp": 0.34274160861968994,
+      "result_evidence": [
+        {
+          "repeat": 0,
+          "results_sha256": "8f492f9deb53932b87dfff9c3c70b79d2fc07c907be20d44ff25a8c021763a1d"
+        },
+        {
+          "repeat": 1,
+          "results_sha256": "cbb26899f067c5a548e4e360e93ab47ae7a3039f67f6735642c7112ab1bb8c85"
+        },
+        {
+          "repeat": 2,
+          "results_sha256": "110bbd1b3bff99033d80ede97faad91687320e4a55ff99ad8de7bfb007a3b50e"
+        }
+      ],
+      "step": 200
+    },
+    {
+      "S_current": 0.39149345954259235,
+      "S_current_range_pp": 0.08207857608795166,
+      "S_long": 0.12929227534267637,
+      "S_long_range_pp": 0.024179865916568177,
+      "checkpoint_sha256": "baa9bcd9c66d8f02d912c1534c7dbbf6a9f514e36110c8462906494779fc7382",
+      "max_AP_range_pp": 0.07253959774971008,
+      "max_current_AP_range_pp": 0.24623572826385498,
+      "result_evidence": [
+        {
+          "repeat": 0,
+          "results_sha256": "9f28f5a14101696671e72cdd45f8a4c41fa084d7c3e120dc4a2a135b80c12184"
+        },
+        {
+          "repeat": 1,
+          "results_sha256": "e4cfe21d1ef6e975734c19f379f9ee1702c8187c2620302df2cc1f560ca1bede"
+        },
+        {
+          "repeat": 2,
+          "results_sha256": "15648fcc8de4c4aafc69df8d3c105900a9926305fe87e8f8b17b0e6711fb2c20"
+        }
+      ],
+      "step": 300
+    },
+    {
+      "S_current": 0.3948735495408376,
+      "S_current_range_pp": 0.095007816950482,
+      "S_long": 0.11997642781999378,
+      "S_long_range_pp": 0.0010485450426742093,
+      "checkpoint_sha256": "a80c3c4f208200be049240bb0a0634b8aba799958263e139632d209b1af1279f",
+      "max_AP_range_pp": 0.034233927726745605,
+      "max_current_AP_range_pp": 0.2816736698150635,
+      "result_evidence": [
+        {
+          "repeat": 0,
+          "results_sha256": "bc0e48dadedc0f04b583f77976a5c90429f6f54b4c7540521adce946ea3f5435"
+        },
+        {
+          "repeat": 1,
+          "results_sha256": "7841d23005b9799b8a29c51e11edcce15a1a5b89fb0a7a62fbc207ed745c3cdb"
+        },
+        {
+          "repeat": 2,
+          "results_sha256": "d742e3170d40249df72654d80de7c5c3a6ff83a7e1b9a6afe9ab4bdace8e5485"
+        }
+      ],
+      "step": 400
+    }
+  ],
+  "completed_checkpoints": [
+    100,
+    200,
+    300,
+    400
+  ],
+  "controller_selection_modified": false,
+  "delta_S_current_vs_M0_pp": -0.5372941493988037,
+  "delta_S_long_vs_M0_pp": -0.20900608764754525,
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "inputs_per_repeat": 84,
+  "repeats_per_checkpoint": 3,
+  "scientific_scope": "Descriptive CAL only; full M0-M6 matrix, locked selection, SEL/PB confirmation pending",
+  "status": "VARIANT_CAL_COMPLETE_CAMPAIGN_PENDING",
+  "updated_unix": 1791993823.3452647,
+  "variant": "M1",
+  "within_variant_endpoint": {
+    "AP": {
+      "T1": 0.42538589239120483,
+      "T2": 0.28637980421384174,
+      "T3": 0.15099914371967316,
+      "T4": 0.1042639637986819,
+      "T5": 0.13261371850967407
+    },
+    "AP_ranges": {
+      "T1": 0.0,
+      "T2": 0.0001043081283569336,
+      "T3": 0.0,
+      "T4": 0.0007253959774971008,
+      "T5": 0.0
+    },
+    "S_current": 0.39149345954259235,
+    "S_long": 0.12929227534267637,
+    "S_long_range": 0.00024179865916568177,
+    "adapter_seed": 146,
+    "current_AP": {
+      "T1": 0.42538589239120483,
+      "T2": 0.4130515456199646,
+      "T3": 0.3725157380104065,
+      "T4": 0.3724709451198578,
+      "T5": 0.4294936954975128
+    },
+    "guard_pass": true,
+    "parameters": 84224,
+    "step": 300,
+    "variant": "M1"
+  }
+}

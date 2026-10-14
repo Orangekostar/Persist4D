@@ -1,0 +1,125 @@
+{
+  "AP_by_repeat": {
+    "AP": {
+      "1": [
+        0.42538589239120483,
+        0.42538589239120483,
+        0.42538589239120483
+      ],
+      "2": [
+        0.26728081703186035,
+        0.2676231563091278,
+        0.2676231563091278
+      ],
+      "3": [
+        0.14180709421634674,
+        0.141778364777565,
+        0.14180982112884521
+      ],
+      "4": [
+        0.09559150785207748,
+        0.09559150785207748,
+        0.09559150785207748
+      ],
+      "5": [
+        0.12253934890031815,
+        0.12253934890031815,
+        0.12253934890031815
+      ]
+    },
+    "current_AP": {
+      "1": [
+        0.42538589239120483,
+        0.42538589239120483,
+        0.42538589239120483
+      ],
+      "2": [
+        0.41348642110824585,
+        0.4140375256538391,
+        0.4140375256538391
+      ],
+      "3": [
+        0.3828306198120117,
+        0.38279712200164795,
+        0.3829115331172943
+      ],
+      "4": [
+        0.376024067401886,
+        0.376024067401886,
+        0.376024067401886
+      ],
+      "5": [
+        0.4276279807090759,
+        0.4248112440109253,
+        0.4248112440109253
+      ]
+    }
+  },
+  "S_current_by_repeat": [
+    0.3954942226409912,
+    0.3945441444714864,
+    0.3945822815100352
+  ],
+  "S_current_range_pp": 0.095007816950482,
+  "S_long_by_repeat": [
+    0.1199793169895808,
+    0.11996974050998688,
+    0.11998022596041362
+  ],
+  "S_long_range_pp": 0.0010485450426742093,
+  "adapter_seed": 146,
+  "checkpoint_sha256": "a80c3c4f208200be049240bb0a0634b8aba799958263e139632d209b1af1279f",
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "evidence": [
+    {
+      "repeat": 0,
+      "results_sha256": "bc0e48dadedc0f04b583f77976a5c90429f6f54b4c7540521adce946ea3f5435"
+    },
+    {
+      "repeat": 1,
+      "results_sha256": "7841d23005b9799b8a29c51e11edcce15a1a5b89fb0a7a62fbc207ed745c3cdb"
+    },
+    {
+      "repeat": 2,
+      "results_sha256": "d742e3170d40249df72654d80de7c5c3a6ff83a7e1b9a6afe9ab4bdace8e5485"
+    }
+  ],
+  "inputs_per_repeat": 84,
+  "max_AP_range_pp": 0.034233927726745605,
+  "max_current_AP_range_pp": 0.2816736698150635,
+  "range_pp": {
+    "AP": {
+      "1": 0.0,
+      "2": 0.034233927726745605,
+      "3": 0.0031456351280212402,
+      "4": 0.0,
+      "5": 0.0
+    },
+    "current_AP": {
+      "1": 0.0,
+      "2": 0.05511045455932617,
+      "3": 0.01144111156463623,
+      "4": 0.0,
+      "5": 0.2816736698150635
+    }
+  },
+  "raw_prediction_differences_vs_repeat0": {
+    "1": 113,
+    "2": 113
+  },
+  "registered_rule_scope": {
+    "baseline_admission": "0.2 pp limit is defined for M0 CAL AP range across T1-T5, not trained-endpoint current_AP",
+    "current_AP_observation": "Nonzero variation is retained; no claim of complete numerical determinism",
+    "seed147_replication_variance": "0.2 pp limit applies to selected candidate/control S_long repeat ranges"
+  },
+  "role": "CAL",
+  "scientific_status": "INCONCLUSIVE_COMPLETE_MATRIX_REQUIRED",
+  "stages_per_repeat": 197,
+  "status": "ENDPOINT_THREE_REPEATS_VERIFIED",
+  "step": 400,
+  "updated_unix": 1791993823.3395798,
+  "variant": "M1"
+}
