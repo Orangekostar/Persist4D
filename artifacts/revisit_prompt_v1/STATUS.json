@@ -1,16 +1,26 @@
 {
   "code_status": "REVIEWED_BUDGET_ONLY_AMENDMENT",
-  "controller_pid": 816960,
-  "current_variant": "M1",
+  "completed_variant_steps": {
+    "M1": 400,
+    "M2": 400
+  },
+  "completed_variants": [
+    "M1",
+    "M2"
+  ],
+  "controller_pid": 1453281,
+  "current_variant": "M3",
   "experiment_status": "FORMAL_TRAINING_RUNNING",
   "formal_N": 400,
   "gpu_training_started": true,
   "new_gpu_hours": 0.0,
   "next_task": "Complete six main formal trajectories, fresh M0 CAL, then full locked evaluation and selection",
+  "physical_gpu_index": 1,
   "publication_status": "NOT_PUBLISHED",
+  "resource_recovery_record": "RESOURCE_RECOVERY_20261014.json",
   "schema": 1,
   "scientific_status": "INCONCLUSIVE",
   "status": "RUNNING",
-  "verified_optimizer_step": 9,
-  "verified_unix": 1791946703.5008154
+  "verified_optimizer_step": 8,
+  "verified_unix": 1791957851.0780528
 }

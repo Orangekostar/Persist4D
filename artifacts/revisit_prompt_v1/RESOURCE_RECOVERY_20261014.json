@@ -1,0 +1,36 @@
+{
+  "budget_changed": false,
+  "cause": "GPU0 occupied by another local compute task; two checks failed before any M3 child launch",
+  "child_pid": 1453286,
+  "completed_model_sha256": {
+    "M1": {
+      "delta-000100.pt": "95e73e238841b9bec1faea146f4d09d07f20f5ad72cf97ba046fc3c6bd9f2985",
+      "delta-000200.pt": "fec9df4caecf098ee50c20f5de0d7057d57a040a1e3a38f7daae220d346a66b9",
+      "delta-000300.pt": "baa9bcd9c66d8f02d912c1534c7dbbf6a9f514e36110c8462906494779fc7382",
+      "delta-000400.pt": "a80c3c4f208200be049240bb0a0634b8aba799958263e139632d209b1af1279f"
+    },
+    "M2": {
+      "delta-000100.pt": "a93e2b1f3f1e304805dbc0a900c75d1555f946a2816971a9425615cd438db5c7",
+      "delta-000200.pt": "279dacc305f4794b31f594a5b0dc90e155cc66401a604f8092edaf76222aa438",
+      "delta-000300.pt": "3589ec0330db6758f0f99ea2d7b454c352e16cdfb69bac7d412ea9fc5983b451",
+      "delta-000400.pt": "3febcb4ba86a3d2bf814e07a2cf9c327d3518b555052d5f3c2539604ac84b038"
+    }
+  },
+  "completed_models_unchanged": true,
+  "controller_commit": "81b3180b4ddcb7a5ad0f400d0091b15e46315fa8",
+  "controller_pid": 1453281,
+  "created_unix": 1791957696.9367201,
+  "new_M3_job_key": "train:M3:s146:resource-recovery1",
+  "new_physical_gpu_index": 1,
+  "numeric_source_registry_changed": false,
+  "old_M3_charged_events": 0,
+  "old_M3_job_key": "train:M3:s146",
+  "old_controller_pid": 816960,
+  "old_journal_preserved": true,
+  "old_journal_sha256": "36eccacbc6f990c1237c64f2d43786fef7a3b7c6e3cb3ee837dd01d280274c7b",
+  "old_physical_gpu_index": 0,
+  "regression_tests_passed": 2,
+  "status": "RECOVERED_TRAINING_RUNNING",
+  "verified_M3_step": 8,
+  "verified_unix": 1791957851.0743184
+}
