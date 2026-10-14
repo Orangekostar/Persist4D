@@ -1,41 +1,41 @@
 {
   "M0_CAL_repeat_AP": [
     [
-      0.42538589239120483,
-      0.42538589239120483,
-      0.42538589239120483
+      0.4266909062862396,
+      0.4266909062862396,
+      0.4266909062862396
     ],
     [
-      0.27786120772361755,
-      0.27786120772361755,
-      0.27786120772361755
+      0.2786877155303955,
+      0.2786877155303955,
+      0.2786877155303955
     ],
     [
-      0.1366797238588333,
-      0.1366797238588333,
-      0.1366797238588333
+      0.1245792806148529,
+      0.1245792806148529,
+      0.1245792806148529
     ],
     [
-      0.12231989204883575,
-      0.12231989204883575,
-      0.12231989204883575
+      0.12545090913772583,
+      0.12545090913772583,
+      0.12545090913772583
     ],
     [
-      0.13514739274978638,
-      0.13514739274978638,
-      0.13514739274978638
+      0.1580933779478073,
+      0.1580933779478073,
+      0.1580933779478073
     ]
   ],
   "P1_admitted": true,
-  "P1_admitted_scope": "numerical admission only; does not authorize formal training",
+  "P1_admitted_scope": "Current Native evaluation numerical admission",
   "P1_status": "COMPLETE_COST_MEASUREMENT_BUDGET_BLOCK",
   "actual_CAL_inputs_per_process": 84,
   "actual_CAL_processes": 3,
   "actual_CAL_stage_forwards": 591,
   "actual_P0_P1_optimizer_updates": 51,
   "actual_P0_P1_training_stage_forwards": 714,
-  "baseline_admission_sha256": "22c10577d11669833b6796b3895a5f6800383284ae04ef6da30319c009f6a660",
-  "baseline_alignment_unix": 1791990382.4794827,
+  "baseline_admission_sha256": "3032294f18c2009694613637c2ef16b7f54e9c02a1da0887b2a14adc04cdc012",
+  "baseline_alignment_unix": 1792008801.3808515,
   "baseline_metric_scope": "CURRENT_FORMAL_EVALUATION_POLICY_CAL",
   "budget_admission": false,
   "comparisons": [
@@ -33683,14 +33683,15 @@
   },
   "epsilon_run_pp": 0.0,
   "evaluation_policy": {
-    "policy_id": "stable-mean-v1",
-    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+    "policy_id": "native-stable-mean-v2",
+    "policy_sha256": "f502cbaf5a3e5035c01240db7eaa9239b5825662b639fa5b56d8c046cb7887b3"
   },
   "evidence_origin": "PREDECESSOR_P0_P1_UNMODIFIED_MODEL_DATA_TRAINING_AND_EVALUATION",
   "formal_training_started": false,
-  "fresh_policy_admission": "EVALUATION_M0_ADMISSION.json",
+  "fresh_policy_admission": "EVALUATION_M0_ADMISSION_V2.json",
   "gradient_status": "SMOKE_COMPLETE_NOT_A_FORMAL_MODEL",
   "inherited_summary_before_alignment_sha256": "8dbdb100c07c10f42116aa6aac9c9a7ebcdf09202a76b3d62e91de6c53228e40",
+  "inherited_summary_before_native_sha256": "94b41bc86cd408e10b0fd4b000b6aa4eae437e230fea31616d005c1c6de11adc",
   "numeric_sources": {
     "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
     "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",

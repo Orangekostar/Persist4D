@@ -2,7 +2,8 @@
   "code_status": "C3_TRAINING_WITH_SEPARATELY_LOCKED_NATIVE_EVALUATION_V2",
   "completed_evaluation_tasks": [
     "Native M0 CAL r0",
-    "Native M0 CAL r1"
+    "Native M0 CAL r1",
+    "Native M0 CAL r2"
   ],
   "completed_main_training_gpu_hours": 9.12422078314583,
   "completed_variant_steps": {
@@ -24,19 +25,19 @@
   "controller_alive": true,
   "controller_pid": 2138018,
   "controller_process_state": "RUNNING",
-  "current_child_pid": 2138260,
-  "current_job_key": "policy:native-stable-mean-v2:eval:M0:s146:u0:CAL:r0",
-  "current_variant": "M0",
+  "current_child_pid": 2149172,
+  "current_job_key": "policy:native-stable-mean-v2:eval:M1:s146:u100:CAL:r0",
+  "current_variant": "M1",
   "evaluation_namespace": "policies/native-stable-mean-v2",
   "evaluation_policy": {
     "policy_id": "native-stable-mean-v2",
     "policy_sha256": "f502cbaf5a3e5035c01240db7eaa9239b5825662b639fa5b56d8c046cb7887b3"
   },
-  "experiment_status": "FORMAL_NATIVE_BASELINE_ADMISSION_RUNNING",
+  "experiment_status": "FORMAL_NATIVE_EVALUATION_MATRIX_RUNNING",
   "formal_N": 400,
-  "formal_baseline_verification": null,
+  "formal_baseline_verification": "NATIVE_FORMAL_BASELINE_VERIFICATION.json",
   "formal_metrics_complete": false,
-  "formal_policy_baseline_admitted": false,
+  "formal_policy_baseline_admitted": true,
   "fresh_M0_admission": "FRESH_M0_ADMISSION.json",
   "fresh_M0_epsilon_run_pp": 2.888917922973633,
   "fresh_M0_limit_pp": 0.2,
@@ -46,11 +47,12 @@
   "native_control_verification": "NATIVE_CAL_CONTROL_VERIFICATION.json",
   "native_formal_baseline_first_two_verification": "NATIVE_FORMAL_BASELINE_FIRST_TWO_VERIFICATION.json",
   "native_formal_baseline_repeat0_verification": "NATIVE_FORMAL_BASELINE_REPEAT0_VERIFICATION.json",
-  "new_gpu_hours": 16.21106479763342,
-  "next_task": "Admit three fresh formal Native M0 CAL repeats; then run full unchanged locked matrix",
+  "native_formal_baseline_verification": "NATIVE_FORMAL_BASELINE_VERIFICATION.json",
+  "new_gpu_hours": 16.492677910347314,
+  "next_task": "Complete unchanged Native CAL matrix: M1\u2013M6, four checkpoints, three repeats each",
   "physical_gpu_index": 1,
   "policy_baseline_admission": "EVALUATION_M0_ADMISSION_V2.json",
-  "policy_epsilon_run_pp": null,
+  "policy_epsilon_run_pp": 0.0,
   "previous_policy_status": {
     "completed_evaluation_tasks": [
       "M0 CAL r0",
@@ -74,10 +76,10 @@
   "publication_status": "NOT_PUBLISHED",
   "resource_recovery_record": "RESOURCE_RECOVERY_20261014.json",
   "schema": 1,
-  "scientific_status": "FORMAL_MATRIX_PENDING_NATIVE_BASELINE_ADMISSION",
+  "scientific_status": "FORMAL_MATRIX_PENDING",
   "shared_first_stage_verification": "SHARED_FIRST_STAGE_VERIFICATION.json",
-  "stage": "POLICY_BASELINE_ADMISSION",
+  "stage": "LOCKED_EVALUATION_AND_SELECTION",
   "status": "RUNNING",
   "verified_optimizer_step": 400,
-  "verified_unix": 1792008436.048052
+  "verified_unix": 1792008953.1783
 }

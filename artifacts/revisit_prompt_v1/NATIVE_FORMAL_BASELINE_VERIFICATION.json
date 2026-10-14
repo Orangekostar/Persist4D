@@ -1,0 +1,76 @@
+{
+  "AP_by_repeat": [
+    {
+      "1": 0.4266909062862396,
+      "2": 0.2786877155303955,
+      "3": 0.1245792806148529,
+      "4": 0.12545090913772583,
+      "5": 0.1580933779478073
+    },
+    {
+      "1": 0.4266909062862396,
+      "2": 0.2786877155303955,
+      "3": 0.1245792806148529,
+      "4": 0.12545090913772583,
+      "5": 0.1580933779478073
+    },
+    {
+      "1": 0.4266909062862396,
+      "2": 0.2786877155303955,
+      "3": 0.1245792806148529,
+      "4": 0.12545090913772583,
+      "5": 0.1580933779478073
+    }
+  ],
+  "admission_report_sha256": "3032294f18c2009694613637c2ef16b7f54e9c02a1da0887b2a14adc04cdc012",
+  "all_structure_summaries_equal": true,
+  "epsilon_run_pp": 0.0,
+  "evaluation_policy": {
+    "policy_id": "native-stable-mean-v2",
+    "policy_sha256": "f502cbaf5a3e5035c01240db7eaa9239b5825662b639fa5b56d8c046cb7887b3"
+  },
+  "evidence": [
+    {
+      "repeat_index": 0,
+      "results_sha256": "68b52ef461bfee2e5a5a7ae97235de3856f97ff693d38e845811af6e638539f1",
+      "status_sha256": "1fc89080deff781b487d858aaa8647fcfdb024565098c8aacfafcefc21bb8a5d"
+    },
+    {
+      "repeat_index": 1,
+      "results_sha256": "aec0b24b0802b4e9831a0df94562e62bf30da1185dcbcc10a918982aeb08fa66",
+      "status_sha256": "c166ea2231a914833018661e2e24a2b1c51af58b7ecc94a2f443c40790771f26"
+    },
+    {
+      "repeat_index": 2,
+      "results_sha256": "414bb53d2f57df0d4ce1e54e10a50f55c24e3ccada1ea63ade03b85271a5e00b",
+      "status_sha256": "66218cb7c6e1cf94849179f224f563ec03643b164f48b7bc6d36d661ac93e914"
+    }
+  ],
+  "formal_main_matrix_complete": false,
+  "global_bitwise_determinism_claim": false,
+  "input_counts": [
+    84,
+    84,
+    84
+  ],
+  "limit_pp": 0.2,
+  "numerical_scope": "Three measured formal M0 processes only; learned-model Native controls still have later nonbitwise outputs",
+  "prior_runtime_summary_sha256": "94b41bc86cd408e10b0fd4b000b6aa4eae437e230fea31616d005c1c6de11adc",
+  "raw_prediction_digest_differences": [
+    0,
+    0
+  ],
+  "runtime_baseline_arrays_verified": true,
+  "runtime_summary_sha256": "fc594604c0f208373d029a0f8b2d89e68527d7cbfccedaa44c5bcdc90f541448",
+  "schema": 1,
+  "source_locks_verified": true,
+  "stage_counts": [
+    197,
+    197,
+    197
+  ],
+  "status": "THREE_FORMAL_NATIVE_BASELINES_ADMITTED_AND_VERIFIED",
+  "training_run_lock_sha256": "c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5",
+  "unchanged_training_checkpoints": 24,
+  "verified_unix": 1792008953.1778543
+}
