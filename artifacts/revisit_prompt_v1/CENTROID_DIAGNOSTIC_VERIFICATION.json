@@ -1,0 +1,290 @@
+{
+  "base_evaluation_policy": {
+    "policy_id": "native-stable-mean-v2",
+    "policy_sha256": "f502cbaf5a3e5035c01240db7eaa9239b5825662b639fa5b56d8c046cb7887b3"
+  },
+  "checkpoint_sha256": "fec9df4caecf098ee50c20f5de0d7057d57a040a1e3a38f7daae220d346a66b9",
+  "evidence": [
+    {
+      "centroid_policy": "original",
+      "event_id": "mpr:P0:1792012530603903723",
+      "gpu_hours": 0.010148397486943092,
+      "probe": 0,
+      "results_sha256": "efe26584e3cf5da3ea738d6571472724a707a0b0100c7ae456238a8f55bee791",
+      "tensor_archive_sha256": "86296ac023950fa5264b125f9e10cdcc63a58038395e1a6a8ed17be984588e6e"
+    },
+    {
+      "centroid_policy": "original",
+      "event_id": "mpr:P0:1792012567258511173",
+      "gpu_hours": 0.010203927936389745,
+      "probe": 1,
+      "results_sha256": "54aa65d0797c91ad5b362fb07ebfd386d9a55b6a5d8aadcd2246a14ed69345bf",
+      "tensor_archive_sha256": "0fdbb18a19173ef5d210a70574543c27955b72d30df3673cec4a57e4e78bcab2"
+    },
+    {
+      "centroid_policy": "original",
+      "event_id": "mpr:P0:1792012604111522300",
+      "gpu_hours": 0.009882498408050095,
+      "probe": 2,
+      "results_sha256": "7948b295d87097053f69ac64f883ce672533a8eee0408ea2e329e7e4029afd90",
+      "tensor_archive_sha256": "386cc97bb744e0d6432bdd36fa9f4c933e568fd71667335d070e5bd8055e6a78"
+    },
+    {
+      "centroid_policy": "stable",
+      "event_id": "mpr:P0:1792012672833677618",
+      "gpu_hours": 0.009938479009166864,
+      "probe": 3,
+      "results_sha256": "bf50fd5bc74f169c898f0adf0e453e124ec03bc0f3c3d7d0cfe7b723d2bb873d",
+      "tensor_archive_sha256": "401f48c996f824a019cd84a47b9586caea70916a1216d206f8a01eb8c7aea332"
+    },
+    {
+      "centroid_policy": "stable",
+      "event_id": "mpr:P0:1792012708730603092",
+      "gpu_hours": 0.010218218419443778,
+      "probe": 4,
+      "results_sha256": "4d794cbb1307818af15ebc3b5def6cf810aa133bc45583e847d70005b99d4984",
+      "tensor_archive_sha256": "401f48c996f824a019cd84a47b9586caea70916a1216d206f8a01eb8c7aea332"
+    },
+    {
+      "centroid_policy": "stable",
+      "event_id": "mpr:P0:1792012745628253886",
+      "gpu_hours": 0.010315636138054996,
+      "probe": 5,
+      "results_sha256": "a3ac7c39e82ca15cb36aff1c0d5bffcb3dd5ec1704016bfa1aecca8a1042d294",
+      "tensor_archive_sha256": "401f48c996f824a019cd84a47b9586caea70916a1216d206f8a01eb8c7aea332"
+    }
+  ],
+  "formal_results_replaced": false,
+  "formal_v3_started": false,
+  "full_CAL_controls": {
+    "helper_source_sha256": "e3a9fce4c699920d2ab1831eb14c6374d3ec28294219f5cc73fd9cc445ebb4f5",
+    "inputs_per_process": 84,
+    "original_S_long_repeat_limit_pp": 0.2,
+    "repeats_per_target": 3,
+    "stages_per_process": 197,
+    "status": "RUNNING",
+    "targets": [
+      {
+        "step": 200,
+        "variant": "M1"
+      },
+      {
+        "step": 300,
+        "variant": "M3"
+      }
+    ]
+  },
+  "global_bitwise_determinism_claim": false,
+  "immutability": {
+    "original_checkpoints_verified": 24,
+    "original_training_run_lock_sha256": "c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5",
+    "training_numeric_sources_verified": 14,
+    "v2_policy_sources_verified": 13
+  },
+  "interpretation": "In this matched five-stage episode, original segment-center accumulation varies first; stable FP32 grouped center means make all measured subsequent predictions and states equal across three processes.",
+  "matched_inputs_rng_and_frozen_parent": true,
+  "original_P0_ledger_used": true,
+  "pairs": [
+    {
+      "base_probe": 0,
+      "centers_equal_by_stage": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "committed_state_equal_by_stage": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "complete_structural_summaries_equal": false,
+      "non_center_context_tensors_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "other_probe": 1,
+      "pre_mask_inputs_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "raw_prediction_tensors_equal_by_stage": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "returned_queries_positions_equal_by_stage": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "base_probe": 0,
+      "centers_equal_by_stage": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "committed_state_equal_by_stage": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "complete_structural_summaries_equal": false,
+      "non_center_context_tensors_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "other_probe": 2,
+      "pre_mask_inputs_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "raw_prediction_tensors_equal_by_stage": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "returned_queries_positions_equal_by_stage": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "base_probe": 3,
+      "centers_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "committed_state_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "complete_structural_summaries_equal": true,
+      "non_center_context_tensors_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "other_probe": 4,
+      "pre_mask_inputs_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "raw_prediction_tensors_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "returned_queries_positions_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "base_probe": 3,
+      "centers_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "committed_state_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "complete_structural_summaries_equal": true,
+      "non_center_context_tensors_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "other_probe": 5,
+      "pre_mask_inputs_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "raw_prediction_tensors_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "returned_queries_positions_equal_by_stage": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    }
+  ],
+  "schema": "mpr-centroid-diagnostic-verification-v1",
+  "scope": {
+    "input_id": "CAL:5090d7174e9ec486ffb51af9",
+    "inputs_per_process": 1,
+    "original_processes": 3,
+    "stable_center_processes": 3,
+    "stages_per_process": 5,
+    "step": 200,
+    "variant": "M1"
+  },
+  "settled_diagnostic_gpu_hours": 0.06070715739804857,
+  "status": "MATCHED_FIVE_STAGE_CONTROL_PASSED_FULL_CAL_PENDING",
+  "verified_unix": 1792013535.8560908
+}
