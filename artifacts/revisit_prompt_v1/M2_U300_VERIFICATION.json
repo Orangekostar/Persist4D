@@ -1,0 +1,160 @@
+{
+  "AP_by_repeat": {
+    "AP": {
+      "1": [
+        0.42538589239120483,
+        0.42538589239120483,
+        0.4304884374141693
+      ],
+      "2": [
+        0.2810766398906708,
+        0.2810766398906708,
+        0.2796858549118042
+      ],
+      "3": [
+        0.12466558068990707,
+        0.12466558068990707,
+        0.11755324900150299
+      ],
+      "4": [
+        0.11438501626253128,
+        0.11438501626253128,
+        0.12191299349069595
+      ],
+      "5": [
+        0.13024353981018066,
+        0.13024353981018066,
+        0.16102619469165802
+      ]
+    },
+    "current_AP": {
+      "1": [
+        0.42538589239120483,
+        0.42538589239120483,
+        0.4304884374141693
+      ],
+      "2": [
+        0.4114140272140503,
+        0.4114140272140503,
+        0.4132714569568634
+      ],
+      "3": [
+        0.3857606053352356,
+        0.3857606053352356,
+        0.3887576460838318
+      ],
+      "4": [
+        0.3761238157749176,
+        0.3761238157749176,
+        0.37193354964256287
+      ],
+      "5": [
+        0.4283332824707031,
+        0.4283332824707031,
+        0.43962156772613525
+      ]
+    }
+  },
+  "S_current_by_repeat": [
+    0.3967392345269521,
+    0.3967392345269521,
+    0.40010425448417664
+  ],
+  "S_current_range_pp": 0.33650199572245465,
+  "S_long_by_repeat": [
+    0.12309804558753967,
+    0.12309804558753967,
+    0.13349747906128565
+  ],
+  "S_long_range_pp": 1.0399433473745971,
+  "adapter_seed": 146,
+  "all_three_results_retained": true,
+  "checkpoint_sha256": "3589ec0330db6758f0f99ea2d7b454c352e16cdfb69bac7d412ea9fc5983b451",
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "evidence": [
+    {
+      "repeat": 0,
+      "results_sha256": "acbaff80e99a3ea3dd142cc6c9b475dd2bc38dcbdee6bcc6063610dd50989cec"
+    },
+    {
+      "repeat": 1,
+      "results_sha256": "95a61f610432589db98b616bf02393f39241bbd733ae7a03c8aaf2ed9afdd4b1"
+    },
+    {
+      "repeat": 2,
+      "results_sha256": "f99892b5fa652e4b24ca4e07c84ce23166af23cd4ca43bf484a12bdc1fd56129"
+    }
+  ],
+  "first_frame_differences_vs_M0": [
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 0
+    },
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 1
+    },
+    {
+      "AP_difference_pp": 0.5102545022964478,
+      "current_AP_difference_pp": 0.5102545022964478,
+      "repeat": 2
+    }
+  ],
+  "formal_policy_or_selection_rules_modified": false,
+  "inputs_per_repeat": 84,
+  "max_AP_range_pp": 3.0782654881477356,
+  "max_current_AP_range_pp": 1.128828525543213,
+  "range_pp": {
+    "AP": {
+      "1": 0.5102545022964478,
+      "2": 0.13907849788665771,
+      "3": 0.7112331688404083,
+      "4": 0.7527977228164673,
+      "5": 3.0782654881477356
+    },
+    "current_AP": {
+      "1": 0.5102545022964478,
+      "2": 0.18574297428131104,
+      "3": 0.29970407485961914,
+      "4": 0.41902661323547363,
+      "5": 1.128828525543213
+    }
+  },
+  "raw_prediction_differences_vs_repeat0": {
+    "1": 0,
+    "2": 197
+  },
+  "registered_rule_scope": {
+    "baseline_admission": "0.2 pp limit is defined for M0 CAL AP range across T1-T5, not trained-endpoint current_AP",
+    "current_AP_observation": "Nonzero variation is retained; no claim of complete numerical determinism",
+    "seed147_replication_variance": "0.2 pp limit applies to selected candidate/control S_long repeat ranges"
+  },
+  "role": "CAL",
+  "scientific_status": "NUMERICAL_ROOT_CAUSE_UNRESOLVED_COMPLETE_MATRIX_REQUIRED",
+  "selected_endpoint_replication_variance_guard": {
+    "limit_pp": 0.2,
+    "pass_if_selected": false,
+    "scope": "Only if this endpoint becomes the locked candidate/control; final selection remains pending"
+  },
+  "stages_per_repeat": 197,
+  "status": "ENDPOINT_COMPLETE_NUMERICAL_VARIANCE_OBSERVED",
+  "step": 300,
+  "structure_summary_differences_vs_repeat0": {
+    "1": 0,
+    "2": 0
+  },
+  "structure_summary_fields_compared": [
+    "window_scan_ids",
+    "points",
+    "segments",
+    "current_points",
+    "state_bytes"
+  ],
+  "updated_unix": 1791998365.646937,
+  "variant": "M2"
+}
