@@ -2,18 +2,18 @@
   "M0_CAL_repeat_AP": [
     [
       0.42538589239120483,
-      0.42482319474220276,
+      0.42538589239120483,
       0.42538589239120483
     ],
     [
       0.27786120772361755,
       0.27786120772361755,
-      0.2778344750404358
+      0.27786120772361755
     ],
     [
       0.1366797238588333,
       0.1366797238588333,
-      0.13667981326580048
+      0.1366797238588333
     ],
     [
       0.12231989204883575,
@@ -34,6 +34,9 @@
   "actual_CAL_stage_forwards": 591,
   "actual_P0_P1_optimizer_updates": 51,
   "actual_P0_P1_training_stage_forwards": 714,
+  "baseline_admission_sha256": "22c10577d11669833b6796b3895a5f6800383284ae04ef6da30319c009f6a660",
+  "baseline_alignment_unix": 1791990382.4794827,
+  "baseline_metric_scope": "CURRENT_FORMAL_EVALUATION_POLICY_CAL",
   "budget_admission": false,
   "comparisons": [
     {
@@ -33687,6 +33690,7 @@
   "formal_training_started": false,
   "fresh_policy_admission": "EVALUATION_M0_ADMISSION.json",
   "gradient_status": "SMOKE_COMPLETE_NOT_A_FORMAL_MODEL",
+  "inherited_summary_before_alignment_sha256": "8dbdb100c07c10f42116aa6aac9c9a7ebcdf09202a76b3d62e91de6c53228e40",
   "numeric_sources": {
     "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
     "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
@@ -33711,5 +33715,32 @@
   "predecessor_summary_sha256": "23eba70e508ba1d8f112a226233f791ca076976e72cd4a9184e4012b09effe8b",
   "root_cause": "NUMERICAL_ROOT_CAUSE_UNRESOLVED",
   "status": "COMPLETE",
+  "training_preflight_M0_CAL_repeat_AP": [
+    [
+      0.42538589239120483,
+      0.42482319474220276,
+      0.42538589239120483
+    ],
+    [
+      0.27786120772361755,
+      0.27786120772361755,
+      0.2778344750404358
+    ],
+    [
+      0.1366797238588333,
+      0.1366797238588333,
+      0.13667981326580048
+    ],
+    [
+      0.12231989204883575,
+      0.12231989204883575,
+      0.12231989204883575
+    ],
+    [
+      0.13514739274978638,
+      0.13514739274978638,
+      0.13514739274978638
+    ]
+  ],
   "training_preflight_epsilon_run_pp": 0.05626976490020752
 }
