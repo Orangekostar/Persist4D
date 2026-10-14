@@ -1,0 +1,51 @@
+{
+  "checkpoint_sha256": "95e73e238841b9bec1faea146f4d09d07f20f5ad72cf97ba046fc3c6bd9f2985",
+  "empty_history_first_stage_digest_differences": 0,
+  "empty_history_inputs_compared": 84,
+  "evaluation_policy": {
+    "policy_id": "native-stable-mean-v2",
+    "policy_sha256": "f502cbaf5a3e5035c01240db7eaa9239b5825662b639fa5b56d8c046cb7887b3"
+  },
+  "finite_AP_and_current_AP": true,
+  "input_count": 84,
+  "loaded_checkpoint_matches_frozen_training_verification": true,
+  "loaded_checkpoint_sha256": "95e73e238841b9bec1faea146f4d09d07f20f5ad72cf97ba046fc3c6bd9f2985",
+  "repeat_index": 0,
+  "results_sha256": "ed1bdbc11cec9bdcf9a4479c0b7f37418d741dd480ee20cd58944a94100bef6e",
+  "rows": [
+    {
+      "AP": 0.4266909062862396,
+      "current_AP": 0.4266909062862396,
+      "horizon": 1
+    },
+    {
+      "AP": 0.2848028540611267,
+      "current_AP": 0.41125136613845825,
+      "horizon": 2
+    },
+    {
+      "AP": 0.12701894342899323,
+      "current_AP": 0.37740930914878845,
+      "horizon": 3
+    },
+    {
+      "AP": 0.11038463562726974,
+      "current_AP": 0.3844791650772095,
+      "horizon": 4
+    },
+    {
+      "AP": 0.12228711694478989,
+      "current_AP": 0.44445833563804626,
+      "horizon": 5
+    }
+  ],
+  "schema": 1,
+  "scientific_gain_claim": false,
+  "stage_count": 197,
+  "status": "FIRST_FORMAL_TRAINED_NATIVE_REPEAT_VERIFIED",
+  "status_sha256": "bf679c84d9173b36e2528040dc25d7c1f16f996eb61a22204e88f1f0ce7cf32b",
+  "step": 100,
+  "three_repeat_comparison": "PENDING",
+  "variant": "M1",
+  "verified_unix": 1792009436.139054
+}

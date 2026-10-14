@@ -3,7 +3,8 @@
   "completed_evaluation_tasks": [
     "Native M0 CAL r0",
     "Native M0 CAL r1",
-    "Native M0 CAL r2"
+    "Native M0 CAL r2",
+    "Native M1 u100 CAL r0"
   ],
   "completed_main_training_gpu_hours": 9.12422078314583,
   "completed_variant_steps": {
@@ -25,8 +26,8 @@
   "controller_alive": true,
   "controller_pid": 2138018,
   "controller_process_state": "RUNNING",
-  "current_child_pid": 2149172,
-  "current_job_key": "policy:native-stable-mean-v2:eval:M1:s146:u100:CAL:r0",
+  "current_child_pid": 2153341,
+  "current_job_key": "policy:native-stable-mean-v2:eval:M1:s146:u100:CAL:r1",
   "current_variant": "M1",
   "evaluation_namespace": "policies/native-stable-mean-v2",
   "evaluation_policy": {
@@ -34,6 +35,7 @@
     "policy_sha256": "f502cbaf5a3e5035c01240db7eaa9239b5825662b639fa5b56d8c046cb7887b3"
   },
   "experiment_status": "FORMAL_NATIVE_EVALUATION_MATRIX_RUNNING",
+  "first_trained_native_evaluation_verification": "FIRST_TRAINED_NATIVE_EVALUATION_VERIFICATION.json",
   "formal_N": 400,
   "formal_baseline_verification": "NATIVE_FORMAL_BASELINE_VERIFICATION.json",
   "formal_metrics_complete": false,
@@ -81,5 +83,5 @@
   "stage": "LOCKED_EVALUATION_AND_SELECTION",
   "status": "RUNNING",
   "verified_optimizer_step": 400,
-  "verified_unix": 1792008953.1783
+  "verified_unix": 1792009509.9135778
 }
