@@ -1,0 +1,20 @@
+{
+  "admission_limit_pp": 0.2,
+  "authorization": "User authorized numerical error repair, autonomous continuation and direct meaningful training; no new resource allocation",
+  "control_evidence": "NATIVE_CAL_CONTROL_VERIFICATION.json",
+  "created_unix": 1792007190.8503332,
+  "diagnostic_AP_range_pp": 0.020539015531539917,
+  "diagnostic_current_AP_range_pp": 0.4629790782928467,
+  "evaluation_policy": {
+    "policy_id": "native-stable-mean-v2",
+    "policy_sha256": "f502cbaf5a3e5035c01240db7eaa9239b5825662b639fa5b56d8c046cb7887b3"
+  },
+  "limitations": "Measured encoder and first-stage stability; later raw outputs remain nonbitwise. No universal determinism or original exact kernel-cause claim.",
+  "main_training": "Six completed C3 seed146 models and 24 checkpoints reused unchanged; no retraining",
+  "original_v1_results": "Retained under policies/stable-mean-v1; excluded from v2 model selection",
+  "reason": "Stable-mean-v1 still produced large learned-model outliers; measured first shared divergence localized to spconv SubMConv3d",
+  "schema": 2,
+  "selection": "Original four-point/three-repeat ranking, guards, seed147 gate, SEL/PB and bootstrap unchanged",
+  "source_evidence": "SHARED_FIRST_STAGE_VERIFICATION.json",
+  "status": "LOCKED"
+}

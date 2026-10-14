@@ -1,0 +1,170 @@
+{
+  "base_evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "checkpoint_sha256": "5a02d4da45ef77683418a32080b256574c9a8ab7e572653e0f8577aa10fe9dd9",
+  "comparisons": [
+    {
+      "dense_differences": 0,
+      "first_stage_raw_differences": 0,
+      "input_differences": 0,
+      "occupied_differences": 0,
+      "pre_first_mask_differences": 0,
+      "raw_differences": 113,
+      "repeat": 1,
+      "stages": 197
+    },
+    {
+      "dense_differences": 0,
+      "first_stage_raw_differences": 0,
+      "input_differences": 0,
+      "occupied_differences": 0,
+      "pre_first_mask_differences": 0,
+      "raw_differences": 113,
+      "repeat": 2,
+      "stages": 197
+    }
+  ],
+  "diagnostic_only": true,
+  "epsilon_run_pp": 0.020539015531539917,
+  "evidence": [
+    {
+      "event_id": "mpr:P0:1792005778267322078",
+      "gpu_hours": 0.12201497859999816,
+      "repeat": 0,
+      "results_sha256": "2d63c00400a649e21e86ccf5dde17d21fddbb6b7132e7d574308e7fc9fab8225",
+      "status_sha256": "ec0ddb4d3356994e2de74396fe107c20518b6050368fe3fd32e83f32fc0508be"
+    },
+    {
+      "event_id": "mpr:P0:1792006217642000156",
+      "gpu_hours": 0.12000953882610904,
+      "repeat": 1,
+      "results_sha256": "39101e5935f9c1174f174135d89064b3e1b08165800e8d155a39e61cc8e79ce6",
+      "status_sha256": "fae9d0d2bfca88c4e98585726bf85d4797577aedd8e511a54ab69b3b834535d7"
+    },
+    {
+      "event_id": "mpr:P0:1792006649786493931",
+      "gpu_hours": 0.11923170893805542,
+      "repeat": 2,
+      "results_sha256": "00845991e60a05200b53784936c2a890968cca8129ae490ab1f46e992b6e65a6",
+      "status_sha256": "7b45f81d61f9c1d931f529b72f156d8e5fb68a337e63232b4dcfd51c074b0285"
+    }
+  ],
+  "exact_low_level_kernel_cause": "NOT_ESTABLISHED",
+  "expected_inputs_per_process": 84,
+  "expected_stages_per_process": 197,
+  "formal_admission": "REQUIRES_THREE_FRESH_FORMAL_M0_PROCESSES_UNDER_NEW_HASHED_POLICY",
+  "formal_repeats_replaced": false,
+  "global_bitwise_determinism_claim": false,
+  "intervention": "Only SparseConvolution algorithm: Native; unchanged KRSC weights, stable-mean base",
+  "intervention_source_sha256": "889f11e3c2fb43d08e1842e6ff0cb507b5dfb35e13c2ef20e509d15bf255e261",
+  "limit_pp": 0.2,
+  "metric_ranges_pp": {
+    "AP": {
+      "1": 0.0,
+      "2": 0.0,
+      "3": 0.0,
+      "4": 0.020539015531539917,
+      "5": 0.0
+    },
+    "current_AP": {
+      "1": 0.0,
+      "2": 0.0,
+      "3": 0.0,
+      "4": 0.4629790782928467,
+      "5": 0.0
+    }
+  },
+  "rows_by_repeat": [
+    [
+      {
+        "AP": 0.4266909062862396,
+        "current_AP": 0.4266909062862396,
+        "horizon": 1
+      },
+      {
+        "AP": 0.27908164262771606,
+        "current_AP": 0.4058292806148529,
+        "horizon": 2
+      },
+      {
+        "AP": 0.1317417472600937,
+        "current_AP": 0.378217875957489,
+        "horizon": 3
+      },
+      {
+        "AP": 0.09641237556934357,
+        "current_AP": 0.377612829208374,
+        "horizon": 4
+      },
+      {
+        "AP": 0.13061249256134033,
+        "current_AP": 0.4611295163631439,
+        "horizon": 5
+      }
+    ],
+    [
+      {
+        "AP": 0.4266909062862396,
+        "current_AP": 0.4266909062862396,
+        "horizon": 1
+      },
+      {
+        "AP": 0.27908164262771606,
+        "current_AP": 0.4058292806148529,
+        "horizon": 2
+      },
+      {
+        "AP": 0.1317417472600937,
+        "current_AP": 0.378217875957489,
+        "horizon": 3
+      },
+      {
+        "AP": 0.09661776572465897,
+        "current_AP": 0.3732028901576996,
+        "horizon": 4
+      },
+      {
+        "AP": 0.13061249256134033,
+        "current_AP": 0.4611295163631439,
+        "horizon": 5
+      }
+    ],
+    [
+      {
+        "AP": 0.4266909062862396,
+        "current_AP": 0.4266909062862396,
+        "horizon": 1
+      },
+      {
+        "AP": 0.27908164262771606,
+        "current_AP": 0.4058292806148529,
+        "horizon": 2
+      },
+      {
+        "AP": 0.1317417472600937,
+        "current_AP": 0.378217875957489,
+        "horizon": 3
+      },
+      {
+        "AP": 0.0966121181845665,
+        "current_AP": 0.37298303842544556,
+        "horizon": 4
+      },
+      {
+        "AP": 0.13061249256134033,
+        "current_AP": 0.4611295163631439,
+        "horizon": 5
+      }
+    ]
+  ],
+  "schema": 1,
+  "status": "WITHIN_REGISTERED_CONTROL_AP_LIMIT",
+  "step": 300,
+  "total_gpu_hours": 0.3612562263641626,
+  "updated_unix": 1792007144.7921736,
+  "variant": "M3",
+  "verifier_source_sha256": "537bc5201dc4ba839187ed59c947eefe1801d69348dfeaaeccd40a016d9591e9",
+  "worker_source_sha256": "8883ab45455a127cbf33d115823bb93df8435fe7f2087f756931437966ce884c"
+}

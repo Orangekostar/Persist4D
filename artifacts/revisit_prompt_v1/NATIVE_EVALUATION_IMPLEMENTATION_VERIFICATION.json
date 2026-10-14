@@ -1,0 +1,27 @@
+{
+  "commands": [
+    {
+      "command": "python -m pytest tests/test_revisit_prompt_native_policy.py tests/test_revisit_prompt_evaluation_policy.py -q",
+      "exit_code": 0,
+      "passed": 18
+    },
+    {
+      "command": "python -m pytest tests/test_revisit_prompt_stable_mean.py tests/test_revisit_prompt_fresh_admission.py -q",
+      "exit_code": 0,
+      "passed": 9
+    }
+  ],
+  "formal_native_evaluation_started": false,
+  "full_control_verification_sha256": "ef1947ca25122dbd0caa8fc54bdc7af371d210e653aa951ef2562bf9b2ba4619",
+  "git_diff_check_exit_code": 0,
+  "implementation_commit": "e6bcb7f",
+  "original_training_run_lock_sha256": "c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5",
+  "original_v1_policy_lock_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912",
+  "py_compile_exit_code": 0,
+  "schema": 1,
+  "status": "CPU_AND_FULL_CAL_CONTROLS_VERIFIED",
+  "total_tests_passed": 27,
+  "unchanged_original_checkpoints": 24,
+  "updated_unix": 1792007184.9327726,
+  "verification_scope": "Weight preservation, builders, policy and source/runtime identity, original budget routing, separate P5 outputs, stable mean, fresh admission and runtime baseline alignment"
+}

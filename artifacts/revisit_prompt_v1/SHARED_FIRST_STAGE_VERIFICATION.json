@@ -54,7 +54,9 @@
   "first_divergent_capture_index": 1,
   "first_divergent_measured_operator": "enc.enc0.block0.cpe.0 (spconv SubMConv3d)",
   "first_operator_max_abs": 6.556510925292969e-07,
-  "full_native_CAL_controls": "PENDING",
+  "full_control_epsilon_run_pp": 0.020539015531539917,
+  "full_control_verification_sha256": "ef1947ca25122dbd0caa8fc54bdc7af371d210e653aa951ef2562bf9b2ba4619",
+  "full_native_CAL_controls": "NATIVE_CAL_CONTROL_VERIFICATION.json",
   "global_determinism_claim": false,
   "input_and_rng_evidence_probes": [
     2,
@@ -73,6 +75,7 @@
   },
   "official_results_replaced": false,
   "parent_tensor_sha256": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
+  "post_first_stage_raw_variation_preserved": true,
   "probe_event_ids": [
     "mpr:P0:1792004997570036506",
     "mpr:P0:1792005019130196054",
@@ -86,6 +89,6 @@
   "probe_gpu_hours": 0.05266511957832942,
   "same_inputs_rng_and_frozen_state": true,
   "schema": 1,
-  "status": "OPERATOR_BOUNDARY_AND_SINGLE_INPUT_INTERVENTION_VERIFIED",
-  "updated_unix": 1792006094.5261126
+  "status": "SINGLE_AND_FULL_CAL_CONTROL_EVIDENCE_VERIFIED",
+  "updated_unix": 1792007184.9242504
 }

@@ -1,0 +1,240 @@
+{
+  "budget_and_ledger": "Original pool, phase caps, prior consumption and charged ledger unchanged",
+  "control_report": {
+    "base_evaluation_policy": {
+      "policy_id": "stable-mean-v1",
+      "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+    },
+    "checkpoint_sha256": "5a02d4da45ef77683418a32080b256574c9a8ab7e572653e0f8577aa10fe9dd9",
+    "comparisons": [
+      {
+        "dense_differences": 0,
+        "first_stage_raw_differences": 0,
+        "input_differences": 0,
+        "occupied_differences": 0,
+        "pre_first_mask_differences": 0,
+        "raw_differences": 113,
+        "repeat": 1,
+        "stages": 197
+      },
+      {
+        "dense_differences": 0,
+        "first_stage_raw_differences": 0,
+        "input_differences": 0,
+        "occupied_differences": 0,
+        "pre_first_mask_differences": 0,
+        "raw_differences": 113,
+        "repeat": 2,
+        "stages": 197
+      }
+    ],
+    "diagnostic_only": true,
+    "epsilon_run_pp": 0.020539015531539917,
+    "evidence": [
+      {
+        "event_id": "mpr:P0:1792005778267322078",
+        "gpu_hours": 0.12201497859999816,
+        "repeat": 0,
+        "results_sha256": "2d63c00400a649e21e86ccf5dde17d21fddbb6b7132e7d574308e7fc9fab8225",
+        "status_sha256": "ec0ddb4d3356994e2de74396fe107c20518b6050368fe3fd32e83f32fc0508be"
+      },
+      {
+        "event_id": "mpr:P0:1792006217642000156",
+        "gpu_hours": 0.12000953882610904,
+        "repeat": 1,
+        "results_sha256": "39101e5935f9c1174f174135d89064b3e1b08165800e8d155a39e61cc8e79ce6",
+        "status_sha256": "fae9d0d2bfca88c4e98585726bf85d4797577aedd8e511a54ab69b3b834535d7"
+      },
+      {
+        "event_id": "mpr:P0:1792006649786493931",
+        "gpu_hours": 0.11923170893805542,
+        "repeat": 2,
+        "results_sha256": "00845991e60a05200b53784936c2a890968cca8129ae490ab1f46e992b6e65a6",
+        "status_sha256": "7b45f81d61f9c1d931f529b72f156d8e5fb68a337e63232b4dcfd51c074b0285"
+      }
+    ],
+    "exact_low_level_kernel_cause": "NOT_ESTABLISHED",
+    "expected_inputs_per_process": 84,
+    "expected_stages_per_process": 197,
+    "formal_admission": "REQUIRES_THREE_FRESH_FORMAL_M0_PROCESSES_UNDER_NEW_HASHED_POLICY",
+    "formal_repeats_replaced": false,
+    "global_bitwise_determinism_claim": false,
+    "intervention": "Only SparseConvolution algorithm: Native; unchanged KRSC weights, stable-mean base",
+    "intervention_source_sha256": "889f11e3c2fb43d08e1842e6ff0cb507b5dfb35e13c2ef20e509d15bf255e261",
+    "limit_pp": 0.2,
+    "metric_ranges_pp": {
+      "AP": {
+        "1": 0.0,
+        "2": 0.0,
+        "3": 0.0,
+        "4": 0.020539015531539917,
+        "5": 0.0
+      },
+      "current_AP": {
+        "1": 0.0,
+        "2": 0.0,
+        "3": 0.0,
+        "4": 0.4629790782928467,
+        "5": 0.0
+      }
+    },
+    "rows_by_repeat": [
+      [
+        {
+          "AP": 0.4266909062862396,
+          "current_AP": 0.4266909062862396,
+          "horizon": 1
+        },
+        {
+          "AP": 0.27908164262771606,
+          "current_AP": 0.4058292806148529,
+          "horizon": 2
+        },
+        {
+          "AP": 0.1317417472600937,
+          "current_AP": 0.378217875957489,
+          "horizon": 3
+        },
+        {
+          "AP": 0.09641237556934357,
+          "current_AP": 0.377612829208374,
+          "horizon": 4
+        },
+        {
+          "AP": 0.13061249256134033,
+          "current_AP": 0.4611295163631439,
+          "horizon": 5
+        }
+      ],
+      [
+        {
+          "AP": 0.4266909062862396,
+          "current_AP": 0.4266909062862396,
+          "horizon": 1
+        },
+        {
+          "AP": 0.27908164262771606,
+          "current_AP": 0.4058292806148529,
+          "horizon": 2
+        },
+        {
+          "AP": 0.1317417472600937,
+          "current_AP": 0.378217875957489,
+          "horizon": 3
+        },
+        {
+          "AP": 0.09661776572465897,
+          "current_AP": 0.3732028901576996,
+          "horizon": 4
+        },
+        {
+          "AP": 0.13061249256134033,
+          "current_AP": 0.4611295163631439,
+          "horizon": 5
+        }
+      ],
+      [
+        {
+          "AP": 0.4266909062862396,
+          "current_AP": 0.4266909062862396,
+          "horizon": 1
+        },
+        {
+          "AP": 0.27908164262771606,
+          "current_AP": 0.4058292806148529,
+          "horizon": 2
+        },
+        {
+          "AP": 0.1317417472600937,
+          "current_AP": 0.378217875957489,
+          "horizon": 3
+        },
+        {
+          "AP": 0.0966121181845665,
+          "current_AP": 0.37298303842544556,
+          "horizon": 4
+        },
+        {
+          "AP": 0.13061249256134033,
+          "current_AP": 0.4611295163631439,
+          "horizon": 5
+        }
+      ]
+    ],
+    "schema": 1,
+    "status": "WITHIN_REGISTERED_CONTROL_AP_LIMIT",
+    "step": 300,
+    "total_gpu_hours": 0.3612562263641626,
+    "updated_unix": 1792007144.7921736,
+    "variant": "M3",
+    "verifier_source_sha256": "537bc5201dc4ba839187ed59c947eefe1801d69348dfeaaeccd40a016d9591e9",
+    "worker_source_sha256": "8883ab45455a127cbf33d115823bb93df8435fe7f2087f756931437966ce884c"
+  },
+  "control_verification_sha256": "ef1947ca25122dbd0caa8fc54bdc7af371d210e653aa951ef2562bf9b2ba4619",
+  "cpu_verification_sha256": "b821381a079a99e06f7ca72ba3aa5ca5a0531ad752bea577b481989e1ca310d7",
+  "created_unix": 1792007184.9390888,
+  "exact_low_level_kernel_cause": "NOT_ESTABLISHED",
+  "formal_admission": "Three fresh formal M0 CAL processes under this exact policy; unchanged 0.2 pp AP limit",
+  "global_bitwise_determinism_claim": false,
+  "inference_runtime": {
+    "all_weight_is_krsc": true,
+    "spconv_allow_tf32": false,
+    "spconv_sources": {
+      "constants.py": "716366952ebffd209c12a36502c4f3a12f56095b05f5edc7ef034b86830cdb28",
+      "conv.py": "728e5eb2d90b449e05118893c833fc252e276d71fb307fd29c2488beb9670b9c",
+      "core_cc": "9d8c4d6f710033cef101e127844d3ff1b329d65c0eb9a8c3f37f44137e69f892"
+    },
+    "spconv_version": "2.3.8",
+    "torch_cuda": "12.6",
+    "torch_version": "2.6.0+cu126"
+  },
+  "intervention": "Stable FP32 segment_csr mean plus ConvAlgo.Native on sparse convolutions after original frozen weight loading; unchanged KRSC tensors and disabled TF32",
+  "namespace": "policies/native-stable-mean-v2",
+  "numerical_status": "NONBITWISE_POST_FIRST_STAGE_OUTPUTS_OBSERVED",
+  "original_results_preserved": true,
+  "policy_id": "native-stable-mean-v2",
+  "policy_implementation_commit": "e6bcb7f9d4e81bf78392d9a234dc6f2003bf8b92",
+  "policy_sources": {
+    "datasets/native_long_dataset.py": "5f78968d95000e1ac92e41d20b73f21127b7fb528947014e40148ede787cba20",
+    "datasets/pointcept_utils.py": "12dc773c74c1d2c28b0c1c0326633a3ce9b3527330648302c2c080e0883976e1",
+    "models/pointcept.py": "88945a48faf0edf949a7ff9ac0fea3d90cc431609569532bb5f221e1d4628007",
+    "models/revisit_prompt_native_numerics.py": "870a984a1e730e5e8557660a0f24576bfb692c3bbe8ea31ab7c8a541736c84ba",
+    "models/revisit_prompt_numerics.py": "6351af7ff038c0dd8b311474974d29cdbacb96c0409155056877f686940b1e55",
+    "models/scatter.py": "99ed4fc0e377fe57927cf31980f100428e6b8623f2caff05bba6d4f39aa85d20",
+    "scripts/continue_revisit_prompt_formal.py": "0a445e93b62cecfddcc390dffeb9d7ca26fa9d9b1926b85d3b748191147c6903",
+    "scripts/continue_revisit_prompt_native.py": "e2a5a36b4a143cccf1c0f8ec0fc8686ae8a5ce726f267c544480bf20331effc7",
+    "scripts/continue_revisit_prompt_policy.py": "741cee2d2528d561ec429cde44d0d03f614ef4c2ae966b58d9341ff071cfa68f",
+    "scripts/evaluate_revisit_prompt_native.py": "80f93ec4efec4f8293c243df0f877ebc9de6616150097eb9ea9db7d84d21055b",
+    "scripts/evaluate_revisit_prompt_policy.py": "59c772e498be45048ea786366f4b75c36c45e66d8653d349e98ed1b8015cc872",
+    "scripts/revisit_prompt_evaluation_policy.py": "a1af3d2c156d808ca1c8207798c320ad65566126393b1cd293d2c6c0beb55247",
+    "scripts/revisit_prompt_native_policy.py": "ac333ba340ebafd7efe4d1131576c403087f20913d4c9991c07766bbe3fb1dd4"
+  },
+  "prior_evaluation_policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912",
+  "schema": 2,
+  "scope": [
+    "CAL",
+    "SEL",
+    "PB",
+    "P5 inference"
+  ],
+  "status": "LOCKED",
+  "training_implementation_commit": "c472a4923c0418cd5ad02a47b6744b51e4e16922",
+  "training_numeric_sources": {
+    "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
+    "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
+    "models/rescene.py": "cb8008610dd248f4e9a80de924d6883e4ca0d41dda16801e9e1621ebe54def9b",
+    "models/revisit_prompt.py": "e8eb01f17f1c21caadf85db0b0820d7351043e913ccccc975dc590d1c6ac75ee",
+    "models/revisit_prompt_loss.py": "ea0aa0b36131e235a3f10a647852a7103e24d03391256aa6347b129983c762e6",
+    "models/revisit_prompt_modules.py": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
+    "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
+    "scripts/evaluate_revisit_prompt.py": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
+    "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
+    "scripts/revisit_prompt_campaign.py": "c7c06def3a089a220093b7335909d40ab3f258559b39b03e6f9519d064c33be3",
+    "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
+    "scripts/select_revisit_prompt.py": "2ab50193500a125f98388b31223adb80399cfd5d7582c4db1ff47eed09fabc03",
+    "scripts/train_revisit_prompt.py": "58dc60049a5f9fc0f5ebb2119b1597614d76a73c5cc916603f6467dda6c8456f",
+    "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d"
+  },
+  "training_run_lock_sha256": "c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5",
+  "training_unchanged": true
+}
