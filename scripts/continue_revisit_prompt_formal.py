@@ -15,7 +15,7 @@ from scripts.revisit_prompt_campaign import (
 )
 
 
-def fresh_m0_admission(assets):
+def fresh_m0_admission(assets, *, report_name="FRESH_M0_ADMISSION.json"):
     """Check fresh results without changing the inherited immutable RUN_LOCK."""
     expected = read_json(ARTIFACTS / "DATA_MANIFEST.json")["counts"]["CAL"]
     endpoint = dict(variant="M0", adapter_seed=146, step=0)
@@ -56,8 +56,8 @@ def fresh_m0_admission(assets):
     result = dict(status="ADMITTED" if epsilon <= .2 + 1e-12 else "BLOCKED_NUMERICAL_VARIANCE",
                   epsilon_run_pp=epsilon, limit_pp=.2, range_by_horizon_pp=ranges,
                   AP_by_repeat=repeats, evidence=evidence, updated_unix=time.time())
-    write_json_atomic(Path(assets["run_root"]) / "FRESH_M0_ADMISSION.json", result)
-    write_json_atomic(ARTIFACTS / "FRESH_M0_ADMISSION.json", result)
+    write_json_atomic(Path(assets["run_root"]) / report_name, result)
+    write_json_atomic(ARTIFACTS / report_name, result)
     return result
 
 

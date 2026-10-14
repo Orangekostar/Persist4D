@@ -76,3 +76,14 @@ def test_incomplete_fresh_population_never_admits(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="complete frozen CAL population"):
         controller.main()
     assert calls == []
+
+
+def test_policy_admission_preserves_original_failed_report(tmp_path, monkeypatch):
+    assets, _, _ = setup_completed_run(tmp_path, monkeypatch, [.5,.5,.5])
+    old = tmp_path / "FRESH_M0_ADMISSION.json"
+    old.write_text('{"status":"BLOCKED_NUMERICAL_VARIANCE","epsilon_run_pp":2.89}')
+    before = old.read_bytes()
+    admission = controller.fresh_m0_admission(assets, report_name="EVALUATION_M0_ADMISSION.json")
+    assert admission["status"] == "ADMITTED"
+    assert old.read_bytes() == before
+    assert (tmp_path / "EVALUATION_M0_ADMISSION.json").exists()
