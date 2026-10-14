@@ -1,0 +1,70 @@
+{
+  "admission_sha256": "22c10577d11669833b6796b3895a5f6800383284ae04ef6da30319c009f6a660",
+  "baseline_evidence": [
+    {
+      "repeat": 0,
+      "results_sha256": "bbdc61be8392442955398746958cdc26fa790f99f7cdb0efcb9dd29b1e8c202d"
+    },
+    {
+      "repeat": 1,
+      "results_sha256": "e61445d9d31543423af0ac8e4bbb01a93c4691462ac02dee6c8139c9969f2fbd"
+    },
+    {
+      "repeat": 2,
+      "results_sha256": "576ff5f143c3af7e09fd01a90af67245801621dcaf30c76f7afb3bdbb13a6527"
+    }
+  ],
+  "baseline_repeats": 3,
+  "epsilon_run_pp": 0.0,
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "inputs_per_repeat": 84,
+  "limit_pp": 0.2,
+  "main_checkpoints_unchanged": 24,
+  "original_large_outlier_root_cause": "NOT_ESTABLISHED",
+  "original_training_sources_unchanged": 14,
+  "rows": [
+    {
+      "AP": 0.42538589239120483,
+      "current_AP": 0.42538589239120483,
+      "horizon": 1
+    },
+    {
+      "AP": 0.27786120772361755,
+      "current_AP": 0.40421366691589355,
+      "horizon": 2
+    },
+    {
+      "AP": 0.1366797238588333,
+      "current_AP": 0.3825426995754242,
+      "horizon": 3
+    },
+    {
+      "AP": 0.12231989204883575,
+      "current_AP": 0.376890629529953,
+      "horizon": 4
+    },
+    {
+      "AP": 0.13514739274978638,
+      "current_AP": 0.431165874004364,
+      "horizon": 5
+    }
+  ],
+  "stage_comparisons": [
+    {
+      "raw_prediction_differences": 0,
+      "repeat": 1,
+      "stages": 197
+    },
+    {
+      "raw_prediction_differences": 0,
+      "repeat": 2,
+      "stages": 197
+    }
+  ],
+  "status": "FORMAL_POLICY_BASELINE_ADMITTED_AND_MAIN_EVALUATION_RUNNING",
+  "training_events": 6,
+  "updated_unix": 1791987334.339283
+}

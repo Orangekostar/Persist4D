@@ -33678,9 +33678,14 @@
     "parent_tensor_sha256_after": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
     "parent_unchanged": true
   },
-  "epsilon_run_pp": 0.05626976490020752,
+  "epsilon_run_pp": 0.0,
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
   "evidence_origin": "PREDECESSOR_P0_P1_UNMODIFIED_MODEL_DATA_TRAINING_AND_EVALUATION",
   "formal_training_started": false,
+  "fresh_policy_admission": "EVALUATION_M0_ADMISSION.json",
   "gradient_status": "SMOKE_COMPLETE_NOT_A_FORMAL_MODEL",
   "numeric_sources": {
     "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
@@ -33701,7 +33706,10 @@
   "numerical_admission": true,
   "numerical_status": "NONBITWISE_RUNTIME_OBSERVED",
   "official_repool_check": "OFFICIAL_REPOOL_CHECK.json",
+  "original_fresh_epsilon_run_pp": 2.888917922973633,
+  "original_large_outlier_root_cause": "NOT_ESTABLISHED",
   "predecessor_summary_sha256": "23eba70e508ba1d8f112a226233f791ca076976e72cd4a9184e4012b09effe8b",
   "root_cause": "NUMERICAL_ROOT_CAUSE_UNRESOLVED",
-  "status": "COMPLETE"
+  "status": "COMPLETE",
+  "training_preflight_epsilon_run_pp": 0.05626976490020752
 }
