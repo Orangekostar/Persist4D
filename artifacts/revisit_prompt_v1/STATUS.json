@@ -1,11 +1,6 @@
 {
   "code_status": "C3_TRAINING_WITH_SEPARATELY_LOCKED_NATIVE_EVALUATION_V2",
-  "completed_evaluation_tasks": [
-    "M0 CAL r0",
-    "M0 CAL r1",
-    "M0 CAL r2",
-    "M1 u100 CAL r0"
-  ],
+  "completed_evaluation_tasks": [],
   "completed_main_training_gpu_hours": 9.12422078314583,
   "completed_variant_steps": {
     "M1": 400,
@@ -52,6 +47,12 @@
   "policy_baseline_admission": "EVALUATION_M0_ADMISSION_V2.json",
   "policy_epsilon_run_pp": null,
   "previous_policy_status": {
+    "completed_evaluation_tasks": [
+      "M0 CAL r0",
+      "M0 CAL r1",
+      "M0 CAL r2",
+      "M1 u100 CAL r0"
+    ],
     "evaluation_namespace": "policies/stable-mean-v1",
     "evaluation_policy": {
       "policy_id": "stable-mean-v1",
