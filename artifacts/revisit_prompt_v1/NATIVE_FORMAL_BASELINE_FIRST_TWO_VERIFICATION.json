@@ -1,0 +1,34 @@
+{
+  "all_structure_summaries_equal": true,
+  "baseline_admission": "PENDING_THIRD_FORMAL_REPEAT",
+  "evaluation_policy": {
+    "policy_id": "native-stable-mean-v2",
+    "policy_sha256": "f502cbaf5a3e5035c01240db7eaa9239b5825662b639fa5b56d8c046cb7887b3"
+  },
+  "evidence": [
+    {
+      "repeat_index": 0,
+      "results_sha256": "68b52ef461bfee2e5a5a7ae97235de3856f97ff693d38e845811af6e638539f1",
+      "status_sha256": "1fc89080deff781b487d858aaa8647fcfdb024565098c8aacfafcefc21bb8a5d"
+    },
+    {
+      "repeat_index": 1,
+      "results_sha256": "aec0b24b0802b4e9831a0df94562e62bf30da1185dcbcc10a918982aeb08fa66",
+      "status_sha256": "c166ea2231a914833018661e2e24a2b1c51af58b7ecc94a2f443c40790771f26"
+    }
+  ],
+  "global_bitwise_determinism_claim": false,
+  "inputs_per_repeat": 84,
+  "max_AP_difference_pp": 0.0,
+  "max_current_AP_difference_pp": 0.0,
+  "raw_prediction_digest_differences": 0,
+  "repeats": [
+    0,
+    1
+  ],
+  "schema": 1,
+  "stages_per_repeat": 197,
+  "status": "FIRST_TWO_FORMAL_NATIVE_BASELINE_REPEATS_VERIFIED",
+  "training_and_policy_source_hashes_unchanged": true,
+  "verified_unix": 1792008436.047667
+}
