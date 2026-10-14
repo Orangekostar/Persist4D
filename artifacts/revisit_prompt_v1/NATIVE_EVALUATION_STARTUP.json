@@ -1,0 +1,24 @@
+{
+  "child_pid": 2138260,
+  "control_verification": "NATIVE_CAL_CONTROL_VERIFICATION.json",
+  "controller_pid": 2138018,
+  "cpu_tests_passed": 27,
+  "evaluation_namespace": "policies/native-stable-mean-v2",
+  "evaluation_policy": {
+    "policy_id": "native-stable-mean-v2",
+    "policy_sha256": "f502cbaf5a3e5035c01240db7eaa9239b5825662b639fa5b56d8c046cb7887b3"
+  },
+  "event_id": "mpr:P1:1792007282143358784",
+  "formal_main_updates_per_variant": 400,
+  "frozen_main_checkpoint_count": 24,
+  "frozen_main_variants": 6,
+  "job_key": "policy:native-stable-mean-v2:eval:M0:s146:u0:CAL:r0",
+  "monitor": "Existing GPT-5.6-Luna mechanical monitor with exact v2 mapping",
+  "phase": "P1",
+  "physical_gpu_index": 1,
+  "schema": 1,
+  "source_policy": "EVALUATION_POLICY_V2.json",
+  "status": "FORMAL_NATIVE_BASELINE_RUNNING",
+  "training_reused_without_retraining": true,
+  "verified_unix": 1792007367.9045448
+}
