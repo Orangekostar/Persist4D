@@ -30,7 +30,8 @@ def main():
                 ensure_job(assets, child_command(assets, "scripts.train_revisit_prompt",
                            "--variant", variant, "--seed", 146),
                            status_path=folder / "STATUS.json", phase="P2",
-                           job_key=f"train:{variant}:s146", training=True,
+                           job_key=assets.get("dispatch_job_keys", {}).get(variant, f"train:{variant}:s146"),
+                           training=True,
                            complete_status="COMPLETE")
             status.update(stage="FRESH_M0_CAL", current_variant="M0", updated_unix=time.time())
             write_json_atomic(status_path, status)
