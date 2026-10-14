@@ -1,0 +1,160 @@
+{
+  "AP_by_repeat": {
+    "AP": {
+      "1": [
+        0.42538589239120483,
+        0.42538589239120483,
+        0.42538589239120483
+      ],
+      "2": [
+        0.2942263185977936,
+        0.2942263185977936,
+        0.2942263185977936
+      ],
+      "3": [
+        0.13265207409858704,
+        0.13215625286102295,
+        0.13215625286102295
+      ],
+      "4": [
+        0.10920284688472748,
+        0.10920284688472748,
+        0.10920284688472748
+      ],
+      "5": [
+        0.12080151587724686,
+        0.12080151587724686,
+        0.12080151587724686
+      ]
+    },
+    "current_AP": {
+      "1": [
+        0.42538589239120483,
+        0.42538589239120483,
+        0.42538589239120483
+      ],
+      "2": [
+        0.40916240215301514,
+        0.40916240215301514,
+        0.40916240215301514
+      ],
+      "3": [
+        0.3840033710002899,
+        0.383026659488678,
+        0.38301917910575867
+      ],
+      "4": [
+        0.3741740584373474,
+        0.3742101192474365,
+        0.3742101192474365
+      ],
+      "5": [
+        0.4129144251346588,
+        0.4129144251346588,
+        0.4129144251346588
+      ]
+    }
+  },
+  "S_current_by_repeat": [
+    0.3903639515240987,
+    0.39005040129025775,
+    0.39004790782928467
+  ],
+  "S_current_range_pp": 0.03160436948140277,
+  "S_long_by_repeat": [
+    0.12088547895352046,
+    0.12072020520766576,
+    0.12072020520766576
+  ],
+  "S_long_range_pp": 0.01652737458547049,
+  "adapter_seed": 146,
+  "all_three_results_retained": true,
+  "checkpoint_sha256": "782e2b07900c96682b638c91560b92d8f025ecd0b30e5f1cf5a308b0d9f81d30",
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "evidence": [
+    {
+      "repeat": 0,
+      "results_sha256": "d3793524e6314a8f1f9a556375c6944ed90db260d91245a8707bd39dd29fea15"
+    },
+    {
+      "repeat": 1,
+      "results_sha256": "69834801dd61dc0c47c7cd33d308a45823879d318e7b8e2d5bf6cf8273388d93"
+    },
+    {
+      "repeat": 2,
+      "results_sha256": "6d482a6d7ec7dc25126549dca03617a9141bdbfde7866ca71842dc1930e1af11"
+    }
+  ],
+  "first_frame_differences_vs_M0": [
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 0
+    },
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 1
+    },
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 2
+    }
+  ],
+  "formal_policy_or_selection_rules_modified": false,
+  "inputs_per_repeat": 84,
+  "max_AP_range_pp": 0.04958212375640869,
+  "max_current_AP_range_pp": 0.098419189453125,
+  "range_pp": {
+    "AP": {
+      "1": 0.0,
+      "2": 0.0,
+      "3": 0.04958212375640869,
+      "4": 0.0,
+      "5": 0.0
+    },
+    "current_AP": {
+      "1": 0.0,
+      "2": 0.0,
+      "3": 0.098419189453125,
+      "4": 0.003606081008911133,
+      "5": 0.0
+    }
+  },
+  "raw_prediction_differences_vs_repeat0": {
+    "1": 112,
+    "2": 112
+  },
+  "registered_rule_scope": {
+    "baseline_admission": "0.2 pp limit is defined for M0 CAL AP range across T1-T5, not trained-endpoint current_AP",
+    "current_AP_observation": "Nonzero variation is retained; no claim of complete numerical determinism",
+    "seed147_replication_variance": "0.2 pp limit applies to selected candidate/control S_long repeat ranges"
+  },
+  "role": "CAL",
+  "scientific_status": "NUMERICAL_ROOT_CAUSE_UNRESOLVED_COMPLETE_MATRIX_REQUIRED",
+  "selected_endpoint_replication_variance_guard": {
+    "limit_pp": 0.2,
+    "pass_if_selected": true,
+    "scope": "Only if this endpoint becomes the locked candidate/control; final selection remains pending"
+  },
+  "stages_per_repeat": 197,
+  "status": "ENDPOINT_THREE_REPEATS_VERIFIED",
+  "step": 100,
+  "structure_summary_differences_vs_repeat0": {
+    "1": 0,
+    "2": 0
+  },
+  "structure_summary_fields_compared": [
+    "window_scan_ids",
+    "points",
+    "segments",
+    "current_points",
+    "state_bytes"
+  ],
+  "updated_unix": 1792001412.5122194,
+  "variant": "M3"
+}
