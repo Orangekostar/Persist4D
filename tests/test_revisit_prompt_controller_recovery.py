@@ -29,6 +29,7 @@ def _resource_blocked_run(tmp_path, monkeypatch, *, recovery):
     monkeypatch.setattr(controller, "local_assets", lambda: assets)
     monkeypatch.setattr(controller, "read_run_plan", lambda _: dict(N=400))
     monkeypatch.setattr(controller, "evaluate_endpoint", lambda *_: None)
+    monkeypatch.setattr(controller, "fresh_m0_admission", lambda _: dict(status="ADMITTED"))
     monkeypatch.setattr(controller, "run_campaign", lambda *_, **__: dict(
         experiment_status="COMPLETE", scientific_status="INCONCLUSIVE"))
 

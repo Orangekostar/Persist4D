@@ -1,5 +1,11 @@
 {
   "code_status": "REVIEWED_BUDGET_ONLY_AMENDMENT",
+  "completed_evaluation_tasks": [
+    "M0 CAL r0",
+    "M0 CAL r1",
+    "M0 CAL r2",
+    "M1 u100 CAL r0"
+  ],
   "completed_main_training_gpu_hours": 9.12422078314583,
   "completed_variant_steps": {
     "M1": 400,
@@ -17,23 +23,27 @@
     "M5",
     "M6"
   ],
+  "controller_alive": false,
   "controller_pid": 1453281,
   "current_variant": "M0",
-  "experiment_status": "FORMAL_EVALUATION_RUNNING",
+  "experiment_status": "FORMAL_EVALUATION_PAUSED_NUMERICAL_VARIANCE",
   "formal_N": 400,
   "formal_metrics_complete": false,
+  "fresh_M0_admission": "FRESH_M0_ADMISSION.json",
+  "fresh_M0_epsilon_run_pp": 2.888917922973633,
+  "fresh_M0_limit_pp": 0.2,
   "gpu_training_started": true,
   "main_training_complete": true,
   "main_training_verification": "MAIN_TRAINING_VERIFICATION.json",
-  "new_gpu_hours": 0.0,
-  "next_task": "Complete fresh M0 CAL and all formal checkpoint CAL; select only after the complete matrix",
+  "new_gpu_hours": 9.810202375618893,
+  "next_task": "Diagnose fresh baseline variance; preserve original repeats and all completed models; admit formal evaluations only under a verified numerical policy",
   "physical_gpu_index": 1,
   "publication_status": "NOT_PUBLISHED",
   "resource_recovery_record": "RESOURCE_RECOVERY_20261014.json",
   "schema": 1,
   "scientific_status": "INCONCLUSIVE",
-  "stage": "FRESH_M0_CAL",
-  "status": "RUNNING",
+  "stage": "NUMERICAL_DIAGNOSIS",
+  "status": "WAITING_NUMERICAL_RECHECK",
   "verified_optimizer_step": 400,
-  "verified_unix": 1791979919.1010602
+  "verified_unix": 1791982704.0327957
 }
