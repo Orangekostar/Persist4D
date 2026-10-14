@@ -1,0 +1,162 @@
+{
+  "AP_by_repeat": {
+    "AP": {
+      "1": [
+        0.42538589239120483,
+        0.4319714903831482,
+        0.42538589239120483
+      ],
+      "2": [
+        0.2779793441295624,
+        0.2699674367904663,
+        0.2779793441295624
+      ],
+      "3": [
+        0.13996712863445282,
+        0.12737040221691132,
+        0.13996712863445282
+      ],
+      "4": [
+        0.11701247096061707,
+        0.12381801009178162,
+        0.11701247096061707
+      ],
+      "5": [
+        0.13541291654109955,
+        0.17245346307754517,
+        0.13541291654109955
+      ]
+    },
+    "current_AP": {
+      "1": [
+        0.42538589239120483,
+        0.4319714903831482,
+        0.42538589239120483
+      ],
+      "2": [
+        0.4094283878803253,
+        0.41455957293510437,
+        0.4094283878803253
+      ],
+      "3": [
+        0.38153526186943054,
+        0.37957829236984253,
+        0.38153526186943054
+      ],
+      "4": [
+        0.37610524892807007,
+        0.37301403284072876,
+        0.37610524892807007
+      ],
+      "5": [
+        0.4265320599079132,
+        0.4700182378292084,
+        0.4265320599079132
+      ]
+    }
+  },
+  "S_current_by_repeat": [
+    0.39472419023513794,
+    0.4075368543465932,
+    0.39472419023513794
+  ],
+  "S_current_range_pp": 1.2812664111455263,
+  "S_long_by_repeat": [
+    0.13079750537872314,
+    0.14121395846207938,
+    0.13079750537872314
+  ],
+  "S_long_range_pp": 1.0416453083356232,
+  "adapter_seed": 146,
+  "all_three_results_retained": true,
+  "checkpoint_sha256": "a93e2b1f3f1e304805dbc0a900c75d1555f946a2816971a9425615cd438db5c7",
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "evidence": [
+    {
+      "repeat": 0,
+      "results_sha256": "800b9415628d68422b795150dfcfc9221e311ceb564b13133e417754bdd346d3"
+    },
+    {
+      "repeat": 1,
+      "results_sha256": "cd77b5762721878b52562d8eb158e391e6eacd39ff3e9723fc82394ddfc104de"
+    },
+    {
+      "repeat": 2,
+      "results_sha256": "159207b9c0875870629d2ea06bb99f733963deecc0b12b792c85095d6ed6e0a0"
+    }
+  ],
+  "first_frame_differences_vs_M0": [
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 0
+    },
+    {
+      "AP_difference_pp": 0.6585597991943359,
+      "current_AP_difference_pp": 0.6585597991943359,
+      "repeat": 1
+    },
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 2
+    }
+  ],
+  "first_frame_source_inspection": "M2 prompt/read hooks bypass changes when selected history slots are empty; no measured tensor-level cause established",
+  "formal_policy_or_selection_rules_modified": false,
+  "input_content_identity_status": "Formal population/request identities match; detailed input tensor hashes were not captured in these normal evaluations",
+  "inputs_per_repeat": 84,
+  "max_AP_range_pp": 3.7040546536445618,
+  "max_current_AP_range_pp": 4.348617792129517,
+  "range_pp": {
+    "AP": {
+      "1": 0.6585597991943359,
+      "2": 0.8011907339096069,
+      "3": 1.2596726417541504,
+      "4": 0.6805539131164551,
+      "5": 3.7040546536445618
+    },
+    "current_AP": {
+      "1": 0.6585597991943359,
+      "2": 0.5131185054779053,
+      "3": 0.19569694995880127,
+      "4": 0.30912160873413086,
+      "5": 4.348617792129517
+    }
+  },
+  "raw_prediction_differences_vs_repeat0": {
+    "1": 197,
+    "2": 0
+  },
+  "registered_rule_scope": {
+    "baseline_admission": "0.2 pp limit is defined for M0 CAL AP range across T1-T5, not trained-endpoint current_AP",
+    "current_AP_observation": "Nonzero variation is retained; no claim of complete numerical determinism",
+    "seed147_replication_variance": "0.2 pp limit applies to selected candidate/control S_long repeat ranges"
+  },
+  "role": "CAL",
+  "scientific_status": "NUMERICAL_ROOT_CAUSE_UNRESOLVED_COMPLETE_MATRIX_REQUIRED",
+  "selected_endpoint_replication_variance_guard": {
+    "limit_pp": 0.2,
+    "pass_if_selected": false,
+    "scope": "Only if this endpoint becomes the locked candidate/control; final selection remains pending"
+  },
+  "stages_per_repeat": 197,
+  "status": "ENDPOINT_COMPLETE_NUMERICAL_VARIANCE_OBSERVED",
+  "step": 100,
+  "structure_summary_differences_vs_repeat0": {
+    "1": 0,
+    "2": 0
+  },
+  "structure_summary_fields_compared": [
+    "window_scan_ids",
+    "points",
+    "segments",
+    "current_points",
+    "state_bytes"
+  ],
+  "updated_unix": 1791995494.1754646,
+  "variant": "M2"
+}
