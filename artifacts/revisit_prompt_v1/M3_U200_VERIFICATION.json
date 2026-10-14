@@ -1,0 +1,176 @@
+{
+  "AP_by_repeat": {
+    "AP": {
+      "1": [
+        0.42538589239120483,
+        0.42538589239120483,
+        0.4304884374141693
+      ],
+      "2": [
+        0.2730087637901306,
+        0.2730087637901306,
+        0.26525169610977173
+      ],
+      "3": [
+        0.14071251451969147,
+        0.14070825278759003,
+        0.13090112805366516
+      ],
+      "4": [
+        0.08758534491062164,
+        0.08758534491062164,
+        0.10113048553466797
+      ],
+      "5": [
+        0.15488412976264954,
+        0.15488412976264954,
+        0.12916094064712524
+      ]
+    },
+    "current_AP": {
+      "1": [
+        0.42538589239120483,
+        0.42538589239120483,
+        0.4304884374141693
+      ],
+      "2": [
+        0.4025919437408447,
+        0.4025919437408447,
+        0.4170251488685608
+      ],
+      "3": [
+        0.37852200865745544,
+        0.3799426257610321,
+        0.393525093793869
+      ],
+      "4": [
+        0.3696269392967224,
+        0.3696269392967224,
+        0.3736899197101593
+      ],
+      "5": [
+        0.44580501317977905,
+        0.44580501317977905,
+        0.4176800847053528
+      ]
+    }
+  },
+  "S_current_by_repeat": [
+    0.39798465371131897,
+    0.39845819274584454,
+    0.3949650327364604
+  ],
+  "S_current_range_pp": 0.3493160009384155,
+  "S_long_by_repeat": [
+    0.12772732973098755,
+    0.1277259091536204,
+    0.12039751807848613
+  ],
+  "S_long_range_pp": 0.7329811652501419,
+  "adapter_seed": 146,
+  "all_three_results_retained": true,
+  "checkpoint_sha256": "083be8dea6e48044588fce6844a98d0df946b491e87b4127124a95c63f7a41bb",
+  "cross_variant_first_stage_observation": {
+    "H1_inputs_compared": 31,
+    "compared_result_paths": [
+      "evaluation/M3-s146-u000200/CAL/repeat2/RESULTS.json",
+      "evaluation/M2-s146-u000300/CAL/repeat2/RESULTS.json"
+    ],
+    "compared_results_sha256": [
+      "5c644722bb72b47fede0ef95c6dc5267ca949640333dd258eaa9337fee9c0805",
+      "f99892b5fa652e4b24ca4e07c84ce23166af23cd4ca43bf484a12bdc1fd56129"
+    ],
+    "first_stages_compared": 84,
+    "interpretation": "Same alternative first-stage output pattern across two variants; causal origin remains unestablished. No claim of a method gain or deterministic runtime.",
+    "matching_H1_first_stage_raw_prediction_hashes": 31,
+    "matching_first_stage_raw_prediction_hashes": 84
+  },
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "evidence": [
+    {
+      "repeat": 0,
+      "results_sha256": "5ec486e0a01fc3dd79ae5b8d984480ad2e535a22521ee1c02e561e9433c83966"
+    },
+    {
+      "repeat": 1,
+      "results_sha256": "c42415cf9b99254fd8a95af452f503a73867c227ec929d947ed3cc13cccb9d01"
+    },
+    {
+      "repeat": 2,
+      "results_sha256": "5c644722bb72b47fede0ef95c6dc5267ca949640333dd258eaa9337fee9c0805"
+    }
+  ],
+  "first_frame_differences_vs_M0": [
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 0
+    },
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 1
+    },
+    {
+      "AP_difference_pp": 0.5102545022964478,
+      "current_AP_difference_pp": 0.5102545022964478,
+      "repeat": 2
+    }
+  ],
+  "formal_policy_or_selection_rules_modified": false,
+  "input_ids_match_formal_M0": true,
+  "inputs_per_repeat": 84,
+  "max_AP_range_pp": 2.572318911552429,
+  "max_current_AP_range_pp": 2.812492847442627,
+  "range_pp": {
+    "AP": {
+      "1": 0.5102545022964478,
+      "2": 0.7757067680358887,
+      "3": 0.9811386466026306,
+      "4": 1.3545140624046326,
+      "5": 2.572318911552429
+    },
+    "current_AP": {
+      "1": 0.5102545022964478,
+      "2": 1.4433205127716064,
+      "3": 1.5003085136413574,
+      "4": 0.40629804134368896,
+      "5": 2.812492847442627
+    }
+  },
+  "raw_prediction_differences_vs_repeat0": {
+    "1": 113,
+    "2": 197
+  },
+  "registered_rule_scope": {
+    "baseline_admission": "0.2 pp limit is defined for M0 CAL AP range across T1-T5, not trained-endpoint current_AP",
+    "current_AP_observation": "Nonzero variation is retained; no claim of complete numerical determinism",
+    "seed147_replication_variance": "0.2 pp limit applies to selected candidate/control S_long repeat ranges"
+  },
+  "role": "CAL",
+  "scientific_status": "NUMERICAL_ROOT_CAUSE_UNRESOLVED_COMPLETE_MATRIX_REQUIRED",
+  "selected_endpoint_replication_variance_guard": {
+    "limit_pp": 0.2,
+    "pass_if_selected": false,
+    "scope": "Only if this endpoint becomes the locked candidate/control; final selection remains pending"
+  },
+  "stages_per_repeat": 197,
+  "status": "ENDPOINT_COMPLETE_NUMERICAL_VARIANCE_OBSERVED",
+  "step": 200,
+  "structure_summary_differences_vs_repeat0": {
+    "1": 0,
+    "2": 0
+  },
+  "structure_summary_fields_compared": [
+    "window_scan_ids",
+    "points",
+    "segments",
+    "current_points",
+    "state_bytes"
+  ],
+  "updated_unix": 1792002902.5534427,
+  "variant": "M3"
+}
