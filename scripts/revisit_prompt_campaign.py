@@ -471,7 +471,8 @@ def forecast_cost_plan(budget, pilots, evaluation, manifest):
     if any(pilots[v]["update_seconds"] <= 0 for v in variants) or evaluation["seconds_per_stage"] <= 0:
         raise ValueError("real optimizer and evaluation costs must be positive")
     b = float(budget["new_cap_gpu_hours"])
-    if not 0 <= b <= 78:
+    pool_cap = float(budget.get("authorized_pool_cap_gpu_hours", 78.))
+    if not math.isfinite(pool_cap) or pool_cap <= 0 or not 0 <= b <= pool_cap:
         raise ValueError("new research pool exceeds the authorized cap")
     def evaluation_seconds(role):
         counts = manifest["counts"][role]
@@ -505,8 +506,10 @@ def available_budget(root, plan, *, phase):
     budget, caps = plan["budget"], plan["phase_caps_gpu_hours"]
     prior, lifetime, new, reserve = (float(budget[k]) for k in
         ("prior_gpu_hours", "lifetime_cap_gpu_hours", "new_cap_gpu_hours", "reserve_gpu_hours"))
-    if (not all(math.isfinite(x) and x >= 0 for x in (prior, lifetime, new, reserve))
-            or new > min(78., max(0., lifetime-prior-reserve))+1e-9
+    pool_cap = float(budget.get("authorized_pool_cap_gpu_hours", 78.))
+    if (not math.isfinite(pool_cap) or pool_cap <= 0
+            or not all(math.isfinite(x) and x >= 0 for x in (prior, lifetime, new, reserve))
+            or new > min(pool_cap, max(0., lifetime-prior-reserve))+1e-9
             or set(caps) != {f"P{i}" for i in range(6)}
             or any(not math.isfinite(float(v)) or v < 0 for v in caps.values())
             or sum(caps.values()) > new+1e-9 or phase not in caps):
