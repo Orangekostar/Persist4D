@@ -1,0 +1,91 @@
+{
+  "diagnostic_only": true,
+  "evidence": [
+    {
+      "probe": 0,
+      "result_sha256": "f0af8728363a4d1c80fbfee18892ba5d1a247a043f9f289fecefc3fb455cd9eb",
+      "status_sha256": "633665034b19d5af37bfc8268d55d7c9013bc569b3bd1e2015a4463493236647",
+      "tensors_sha256": "a540a1f660925b5015aa14c66d45539db31aad37c4bec5d88234c4e35d918482"
+    },
+    {
+      "probe": 1,
+      "result_sha256": "6abc52df1d248399c9fd82530e915bbec3f615bb7aa35268eb3c99e6c6db5c61",
+      "status_sha256": "ee5789c8c0d6859517f7fca8c9f4eec948f59ce9abb63d83352de03f4cc1e658",
+      "tensors_sha256": "b97a4466903563e1df60a5d65c9cc81f6e14aca27c96d0d1257cfd826a8ed645"
+    },
+    {
+      "probe": 2,
+      "result_sha256": "7ee6b7b696d0ff62c33f39c47a44170a261a2a2e629e4f421b36b76de5ebc3d8",
+      "status_sha256": "c0387f4ec65a2873c7aed1d7be1e083223602653771d217827cb41873d03b9a6",
+      "tensors_sha256": "3f43d62541ed56e6c8770101b482255e50fb08707c3f8c73225815fcb281f216"
+    },
+    {
+      "probe": 3,
+      "result_sha256": "7ee6b7b696d0ff62c33f39c47a44170a261a2a2e629e4f421b36b76de5ebc3d8",
+      "status_sha256": "4405a9359bc26ca0686669709c5f87b83f2ddbcceaca86ee8b996c3ccc4d8d05",
+      "tensors_sha256": "3f43d62541ed56e6c8770101b482255e50fb08707c3f8c73225815fcb281f216"
+    },
+    {
+      "probe": 4,
+      "result_sha256": "dcf630f706e019530f843fb6728cf50f7b347af637a4761d6244e70cb45be812",
+      "status_sha256": "509c925ae7de2ef7dde255c57bc9b30249f3485b0686386d1a5079eb8dc973ed",
+      "tensors_sha256": "55cf72dc73313e50fa14f628ad9cbc9862d00eb5202716fe97b02f160a841f8f"
+    },
+    {
+      "probe": 5,
+      "result_sha256": "3461d99d79a301d4cd85a48b977e19824f322a94e5f48681d381798dbe968eee",
+      "status_sha256": "6b6f972aac3e97b3c6ea529016c546ba5ed665d42be3ebed9b6189ebe495d2c5",
+      "tensors_sha256": "f72f43145699d69b28ed3c9e9e7616a2b3784c396dc32b4fd4a5df5c3fe477eb"
+    },
+    {
+      "probe": 6,
+      "result_sha256": "3461d99d79a301d4cd85a48b977e19824f322a94e5f48681d381798dbe968eee",
+      "status_sha256": "31152e5f4ab76796431af2fb4a03520176f1e6a7777f34265339edeed70d529b",
+      "tensors_sha256": "f72f43145699d69b28ed3c9e9e7616a2b3784c396dc32b4fd4a5df5c3fe477eb"
+    },
+    {
+      "probe": 7,
+      "result_sha256": "3461d99d79a301d4cd85a48b977e19824f322a94e5f48681d381798dbe968eee",
+      "status_sha256": "26587b56b4876e7463d22a22895be93cf10e0833bc8545030f8f50c44206c0bc",
+      "tensors_sha256": "f72f43145699d69b28ed3c9e9e7616a2b3784c396dc32b4fd4a5df5c3fe477eb"
+    }
+  ],
+  "exact_low_level_kernel_cause": "NOT_ESTABLISHED",
+  "first_divergent_capture_index": 1,
+  "first_divergent_measured_operator": "enc.enc0.block0.cpe.0 (spconv SubMConv3d)",
+  "first_operator_max_abs": 6.556510925292969e-07,
+  "full_native_CAL_controls": "PENDING",
+  "global_determinism_claim": false,
+  "input_and_rng_evidence_probes": [
+    2,
+    4
+  ],
+  "native_controls": {
+    "all_capture_summaries_equal": true,
+    "all_saved_tensor_summaries_equal": true,
+    "capture_count": 95,
+    "probes": [
+      5,
+      6,
+      7
+    ],
+    "raw_prediction_sha256": "9ac5775353131a084f50a586129bc24983560a7ef6bf38837d5e26a09a808953"
+  },
+  "official_results_replaced": false,
+  "parent_tensor_sha256": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
+  "probe_event_ids": [
+    "mpr:P0:1792004997570036506",
+    "mpr:P0:1792005019130196054",
+    "mpr:P0:1792005208122052891",
+    "mpr:P0:1792005233591801685",
+    "mpr:P0:1792005257631643873",
+    "mpr:P0:1792005477950880030",
+    "mpr:P0:1792005503321619699",
+    "mpr:P0:1792005526742427265"
+  ],
+  "probe_gpu_hours": 0.05266511957832942,
+  "same_inputs_rng_and_frozen_state": true,
+  "schema": 1,
+  "status": "OPERATOR_BOUNDARY_AND_SINGLE_INPUT_INTERVENTION_VERIFIED",
+  "updated_unix": 1792006094.5261126
+}

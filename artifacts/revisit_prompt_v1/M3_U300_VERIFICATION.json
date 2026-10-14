@@ -1,0 +1,161 @@
+{
+  "AP_by_repeat": {
+    "AP": {
+      "1": [
+        0.4304884374141693,
+        0.4326806664466858,
+        0.42538589239120483
+      ],
+      "2": [
+        0.2754582464694977,
+        0.25317734479904175,
+        0.2787666618824005
+      ],
+      "3": [
+        0.1306062936782837,
+        0.12429820746183395,
+        0.1320675164461136
+      ],
+      "4": [
+        0.11899014562368393,
+        0.11483585089445114,
+        0.11790796369314194
+      ],
+      "5": [
+        0.12685735523700714,
+        0.17478740215301514,
+        0.0812496766448021
+      ]
+    },
+    "current_AP": {
+      "1": [
+        0.4304884374141693,
+        0.4326806664466858,
+        0.42538589239120483
+      ],
+      "2": [
+        0.40237486362457275,
+        0.4001203775405884,
+        0.3985331952571869
+      ],
+      "3": [
+        0.3798624277114868,
+        0.38210898637771606,
+        0.3619253635406494
+      ],
+      "4": [
+        0.3774093985557556,
+        0.3790024220943451,
+        0.3681749403476715
+      ],
+      "5": [
+        0.4259389638900757,
+        0.42846256494522095,
+        0.4409973919391632
+      ]
+    }
+  },
+  "S_current_by_repeat": [
+    0.394403596719106,
+    0.3965246578057607,
+    0.3903658986091614
+  ],
+  "S_current_range_pp": 0.6158759196599306,
+  "S_long_by_repeat": [
+    0.12548459817965826,
+    0.13797382016976675,
+    0.11040838559468587
+  ],
+  "S_long_range_pp": 2.7565434575080885,
+  "adapter_seed": 146,
+  "all_three_results_retained": true,
+  "checkpoint_sha256": "5a02d4da45ef77683418a32080b256574c9a8ab7e572653e0f8577aa10fe9dd9",
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "evidence": [
+    {
+      "repeat": 0,
+      "results_sha256": "d712f797bae3a5171b45226e83f2669c3016a925a4d77a98963702394d743e90"
+    },
+    {
+      "repeat": 1,
+      "results_sha256": "701714d19a5c2d0c894bd818c365afa2698d1226b8c929ffcb1543639dd01182"
+    },
+    {
+      "repeat": 2,
+      "results_sha256": "707e67651980a00441ec6623b517aaa46ac21174ae2959843d255a763715bb87"
+    }
+  ],
+  "first_frame_differences_vs_M0": [
+    {
+      "AP_difference_pp": 0.5102545022964478,
+      "current_AP_difference_pp": 0.5102545022964478,
+      "repeat": 0
+    },
+    {
+      "AP_difference_pp": 0.7294774055480957,
+      "current_AP_difference_pp": 0.7294774055480957,
+      "repeat": 1
+    },
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 2
+    }
+  ],
+  "formal_policy_or_selection_rules_modified": false,
+  "input_ids_match_formal_M0": true,
+  "inputs_per_repeat": 84,
+  "max_AP_range_pp": 9.353772550821304,
+  "max_current_AP_range_pp": 2.018362283706665,
+  "range_pp": {
+    "AP": {
+      "1": 0.7294774055480957,
+      "2": 2.5589317083358765,
+      "3": 0.7769308984279633,
+      "4": 0.4154294729232788,
+      "5": 9.353772550821304
+    },
+    "current_AP": {
+      "1": 0.7294774055480957,
+      "2": 0.3841668367385864,
+      "3": 2.018362283706665,
+      "4": 1.0827481746673584,
+      "5": 1.5058428049087524
+    }
+  },
+  "raw_prediction_differences_vs_repeat0": {
+    "1": 197,
+    "2": 197
+  },
+  "registered_rule_scope": {
+    "baseline_admission": "0.2 pp limit is defined for M0 CAL AP range across T1-T5, not trained-endpoint current_AP",
+    "current_AP_observation": "Nonzero variation is retained; no claim of complete numerical determinism",
+    "seed147_replication_variance": "0.2 pp limit applies to selected candidate/control S_long repeat ranges"
+  },
+  "role": "CAL",
+  "scientific_status": "NUMERICAL_ROOT_CAUSE_UNRESOLVED_COMPLETE_MATRIX_REQUIRED",
+  "selected_endpoint_replication_variance_guard": {
+    "limit_pp": 0.2,
+    "pass_if_selected": false,
+    "scope": "Only if this endpoint becomes the locked candidate/control; final selection remains pending"
+  },
+  "stages_per_repeat": 197,
+  "status": "ENDPOINT_COMPLETE_NUMERICAL_VARIANCE_OBSERVED",
+  "step": 300,
+  "structure_summary_differences_vs_repeat0": {
+    "1": 0,
+    "2": 0
+  },
+  "structure_summary_fields_compared": [
+    "window_scan_ids",
+    "points",
+    "segments",
+    "current_points",
+    "state_bytes"
+  ],
+  "updated_unix": 1792004404.2573314,
+  "variant": "M3"
+}
