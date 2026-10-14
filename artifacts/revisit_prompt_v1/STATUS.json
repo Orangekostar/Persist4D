@@ -1,26 +1,39 @@
 {
   "code_status": "REVIEWED_BUDGET_ONLY_AMENDMENT",
+  "completed_main_training_gpu_hours": 9.12422078314583,
   "completed_variant_steps": {
     "M1": 400,
-    "M2": 400
+    "M2": 400,
+    "M3": 400,
+    "M4": 400,
+    "M5": 400,
+    "M6": 400
   },
   "completed_variants": [
     "M1",
-    "M2"
+    "M2",
+    "M3",
+    "M4",
+    "M5",
+    "M6"
   ],
   "controller_pid": 1453281,
-  "current_variant": "M3",
-  "experiment_status": "FORMAL_TRAINING_RUNNING",
+  "current_variant": "M0",
+  "experiment_status": "FORMAL_EVALUATION_RUNNING",
   "formal_N": 400,
+  "formal_metrics_complete": false,
   "gpu_training_started": true,
+  "main_training_complete": true,
+  "main_training_verification": "MAIN_TRAINING_VERIFICATION.json",
   "new_gpu_hours": 0.0,
-  "next_task": "Complete six main formal trajectories, fresh M0 CAL, then full locked evaluation and selection",
+  "next_task": "Complete fresh M0 CAL and all formal checkpoint CAL; select only after the complete matrix",
   "physical_gpu_index": 1,
   "publication_status": "NOT_PUBLISHED",
   "resource_recovery_record": "RESOURCE_RECOVERY_20261014.json",
   "schema": 1,
   "scientific_status": "INCONCLUSIVE",
+  "stage": "FRESH_M0_CAL",
   "status": "RUNNING",
-  "verified_optimizer_step": 8,
-  "verified_unix": 1791957851.0780528
+  "verified_optimizer_step": 400,
+  "verified_unix": 1791979919.1010602
 }
