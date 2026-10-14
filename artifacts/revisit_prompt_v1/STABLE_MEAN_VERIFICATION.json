@@ -1,0 +1,73 @@
+{
+  "comparisons": [
+    {
+      "dense_differences": 0,
+      "input_differences": 0,
+      "occupied_differences": 0,
+      "position_differences": 0,
+      "raw_differences": 0,
+      "repeat": 1,
+      "stages": 197
+    },
+    {
+      "dense_differences": 0,
+      "input_differences": 0,
+      "occupied_differences": 0,
+      "position_differences": 0,
+      "raw_differences": 0,
+      "repeat": 2,
+      "stages": 197
+    }
+  ],
+  "epsilon_run_pp": 0.0,
+  "evidence": [
+    {
+      "repeat": 0,
+      "results_sha256": "7cdde660ca611b7bc8b3377bcb6cb433190b7af238d50bae142d86e700f5fabe",
+      "status_sha256": "36178a50d6d6de4c3f11cd42c3f223d597ce607dcc00d9456aba87449832dd0c"
+    },
+    {
+      "repeat": 1,
+      "results_sha256": "7cdde660ca611b7bc8b3377bcb6cb433190b7af238d50bae142d86e700f5fabe",
+      "status_sha256": "a9a86c352f2edc733f8c29c792ede6dc552496a2598688fe4f45c309e2583a73"
+    },
+    {
+      "repeat": 2,
+      "results_sha256": "7cdde660ca611b7bc8b3377bcb6cb433190b7af238d50bae142d86e700f5fabe",
+      "status_sha256": "8904a449a7c79f85cab7a64b4e3d3066880b147422d2a5854396e2bbab7684e4"
+    }
+  ],
+  "formal_admission": "REQUIRES_THREE_FRESH_FORMAL_REPEATS_UNDER_HASHED_POLICY",
+  "intervention": "Stable sort and segment_csr FP32 mean; original weights, seeds, precision and global determinism settings unchanged",
+  "limit_pp": 0.2,
+  "original_large_outlier_root_cause": "NOT_ESTABLISHED",
+  "rows": [
+    {
+      "AP": 0.42538589239120483,
+      "current_AP": 0.42538589239120483,
+      "horizon": 1
+    },
+    {
+      "AP": 0.27786120772361755,
+      "current_AP": 0.40421366691589355,
+      "horizon": 2
+    },
+    {
+      "AP": 0.1366797238588333,
+      "current_AP": 0.3825426995754242,
+      "horizon": 3
+    },
+    {
+      "AP": 0.12231989204883575,
+      "current_AP": 0.376890629529953,
+      "horizon": 4
+    },
+    {
+      "AP": 0.13514739274978638,
+      "current_AP": 0.431165874004364,
+      "horizon": 5
+    }
+  ],
+  "status": "THREE_CONTROL_REPLAYS_VERIFIED",
+  "updated_unix": 1791984628.1068177
+}
