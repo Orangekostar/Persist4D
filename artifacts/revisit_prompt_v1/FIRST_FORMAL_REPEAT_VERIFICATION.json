@@ -1,0 +1,42 @@
+{
+  "AP_rows_identical_to_control": true,
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "formal_admission_complete": false,
+  "inputs": 84,
+  "occupied_differences_vs_control": 0,
+  "raw_prediction_differences_vs_control": 0,
+  "results_sha256": "bbdc61be8392442955398746958cdc26fa790f99f7cdb0efcb9dd29b1e8c202d",
+  "rows": [
+    {
+      "AP": 0.42538589239120483,
+      "current_AP": 0.42538589239120483,
+      "horizon": 1
+    },
+    {
+      "AP": 0.27786120772361755,
+      "current_AP": 0.40421366691589355,
+      "horizon": 2
+    },
+    {
+      "AP": 0.1366797238588333,
+      "current_AP": 0.3825426995754242,
+      "horizon": 3
+    },
+    {
+      "AP": 0.12231989204883575,
+      "current_AP": 0.376890629529953,
+      "horizon": 4
+    },
+    {
+      "AP": 0.13514739274978638,
+      "current_AP": 0.431165874004364,
+      "horizon": 5
+    }
+  ],
+  "stages": 197,
+  "status": "FIRST_FORMAL_POLICY_REPEAT_VERIFIED",
+  "updated_unix": 1791986250.8973444
+}
