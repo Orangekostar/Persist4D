@@ -1,18 +1,24 @@
 {
-  "N": null,
-  "baseline_repeats": 3,
+  "N": 400,
   "budget": {
-    "authorization": "user instruction; original cap and audited predecessor receipt",
+    "authorization": "2026-10-14 user: \u4ec0\u4e48\u9884\u7b97\u89c4\u5219\u5bfc\u81f4\u7684\uff0c\u5982\u679c\u4f60\u8ba4\u4e3a\u8bad\u7ec3\u6709\u610f\u4e49\u5c31\u76f4\u63a5\u542f\u52a8\u8bad\u7ec3",
+    "authorized_pool_cap_gpu_hours": 100.0,
     "historical_cost_sha256": "3e4bf6633bf7510a67f27891157be46264f6eea5f1066a3876b43dea53bb5e92",
     "historical_ledger_sha256": "aab9929b5af57182afc57a53c5cd7d94f6ecbf8bf45f0e869a1a0bbbc6ea5387",
-    "lifetime_cap_gpu_hours": 1800,
-    "new_cap_gpu_hours": 78.0,
-    "prior_gpu_hours": 1713.8830547291614,
+    "lifetime_cap_gpu_hours": 1823.0,
+    "new_cap_gpu_hours": 100.0,
+    "predecessor_mpr_gpu_hours": 0.9310066865094472,
+    "predecessor_mpr_ledger_sha256": "2d2c6975d6722ca312cd50eda9d1616b70ba34c3fa06d283a5bbf061a698c3c6",
+    "prior_gpu_hours": 1714.8140614156707,
     "reserve_gpu_hours": 8.0
   },
-  "cap_P2_available_gpu_hours": 4.621674756945126,
-  "checkpoint_steps": [],
-  "epsilon_run_pp": 0.05626976490020752,
+  "cap_P2_available_gpu_hours": 23.23705937232974,
+  "checkpoint_steps": [
+    100,
+    200,
+    300,
+    400
+  ],
   "forecast_policy": "training max six timed updates x1.25; evaluation full populations x1.5; startup included",
   "measured_evaluation": {
     "seconds_per_input": 4.547738039261839,
@@ -133,7 +139,7 @@
       "warmup_updates": 2
     }
   },
-  "minimum_additional_gpu_hours": 15.450310992607598,
+  "minimum_additional_gpu_hours": 0.0,
   "numeric_sources": {
     "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
     "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
@@ -144,21 +150,23 @@
     "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
     "scripts/evaluate_revisit_prompt.py": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
     "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
-    "scripts/revisit_prompt_campaign.py": "c21c87b87eac61e0cc94f75997ecbf1c8cb83219fd1ab02dce0718e121633939",
+    "scripts/revisit_prompt_campaign.py": "c7c06def3a089a220093b7335909d40ab3f258559b39b03e6f9519d064c33be3",
     "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
     "scripts/select_revisit_prompt.py": "2ab50193500a125f98388b31223adb80399cfd5d7582c4db1ff47eed09fabc03",
     "scripts/train_revisit_prompt.py": "58dc60049a5f9fc0f5ebb2119b1597614d76a73c5cc916603f6467dda6c8456f",
     "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d"
   },
   "phase_caps_gpu_hours": {
-    "P0": 4.0,
-    "P1": 4.0,
-    "P2": 4.621674756945126,
+    "P0": 5.128205128205129,
+    "P1": 5.128205128205129,
+    "P2": 23.23705937232974,
     "P3": 26.299599797399132,
     "P4": 35.07872544565574,
-    "P5": 4.0
+    "P5": 5.128205128205129
   },
-  "status": "BLOCKED_FULL_MATRIX_BUDGET",
+  "pilot_source": "PREDECESSOR_MEASURED_COST_ONLY",
+  "predecessor_run_lock_sha256": "aec9d04d4a571f6718ce7c3d99414255176d96a6a69ce8c194cb2e8c979ce7e0",
+  "status": "LOCKABLE",
   "training_estimates_gpu_hours": {
     "1200": 60.12021816816302,
     "1600": 80.14433437746816,

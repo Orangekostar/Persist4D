@@ -1,86 +1,16 @@
 {
-  "active_cost_unsettled": false,
-  "adapter_seeds": [
-    146,
-    147
-  ],
-  "code_status": "IMPLEMENTED_P0_P1_VERIFIED_FORMAL_STAGES_NOT_EXECUTED",
-  "completed": [
-    "P0 current-source 3-update M6 gradient/freeze and 12 fresh-process probes",
-    "P1 three complete 84-input M0 CAL processes",
-    "P1 six real eight-update connectivity/cost pilots",
-    "30 saved official pooled states independently repooled exactly",
-    "Full-matrix cost admission evaluated: minimum N400 does not fit"
-  ],
-  "cost_event_count": 46,
-  "cpu_verified": [
-    "exact parent task and encoder construction for M0 through M6",
-    "specified new parameter counts",
-    "untrained M4 parent/encoder/delta tensor reconstruction",
-    "native causal CAL/PB data replay",
-    "selector: 15 cases passed",
-    "training/evaluation/publishing help and honest pilot/baseline/publication dry-runs",
-    "official reference-state pooling matches direct accumulation and preserves duplicate bootstrap clusters",
-    "CPU private initialization avoids CUDA seeding calls and preserves the CPU generator",
-    "seed147 CLI preserves the main locks and snapshots its input CSV"
-  ],
-  "current_numeric_sources": {
-    "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
-    "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
-    "models/rescene.py": "cb8008610dd248f4e9a80de924d6883e4ca0d41dda16801e9e1621ebe54def9b",
-    "models/revisit_prompt.py": "e8eb01f17f1c21caadf85db0b0820d7351043e913ccccc975dc590d1c6ac75ee",
-    "models/revisit_prompt_loss.py": "ea0aa0b36131e235a3f10a647852a7103e24d03391256aa6347b129983c762e6",
-    "models/revisit_prompt_modules.py": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
-    "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
-    "scripts/evaluate_revisit_prompt.py": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
-    "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
-    "scripts/revisit_prompt_campaign.py": "c21c87b87eac61e0cc94f75997ecbf1c8cb83219fd1ab02dce0718e121633939",
-    "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
-    "scripts/select_revisit_prompt.py": "2ab50193500a125f98388b31223adb80399cfd5d7582c4db1ff47eed09fabc03",
-    "scripts/train_revisit_prompt.py": "58dc60049a5f9fc0f5ebb2119b1597614d76a73c5cc916603f6467dda6c8456f",
-    "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d"
-  },
-  "current_source_actual_P0_P1_updates": 51,
-  "experiment_status": "BLOCKED_FULL_MATRIX_BUDGET",
-  "failed_cost_event_count": 9,
-  "formal_N": null,
-  "formal_models_produced": false,
-  "formal_training_started": false,
-  "formal_training_steps": 0,
-  "gpu_training_scope": "P0 3 M6 smoke updates plus P1 8 updates per M1-M6; connectivity and cost only",
+  "code_status": "REVIEWED_BUDGET_ONLY_AMENDMENT",
+  "controller_pid": 816960,
+  "current_variant": "M1",
+  "experiment_status": "FORMAL_TRAINING_RUNNING",
+  "formal_N": 400,
   "gpu_training_started": true,
-  "hypothesis_status": {
-    "H1": "NOT_ESTABLISHED",
-    "H2": "NOT_AVAILABLE_MOVING_SUBSET",
-    "H3": "NOT_ESTABLISHED"
-  },
-  "implementation_commit": "c880ba7912a9ac8e416ba4ed3ca98474111409fc",
-  "lifetime_gpu_hours": 1714.8140614156707,
-  "new_gpu_hours": 0.9310066865094472,
-  "new_pool_remaining_gpu_hours": 77.06899331349055,
-  "next_direction": "Stop new GPU work under the current lock. The single justified continuation is a new budget admission covering the same complete fixed matrix; current measured forecast requires at least 15.450310993 additional GPU hours beyond the 78-hour pool. This is a conservative cost estimate, not a guarantee or method NO_GO.",
-  "next_task": "Publish the audited budget-blocked branch; no further GPU jobs",
-  "numeric_root_cause": "NUMERICAL_ROOT_CAUSE_UNRESOLVED",
-  "numerical_status": "NONBITWISE_RUNTIME_OBSERVED",
-  "parent": "E1-23760 seed45",
-  "pending": [
-    "Formal six-arm N-step training and four-quarter CAL",
-    "CAL selection and conditional full seed147 replication",
-    "Locked SEL/PB and paired bootstrap",
-    "Mechanism/resource profile and formal deployment reload",
-    "External Git/LFS byte verification and Release receipt"
-  ],
-  "phase": "BLOCKED_REPORT_AND_PUBLICATION",
-  "phase_actual_gpu_hours": {
-    "P0": 0.26220287307055423,
-    "P1": 0.668803813438893
-  },
-  "prompt_audit_execution_complete": true,
-  "publication_ready": true,
-  "publication_status": "PENDING_EXTERNAL_VERIFICATION",
-  "remaining_lifetime_gpu_hours": 85.18593858432928,
-  "retained_reserve_gpu_hours": 8,
+  "new_gpu_hours": 0.0,
+  "next_task": "Complete six main formal trajectories, fresh M0 CAL, then full locked evaluation and selection",
+  "publication_status": "NOT_PUBLISHED",
   "schema": 1,
   "scientific_status": "INCONCLUSIVE",
-  "status": "BLOCKED_FULL_MATRIX_BUDGET"
+  "status": "RUNNING",
+  "verified_optimizer_step": 9,
+  "verified_unix": 1791946703.5008154
 }

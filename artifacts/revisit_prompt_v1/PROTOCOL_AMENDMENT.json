@@ -1,0 +1,26 @@
+{
+  "authorization": "2026-10-14 user: \u4ec0\u4e48\u9884\u7b97\u89c4\u5219\u5bfc\u81f4\u7684\uff0c\u5982\u679c\u4f60\u8ba4\u4e3a\u8bad\u7ec3\u6709\u610f\u4e49\u5c31\u76f4\u63a5\u542f\u52a8\u8bad\u7ec3",
+  "budget": {
+    "authorization": "2026-10-14 user: \u4ec0\u4e48\u9884\u7b97\u89c4\u5219\u5bfc\u81f4\u7684\uff0c\u5982\u679c\u4f60\u8ba4\u4e3a\u8bad\u7ec3\u6709\u610f\u4e49\u5c31\u76f4\u63a5\u542f\u52a8\u8bad\u7ec3",
+    "authorized_pool_cap_gpu_hours": 100.0,
+    "historical_cost_sha256": "3e4bf6633bf7510a67f27891157be46264f6eea5f1066a3876b43dea53bb5e92",
+    "historical_ledger_sha256": "aab9929b5af57182afc57a53c5cd7d94f6ecbf8bf45f0e869a1a0bbbc6ea5387",
+    "lifetime_cap_gpu_hours": 1823.0,
+    "new_cap_gpu_hours": 100.0,
+    "predecessor_mpr_gpu_hours": 0.9310066865094472,
+    "predecessor_mpr_ledger_sha256": "2d2c6975d6722ca312cd50eda9d1616b70ba34c3fa06d283a5bbf061a698c3c6",
+    "prior_gpu_hours": 1714.8140614156707,
+    "reserve_gpu_hours": 8.0
+  },
+  "formal_weights_from_pilots": false,
+  "inheritance_policy": "Keep original P0/P1 evidence and source identity; reuse cost estimates only. New CAL rows are measured again with the new source identity.",
+  "old_mpr_events": 46,
+  "old_mpr_gpu_hours": 0.9310066865094472,
+  "old_published_commit": "0c958f535679a94b39b5661fba0b900305582170",
+  "old_run_lock_sha256": "aec9d04d4a571f6718ce7c3d99414255176d96a6a69ce8c194cb2e8c979ce7e0",
+  "predecessor_preserved": true,
+  "run_id": "mpr-formal-20261014",
+  "schema": 1,
+  "spec": "docs/superpowers/specs/2026-10-14-mpr-formal-budget-amendment.md",
+  "status": "USER_AUTHORIZED_FORMAL_CONTINUATION"
+}

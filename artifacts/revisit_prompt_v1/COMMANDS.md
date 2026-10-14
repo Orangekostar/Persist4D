@@ -1,24 +1,26 @@
-# MPR-V1 commands
+# 正式训练运行命令
 
-Run from the repository root in the resolver-bound original Python 3.10 environment. These are the campaign interfaces, not authorization to change the frozen budget.
+使用 assets.local.json 中已绑定的 Python 和环境，在本分支工作区执行。
 
-```sh
-python -m scripts.revisit_prompt_campaign resolve --auto
-python -m scripts.revisit_prompt_campaign preflight
-python -m scripts.revisit_prompt_campaign plan
-python -m scripts.revisit_prompt_campaign run --resume
-python -m scripts.revisit_prompt_campaign summarize
-python -m scripts.publish_revisit_prompt --execute
+```bash
+python -m scripts.continue_revisit_prompt_formal
 ```
 
-The resolver binds local licensed data and the original encoder; these assets are not redistributed.
+当前已有独立后台控制器，进程锁拒绝并行重复启动。训练和评测由原收费管理器执行。
 
-Current terminal state: BLOCKED_FULL_MATRIX_BUDGET. Resolve/preflight/plan/summarize were actually run; formal run --resume was not started. Preserve published A/B and their tables. A future budget change requires a new admission and publication identity; do not edit this RUN_LOCK or overwrite the frozen report to bypass it.
+读取实时训练状态：
 
-Parent retrieval from origin uses the exact Git/LFS path:
-
-```sh
-git lfs pull --include=artifacts/native_long_postselection_v1/deployment/E1-23760.pt --exclude=
+```bash
+python - <<'PYCODE'
+import json
+from pathlib import Path
+a=json.loads(Path("assets.local.json").read_text())
+r=Path(a["run_root"])
+print((r/"CONTROLLER_STATUS.json").read_text())
+for p in sorted((r/"trajectories").glob("*/STATUS.json")):
+    s=json.loads(p.read_text())
+    print(p.parent.name,s["status"],s["step"],s["planned_updates"])
+PYCODE
 ```
 
-Official states: unzip evidence/official_states.zip in an offline directory and use scripts.evaluate_revisit_prompt.pool_official_states with the bound taxonomy; OFFICIAL_REPOOL_CHECK.json records the 30 actual exact checks. No formal MPR delta or optimizer resume exists in this blocked publication.
+活动锁不可手工删除；已有正式轨迹通过控制器和原 --resume 路径恢复。resolve 命令使用旧协议默认预算，不用于本次已绑定预算修订。发布原始协议的脚本不自动执行；正式结果完成后由主执行者复核。

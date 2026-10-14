@@ -1,6 +1,0 @@
-{
-  "error": "Command '['git', 'diff', '--cached', '--check']' returned non-zero exit status 2.",
-  "error_type": "CalledProcessError",
-  "repair": "CSV line-ending conversion CRLF to LF; parsed records identical; no A/B commit had been created",
-  "status": "PRIOR_PREPARATION_FAILURE_REPAIRED_PENDING_RETRY"
-}

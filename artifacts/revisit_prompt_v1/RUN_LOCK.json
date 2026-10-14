@@ -1,18 +1,38 @@
 {
-  "N": null,
+  "N": 400,
+  "adapter_seeds": [
+    146,
+    147
+  ],
   "baseline_repeats": 3,
   "budget": {
-    "authorization": "user instruction; original cap and audited predecessor receipt",
+    "authorization": "2026-10-14 user: \u4ec0\u4e48\u9884\u7b97\u89c4\u5219\u5bfc\u81f4\u7684\uff0c\u5982\u679c\u4f60\u8ba4\u4e3a\u8bad\u7ec3\u6709\u610f\u4e49\u5c31\u76f4\u63a5\u542f\u52a8\u8bad\u7ec3",
+    "authorized_pool_cap_gpu_hours": 100.0,
     "historical_cost_sha256": "3e4bf6633bf7510a67f27891157be46264f6eea5f1066a3876b43dea53bb5e92",
     "historical_ledger_sha256": "aab9929b5af57182afc57a53c5cd7d94f6ecbf8bf45f0e869a1a0bbbc6ea5387",
-    "lifetime_cap_gpu_hours": 1800,
-    "new_cap_gpu_hours": 78.0,
-    "prior_gpu_hours": 1713.8830547291614,
+    "lifetime_cap_gpu_hours": 1823.0,
+    "new_cap_gpu_hours": 100.0,
+    "predecessor_mpr_gpu_hours": 0.9310066865094472,
+    "predecessor_mpr_ledger_sha256": "2d2c6975d6722ca312cd50eda9d1616b70ba34c3fa06d283a5bbf061a698c3c6",
+    "prior_gpu_hours": 1714.8140614156707,
     "reserve_gpu_hours": 8.0
   },
-  "cap_P2_available_gpu_hours": 4.621674756945126,
-  "checkpoint_steps": [],
+  "cap_P2_available_gpu_hours": 23.23705937232974,
+  "checkpoint_steps": [
+    100,
+    200,
+    300,
+    400
+  ],
+  "configuration_overrides": {},
+  "data_manifest_sha256": "0c87afc7b1282897bd395fe7af7c1dd514c42e1ce8adff47675e3d27f16ba63d",
+  "draw_hashes": {
+    "146": "d51499edf0b804530e9def82a44e79cd2d396b5e9aab0613aaf07c253f6fd844",
+    "147": "53d57650342d2efd565402ba0d9e910eef5cb88fcc2b444c2e3466a025a62ebe"
+  },
+  "encoder_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
   "epsilon_run_pp": 0.05626976490020752,
+  "evaluation_processes_per_endpoint": 3,
   "expected_inputs": {
     "CAL": {
       "1": 31,
@@ -36,7 +56,21 @@
     }
   },
   "forecast_policy": "training max six timed updates x1.25; evaluation full populations x1.5; startup included",
-  "formal_training_started": false,
+  "implementation_commit": "c472a4923c0418cd5ad02a47b6744b51e4e16922",
+  "initialization_hashes": {
+    "M1-s146": "5ab677a4bf90fcd2bbdd79deeb836367c3d02de96b7f32778b51d91efb7eaeac",
+    "M1-s147": "b1b5f4bb7cf2aa7b86abd14082489507eabe69cd311174cd345bd396a6da5dbc",
+    "M2-s146": "11ee8b3a42d59d97624d1fe723596034d58ea48df459a3978ee7fa7e4a829d19",
+    "M2-s147": "3fb18077fd5d087a02823115d2b7a26c0541caee267c03e9f71574c0281d6a3a",
+    "M3-s146": "25d13f7f6b95a5e4ac9f7f91242e8cd7c87765ecd69573b54dab8fef9485399a",
+    "M3-s147": "96e076ceb6853869bddc06e6c7ea7fbc4d24235c73946280b2fe1944d456cb6f",
+    "M4-s146": "5ab677a4bf90fcd2bbdd79deeb836367c3d02de96b7f32778b51d91efb7eaeac",
+    "M4-s147": "b1b5f4bb7cf2aa7b86abd14082489507eabe69cd311174cd345bd396a6da5dbc",
+    "M5-s146": "5ab677a4bf90fcd2bbdd79deeb836367c3d02de96b7f32778b51d91efb7eaeac",
+    "M5-s147": "b1b5f4bb7cf2aa7b86abd14082489507eabe69cd311174cd345bd396a6da5dbc",
+    "M6-s146": "a583dd94fcd8646649a2d379db6c4a9609546a1b4f9d3f94befb5ae9125def65",
+    "M6-s147": "15d5f1a44c4106eade8f30386af2b82a49101793f20cb058be16e2dde15c4889"
+  },
   "measured_evaluation": {
     "seconds_per_input": 4.547738039261839,
     "seconds_per_stage": 1.3070398115989224,
@@ -156,7 +190,7 @@
       "warmup_updates": 2
     }
   },
-  "minimum_additional_gpu_hours": 15.450310992607598,
+  "minimum_additional_gpu_hours": 0.0,
   "numeric_sources": {
     "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
     "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
@@ -167,22 +201,37 @@
     "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
     "scripts/evaluate_revisit_prompt.py": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
     "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
-    "scripts/revisit_prompt_campaign.py": "c21c87b87eac61e0cc94f75997ecbf1c8cb83219fd1ab02dce0718e121633939",
+    "scripts/revisit_prompt_campaign.py": "c7c06def3a089a220093b7335909d40ab3f258559b39b03e6f9519d064c33be3",
     "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
     "scripts/select_revisit_prompt.py": "2ab50193500a125f98388b31223adb80399cfd5d7582c4db1ff47eed09fabc03",
     "scripts/train_revisit_prompt.py": "58dc60049a5f9fc0f5ebb2119b1597614d76a73c5cc916603f6467dda6c8456f",
     "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d"
   },
+  "parent_seed": 45,
+  "parent_sha256": "8c9d0d57044ce23c7964ddb1e7a2d8bd18e388e6ee657a7f4b02b1368b5b3a98",
   "phase_caps_gpu_hours": {
-    "P0": 4.0,
-    "P1": 4.0,
-    "P2": 4.621674756945126,
+    "P0": 5.128205128205129,
+    "P1": 5.128205128205129,
+    "P2": 23.23705937232974,
     "P3": 26.299599797399132,
     "P4": 35.07872544565574,
-    "P5": 4.0
+    "P5": 5.128205128205129
   },
+  "preflight_evidence_origin": "PREDECESSOR_UNMODIFIED_NUMERICAL_EXECUTION",
+  "protocol_amendment_sha256": "66095ef08262703c4dc852dfd08104f35c32d0595443cb664aa0907a1205364d",
+  "recipe": "conf/revisit_prompt/default.yaml",
   "schema": 1,
-  "status": "BLOCKED_FULL_MATRIX_BUDGET",
+  "status": "LOCKED",
+  "taxonomy_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba",
+  "trainable_parameters": {
+    "M0": 0,
+    "M1": 84224,
+    "M2": 99073,
+    "M3": 51200,
+    "M4": 84224,
+    "M5": 84224,
+    "M6": 101761
+  },
   "training_estimates_gpu_hours": {
     "1200": 60.12021816816302,
     "1600": 80.14433437746816,

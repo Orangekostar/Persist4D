@@ -33679,6 +33679,7 @@
     "parent_unchanged": true
   },
   "epsilon_run_pp": 0.05626976490020752,
+  "evidence_origin": "PREDECESSOR_P0_P1_UNMODIFIED_MODEL_DATA_TRAINING_AND_EVALUATION",
   "formal_training_started": false,
   "gradient_status": "SMOKE_COMPLETE_NOT_A_FORMAL_MODEL",
   "numeric_sources": {
@@ -33700,6 +33701,7 @@
   "numerical_admission": true,
   "numerical_status": "NONBITWISE_RUNTIME_OBSERVED",
   "official_repool_check": "OFFICIAL_REPOOL_CHECK.json",
+  "predecessor_summary_sha256": "23eba70e508ba1d8f112a226233f791ca076976e72cd4a9184e4012b09effe8b",
   "root_cause": "NUMERICAL_ROOT_CAUSE_UNRESOLVED",
   "status": "COMPLETE"
 }
