@@ -6,7 +6,10 @@
     "Native M0 CAL r2",
     "Native M1 u100 CAL r0",
     "Native M1 u100 CAL r1",
-    "Native M1 u100 CAL r2"
+    "Native M1 u100 CAL r2",
+    "Native M1 u200 CAL r0",
+    "Native M1 u200 CAL r1",
+    "Native M1 u200 CAL r2"
   ],
   "completed_main_training_gpu_hours": 9.12422078314583,
   "completed_variant_steps": {
@@ -27,7 +30,7 @@
   ],
   "controller_alive": true,
   "controller_pid": 2138018,
-  "controller_process_state": "RUNNING",
+  "controller_process_state": "T",
   "current_child_pid": 2160403,
   "current_job_key": "policy:native-stable-mean-v2:eval:M1:s146:u200:CAL:r0",
   "current_variant": "M1",
@@ -36,7 +39,7 @@
     "policy_id": "native-stable-mean-v2",
     "policy_sha256": "f502cbaf5a3e5035c01240db7eaa9239b5825662b639fa5b56d8c046cb7887b3"
   },
-  "experiment_status": "FORMAL_NATIVE_EVALUATION_MATRIX_RUNNING",
+  "experiment_status": "FORMAL_NATIVE_EVALUATION_QUEUE_HELD",
   "first_trained_native_evaluation_verification": "FIRST_TRAINED_NATIVE_EVALUATION_VERIFICATION.json",
   "formal_N": 400,
   "formal_baseline_verification": "NATIVE_FORMAL_BASELINE_VERIFICATION.json",
@@ -54,7 +57,9 @@
   "native_formal_baseline_repeat0_verification": "NATIVE_FORMAL_BASELINE_REPEAT0_VERIFICATION.json",
   "native_formal_baseline_verification": "NATIVE_FORMAL_BASELINE_VERIFICATION.json",
   "new_gpu_hours": 16.492677910347314,
-  "next_task": "Complete unchanged Native CAL matrix: M1\u2013M6, four checkpoints, three repeats each",
+  "next_task": "Finish owned M1-u300 r0; bounded late-stage diagnosis; preserve all old results and original guards",
+  "numerical_queue_hold_evidence": "NATIVE_M1_U200_VERIFICATION.json",
+  "numerical_queue_hold_reason": "Native M1-u200 S_long range 0.4911815126736968 pp exceeds original 0.2 pp; later-stage instability persists",
   "physical_gpu_index": 1,
   "policy_baseline_admission": "EVALUATION_M0_ADMISSION_V2.json",
   "policy_epsilon_run_pp": 0.0,
@@ -84,7 +89,7 @@
   "scientific_status": "FORMAL_MATRIX_PENDING",
   "shared_first_stage_verification": "SHARED_FIRST_STAGE_VERIFICATION.json",
   "stage": "LOCKED_EVALUATION_AND_SELECTION",
-  "status": "RUNNING",
+  "status": "WAITING_NUMERICAL_DIAGNOSIS",
   "verified_optimizer_step": 400,
-  "verified_unix": 1792010541.3417065
+  "verified_unix": 1792012173.7041626
 }
