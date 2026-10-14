@@ -1,0 +1,21 @@
+{
+  "adapter_seed": 146,
+  "checkpoint_sha256": "95e73e238841b9bec1faea146f4d09d07f20f5ad72cf97ba046fc3c6bd9f2985",
+  "completed_inputs": 84,
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "first_frame_guard": {
+    "AP_difference_pp": 0.0,
+    "current_AP_difference_pp": 0.0
+  },
+  "repeat_index": 0,
+  "results_sha256": "99df8f1eefb001a90e31813dfab2dbec1ed8fd406e3645a10bd1ab2b6db2b807",
+  "role": "CAL",
+  "scientific_status": "INCONCLUSIVE_COMPLETE_MATRIX_REQUIRED",
+  "status": "FIRST_TRAINED_CHECKPOINT_REPEAT_VERIFIED",
+  "step": 100,
+  "updated_unix": 1791987981.013577,
+  "variant": "M1"
+}
