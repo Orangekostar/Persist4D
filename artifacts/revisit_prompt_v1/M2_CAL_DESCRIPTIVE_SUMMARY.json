@@ -1,0 +1,201 @@
+{
+  "adapter_seed": 146,
+  "all_results_retained": true,
+  "baseline_M0": {
+    "AP": {
+      "T1": 0.42538589239120483,
+      "T2": 0.27786120772361755,
+      "T3": 0.1366797238588333,
+      "T4": 0.12231989204883575,
+      "T5": 0.13514739274978638
+    },
+    "AP_ranges": {
+      "T1": 0.0,
+      "T2": 0.0,
+      "T3": 0.0,
+      "T4": 0.0,
+      "T5": 0.0
+    },
+    "S_current": 0.3968664010365804,
+    "S_long": 0.13138233621915182,
+    "S_long_range": 0.0,
+    "adapter_seed": 146,
+    "current_AP": {
+      "T1": 0.42538589239120483,
+      "T2": 0.40421366691589355,
+      "T3": 0.3825426995754242,
+      "T4": 0.376890629529953,
+      "T5": 0.431165874004364
+    },
+    "guard_pass": true,
+    "parameters": 0,
+    "step": 0,
+    "variant": "M0"
+  },
+  "checkpoint_metrics": [
+    {
+      "S_current": 0.3989950782722897,
+      "S_current_range_pp": 1.2812664111455263,
+      "S_long": 0.13426965640650856,
+      "S_long_range_pp": 1.0416453083356232,
+      "checkpoint_sha256": "a93e2b1f3f1e304805dbc0a900c75d1555f946a2816971a9425615cd438db5c7",
+      "max_AP_range_pp": 3.7040546536445618,
+      "max_current_AP_range_pp": 4.348617792129517,
+      "result_evidence": [
+        {
+          "repeat": 0,
+          "results_sha256": "800b9415628d68422b795150dfcfc9221e311ceb564b13133e417754bdd346d3"
+        },
+        {
+          "repeat": 1,
+          "results_sha256": "cd77b5762721878b52562d8eb158e391e6eacd39ff3e9723fc82394ddfc104de"
+        },
+        {
+          "repeat": 2,
+          "results_sha256": "159207b9c0875870629d2ea06bb99f733963deecc0b12b792c85095d6ed6e0a0"
+        }
+      ],
+      "status": "ENDPOINT_COMPLETE_NUMERICAL_VARIANCE_OBSERVED",
+      "step": 100
+    },
+    {
+      "S_current": 0.39600850145022076,
+      "S_current_range_pp": 0.0,
+      "S_long": 0.1284224291642507,
+      "S_long_range_pp": 0.0,
+      "checkpoint_sha256": "279dacc305f4794b31f594a5b0dc90e155cc66401a604f8092edaf76222aa438",
+      "max_AP_range_pp": 0.0,
+      "max_current_AP_range_pp": 0.0,
+      "result_evidence": [
+        {
+          "repeat": 0,
+          "results_sha256": "e1cdd7d535f0401a1c2409fbc2a8b26be5f4c860810fa4d56bf64b10688d6963"
+        },
+        {
+          "repeat": 1,
+          "results_sha256": "c81fe9f6f58ceddf8da11af2697461c2c78c65a92faf61151eb5b95d4f3fbeb3"
+        },
+        {
+          "repeat": 2,
+          "results_sha256": "c09de859cec9d16b8552e71cb15ca966f0a4f0ebd03c1c30ec1a319bfcf150c9"
+        }
+      ],
+      "status": "ENDPOINT_THREE_REPEATS_VERIFIED",
+      "step": 200
+    },
+    {
+      "S_current": 0.3978609078460269,
+      "S_current_range_pp": 0.33650199572245465,
+      "S_long": 0.12656452341212165,
+      "S_long_range_pp": 1.0399433473745971,
+      "checkpoint_sha256": "3589ec0330db6758f0f99ea2d7b454c352e16cdfb69bac7d412ea9fc5983b451",
+      "max_AP_range_pp": 3.0782654881477356,
+      "max_current_AP_range_pp": 1.128828525543213,
+      "result_evidence": [
+        {
+          "repeat": 0,
+          "results_sha256": "acbaff80e99a3ea3dd142cc6c9b475dd2bc38dcbdee6bcc6063610dd50989cec"
+        },
+        {
+          "repeat": 1,
+          "results_sha256": "95a61f610432589db98b616bf02393f39241bbd733ae7a03c8aaf2ed9afdd4b1"
+        },
+        {
+          "repeat": 2,
+          "results_sha256": "f99892b5fa652e4b24ca4e07c84ce23166af23cd4ca43bf484a12bdc1fd56129"
+        }
+      ],
+      "status": "ENDPOINT_COMPLETE_NUMERICAL_VARIANCE_OBSERVED",
+      "step": 300
+    },
+    {
+      "S_current": 0.39903416236241657,
+      "S_current_range_pp": 0.0,
+      "S_long": 0.12278387447198232,
+      "S_long_range_pp": 0.0,
+      "checkpoint_sha256": "3febcb4ba86a3d2bf814e07a2cf9c327d3518b555052d5f3c2539604ac84b038",
+      "max_AP_range_pp": 0.0,
+      "max_current_AP_range_pp": 0.0,
+      "result_evidence": [
+        {
+          "repeat": 0,
+          "results_sha256": "b4e01e7f5355168c49af5967b633096a8f2349f098b8e6b9e9a3666710186f9b"
+        },
+        {
+          "repeat": 1,
+          "results_sha256": "999a1d74a4dc977dd278069fa9ff971054fad593a314c14652d2a6bf40772a92"
+        },
+        {
+          "repeat": 2,
+          "results_sha256": "72a3606e2d8c6dc3c3c19baf47d064bfd70a8cca01673e0b4cd14e8b16d58a14"
+        }
+      ],
+      "status": "ENDPOINT_THREE_REPEATS_VERIFIED",
+      "step": 400
+    }
+  ],
+  "completed_checkpoints": [
+    100,
+    200,
+    300,
+    400
+  ],
+  "controller_selection_modified": false,
+  "delta_AP_vs_M0_pp": {
+    "T1": 0.2195199330647768,
+    "T2": -0.2552499373753847,
+    "T3": -0.09115040302276611,
+    "T4": -0.30389080444971767,
+    "T5": 1.2612372636795044
+  },
+  "delta_S_current_vs_M0_pp": 0.21286772357093087,
+  "delta_S_long_vs_M0_pp": 0.2887320187356712,
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "inputs_per_repeat": 84,
+  "repeats_per_checkpoint": 3,
+  "scientific_scope": "Descriptive CAL only; repeated large process variance observed. Full M0-M6 matrix, locked selection, SEL/PB confirmation pending; no reliable method-gain claim",
+  "scientific_status": "NUMERICAL_ROOT_CAUSE_UNRESOLVED",
+  "short_horizon_guard_limit_pp": -0.2,
+  "status": "VARIANT_CAL_COMPLETE_NUMERICAL_VARIANCE_OBSERVED_CAMPAIGN_PENDING",
+  "updated_unix": 1791999913.0081894,
+  "variant": "M2",
+  "within_variant_endpoint": {
+    "AP": {
+      "T1": 0.4275810917218526,
+      "T2": 0.2753087083498637,
+      "T3": 0.13576821982860565,
+      "T4": 0.11928098400433858,
+      "T5": 0.14775976538658142
+    },
+    "AP_ranges": {
+      "T1": 0.006585597991943359,
+      "T2": 0.00801190733909607,
+      "T3": 0.012596726417541504,
+      "T4": 0.006805539131164551,
+      "T5": 0.03704054653644562
+    },
+    "S_current": 0.3989950782722897,
+    "S_long": 0.13426965640650854,
+    "S_long_range": 0.01041645308335623,
+    "adapter_seed": 146,
+    "current_AP": {
+      "T1": 0.4275810917218526,
+      "T2": 0.411138782898585,
+      "T3": 0.3808829387029012,
+      "T4": 0.375074843565623,
+      "T5": 0.4410274525483449
+    },
+    "guard_pass": false,
+    "parameters": 99073,
+    "step": 100,
+    "variant": "M2"
+  },
+  "within_variant_endpoint_guard_failures": [
+    "T2"
+  ],
+  "within_variant_endpoint_guard_pass": false,
+  "within_variant_endpoint_replication_variance_guard_pass": false
+}
