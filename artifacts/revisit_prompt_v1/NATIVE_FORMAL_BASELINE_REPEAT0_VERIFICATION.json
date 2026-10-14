@@ -1,0 +1,55 @@
+{
+  "baseline_admission": "PENDING_THREE_FORMAL_REPEATS",
+  "charge_event_id": "mpr:P1:1792007282143358784",
+  "empty_history_cross_variant_control": {
+    "control_results_sha256": "2d63c00400a649e21e86ccf5dde17d21fddbb6b7132e7d574308e7fc9fab8225",
+    "diagnostic_repeat": 0,
+    "first_stage_raw_differences": 0,
+    "inputs_compared": 84,
+    "step": 300,
+    "variant": "M3"
+  },
+  "evaluation_policy": {
+    "policy_id": "native-stable-mean-v2",
+    "policy_sha256": "f502cbaf5a3e5035c01240db7eaa9239b5825662b639fa5b56d8c046cb7887b3"
+  },
+  "finite_AP_and_current_AP": true,
+  "global_bitwise_determinism_claim": false,
+  "gpu_hours": 0.14009071845972762,
+  "input_count": 84,
+  "repeat_index": 0,
+  "results_sha256": "68b52ef461bfee2e5a5a7ae97235de3856f97ff693d38e845811af6e638539f1",
+  "rows": [
+    {
+      "AP": 0.4266909062862396,
+      "current_AP": 0.4266909062862396,
+      "horizon": 1
+    },
+    {
+      "AP": 0.2786877155303955,
+      "current_AP": 0.4148247241973877,
+      "horizon": 2
+    },
+    {
+      "AP": 0.1245792806148529,
+      "current_AP": 0.37620672583580017,
+      "horizon": 3
+    },
+    {
+      "AP": 0.12545090913772583,
+      "current_AP": 0.3775409460067749,
+      "horizon": 4
+    },
+    {
+      "AP": 0.1580933779478073,
+      "current_AP": 0.4461193084716797,
+      "horizon": 5
+    }
+  ],
+  "schema": 1,
+  "stage_count": 197,
+  "status": "FIRST_FORMAL_NATIVE_BASELINE_REPEAT_VERIFIED",
+  "status_sha256": "1fc89080deff781b487d858aaa8647fcfdb024565098c8aacfafcefc21bb8a5d",
+  "training_source_and_policy_source_locks_verified": true,
+  "verified_unix": 1792007966.324435
+}

@@ -1,6 +1,8 @@
 {
   "code_status": "C3_TRAINING_WITH_SEPARATELY_LOCKED_NATIVE_EVALUATION_V2",
-  "completed_evaluation_tasks": [],
+  "completed_evaluation_tasks": [
+    "Native M0 CAL r0"
+  ],
   "completed_main_training_gpu_hours": 9.12422078314583,
   "completed_variant_steps": {
     "M1": 400,
@@ -41,7 +43,8 @@
   "main_training_complete": true,
   "main_training_verification": "MAIN_TRAINING_VERIFICATION.json",
   "native_control_verification": "NATIVE_CAL_CONTROL_VERIFICATION.json",
-  "new_gpu_hours": 16.07097407917369,
+  "native_formal_baseline_repeat0_verification": "NATIVE_FORMAL_BASELINE_REPEAT0_VERIFICATION.json",
+  "new_gpu_hours": 16.21106479763342,
   "next_task": "Admit three fresh formal Native M0 CAL repeats; then run full unchanged locked matrix",
   "physical_gpu_index": 1,
   "policy_baseline_admission": "EVALUATION_M0_ADMISSION_V2.json",
@@ -74,5 +77,5 @@
   "stage": "POLICY_BASELINE_ADMISSION",
   "status": "RUNNING",
   "verified_optimizer_step": 400,
-  "verified_unix": 1792007367.904327
+  "verified_unix": 1792007966.3249245
 }
