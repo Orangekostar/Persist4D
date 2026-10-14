@@ -1,0 +1,128 @@
+{
+  "control_parent_pid": 1934204,
+  "control_paths": [
+    "diagnostics/m0-variance-20261014/stable_mean0",
+    "diagnostics/m0-variance-20261014/stable_mean1",
+    "diagnostics/m0-variance-20261014/stable_mean2"
+  ],
+  "control_source_sha256": "d6bdf0df57256ecec74c994053e0486fb8608497dea63294df576093426dfbf2",
+  "difference_pp_vs_original_repeats": [
+    [
+      {
+        "AP": 0.0,
+        "current_AP": 0.0,
+        "horizon": 1
+      },
+      {
+        "AP": 0.0026732683181762695,
+        "current_AP": 0.0,
+        "horizon": 2
+      },
+      {
+        "AP": 0.0,
+        "current_AP": 0.0,
+        "horizon": 3
+      },
+      {
+        "AP": 0.0,
+        "current_AP": 0.0,
+        "horizon": 4
+      },
+      {
+        "AP": 0.0,
+        "current_AP": 0.0,
+        "horizon": 5
+      }
+    ],
+    [
+      {
+        "AP": 0.0,
+        "current_AP": 0.0,
+        "horizon": 1
+      },
+      {
+        "AP": 0.0,
+        "current_AP": 0.0,
+        "horizon": 2
+      },
+      {
+        "AP": -8.940696716308594e-06,
+        "current_AP": 0.0,
+        "horizon": 3
+      },
+      {
+        "AP": 0.0,
+        "current_AP": 0.0,
+        "horizon": 4
+      },
+      {
+        "AP": 0.0,
+        "current_AP": 0.0,
+        "horizon": 5
+      }
+    ],
+    [
+      {
+        "AP": -0.5102545022964478,
+        "current_AP": -0.5102545022964478,
+        "horizon": 1
+      },
+      {
+        "AP": 0.713995099067688,
+        "current_AP": -0.25855302810668945,
+        "horizon": 2
+      },
+      {
+        "AP": 2.0713292062282562,
+        "current_AP": 0.364840030670166,
+        "horizon": 3
+      },
+      {
+        "AP": 0.9503968060016632,
+        "current_AP": 0.16186237335205078,
+        "horizon": 4
+      },
+      {
+        "AP": -2.888917922973633,
+        "current_AP": -0.23824870586395264,
+        "horizon": 5
+      }
+    ]
+  ],
+  "formal_queue_held": true,
+  "full_diagnostic_complete": true,
+  "full_diagnostic_instrumentation": "Original replay with mpr_capture_probe; diagnostic results are not replacements for original formal repeats",
+  "full_diagnostic_rows": [
+    {
+      "AP": 0.42538589239120483,
+      "current_AP": 0.42538589239120483,
+      "horizon": 1
+    },
+    {
+      "AP": 0.27786120772361755,
+      "current_AP": 0.40421366691589355,
+      "horizon": 2
+    },
+    {
+      "AP": 0.1366797238588333,
+      "current_AP": 0.3825426995754242,
+      "horizon": 3
+    },
+    {
+      "AP": 0.12231989204883575,
+      "current_AP": 0.376890629529953,
+      "horizon": 4
+    },
+    {
+      "AP": 0.13514739274978638,
+      "current_AP": 0.431165874004364,
+      "horizon": 5
+    }
+  ],
+  "input_count": 84,
+  "next_control": "Three independent full CAL processes; only AdaptiveScatter.mean_scatter uses stable argsort plus segment_csr mean; FP32 unchanged; global deterministic flag unchanged",
+  "original_formal_repeats_preserved": true,
+  "source_lock_unchanged": true,
+  "status": "CONTROLLED_REDUCTION_RECHECK_RUNNING_ROOT_CAUSE_UNRESOLVED",
+  "updated_unix": 1791983427.3972552
+}
