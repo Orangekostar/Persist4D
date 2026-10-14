@@ -1,0 +1,160 @@
+{
+  "AP_by_repeat": {
+    "AP": {
+      "1": [
+        0.42538589239120483,
+        0.42538589239120483,
+        0.42538589239120483
+      ],
+      "2": [
+        0.2816859781742096,
+        0.2816859781742096,
+        0.2816859781742096
+      ],
+      "3": [
+        0.12321966886520386,
+        0.12321966886520386,
+        0.12321966886520386
+      ],
+      "4": [
+        0.12114754319190979,
+        0.12114754319190979,
+        0.12114754319190979
+      ],
+      "5": [
+        0.14090007543563843,
+        0.14090007543563843,
+        0.14090007543563843
+      ]
+    },
+    "current_AP": {
+      "1": [
+        0.42538589239120483,
+        0.42538589239120483,
+        0.42538589239120483
+      ],
+      "2": [
+        0.4117642939090729,
+        0.4117642939090729,
+        0.4117642939090729
+      ],
+      "3": [
+        0.38497254252433777,
+        0.38497254252433777,
+        0.38497254252433777
+      ],
+      "4": [
+        0.37339839339256287,
+        0.37339839339256287,
+        0.37339839339256287
+      ],
+      "5": [
+        0.4296545684337616,
+        0.4296545684337616,
+        0.4296545684337616
+      ]
+    }
+  },
+  "S_current_by_repeat": [
+    0.39600850145022076,
+    0.39600850145022076,
+    0.39600850145022076
+  ],
+  "S_current_range_pp": 0.0,
+  "S_long_by_repeat": [
+    0.1284224291642507,
+    0.1284224291642507,
+    0.1284224291642507
+  ],
+  "S_long_range_pp": 0.0,
+  "adapter_seed": 146,
+  "all_three_results_retained": true,
+  "checkpoint_sha256": "279dacc305f4794b31f594a5b0dc90e155cc66401a604f8092edaf76222aa438",
+  "evaluation_policy": {
+    "policy_id": "stable-mean-v1",
+    "policy_sha256": "aeddcfa10afa1b0f65305ecd7f80fb824feddf6846c1e986835d3ed0ac289912"
+  },
+  "evidence": [
+    {
+      "repeat": 0,
+      "results_sha256": "e1cdd7d535f0401a1c2409fbc2a8b26be5f4c860810fa4d56bf64b10688d6963"
+    },
+    {
+      "repeat": 1,
+      "results_sha256": "c81fe9f6f58ceddf8da11af2697461c2c78c65a92faf61151eb5b95d4f3fbeb3"
+    },
+    {
+      "repeat": 2,
+      "results_sha256": "c09de859cec9d16b8552e71cb15ca966f0a4f0ebd03c1c30ec1a319bfcf150c9"
+    }
+  ],
+  "first_frame_differences_vs_M0": [
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 0
+    },
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 1
+    },
+    {
+      "AP_difference_pp": 0.0,
+      "current_AP_difference_pp": 0.0,
+      "repeat": 2
+    }
+  ],
+  "formal_policy_or_selection_rules_modified": false,
+  "inputs_per_repeat": 84,
+  "max_AP_range_pp": 0.0,
+  "max_current_AP_range_pp": 0.0,
+  "range_pp": {
+    "AP": {
+      "1": 0.0,
+      "2": 0.0,
+      "3": 0.0,
+      "4": 0.0,
+      "5": 0.0
+    },
+    "current_AP": {
+      "1": 0.0,
+      "2": 0.0,
+      "3": 0.0,
+      "4": 0.0,
+      "5": 0.0
+    }
+  },
+  "raw_prediction_differences_vs_repeat0": {
+    "1": 0,
+    "2": 0
+  },
+  "registered_rule_scope": {
+    "baseline_admission": "0.2 pp limit is defined for M0 CAL AP range across T1-T5, not trained-endpoint current_AP",
+    "current_AP_observation": "Nonzero variation is retained; no claim of complete numerical determinism",
+    "seed147_replication_variance": "0.2 pp limit applies to selected candidate/control S_long repeat ranges"
+  },
+  "role": "CAL",
+  "scientific_status": "NUMERICAL_ROOT_CAUSE_UNRESOLVED_COMPLETE_MATRIX_REQUIRED",
+  "selected_endpoint_replication_variance_guard": {
+    "limit_pp": 0.2,
+    "pass_if_selected": true,
+    "scope": "Only if this endpoint becomes the locked candidate/control; final selection remains pending"
+  },
+  "stages_per_repeat": 197,
+  "status": "ENDPOINT_THREE_REPEATS_VERIFIED",
+  "step": 200,
+  "structure_summary_differences_vs_repeat0": {
+    "1": 0,
+    "2": 0
+  },
+  "structure_summary_fields_compared": [
+    "window_scan_ids",
+    "points",
+    "segments",
+    "current_points",
+    "state_bytes"
+  ],
+  "updated_unix": 1791996838.8554704,
+  "variant": "M2"
+}
