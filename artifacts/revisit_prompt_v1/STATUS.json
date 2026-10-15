@@ -37,9 +37,9 @@
   "controller_alive": false,
   "controller_pid": 2138018,
   "controller_process_state": "EXITED_AFTER_OWNED_CHILD_COMPLETED",
-  "current_activity": "BOUNDED_FIRST_STAGE_NATIVE_DIAGNOSIS",
-  "current_child_pid": 2298120,
-  "current_job_key": "diagnostic:native-first-stage:probe4",
+  "current_activity": "BOUNDED_FULL_CAL_NATIVE_KERNEL_DIAGNOSIS",
+  "current_child_pid": 2300158,
+  "current_job_key": "diagnostic:native-first-stage:fullCAL:M1:u200:r0",
   "current_variant": "M1",
   "evaluation_namespace": "policies/native-stable-mean-v2",
   "evaluation_policy": {
@@ -60,11 +60,12 @@
   "main_training_verification": "MAIN_TRAINING_VERIFICATION.json",
   "native_M1_u100_verification": "NATIVE_M1_U100_VERIFICATION.json",
   "native_control_verification": "NATIVE_CAL_CONTROL_VERIFICATION.json",
+  "native_first_stage_single_frame_verification": "NATIVE_FIRST_STAGE_SINGLE_FRAME_VERIFICATION.json",
   "native_formal_baseline_first_two_verification": "NATIVE_FORMAL_BASELINE_FIRST_TWO_VERIFICATION.json",
   "native_formal_baseline_repeat0_verification": "NATIVE_FORMAL_BASELINE_REPEAT0_VERIFICATION.json",
   "native_formal_baseline_verification": "NATIVE_FORMAL_BASELINE_VERIFICATION.json",
   "new_gpu_hours": 18.30196448466508,
-  "next_task": "Capture fixed-input layer and actual Native GEMM kernel identities; preserve every repeat and original guard; formal queue stays held",
+  "next_task": "Complete up to three source-hashed full CAL diagnostic captures with live frozen-parent and actual GEMM-cache records; formal queue remains held",
   "numerical_queue_hold_evidence": "CENTROID_FULL_CAL_VERIFICATION.json",
   "numerical_queue_hold_reason": "Stable-centroid full CAL controls: M1-u200 S_long range 0.9096940358479799 pp exceeds unchanged 0.2 pp; repeat2 has identical inputs but different encoder dense features and 84/84 first-stage predictions. M3-u300 three controls equal.",
   "physical_gpu_index": 1,
@@ -98,5 +99,5 @@
   "stage": "LOCKED_EVALUATION_AND_SELECTION",
   "status": "WAITING_NUMERICAL_DIAGNOSIS",
   "verified_optimizer_step": 400,
-  "verified_unix": 1792027190.165807
+  "verified_unix": 1792027424.2462847
 }

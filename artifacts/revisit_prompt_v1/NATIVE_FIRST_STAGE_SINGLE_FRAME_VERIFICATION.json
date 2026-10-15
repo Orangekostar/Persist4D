@@ -1,0 +1,152 @@
+{
+  "cause_of_prior_failed_full_replay": "NOT_ESTABLISHED",
+  "diagnostic_only": true,
+  "equality_across_measured_processes": {
+    "captures": true,
+    "frozen_state_sha256": true,
+    "initial_rng": true,
+    "raw_prediction_sha256": true,
+    "samples": true,
+    "structures": true,
+    "tensor_summaries": true
+  },
+  "evidence": [
+    {
+      "event_id": "mpr:P0:1792027071295333140",
+      "first_native_kernel": {
+        "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+        "found": true,
+        "nhot_profile": 7139,
+        "splitk": 1
+      },
+      "gpu_hours": 0.006621747438613157,
+      "repeat": 0,
+      "results_sha256": "aee8ad3dbd4f33b0abdf9f529177a0b77360cd554db48d37ba0129c7b28fce36",
+      "status_sha256": "cac6b1aeb244eb51f330eb6ec18d889a7b5b946241b62a6a3c199a8322a58703"
+    },
+    {
+      "event_id": "mpr:P0:1792027095639781696",
+      "first_native_kernel": {
+        "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+        "found": true,
+        "nhot_profile": 7139,
+        "splitk": 1
+      },
+      "gpu_hours": 0.0064979727636091415,
+      "repeat": 1,
+      "results_sha256": "3b621f921a3398bbe84ae637de7f6aed2c9555371e753537f07be71394a10ca0",
+      "status_sha256": "0609f33ddebbc93024a6721e4b7bd9acb625c8f4c7edd305d8810f1973d2dda6"
+    },
+    {
+      "event_id": "mpr:P0:1792027119533122438",
+      "first_native_kernel": {
+        "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+        "found": true,
+        "nhot_profile": 7139,
+        "splitk": 1
+      },
+      "gpu_hours": 0.006455744392498875,
+      "repeat": 2,
+      "results_sha256": "8e0632421c9ea33dd333336670f40a4baa31f680ae57ef5497d71776ae866a8a",
+      "status_sha256": "c7ca43f2e8db4f4b7387c06111274f7a03b3e7ee3b8b50b963b5b77467a9d1c5"
+    },
+    {
+      "event_id": "mpr:P0:1792027143265126458",
+      "first_native_kernel": {
+        "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+        "found": true,
+        "nhot_profile": 7139,
+        "splitk": 1
+      },
+      "gpu_hours": 0.0068033256091601085,
+      "repeat": 3,
+      "results_sha256": "0168122c46e552141534fc1dafc3def8884699f7e3a684e45d2865b8fa7dca2e",
+      "status_sha256": "6f34bd9c93a36974f3a7e9e4cb95de8167a2d531527e35682f28d348a661389a"
+    },
+    {
+      "event_id": "mpr:P0:1792027168257622935",
+      "first_native_kernel": {
+        "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+        "found": true,
+        "nhot_profile": 7139,
+        "splitk": 1
+      },
+      "gpu_hours": 0.00671954396804924,
+      "repeat": 4,
+      "results_sha256": "75f65ba9fd9aefd62f48f1c813faddbcc6b65a60e5c49045910b9c16561aac57",
+      "status_sha256": "919abd2bfa05148283a1eab0018272381a0c0b18358660f5ff551069dae67884"
+    },
+    {
+      "event_id": "mpr:P0:1792027192975390389",
+      "first_native_kernel": {
+        "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+        "found": true,
+        "nhot_profile": 7139,
+        "splitk": 1
+      },
+      "gpu_hours": 0.006683501206385295,
+      "repeat": 5,
+      "results_sha256": "45fa93f33987f341df0907aa7f96fa2660c64d160d46dcf5ec17cea2c55cb66a",
+      "status_sha256": "3fa0d77d6210b3318cf47f321050cc08248b821a0582b55f61873f694be821ad"
+    },
+    {
+      "event_id": "mpr:P0:1792027217588361773",
+      "first_native_kernel": {
+        "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+        "found": true,
+        "nhot_profile": 7139,
+        "splitk": 1
+      },
+      "gpu_hours": 0.00707023365944527,
+      "repeat": 6,
+      "results_sha256": "88001db0852a4feadd61dfb295d3e0fadb405a39dc73b2fd370c0981bf4c40c9",
+      "status_sha256": "b93158b25cd6207aef81e94ff41937d5ed94c21c2649cf0834b3878e4b28546b"
+    },
+    {
+      "event_id": "mpr:P0:1792027243542340852",
+      "first_native_kernel": {
+        "descriptor": "Simt_f32f32f32f32f32tnt_m64n32k16m32n32k8A1_200_S1",
+        "found": true,
+        "nhot_profile": 7139,
+        "splitk": 1
+      },
+      "gpu_hours": 0.00676300876610589,
+      "repeat": 7,
+      "results_sha256": "5e85eecf3e063473d0e0f9806381cd61da7ecb2fe50d0640c889f277ae7fa7f5",
+      "status_sha256": "520c29db2aead0aabdb3cbcc54ff4fe4e51c99f507069f90aaef92a906c22655"
+    }
+  ],
+  "first_conv_record_equality": {
+    "algo": true,
+    "tuned_kernel": false
+  },
+  "first_conv_tensor_equality": {
+    "indice_pair_num": true,
+    "input_features": true,
+    "input_indices": true,
+    "output_features": true,
+    "output_indices": true,
+    "weights": true
+  },
+  "formal_results_replaced": false,
+  "frozen_parent_sha256": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
+  "global_determinism_claim": false,
+  "indice_pair_storage_hash_equal": false,
+  "indice_pair_storage_limit": "Raw storage hashes differ; valid neighbor-pair ordering was not canonicalized or compared. This alone does not establish semantic variation.",
+  "kernel_observation": "Actual Native GEMM descriptor differs in one measured process, while all measured first-conv outputs, downstream layer outputs and final predictions remain equal in these eight captures.",
+  "next_bounded_observation": "Up to three full M1-u200 CAL processes recording actual live frozen parent hashes and installed C++ Native GEMM tuner cache descriptors; same numerical policy and original P0 pool.",
+  "prior_failed_full_CAL_control_status": "REMAINS_FAILED_ORIGINAL_REPEAT_GUARD",
+  "raw_prediction_sha256": "9ac5775353131a084f50a586129bc24983560a7ef6bf38837d5e26a09a808953",
+  "schema": "mpr-native-first-stage-diagnostic-v1",
+  "status": "NO_PREDICTION_DIVERGENCE_IN_EIGHT_SINGLE_FRAME_CAPTURES",
+  "target": {
+    "cold_processes": 8,
+    "inputs_per_process": 1,
+    "stages_per_process": 1,
+    "step": 200,
+    "variant": "M1"
+  },
+  "total_settled_gpu_hours": 0.05361507780386698,
+  "verified_unix": 1792027424.2456203,
+  "worker_source_sha256": "1d58e33c5ec9264e85e6aef2fb240ccbf448409e4552765f0ed2db496f379b66"
+}
