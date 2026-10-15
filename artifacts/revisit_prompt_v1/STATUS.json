@@ -37,9 +37,9 @@
   "controller_alive": false,
   "controller_pid": 2138018,
   "controller_process_state": "EXITED_AFTER_OWNED_CHILD_COMPLETED",
-  "current_activity": "BOUNDED_FULL_CAL_NATIVE_KERNEL_DIAGNOSIS",
-  "current_child_pid": 2300158,
-  "current_job_key": "diagnostic:native-first-stage:fullCAL:M1:u200:r0",
+  "current_activity": "BOUNDED_DEFERRED_FIRST_STAGE_CAPTURE",
+  "current_child_pid": 2446933,
+  "current_job_key": "diagnostic:native-first-stage:deferred:probe0",
   "current_variant": "M1",
   "evaluation_namespace": "policies/native-stable-mean-v2",
   "evaluation_policy": {
@@ -64,8 +64,10 @@
   "native_formal_baseline_first_two_verification": "NATIVE_FORMAL_BASELINE_FIRST_TWO_VERIFICATION.json",
   "native_formal_baseline_repeat0_verification": "NATIVE_FORMAL_BASELINE_REPEAT0_VERIFICATION.json",
   "native_formal_baseline_verification": "NATIVE_FORMAL_BASELINE_VERIFICATION.json",
-  "new_gpu_hours": 18.30196448466508,
-  "next_task": "Complete up to three source-hashed full CAL diagnostic captures with live frozen-parent and actual GEMM-cache records; formal queue remains held",
+  "native_full_replay_diagnostic_status": "THREE_MEASURED_FULL_REPLAYS_EQUAL_PRIOR_FAILURE_UNRESOLVED",
+  "native_full_replay_verification": "NATIVE_FULL_REPLAY_VERIFICATION.json",
+  "new_gpu_hours": 18.6914962837359,
+  "next_task": "Up to twelve cold single-frame captures with all encoder tensor reads deferred until after the complete episode; preserve earlier failed full control and unchanged formal guard",
   "numerical_queue_hold_evidence": "CENTROID_FULL_CAL_VERIFICATION.json",
   "numerical_queue_hold_reason": "Stable-centroid full CAL controls: M1-u200 S_long range 0.9096940358479799 pp exceeds unchanged 0.2 pp; repeat2 has identical inputs but different encoder dense features and 84/84 first-stage predictions. M3-u300 three controls equal.",
   "physical_gpu_index": 1,
@@ -99,5 +101,5 @@
   "stage": "LOCKED_EVALUATION_AND_SELECTION",
   "status": "WAITING_NUMERICAL_DIAGNOSIS",
   "verified_optimizer_step": 400,
-  "verified_unix": 1792027424.2462847
+  "verified_unix": 1792044753.8090074
 }

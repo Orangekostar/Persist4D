@@ -1,0 +1,522 @@
+{
+  "AP_range_pp": 0.0,
+  "actual_kernel_caches_by_repeat": [
+    {
+      "after_final_episode": {
+        "0:192:192": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc2.block0.cpe.0",
+            "model.backbone.model.enc.enc2.block1.cpe.0",
+            "model.backbone.model.enc.enc2.block2.cpe.0",
+            "model.backbone.model.dec.dec2.block0.cpe.0",
+            "model.backbone.model.dec.dec2.block1.cpe.0",
+            "model.backbone.model.dec.dec2.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:384:384": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc3.block0.cpe.0",
+            "model.backbone.model.enc.enc3.block1.cpe.0",
+            "model.backbone.model.enc.enc3.block2.cpe.0",
+            "model.backbone.model.enc.enc3.block3.cpe.0",
+            "model.backbone.model.enc.enc3.block4.cpe.0",
+            "model.backbone.model.enc.enc3.block5.cpe.0",
+            "model.backbone.model.enc.enc3.block6.cpe.0",
+            "model.backbone.model.enc.enc3.block7.cpe.0",
+            "model.backbone.model.enc.enc3.block8.cpe.0",
+            "model.backbone.model.enc.enc3.block9.cpe.0",
+            "model.backbone.model.enc.enc3.block10.cpe.0",
+            "model.backbone.model.enc.enc3.block11.cpe.0",
+            "model.backbone.model.dec.dec3.block0.cpe.0",
+            "model.backbone.model.dec.dec3.block1.cpe.0",
+            "model.backbone.model.dec.dec3.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:48:48": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc0.block0.cpe.0",
+            "model.backbone.model.enc.enc0.block1.cpe.0",
+            "model.backbone.model.enc.enc0.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:512:512": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc4.block0.cpe.0",
+            "model.backbone.model.enc.enc4.block1.cpe.0",
+            "model.backbone.model.enc.enc4.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:96:96": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc1.block0.cpe.0",
+            "model.backbone.model.enc.enc1.block1.cpe.0",
+            "model.backbone.model.enc.enc1.block2.cpe.0",
+            "model.backbone.model.dec.dec1.block0.cpe.0",
+            "model.backbone.model.dec.dec1.block1.cpe.0",
+            "model.backbone.model.dec.dec1.block2.cpe.0",
+            "model.backbone.model.dec.dec0.block0.cpe.0",
+            "model.backbone.model.dec.dec0.block1.cpe.0",
+            "model.backbone.model.dec.dec0.block2.cpe.0"
+          ],
+          "splitk": 1
+        }
+      },
+      "after_first_episode": {
+        "0:192:192": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc2.block0.cpe.0",
+            "model.backbone.model.enc.enc2.block1.cpe.0",
+            "model.backbone.model.enc.enc2.block2.cpe.0",
+            "model.backbone.model.dec.dec2.block0.cpe.0",
+            "model.backbone.model.dec.dec2.block1.cpe.0",
+            "model.backbone.model.dec.dec2.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:384:384": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc3.block0.cpe.0",
+            "model.backbone.model.enc.enc3.block1.cpe.0",
+            "model.backbone.model.enc.enc3.block2.cpe.0",
+            "model.backbone.model.enc.enc3.block3.cpe.0",
+            "model.backbone.model.enc.enc3.block4.cpe.0",
+            "model.backbone.model.enc.enc3.block5.cpe.0",
+            "model.backbone.model.enc.enc3.block6.cpe.0",
+            "model.backbone.model.enc.enc3.block7.cpe.0",
+            "model.backbone.model.enc.enc3.block8.cpe.0",
+            "model.backbone.model.enc.enc3.block9.cpe.0",
+            "model.backbone.model.enc.enc3.block10.cpe.0",
+            "model.backbone.model.enc.enc3.block11.cpe.0",
+            "model.backbone.model.dec.dec3.block0.cpe.0",
+            "model.backbone.model.dec.dec3.block1.cpe.0",
+            "model.backbone.model.dec.dec3.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:48:48": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc0.block0.cpe.0",
+            "model.backbone.model.enc.enc0.block1.cpe.0",
+            "model.backbone.model.enc.enc0.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:512:512": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc4.block0.cpe.0",
+            "model.backbone.model.enc.enc4.block1.cpe.0",
+            "model.backbone.model.enc.enc4.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:96:96": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc1.block0.cpe.0",
+            "model.backbone.model.enc.enc1.block1.cpe.0",
+            "model.backbone.model.enc.enc1.block2.cpe.0",
+            "model.backbone.model.dec.dec1.block0.cpe.0",
+            "model.backbone.model.dec.dec1.block1.cpe.0",
+            "model.backbone.model.dec.dec1.block2.cpe.0",
+            "model.backbone.model.dec.dec0.block0.cpe.0",
+            "model.backbone.model.dec.dec0.block1.cpe.0",
+            "model.backbone.model.dec.dec0.block2.cpe.0"
+          ],
+          "splitk": 1
+        }
+      },
+      "repeat": 0
+    },
+    {
+      "after_final_episode": {
+        "0:192:192": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc2.block0.cpe.0",
+            "model.backbone.model.enc.enc2.block1.cpe.0",
+            "model.backbone.model.enc.enc2.block2.cpe.0",
+            "model.backbone.model.dec.dec2.block0.cpe.0",
+            "model.backbone.model.dec.dec2.block1.cpe.0",
+            "model.backbone.model.dec.dec2.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:384:384": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc3.block0.cpe.0",
+            "model.backbone.model.enc.enc3.block1.cpe.0",
+            "model.backbone.model.enc.enc3.block2.cpe.0",
+            "model.backbone.model.enc.enc3.block3.cpe.0",
+            "model.backbone.model.enc.enc3.block4.cpe.0",
+            "model.backbone.model.enc.enc3.block5.cpe.0",
+            "model.backbone.model.enc.enc3.block6.cpe.0",
+            "model.backbone.model.enc.enc3.block7.cpe.0",
+            "model.backbone.model.enc.enc3.block8.cpe.0",
+            "model.backbone.model.enc.enc3.block9.cpe.0",
+            "model.backbone.model.enc.enc3.block10.cpe.0",
+            "model.backbone.model.enc.enc3.block11.cpe.0",
+            "model.backbone.model.dec.dec3.block0.cpe.0",
+            "model.backbone.model.dec.dec3.block1.cpe.0",
+            "model.backbone.model.dec.dec3.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:48:48": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n32k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc0.block0.cpe.0",
+            "model.backbone.model.enc.enc0.block1.cpe.0",
+            "model.backbone.model.enc.enc0.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:512:512": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc4.block0.cpe.0",
+            "model.backbone.model.enc.enc4.block1.cpe.0",
+            "model.backbone.model.enc.enc4.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:96:96": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc1.block0.cpe.0",
+            "model.backbone.model.enc.enc1.block1.cpe.0",
+            "model.backbone.model.enc.enc1.block2.cpe.0",
+            "model.backbone.model.dec.dec1.block0.cpe.0",
+            "model.backbone.model.dec.dec1.block1.cpe.0",
+            "model.backbone.model.dec.dec1.block2.cpe.0",
+            "model.backbone.model.dec.dec0.block0.cpe.0",
+            "model.backbone.model.dec.dec0.block1.cpe.0",
+            "model.backbone.model.dec.dec0.block2.cpe.0"
+          ],
+          "splitk": 1
+        }
+      },
+      "after_first_episode": {
+        "0:192:192": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc2.block0.cpe.0",
+            "model.backbone.model.enc.enc2.block1.cpe.0",
+            "model.backbone.model.enc.enc2.block2.cpe.0",
+            "model.backbone.model.dec.dec2.block0.cpe.0",
+            "model.backbone.model.dec.dec2.block1.cpe.0",
+            "model.backbone.model.dec.dec2.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:384:384": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc3.block0.cpe.0",
+            "model.backbone.model.enc.enc3.block1.cpe.0",
+            "model.backbone.model.enc.enc3.block2.cpe.0",
+            "model.backbone.model.enc.enc3.block3.cpe.0",
+            "model.backbone.model.enc.enc3.block4.cpe.0",
+            "model.backbone.model.enc.enc3.block5.cpe.0",
+            "model.backbone.model.enc.enc3.block6.cpe.0",
+            "model.backbone.model.enc.enc3.block7.cpe.0",
+            "model.backbone.model.enc.enc3.block8.cpe.0",
+            "model.backbone.model.enc.enc3.block9.cpe.0",
+            "model.backbone.model.enc.enc3.block10.cpe.0",
+            "model.backbone.model.enc.enc3.block11.cpe.0",
+            "model.backbone.model.dec.dec3.block0.cpe.0",
+            "model.backbone.model.dec.dec3.block1.cpe.0",
+            "model.backbone.model.dec.dec3.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:48:48": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n32k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc0.block0.cpe.0",
+            "model.backbone.model.enc.enc0.block1.cpe.0",
+            "model.backbone.model.enc.enc0.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:512:512": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc4.block0.cpe.0",
+            "model.backbone.model.enc.enc4.block1.cpe.0",
+            "model.backbone.model.enc.enc4.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:96:96": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc1.block0.cpe.0",
+            "model.backbone.model.enc.enc1.block1.cpe.0",
+            "model.backbone.model.enc.enc1.block2.cpe.0",
+            "model.backbone.model.dec.dec1.block0.cpe.0",
+            "model.backbone.model.dec.dec1.block1.cpe.0",
+            "model.backbone.model.dec.dec1.block2.cpe.0",
+            "model.backbone.model.dec.dec0.block0.cpe.0",
+            "model.backbone.model.dec.dec0.block1.cpe.0",
+            "model.backbone.model.dec.dec0.block2.cpe.0"
+          ],
+          "splitk": 1
+        }
+      },
+      "repeat": 1
+    },
+    {
+      "after_final_episode": {
+        "0:192:192": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc2.block0.cpe.0",
+            "model.backbone.model.enc.enc2.block1.cpe.0",
+            "model.backbone.model.enc.enc2.block2.cpe.0",
+            "model.backbone.model.dec.dec2.block0.cpe.0",
+            "model.backbone.model.dec.dec2.block1.cpe.0",
+            "model.backbone.model.dec.dec2.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:384:384": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc3.block0.cpe.0",
+            "model.backbone.model.enc.enc3.block1.cpe.0",
+            "model.backbone.model.enc.enc3.block2.cpe.0",
+            "model.backbone.model.enc.enc3.block3.cpe.0",
+            "model.backbone.model.enc.enc3.block4.cpe.0",
+            "model.backbone.model.enc.enc3.block5.cpe.0",
+            "model.backbone.model.enc.enc3.block6.cpe.0",
+            "model.backbone.model.enc.enc3.block7.cpe.0",
+            "model.backbone.model.enc.enc3.block8.cpe.0",
+            "model.backbone.model.enc.enc3.block9.cpe.0",
+            "model.backbone.model.enc.enc3.block10.cpe.0",
+            "model.backbone.model.enc.enc3.block11.cpe.0",
+            "model.backbone.model.dec.dec3.block0.cpe.0",
+            "model.backbone.model.dec.dec3.block1.cpe.0",
+            "model.backbone.model.dec.dec3.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:48:48": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc0.block0.cpe.0",
+            "model.backbone.model.enc.enc0.block1.cpe.0",
+            "model.backbone.model.enc.enc0.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:512:512": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n32k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc4.block0.cpe.0",
+            "model.backbone.model.enc.enc4.block1.cpe.0",
+            "model.backbone.model.enc.enc4.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:96:96": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc1.block0.cpe.0",
+            "model.backbone.model.enc.enc1.block1.cpe.0",
+            "model.backbone.model.enc.enc1.block2.cpe.0",
+            "model.backbone.model.dec.dec1.block0.cpe.0",
+            "model.backbone.model.dec.dec1.block1.cpe.0",
+            "model.backbone.model.dec.dec1.block2.cpe.0",
+            "model.backbone.model.dec.dec0.block0.cpe.0",
+            "model.backbone.model.dec.dec0.block1.cpe.0",
+            "model.backbone.model.dec.dec0.block2.cpe.0"
+          ],
+          "splitk": 1
+        }
+      },
+      "after_first_episode": {
+        "0:192:192": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc2.block0.cpe.0",
+            "model.backbone.model.enc.enc2.block1.cpe.0",
+            "model.backbone.model.enc.enc2.block2.cpe.0",
+            "model.backbone.model.dec.dec2.block0.cpe.0",
+            "model.backbone.model.dec.dec2.block1.cpe.0",
+            "model.backbone.model.dec.dec2.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:384:384": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc3.block0.cpe.0",
+            "model.backbone.model.enc.enc3.block1.cpe.0",
+            "model.backbone.model.enc.enc3.block2.cpe.0",
+            "model.backbone.model.enc.enc3.block3.cpe.0",
+            "model.backbone.model.enc.enc3.block4.cpe.0",
+            "model.backbone.model.enc.enc3.block5.cpe.0",
+            "model.backbone.model.enc.enc3.block6.cpe.0",
+            "model.backbone.model.enc.enc3.block7.cpe.0",
+            "model.backbone.model.enc.enc3.block8.cpe.0",
+            "model.backbone.model.enc.enc3.block9.cpe.0",
+            "model.backbone.model.enc.enc3.block10.cpe.0",
+            "model.backbone.model.enc.enc3.block11.cpe.0",
+            "model.backbone.model.dec.dec3.block0.cpe.0",
+            "model.backbone.model.dec.dec3.block1.cpe.0",
+            "model.backbone.model.dec.dec3.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:48:48": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m32n64k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc0.block0.cpe.0",
+            "model.backbone.model.enc.enc0.block1.cpe.0",
+            "model.backbone.model.enc.enc0.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:512:512": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n32k16m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc4.block0.cpe.0",
+            "model.backbone.model.enc.enc4.block1.cpe.0",
+            "model.backbone.model.enc.enc4.block2.cpe.0"
+          ],
+          "splitk": 1
+        },
+        "0:96:96": {
+          "descriptor": "Simt_f32f32f32f32f32tnt_m64n64k8m32n32k8A1_200_S1",
+          "found": true,
+          "modules": [
+            "model.backbone.model.enc.enc1.block0.cpe.0",
+            "model.backbone.model.enc.enc1.block1.cpe.0",
+            "model.backbone.model.enc.enc1.block2.cpe.0",
+            "model.backbone.model.dec.dec1.block0.cpe.0",
+            "model.backbone.model.dec.dec1.block1.cpe.0",
+            "model.backbone.model.dec.dec1.block2.cpe.0",
+            "model.backbone.model.dec.dec0.block0.cpe.0",
+            "model.backbone.model.dec.dec0.block1.cpe.0",
+            "model.backbone.model.dec.dec0.block2.cpe.0"
+          ],
+          "splitk": 1
+        }
+      },
+      "repeat": 2
+    }
+  ],
+  "all_input_summaries_pre_mask_features_raw_predictions_and_metric_rows_equal": true,
+  "all_live_frozen_parent_digests_unchanged": true,
+  "cause_of_prior_outlier": "NOT_ESTABLISHED",
+  "checkpoint_sha256": "fec9df4caecf098ee50c20f5de0d7057d57a040a1e3a38f7daae220d346a66b9",
+  "current_AP_range_pp": 0.0,
+  "evidence": [
+    {
+      "event_id": "mpr:P0:1792027346760754926",
+      "gpu_hours": 0.12129468584138926,
+      "repeat": 0,
+      "results_sha256": "f4b77e14a4e69ce3f714e74201621053ac9757c94ac06ac2402aed13651dc9d8",
+      "status_sha256": "9e53141a710d57dc3f91b3302eca7a32a6e7d4cb4b8830cda2c2c3d237c44904"
+    },
+    {
+      "event_id": "mpr:P0:1792027783996905134",
+      "gpu_hours": 0.12078023558666852,
+      "repeat": 1,
+      "results_sha256": "7f170aa42db3cccea4e103c332781da939706eb2cc5752ce1e541af25c35bda0",
+      "status_sha256": "54c08a5fd35d76d2dd5eba475f72ff822224ff4bc5bdfe9e785382cc08003a9a"
+    },
+    {
+      "event_id": "mpr:P0:1792028219439355372",
+      "gpu_hours": 0.12022059004277658,
+      "repeat": 2,
+      "results_sha256": "981bc8360afb7aa50ddda9b818662ea9bcf7788c2294f37b065f170656927f7b",
+      "status_sha256": "fd8964e1523668114e92095a2797488f2c5bf0609ba81b8b8939c6307beb2e2d"
+    }
+  ],
+  "expected_inputs_per_process": 84,
+  "expected_stages_per_process": 197,
+  "formal_results_replaced": false,
+  "formal_v3_started": false,
+  "frozen_parent_sha256": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
+  "global_determinism_claim": false,
+  "kernel_interpretation": "Timed Native GEMM choices differ in these runs without changing measured outputs; that observation does not establish the cause of the prior outlier.",
+  "prior_failed_full_control": "CENTROID_FULL_CAL_VERIFICATION.json retains failed M1-u200 0.9096940358479799 pp long-repeat range; these diagnostic repeats do not replace it.",
+  "rows": [
+    {
+      "AP": 0.4266909062862396,
+      "current_AP": 0.4266909062862396,
+      "horizon": 1
+    },
+    {
+      "AP": 0.29312655329704285,
+      "current_AP": 0.4145139157772064,
+      "horizon": 2
+    },
+    {
+      "AP": 0.14377477765083313,
+      "current_AP": 0.3772038221359253,
+      "horizon": 3
+    },
+    {
+      "AP": 0.09304647892713547,
+      "current_AP": 0.374103307723999,
+      "horizon": 4
+    },
+    {
+      "AP": 0.14141276478767395,
+      "current_AP": 0.42970719933509827,
+      "horizon": 5
+    }
+  ],
+  "schema": "mpr-native-full-replay-verification-v1",
+  "status": "THREE_MEASURED_FULL_REPLAYS_EQUAL_PRIOR_FAILURE_UNRESOLVED",
+  "step": 200,
+  "total_settled_gpu_hours": 0.3622955114708344,
+  "variant": "M1",
+  "verified_unix": 1792044662.6004868,
+  "worker_source_sha256": "f152aaae656b5f62b5a3edd746b902a6460c10bcc98bd28d19e6a03cc4b24ea1"
+}

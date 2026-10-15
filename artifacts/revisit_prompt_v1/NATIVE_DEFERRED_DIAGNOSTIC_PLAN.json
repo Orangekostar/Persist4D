@@ -1,0 +1,19 @@
+{
+  "all_encoder_modules_observed": true,
+  "created_unix": 1792044662.6018314,
+  "formal_results_replaced": false,
+  "hypothesis": "Synchronous diagnostic tensor reads inside the encoder may change kernel tuning or execution timing; collect references in hooks and read only after the complete episode.",
+  "inplace_mutations_recorded": true,
+  "launcher_source_sha256": "f040c2da93096f23028be541c337ba74dd72aff2835458e7a20716ff5cd45f42",
+  "max_processes": 12,
+  "maximum_total_gpu_hours": 0.36,
+  "no_new_mathematical_intervention": true,
+  "original_failed_control_retained": true,
+  "per_process_gpu_hours": 0.03,
+  "phase": "P0",
+  "prior_worker_source_sha256": "1d58e33c5ec9264e85e6aef2fb240ccbf448409e4552765f0ed2db496f379b66",
+  "status": "PLANNED_BOUNDED_DIAGNOSIS",
+  "stop": "Two distinct first predictions or twelve captures; preserve all results",
+  "target": "M1-u200 first CAL H1 input in a cold Native+stable-feature+stable-centroid process",
+  "worker_source_sha256": "e615fc4420e27fbce361006b952a4445bb43ea167374c2d01085b1fb60cf74ec"
+}
