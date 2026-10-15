@@ -1,0 +1,308 @@
+{
+  "baseline_verification_sha256": "5c98e1e223ba92b7099fe225af9e33c7fa69d84a0c0c599038a572e8afbcbd9e",
+  "descriptive_deltas": [
+    {
+      "delta_current_pp": 0.4156867663065611,
+      "delta_long_pp": -0.7783241569995893,
+      "step": 100
+    },
+    {
+      "delta_current_pp": 0.8656551440556881,
+      "delta_long_pp": -0.2663806080818176,
+      "step": 200
+    },
+    {
+      "delta_current_pp": -0.07238388061523438,
+      "delta_long_pp": -1.4528202513853714,
+      "step": 300
+    }
+  ],
+  "evaluation_policy": {
+    "policy_id": "ordered-sparse-reference-v4",
+    "policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+  },
+  "groups": [
+    {
+      "AP_by_repeat": [
+        [
+          0.43269217014312744,
+          0.2777569890022278,
+          0.1260191649198532,
+          0.11544854193925858,
+          0.12305077165365219
+        ],
+        [
+          0.43269217014312744,
+          0.2777569890022278,
+          0.1260191649198532,
+          0.11544854193925858,
+          0.12305077165365219
+        ],
+        [
+          0.43269217014312744,
+          0.2777569890022278,
+          0.1260191649198532,
+          0.11544854193925858,
+          0.12305077165365219
+        ]
+      ],
+      "S_current_by_repeat": [
+        0.39812418818473816,
+        0.39812418818473816,
+        0.39812418818473816
+      ],
+      "S_long_by_repeat": [
+        0.12150615950425465,
+        0.12150615950425465,
+        0.12150615950425465
+      ],
+      "S_long_range_pp": 0.0,
+      "all_current_mask_diagnostics_equal": true,
+      "all_structure_and_raw_predictions_equal": true,
+      "current_AP_by_repeat": [
+        [
+          0.43269217014312744,
+          0.40169525146484375,
+          0.3709981441497803,
+          0.3722650706768036,
+          0.4511093497276306
+        ],
+        [
+          0.43269217014312744,
+          0.40169525146484375,
+          0.3709981441497803,
+          0.3722650706768036,
+          0.4511093497276306
+        ],
+        [
+          0.43269217014312744,
+          0.40169525146484375,
+          0.3709981441497803,
+          0.3722650706768036,
+          0.4511093497276306
+        ]
+      ],
+      "evidence": [
+        {
+          "actual_gpu_hours": 0.17251120573333334,
+          "charge_event_id": "mpr:P3:1792057183079612733",
+          "repeat": 0,
+          "results_sha256": "e1dc0ebf409ed7bc86175a8ace4df7b2e5f9b30ebb4ba6a195cd8af31789f260",
+          "status_sha256": "14a8a7b0bfa13c9cb0f8f69eccad7dfd474fbbbf52e5be988a2b22cce06dd4b0"
+        },
+        {
+          "actual_gpu_hours": 0.17512180989360787,
+          "charge_event_id": "mpr:P3:1792057804629558152",
+          "repeat": 1,
+          "results_sha256": "49b5202669f932f5f68fb7b1f702e74634672cc4106cb75f2cb0883eaa186c10",
+          "status_sha256": "abe9cf585f2626769def5922d5768cbc233ac2e4e629de619945bba7db5543de"
+        },
+        {
+          "actual_gpu_hours": 0.17607683308555958,
+          "charge_event_id": "mpr:P3:1792058435626430505",
+          "repeat": 2,
+          "results_sha256": "8438ee26cb7b199487f19f9a02fedfdffb8d1df73b88e90100a7f9489ee416b6",
+          "status_sha256": "23975b2697a4185218a53d0fcd5a207f22e1071744d3564252c58d81762aa090"
+        }
+      ],
+      "evidence_files_verified": 198,
+      "input_count": 84,
+      "maximum_AP_range_pp": 0.0,
+      "repeat_count": 3,
+      "stages_per_repeat": 197,
+      "step": 100,
+      "variant": "M1"
+    },
+    {
+      "AP_by_repeat": [
+        [
+          0.43269217014312744,
+          0.28434279561042786,
+          0.1366574615240097,
+          0.09956010431051254,
+          0.14365921914577484
+        ],
+        [
+          0.43269217014312744,
+          0.28434279561042786,
+          0.1366574615240097,
+          0.09956010431051254,
+          0.14365921914577484
+        ],
+        [
+          0.43269217014312744,
+          0.28434279561042786,
+          0.1366574615240097,
+          0.09956010431051254,
+          0.14365921914577484
+        ]
+      ],
+      "S_current_by_repeat": [
+        0.40262387196222943,
+        0.40262387196222943,
+        0.40262387196222943
+      ],
+      "S_long_by_repeat": [
+        0.12662559499343237,
+        0.12662559499343237,
+        0.12662559499343237
+      ],
+      "S_long_range_pp": 0.0,
+      "all_current_mask_diagnostics_equal": true,
+      "all_structure_and_raw_predictions_equal": true,
+      "current_AP_by_repeat": [
+        [
+          0.43269217014312744,
+          0.41806545853614807,
+          0.3882935643196106,
+          0.37492603063583374,
+          0.4446520209312439
+        ],
+        [
+          0.43269217014312744,
+          0.41806545853614807,
+          0.3882935643196106,
+          0.37492603063583374,
+          0.4446520209312439
+        ],
+        [
+          0.43269217014312744,
+          0.41806545853614807,
+          0.3882935643196106,
+          0.37492603063583374,
+          0.4446520209312439
+        ]
+      ],
+      "evidence": [
+        {
+          "actual_gpu_hours": 0.16518724577527286,
+          "charge_event_id": "mpr:P3:1792059070027415978",
+          "repeat": 0,
+          "results_sha256": "063f7c88136d4ddb6d63a75bfb639913df8423fdd0a4a11f09a3e8f0702c6dc6",
+          "status_sha256": "017b6eac260babd48b7fb7dd9966dc4a6fc9ee25f048a72bb7e317d8401e194b"
+        },
+        {
+          "actual_gpu_hours": 0.16406247086083264,
+          "charge_event_id": "mpr:P3:1792059665211024895",
+          "repeat": 1,
+          "results_sha256": "dfbcfb6b36e1d9827606c5bb33aa72871cfa23fbe8c2083c697dd92a99d8d3fe",
+          "status_sha256": "97fcbf37e15b3aa1966a95a9fdcc0eab24401202ebcf9b42cfa808268e6f544a"
+        },
+        {
+          "actual_gpu_hours": 0.16530466815889264,
+          "charge_event_id": "mpr:P3:1792060256346751762",
+          "repeat": 2,
+          "results_sha256": "58a7eef48da8f7a861c0af7cfc3608838a7974fb8266653b36ba72e6284e0cd3",
+          "status_sha256": "5898d0a3fd5ed7301083d011f6a2b49a45b061dde38581da3bb98f7fe307a329"
+        }
+      ],
+      "evidence_files_verified": 198,
+      "input_count": 84,
+      "maximum_AP_range_pp": 0.0,
+      "repeat_count": 3,
+      "stages_per_repeat": 197,
+      "step": 200,
+      "variant": "M1"
+    },
+    {
+      "AP_by_repeat": [
+        [
+          0.43269217014312744,
+          0.2804291546344757,
+          0.14242951571941376,
+          0.09703245759010315,
+          0.10482162237167358
+        ],
+        [
+          0.43269217014312744,
+          0.2804291546344757,
+          0.14242951571941376,
+          0.09703245759010315,
+          0.10482162237167358
+        ],
+        [
+          0.43269217014312744,
+          0.2804291546344757,
+          0.14242951571941376,
+          0.09703245759010315,
+          0.10482162237167358
+        ]
+      ],
+      "S_current_by_repeat": [
+        0.3932434817155202,
+        0.3932434817155202,
+        0.3932434817155202
+      ],
+      "S_long_by_repeat": [
+        0.11476119856039683,
+        0.11476119856039683,
+        0.11476119856039683
+      ],
+      "S_long_range_pp": 0.0,
+      "all_current_mask_diagnostics_equal": true,
+      "all_structure_and_raw_predictions_equal": true,
+      "current_AP_by_repeat": [
+        [
+          0.43269217014312744,
+          0.40920841693878174,
+          0.38513681292533875,
+          0.36844176054000854,
+          0.4261518716812134
+        ],
+        [
+          0.43269217014312744,
+          0.40920841693878174,
+          0.38513681292533875,
+          0.36844176054000854,
+          0.4261518716812134
+        ],
+        [
+          0.43269217014312744,
+          0.40920841693878174,
+          0.38513681292533875,
+          0.36844176054000854,
+          0.4261518716812134
+        ]
+      ],
+      "evidence": [
+        {
+          "actual_gpu_hours": 0.16926794102166443,
+          "charge_event_id": "mpr:P3:1792060851957739736",
+          "repeat": 0,
+          "results_sha256": "71ef9b5a6a7f5d6ee73d1f5813c6e81c1f945ac2d151bfc156c554d8637c372b",
+          "status_sha256": "b2420b52d70d331e247c5d88bb08f81039c21f071def2058667bc488e2353281"
+        },
+        {
+          "actual_gpu_hours": 0.16783754846638962,
+          "charge_event_id": "mpr:P3:1792061461832373045",
+          "repeat": 1,
+          "results_sha256": "9f927c77354757302e2e7882b584ec0c444938a96d3fa67dbab11be703b2cb3a",
+          "status_sha256": "450b54651d495abbcac9e583de2cdea9968f396b7d5de8e09918524cf8b4e3a3"
+        },
+        {
+          "actual_gpu_hours": 0.1854732440266687,
+          "charge_event_id": "mpr:P3:1792062066553560707",
+          "repeat": 2,
+          "results_sha256": "26770e35958960829d73267e5a420fcba12ce3f4d11243c632d71c944ada7a9a",
+          "status_sha256": "1e879755a966b86074a7459364d8ff16db59f88b6057ea9c1fd5aecb84aa7ecf"
+        }
+      ],
+      "evidence_files_verified": 198,
+      "input_count": 84,
+      "maximum_AP_range_pp": 0.0,
+      "repeat_count": 3,
+      "stages_per_repeat": 197,
+      "step": 300,
+      "variant": "M1"
+    }
+  ],
+  "limitations": [
+    "M1-u400 and the remaining variants must complete before selection.",
+    "These are internal CAL results under V4, not ReScene test-set comparisons.",
+    "Finite repeated results do not establish the earlier outlier cause or global bitwise determinism."
+  ],
+  "original_failed_controls_retained": true,
+  "original_repeat_limit_pp": 0.2,
+  "selection_performed": false,
+  "status": "FIRST_THREE_M1_CHECKPOINTS_VERIFIED_FOUR_POINT_MATRIX_PENDING"
+}
