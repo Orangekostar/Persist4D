@@ -1,4 +1,9 @@
 {
+  "candidate_v3_formal_started": false,
+  "candidate_v3_policy_frozen": false,
+  "centroid_diagnostic_verification": "CENTROID_DIAGNOSTIC_VERIFICATION.json",
+  "centroid_full_cal_verification": "CENTROID_FULL_CAL_VERIFICATION.json",
+  "centroid_implementation_verification": "CENTROID_IMPLEMENTATION_VERIFICATION.json",
   "code_status": "C3_TRAINING_WITH_SEPARATELY_LOCKED_NATIVE_EVALUATION_V2",
   "completed_evaluation_tasks": [
     "Native M0 CAL r0",
@@ -9,7 +14,8 @@
     "Native M1 u100 CAL r2",
     "Native M1 u200 CAL r0",
     "Native M1 u200 CAL r1",
-    "Native M1 u200 CAL r2"
+    "Native M1 u200 CAL r2",
+    "Native M1 u300 CAL r0"
   ],
   "completed_main_training_gpu_hours": 9.12422078314583,
   "completed_variant_steps": {
@@ -28,11 +34,12 @@
     "M5",
     "M6"
   ],
-  "controller_alive": true,
+  "controller_alive": false,
   "controller_pid": 2138018,
-  "controller_process_state": "T",
-  "current_child_pid": 2160403,
-  "current_job_key": "policy:native-stable-mean-v2:eval:M1:s146:u200:CAL:r0",
+  "controller_process_state": "EXITED_AFTER_OWNED_CHILD_COMPLETED",
+  "current_activity": "BOUNDED_FIRST_STAGE_NATIVE_DIAGNOSIS",
+  "current_child_pid": 2298120,
+  "current_job_key": "diagnostic:native-first-stage:probe4",
   "current_variant": "M1",
   "evaluation_namespace": "policies/native-stable-mean-v2",
   "evaluation_policy": {
@@ -56,10 +63,10 @@
   "native_formal_baseline_first_two_verification": "NATIVE_FORMAL_BASELINE_FIRST_TWO_VERIFICATION.json",
   "native_formal_baseline_repeat0_verification": "NATIVE_FORMAL_BASELINE_REPEAT0_VERIFICATION.json",
   "native_formal_baseline_verification": "NATIVE_FORMAL_BASELINE_VERIFICATION.json",
-  "new_gpu_hours": 16.492677910347314,
-  "next_task": "Finish owned M1-u300 r0; bounded late-stage diagnosis; preserve all old results and original guards",
-  "numerical_queue_hold_evidence": "NATIVE_M1_U200_VERIFICATION.json",
-  "numerical_queue_hold_reason": "Native M1-u200 S_long range 0.4911815126736968 pp exceeds original 0.2 pp; later-stage instability persists",
+  "new_gpu_hours": 18.30196448466508,
+  "next_task": "Capture fixed-input layer and actual Native GEMM kernel identities; preserve every repeat and original guard; formal queue stays held",
+  "numerical_queue_hold_evidence": "CENTROID_FULL_CAL_VERIFICATION.json",
+  "numerical_queue_hold_reason": "Stable-centroid full CAL controls: M1-u200 S_long range 0.9096940358479799 pp exceeds unchanged 0.2 pp; repeat2 has identical inputs but different encoder dense features and 84/84 first-stage predictions. M3-u300 three controls equal.",
   "physical_gpu_index": 1,
   "policy_baseline_admission": "EVALUATION_M0_ADMISSION_V2.json",
   "policy_epsilon_run_pp": 0.0,
@@ -91,5 +98,5 @@
   "stage": "LOCKED_EVALUATION_AND_SELECTION",
   "status": "WAITING_NUMERICAL_DIAGNOSIS",
   "verified_optimizer_step": 400,
-  "verified_unix": 1792012173.7041626
+  "verified_unix": 1792027190.165807
 }
