@@ -37,9 +37,9 @@
   "controller_alive": false,
   "controller_pid": 2138018,
   "controller_process_state": "EXITED_AFTER_OWNED_CHILD_COMPLETED",
-  "current_activity": "CPU_REFERENCE_VERIFIED_GPU_CONTROLS_PREPARED",
-  "current_child_pid": null,
-  "current_job_key": null,
+  "current_activity": "BOUNDED_ORDERED_SPARSE_FULL_CAL_CONTROLS",
+  "current_child_pid": 2514571,
+  "current_job_key": "diagnostic:ordered-sparse:full:M1:u200:r0",
   "current_variant": "M1",
   "evaluation_namespace": "policies/native-stable-mean-v2",
   "evaluation_policy": {
@@ -67,8 +67,8 @@
   "native_formal_baseline_verification": "NATIVE_FORMAL_BASELINE_VERIFICATION.json",
   "native_full_replay_diagnostic_status": "THREE_MEASURED_FULL_REPLAYS_EQUAL_PRIOR_FAILURE_UNRESOLVED",
   "native_full_replay_verification": "NATIVE_FULL_REPLAY_VERIFICATION.json",
-  "new_gpu_hours": 18.899489816387568,
-  "next_task": "Bounded ordered sparse reference controls; retain prior failure and unchanged formal guard",
+  "new_gpu_hours": 18.91863824292757,
+  "next_task": "Complete separate ordered sparse reference CAL controls; preserve all original failed repeats; formal evaluation held",
   "numerical_queue_hold_evidence": "CENTROID_FULL_CAL_VERIFICATION.json",
   "numerical_queue_hold_reason": "Stable-centroid full CAL controls: M1-u200 S_long range 0.9096940358479799 pp exceeds unchanged 0.2 pp; repeat2 has identical inputs but different encoder dense features and 84/84 first-stage predictions. M3-u300 three controls equal.",
   "physical_gpu_index": 1,
@@ -101,8 +101,9 @@
   "shared_first_stage_verification": "SHARED_FIRST_STAGE_VERIFICATION.json",
   "sparse_reference_diagnostic_plan": "SPARSE_REFERENCE_DIAGNOSTIC_PLAN.json",
   "sparse_reference_implementation_verification": "SPARSE_REFERENCE_IMPLEMENTATION_VERIFICATION.json",
+  "sparse_reference_single_input_verification": "SPARSE_REFERENCE_SINGLE_INPUT_VERIFICATION.json",
   "stage": "LOCKED_EVALUATION_AND_SELECTION",
   "status": "WAITING_NUMERICAL_DIAGNOSIS",
   "verified_optimizer_step": 400,
-  "verified_unix": 1792051328.1154718
+  "verified_unix": 1792051534.9294426
 }
