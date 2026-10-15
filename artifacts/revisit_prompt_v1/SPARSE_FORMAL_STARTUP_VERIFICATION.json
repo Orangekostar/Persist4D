@@ -1,0 +1,32 @@
+{
+  "all_main_checkpoints_verified": 24,
+  "charge_event_id": "mpr:P1:1792055365662140057",
+  "child_pid": 2546889,
+  "child_status_sha256": "da7f66e87a445e6a3c02eb86ad45e64e9c2f53765d463e757d273c0690fde98a",
+  "complete_CAL_controls_passed": 6,
+  "controller_pid": 2546831,
+  "cpu_tests_passed": 62,
+  "diagnostic_controls_passed": 9,
+  "evaluation_policy": {
+    "policy_id": "ordered-sparse-reference-v4",
+    "policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+  },
+  "expected_inputs": 84,
+  "formal_metrics_complete": false,
+  "fresh_M0_admitted": false,
+  "global_bitwise_determinism_claim": false,
+  "implementation_commit": "66469ba90c88ce6bcb19ba5b253fcce4c4e43e1e",
+  "job_key": "policy:ordered-sparse-reference-v4:eval:M0:s146:u0:CAL:r0",
+  "main_training_complete": true,
+  "monitor_error": null,
+  "monitor_progress": 36,
+  "monitor_timestamp_utc": "2026-10-15T09:11:18.671020Z",
+  "monitor_total": 84,
+  "namespace": "policies/ordered-sparse-reference-v4",
+  "observed_completed_inputs": 38,
+  "original_budget_and_repeat_guards_unchanged": true,
+  "original_failed_controls_preserved": true,
+  "phase": "P1",
+  "status": "VERIFIED_RUNNING_FRESH_BASELINE_REPEAT0",
+  "verified_unix": 1792055484.6012595
+}
