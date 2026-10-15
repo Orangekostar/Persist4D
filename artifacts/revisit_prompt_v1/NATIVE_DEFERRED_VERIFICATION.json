@@ -1,0 +1,145 @@
+{
+  "actual_frozen_parent_sha256": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
+  "all_observed_tensor_summaries_equal": true,
+  "all_sample_and_structure_records_equal": true,
+  "diagnostic_only": true,
+  "diagnostic_plan_sha256": "a34711c885d76b7b64e80f00008285efe0275261f525c29debc25938db52ffe0",
+  "evidence": [
+    {
+      "actual_gpu_hours": 0.016807101419164812,
+      "charge_event_id": "mpr:P0:1792044714324525573",
+      "private_tensors_sha256": "c144de620b118a97ac2005aa6be8937c1e9c7f99333dc5e13abb1a8b6b25101f",
+      "repeat": 0,
+      "results_sha256": "076debf6799e10724b5d5551e6b10701c1c3d6eccbe325a9698e6d073492cc56",
+      "status_sha256": "9b03d74918cf4cd8cc53f47122a463a0ced0bdf25d83225aaaa0a0f54994e30c"
+    },
+    {
+      "actual_gpu_hours": 0.01701799534361473,
+      "charge_event_id": "mpr:P0:1792044775346604916",
+      "private_tensors_sha256": "40e93d1266cf00744cd0525d7b0950849976849ed7548c8ac2194bad3039f92b",
+      "repeat": 1,
+      "results_sha256": "f0f4411629d2c8477f8fd7ee28c92c1150d20320722aedbbeba3c80899b2047d",
+      "status_sha256": "8585bb62cdcdf04dc65a5d905ace267af6bbcf26477352d96567ca649fb0647d"
+    },
+    {
+      "actual_gpu_hours": 0.0171456544236086,
+      "charge_event_id": "mpr:P0:1792044837041277853",
+      "private_tensors_sha256": "0acb4957209e9572696e1f5e3744e26cf86ad785d5060ce244e87366e8edc2be",
+      "repeat": 2,
+      "results_sha256": "7f76ed1925559be358031c56bb837a59306a0672286d46a59857bb6f17c7d435",
+      "status_sha256": "7a307a0ea1cc93edbad586fad1477ab93a07c8c47d1ec92e790ce8a5ada630c3"
+    },
+    {
+      "actual_gpu_hours": 0.016964280008340007,
+      "charge_event_id": "mpr:P0:1792044899314401031",
+      "private_tensors_sha256": "ac2fde8d05db1e62746da388d3fc2ff7257d55742fcf74ca78cb80957f5d8939",
+      "repeat": 3,
+      "results_sha256": "cb995a9d8c45c258144c49fc61fd4cf4506a7a91d7defdd4c3e452cf55451cd4",
+      "status_sha256": "0dcb885c391574239377732c131a0048b5ebd3e66b62c94b5442f17ee5a477b4"
+    },
+    {
+      "actual_gpu_hours": 0.016979154206387143,
+      "charge_event_id": "mpr:P0:1792044960913139061",
+      "private_tensors_sha256": "8178bfd43a5d622374dda6170d62f37995c0c9a8172f8765a827d8d3fbc51cfb",
+      "repeat": 4,
+      "results_sha256": "241de6137262c5776f69891cb5ffe39ca95bfd59d2dcf051b3615d26b2c714ac",
+      "status_sha256": "9e8eb8df5c970afb8bddd6e1fc42ced9e0844ab4717e976bc197683c978c2318"
+    },
+    {
+      "actual_gpu_hours": 0.01722883532249802,
+      "charge_event_id": "mpr:P0:1792045022560238246",
+      "private_tensors_sha256": "e9ab500278c98c0355413a70759e7e4edecfabcf008726680e2f6fd1e8882ebd",
+      "repeat": 5,
+      "results_sha256": "724c675ed22bee450851161abf67429e09471a4f8570d95fa0b50970794a7e3a",
+      "status_sha256": "d619074472f74654c2825c5ce3a4dcea6b4b4bfb1639e60d800a3326824663c9"
+    },
+    {
+      "actual_gpu_hours": 0.017285917356388784,
+      "charge_event_id": "mpr:P0:1792045085135270429",
+      "private_tensors_sha256": "2f06a093eab1e94d965e97b2090e7b16735c97d0904399d8c4bda24f154f3b02",
+      "repeat": 6,
+      "results_sha256": "2adae1c11fef512a063818c58cc1db4ed43df08429d4fa1cb8ac9b41ab3e1468",
+      "status_sha256": "8895a68d08853442b26d99aefe4f47c00b43d060a0768478794d63581f982847"
+    },
+    {
+      "actual_gpu_hours": 0.01714690527305518,
+      "charge_event_id": "mpr:P0:1792045148070063801",
+      "private_tensors_sha256": "2e1f3e63bdd07bc86bea01b8dc4630922b72db6f50ee800d114d6907de5541f0",
+      "repeat": 7,
+      "results_sha256": "0390d75c9ae4d4fd07b3db8a837d4db24c431c60035b8f5c1a15d0222b458997",
+      "status_sha256": "818a03f047d86530198dd37fb4153e0a88f3ef6e74954c6d18e84dbd715e37c0"
+    },
+    {
+      "actual_gpu_hours": 0.0182691552705526,
+      "charge_event_id": "mpr:P0:1792045210320533662",
+      "private_tensors_sha256": "de8800eb7f7436e3fe06d207f792da5fd219289f3c3cb6f977f0657db8c2c371",
+      "repeat": 8,
+      "results_sha256": "42ceae74382c7fc9e24e818854b08301287a77925b67ce1b4746b542aff5105c",
+      "status_sha256": "bc91ad954c6910f9b1227d5cc3bc247fb8e160d17ecc8846fe672c3461cfd197"
+    },
+    {
+      "actual_gpu_hours": 0.017720584355556637,
+      "charge_event_id": "mpr:P0:1792045276614683804",
+      "private_tensors_sha256": "612608ec180148685a2d4935c11c7344731e7b47029a6f3ea5df22f4d1180420",
+      "repeat": 9,
+      "results_sha256": "3a539975486720a2c8b683e2c9441d0fa71d57030a4df418c83748ec23d3cf11",
+      "status_sha256": "5ee337480f9a3745bdcbad939b0a3a2f761acf23e63e1380050eaf083aa1657f"
+    },
+    {
+      "actual_gpu_hours": 0.01742792676388894,
+      "charge_event_id": "mpr:P0:1792045340932343685",
+      "private_tensors_sha256": "e3edd5f4fe8ebdedacd0bffbfec7e3cebef9b468594884ba4b98514a465486ff",
+      "repeat": 10,
+      "results_sha256": "744e9af01f8ca646b2906227e8f1b6437a18c9ae10feb400a990e6cd91dc3ea5",
+      "status_sha256": "d928223da3c48afaf11c334a0f8d58a649f1d0a41f4940ccf0184a5b0ec4c8b7"
+    },
+    {
+      "actual_gpu_hours": 0.018000022908608016,
+      "charge_event_id": "mpr:P0:1792045404248359892",
+      "private_tensors_sha256": "7aa4582ad596e564bcadbd4227dc4b104ee09a330f8c26ff76aff94b4d9a07e5",
+      "repeat": 11,
+      "results_sha256": "03a3d925a75836a274d9f55611ab7098c46d1ea834b88679e5afd818dccb7bfd",
+      "status_sha256": "7cebb85d42e02ebb6ddf09ca0ac2fd957fa2f143be48268f21368653e7ef58c3"
+    }
+  ],
+  "formal_policy_frozen": false,
+  "formal_results_replaced": false,
+  "instrumentation": "Tensor references only during encoder; tensor summaries read after the complete episode",
+  "limitations": [
+    "No anomalous prediction was captured; the previous full-control outlier remains unresolved.",
+    "One H1 input does not establish full CAL repeatability.",
+    "Observed tensor version counters do not prove absence of every possible external mutation."
+  ],
+  "observed_mutation_flags": 0,
+  "original_failed_control_retained": true,
+  "raw_prediction_sha256": "9ac5775353131a084f50a586129bc24983560a7ef6bf38837d5e26a09a808953",
+  "scope": {
+    "encoder_observations_per_process": 1085,
+    "inputs_per_process": 1,
+    "processes": 12,
+    "stages_per_process": 1,
+    "step": 200,
+    "variant": "M1"
+  },
+  "sources": {
+    "all_encoder_modules_observed": true,
+    "created_unix": 1792044662.6018314,
+    "formal_results_replaced": false,
+    "hypothesis": "Synchronous diagnostic tensor reads inside the encoder may change kernel tuning or execution timing; collect references in hooks and read only after the complete episode.",
+    "inplace_mutations_recorded": true,
+    "launcher_source_sha256": "f040c2da93096f23028be541c337ba74dd72aff2835458e7a20716ff5cd45f42",
+    "max_processes": 12,
+    "maximum_total_gpu_hours": 0.36,
+    "no_new_mathematical_intervention": true,
+    "original_failed_control_retained": true,
+    "per_process_gpu_hours": 0.03,
+    "phase": "P0",
+    "prior_worker_source_sha256": "1d58e33c5ec9264e85e6aef2fb240ccbf448409e4552765f0ed2db496f379b66",
+    "status": "PLANNED_BOUNDED_DIAGNOSIS",
+    "stop": "Two distinct first predictions or twelve captures; preserve all results",
+    "target": "M1-u200 first CAL H1 input in a cold Native+stable-feature+stable-centroid process",
+    "worker_source_sha256": "e615fc4420e27fbce361006b952a4445bb43ea167374c2d01085b1fb60cf74ec"
+  },
+  "status": "TWELVE_DEFERRED_CAPTURES_EQUAL_PRIOR_FULL_CONTROL_FAILURE_UNRESOLVED",
+  "total_actual_gpu_hours": 0.20799353265166348
+}

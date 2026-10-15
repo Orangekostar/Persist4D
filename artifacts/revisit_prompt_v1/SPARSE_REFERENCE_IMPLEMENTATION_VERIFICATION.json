@@ -1,0 +1,20 @@
+{
+  "checks": [
+    "Known exact sparse neighborhoods, center, bias, mirrored Native counts and padding",
+    "Pair storage permutation, empty input, inference guard and unsupported tensor operations",
+    "Context restores on exception; installed spconv CPU convolution comparison",
+    "Existing centroid/native/stable-mean/admission regressions"
+  ],
+  "files": {
+    "models/revisit_prompt_sparse_reference.py": "f964d3243cc9bac212c606176f0fcd49c1fe3dc4e7a00ffc30a7664a155fc20c",
+    "tests/test_revisit_prompt_sparse_reference.py": "54ece492070ff13aee89f8c0aed2af203472e665b0766a8988978db8af360432"
+  },
+  "global_determinism_claim": false,
+  "gpu_verification_pending": true,
+  "immutable_checkpoints_verified": 24,
+  "immutable_training_sources_verified": true,
+  "new_tests": 13,
+  "red_verified": "New tests initially failed with ModuleNotFoundError before helper implementation",
+  "regression_tests": 40,
+  "status": "PASSED_CPU_ONLY"
+}
