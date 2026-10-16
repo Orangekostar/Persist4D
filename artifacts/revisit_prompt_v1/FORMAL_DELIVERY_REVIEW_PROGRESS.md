@@ -29,3 +29,5 @@ python -m scripts.publish_revisit_prompt --dry-run --branch research/persist4d-m
 后台监控由 GPT-5.6 Luna 负责机械轮询；主代理保留错误判断、修复、科学结论和最终集成责任。2026-10-16 03:18 UTC Luna 实测 watcher/controller 均存活且无控制终端，M3-400 PB r0 为 332/516，无 error。实时状态以运行根的 monitor_luna/latest.json 与活进程核对为准。
 
 主代理 2026-10-16 03:31 UTC 再次核对：watcher 3099815、控制器 2546831、评测子进程 3105331 均存活且无控制终端；03:30:53 心跳记录 M3-400 PB r0 为 405/516，较 03:27:53 的 391/516 持续推进，无 error。PRIMARY_IMPLEMENTATION_REVIEW.json 明确区分源码契约、既有实际执行证据与未完成项；没有启动新 GPU 作业或改写冻结的模型、数值源码、选点、预算与协议。最终部署验证可使用 P5 的 `EXACT_PARENT_ENCODER_DELTA_COVERAGE_AND_REAL_FORWARD` 实际完成记录，随后核对所打包 delta 与其源文件字节一致；目前不能把源码中的标记当作已完成的回载证据。
+
+2026-10-16 04:01 UTC：M3-400 PB r0 已实际 COMPLETE。主代理核对 516 个不同输入、1806 个阶段、T2–T5 各 129 个输入、8 份总体及 48 份 reference 官方状态文件哈希，以及所加载 delta 身份；原收费事件仅结算一次，实际 1.273136423938332 GPUh。私有/公开账本 218 个唯一事件完全相同，新增累计 38.61483371920259 GPUh。控制器已自动切换 PB r1（PID 3141434），心跳进度 40/516；watcher/controller/child 存活且无控制终端。STATUS.json 保存该完成验证及实时快照；本轮已完成正式评测进程 85 个。单次 PB 完成不等于三重复确认完成，CAL 失败的复验门槛及全部未完成范围保持原判定。
