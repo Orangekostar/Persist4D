@@ -1,0 +1,65 @@
+{
+  "AP_by_repeat": [
+    {
+      "2": 0.17730391025543213,
+      "3": 0.09801165014505386,
+      "4": 0.0636085569858551,
+      "5": 0.042912546545267105
+    },
+    {
+      "2": 0.17730391025543213,
+      "3": 0.09801165014505386,
+      "4": 0.0636085569858551,
+      "5": 0.042912546545267105
+    }
+  ],
+  "completed_repeats": 2,
+  "current_AP_by_repeat": [
+    {
+      "2": 0.34625062346458435,
+      "3": 0.3535059094429016,
+      "4": 0.337706983089447,
+      "5": 0.342519074678421
+    },
+    {
+      "2": 0.34625062346458435,
+      "3": 0.3535059094429016,
+      "4": 0.337706983089447,
+      "5": 0.342519074678421
+    }
+  ],
+  "evaluation_policy": {
+    "policy_id": "ordered-sparse-reference-v4",
+    "policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+  },
+  "evidence": [
+    {
+      "actual_gpu_hours": 1.273136423938332,
+      "charge_event_id": "mpr:P4:1792118558890867756",
+      "repeat": 0,
+      "results_sha256": "92d19e48233238d079a9651a4f971670a04e39b1418d8ea63e8d9f464e65db2b",
+      "status_sha256": "b6c46700e2469e8e5fb3fd42f780f898ac49bd718a7320c600fe7b7af8e4903f"
+    },
+    {
+      "actual_gpu_hours": 1.2452366792674971,
+      "charge_event_id": "mpr:P4:1792123142691480822",
+      "repeat": 1,
+      "results_sha256": "4e7f579e267434fa83a6a9248770fdcde9689247e17cfafc1ce33adf8d0f5a6e",
+      "status_sha256": "4216b8e4a0eec9f0707b46f1146d0a65dcd2a6ab0911b5d4d151aee7be3abaea"
+    }
+  ],
+  "inputs_per_repeat": 516,
+  "limitation": "Finite internal PB repeat comparison only; no global determinism claim. All three repetitions, candidate confirmation, bootstrap and P5 require separate completion evidence.",
+  "metric_rows_equal": true,
+  "official_global_and_reference_state_bytes_equal": true,
+  "official_state_files_byte_verified": 16,
+  "reference_state_files_byte_verified": 96,
+  "role": "PB",
+  "seed": 146,
+  "stages_per_repeat": 1806,
+  "status": "TWO_PB_REPEATS_VERIFIED",
+  "step": 400,
+  "structures_raw_predictions_and_identity_diagnostics_equal": true,
+  "variant": "M3",
+  "verified_unix": 1792127648.8747418
+}
