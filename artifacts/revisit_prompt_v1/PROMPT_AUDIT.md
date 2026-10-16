@@ -17,7 +17,9 @@
 - 早期 stable-mean、Native 与 centroid 诊断、失败和费用保留在相应报告及独立命名空间。V4 不是原论文推理程序完全不变的结果；正式 CAL/SEL/PB/P5 须使用同一 V4 上下文，不能混入旧策略结果。V4 的有限重复一致没有解决旧 Native 大幅异常的因果来源，也没有证明全局逐张量确定性。
 - 唯一选点只使用完整 CAL 四点及每点三次独立进程。锁定对照为 M3-400，描述性候选为 M4-200；[CAL_SELECTION_LOCK.json](CAL_SELECTION_LOCK.json) 的 SHA256 为 `e182171047492635eb6b4b8efe9a502128a3ff639775df5b4c3cf0631fd09e02`。SEL/PB 不重选端点。
 - CAL 长期均值差为 +0.7764pp，但 T3/T4 分别为 −0.8040pp/−1.4022pp，未满足逐长度 −0.2pp 门槛。[REPLICATION_LOCK.json](REPLICATION_LOCK.json) 如实为 `NOT_EXECUTED_CAL_GATE_FAILED`，不追加 seed147 或替换候选。完整交付仍应保留 `SCREEN_NO_GO`，不能因确认集某个正差值改写 CAL 晋级规则。
-- 可选 CPU 统计入口仅加速原 bootstrap 内的 PR 曲线计算，保留官方积分、reference 成对抽样、1000 次重采样、seed9101、三进程差值均值与 NA 规则。56 份状态及 reference 池化和 220 条实际曲线已精确核对，23 项聚焦测试通过，见 [CPU_STATISTICS_ACCELERATION_VERIFICATION.json](CPU_STATISTICS_ACCELERATION_VERIFICATION.json)。截至本草稿，正式控制器接管和完整加速 bootstrap 均未执行；局部计时不代表完整统计耗时。
+- 可选 CPU 统计入口仅加速原 bootstrap 内的 PR 曲线计算，保留官方积分、reference 成对抽样、1000 次重采样、seed9101、三进程差值均值与 NA 规则。56 份状态及 reference 池化和 220 条实际曲线已精确核对，23 项聚焦测试通过，见 [CPU_STATISTICS_ACCELERATION_VERIFICATION.json](CPU_STATISTICS_ACCELERATION_VERIFICATION.json)。07:19 初始审阅时，正式控制器接管和完整加速 bootstrap 均未执行；局部计时不代表完整统计耗时。
+
+07:26 UTC 执行增补：两个锁定 SEL 端点的三轮结果已齐，主代理启动独立 CPU 进程，使用已验证加速上下文与 V4 命名空间调用原 `bootstrap_locked`。正式 GPU 控制器未接管或重启，PB 队列继续运行。CPU 进程已验证 6 份输入并开始官方状态池化，完整 1000 次重采样尚在计算，区间未生成；PB bootstrap 尚未执行。运行快照见 CPU 统计核验文件的 `active_full_bootstrap`，不能将 RUNNING 写成统计完成。
 
 ## §19 执行内容逐项审核
 

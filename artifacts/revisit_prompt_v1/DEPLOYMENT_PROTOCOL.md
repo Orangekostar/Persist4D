@@ -72,7 +72,7 @@ PY
 
 可选的 CPU 统计恢复入口是 `python -m scripts.continue_revisit_prompt_statistics --execute`，默认或 `--dry-run` 只打印 `DRY_RUN_NOT_STARTED`。它仍调用上述原控制器，沿用其互斥锁、收费、身份核查与完成任务去重；仅在原 `bootstrap_locked` 调用期间批量计算 CPU float32 PR 阈值，退出或异常时恢复函数绑定。原 AP 积分、reference 抽样、1000 次 bootstrap、种子、三次重复和 NA 规则均保留。当前 GPU 评测运行期间不得据此启动第二个控制器。
 
-2026-10-16 的实现验证见 `CPU_STATISTICS_ACCELERATION_VERIFICATION.json`：56 份已完成状态及各自 reference 池化指标精确相同，220 条实际 PR 曲线逐元素精确相同；23 项测试通过，包括 dry-run 不启动控制器、正常/异常退出恢复绑定及损坏状态被拒绝。该入口尚未用于接管正式控制器，完整加速 bootstrap 尚未执行。曲线局部计时不代表整套 bootstrap 的实测耗时。
+2026-10-16 的实现验证见 `CPU_STATISTICS_ACCELERATION_VERIFICATION.json`：56 份已完成状态及各自 reference 池化指标精确相同，220 条实际 PR 曲线逐元素精确相同；23 项测试通过，包括 dry-run 不启动控制器、正常/异常退出恢复绑定及损坏状态被拒绝。该入口尚未用于接管正式控制器。SEL 两个锁定端点的三轮结果齐备后，主代理于 07:26 UTC 在独立 CPU 进程中调用原 `bootstrap_locked`，使用同一加速上下文及 V4 命名空间；保留原 1000 次抽样和 seed9101，CUDA 不可见，原 GPU 控制器继续执行 PB。完整 SEL bootstrap 正在计算，PB bootstrap 尚未执行。曲线局部计时不代表整套 bootstrap 的实测耗时。
 
 ## 从官方充分状态复算
 

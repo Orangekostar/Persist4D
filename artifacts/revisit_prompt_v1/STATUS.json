@@ -122,6 +122,18 @@
   "controller_alive": true,
   "controller_pid": 2546831,
   "controller_process_state": "RUNNING_LOCKED_EVALUATION",
+  "cpu_bootstrap": {
+    "bootstrap_seed": 9101,
+    "controller_handoff": "NOT_EXECUTED",
+    "execution_journal": "statistics/sel-bootstrap-20261016 (private run root)",
+    "heartbeat_utc": "2026-10-16T07:30:12.606984+00:00",
+    "pid": 3257481,
+    "pool_calls_completed": 1083,
+    "role": "SEL",
+    "samples": 1000,
+    "started_utc": "2026-10-16T07:26:07.715424+00:00",
+    "status": "RUNNING"
+  },
   "current_activity": "V4_LOCKED_SEL_PB_CONFIRMATION",
   "current_child_pid": 3248718,
   "current_completed_inputs": 57,

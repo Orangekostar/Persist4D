@@ -1,6 +1,24 @@
 {
   "accelerated_full_recomputation_seconds": 23.69314809300704,
   "acceleration_source_sha256": "1055376e1dd33f74d18272524fda8032edb4736440ecc17d6951a3d1c06e6028",
+  "active_full_bootstrap": {
+    "bootstrap_seed": 9101,
+    "controller_handoff": "NOT_EXECUTED",
+    "cpu_threads": 2,
+    "cuda_visible_devices": "",
+    "execution_journal": "statistics/sel-bootstrap-20261016 (private run root)",
+    "execution_script_sha256": "7b0f069f53bd57640551bcd1d7356e1a78599986bf168bd785a4594a8c4e6bbe",
+    "heartbeat_utc": "2026-10-16T07:30:12.606984+00:00",
+    "inputs_verified": 6,
+    "new_gpu_jobs_launched": 0,
+    "pid": 3257481,
+    "pool_calls_completed": 1083,
+    "role": "SEL",
+    "samples": 1000,
+    "scope": "Separate CPU-only call of the original SEL bootstrap under the verified acceleration and V4 namespace contexts. Full result and confidence intervals remain pending; original GPU controller continues its unchanged PB queue.",
+    "started_utc": "2026-10-16T07:26:07.715424+00:00",
+    "status": "RUNNING"
+  },
   "actual_curve_argument_types": [
     [
       "torch.float32",
@@ -12,7 +30,7 @@
   "all_actual_pr_curve_elements_exact": true,
   "all_global_and_reference_metrics_exact": true,
   "baseline_recomputation_sha256": "6880bc6ce1cde6040ae8861087b2903d8d9820e5a0c101283d5fb9b7b9dbd955",
-  "complete_accelerated_bootstrap_status": "NOT_EXECUTED",
+  "complete_accelerated_bootstrap_status": "SEL_RUNNING_PB_NOT_EXECUTED",
   "continuation_validation": {
     "binding_restoration_normal_and_exception": "PASS",
     "cli_dry_run_status": "DRY_RUN_NOT_STARTED",
@@ -435,7 +453,7 @@
     }
   ],
   "schema": 1,
-  "scope": "56 completed repeat0 CAL/SEL/PB global states and their reference pools; elementwise PR comparison for M3 PB repeat0 T5 long/current; complete accelerated bootstrap not executed",
+  "scope": "56 completed repeat0 CAL/SEL/PB global states and their reference pools; elementwise PR comparison for M3 PB repeat0 T5 long/current. The later complete-bootstrap execution has its own active_full_bootstrap status; it is not included in the completed curve/metric verification.",
   "status": "CPU_CURVES_AND_POOLED_METRICS_EXACT",
   "verified_utc": "2026-10-16T04:58:11.035846+00:00"
 }
