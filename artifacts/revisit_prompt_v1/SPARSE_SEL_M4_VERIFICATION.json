@@ -1,0 +1,304 @@
+{
+  "AP_by_repeat": [
+    {
+      "1": 0.3278028070926666,
+      "2": 0.2139364331960678,
+      "3": 0.09471788257360458,
+      "4": 0.07513643056154251,
+      "5": 0.06893039494752884
+    },
+    {
+      "1": 0.3278028070926666,
+      "2": 0.2139364331960678,
+      "3": 0.09471788257360458,
+      "4": 0.07513643056154251,
+      "5": 0.06893039494752884
+    },
+    {
+      "1": 0.3278028070926666,
+      "2": 0.2139364331960678,
+      "3": 0.09471788257360458,
+      "4": 0.07513643056154251,
+      "5": 0.06893039494752884
+    }
+  ],
+  "S_current_by_repeat": [
+    0.271793266137441,
+    0.271793266137441,
+    0.271793266137441
+  ],
+  "S_long_by_repeat": [
+    0.07959490269422531,
+    0.07959490269422531,
+    0.07959490269422531
+  ],
+  "completed_repeats": 3,
+  "current_AP_by_repeat": [
+    {
+      "1": 0.3278028070926666,
+      "2": 0.39703211188316345,
+      "3": 0.26869267225265503,
+      "4": 0.27265599370002747,
+      "5": 0.2740311324596405
+    },
+    {
+      "1": 0.3278028070926666,
+      "2": 0.39703211188316345,
+      "3": 0.26869267225265503,
+      "4": 0.27265599370002747,
+      "5": 0.2740311324596405
+    },
+    {
+      "1": 0.3278028070926666,
+      "2": 0.39703211188316345,
+      "3": 0.26869267225265503,
+      "4": 0.27265599370002747,
+      "5": 0.2740311324596405
+    }
+  ],
+  "evaluation_policy": {
+    "policy_id": "ordered-sparse-reference-v4",
+    "policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+  },
+  "evidence": [
+    {
+      "actual_gpu_hours": 0.2257816890955534,
+      "charge_event_id": "mpr:P4:1792132169955840961",
+      "repeat": 0,
+      "results_sha256": "d1582c94c5f96b4004bb1d7812c08b74c88e300e73cfcc0c07dcbe202c38c070",
+      "status_sha256": "75575dc7ec9cd146bb99f2f195c253020ee3970fbc94611beaf619ea24a6dd18"
+    },
+    {
+      "actual_gpu_hours": 0.21813176407611334,
+      "charge_event_id": "mpr:P4:1792132983285066380",
+      "repeat": 1,
+      "results_sha256": "fdca1f7ab76e77e51607983ad22fd13d9a80a92a48d2afb81da3f6ab914dbdec",
+      "status_sha256": "5af355a8142b504bcff4206ffbfa18f9cba6711e837a6a5e7703a843cce8068b"
+    },
+    {
+      "actual_gpu_hours": 0.21880094746389658,
+      "charge_event_id": "mpr:P4:1792133769067139317",
+      "repeat": 2,
+      "results_sha256": "c5c06c53b29f31161fdc277c03172ac3c7cf92cd60475006142ace4168d56a03",
+      "status_sha256": "6e778b41adb01bc5c17b86c2e3f045b5deb0a0a2eb212c2c85ced7ef258a9047"
+    }
+  ],
+  "input_ids_horizons_and_reference_populations_match_M0": true,
+  "inputs_per_repeat": 111,
+  "limitation": "Only this finite internal SEL repeat group was compared; no global determinism claim. Locked PB confirmation, complete bootstrap, P5 and final archive/publication remain pending.",
+  "locked_pair_descriptive_comparison": {
+    "CAL_selection_unchanged": true,
+    "control": {
+      "seed": 146,
+      "step": 400,
+      "variant": "M3",
+      "verification": "SPARSE_SEL_M3_VERIFICATION.json",
+      "verification_sha256": "11944a59cae51a28ee6603525326ae0c2cd0b162c1f1674cbcd168df6a4d8aaa"
+    },
+    "delta_S_current": -0.004596849282582638,
+    "delta_S_long": 0.006604136278231934,
+    "status": "DESCRIPTIVE_ONLY_CAL_REPLICATION_GATE_FAILED",
+    "unit": "0-1"
+  },
+  "metric_rows_equal": true,
+  "observed_S_current_range_pp": 0,
+  "observed_S_long_range_pp": 0,
+  "official_global_and_reference_state_bytes_equal": true,
+  "official_state_files_byte_verified": 30,
+  "offline_metric_recomputation": {
+    "cuda_initialized": false,
+    "elapsed_seconds": 31.305392916954588,
+    "evaluation_policy": {
+      "policy_id": "ordered-sparse-reference-v4",
+      "policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+    },
+    "new_gpu_jobs": 0,
+    "official_states_checked": 10,
+    "reference_states_checked": 68,
+    "results_sha256": "d1582c94c5f96b4004bb1d7812c08b74c88e300e73cfcc0c07dcbe202c38c070",
+    "rows": [
+      {
+        "global_metrics_exact": true,
+        "horizon": 1,
+        "kind": "long",
+        "metrics": {
+          "raw_local_AP": 0.3278028070926666,
+          "raw_local_AP25": 0.7315728068351746,
+          "raw_local_AP50": 0.4939010739326477,
+          "raw_local_REC": 0.44634363055229187,
+          "raw_local_REC25": 0.8160609602928162,
+          "raw_local_REC50": 0.6194320917129517
+        },
+        "reference_pool_metrics_exact": true,
+        "reference_states": 8,
+        "sha256": "459a74be01f49213c54a38f29ddadf0be318fcffdbfbcdb3c42cd0300c804582",
+        "state": "M4-s146-u000200/SEL/repeat0/official-long-T1.json"
+      },
+      {
+        "global_metrics_exact": true,
+        "horizon": 1,
+        "kind": "current",
+        "metrics": {
+          "raw_local_AP": 0.3278028070926666,
+          "raw_local_AP25": 0.7315728068351746,
+          "raw_local_AP50": 0.4939010739326477,
+          "raw_local_REC": 0.44634363055229187,
+          "raw_local_REC25": 0.8160609602928162,
+          "raw_local_REC50": 0.6194320917129517
+        },
+        "reference_pool_metrics_exact": true,
+        "reference_states": 8,
+        "sha256": "459a74be01f49213c54a38f29ddadf0be318fcffdbfbcdb3c42cd0300c804582",
+        "state": "M4-s146-u000200/SEL/repeat0/official-current-T1.json"
+      },
+      {
+        "global_metrics_exact": true,
+        "horizon": 2,
+        "kind": "long",
+        "metrics": {
+          "online_t-REC": 0.33578240871429443,
+          "online_t-REC25": 0.6479796767234802,
+          "online_t-REC50": 0.4945313036441803,
+          "online_t-mAP": 0.2139364331960678,
+          "online_t-mAP25": 0.5028998851776123,
+          "online_t-mAP50": 0.35407498478889465
+        },
+        "reference_pool_metrics_exact": true,
+        "reference_states": 8,
+        "sha256": "52b0b582e70af17bf8b87aea2bd8988920ea1b42c64edcac63e19c8aabc2e210",
+        "state": "M4-s146-u000200/SEL/repeat0/official-long-T2.json"
+      },
+      {
+        "global_metrics_exact": true,
+        "horizon": 2,
+        "kind": "current",
+        "metrics": {
+          "raw_local_AP": 0.39703211188316345,
+          "raw_local_AP25": 0.7751024961471558,
+          "raw_local_AP50": 0.5721408128738403,
+          "raw_local_REC": 0.5105854868888855,
+          "raw_local_REC25": 0.8393241167068481,
+          "raw_local_REC50": 0.7175607085227966
+        },
+        "reference_pool_metrics_exact": true,
+        "reference_states": 8,
+        "sha256": "d43725ea2f41f2140f1b275e223362c749261e7a5fe96a4ac69e4e7c99c2a044",
+        "state": "M4-s146-u000200/SEL/repeat0/official-current-T2.json"
+      },
+      {
+        "global_metrics_exact": true,
+        "horizon": 3,
+        "kind": "long",
+        "metrics": {
+          "online_t-REC": 0.19857503473758698,
+          "online_t-REC25": 0.4590834677219391,
+          "online_t-REC50": 0.34886354207992554,
+          "online_t-mAP": 0.09471788257360458,
+          "online_t-mAP25": 0.3319644331932068,
+          "online_t-mAP50": 0.2068011611700058
+        },
+        "reference_pool_metrics_exact": true,
+        "reference_states": 8,
+        "sha256": "d9c980446b5ba31ac27b8199a40e58d99246ffe58e8128a2df633c1b6be42784",
+        "state": "M4-s146-u000200/SEL/repeat0/official-long-T3.json"
+      },
+      {
+        "global_metrics_exact": true,
+        "horizon": 3,
+        "kind": "current",
+        "metrics": {
+          "raw_local_AP": 0.26869267225265503,
+          "raw_local_AP25": 0.729650616645813,
+          "raw_local_AP50": 0.42409199476242065,
+          "raw_local_REC": 0.41730809211730957,
+          "raw_local_REC25": 0.811554491519928,
+          "raw_local_REC50": 0.6058381795883179
+        },
+        "reference_pool_metrics_exact": true,
+        "reference_states": 8,
+        "sha256": "48e864c3ed7c5ff8b417a5a69db40621dbd4968baa7f8b86847791215910abc4",
+        "state": "M4-s146-u000200/SEL/repeat0/official-current-T3.json"
+      },
+      {
+        "global_metrics_exact": true,
+        "horizon": 4,
+        "kind": "long",
+        "metrics": {
+          "online_t-REC": 0.12293893843889236,
+          "online_t-REC25": 0.4515642821788788,
+          "online_t-REC50": 0.2847250699996948,
+          "online_t-mAP": 0.07513643056154251,
+          "online_t-mAP25": 0.373868465423584,
+          "online_t-mAP50": 0.189493790268898
+        },
+        "reference_pool_metrics_exact": true,
+        "reference_states": 5,
+        "sha256": "4941d9d1474f495ce220525e8d62c0e5617756268220a4f5e5e3bde50427d846",
+        "state": "M4-s146-u000200/SEL/repeat0/official-long-T4.json"
+      },
+      {
+        "global_metrics_exact": true,
+        "horizon": 4,
+        "kind": "current",
+        "metrics": {
+          "raw_local_AP": 0.27265599370002747,
+          "raw_local_AP25": 0.8520005941390991,
+          "raw_local_AP50": 0.5138423442840576,
+          "raw_local_REC": 0.3937555253505707,
+          "raw_local_REC25": 0.909335196018219,
+          "raw_local_REC50": 0.6453882455825806
+        },
+        "reference_pool_metrics_exact": true,
+        "reference_states": 5,
+        "sha256": "ca60a08402a41b3cb29e81fc61c730dbb6279d2fd3940ce565ac6099574d34d2",
+        "state": "M4-s146-u000200/SEL/repeat0/official-current-T4.json"
+      },
+      {
+        "global_metrics_exact": true,
+        "horizon": 5,
+        "kind": "long",
+        "metrics": {
+          "online_t-REC": 0.12844786047935486,
+          "online_t-REC25": 0.4596979022026062,
+          "online_t-REC50": 0.30048683285713196,
+          "online_t-mAP": 0.06893039494752884,
+          "online_t-mAP25": 0.3990273177623749,
+          "online_t-mAP50": 0.20059505105018616
+        },
+        "reference_pool_metrics_exact": true,
+        "reference_states": 5,
+        "sha256": "948ac80c53aae621ab007e87e3ff6a257c52cfc9adc8b92d8c9b9a0f163d0139",
+        "state": "M4-s146-u000200/SEL/repeat0/official-long-T5.json"
+      },
+      {
+        "global_metrics_exact": true,
+        "horizon": 5,
+        "kind": "current",
+        "metrics": {
+          "raw_local_AP": 0.2740311324596405,
+          "raw_local_AP25": 0.7561813592910767,
+          "raw_local_AP50": 0.5046045780181885,
+          "raw_local_REC": 0.39673912525177,
+          "raw_local_REC25": 0.8219007849693298,
+          "raw_local_REC50": 0.6244543790817261
+        },
+        "reference_pool_metrics_exact": true,
+        "reference_states": 5,
+        "sha256": "0c67bc2febadea9fac74e5da812a8908d11ab8d6ea66c6d14b7a5f45a552b054",
+        "state": "M4-s146-u000200/SEL/repeat0/official-current-T5.json"
+      }
+    ],
+    "scope": "M4-200 SEL repeat0 only; original scalar official pooling, all ten long/current global states and their reference pools",
+    "status": "OFFICIAL_CPU_GLOBAL_AND_REFERENCE_POOL_METRICS_EXACT",
+    "verified_utc": "2026-10-16T07:11:44.222925+00:00"
+  },
+  "reference_state_files_byte_verified": 204,
+  "role": "SEL",
+  "seed": 146,
+  "stages_per_repeat": 279,
+  "status": "THREE_SEL_REPEATS_VERIFIED",
+  "step": 200,
+  "structures_raw_predictions_and_identity_diagnostics_equal": true,
+  "variant": "M4",
+  "verified_unix": 1792134671.560634
+}

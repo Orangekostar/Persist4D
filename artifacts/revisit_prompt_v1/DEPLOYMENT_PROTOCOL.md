@@ -96,6 +96,6 @@ print(pool_official_states([state], dataset_spec='artifacts/native_long_postsele
 PY
 ```
 
-`OFFLINE_METRIC_RECOMPUTATION.json` 记录主代理已执行的 CPU 核查范围：两个锁定 CAL 端点的 repeat0 共 20 份 long/current 状态，以及 M0、M3 已完成的 SEL/PB repeat0 共 36 份状态，总计 56 份。所有官方指标与记录值完全相同，分别从 reference 状态重新池化也完全相同。该范围不包括 M4 的 SEL/PB、其他 repeat 的独立复算及最终压缩包，不能扩大表述为全部交付已经验收。
+`OFFLINE_METRIC_RECOMPUTATION.json` 记录主代理已执行的 CPU 核查范围：两个锁定 CAL 端点的 repeat0 共 20 份 long/current 状态，以及 M0、M3 已完成的 SEL/PB repeat0 共 36 份状态，总计 56 份。所有官方指标与记录值完全相同，分别从 reference 状态重新池化也完全相同。`SPARSE_SEL_M4_VERIFICATION.json` 的 `offline_metric_recomputation` 另记录 M4-200 SEL repeat0 的 10 份总体状态及 68 份 reference 状态；使用原标量官方实现，指标也完全相同，CUDA 未初始化。因此已有 66 份总体状态完成独立 CPU 核查，但尚未覆盖 M4 PB、其他 repeat 的独立复算及最终压缩包，不能扩大表述为全部交付已经验收。
 
 一次真实部署回载和有限前向可使用本轮 P5 profile 的 `EXACT_PARENT_ENCODER_DELTA_COVERAGE_AND_REAL_FORWARD` 完成证据，并核对所加载原 delta 与最终公开副本的 SHA256 相同。代码中的字符串、此处加载示例和 CPU 指标复算均不能代替这份实际前向证据。旧 Native 的数值异常根因仍未解决；有限 V4 重复一致不等于全局逐张量确定性。
