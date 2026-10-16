@@ -72,7 +72,7 @@ PY
 
 可选的 CPU 统计恢复入口是 `python -m scripts.continue_revisit_prompt_statistics --execute`，默认或 `--dry-run` 只打印 `DRY_RUN_NOT_STARTED`。它仍调用上述原控制器，沿用其互斥锁、收费、身份核查与完成任务去重；仅在原 `bootstrap_locked` 调用期间批量计算 CPU float32 PR 阈值，退出或异常时恢复函数绑定。原 AP 积分、reference 抽样、1000 次 bootstrap、种子、三次重复和 NA 规则均保留。当前 GPU 评测运行期间不得据此启动第二个控制器。
 
-2026-10-16 的实现验证见 `CPU_STATISTICS_ACCELERATION_VERIFICATION.json`：56 份已完成状态及各自 reference 池化指标精确相同，220 条实际 PR 曲线逐元素精确相同；23 项测试通过，包括 dry-run 不启动控制器、正常/异常退出恢复绑定及损坏状态被拒绝。该入口尚未用于接管正式控制器。SEL 两个锁定端点的三轮结果齐备后，主代理于 07:26 UTC 在独立 CPU 进程中调用原 `bootstrap_locked`，使用同一加速上下文及 V4 命名空间；保留原 1000 次抽样和 seed9101，CUDA 不可见，原 GPU 控制器继续执行 PB。完整 SEL bootstrap 正在计算，PB bootstrap 尚未执行。曲线局部计时不代表整套 bootstrap 的实测耗时。
+2026-10-16 的实现验证见 `CPU_STATISTICS_ACCELERATION_VERIFICATION.json`：56 份已完成状态及各自 reference 池化指标精确相同，220 条实际 PR 曲线逐元素精确相同；23 项测试通过，包括 dry-run 不启动控制器、正常/异常退出恢复绑定及损坏状态被拒绝。该入口尚未用于接管正式控制器。SEL 两个锁定端点的三轮结果齐备后，主代理在独立 CPU 进程中调用原 `bootstrap_locked`，使用同一加速上下文及 V4 命名空间；保留 seed9101、原 1000 次抽样及 NA 规则，CUDA 未初始化。该进程于 09:34:57 UTC 实际完成全部 36000 次池化，耗时 7729.626 秒；1000 次抽样均有效。`SEL_BOOTSTRAP_EXECUTION_VERIFICATION.json` 记录实际输入/源码/输出哈希，以及独立的三进程差值、全部保存抽样百分位及字节核对。8 个 reference 的少场景警示保留，长期和当前差值的区间均跨零。原 GPU 控制器继续执行 PB，PB bootstrap 尚未执行；完整 SEL 耗时不代表 PB 耗时或整套统计加速比。
 
 ## 从官方充分状态复算
 

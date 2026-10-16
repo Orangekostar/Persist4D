@@ -1,0 +1,202 @@
+{
+  "bootstrap_seed": 9101,
+  "candidate": {
+    "AP": {
+      "T1": 0.43269217014312744,
+      "T2": 0.2687074542045593,
+      "T3": 0.13553912937641144,
+      "T4": 0.10350719094276428,
+      "T5": 0.18716569244861603
+    },
+    "AP_ranges": {
+      "T1": 0.0,
+      "T2": 0.0,
+      "T3": 0.0,
+      "T4": 0.0,
+      "T5": 0.0
+    },
+    "S_current": 0.4079311589399974,
+    "S_long": 0.14207067092259726,
+    "S_long_range": 0.0,
+    "adapter_seed": 146,
+    "current_AP": {
+      "T1": 0.43269217014312744,
+      "T2": 0.4164098799228668,
+      "T3": 0.38026824593544006,
+      "T4": 0.376382976770401,
+      "T5": 0.467142254114151
+    },
+    "guard_pass": true,
+    "parameters": 84224,
+    "step": 200,
+    "variant": "M4"
+  },
+  "control": {
+    "AP": {
+      "T1": 0.43269217014312744,
+      "T2": 0.27176153659820557,
+      "T3": 0.14357934892177582,
+      "T4": 0.11752919107675552,
+      "T5": 0.1418112963438034
+    },
+    "AP_ranges": {
+      "T1": 0.0,
+      "T2": 0.0,
+      "T3": 0.0,
+      "T4": 0.0,
+      "T5": 0.0
+    },
+    "S_current": 0.391400545835495,
+    "S_long": 0.13430661211411157,
+    "S_long_range": 0.0,
+    "adapter_seed": 146,
+    "current_AP": {
+      "T1": 0.43269217014312744,
+      "T2": 0.40336376428604126,
+      "T3": 0.3761378824710846,
+      "T4": 0.3838258981704712,
+      "T5": 0.4142378568649292
+    },
+    "guard_pass": true,
+    "parameters": 51200,
+    "step": 400,
+    "variant": "M3"
+  },
+  "cpu_curve_source_sha256": "1055376e1dd33f74d18272524fda8032edb4736440ecc17d6951a3d1c06e6028",
+  "cuda_initialized": false,
+  "defined_draws": 1000,
+  "elapsed_seconds": 7729.625880439009,
+  "endpoint_metadata_scope": "The control/candidate dictionaries are the original immutable CAL selection records; actual SEL process differences and intervals are recorded separately.",
+  "evaluation_policy": {
+    "policy_id": "ordered-sparse-reference-v4",
+    "policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+  },
+  "finished_utc": "2026-10-16T09:34:57.341265+00:00",
+  "function_bindings_restored": true,
+  "independent_review": {
+    "elapsed_seconds": 7729.625880439009,
+    "execution_record_input_output_and_source_hashes_exact": true,
+    "generic_and_seed_specific_bytes_identical": true,
+    "independently_regenerated_empty_state_draw_indices": [],
+    "interval_status": "DEFINED",
+    "intervals_95": {
+      "S_current": [
+        -0.007062830030918121,
+        0.0068893509606520265
+      ],
+      "S_long": [
+        -0.0058495622749129925,
+        0.012406823784112926
+      ]
+    },
+    "percentiles_exact_from_all_1000_saved_draws": true,
+    "pool_calls_completed": 36000,
+    "process_differences_exact_from_all_six_actual_results": true,
+    "reference_count": 8,
+    "samples": 1000,
+    "scope": "Independent completed SEL metadata, byte/provenance, process-difference and saved-draw percentile checks. Does not claim a second execution of all 1000 official pooling draws, PB completion or an independent training seed.",
+    "status": "COMPLETED_SEL_BOOTSTRAP_INDEPENDENT_METADATA_AND_PERCENTILE_CHECKS_PASS",
+    "undefined_draw_indices": [],
+    "verified_utc": "2026-10-16T09:35:17.995048+00:00",
+    "verifier_sha256": "e96c9d2d8a6461677275be565b053b806a0495bf6ec26b8af9238d8760bf7999"
+  },
+  "inputs": [
+    {
+      "repeat_index": 0,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M3-s146-u000400/SEL/repeat0/RESULTS.json",
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "step": 400,
+      "variant": "M3"
+    },
+    {
+      "repeat_index": 1,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M3-s146-u000400/SEL/repeat1/RESULTS.json",
+      "results_sha256": "e7c38b866a10356c13912dfc39ec14a463c2ede76a3865aa570127efb3d5b0ef",
+      "step": 400,
+      "variant": "M3"
+    },
+    {
+      "repeat_index": 2,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M3-s146-u000400/SEL/repeat2/RESULTS.json",
+      "results_sha256": "3e8d9d88169b4fb234eb500d81cac1025a4979dc9256aca664235f8d0133da9a",
+      "step": 400,
+      "variant": "M3"
+    },
+    {
+      "repeat_index": 0,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M4-s146-u000200/SEL/repeat0/RESULTS.json",
+      "results_sha256": "d1582c94c5f96b4004bb1d7812c08b74c88e300e73cfcc0c07dcbe202c38c070",
+      "step": 200,
+      "variant": "M4"
+    },
+    {
+      "repeat_index": 1,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M4-s146-u000200/SEL/repeat1/RESULTS.json",
+      "results_sha256": "fdca1f7ab76e77e51607983ad22fd13d9a80a92a48d2afb81da3f6ab914dbdec",
+      "step": 200,
+      "variant": "M4"
+    },
+    {
+      "repeat_index": 2,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M4-s146-u000200/SEL/repeat2/RESULTS.json",
+      "results_sha256": "c5c06c53b29f31161fdc277c03172ac3c7cf92cd60475006142ace4168d56a03",
+      "step": 200,
+      "variant": "M4"
+    }
+  ],
+  "interval_status": "DEFINED",
+  "intervals_95": {
+    "S_current": [
+      -0.007062830030918121,
+      0.0068893509606520265
+    ],
+    "S_long": [
+      -0.0058495622749129925,
+      0.012406823784112926
+    ]
+  },
+  "new_gpu_jobs_launched": 0,
+  "original_bootstrap_source_sha256": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
+  "outputs": [
+    {
+      "bytes": 142764,
+      "path": "BOOTSTRAP_SEL.json",
+      "sha256": "8b97d4df1ca897d3cf5d769504d23025df67bf943792af9c6bdc407a993bb5e6"
+    },
+    {
+      "bytes": 142764,
+      "path": "BOOTSTRAP_SEL_s146.json",
+      "sha256": "8b97d4df1ca897d3cf5d769504d23025df67bf943792af9c6bdc407a993bb5e6"
+    }
+  ],
+  "panel_warning": "INTERVAL_UNSTABLE_FEWER_THAN_TEN_REFERENCES",
+  "pool_calls_completed": 36000,
+  "process_difference_ranges": {
+    "S_current": 0.0,
+    "S_long": 0.0
+  },
+  "process_differences": [
+    {
+      "S_current": -0.004596849282582601,
+      "S_long": 0.006604136278231938
+    },
+    {
+      "S_current": -0.004596849282582601,
+      "S_long": 0.006604136278231938
+    },
+    {
+      "S_current": -0.004596849282582601,
+      "S_long": 0.006604136278231938
+    }
+  ],
+  "reference_count": 8,
+  "role": "SEL",
+  "samples": 1000,
+  "schema": 1,
+  "scope": "All 1000 original paired physical-reference draws, all three independent process differences, unchanged official pooling/AP/NA rules. PB, P5, packaging and remote publication remain pending.",
+  "scoped_launcher_source_sha256": "9232d21444a38735ae2d0063945a4d010ee7286cbfc7b31b2ccd26912a5bc0dd",
+  "selection_lock_sha256": "e182171047492635eb6b4b8efe9a502128a3ff639775df5b4c3cf0631fd09e02",
+  "started_utc": "2026-10-16T07:26:07.715424+00:00",
+  "status": "COMPLETE_ORIGINAL_LOCKED_SEL_BOOTSTRAP_ON_CPU",
+  "undefined_draws": 0
+}

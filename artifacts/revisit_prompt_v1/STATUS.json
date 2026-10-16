@@ -126,19 +126,43 @@
   "cpu_bootstrap": {
     "bootstrap_seed": 9101,
     "controller_handoff": "NOT_EXECUTED",
+    "cpu_threads": 2,
+    "cuda_visible_devices": "",
+    "defined_draws": 1000,
+    "elapsed_seconds": 7729.625880439009,
     "execution_journal": "statistics/sel-bootstrap-20261016 (private run root)",
-    "heartbeat_utc": "2026-10-16T08:37:20.607920+00:00",
+    "execution_script_sha256": "7b0f069f53bd57640551bcd1d7356e1a78599986bf168bd785a4594a8c4e6bbe",
+    "finished_utc": "2026-10-16T09:34:57.341265+00:00",
+    "heartbeat_utc": "2026-10-16T09:34:57.341265+00:00",
+    "inputs_verified": 6,
+    "interval_status": "DEFINED",
+    "intervals_95": {
+      "S_current": [
+        -0.007062830030918121,
+        0.0068893509606520265
+      ],
+      "S_long": [
+        -0.0058495622749129925,
+        0.012406823784112926
+      ]
+    },
+    "new_gpu_jobs_launched": 0,
     "pid": 3257481,
-    "pool_calls_completed": 19897,
+    "pool_calls_completed": 36000,
+    "process_alive": false,
     "role": "SEL",
     "samples": 1000,
+    "scope": "Completed original SEL bootstrap: all 1000 paired physical-reference draws, three process differences, unchanged pooling/AP/NA. PB bootstrap and formal controller handoff remain unexecuted.",
     "started_utc": "2026-10-16T07:26:07.715424+00:00",
-    "status": "RUNNING"
+    "status": "COMPLETE",
+    "undefined_draws": 0,
+    "verification": "SEL_BOOTSTRAP_EXECUTION_VERIFICATION.json",
+    "verification_sha256": "bb44e2045773713a961b707dd1ad08d1b9f4aaeb96ae179423dac9350b688f75"
   },
   "current_activity": "V4_LOCKED_SEL_PB_CONFIRMATION",
   "current_child_pid": 3292195,
-  "current_completed_inputs": 148,
-  "current_evaluation_snapshot_utc": "2026-10-16T08:38:01.731322+00:00",
+  "current_completed_inputs": 490,
+  "current_evaluation_snapshot_utc": "2026-10-16T09:37:00.899581+00:00",
   "current_job_key": "policy:ordered-sparse-reference-v4:eval:M4:s146:u200:PB:r1",
   "current_repeat_index": 1,
   "current_role": "PB",
@@ -185,7 +209,7 @@
   "model_asset_count": 8,
   "model_manifest": "MODEL_MANIFEST.json",
   "model_remote_verification": "NOT_EXECUTED",
-  "monitor_heartbeat_utc": "2026-10-16T07:12:53.261763Z",
+  "monitor_heartbeat_utc": "2026-10-16T09:36:53.279207Z",
   "monitor_latest": "monitor_luna/latest.json (private run root)",
   "monitor_pid": 3099815,
   "monitor_status": "RUNNING",
@@ -199,7 +223,7 @@
   "native_full_replay_diagnostic_status": "THREE_MEASURED_FULL_REPLAYS_EQUAL_PRIOR_FAILURE_UNRESOLVED",
   "native_full_replay_verification": "NATIVE_FULL_REPLAY_VERIFICATION.json",
   "new_gpu_hours": 43.066134797265114,
-  "next_task": "Finish the original locked SEL/PB confirmation, bootstrap, and P5; retain the failed CAL replication gate",
+  "next_task": "Finish the original locked PB repeats, then PB bootstrap and P5; retain the failed CAL replication gate and uncertain SEL intervals",
   "physical_gpu_index": 1,
   "policy_baseline_admission": "EVALUATION_M0_ADMISSION_V4.json",
   "policy_baseline_admission_pending": false,
@@ -265,6 +289,7 @@
     "DELTA_AP_T4_BELOW_-0.002"
   ],
   "seed147_status": "NOT_EXECUTED_CAL_GATE_FAILED",
+  "sel_bootstrap_verification": "SEL_BOOTSTRAP_EXECUTION_VERIFICATION.json",
   "selected_candidate": {
     "step": 200,
     "variant": "M4"
@@ -287,8 +312,12 @@
   "sparse_reference_implementation_verification": "SPARSE_REFERENCE_IMPLEMENTATION_VERIFICATION.json",
   "sparse_reference_single_input_verification": "SPARSE_REFERENCE_SINGLE_INPUT_VERIFICATION.json",
   "stage": "LOCKED_EVALUATION_AND_SELECTION",
+  "statistics_status": {
+    "PB": "NOT_EXECUTED",
+    "SEL": "COMPLETE"
+  },
   "status": "RUNNING",
-  "updated_unix": 1792139881.731431,
+  "updated_unix": 1792143420.899581,
   "verified_optimizer_step": 400,
-  "verified_unix": 1792139881.731431
+  "verified_unix": 1792143420.899581
 }
