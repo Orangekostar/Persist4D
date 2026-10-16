@@ -1,0 +1,40 @@
+{
+  "all_original_source_registry_fields_preserved": true,
+  "archive_name": "Persist4D_MPR_Codex_Prompts_Audited.zip",
+  "archive_sha256": "2605b216d5acb6f34c6d302777c674a321cf62b4beaf5d8c19858d22959bc4ed",
+  "checked_package_members": [
+    {
+      "bytes": 1627,
+      "name": "00_README.md",
+      "sha256": "62cd36fb6f328b75c8248b89fa3e6e7d3092e88b5f0b453602cdec5ee79738d1"
+    },
+    {
+      "bytes": 83238,
+      "name": "01_CODEX_EXECUTION.md",
+      "sha256": "08cf2d2c83f1bd93d3120623f3ea9884fddd0f1fb13af843677b92160cc0070e"
+    },
+    {
+      "bytes": 8914,
+      "name": "02_EVIDENCE_AND_REVIEW.md",
+      "sha256": "91f9cd08c50daddd2ba62f644a7f0d950b466ba3717b25f6ef5ca0712fcddf59"
+    },
+    {
+      "bytes": 5204,
+      "name": "instruction_static_audit.json",
+      "sha256": "d90dbb2f297eed2ad199b92413c36a2d283d62db1cd068a1cfb26d09e8aa616d"
+    },
+    {
+      "bytes": 21671,
+      "name": "source_bindings.json",
+      "sha256": "61431f3a7f8a2c0ec47663e2983155346568bf8317ab25bcba0ed808d46fda64"
+    }
+  ],
+  "copied_original_review": "PROMPT_REVIEW_SOURCE.md",
+  "copied_original_static_audit": "INSTRUCTION_STATIC_AUDIT.json",
+  "execution_instruction_exact_bytes": true,
+  "final_execution_audit": "PENDING_LOCKED_CONFIRMATION_P5_PACKAGING_AND_REMOTE_VERIFICATION",
+  "schema": 1,
+  "scope": "Authenticity and original instruction-review evidence only. Historical static PASS is not evidence that implementation, training or publication is complete.",
+  "status": "ALL_FIVE_SUPPLIED_CHECKSUMS_VERIFIED",
+  "verified_utc": "2026-10-16T03:43:24.571504+00:00"
+}

@@ -1,0 +1,98 @@
+{
+  "configuration_reconstruction": {
+    "loader": "scripts.revisit_prompt_assets.load_revisit_bundle",
+    "numeric_identity_checks": "Each delta binds its original parent/encoder/taxonomy and the 14 training source hashes; current inference additionally uses EVALUATION_POLICY_V4.json and the contexts in evaluate_revisit_prompt_sparse.py",
+    "optimizer_resume_from_delta": false,
+    "parent_configuration": "Fixed E1 parent payload config, relocated by parent_config",
+    "resume_asset_format": "Separate selected candidate/control resume files include adapter, optimizer, scheduler, RNG and progress and retain fixed parent dependencies",
+    "standalone_delta_inference": false,
+    "variant_and_adapter_seed": "Read from each selected delta; all overrides are the frozen parent_config and RevisitPromptTrainer implementation"
+  },
+  "data": {
+    "name": "3RScan",
+    "note": "Use legally obtained scans and the bound native preprocessing; the historically exposed CAL/SEL/PB panels are not a new independent official ReScene test benchmark.",
+    "path_binding": "MPR_DATA_ROOT environment variable or the private resolver data_root",
+    "preprocessing_instructions": "README.md#data-preprocessing",
+    "redistributed": false,
+    "role_and_input_manifest": "artifacts/revisit_prompt_v1/DATA_MANIFEST.json",
+    "role_manifest_sha256": "0c87afc7b1282897bd395fe7af7c1dd514c42e1ce8adff47675e3d27f16ba63d"
+  },
+  "encoder": {
+    "acquisition": "Obtain the exact encoder under its original distribution terms; the original deployment README and source/init receipt bind this checkpoint. No new encoder download was performed in this audit.",
+    "original_deployment_instructions": "artifacts/native_long_postselection_v1/deployment/README.md",
+    "original_source_repository": "https://github.com/Pointcept/Concerto",
+    "path_binding": "CONCERTO_CHECKPOINT environment variable or the private resolver encoder_path",
+    "redistributed": false,
+    "sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07"
+  },
+  "environment": {
+    "actual_frozen_inference_runtime": {
+      "all_weight_is_krsc": true,
+      "spconv_allow_tf32": false,
+      "spconv_sources": {
+        "constants.py": "716366952ebffd209c12a36502c4f3a12f56095b05f5edc7ef034b86830cdb28",
+        "conv.py": "728e5eb2d90b449e05118893c833fc252e276d71fb307fd29c2488beb9670b9c",
+        "core_cc": "9d8c4d6f710033cef101e127844d3ff1b329d65c0eb9a8c3f37f44137e69f892"
+      },
+      "spconv_version": "2.3.8",
+      "torch_cuda": "12.6",
+      "torch_version": "2.6.0+cu126"
+    },
+    "original_controller_source_record": "artifacts/native_long_postselection_v1/evidence/ENVIRONMENT_SOURCES.json",
+    "original_controller_source_record_sha256": "5edd91bc792acd86d7ccc309692c4ce75ad81217104ce3a1769e772b84d1eeae",
+    "original_record_scope": "controller CPU audit/loading environment; trained remote source bytes bound separately by source/init and execution receipts",
+    "runtime_policy_file": "artifacts/revisit_prompt_v1/EVALUATION_POLICY_V4.json",
+    "runtime_policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6",
+    "third_party_source_repositories": [
+      {
+        "commit": "10a7d17cff4dddff028f1522c2e72de4c4515df7",
+        "modified_files": [],
+        "origin": "https://github.com/Pointcept/Concerto.git",
+        "package": "concerto"
+      },
+      {
+        "commit": "18c09ff8d713494f78a8213792262b910977a65d",
+        "modified_files": [],
+        "origin": "https://github.com/facebookresearch/sonata.git",
+        "package": "sonata"
+      },
+      {
+        "commit": "640e34c2dd15c8e1a5061f4e66aa4fb6a5da9a5f",
+        "modified_files": [],
+        "origin": "https://github.com/GradientSpaces/stmetrics.git",
+        "package": "stmetrics"
+      },
+      {
+        "commit": "b4a4a3bd136852dae5fb1de37978dee412653e31",
+        "modified_files": [],
+        "origin": "https://github.com/facebookresearch/detectron2.git",
+        "package": "detectron2"
+      }
+    ]
+  },
+  "new_gpu_jobs_launched": 0,
+  "new_model_delivery_status": "Pending completion of the locked confirmation and P5; final MODEL_MANIFEST must link these dependencies and verify each packaged entity.",
+  "parent": {
+    "bytes": 106906589,
+    "fetch_command": "git lfs pull --include=artifacts/native_long_postselection_v1/deployment/E1-23760.pt --exclude=",
+    "git_pointer_at_base_verified": true,
+    "git_ref": "6b1b779172afdeb51e2719a737cd05e7eeeca982",
+    "local_entity_bytes_verified": true,
+    "original_download_evidence": "artifacts/native_long_postselection_v1/deployment/LFS_MODEL_DOWNLOAD_RECEIPT.json",
+    "path": "artifacts/native_long_postselection_v1/deployment/E1-23760.pt",
+    "redistributed_again": false,
+    "repository": "https://github.com/Orangekostar/Persist4D",
+    "sha256": "8c9d0d57044ce23c7964ddb1e7a2d8bd18e388e6ee657a7f4b02b1368b5b3a98",
+    "storage": "git-lfs"
+  },
+  "publication_verified": false,
+  "schema": 1,
+  "status": "DEPENDENCIES_BOUND_NEW_MODEL_PACKAGING_PENDING",
+  "taxonomy": {
+    "contains_scene_annotations": false,
+    "local_entity_bytes_verified": true,
+    "path": "artifacts/native_long_postselection_v1/deployment/rio.yaml",
+    "sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba"
+  },
+  "verified_utc": "2026-10-16T03:40:10.311670+00:00"
+}

@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "review_date": "2026-10-13",
+  "document": "01_CODEX_EXECUTION.md",
+  "document_sha256": "08cf2d2c83f1bd93d3120623f3ea9884fddd0f1fb13af843677b92160cc0070e",
+  "status": "PASS_WITH_EXPLICIT_RUNTIME_PREREQUISITES",
+  "scope": "Static instruction review and arithmetic/structural checks. No new GPU experiment, source AST execution, remote write, or model accuracy validation was performed.",
+  "checks": [
+    {
+      "id": "S01",
+      "check": "不可变版本与仓库身份",
+      "status": "PASS",
+      "detail": "BASE明确；新分支与旧tag保护规则明确。"
+    },
+    {
+      "id": "S02",
+      "check": "证据索引完整及SHA格式",
+      "status": "PASS",
+      "detail": "26组证据，29个不重复文件。SHA来自工具返回，不是本地重新哈希源代码。"
+    },
+    {
+      "id": "S03",
+      "check": "引用编号范围",
+      "status": "PASS",
+      "detail": "R01–R26全部在主指令和registry中。"
+    },
+    {
+      "id": "S04",
+      "check": "预算算术",
+      "status": "PASS",
+      "detail": "十进制按报告有效数字复算；引用历史更多尾数属于浮点账本表示差异，不构成新增额度。"
+    },
+    {
+      "id": "S05",
+      "check": "不擅自追加预算与准入分支",
+      "status": "PASS",
+      "detail": "默认最多78GPUh；P0/P1固定，研究池仅锁定前确定性分配。"
+    },
+    {
+      "id": "S06",
+      "check": "固定七行及两个适配种子",
+      "status": "PASS",
+      "detail": "M0冻结、M1–M6六臂；第二适配种子不是新父模型种子。"
+    },
+    {
+      "id": "S07",
+      "check": "候选步数与检查点可整除",
+      "status": "PASS",
+      "detail": "四个CAL选点与50步恢复间隔均为整数。"
+    },
+    {
+      "id": "S08",
+      "check": "NEW层维度与参数推导",
+      "status": "PASS",
+      "detail": "270维提示MLP；272维拒绝头；此为结构推导，不是实测模型参数。"
+    },
+    {
+      "id": "S09",
+      "check": "数据索引与时间绑定",
+      "status": "PASS",
+      "detail": "train/validation索引分离；局部t不被绝对阶段替代。"
+    },
+    {
+      "id": "S10",
+      "check": "首mask前机制和已有读取对照",
+      "status": "PASS",
+      "detail": "新增hook与M2、32提示上限、最终ID均分开。"
+    },
+    {
+      "id": "S11",
+      "check": "权重与梯度边界",
+      "status": "PASS",
+      "detail": "原任务decoder与缓冲区覆盖；冻结参数不切断输入梯度。"
+    },
+    {
+      "id": "S12",
+      "check": "标签与未知负例",
+      "status": "PASS",
+      "detail": "预测驱动状态；训练账本单独；未知不作为物理缺席。"
+    },
+    {
+      "id": "S13",
+      "check": "官方候选和输出政策",
+      "status": "PASS",
+      "detail": "候选列不等于query；只对当前扫描commit；评分单次修正。"
+    },
+    {
+      "id": "S14",
+      "check": "选模可终止、可并列、可失败",
+      "status": "PASS",
+      "detail": "PB无T1时不补造；候选为空不替换初始化权重。"
+    },
+    {
+      "id": "S15",
+      "check": "不冒充因果或独立复验",
+      "status": "PASS",
+      "detail": "历史面板、数值限制、条件性机制及质量来源均有标识。"
+    },
+    {
+      "id": "S16",
+      "check": "测试范围有上限",
+      "status": "PASS",
+      "detail": "必要正确性测试保留；无无限安全测试及GPU bootstrap。"
+    },
+    {
+      "id": "S17",
+      "check": "NEW命令与工作分解齐全",
+      "status": "PASS",
+      "detail": "六个命令明确标NEW，需Codex实现后运行。"
+    },
+    {
+      "id": "S18",
+      "check": "发布避免自引用与假成功",
+      "status": "PASS",
+      "detail": "A/B与外部Release回执分离；模型实体字节需远端取回。"
+    },
+    {
+      "id": "S19",
+      "check": "文档结构及代码围栏",
+      "status": "PASS",
+      "detail": "0–21章节齐全；围栏成对。"
+    },
+    {
+      "id": "S20",
+      "check": "无待办占位输出",
+      "status": "PASS",
+      "detail": "文中的YOUR_PATH仅作为禁止示例；执行命令使用自动资产解析，不含真实未知路径。"
+    },
+    {
+      "id": "S21",
+      "check": "未虚构已执行训练",
+      "status": "PASS",
+      "detail": "审核对象为执行指令，不是已经完成的新实验。"
+    },
+    {
+      "id": "S22",
+      "check": "共同状态的输出开关",
+      "status": "PASS",
+      "detail": "所有变体显式提供最终query特征，关闭GT导出支路。"
+    },
+    {
+      "id": "S23",
+      "check": "新成本入口不误绑旧计划路径",
+      "status": "PASS",
+      "detail": "新RUN_LOCK与旧BUDGET_LOCK入口分开，复用计费公式而不绕过旧约束。"
+    }
+  ],
+  "parameter_counts_derived_from_proposed_layers": {
+    "M1": 84224,
+    "M2": 99073,
+    "M3": 51200,
+    "M4": 84224,
+    "M5": 84224,
+    "M6": 101761
+  },
+  "budget": {
+    "historical_cap_gpu_h": 1800,
+    "historical_used_gpu_h": "1713.8830547291614",
+    "reserved_gpu_h": 8,
+    "new_default_cap_gpu_h": 78
+  },
+  "inspected_file_count": 29
+}
