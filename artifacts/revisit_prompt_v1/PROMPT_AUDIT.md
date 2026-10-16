@@ -39,9 +39,9 @@ SEL 统计执行增补：独立 CPU 进程于 07:26 UTC 启动，09:34:57 UTC �
 
 结论：因果数据与索引契约已核对，锁定候选 PB 尚未全部核验。完整 UUID 独立校验；TRAIN/CAL/SEL 使用 train 索引，PB 使用 validation；阶段 j 共同真值只使用 0..j 因果前缀。局部 pair 的 local-t、轨迹 absolute-t、superpoint 映射与实际参考坐标变换分开。
 
-SEL 三轮的实际 `(input_id, horizon, reference_id)` 集合及 reference 状态键与同角色 M0 完全相同。PB 候选完成后仍需同样检查，不能只凭计数相等通过。
+SEL 三轮及 PB 前两轮的实际 `(input_id, horizon, reference_id)` 集合及 reference 状态键与同角色 M0 完全相同；PB 最后一轮仍待完成，不能只凭计数相等通过。
 
-证据：[DATA_MANIFEST.json](DATA_MANIFEST.json)、[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 3 项、[SPARSE_SEL_M4_VERIFICATION.json](SPARSE_SEL_M4_VERIFICATION.json)。
+证据：[DATA_MANIFEST.json](DATA_MANIFEST.json)、[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 3 项、[SPARSE_SEL_M4_VERIFICATION.json](SPARSE_SEL_M4_VERIFICATION.json)、[SPARSE_PB_M4_VERIFICATION.json](SPARSE_PB_M4_VERIFICATION.json)。
 
 ### 4. 父参数、缓冲区和新旧身份是否完整保留
 
@@ -57,7 +57,7 @@ SEL 三轮的实际 `(input_id, horizon, reference_id)` 集合及 reference 状�
 
 ### 6. 适配对照、全新 M0 与共同最终政策是否成立
 
-结论：CAL 和已完成确认组支持，M4 PB 尚待完成。M2 是按本轮训练配方适配的旧 proposal-read 对照；M0 是本轮 V4 的独立三进程基线，没有借用旧 B4 数字。各变体共用最终关联、一次 commit 与 logical-ID 绑定；M6 按预定义差异对来源 query 的官方候选乘支持概率一次。
+结论：CAL 和已完成确认组支持，M4 PB 前两轮也已核对，最后一轮待完成。M2 是按本轮训练配方适配的旧 proposal-read 对照；M0 是本轮 V4 的独立三进程基线，没有借用旧 B4 数字。各变体共用最终关联、一次 commit 与 logical-ID 绑定；M6 按预定义差异对来源 query 的官方候选乘支持概率一次。
 
 证据：[SPARSE_FORMAL_BASELINE_VERIFICATION.json](SPARSE_FORMAL_BASELINE_VERIFICATION.json)、[EVALUATION_M0_ADMISSION_V4.json](EVALUATION_M0_ADMISSION_V4.json)、[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 6 项、已完成 SEL/PB 组核验文件。
 
@@ -75,7 +75,7 @@ SEL 三轮的实际 `(input_id, horizon, reference_id)` 集合及 reference 状�
 
 ### 9. 重复、失败、分母、统计单位和暴露是否完整
 
-结论：CAL、部分确认及完整 SEL bootstrap 已核对；完整 PB 确认、PB bootstrap 和报告待完成。CAL 共 75 个进程、25 个三重复组、375 行结果；M0/M3 的 SEL/PB、M4 的 SEL 均完成三重复。M4 PB repeat0 已完成并核验，另外两轮尚未完成，不据此声称跨重复一致。SEL 每轮 111 个不同输入、279 个阶段；PB 每轮应为 516 个输入、1806 个阶段。不能把阶段前向数冒充输入数。
+结论：CAL、部分确认及完整 SEL bootstrap 已核对；完整 PB 确认、PB bootstrap 和报告待完成。CAL 共 75 个进程、25 个三重复组、375 行结果；M0/M3 的 SEL/PB、M4 的 SEL 均完成三重复。M4 PB repeat0/1 已完成并核验，前两轮对应状态字节、指标和预测记录完全相同；最后一轮待完成，不声称三重复确认已齐。SEL 每轮 111 个不同输入、279 个阶段；PB 每轮应为 516 个输入、1806 个阶段。不能把阶段前向数冒充输入数。
 
 固定输入分母：CAL T1–T5 为 31/19/14/14/6；SEL 为 39/21/21/15/15；PB T2–T5 各 129，没有 PB-T1。独立 reference 数 CAL/SEL/PB 为 8/8/6，均为 `HISTORICALLY_EXPOSED`，不能宣称新的外部独立测试集。
 
@@ -89,7 +89,7 @@ SEL 已实际沿用物理 reference 成对重采样、官方充分状态池化�
 
 结论：CAL 筛选未通过，完整确认和诊断不改变该失败门槛。M4-200 是描述性最佳候选，不是已验证胜出的方法。M4 SEL 三轮 S_long=0.07959490269422531、S_current=0.271793266137441；相对锁定 M3-400 的描述性差值为 +0.6604pp/−0.4597pp，当前 AP 的下降必须同时保留。已完成 SEL bootstrap 的长期和当前差值区间均跨零，且仅有 8 个历史暴露 reference。该证据不能支持“补回漏分割”的 H1。
 
-PB 首轮的描述性 S_long=0.07106386745969455、S_current=0.34513384103775024，相对锁定 M3 的差值为 +0.2886pp/+0.0557pp；但 T2 AP 为 −0.3968pp。其余两轮、PB 区间和机制尚未完成，首轮均值正差不改写失败的 CAL 门槛，也不能称已重复验证。
+PB 前两轮的描述性 S_long=0.07106386745969455、S_current=0.34513384103775024，相对锁定 M3 的差值为 +0.2886pp/+0.0557pp；但 T2 AP 为 −0.3968pp。最后一轮、PB 区间和机制尚未完成，前两轮均值正差不改写失败的 CAL 门槛，也不能称三次确认已完成。
 
 H1 还需要当前掩码的一对一恢复与丢失诊断；仅长期正差而 current 无增益须保留 TEMPORAL_ONLY 范围。H2 搬动子集没有已验证变化标注绑定时为 NOT_AVAILABLE；H3 不凭参数梯度或 query 改变宣称成立。完整 PB、PB 区间、机制和资源仍待实际完成。本轮不自动给出 READY_FOR_CVPR。
 
@@ -97,7 +97,7 @@ H1 还需要当前掩码的一对一恢复与丢失诊断；仅长期正差而 c
 
 ### 11. 总账、预留和运行范围是否真实
 
-结论：截至已结算快照核对通过，最终总额与无活动进程待收尾核验。[SPARSE_PB_M4_VERIFICATION.json](SPARSE_PB_M4_VERIFICATION.json) 记录私有/公开账本 224 个唯一事件相同，M4 PB 首轮费用只结算一次；新增实际累计 43.066134797265114 GPUh，含历史累计 1757.8801962129357 GPUh。SEL bootstrap 为 CPU 运算，没有新增 GPU 收费事件。活动 PB 的预留不是实际已结算消费，不能重复加到上述累计。
+结论：截至已结算快照核对通过，最终总额与无活动进程待收尾核验。[SPARSE_PB_M4_VERIFICATION.json](SPARSE_PB_M4_VERIFICATION.json) 记录私有/公开账本 225 个唯一事件相同，两笔 M4 PB 费用各只结算一次；新增实际累计 44.3971988116651 GPUh，含历史累计 1759.2112602273357 GPUh。SEL bootstrap 为 CPU 运算，没有新增 GPU 收费事件。活动 PB 的预留不是实际已结算消费，不能重复加到上述累计。
 
 正式训练实际为 9.12422078314583 GPUh，额外费用还包括失败、诊断与评测。8 GPUh 预留保留，旧消费和失败不抹去。当前 GPU 子进程仍在运行，不能填写“无本任务活动进程”。原费用锁及去重仍由原控制器管理。
 
@@ -115,7 +115,7 @@ P5 profile 已实现严格父/编码器/delta 覆盖及固定 CAL panel 的实�
 
 ## 最终验收仍需的实际证据
 
-1. M4 PB 其余两次完整结果、分母/实际 ID 集合、官方总体/reference 状态实体 SHA 与一次结算，并在三轮均完成后核对重复差异；repeat0 及其独立 CPU 复算已完成。
+1. M4 PB 最后一轮完整结果、分母/实际 ID 集合、官方总体/reference 状态实体 SHA 与一次结算，并在三轮均完成后核对重复差异；前两轮及 repeat0 的独立 CPU 复算已完成。
 2. 原规则的 PB bootstrap 实际输出及 NA/少场景边界、P5 机制与 profile 的实际状态、共同上下文及部署回载证据；SEL 的完整 1000 次抽样、区间和少场景边界已核对。
 3. 完整 TRAINING/CAL/SEL/PB/BY_REFERENCE/IDENTITY/MECHANISM/PROFILE、CURRENT_MASK_DIAGNOSTICS、SELECTION_DECISION、REPORT 和本页最终执行结论；失败及历史暴露完整保留。
 4. 已核对的六个最佳 delta/两份 resume 与最终 MODEL_MANIFEST 仍保持同 SHA；补齐并核验最终状态压缩包。依赖取得位置、合法来源和严格加载契约完整，最终自动汇总后不能丢失依赖取得记录。最终公开 diff/压缩包不得含原始点云、逐点 GT、编码器、绝对运行路径或凭据。
