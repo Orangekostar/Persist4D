@@ -1,133 +1,103 @@
 # MPR-V1 提示词执行审计
 
-状态：`IN_PROGRESS`。本页是执行审计草稿，不是最终验收或发布成功声明。初始审阅时间为 2026-10-16 07:19 UTC，随后增补已完成的正式结果与复算证据；当前运行以实际进程状态为准。`STATUS.json` 中的 `publication_ready` 与 `prompt_audit_execution_complete` 仍为 false。
+主代理已完成原指令 §19 的十二项内容审核。代码、锁定实验、统计、部署前向和本地交付核对完成，研究结论为 `SCREEN_NO_GO`。A/B 发布状态保持 `PENDING_EXTERNAL_VERIFICATION`；实际远端 Git/LFS 字节、Release 能力及最终状态只由运行根 publication/PUBLICATION_RECEIPT.json 记录，本页不预填发布成功。
 
-原指令为 [EXECUTION_INSTRUCTION.md](EXECUTION_INSTRUCTION.md)，SHA256 `08cf2d2c83f1bd93d3120623f3ea9884fddd0f1fb13af843677b92160cc0070e`。原 ZIP 五项 checksum 和主指令字节已核对，见 [INPUT_PACKAGE_VERIFICATION.json](INPUT_PACKAGE_VERIFICATION.json)。
+原文为 [EXECUTION_INSTRUCTION.md](EXECUTION_INSTRUCTION.md)，SHA256 `08cf2d2c83f1bd93d3120623f3ea9884fddd0f1fb13af843677b92160cc0070e`；原 ZIP 五项 checksum 见 [INPUT_PACKAGE_VERIFICATION.json](INPUT_PACKAGE_VERIFICATION.json)。[PROMPT_REVIEW_SOURCE.md](PROMPT_REVIEW_SOURCE.md) 的静态审阅不等于实际训练或收益验证。BASE 为 `6b1b779172afdeb51e2719a737cd05e7eeeca982`；本轮分支 `research/persist4d-mpr-v1-formal-20261014`，tag `persist4d-mpr-v1-formal-20261014-v1`。旧预算阻塞轮及其已发布引用保持原身份。
 
-## 原提示词审阅与实际执行的边界
+[FORMAL_DELIVERY_REVIEW_PROGRESS.md](FORMAL_DELIVERY_REVIEW_PROGRESS.md) 和早期审查 JSON 保留其日期、当时 pending 状态及证据范围，不追溯改写历史。以下审核结合 [PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 的实际源码审阅与最终执行证明，不把任何旧快照扩大为最终验收。
 
-[PROMPT_REVIEW_SOURCE.md](PROMPT_REVIEW_SOURCE.md) 和 [INSTRUCTION_STATIC_AUDIT.json](INSTRUCTION_STATIC_AUDIT.json) 保留交付提示词时的静态审阅。其 23 项 PASS 不代表本轮模型、训练、部署或远端发布已完成。固定 BASE 的 29 个源码 blob 与 26 组索引的本地绑定见 [SOURCE_BINDINGS.json](SOURCE_BINDINGS.json)。
+## 1. 首个掩码前是否真正使用历史检索
 
-本轮正式分支为 `research/persist4d-mpr-v1-formal-20261014`，固定 BASE 为 `6b1b779172afdeb51e2719a737cd05e7eeeca982`。旧预算阻塞轮及其已发布标签保留原身份，不用本轮记录改写它。最终 A/B 提交和 tag 尚未生成；发布时由 HANDOFF 引用 A，B 不嵌入自己的 SHA，远端核验事实另写外部回执。
+结论：实现及有限内容干预有实际证据，收益机制未成立。models/rescene.py 在 initialize_queries 后、首次 mask module 前调用 before_first_mask；M4–M6 使用完整当前段特征与先前预测状态。P5 六个固定 CAL 长输入在共享冻结 backbone、旧状态及对齐 RNG 下干预，均为 CONTROLLED，原始预测指纹均改变。只证明受限内容敏感性，不能替代 AP 收益或重训练消融。
 
-## 实际修订、身份与科学边界
+证据：[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 1 项、[SPARSE_CAL_SELECTION_VERIFICATION.json](SPARSE_CAL_SELECTION_VERIFICATION.json)、[P5_EXECUTION_VERIFICATION.json](P5_EXECUTION_VERIFICATION.json)、[MECHANISM.csv](MECHANISM.csv)。
 
-- 用户授权的预算续跑记录于 [PROTOCOL_AMENDMENT.json](PROTOCOL_AMENDMENT.json)。prior 为 1714.8140614156707 GPUh，新池上限 100 GPUh、累计上限 1823 GPUh、保留 8 GPUh；既有消费没有归零。冻结 RUN_LOCK 的 SHA256 为 `c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5`。
-- 六条正式训练使用 C3 `c472a4923c0418cd5ad02a47b6744b51e4e16922` 及其 14 项训练数值源码。评测改用独立冻结的 [EVALUATION_POLICY_V4.json](EVALUATION_POLICY_V4.json)，政策 `ordered-sparse-reference-v4`，SHA256 `4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6`，绑定 18 项推理源码。两条身份链明确分开，没有为采用新推理政策重新训练模型。
-- 早期 stable-mean、Native 与 centroid 诊断、失败和费用保留在相应报告及独立命名空间。V4 不是原论文推理程序完全不变的结果；正式 CAL/SEL/PB/P5 须使用同一 V4 上下文，不能混入旧策略结果。V4 的有限重复一致没有解决旧 Native 大幅异常的因果来源，也没有证明全局逐张量确定性。
-- 唯一选点只使用完整 CAL 四点及每点三次独立进程。锁定对照为 M3-400，描述性候选为 M4-200；[CAL_SELECTION_LOCK.json](CAL_SELECTION_LOCK.json) 的 SHA256 为 `e182171047492635eb6b4b8efe9a502128a3ff639775df5b4c3cf0631fd09e02`。SEL/PB 不重选端点。
-- CAL 长期均值差为 +0.7764pp，但 T3/T4 分别为 −0.8040pp/−1.4022pp，未满足逐长度 −0.2pp 门槛。[REPLICATION_LOCK.json](REPLICATION_LOCK.json) 如实为 `NOT_EXECUTED_CAL_GATE_FAILED`，不追加 seed147 或替换候选。完整交付仍应保留 `SCREEN_NO_GO`，不能因确认集某个正差值改写 CAL 晋级规则。
-- 可选 CPU 统计入口仅加速原 bootstrap 内的 PR 曲线计算，保留官方积分、reference 成对抽样、1000 次重采样、seed9101、三进程差值均值与 NA 规则。56 份状态及 reference 池化和 220 条实际曲线已精确核对，23 项聚焦测试通过，见 [CPU_STATISTICS_ACCELERATION_VERIFICATION.json](CPU_STATISTICS_ACCELERATION_VERIFICATION.json)。07:19 初始审阅时，正式控制器接管和完整加速 bootstrap 均未执行；局部计时不代表完整统计耗时。
+## 2. 是否绕过当前 proposal 门槛并保留新对象发现
 
-SEL 统计执行增补：独立 CPU 进程于 07:26 UTC 启动，09:34:57 UTC 实际完成原 `bootstrap_locked` 的全部 1000 次抽样及 36000 次池化，使用已验证加速上下文与 V4 命名空间。主代理另核对六份输入及源码/输出哈希、三进程实际差值、全部保存抽样及原百分位区间，见 [SEL_BOOTSTRAP_EXECUTION_VERIFICATION.json](SEL_BOOTSTRAP_EXECUTION_VERIFICATION.json)；[BOOTSTRAP_SEL_s146.json](BOOTSTRAP_SEL_s146.json) 保存全部实际抽样。正式 GPU 控制器没有接管或重启，PB 队列继续运行；PB bootstrap 尚未执行。
+结论：调用与输入契约成立，不据此声称召回上升。M4–M6 检索不接收当前 proposal 或其置信度；最多 32 个历史提示查询，至少 68 个原 FPS 查询。空历史严格不修改查询和位置。M2 保持 proposal-read 适配对照含义。
 
-CPU 缓存增补：独立模块按完整保序输入、taxonomy 内容及代码/环境身份缓存原官方池化值，缺项仍计算原池化，损坏输入或缓存不会命中旧值。12 组实际 PB 完整池化及 12 组固定抽样池化的六项指标精确相同，33 项相关测试通过，见 [CPU_POOL_CACHE_VERIFICATION.json](CPU_POOL_CACHE_VERIFICATION.json)。10:18 UTC 开始的 CPU 预热仅使用已有 repeat0 状态，不写正式 bootstrap，不替代第三次实际确认；此时 PB bootstrap 与控制器接管均未执行。
+证据：[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 2 项及其 models/revisit_prompt.py、models/revisit_prompt_modules.py 源码锚点。
 
-11:10 UTC 增补：M4 PB 第三轮已真实完成并结算，93 个正式评测进程全部齐备；[FORMAL_EVALUATION_COMPLETION_VERIFICATION.json](FORMAL_EVALUATION_COMPLETION_VERIFICATION.json) 核对 456 行指标、912 份总体和 5244 份 reference 官方状态实体、11943 行输入诊断及 32 份冻结源码。该检查不替代完整 bootstrap、P5、最终 CSV/压缩包和发布审核。[SAME_CLASS_DIAGNOSTICS.json](SAME_CLASS_DIAGNOSTICS.json) 已完成 627 个实际最终当前场景的 CPU 后处理；[SAME_CLASS_DIAGNOSTICS_VERIFICATION.json](SAME_CLASS_DIAGNOSTICS_VERIFICATION.json) 核对全部 1881 行计数和六组汇总，并以原当前评价辅助函数独立抽查 SEL/PB 各一个实际 GT。新增行为和发布范围共 11 项测试通过，未增加 GPU 作业。
+## 3. UUID、时间、超点和坐标是否对应实际源码
 
-11:12 UTC 控制器交接：缓存预热实际完成 12000 次逻辑池化，保存 11916 项完整来源绑定的缓存；这不等于正式 bootstrap。全部 P4 完成、无 GPU 子进程/reservation 且持有原 JOB.lock 的守卫条件满足后，只中断旧 CPU 父控制器；预期的 KeyboardInterrupt 完整保存在私有交接记录。新控制器 3371682 已脱离终端、PPID=1，原环境仅在内存传递，watcher 沿动态 PID 继续观察。它已核对全部六份实际 PB 输入并运行原 bootstrap，P5 仍待执行，见 [CPU_CONTROLLER_HANDOFF_VERIFICATION.json](CPU_CONTROLLER_HANDOFF_VERIFICATION.json)。该交接没有中断或重跑 GPU 评测，最终函数恢复、输出与发布仍待验收。
+结论：因果数据和索引契约、全部正式评测实际集合已核对。UUID 独立校验；TRAIN/CAL/SEL 使用 train 索引，PB 使用 validation；阶段 j 的共同真值仅使用 0..j 前缀。local-t、轨迹 absolute-t、superpoint 映射及参考坐标变换分开。全部 93 进程的 input_id/horizon/reference_id 实际集合及状态键已核对，不只比较计数。同类诊断以同一 native loader 读取 627 个最终当前 GT，逐项核对 18 份实际结果的可评价实体集合。
 
-## §19 执行内容逐项审核
+证据：[DATA_MANIFEST.json](DATA_MANIFEST.json)、[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 3 项、[FINAL_DELIVERY_VERIFICATION.json](FINAL_DELIVERY_VERIFICATION.json)、[SAME_CLASS_DIAGNOSTICS_VERIFICATION.json](SAME_CLASS_DIAGNOSTICS_VERIFICATION.json)。
 
-### 1. 首掩码前是否使用历史检索
+## 4. 父参数、缓冲区与新旧身份是否完整保留
 
-结论：调用链已核对，机制收益尚未证实。`models/rescene.py` 在 initialize_queries 后、首次 mask module 前调用 `before_first_mask`；M4–M6 从完整当前段特征和先前预测状态检索。正式 CAL 前向与该冻结源码身份对应。实际干预尚待 P5，不能将 query 改变等同涨点机制有效。
+结论：真实训练加载、六个最佳 delta、两份 resume 及两个锁定端点的实际部署前向有证据。固定父任务包严格核对原 BASE 身份和任务参数/buffer 的名称、shape、dtype、值；编码器单独取得，不遗漏任务 decoder。delta 绑定父、编码器、taxonomy、训练数值源码及全部新增张量。
 
-证据：[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 1 项、[SPARSE_CAL_SELECTION_VERIFICATION.json](SPARSE_CAL_SELECTION_VERIFICATION.json)。
+P5 的 M3-400/M4-200 实际结果均为 EXACT_PARENT_ENCODER_DELTA_COVERAGE_AND_REAL_FORWARD，加载 delta 与公开副本 SHA 相同。其余四个最佳 delta 为离线张量/身份核对及原训练/评测证据，不冒称额外进行了六次公开包 GPU 回载。M4 最佳 delta 位于 200，resume 位于 400，不混称相同 optimizer 边界。
 
-### 2. 是否绕过当前 proposal 门槛并保留新对象发现
+证据：[PARAMETER_AND_LOAD_AUDIT.json](PARAMETER_AND_LOAD_AUDIT.json)、[MAIN_TRAINING_VERIFICATION.json](MAIN_TRAINING_VERIFICATION.json)、[MODEL_PAYLOAD_REVIEW.json](MODEL_PAYLOAD_REVIEW.json)、[P5_EXECUTION_VERIFICATION.json](P5_EXECUTION_VERIFICATION.json)、[MODEL_MANIFEST.json](MODEL_MANIFEST.json)、[DEPENDENCY_ACQUISITION.json](DEPENDENCY_ACQUISITION.json)。
 
-结论：结构和输入契约已核对，召回收益未被本项证明。M4–M6 的检索路径不读取当前 proposal 或其分数；最多使用 32 个历史提示槽，至少保留 68 个原始 FPS 查询；空历史严格不修改查询与位置。M2 单独保留 proposal-read 适配对照的含义。
+## 5. 梯度是否连通，M1/M4 是否真等参数且执行
 
-证据：[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 2 项及所列 `models/revisit_prompt.py`、`models/revisit_prompt_modules.py` 源码锚点。
-
-### 3. UUID、时间、超点和坐标是否对应实际源码
-
-结论：因果数据与索引契约、锁定 SEL/PB 全部实际输入集合已核对。完整 UUID 独立校验；TRAIN/CAL/SEL 使用 train 索引，PB 使用 validation；阶段 j 共同真值只使用 0..j 因果前缀。局部 pair 的 local-t、轨迹 absolute-t、superpoint 映射与实际参考坐标变换分开。
-
-SEL/PB 各三轮的实际 `(input_id, horizon, reference_id)` 集合及 reference 状态键与同角色 M0 完全相同，已核对实际集合及实体，不能只凭计数相等通过。
-
-证据：[DATA_MANIFEST.json](DATA_MANIFEST.json)、[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 3 项、[SPARSE_SEL_M4_VERIFICATION.json](SPARSE_SEL_M4_VERIFICATION.json)、[SPARSE_PB_M4_VERIFICATION.json](SPARSE_PB_M4_VERIFICATION.json)。
-
-### 4. 父参数、缓冲区和新旧身份是否完整保留
-
-结论：实际训练加载覆盖、六个最佳 delta 及六个 delta/两份 resume 的本地公开副本已核对；真实部署回载待完成。父包按 BASE 原源码身份校验，所有任务参数及 buffer 的名称、shape、dtype、值严格覆盖；编码器仅按规定前缀单独取得，不能遗漏其任务 decoder。delta 校验父/编码器/taxonomy/训练数值身份及全部新增张量。
-
-证据：[PARAMETER_AND_LOAD_AUDIT.json](PARAMETER_AND_LOAD_AUDIT.json)、[MAIN_TRAINING_VERIFICATION.json](MAIN_TRAINING_VERIFICATION.json)、[MODEL_PAYLOAD_REVIEW.json](MODEL_PAYLOAD_REVIEW.json)、[DEPENDENCY_ACQUISITION.json](DEPENDENCY_ACQUISITION.json)。P5 实际前向标记、最终 MODEL_MANIFEST 和公开资产 SHA 仍需核对。
-
-### 5. 冻结父模型后梯度是否连通、M1/M4 是否真等参数
-
-结论：已有真实训练证据支持，不新增重复 GPU 梯度任务。父模块保持 eval，no_grad 仅包围冻结 backbone；提示后的冻结解码运算保留输入梯度。M1/M4 实际均为 84224 参数且初始化哈希相同；六条正式轨迹记录父张量未变、新增张量训练后改变。此前 P0 梯度核查和正式训练证据各按其实际范围表述。
+结论：真实训练支持实现契约，未追加重复 GPU 梯度任务。父模块保持 eval；no_grad 仅包围冻结 backbone，提示后的冻结 decoder 保留输入梯度。M1/M4 均为 84224 个可训练参数且初始化哈希相同。六条正式轨迹的新增张量改变、父张量未变，P0 和正式训练证据分别保留其范围。
 
 证据：[PARAMETER_AND_LOAD_AUDIT.json](PARAMETER_AND_LOAD_AUDIT.json)、[MAIN_TRAINING_VERIFICATION.json](MAIN_TRAINING_VERIFICATION.json)、[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 5 项。
 
-### 6. 适配对照、全新 M0 与共同最终政策是否成立
+## 6. 适配对照、全新 M0 和共同最终政策是否成立
 
-结论：CAL 和全部 SEL/PB 三进程确认已核对。M2 是按本轮训练配方适配的旧 proposal-read 对照；M0 是本轮 V4 的独立三进程基线，没有借用旧 B4 数字。各变体共用最终关联、一次 commit 与 logical-ID 绑定；M6 按预定义差异对来源 query 的官方候选乘支持概率一次。
+结论：正式 CAL/SEL/PB/P5 使用同一冻结 V4。M2 是按本轮配方训练的旧 proposal-read 适配对照；M0 是新鲜三进程基线，没有借用旧 B4 数字。共同最终 route/commit、logical-ID/generation、commit0 及轨迹分数政策一致；M6 保留预定义的来源查询支持概率乘一次差异。
 
-证据：[SPARSE_FORMAL_BASELINE_VERIFICATION.json](SPARSE_FORMAL_BASELINE_VERIFICATION.json)、[EVALUATION_M0_ADMISSION_V4.json](EVALUATION_M0_ADMISSION_V4.json)、[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 6 项、已完成 SEL/PB 组核验文件。
+训练为 C3 `c472a4923c0418cd5ad02a47b6744b51e4e16922` 的 14 项数值源码；推理独立冻结 ordered-sparse-reference-v4 的 18 项源码，政策 SHA256 `4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6`。V4 含稳定 FP32 归约和保序稀疏参考计算，不称原论文推理实现完全不变。旧 Native 异常的精确低层原因仍未解决，旧失败、政策和成本保留。有限重复一致不证明全局确定性。
 
-### 7. GT 是否隔离、UNKNOWN 是否排除
+证据：[SPARSE_FORMAL_BASELINE_VERIFICATION.json](SPARSE_FORMAL_BASELINE_VERIFICATION.json)、[EVALUATION_M0_ADMISSION_V4.json](EVALUATION_M0_ADMISSION_V4.json)、[EVALUATION_POLICY_V4.json](EVALUATION_POLICY_V4.json)、[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 6 项。
 
-结论：检索前向与训练标签用途已核对。预测检索不接收 GT；训练账本只在预测提交后、可靠 birth 时绑定 logical_id/generation/reference，已有标签不重写。检索没有正段时跳过；support 的 UNKNOWN=-1 不参与 BCE。可靠 anchor 明确属于另一可靠对象才是显式负例，不能将历史缺席或未绑定身份推断为负例。
+## 7. GT 是否隔离，UNKNOWN 是否被当成负例
 
-证据：[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 7 项及 `models/revisit_prompt_loss.py`、`models/revisit_prompt.py` 的冻结源码锚点。
+结论：预测检索不接收 GT，GT 只用于训练损失/账本和评价。训练在预测提交后的可靠 birth 才绑定 logical_id/generation/reference，不重写既有标签。检索无正段时跳过；support UNKNOWN=-1 不参与 BCE。显式负例要求可靠 anchor 明确属于另一可靠对象，缺席或未绑定身份不能自动变成负例。同类诊断也不把未知/歧义身份当可靠实体，不删除主评价输入。
 
-### 8. N、学习率、种子、四点和六臂是否遵守锁
+证据：[PRIMARY_IMPLEMENTATION_REVIEW.json](PRIMARY_IMPLEMENTATION_REVIEW.json) 第 7 项及 models/revisit_prompt_loss.py、models/revisit_prompt.py 锚点、[SAME_CLASS_DIAGNOSTICS_VERIFICATION.json](SAME_CLASS_DIAGNOSTICS_VERIFICATION.json)。
 
-结论：正式主训练与 CAL 已完成，条件复验按失败分支不执行。M1–M6 seed146 均完成 N=400，检查点为 100/200/300/400，实际锁定优化配方学习率 1e-4。24 个训练检查点逐份核对。seed146/147 都是同一 seed45 父模型的适配种子；本轮没有执行 seed147，也没有以短跑或继续微调代替配对复验。
+## 8. N、lr、种子、四点和六臂是否遵守锁
+
+结论：六条 seed146 主训练均完成 N=400、lr=1e-4，100/200/300/400 共 24 个实际检查点逐份核对。seed146/147 是同一 seed45 父任务包的适配种子。RUN_LOCK SHA256 `c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5`；CAL_SELECTION_LOCK SHA256 `e182171047492635eb6b4b8efe9a502128a3ff639775df5b4c3cf0631fd09e02`，均未改写。
+
+锁定对照 M3-400、描述性候选 M4-200。CAL 长期差 +0.776406pp，但 T3/T4 差 −0.804022pp/−1.402200pp，未满足逐长度 −0.2pp 门槛。seed147 如实为 NOT_EXECUTED_CAL_GATE_FAILED，不补训练、不伪造种子、不用确认集重选。
 
 证据：[RUN_LOCK.json](RUN_LOCK.json)、[MAIN_TRAINING_VERIFICATION.json](MAIN_TRAINING_VERIFICATION.json)、[SPARSE_CAL_SELECTION_VERIFICATION.json](SPARSE_CAL_SELECTION_VERIFICATION.json)、[CAL_SELECTION_LOCK.json](CAL_SELECTION_LOCK.json)、[REPLICATION_LOCK.json](REPLICATION_LOCK.json)。
 
-### 9. 重复、失败、分母、统计单位和暴露是否完整
+## 9. 重复、失败、分母、统计单位和历史暴露是否完整
 
-结论：全部 CAL/SEL/PB 确认及完整 SEL bootstrap 已核对；PB bootstrap 和最终报告待完成。CAL 共 75 个进程、25 个三重复组、375 行结果；M0/M3/M4 的 SEL/PB 均完成三重复。M4 PB 三轮共 24 份总体和 144 份 reference 状态实体、指标和预测记录完全相同。SEL 每轮 111 个不同输入、279 个阶段；PB 每轮 516 个不同输入、1806 个阶段。不能把阶段前向数冒充输入数。
+结论：75 个 CAL、18 个 SEL/PB 正式进程完成，共 31 个三重复组、456 行指标、11943 行输入诊断。CAL T1–T5 输入为 31/19/14/14/6；SEL 为 39/21/21/15/15，每轮 111 输入/279 阶段；PB T2–T5 各 129，每轮 516 输入/1806 阶段，无 PB-T1。阶段数不冒充输入数。物理 reference 为 8/8/6，均 HISTORICALLY_EXPOSED；LOCAL 不加入，重叠输入和进程重复不增加独立场景数，不与 ReScene 完整测试主表直接比较。
 
-固定输入分母：CAL T1–T5 为 31/19/14/14/6；SEL 为 39/21/21/15/15；PB T2–T5 各 129，没有 PB-T1。独立 reference 数 CAL/SEL/PB 为 8/8/6，均为 `HISTORICALLY_EXPOSED`，不能宣称新的外部独立测试集。
+SEL/PB 真实完成原规则 1000 次物理 reference 成对 bootstrap，seed9101，三进程差值分别计算后取均值，1000 有效/0 NA，不重抽。SEL 长期/current 95% 区间为 [−0.584956,+1.240682]pp/[−0.706283,+0.688935]pp；PB 为 [−0.064652,+0.598815]pp/[−0.407302,+0.296667]pp，全部跨零，少于十场景的警示保留。
 
-主代理使用原标量官方接口已独立 CPU 复算 74 份总体状态及各自 reference 池化，指标与 RESULTS 精确一致：原 [OFFLINE_METRIC_RECOMPUTATION.json](OFFLINE_METRIC_RECOMPUTATION.json) 56 份，另有 [SPARSE_SEL_M4_VERIFICATION.json](SPARSE_SEL_M4_VERIFICATION.json) 中 M4 SEL repeat0 的 10 份，以及 [SPARSE_PB_M4_VERIFICATION.json](SPARSE_PB_M4_VERIFICATION.json) 中 M4 PB repeat0 的 8 份。该范围不包括其他 repeat 的独立复算或最终压缩包。
+CPU 加速只改变曲线计算和完整保序输入精确缓存，未改官方积分/抽样/NA。SEL 实际 36000 池化；PB 实际 36000 逻辑调用全部命中，仍读取六份真实结果并执行全部原抽样，预热不是正式结果。函数绑定最终恢复，CPU 未初始化 CUDA。安全交接仅在全部 GPU 评测结束且无 reservation/子进程后中断旧 CPU 父控制器；预期 KeyboardInterrupt 保留，新控制器完成 PB/P5 后正常退出。
 
-SEL 已实际沿用物理 reference 成对重采样、官方充分状态池化、三进程差值分别计算后取均值；1000/1000 次抽样有效，NA 为 0，没有重抽。8 个 reference 的少场景警示仍保留。长期差值的 95% 区间为 [−0.584956, +1.240682]pp，当前 AP 差值为 [−0.706283, +0.688935]pp，均跨零；不据此确认稳定收益。独立核验复算了已保存抽样的百分位，没有声称第二次执行全部 1000 次官方池化。PB bootstrap 仍待完成。
+原标量官方接口独立复算范围仍是 74 份总体状态及各自 reference 池化，不冒称所有重复又做一轮指标。最终字节核对覆盖 912 份总体、5244 份 reference 状态及 ZIP 内全部 6156 份实体；所有最终 CSV 字段与实际结果一致，TRAINING 共 2400 行。
 
-证据：[DATA_MANIFEST.json](DATA_MANIFEST.json)、各组核验文件、[CPU_STATISTICS_ACCELERATION_VERIFICATION.json](CPU_STATISTICS_ACCELERATION_VERIFICATION.json)、[FORMAL_DELIVERY_REVIEW_PROGRESS.md](FORMAL_DELIVERY_REVIEW_PROGRESS.md)。历史异常与失败不删除。
+证据：[FINAL_DELIVERY_VERIFICATION.json](FINAL_DELIVERY_VERIFICATION.json)、[SEL_BOOTSTRAP_EXECUTION_VERIFICATION.json](SEL_BOOTSTRAP_EXECUTION_VERIFICATION.json)、[PB_BOOTSTRAP_EXECUTION_VERIFICATION.json](PB_BOOTSTRAP_EXECUTION_VERIFICATION.json)、[PB_BOOTSTRAP_INDEPENDENT_VERIFICATION.json](PB_BOOTSTRAP_INDEPENDENT_VERIFICATION.json)、[CPU_CONTROLLER_HANDOFF_VERIFICATION.json](CPU_CONTROLLER_HANDOFF_VERIFICATION.json)、[DATASET_COMPARISON.md](DATASET_COMPARISON.md)。
 
-### 10. 最佳候选、方法胜出和投稿就绪是否分开
+## 10. 最佳候选、方法胜出和投稿就绪是否分开
 
-结论：CAL 筛选未通过，完整确认和诊断不改变该失败门槛。M4-200 是描述性最佳候选，不是已验证胜出的方法。M4 SEL 三轮 S_long=0.07959490269422531、S_current=0.271793266137441；相对锁定 M3-400 的描述性差值为 +0.6604pp/−0.4597pp，当前 AP 的下降必须同时保留。已完成 SEL bootstrap 的长期和当前差值区间均跨零，且仅有 8 个历史暴露 reference。该证据不能支持“补回漏分割”的 H1。
+结论：研究证据不足，收缩论断为 SCREEN_NO_GO，不声明 READY_FOR_CVPR。M4-200 是描述性最佳，不是验证成功的赢家。相对 M3，SEL 长期/current 为 +0.660414pp/−0.459685pp；PB 为 +0.288628pp/+0.055652pp，但 PB T2 为 −0.396755pp。CAL 失败门槛不由确认集改写，四个区间均跨零。
 
-PB 三轮的描述性 S_long=0.07106386745969455、S_current=0.34513384103775024，相对锁定 M3 的差值为 +0.2886pp/+0.0557pp；但 T2 AP 为 −0.3968pp。PB 区间和机制尚未完成，均值正差不改写失败的 CAL 门槛。
+当前掩码一对一诊断每轮 SEL 恢复/丢失 29/26、PB 181/214（M4 相对 M0）；同类共现子集相对 M3 为 SEL 18/13、PB 91/125。PB 负结果保留，条件召回不是 AP，不能确立同类干扰因果。H1=NOT_ESTABLISHED；搬动子集无可靠变化标注绑定，H2=NOT_AVAILABLE_MOVING_SUBSET；六个受控输入的内容敏感性不足以证明增益，H3=NOT_ESTABLISHED。QUALITY_SCOPE=TEMPORAL_ONLY，不以梯度、代码测试或 query 改变替代科学有效性。
 
-同类共现诊断仅按当前可评价 GT 中可靠的不同实体统计；未知及歧义身份只退出该诊断，主评价输入不删除。每轮 SEL 有 667 个同类共现实体现象计数，M0/M3/M4 分别匹配 406/398/403；PB 有 2969 个，分别匹配 2015/2025/1991。M4 相对 M3 在 SEL 恢复/丢失为 18/13，在 PB 为 91/125；负结果完整保留。这里是重叠输入中的条件掩码召回，既不是 AP，也不能确立同类干扰的因果机制。见 [SAME_CLASS_DIAGNOSTICS.json](SAME_CLASS_DIAGNOSTICS.json) 及其独立核验。
+唯一停止判断：保留可复现基线与负结果，停止将此候选作为已验证赢家继续涨点或投稿，不追加训练或调整门槛。
 
-H1 还需要最终当前掩码的一对一恢复与丢失汇总；仅长期正差而 current 无增益须保留 TEMPORAL_ONLY 范围。H2 搬动子集没有已验证变化标注绑定时为 NOT_AVAILABLE；H3 不凭参数梯度或 query 改变宣称成立。PB 区间、机制和资源仍待实际完成。本轮不自动给出 READY_FOR_CVPR。
+证据：[SELECTION_DECISION.json](SELECTION_DECISION.json)、[REPORT.md](REPORT.md)、[CURRENT_MASK_DIAGNOSTICS.json](CURRENT_MASK_DIAGNOSTICS.json)、[SAME_CLASS_DIAGNOSTICS.json](SAME_CLASS_DIAGNOSTICS.json)、[MECHANISM.csv](MECHANISM.csv)。
 
-证据：[CAL_SELECTION_LOCK.json](CAL_SELECTION_LOCK.json)、[REPLICATION_LOCK.json](REPLICATION_LOCK.json)、[SPARSE_SEL_M4_VERIFICATION.json](SPARSE_SEL_M4_VERIFICATION.json)、[DATASET_COMPARISON.md](DATASET_COMPARISON.md)。
+## 11. 总账、预留和运行范围是否真实
 
-### 11. 总账、预留和运行范围是否真实
+结论：公开/私有账本 230 个唯一事件完全相同，每个只收费一次；历史消费、失败和诊断没有删除。正式主训练 9.12422078314583 GPUh，全部新增实际 45.853692703092854 GPUh，prior 1714.8140614156707 GPUh，累计 1760.6677541187635 GPUh。新增池上限 100、累计上限 1823、预留 8 GPUh；累计余额 62.332245881 GPUh，预留不是已结算消费，不重复计费。
 
-结论：截至全部 P4 结算快照核对通过，最终总额与无活动进程待收尾核验。[SPARSE_PB_M4_VERIFICATION.json](SPARSE_PB_M4_VERIFICATION.json) 记录私有/公开账本 226 个唯一事件相同，三笔 M4 PB 费用各只结算一次；新增实际累计 45.724790513 GPUh，含历史累计 1760.538851929 GPUh（展示四舍五入）。SEL bootstrap 和同类共现诊断为 CPU 运算，没有新增 GPU 收费事件。预留不是实际已结算消费，不能重复加入累计。
+全部 GPU 工作只使用本任务物理 GPU1，未占其他用户/设备。最终 ACTIVE_JOB 不存在，reservation 为零；正式控制器和训练/评测/P5/CPU 子任务退出。本任务只读 watcher 在收尾阶段单独检查并结束，实际状态见最终 STATUS，不把监控进程冒称训练仍运行。CPU bootstrap、缓存和同类诊断没有新增 GPU 费用，小试不冒充全量。
 
-正式训练实际为 9.12422078314583 GPUh，额外费用还包括失败、诊断与评测。8 GPUh 预留保留，旧消费和失败不抹去。11:10 UTC 的 P4 子进程及 reservation 已释放，CPU 统计尚在运行且 P5 仍计划执行，不能预填最终“无本任务活动进程”。原费用锁及去重仍由控制器管理。
+证据：[PROTOCOL_AMENDMENT.json](PROTOCOL_AMENDMENT.json)、[COST_LEDGER.jsonl](COST_LEDGER.jsonl)、[FINAL_DELIVERY_VERIFICATION.json](FINAL_DELIVERY_VERIFICATION.json)、[STATUS.json](STATUS.json)、[PROFILE.csv](PROFILE.csv)。
 
-证据：[PROTOCOL_AMENDMENT.json](PROTOCOL_AMENDMENT.json)、[RUN_LOCK.json](RUN_LOCK.json)、[COST_LEDGER.jsonl](COST_LEDGER.jsonl)、[SPARSE_SEL_M4_VERIFICATION.json](SPARSE_SEL_M4_VERIFICATION.json)。最终需重核已结算总额、reservation 释放和进程终态。
+## 12. 可加载资产、交接、远端字节和 SHA 自引用
 
-### 12. 可加载资产、交接、远端字节和 SHA 自引用是否完成
+结论：本地资产及部署证据齐备；实际远端发布由外部回执验收，不能在 push 前填 PASS。MODEL_MANIFEST 有九项真实实体：六个 CAL 最佳 delta、M3/M4 的 N=400 resume（八份模型共 3724164 bytes）及 212215855 bytes 的充分状态 ZIP。实体 bytes/SHA 与原件核对，ZIP 内 6156 份状态逐份核对，无原始点云/逐点 GT。模型依赖固定父包、独立合法取得的编码器和 taxonomy，delta 不冒称可恢复 optimizer。
 
-结论：尚未全部完成。六个最佳 delta 和 M3/M4 的 N=400 resume 原件已完成离线张量/身份审核；八份本地公开副本共 3724164 bytes，与原件字节数及 SHA256 全部一致，MODEL_MANIFEST 已逐份列出真实资产并绑定依赖取得记录。M4 最佳 delta 位于 step200，resume 位于 step400，两者不混称相同步数的 optimizer 恢复。当前 manifest 尚不含官方状态压缩包；完整档案、一次真实 P5 部署前向及远端取回仍待生成或核验。
+主代理已审阅发布脚本及 HANDOFF/COMMANDS 生成内容，涵盖原 §18.4。P5 两个锁定端点提供严格加载和有限真实前向，不反复加载几十遍。发布 A 冻结代码、配置、结果、模型和 REPORT；ARTIFACT_MANIFEST 排除自身、B 的 HANDOFF/COMMANDS/PROMPT_AUDIT 和外部回执。B 交接引用 A 完整 SHA，不写 B 自己的 SHA；旧分支/tag 不覆盖。
 
-P5 profile 已实现严格父/编码器/delta 覆盖及固定 CAL panel 的实际 warmup/测量。只有真实输出中的 `EXACT_PARENT_ENCODER_DELTA_COVERAGE_AND_REAL_FORWARD` 与最终公开 delta 同 SHA，才满足该回载证据；源码字符串和加载示例不算实际完成。
+真实发布使用本轮显式分支/tag，上传九个选定 LFS 实体并推送引用；一次新临时目录和空 LFS 缓存实际取回全部新实体，逐项核对 bytes/SHA，同时核对所有 A manifest 文件、B 交接和远端引用。ls-remote 或指针列表不算实体证明。Git/LFS 成功但 Release 不可用时，依原指令记录 CODE_AND_LFS_PUSH_VERIFIED_RELEASE_RECEIPT_LOCAL_ONLY、实际错误和本地回执，不伪造 Release 链接；失败保留 A/B 和可重试命令。
 
-发布脚本支持本轮显式 branch/tag、冻结推理源码进入 A manifest、选定 Git LFS 上传及一次空缓存远端下载核验。八个模型路径使用 LFS 属性；本地副本不代表远端资产可取回。当前仅预检/dry-run，没有 A/B/tag 或实际 Git/LFS 上传；SSH 读取成功不证明写权限。Release API 凭据在预检时不可用，最终按实际尝试记录本地回执或 Release 回执，不能伪造成功链接。
+证据：[MODEL_MANIFEST.json](MODEL_MANIFEST.json)、[DEPENDENCY_ACQUISITION.json](DEPENDENCY_ACQUISITION.json)、[DEPLOYMENT_PROTOCOL.md](DEPLOYMENT_PROTOCOL.md)、[P5_EXECUTION_VERIFICATION.json](P5_EXECUTION_VERIFICATION.json)、[FINAL_DELIVERY_VERIFICATION.json](FINAL_DELIVERY_VERIFICATION.json)。远端事实不回写已冻结 A/B，保存在外部 PUBLICATION_RECEIPT。
 
-证据：[MODEL_PAYLOAD_REVIEW.json](MODEL_PAYLOAD_REVIEW.json)、[DEPENDENCY_ACQUISITION.json](DEPENDENCY_ACQUISITION.json)、[DEPLOYMENT_PROTOCOL.md](DEPLOYMENT_PROTOCOL.md)、[PUBLICATION_IMPLEMENTATION_VERIFICATION.json](PUBLICATION_IMPLEMENTATION_VERIFICATION.json)、[PUBLICATION_PREFLIGHT_REVIEW.json](PUBLICATION_PREFLIGHT_REVIEW.json)。远端证据最终由 run root 外部 publication 回执负责，不能预填在 A/B。
-
-## 最终验收仍需的实际证据
-
-1. 全部 93 个评测进程的实体及重复核对已完成，最终 collect 的 CSV 和充分状态压缩包仍需逐项对齐这些实际结果；已有 74 份总体状态的独立 CPU 复算保留原范围。
-2. 原规则的 PB bootstrap 实际输出及 NA/少场景边界、P5 机制与 profile 的实际状态、共同上下文及部署回载证据；SEL 的完整 1000 次抽样、区间和少场景边界已核对。
-3. 完整 TRAINING/CAL/SEL/PB/BY_REFERENCE/IDENTITY/MECHANISM/PROFILE、CURRENT_MASK_DIAGNOSTICS、SELECTION_DECISION、REPORT 和本页最终执行结论；失败及历史暴露完整保留。
-4. 已核对的六个最佳 delta/两份 resume 与最终 MODEL_MANIFEST 仍保持同 SHA；补齐并核验最终状态压缩包。依赖取得位置、合法来源和严格加载契约完整，最终自动汇总后不能丢失依赖取得记录。最终公开 diff/压缩包不得含原始点云、逐点 GT、编码器、绝对运行路径或凭据。
-5. 最终账本及无活动 GPU reservation/子进程；原规则与冻结源码身份仍一致；仅完成所需聚焦检查。
-6. 冻结 A、仅交接的 B、tag、实际 Git/LFS push、一次空 LFS 缓存取回全部本轮资产及 B 文档；外部回执记录真实 SHA/时间/错误。四种 CODE/EXPERIMENT/SCIENCE/PUBLICATION 状态分别报告，远端未完成项不能用本地测试代替。
-
-以上未完成项未被设置为 PASS。健康运行的评测属于等待实际输出；不得因观察等待超时重启同一任务或追加未约定的涨点实验。
+本地审核结论：实现与锁定实验完成，条件复验按明确失败分支不执行；科学证据不支持胜出或 CVPR 就绪。实际发布是下一步操作，不由本页预先宣告成功。
