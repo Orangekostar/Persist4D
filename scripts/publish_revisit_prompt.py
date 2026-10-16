@@ -103,8 +103,8 @@ def write_handoff(assets, *, commit_a, status, models, branch=BRANCH, tag=TAG):
         "真实发布使用本轮独立引用：", "", "```sh", publish_command, "```", "",
         "父包实体取得：", "", "```sh",
         "git lfs pull --include=artifacts/native_long_postselection_v1/deployment/E1-23760.pt --exclude=", "```", "",
-        "部署使用 scripts.revisit_prompt_assets.load_revisit_bundle(delta_path, assets=bound_assets)。模型文件与实际 optimizer 恢复文件分别见 MODEL_MANIFEST.json；delta 不含 optimizer。",
-        "官方状态包离线解压后，使用 scripts.evaluate_revisit_prompt.pool_official_states 和绑定 taxonomy 重新池化。该操作不运行 GPU 推理。", "",
+        "完整的依赖取得、严格加载和官方状态离线复算命令见 [DEPLOYMENT_PROTOCOL.md](DEPLOYMENT_PROTOCOL.md)，固定来源和哈希见 [DEPENDENCY_ACQUISITION.json](DEPENDENCY_ACQUISITION.json)。加载和前向均须保持其中的 V4 推理上下文。",
+        "模型文件与实际 optimizer 恢复文件分别见 MODEL_MANIFEST.json；delta 不含 optimizer，最终 resume 的进度为原 N 边界。官方状态离线复算不运行 GPU 推理。", "",
     ]
     (ARTIFACTS/"COMMANDS.md").write_text("\n".join(commands))
     endpoints = {name:selection.get(name) for name in
@@ -128,9 +128,9 @@ def write_handoff(assets, *, commit_a, status, models, branch=BRANCH, tag=TAG):
         "发布准备要求本任务 ACTIVE_JOB.json 不存在；最终活动进程检查、各阶段完成范围和部署回载证据见 STATUS.json 与 PROMPT_AUDIT.md。", "",
         f"父包：artifacts/native_long_postselection_v1/deployment/E1-23760.pt，SHA256 `{assets['hashes']['parent']}`。",
         f"编码器 SHA256 `{assets['hashes']['encoder']}`；按原 Concerto 许可单独取得，未重新发布。",
-        "3RScan 按原许可取得，使用仓库 README 的预处理和 resolver；MODEL_MANIFEST.json 记录父包 Git/LFS 来源及编码器/数据来源。原始点云、逐点 GT、编码器和本地绝对路径不在本次公开资产中。", "",
+        "3RScan 按原许可取得，使用仓库 README 的预处理和 resolver；固定父包 Git/LFS、编码器及数据来源见 [DEPENDENCY_ACQUISITION.json](DEPENDENCY_ACQUISITION.json)。原始点云、逐点 GT、编码器和本地绝对路径不在本次公开资产中。", "",
         f"实际模型及指标包数量：{len(models)}；每项实体字节、SHA256、变体、种子、步数和 optimizer 标记见 MODEL_MANIFEST.json。",
-        "部署必须同时具备固定父包、指定编码器和 delta；load_revisit_bundle 严格核验参数覆盖及新旧源码身份。optimizer 恢复使用 manifest 实际列出的 resume 文件与原 RUN_LOCK，不能用部署 delta 代替。",
+        "部署必须同时具备固定父包、指定编码器和 delta；严格加载、V4 推理上下文及离线复算命令见 [DEPLOYMENT_PROTOCOL.md](DEPLOYMENT_PROTOCOL.md)。optimizer 恢复使用 manifest 实际列出的 resume 文件与原 RUN_LOCK，其进度为原 N 边界。",
         "evidence/official_states.zip 保存可重新池化的官方充分状态。TRAINING/CAL_ALL/SEL_LOCKED/PB_LOCKED/BY_REFERENCE/IDENTITY_EVENTS_SUMMARY 保留原始行；机制与资源见 MECHANISM/PROFILE，实际命令见 COMMANDS.md。", "",
         "REPORT.md 与 PROMPT_AUDIT.md 记录所有失败、分母、历史面板暴露、数值根因限制以及 H1–H3 支持范围。有限重复一致不证明全局逐张量确定性；内部面板结果不等于 ReScene 原论文完整测试指标，也不自动表示 CVPR 投稿就绪。", "",
         "ARTIFACT_MANIFEST.json 冻结 A 中的代码、配置和实验资产，排除自身、B 交接及外部回执。HANDOFF 只引用 A，不嵌入自己的提交 SHA。", "",
