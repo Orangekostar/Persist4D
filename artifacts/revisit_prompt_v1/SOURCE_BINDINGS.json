@@ -1,0 +1,506 @@
+{
+  "base_commit": "6b1b779172afdeb51e2719a737cd05e7eeeca982",
+  "execution_verification": {
+    "current_training_numeric_sources": {
+      "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
+      "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
+      "models/rescene.py": "cb8008610dd248f4e9a80de924d6883e4ca0d41dda16801e9e1621ebe54def9b",
+      "models/revisit_prompt.py": "e8eb01f17f1c21caadf85db0b0820d7351043e913ccccc975dc590d1c6ac75ee",
+      "models/revisit_prompt_loss.py": "ea0aa0b36131e235a3f10a647852a7103e24d03391256aa6347b129983c762e6",
+      "models/revisit_prompt_modules.py": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
+      "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
+      "scripts/evaluate_revisit_prompt.py": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
+      "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
+      "scripts/revisit_prompt_campaign.py": "c7c06def3a089a220093b7335909d40ab3f258559b39b03e6f9519d064c33be3",
+      "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
+      "scripts/select_revisit_prompt.py": "2ab50193500a125f98388b31223adb80399cfd5d7582c4db1ff47eed09fabc03",
+      "scripts/train_revisit_prompt.py": "58dc60049a5f9fc0f5ebb2119b1597614d76a73c5cc916603f6467dda6c8456f",
+      "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d"
+    },
+    "registry_from_prompt_sha256": "61431f3a7f8a2c0ec47663e2983155346568bf8317ab25bcba0ed808d46fda64",
+    "scope": "Git blob identities at the fixed BASE only; inspected_ranges and scientific interpretations retain their original audit scope",
+    "status": "ALL_29_BASE_BLOB_IDENTITIES_VERIFIED_LOCALLY",
+    "training_run_lock_sha256": "c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5",
+    "unique_files": 29,
+    "verified_unix": 1792120662.5328643
+  },
+  "literature": [
+    {
+      "date": "2026-09-21",
+      "id": "P01",
+      "scope": "Geometry conditions mask decoding; not an implemented teacher or point-cloud plug-in in this task.",
+      "title": "SAM-V: Geometry-Aware Segment Anything for Multi-View Instance Segmentation",
+      "url": "https://arxiv.org/abs/2609.25490"
+    },
+    {
+      "date": "2021-05-07 (first submission)",
+      "id": "P02",
+      "scope": "Track query propagation is prior art; not our new contribution.",
+      "title": "MOTR: End-to-End Multiple-Object Tracking with Transformer",
+      "url": "https://arxiv.org/abs/2105.03247"
+    },
+    {
+      "date": "2026-09-29; v2 2026-10-03",
+      "id": "P03",
+      "scope": "Persistent object queries over shared visual geometry are prior art.",
+      "title": "S4VY: Segment Anything in Feed-Forward 4D Visual Geometry",
+      "url": "https://arxiv.org/abs/2609.36875"
+    }
+  ],
+  "references": [
+    {
+      "design_decision": "保留正负结果；新研究不重用旧表来宣称新模块有效。",
+      "id": "R01",
+      "sources": [
+        {
+          "git_blob_sha": "01d1dc90d736b18d22427e3f69d03c67c837f115",
+          "inspected_ranges": [
+            "报告主体；130行起末尾"
+          ],
+          "path": "artifacts/native_long_postselection_v1/REPORT.md",
+          "symbols": "实验、资源、投稿判断",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_postselection_v1/REPORT.md"
+        }
+      ],
+      "verified_observation": "本轮E0–E3结果、数值限制、记忆桥接和最终总成本。"
+    },
+    {
+      "design_decision": "只继承可证实资产；实际额度执行前重新绑定。",
+      "id": "R02",
+      "sources": [
+        {
+          "git_blob_sha": "8665de5e4530d0cb82aacae1b8f99ae7542a7389",
+          "inspected_ranges": [
+            "全文"
+          ],
+          "path": "artifacts/native_long_postselection_v1/HANDOFF.md",
+          "symbols": "交接、下载、后续科研边界",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_postselection_v1/HANDOFF.md"
+        }
+      ],
+      "verified_observation": "完成态交接、父权重交付与历史预算余额。"
+    },
+    {
+      "design_decision": "新增默认空操作的首mask前hook，不把后续读取换名为新机制。",
+      "id": "R03",
+      "sources": [
+        {
+          "git_blob_sha": "b2044426fe75af46675aa924cb118067c96278f8",
+          "inspected_ranges": [
+            "1–230",
+            "230–530",
+            "530行起forward及相关尾部函数"
+          ],
+          "path": "models/rescene.py",
+          "symbols": "ReScene.__init__; initialize_queries; forward; mask_module; aggregate_features; after_decoder_stage",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/rescene.py"
+        }
+      ],
+      "verified_observation": "原ReScene在初始化query后生成首次mask；其后才执行cross/self attention与after_decoder_stage。"
+    },
+    {
+      "design_decision": "M2重用已有读取模块；不能声称首次attention记忆。",
+      "id": "R04",
+      "sources": [
+        {
+          "git_blob_sha": "271bb327eca16acdfafc232f535d1c89447ca34d",
+          "inspected_ranges": [
+            "1行起至文件末尾"
+          ],
+          "path": "models/task_memory_read.py",
+          "symbols": "TaskMemoryRead.forward",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/task_memory_read.py"
+        }
+      ],
+      "verified_observation": "单个路由历史槽与null分支竞争，再门控更新query。"
+    },
+    {
+      "design_decision": "绑定M2的真实插入位置；注明最终重新关联的协议差异。",
+      "id": "R05",
+      "sources": [
+        {
+          "git_blob_sha": "9b5d4b416831920919bb4fe83a63908100adf054",
+          "inspected_ranges": [
+            "1–220",
+            "210行起后续forward/hook实现"
+          ],
+          "path": "models/persist4d_task_memory.py",
+          "symbols": "Persist4DTaskMemory; _build_pre_observation; after_decoder_stage; forward",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/persist4d_task_memory.py"
+        }
+      ],
+      "verified_observation": "首轮hlevels末尾用初步mask构造observation、route和task_read。"
+    },
+    {
+      "design_decision": "不重复开发普通多代表记忆并称创新。",
+      "id": "R06",
+      "sources": [
+        {
+          "git_blob_sha": "0a0849300445c9142143025b7ca8bbfd4c3a4676",
+          "inspected_ranges": [
+            "1–140"
+          ],
+          "path": "models/object_visual_memory.py",
+          "symbols": "VisualCandidate; ObjectVisualState",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/object_visual_memory.py"
+        }
+      ],
+      "verified_observation": "已经有K100、r8、D128的有界多代表视觉记忆。"
+    },
+    {
+      "design_decision": "不续训该旧路线；不拼接跨协议数值。",
+      "id": "R07",
+      "sources": [
+        {
+          "git_blob_sha": "5b09341c5dfe7265708fc745b266439a0af83a1c",
+          "inspected_ranges": [
+            "全文"
+          ],
+          "path": "artifacts/task_memory_retention_v2/FINAL_REPORT.md",
+          "symbols": "Protocol-B tMAP; Strict comparisons; Limitations",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/task_memory_retention_v2/FINAL_REPORT.md"
+        }
+      ],
+      "verified_observation": "M3-V-CORE在旧研究中输给多个更强对照，且旧发布政策不同。"
+    },
+    {
+      "design_decision": "保留物理角色和真实UUID；不要直接复用旧scene名正则。",
+      "id": "R08",
+      "sources": [
+        {
+          "git_blob_sha": "6fe32307f9feb239f4bf342a368dfece686b289e",
+          "inspected_ranges": [
+            "1–100"
+          ],
+          "path": "artifacts/native_long_retrain_v1/POPULATION.json",
+          "symbols": "counts; evaluation_counts; evaluation_inputs",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_retrain_v1/POPULATION.json"
+        }
+      ],
+      "verified_observation": "原清单角色计数361/8/8、CAL/SEL输入计数，扫描为UUID。"
+    },
+    {
+      "design_decision": "选择E1-23760，检查父资产而不假称optimizer恢复。",
+      "id": "R09",
+      "sources": [
+        {
+          "git_blob_sha": "9f874b60ccb9b23e9c66b944149325d168168767",
+          "inspected_ranges": [
+            "全文"
+          ],
+          "path": "artifacts/native_long_postselection_v1/deployment/README.md",
+          "symbols": "Trained native-long task bundles; portable loading",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_postselection_v1/deployment/README.md"
+        }
+      ],
+      "verified_observation": "部署资产是非编码器任务参数和缓冲区；编码器独立；有源码与数值限制。"
+    },
+    {
+      "design_decision": "新迁移器核验父身份，同时绑定新代码；不删除旧检查。",
+      "id": "R10",
+      "sources": [
+        {
+          "git_blob_sha": "f89d7edf9166fb970b3d3c129848bd77fab37654",
+          "inspected_ranges": [
+            "1行起完整加载及部署审查实现"
+          ],
+          "path": "scripts/native_long_delivery.py",
+          "symbols": "portable_config; load_portable_bundle",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_delivery.py"
+        }
+      ],
+      "verified_observation": "portable loader校验旧数值code identity、父资产与两处backbone路径。"
+    },
+    {
+      "design_decision": "新UUID episode + 原native loader；短适配从第一更新含四个长度。",
+      "id": "R11",
+      "sources": [
+        {
+          "git_blob_sha": "8865049d5566f819bd188bc832828f00b60ada80",
+          "inspected_ranges": [
+            "1行起完整实现"
+          ],
+          "path": "datasets/native_long_dataset.py",
+          "symbols": "stable_seed; isolated_rng; horizon_weights; NativeLongCollator; build_native_datasets",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/datasets/native_long_dataset.py"
+        },
+        {
+          "git_blob_sha": "64ebc4eab1d933bb9d23e2e3b6368d3d2f56537f",
+          "inspected_ranges": [
+            "1–190",
+            "190–355"
+          ],
+          "path": "datasets/task_memory_episode.py",
+          "symbols": "NativeEpisodeMaster; TaskMemoryEpisodeSpec; StageMeta",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/datasets/task_memory_episode.py"
+        }
+      ],
+      "verified_observation": "native数据有稳定种子、UUID清单和初始T2课程；旧episode spec校验scene正则，StageMeta保留几何映射。"
+    },
+    {
+      "design_decision": "复用必要思想/助手，不机械继承旧variant梯度审计和训练约束。",
+      "id": "R12",
+      "sources": [
+        {
+          "git_blob_sha": "5257e59bb1d28efa0928c7b21d169085d863d23e",
+          "inspected_ranges": [
+            "1–260",
+            "380–670"
+          ],
+          "path": "trainer/task_memory_trainer.py",
+          "symbols": "stage_mean_coefficients; task_memory_lr_multiplier; commit_task_memory_stage; bind_training_births; TaskMemoryTrainer",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/trainer/task_memory_trainer.py"
+        }
+      ],
+      "verified_observation": "旧trainer有stage平均、TBPTT、最终observation、commit与独立训练birth ledger。"
+    },
+    {
+      "design_decision": "最终统一route/commit一次；query来源不是最终ID；几何sidecar只由预测更新。",
+      "id": "R13",
+      "sources": [
+        {
+          "git_blob_sha": "7a0e2dcb6d40fc81a58ff8d8c23bffaa71c5388b",
+          "inspected_ranges": [
+            "1–150",
+            "235–530"
+          ],
+          "path": "models/task_memory_routing.py",
+          "symbols": "PredictionObservation; EntityRoute; route_entities; commit_entities",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/task_memory_routing.py"
+        },
+        {
+          "git_blob_sha": "9d4bf687c6a66529d3eabc466b3c53d9af44afd6",
+          "inspected_ranges": [
+            "1–155"
+          ],
+          "path": "models/task_memory_state.py",
+          "symbols": "TaskMemoryConfig; TaskMemoryState.empty",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/task_memory_state.py"
+        }
+      ],
+      "verified_observation": "实体状态有logical ID/generation；route关联旧状态，commit只接受当前有效观测并分配出生。"
+    },
+    {
+      "design_decision": "主比较统一独立匹配；新增监督在loss侧，不把TALA route直接套给preproposal提示。",
+      "id": "R14",
+      "sources": [
+        {
+          "git_blob_sha": "d215cfdb215881321a9eadaaa8e40543527157eb",
+          "inspected_ranges": [
+            "1–220"
+          ],
+          "path": "models/task_memory_criterion.py",
+          "symbols": "TaskMemoryCriterion; _assignment; _safe_mask_losses; _empty_current_loss",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/task_memory_criterion.py"
+        }
+      ],
+      "verified_observation": "旧criterion有独立匹配与TALA分支，空集mask loss与GT ledger要求不同。"
+    },
+    {
+      "design_decision": "另写训练入口，不更换常数冒充原实验。",
+      "id": "R15",
+      "sources": [
+        {
+          "git_blob_sha": "828dc0488a2298ec20ca8a78fcf6da78627777b1",
+          "inspected_ranges": [
+            "1–210"
+          ],
+          "path": "scripts/train_task_memory.py",
+          "symbols": "R1_SHA256; VARIANTS; validate_run_budget; compose_variant_config",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/train_task_memory.py"
+        }
+      ],
+      "verified_observation": "旧训练入口硬绑定R1字节/哈希、旧变体、3000/1500步和120GPUh。"
+    },
+    {
+      "design_decision": "用明确候选谱系映射ID，分清局部t和绝对t。",
+      "id": "R16",
+      "sources": [
+        {
+          "git_blob_sha": "64c262ae5ca27704d835fcf94702043f67da689c",
+          "inspected_ranges": [
+            "1–190"
+          ],
+          "path": "scripts/rescene_task_postprocess.py",
+          "symbols": "OfficialTaskPrediction; OfficialTaskSoftEvidence",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/rescene_task_postprocess.py"
+        }
+      ],
+      "verified_observation": "官方候选携带source_query_ids/source_class_ids及局部latest-stage masks。"
+    },
+    {
+      "design_decision": "固定commit0/mean，保留未关联官方候选。",
+      "id": "R17",
+      "sources": [
+        {
+          "git_blob_sha": "ada48c0cabf5db0a8e98cbe2640aa689d993a61f",
+          "inspected_ranges": [
+            "1行起完整实现"
+          ],
+          "path": "scripts/system_comparison_v2_inference.py",
+          "symbols": "CandidateTrajectoryKey; OfficialCandidateTrajectoryAccumulator.add_stage; snapshot",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/system_comparison_v2_inference.py"
+        }
+      ],
+      "verified_observation": "轨迹累计器使用persistent/ephemeral键、stage_id、source_query_ids和mean/latest/max reducer。"
+    },
+    {
+      "design_decision": "复用公共真值对齐原则；不直接复用硬编码129条/E臂的工作进程。",
+      "id": "R18",
+      "sources": [
+        {
+          "git_blob_sha": "3cde90d8521898e9c2dfbfb7d8e7a75f64c7fe8f",
+          "inspected_ranges": [
+            "1–210"
+          ],
+          "path": "scripts/native_long_memory_bridge.py",
+          "symbols": "context_record; current_target; audit_current_alignment; project_common_truth; assert_same_temporal_truth",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_memory_bridge.py"
+        }
+      ],
+      "verified_observation": "记忆桥接按局部/完整上下文构造记录，并核实公共GT和当前点索引。"
+    },
+    {
+      "design_decision": "新selector保持正确指标语义，移除旧任务硬绑定但不重写官方AP。",
+      "id": "R19",
+      "sources": [
+        {
+          "git_blob_sha": "5c3e80e6038ca8446d4e781ec8c49c493a844acc",
+          "inspected_ranges": [
+            "1–175"
+          ],
+          "path": "scripts/native_long_execution.py",
+          "symbols": "select_cal_points; evaluate_checkpoint; charged_process入口",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_execution.py"
+        }
+      ],
+      "verified_observation": "旧CAL选择要求完整官方总体并用pooled T3–T5平均；入口绑定旧E臂/seed45。"
+    },
+    {
+      "design_decision": "必须显式绑定总上限和prior，避免重置旧消费或重复收费。",
+      "id": "R20",
+      "sources": [
+        {
+          "git_blob_sha": "003eb3559ac77655f6b091660c9d981588e31207",
+          "inspected_ranges": [
+            "全文"
+          ],
+          "path": "scripts/native_long_budget.py",
+          "symbols": "budget_cap; merge_events; remaining_budget; write_json_atomic",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_budget.py"
+        }
+      ],
+      "verified_observation": "成本工具以prior+新事件计算余额，缺省cap可落回192。"
+    },
+    {
+      "design_decision": "发布新结果沿用可追溯原则，但不建设新审计平台。",
+      "id": "R21",
+      "sources": [
+        {
+          "git_blob_sha": "cc15d0919362dab9d4e87d44352ec4f2ad46a177",
+          "inspected_ranges": [
+            "全文"
+          ],
+          "path": "artifacts/native_long_postselection_v1/CODE_BINDINGS.md",
+          "symbols": "代码与实测证据的对应",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_postselection_v1/CODE_BINDINGS.md"
+        }
+      ],
+      "verified_observation": "已有代码/结果绑定明确评价、交接、LFS和外部回执范围。"
+    },
+    {
+      "design_decision": "从导出解析配置迁移并单列本轮冻结全部父模型的改变。",
+      "id": "R22",
+      "sources": [
+        {
+          "git_blob_sha": "e4365424a6429420a7b13b5f464907ec29cad83e",
+          "inspected_ranges": [
+            "全文"
+          ],
+          "path": "conf/config_native_long_retrain.yaml",
+          "symbols": "general; data; model; optimizer; native_long",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/conf/config_native_long_retrain.yaml"
+        }
+      ],
+      "verified_observation": "原配方设Q100、native flags和冻结政策；YAML默认batch不等于运行后实际fallback。"
+    },
+    {
+      "design_decision": "不能漏掉Concerto任务decoder；新delta必须依赖完整父包。",
+      "id": "R23",
+      "sources": [
+        {
+          "git_blob_sha": "48513edfc16b398d23610aa930a9b4f94abed5d9",
+          "inspected_ranges": [
+            "全文"
+          ],
+          "path": "scripts/native_long_assets.py",
+          "symbols": "ENCODER_PREFIXES; export_task_bundle; load_task_bundle",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_assets.py"
+        }
+      ],
+      "verified_observation": "任务包只省略编码器参数，保存任务权重及缓冲区，加载校验源码身份。"
+    },
+    {
+      "design_decision": "冻结父模型仍包含已训练任务decoder；机制缓存不得假设只需一个裸特征矩阵。",
+      "id": "R24",
+      "sources": [
+        {
+          "git_blob_sha": "d73c630bca06ac9d44fcb965812a2f0aa4f11d27",
+          "inspected_ranges": [
+            "1–190",
+            "430–695"
+          ],
+          "path": "models/pointcept.py",
+          "symbols": "PointceptBackbone; _load_state_dict; forward; encoder; serialization helpers",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/models/pointcept.py"
+        }
+      ],
+      "verified_observation": "PointceptBackbone分别编码和解码，encoder_only仅加载embedding/enc预训练。"
+    },
+    {
+      "design_decision": "明确分离train与validation索引空间；PB不复用训练index定位。",
+      "id": "R25",
+      "sources": [
+        {
+          "git_blob_sha": "41ccdd1730b2e9985254535f835a6d6495efb94e",
+          "inspected_ranges": [
+            "1–130"
+          ],
+          "path": "scripts/native_long_confirmation_inference.py",
+          "symbols": "formal_dataset; formal_samples",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/native_long_confirmation_inference.py"
+        },
+        {
+          "git_blob_sha": "8e724742780c196316d480d28353acaecb235bbd",
+          "inspected_ranges": [
+            "1–45"
+          ],
+          "path": "artifacts/native_long_postselection_v1/protocol/FORMAL_POPULATION.json",
+          "symbols": "claim_boundary; coverage",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/artifacts/native_long_postselection_v1/protocol/FORMAL_POPULATION.json"
+        }
+      ],
+      "verified_observation": "正式数据loader使用validation模式及validation_aliases映射，PB有单独ambiguities。"
+    },
+    {
+      "design_decision": "官方充分状态与运行预测需分别绑定；不平均场景AP冒充总体。",
+      "id": "R26",
+      "sources": [
+        {
+          "git_blob_sha": "9e0af22ae161066dd6dc466b149ceb8600f5b83f",
+          "inspected_ranges": [
+            "1–220"
+          ],
+          "path": "scripts/p6a_metrics.py",
+          "symbols": "FrozenRawObservation; assert_shared_raw_predictions; adapt_raw_local_prediction",
+          "url": "https://github.com/Orangekostar/Persist4D/blob/6b1b779172afdeb51e2719a737cd05e7eeeca982/scripts/p6a_metrics.py"
+        }
+      ],
+      "verified_observation": "官方指标包装有FrozenRawObservation、候选指纹、raw_local和strict_online相关路径。"
+    }
+  ],
+  "repository": "Orangekostar/Persist4D",
+  "review_date": "2026-10-13",
+  "schema": 1,
+  "verification_scope": "GitHub connector reads of the specified excerpts and cited reports; no local repository clone or GPU execution."
+}

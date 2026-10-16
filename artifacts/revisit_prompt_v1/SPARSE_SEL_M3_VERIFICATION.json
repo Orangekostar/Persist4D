@@ -1,0 +1,83 @@
+{
+  "AP_by_repeat": [
+    {
+      "1": 0.3278028070926666,
+      "2": 0.20445036888122559,
+      "3": 0.09280321002006531,
+      "4": 0.08077199012041092,
+      "5": 0.04539709910750389
+    },
+    {
+      "1": 0.3278028070926666,
+      "2": 0.20445036888122559,
+      "3": 0.09280321002006531,
+      "4": 0.08077199012041092,
+      "5": 0.04539709910750389
+    },
+    {
+      "1": 0.3278028070926666,
+      "2": 0.20445036888122559,
+      "3": 0.09280321002006531,
+      "4": 0.08077199012041092,
+      "5": 0.04539709910750389
+    }
+  ],
+  "current_AP_by_repeat": [
+    {
+      "1": 0.3278028070926666,
+      "2": 0.3922024667263031,
+      "3": 0.2683681845664978,
+      "4": 0.27696460485458374,
+      "5": 0.28383755683898926
+    },
+    {
+      "1": 0.3278028070926666,
+      "2": 0.3922024667263031,
+      "3": 0.2683681845664978,
+      "4": 0.27696460485458374,
+      "5": 0.28383755683898926
+    },
+    {
+      "1": 0.3278028070926666,
+      "2": 0.3922024667263031,
+      "3": 0.2683681845664978,
+      "4": 0.27696460485458374,
+      "5": 0.28383755683898926
+    }
+  ],
+  "evaluation_policy": {
+    "policy_id": "ordered-sparse-reference-v4",
+    "policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+  },
+  "evidence": [
+    {
+      "charge_event_id": "mpr:P4:1792116231035305545",
+      "repeat": 0,
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "status_sha256": "a0bca9da9f25318b528c0349d140670afe88a660253b91aa4d5db4c4d1735aec"
+    },
+    {
+      "charge_event_id": "mpr:P4:1792116987626106161",
+      "repeat": 1,
+      "results_sha256": "e7c38b866a10356c13912dfc39ec14a463c2ede76a3865aa570127efb3d5b0ef",
+      "status_sha256": "007860fe4eeb0b855017a8aa92adfd3dc1f7d45cd7856ecdc98025aff3079d7d"
+    },
+    {
+      "charge_event_id": "mpr:P4:1792117773838989895",
+      "repeat": 2,
+      "results_sha256": "3e8d9d88169b4fb234eb500d81cac1025a4979dc9256aca664235f8d0133da9a",
+      "status_sha256": "f9fa24182578fc7fcf2aecf9a72516ecc566507cdeefdc67c111a5ef0b231408"
+    }
+  ],
+  "inputs_per_repeat": 111,
+  "limitation": "Only this finite internal-panel repeat group was compared; no global determinism claim.",
+  "metric_rows_structures_and_raw_predictions_equal": true,
+  "observed_S_long_range_pp": 0.0,
+  "role": "SEL",
+  "seed": 146,
+  "stages_per_repeat": 279,
+  "status": "THREE_SEL_REPEATS_VERIFIED",
+  "step": 400,
+  "variant": "M3",
+  "verified_unix": 1792120841.4897254
+}

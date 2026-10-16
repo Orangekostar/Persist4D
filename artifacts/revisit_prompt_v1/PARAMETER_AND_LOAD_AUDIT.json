@@ -1,0 +1,328 @@
+{
+  "M0": {
+    "evidence": "SPARSE_FORMAL_BASELINE_VERIFICATION.json",
+    "trainable_parameters": 0,
+    "trained": false
+  },
+  "M1_M4_equal_parameters_and_initialization": true,
+  "encoder_sha256": "845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07",
+  "formal_deployment_reload_status": "PENDING_SINGLE_PACKAGED_MODEL_RELOAD_AND_REAL_FORWARD",
+  "numeric_sources": {
+    "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
+    "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
+    "models/rescene.py": "cb8008610dd248f4e9a80de924d6883e4ca0d41dda16801e9e1621ebe54def9b",
+    "models/revisit_prompt.py": "e8eb01f17f1c21caadf85db0b0820d7351043e913ccccc975dc590d1c6ac75ee",
+    "models/revisit_prompt_loss.py": "ea0aa0b36131e235a3f10a647852a7103e24d03391256aa6347b129983c762e6",
+    "models/revisit_prompt_modules.py": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
+    "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
+    "scripts/evaluate_revisit_prompt.py": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
+    "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
+    "scripts/revisit_prompt_campaign.py": "c7c06def3a089a220093b7335909d40ab3f258559b39b03e6f9519d064c33be3",
+    "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
+    "scripts/select_revisit_prompt.py": "2ab50193500a125f98388b31223adb80399cfd5d7582c4db1ff47eed09fabc03",
+    "scripts/train_revisit_prompt.py": "58dc60049a5f9fc0f5ebb2119b1597614d76a73c5cc916603f6467dda6c8456f",
+    "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d"
+  },
+  "parent_sha256": "8c9d0d57044ce23c7964ddb1e7a2d8bd18e388e6ee657a7f4b02b1368b5b3a98",
+  "schema": 1,
+  "scope": "Existing real training load/freeze records plus CPU inspection of the six selected trained delta tensors; no extra GPU jobs",
+  "status": "ALL_SIX_FORMAL_TRAINING_LOADS_AND_SELECTED_DELTA_COVERAGE_VERIFIED",
+  "training_run_lock_sha256": "c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5",
+  "variants": {
+    "M1": {
+      "actual_optimizer_step": 400,
+      "adapter_tensor_changed": {
+        "model.mpr_prompt.Wk.bias": true,
+        "model.mpr_prompt.Wk.weight": true,
+        "model.mpr_prompt.Wq.bias": true,
+        "model.mpr_prompt.Wq.weight": true,
+        "model.mpr_prompt.input_layer.bias": true,
+        "model.mpr_prompt.input_layer.weight": true,
+        "model.mpr_prompt.output_layer.bias": true,
+        "model.mpr_prompt.output_layer.weight": true
+      },
+      "formal_status_sha256": "ac5708caa335505a58ee8bb8e66d77e3413559d9c00fa13cd6b68074c4197d16",
+      "frozen_parent_unchanged": true,
+      "initialization_sha256": "5ab677a4bf90fcd2bbdd79deeb836367c3d02de96b7f32778b51d91efb7eaeac",
+      "load_audit": {
+        "included_encoder_buffers": [],
+        "loaded_task_entries": 345,
+        "new_parameter_names": [
+          "model.mpr_prompt.Wk.bias",
+          "model.mpr_prompt.Wk.weight",
+          "model.mpr_prompt.Wq.bias",
+          "model.mpr_prompt.Wq.weight",
+          "model.mpr_prompt.input_layer.bias",
+          "model.mpr_prompt.input_layer.weight",
+          "model.mpr_prompt.output_layer.bias",
+          "model.mpr_prompt.output_layer.weight"
+        ],
+        "new_state_entries": [
+          "model.mpr_prompt.Wk.bias",
+          "model.mpr_prompt.Wk.weight",
+          "model.mpr_prompt.Wq.bias",
+          "model.mpr_prompt.Wq.weight",
+          "model.mpr_prompt.input_layer.bias",
+          "model.mpr_prompt.input_layer.weight",
+          "model.mpr_prompt.output_layer.bias",
+          "model.mpr_prompt.output_layer.weight"
+        ],
+        "omitted_encoder_entries": 453,
+        "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE"
+      },
+      "parent_tensor_sha256": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
+      "seed": 146,
+      "selected_delta_sha256": "fec9df4caecf098ee50c20f5de0d7057d57a040a1e3a38f7daae220d346a66b9",
+      "selected_delta_step": 200,
+      "trainable_parameters": 84224
+    },
+    "M2": {
+      "actual_optimizer_step": 400,
+      "adapter_tensor_changed": {
+        "model.mpr_read.attention_scale": true,
+        "model.mpr_read.gate_projection.bias": true,
+        "model.mpr_read.gate_projection.weight": true,
+        "model.mpr_read.key_projection.bias": true,
+        "model.mpr_read.key_projection.weight": true,
+        "model.mpr_read.null_key": true,
+        "model.mpr_read.output_projection.bias": true,
+        "model.mpr_read.output_projection.weight": true,
+        "model.mpr_read.query_projection.bias": true,
+        "model.mpr_read.query_projection.weight": true,
+        "model.mpr_read.value_projection.bias": true,
+        "model.mpr_read.value_projection.weight": true
+      },
+      "formal_status_sha256": "2a22f8a4881314d52d19c09298f0caeb12bd52010a1fd0ae18772944cdb90fa8",
+      "frozen_parent_unchanged": true,
+      "initialization_sha256": "11ee8b3a42d59d97624d1fe723596034d58ea48df459a3978ee7fa7e4a829d19",
+      "load_audit": {
+        "included_encoder_buffers": [],
+        "loaded_task_entries": 345,
+        "new_parameter_names": [
+          "model.mpr_read.attention_scale",
+          "model.mpr_read.gate_projection.bias",
+          "model.mpr_read.gate_projection.weight",
+          "model.mpr_read.key_projection.bias",
+          "model.mpr_read.key_projection.weight",
+          "model.mpr_read.null_key",
+          "model.mpr_read.output_projection.bias",
+          "model.mpr_read.output_projection.weight",
+          "model.mpr_read.query_projection.bias",
+          "model.mpr_read.query_projection.weight",
+          "model.mpr_read.value_projection.bias",
+          "model.mpr_read.value_projection.weight"
+        ],
+        "new_state_entries": [
+          "model.mpr_read.attention_scale",
+          "model.mpr_read.gate_projection.bias",
+          "model.mpr_read.gate_projection.weight",
+          "model.mpr_read.key_projection.bias",
+          "model.mpr_read.key_projection.weight",
+          "model.mpr_read.null_key",
+          "model.mpr_read.output_projection.bias",
+          "model.mpr_read.output_projection.weight",
+          "model.mpr_read.query_projection.bias",
+          "model.mpr_read.query_projection.weight",
+          "model.mpr_read.value_projection.bias",
+          "model.mpr_read.value_projection.weight"
+        ],
+        "omitted_encoder_entries": 453,
+        "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE"
+      },
+      "parent_tensor_sha256": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
+      "seed": 146,
+      "selected_delta_sha256": "3589ec0330db6758f0f99ea2d7b454c352e16cdfb69bac7d412ea9fc5983b451",
+      "selected_delta_step": 300,
+      "trainable_parameters": 99073
+    },
+    "M3": {
+      "actual_optimizer_step": 400,
+      "adapter_tensor_changed": {
+        "model.mpr_prompt.input_layer.bias": true,
+        "model.mpr_prompt.input_layer.weight": true,
+        "model.mpr_prompt.output_layer.bias": true,
+        "model.mpr_prompt.output_layer.weight": true
+      },
+      "formal_status_sha256": "42bd8395da983dc84aa84258afece8f400666e20b21e6a788ee53f5ee5838c76",
+      "frozen_parent_unchanged": true,
+      "initialization_sha256": "25d13f7f6b95a5e4ac9f7f91242e8cd7c87765ecd69573b54dab8fef9485399a",
+      "load_audit": {
+        "included_encoder_buffers": [],
+        "loaded_task_entries": 345,
+        "new_parameter_names": [
+          "model.mpr_prompt.input_layer.bias",
+          "model.mpr_prompt.input_layer.weight",
+          "model.mpr_prompt.output_layer.bias",
+          "model.mpr_prompt.output_layer.weight"
+        ],
+        "new_state_entries": [
+          "model.mpr_prompt.input_layer.bias",
+          "model.mpr_prompt.input_layer.weight",
+          "model.mpr_prompt.output_layer.bias",
+          "model.mpr_prompt.output_layer.weight"
+        ],
+        "omitted_encoder_entries": 453,
+        "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE"
+      },
+      "parent_tensor_sha256": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
+      "seed": 146,
+      "selected_delta_sha256": "d2c35487d4bee08fd294eee1ed8098729c2a1fbd26517f3d0bc270561ef5dc77",
+      "selected_delta_step": 400,
+      "trainable_parameters": 51200
+    },
+    "M4": {
+      "actual_optimizer_step": 400,
+      "adapter_tensor_changed": {
+        "model.mpr_prompt.Wk.bias": true,
+        "model.mpr_prompt.Wk.weight": true,
+        "model.mpr_prompt.Wq.bias": true,
+        "model.mpr_prompt.Wq.weight": true,
+        "model.mpr_prompt.input_layer.bias": true,
+        "model.mpr_prompt.input_layer.weight": true,
+        "model.mpr_prompt.output_layer.bias": true,
+        "model.mpr_prompt.output_layer.weight": true
+      },
+      "formal_status_sha256": "f8387387a223e32b8325ca52a725b19f1001d221932aa7302c9ea18faeb00b72",
+      "frozen_parent_unchanged": true,
+      "initialization_sha256": "5ab677a4bf90fcd2bbdd79deeb836367c3d02de96b7f32778b51d91efb7eaeac",
+      "load_audit": {
+        "included_encoder_buffers": [],
+        "loaded_task_entries": 345,
+        "new_parameter_names": [
+          "model.mpr_prompt.Wk.bias",
+          "model.mpr_prompt.Wk.weight",
+          "model.mpr_prompt.Wq.bias",
+          "model.mpr_prompt.Wq.weight",
+          "model.mpr_prompt.input_layer.bias",
+          "model.mpr_prompt.input_layer.weight",
+          "model.mpr_prompt.output_layer.bias",
+          "model.mpr_prompt.output_layer.weight"
+        ],
+        "new_state_entries": [
+          "model.mpr_prompt.Wk.bias",
+          "model.mpr_prompt.Wk.weight",
+          "model.mpr_prompt.Wq.bias",
+          "model.mpr_prompt.Wq.weight",
+          "model.mpr_prompt.input_layer.bias",
+          "model.mpr_prompt.input_layer.weight",
+          "model.mpr_prompt.output_layer.bias",
+          "model.mpr_prompt.output_layer.weight"
+        ],
+        "omitted_encoder_entries": 453,
+        "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE"
+      },
+      "parent_tensor_sha256": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
+      "seed": 146,
+      "selected_delta_sha256": "f500184cf7c468269135d08a88132da4ad66b8b619e2777b63f0e2ea18c619f5",
+      "selected_delta_step": 200,
+      "trainable_parameters": 84224
+    },
+    "M5": {
+      "actual_optimizer_step": 400,
+      "adapter_tensor_changed": {
+        "model.mpr_prompt.Wk.bias": true,
+        "model.mpr_prompt.Wk.weight": true,
+        "model.mpr_prompt.Wq.bias": true,
+        "model.mpr_prompt.Wq.weight": true,
+        "model.mpr_prompt.input_layer.bias": true,
+        "model.mpr_prompt.input_layer.weight": true,
+        "model.mpr_prompt.output_layer.bias": true,
+        "model.mpr_prompt.output_layer.weight": true
+      },
+      "formal_status_sha256": "42d6470102228ccd1d162a93feb49797012ee226abac5158ecb87f8091f5a363",
+      "frozen_parent_unchanged": true,
+      "initialization_sha256": "5ab677a4bf90fcd2bbdd79deeb836367c3d02de96b7f32778b51d91efb7eaeac",
+      "load_audit": {
+        "included_encoder_buffers": [],
+        "loaded_task_entries": 345,
+        "new_parameter_names": [
+          "model.mpr_prompt.Wk.bias",
+          "model.mpr_prompt.Wk.weight",
+          "model.mpr_prompt.Wq.bias",
+          "model.mpr_prompt.Wq.weight",
+          "model.mpr_prompt.input_layer.bias",
+          "model.mpr_prompt.input_layer.weight",
+          "model.mpr_prompt.output_layer.bias",
+          "model.mpr_prompt.output_layer.weight"
+        ],
+        "new_state_entries": [
+          "model.mpr_prompt.Wk.bias",
+          "model.mpr_prompt.Wk.weight",
+          "model.mpr_prompt.Wq.bias",
+          "model.mpr_prompt.Wq.weight",
+          "model.mpr_prompt.input_layer.bias",
+          "model.mpr_prompt.input_layer.weight",
+          "model.mpr_prompt.output_layer.bias",
+          "model.mpr_prompt.output_layer.weight"
+        ],
+        "omitted_encoder_entries": 453,
+        "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE"
+      },
+      "parent_tensor_sha256": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
+      "seed": 146,
+      "selected_delta_sha256": "ca495c082af9ab09d719b4fa81bf50566f70b0f5c2bc3911d42469dcbd79341e",
+      "selected_delta_step": 200,
+      "trainable_parameters": 84224
+    },
+    "M6": {
+      "actual_optimizer_step": 400,
+      "adapter_tensor_changed": {
+        "model.mpr_prompt.Wk.bias": true,
+        "model.mpr_prompt.Wk.weight": true,
+        "model.mpr_prompt.Wq.bias": true,
+        "model.mpr_prompt.Wq.weight": true,
+        "model.mpr_prompt.input_layer.bias": true,
+        "model.mpr_prompt.input_layer.weight": true,
+        "model.mpr_prompt.output_layer.bias": true,
+        "model.mpr_prompt.output_layer.weight": true,
+        "model.mpr_support.layers.0.bias": true,
+        "model.mpr_support.layers.0.weight": true,
+        "model.mpr_support.layers.2.bias": true,
+        "model.mpr_support.layers.2.weight": true
+      },
+      "formal_status_sha256": "68697b6b6dbdb2cb4b32c75787d3602d92c8d5d45eaa7aa1d384121193ba4972",
+      "frozen_parent_unchanged": true,
+      "initialization_sha256": "a583dd94fcd8646649a2d379db6c4a9609546a1b4f9d3f94befb5ae9125def65",
+      "load_audit": {
+        "included_encoder_buffers": [],
+        "loaded_task_entries": 345,
+        "new_parameter_names": [
+          "model.mpr_prompt.Wk.bias",
+          "model.mpr_prompt.Wk.weight",
+          "model.mpr_prompt.Wq.bias",
+          "model.mpr_prompt.Wq.weight",
+          "model.mpr_prompt.input_layer.bias",
+          "model.mpr_prompt.input_layer.weight",
+          "model.mpr_prompt.output_layer.bias",
+          "model.mpr_prompt.output_layer.weight",
+          "model.mpr_support.layers.0.bias",
+          "model.mpr_support.layers.0.weight",
+          "model.mpr_support.layers.2.bias",
+          "model.mpr_support.layers.2.weight"
+        ],
+        "new_state_entries": [
+          "model.mpr_prompt.Wk.bias",
+          "model.mpr_prompt.Wk.weight",
+          "model.mpr_prompt.Wq.bias",
+          "model.mpr_prompt.Wq.weight",
+          "model.mpr_prompt.input_layer.bias",
+          "model.mpr_prompt.input_layer.weight",
+          "model.mpr_prompt.output_layer.bias",
+          "model.mpr_prompt.output_layer.weight",
+          "model.mpr_support.layers.0.bias",
+          "model.mpr_support.layers.0.weight",
+          "model.mpr_support.layers.2.bias",
+          "model.mpr_support.layers.2.weight"
+        ],
+        "omitted_encoder_entries": 453,
+        "status": "EXACT_PARENT_TASK_AND_BUFFER_COVERAGE"
+      },
+      "parent_tensor_sha256": "2a328e3f4fdf21e687a8af5d100736a9810a4f1bd9333a027fe6ad2de6f65156",
+      "seed": 146,
+      "selected_delta_sha256": "7ccd33d056b9ba8a98f341f0d2c0ba30cc8320a31a0bbede54192703356fd6fb",
+      "selected_delta_step": 200,
+      "trainable_parameters": 101761
+    }
+  },
+  "verified_unix": 1792120662.5739424
+}

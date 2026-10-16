@@ -1,0 +1,43 @@
+{
+  "CSV_byte_preservation": {
+    "scope": "artifacts/revisit_prompt_v1/*.csv",
+    "text_conversion": false,
+    "whitespace_check": "Default checks plus cr-at-eol for standard CSV CRLF; no frozen CSV bytes changed"
+  },
+  "changed_sources": [
+    "scripts/publish_revisit_prompt.py",
+    "tests/test_revisit_prompt_publication.py",
+    ".gitattributes"
+  ],
+  "frozen_inference_sources_unchanged": true,
+  "frozen_training_numeric_sources_unchanged": true,
+  "green_verification": {
+    "command": "python -m pytest tests/test_revisit_prompt_publication.py -q",
+    "failed": 0,
+    "passed": 3
+  },
+  "limitations": [
+    "No remote publication or byte-download check has run for this formal round.",
+    "Final handoff content and all delivery requirements require the primary post-experiment audit."
+  ],
+  "preview": {
+    "command": "python -m scripts.publish_revisit_prompt --dry-run --branch research/persist4d-mpr-v1-formal-20261014 --tag persist4d-mpr-v1-formal-20261014-v1",
+    "missing": [
+      "REPORT.md",
+      "MODEL_MANIFEST.json",
+      "PROMPT_AUDIT.md"
+    ],
+    "publication_ready": false,
+    "status": "DRY_RUN_NOT_PUBLISHED"
+  },
+  "red_verification": {
+    "command": "python -m pytest tests/test_revisit_prompt_publication.py -q",
+    "failed": 3,
+    "reason": "Missing explicit branch/tag support, wrong origin accepted, frozen inference sources omitted from A"
+  },
+  "remote_operations_executed": false,
+  "schema": 1,
+  "source_sha256": "b9555012acb1ed106903c87f1347022683c903819862813e40ab697a7e9106ed",
+  "status": "PUBLICATION_LOGIC_VERIFIED_OFFLINE_NOT_PUBLISHED",
+  "verified_unix": 1792120873.442511
+}

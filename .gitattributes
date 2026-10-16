@@ -8,3 +8,4 @@ artifacts/native_long_postselection_v1/evidence/official_metric_states.zip filte
 artifacts/revisit_prompt_v1/deployment/*.pt filter=lfs diff=lfs merge=lfs -text
 artifacts/revisit_prompt_v1/resume/*.pt filter=lfs diff=lfs merge=lfs -text
 artifacts/revisit_prompt_v1/evidence/official_states.zip filter=lfs diff=lfs merge=lfs -text
+artifacts/revisit_prompt_v1/*.csv -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
