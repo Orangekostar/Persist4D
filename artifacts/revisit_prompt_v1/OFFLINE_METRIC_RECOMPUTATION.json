@@ -1,6 +1,6 @@
 {
   "all_official_metrics_exact": true,
-  "cpu_seconds": 46.01932670202223,
+  "cpu_seconds": 437.0187167630065,
   "cuda_initialized": false,
   "evaluation_policy": {
     "policy_id": "ordered-sparse-reference-v4",
@@ -8,7 +8,19 @@
   },
   "final_SEL_PB_and_archive_verification": "PENDING_COMPLETE_LOCKED_CONFIRMATION_AND_PACKAGING",
   "new_gpu_jobs": 0,
-  "official_states_checked": 20,
+  "official_states_checked": 56,
+  "performance_profile": {
+    "cuda_initialized": false,
+    "elapsed_seconds": 26.197830985998735,
+    "hot_function": "stmetrics.instances.ap_math.compute_precision_recall",
+    "hot_function_calls": 110,
+    "hot_function_cumulative_seconds": 22.856719518000002,
+    "instrumentation": "cProfile",
+    "new_gpu_jobs": 0,
+    "official_evidence_sha256": "7b0ce8b53db518acc74aceaa89f7b52239e9c566dff2eabc7a4581cba11bcdf6",
+    "scope": "Single original CPU pool: M3 PB repeat0 long T5; six official metrics exact",
+    "third_party_source_sha256": "69c63fcc1736ef34847a85e1783c189e56ef20fd50aaaa355b3f7fb57251620b"
+  },
   "reference_pool_all_exact": true,
   "rows": [
     {
@@ -830,11 +842,1539 @@
       },
       "repeat_index": 0,
       "role": "CAL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 1,
+      "kind": "long",
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-long-T1.json",
+      "official_evidence_sha256": "459a74be01f49213c54a38f29ddadf0be318fcffdbfbcdb3c42cd0300c804582",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.3278028070926666,
+        "raw_local_AP25": 0.7315728068351746,
+        "raw_local_AP50": 0.4939010739326477,
+        "raw_local_REC": 0.44634363055229187,
+        "raw_local_REC25": 0.8160609602928162,
+        "raw_local_REC50": 0.6194320917129517
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.3278028070926666,
+        "raw_local_AP25": 0.7315728068351746,
+        "raw_local_AP50": 0.4939010739326477,
+        "raw_local_REC": 0.44634363055229187,
+        "raw_local_REC25": 0.8160609602928162,
+        "raw_local_REC50": 0.6194320917129517
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "ac1f65a0dd79997ba9518d9b12444a857768965a9dc5f0adff262829eb60c952",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 1,
+      "kind": "current",
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-current-T1.json",
+      "official_evidence_sha256": "459a74be01f49213c54a38f29ddadf0be318fcffdbfbcdb3c42cd0300c804582",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.3278028070926666,
+        "raw_local_AP25": 0.7315728068351746,
+        "raw_local_AP50": 0.4939010739326477,
+        "raw_local_REC": 0.44634363055229187,
+        "raw_local_REC25": 0.8160609602928162,
+        "raw_local_REC50": 0.6194320917129517
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.3278028070926666,
+        "raw_local_AP25": 0.7315728068351746,
+        "raw_local_AP50": 0.4939010739326477,
+        "raw_local_REC": 0.44634363055229187,
+        "raw_local_REC25": 0.8160609602928162,
+        "raw_local_REC50": 0.6194320917129517
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "ac1f65a0dd79997ba9518d9b12444a857768965a9dc5f0adff262829eb60c952",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 2,
+      "kind": "long",
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-long-T2.json",
+      "official_evidence_sha256": "03da576f241384622889db12b7d49e945c0f644a4c49a3a50de41ad6037656fb",
+      "recomputed_metrics": {
+        "online_t-REC": 0.33343496918678284,
+        "online_t-REC25": 0.6237606406211853,
+        "online_t-REC50": 0.48976680636405945,
+        "online_t-mAP": 0.20642675459384918,
+        "online_t-mAP25": 0.508433997631073,
+        "online_t-mAP50": 0.3426677882671356
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.33343496918678284,
+        "online_t-REC25": 0.6237606406211853,
+        "online_t-REC50": 0.48976680636405945,
+        "online_t-mAP": 0.20642675459384918,
+        "online_t-mAP25": 0.508433997631073,
+        "online_t-mAP50": 0.3426677882671356
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "ac1f65a0dd79997ba9518d9b12444a857768965a9dc5f0adff262829eb60c952",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 2,
+      "kind": "current",
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-current-T2.json",
+      "official_evidence_sha256": "041636837979aa2dc571e25f50ebfb28b45b44c0a11cc55ddf1c322fdd481e0c",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.40232834219932556,
+        "raw_local_AP25": 0.7681140899658203,
+        "raw_local_AP50": 0.5950920581817627,
+        "raw_local_REC": 0.5137131214141846,
+        "raw_local_REC25": 0.8247511386871338,
+        "raw_local_REC50": 0.7182657122612
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.40232834219932556,
+        "raw_local_AP25": 0.7681140899658203,
+        "raw_local_AP50": 0.5950920581817627,
+        "raw_local_REC": 0.5137131214141846,
+        "raw_local_REC25": 0.8247511386871338,
+        "raw_local_REC50": 0.7182657122612
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "ac1f65a0dd79997ba9518d9b12444a857768965a9dc5f0adff262829eb60c952",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 3,
+      "kind": "long",
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-long-T3.json",
+      "official_evidence_sha256": "ae8954abb07060c68a32966dc918183e19fcc2b5bbc5b772770a484b30ecd109",
+      "recomputed_metrics": {
+        "online_t-REC": 0.2047731876373291,
+        "online_t-REC25": 0.44069913029670715,
+        "online_t-REC50": 0.3498201072216034,
+        "online_t-mAP": 0.1028706505894661,
+        "online_t-mAP25": 0.33023837208747864,
+        "online_t-mAP50": 0.21376393735408783
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.2047731876373291,
+        "online_t-REC25": 0.44069913029670715,
+        "online_t-REC50": 0.3498201072216034,
+        "online_t-mAP": 0.1028706505894661,
+        "online_t-mAP25": 0.33023837208747864,
+        "online_t-mAP50": 0.21376393735408783
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "ac1f65a0dd79997ba9518d9b12444a857768965a9dc5f0adff262829eb60c952",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 3,
+      "kind": "current",
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-current-T3.json",
+      "official_evidence_sha256": "de1414d9512e77f50677f885940fee7b816a62c294eeec95f20c8374503be854",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.2818358838558197,
+        "raw_local_AP25": 0.6976036429405212,
+        "raw_local_AP50": 0.456086665391922,
+        "raw_local_REC": 0.4119280278682709,
+        "raw_local_REC25": 0.7984287142753601,
+        "raw_local_REC50": 0.6172361969947815
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.2818358838558197,
+        "raw_local_AP25": 0.6976036429405212,
+        "raw_local_AP50": 0.456086665391922,
+        "raw_local_REC": 0.4119280278682709,
+        "raw_local_REC25": 0.7984287142753601,
+        "raw_local_REC50": 0.6172361969947815
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "ac1f65a0dd79997ba9518d9b12444a857768965a9dc5f0adff262829eb60c952",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 4,
+      "kind": "long",
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-long-T4.json",
+      "official_evidence_sha256": "5c1c7da41622788026814f888020f54790b29e0d9a2b4aef0ddf1478f18a8dd5",
+      "recomputed_metrics": {
+        "online_t-REC": 0.11493223160505295,
+        "online_t-REC25": 0.451339989900589,
+        "online_t-REC50": 0.2766907811164856,
+        "online_t-mAP": 0.06755153834819794,
+        "online_t-mAP25": 0.3821916878223419,
+        "online_t-mAP50": 0.18002139031887054
+      },
+      "reference_count": 5,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.11493223160505295,
+        "online_t-REC25": 0.451339989900589,
+        "online_t-REC50": 0.2766907811164856,
+        "online_t-mAP": 0.06755153834819794,
+        "online_t-mAP25": 0.3821916878223419,
+        "online_t-mAP50": 0.18002139031887054
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "ac1f65a0dd79997ba9518d9b12444a857768965a9dc5f0adff262829eb60c952",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 4,
+      "kind": "current",
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-current-T4.json",
+      "official_evidence_sha256": "84a2a99e7233e4ef04aee747671b85436c71a5e5ccfc12cbf0a76952bf97102c",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.26697224378585815,
+        "raw_local_AP25": 0.839438796043396,
+        "raw_local_AP50": 0.49938341975212097,
+        "raw_local_REC": 0.38878658413887024,
+        "raw_local_REC25": 0.9028843641281128,
+        "raw_local_REC50": 0.6509400606155396
+      },
+      "reference_count": 5,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.26697224378585815,
+        "raw_local_AP25": 0.839438796043396,
+        "raw_local_AP50": 0.49938341975212097,
+        "raw_local_REC": 0.38878658413887024,
+        "raw_local_REC25": 0.9028843641281128,
+        "raw_local_REC50": 0.6509400606155396
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "ac1f65a0dd79997ba9518d9b12444a857768965a9dc5f0adff262829eb60c952",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 5,
+      "kind": "long",
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-long-T5.json",
+      "official_evidence_sha256": "04d605705f4a3dbc368c4255e963a53ed8be6ab01cecfb09810e6aeda72220bc",
+      "recomputed_metrics": {
+        "online_t-REC": 0.11010155081748962,
+        "online_t-REC25": 0.44728320837020874,
+        "online_t-REC50": 0.2672428786754608,
+        "online_t-mAP": 0.06017472222447395,
+        "online_t-mAP25": 0.36949247121810913,
+        "online_t-mAP50": 0.16391029953956604
+      },
+      "reference_count": 5,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.11010155081748962,
+        "online_t-REC25": 0.44728320837020874,
+        "online_t-REC50": 0.2672428786754608,
+        "online_t-mAP": 0.06017472222447395,
+        "online_t-mAP25": 0.36949247121810913,
+        "online_t-mAP50": 0.16391029953956604
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "ac1f65a0dd79997ba9518d9b12444a857768965a9dc5f0adff262829eb60c952",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 5,
+      "kind": "current",
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-current-T5.json",
+      "official_evidence_sha256": "3b415e89b0d552c18d7d21143a0262aec9b9c5c9f964939fd56e5b3eeceeb8d4",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.2838115394115448,
+        "raw_local_AP25": 0.7135452628135681,
+        "raw_local_AP50": 0.5091065764427185,
+        "raw_local_REC": 0.4105450510978699,
+        "raw_local_REC25": 0.8057949542999268,
+        "raw_local_REC50": 0.6123830676078796
+      },
+      "reference_count": 5,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.2838115394115448,
+        "raw_local_AP25": 0.7135452628135681,
+        "raw_local_AP50": 0.5091065764427185,
+        "raw_local_REC": 0.4105450510978699,
+        "raw_local_REC25": 0.8057949542999268,
+        "raw_local_REC50": 0.6123830676078796
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "ac1f65a0dd79997ba9518d9b12444a857768965a9dc5f0adff262829eb60c952",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 2,
+      "kind": "long",
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-long-T2.json",
+      "official_evidence_sha256": "aee2792cfa4a7cfbc9e0931e2a256bc78f7ed25b25b162848860fc4d24957ae1",
+      "recomputed_metrics": {
+        "online_t-REC": 0.3550195097923279,
+        "online_t-REC25": 0.7265421152114868,
+        "online_t-REC50": 0.5478599667549133,
+        "online_t-mAP": 0.17419040203094482,
+        "online_t-mAP25": 0.5381453037261963,
+        "online_t-mAP50": 0.29995808005332947
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.3550195097923279,
+        "online_t-REC25": 0.7265421152114868,
+        "online_t-REC50": 0.5478599667549133,
+        "online_t-mAP": 0.17419040203094482,
+        "online_t-mAP25": 0.5381453037261963,
+        "online_t-mAP50": 0.29995808005332947
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "72f33eb63bef937843391ce415e14f9857994d0f5fa1b9d5b8aeab1de493986d",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 2,
+      "kind": "current",
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-current-T2.json",
+      "official_evidence_sha256": "54a30b8fca4d5f5a4ff8738b21d84d81ee86368d9b0f0f834dad563a4d75224a",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.3393106460571289,
+        "raw_local_AP25": 0.7895223498344421,
+        "raw_local_AP50": 0.5333883166313171,
+        "raw_local_REC": 0.5205106735229492,
+        "raw_local_REC25": 0.8953792452812195,
+        "raw_local_REC50": 0.7324749231338501
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.3393106460571289,
+        "raw_local_AP25": 0.7895223498344421,
+        "raw_local_AP50": 0.5333883166313171,
+        "raw_local_REC": 0.5205106735229492,
+        "raw_local_REC25": 0.8953792452812195,
+        "raw_local_REC50": 0.7324749231338501
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "72f33eb63bef937843391ce415e14f9857994d0f5fa1b9d5b8aeab1de493986d",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 3,
+      "kind": "long",
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-long-T3.json",
+      "official_evidence_sha256": "983d3ea7f03f734afc6bc4084f01f80a75475fac053ece153332074ff6cc94fb",
+      "recomputed_metrics": {
+        "online_t-REC": 0.2590866982936859,
+        "online_t-REC25": 0.6015498042106628,
+        "online_t-REC50": 0.43360188603401184,
+        "online_t-mAP": 0.1065184697508812,
+        "online_t-mAP25": 0.3930540978908539,
+        "online_t-mAP50": 0.20012369751930237
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.2590866982936859,
+        "online_t-REC25": 0.6015498042106628,
+        "online_t-REC50": 0.43360188603401184,
+        "online_t-mAP": 0.1065184697508812,
+        "online_t-mAP25": 0.3930540978908539,
+        "online_t-mAP50": 0.20012369751930237
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "72f33eb63bef937843391ce415e14f9857994d0f5fa1b9d5b8aeab1de493986d",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 3,
+      "kind": "current",
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-current-T3.json",
+      "official_evidence_sha256": "32b7169e740b92ec210e6ae6ddb558652169fdaf09d28b70ed5bddaed4a59380",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.3620195984840393,
+        "raw_local_AP25": 0.8003658056259155,
+        "raw_local_AP50": 0.5663562417030334,
+        "raw_local_REC": 0.5413175225257874,
+        "raw_local_REC25": 0.8981603384017944,
+        "raw_local_REC50": 0.7456929683685303
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.3620195984840393,
+        "raw_local_AP25": 0.8003658056259155,
+        "raw_local_AP50": 0.5663562417030334,
+        "raw_local_REC": 0.5413175225257874,
+        "raw_local_REC25": 0.8981603384017944,
+        "raw_local_REC50": 0.7456929683685303
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "72f33eb63bef937843391ce415e14f9857994d0f5fa1b9d5b8aeab1de493986d",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 4,
+      "kind": "long",
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-long-T4.json",
+      "official_evidence_sha256": "facac8ccca6b6f8cb1ba4e1484e658c0bfbd5addc9bad0c64e80801808400023",
+      "recomputed_metrics": {
+        "online_t-REC": 0.18092431128025055,
+        "online_t-REC25": 0.4786611795425415,
+        "online_t-REC50": 0.31436634063720703,
+        "online_t-mAP": 0.06370779126882553,
+        "online_t-mAP25": 0.2555195689201355,
+        "online_t-mAP50": 0.1271085888147354
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.18092431128025055,
+        "online_t-REC25": 0.4786611795425415,
+        "online_t-REC50": 0.31436634063720703,
+        "online_t-mAP": 0.06370779126882553,
+        "online_t-mAP25": 0.2555195689201355,
+        "online_t-mAP50": 0.1271085888147354
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "72f33eb63bef937843391ce415e14f9857994d0f5fa1b9d5b8aeab1de493986d",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 4,
+      "kind": "current",
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-current-T4.json",
+      "official_evidence_sha256": "9d05fe07ffffeb30f51331f43b121dc06b5633eadd4a05092759452463e8d373",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.3388097286224365,
+        "raw_local_AP25": 0.8002994060516357,
+        "raw_local_AP50": 0.5684337019920349,
+        "raw_local_REC": 0.523250162601471,
+        "raw_local_REC25": 0.8972275257110596,
+        "raw_local_REC50": 0.7685304284095764
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.3388097286224365,
+        "raw_local_AP25": 0.8002994060516357,
+        "raw_local_AP50": 0.5684337019920349,
+        "raw_local_REC": 0.523250162601471,
+        "raw_local_REC25": 0.8972275257110596,
+        "raw_local_REC50": 0.7685304284095764
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "72f33eb63bef937843391ce415e14f9857994d0f5fa1b9d5b8aeab1de493986d",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 5,
+      "kind": "long",
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-long-T5.json",
+      "official_evidence_sha256": "68f663707e7435bf45aa79e68c9da1e34d2fe819135e09fb3621f13c86ae6b8b",
+      "recomputed_metrics": {
+        "online_t-REC": 0.1357235610485077,
+        "online_t-REC25": 0.40603455901145935,
+        "online_t-REC50": 0.24914388358592987,
+        "online_t-mAP": 0.0435030572116375,
+        "online_t-mAP25": 0.2095189094543457,
+        "online_t-mAP50": 0.08906233310699463
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.1357235610485077,
+        "online_t-REC25": 0.40603455901145935,
+        "online_t-REC50": 0.24914388358592987,
+        "online_t-mAP": 0.0435030572116375,
+        "online_t-mAP25": 0.2095189094543457,
+        "online_t-mAP50": 0.08906233310699463
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "72f33eb63bef937843391ce415e14f9857994d0f5fa1b9d5b8aeab1de493986d",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 0,
+        "variant": "M0"
+      },
+      "endpoint_name": "fresh_M0_baseline",
+      "horizon": 5,
+      "kind": "current",
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-current-T5.json",
+      "official_evidence_sha256": "7254bac438d2bb5e5979aa53e21754dafe7a2b1f6a0cceb1896a1a04699d005a",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.34307560324668884,
+        "raw_local_AP25": 0.8015033602714539,
+        "raw_local_AP50": 0.5463381409645081,
+        "raw_local_REC": 0.513664186000824,
+        "raw_local_REC25": 0.8922386169433594,
+        "raw_local_REC50": 0.7190205454826355
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.34307560324668884,
+        "raw_local_AP25": 0.8015033602714539,
+        "raw_local_AP50": 0.5463381409645081,
+        "raw_local_REC": 0.513664186000824,
+        "raw_local_REC25": 0.8922386169433594,
+        "raw_local_REC50": 0.7190205454826355
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "72f33eb63bef937843391ce415e14f9857994d0f5fa1b9d5b8aeab1de493986d",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 1,
+      "kind": "long",
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-long-T1.json",
+      "official_evidence_sha256": "459a74be01f49213c54a38f29ddadf0be318fcffdbfbcdb3c42cd0300c804582",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.3278028070926666,
+        "raw_local_AP25": 0.7315728068351746,
+        "raw_local_AP50": 0.4939010739326477,
+        "raw_local_REC": 0.44634363055229187,
+        "raw_local_REC25": 0.8160609602928162,
+        "raw_local_REC50": 0.6194320917129517
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.3278028070926666,
+        "raw_local_AP25": 0.7315728068351746,
+        "raw_local_AP50": 0.4939010739326477,
+        "raw_local_REC": 0.44634363055229187,
+        "raw_local_REC25": 0.8160609602928162,
+        "raw_local_REC50": 0.6194320917129517
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 1,
+      "kind": "current",
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-current-T1.json",
+      "official_evidence_sha256": "459a74be01f49213c54a38f29ddadf0be318fcffdbfbcdb3c42cd0300c804582",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.3278028070926666,
+        "raw_local_AP25": 0.7315728068351746,
+        "raw_local_AP50": 0.4939010739326477,
+        "raw_local_REC": 0.44634363055229187,
+        "raw_local_REC25": 0.8160609602928162,
+        "raw_local_REC50": 0.6194320917129517
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.3278028070926666,
+        "raw_local_AP25": 0.7315728068351746,
+        "raw_local_AP50": 0.4939010739326477,
+        "raw_local_REC": 0.44634363055229187,
+        "raw_local_REC25": 0.8160609602928162,
+        "raw_local_REC50": 0.6194320917129517
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 2,
+      "kind": "long",
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-long-T2.json",
+      "official_evidence_sha256": "278f94d28c1ff3b0af7b064b89b61f303c748f29f9a7e1cbe4f3c04a07ce7410",
+      "recomputed_metrics": {
+        "online_t-REC": 0.3301861882209778,
+        "online_t-REC25": 0.6296850442886353,
+        "online_t-REC50": 0.4830687940120697,
+        "online_t-mAP": 0.20445036888122559,
+        "online_t-mAP25": 0.4907148778438568,
+        "online_t-mAP50": 0.3276868760585785
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.3301861882209778,
+        "online_t-REC25": 0.6296850442886353,
+        "online_t-REC50": 0.4830687940120697,
+        "online_t-mAP": 0.20445036888122559,
+        "online_t-mAP25": 0.4907148778438568,
+        "online_t-mAP50": 0.3276868760585785
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 2,
+      "kind": "current",
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-current-T2.json",
+      "official_evidence_sha256": "cd7a07c507d07d2cb29982042ae47671428519ddfa753a12124926a7691ff329",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.3922024667263031,
+        "raw_local_AP25": 0.7758798003196716,
+        "raw_local_AP50": 0.5533131957054138,
+        "raw_local_REC": 0.4977971911430359,
+        "raw_local_REC25": 0.8586035966873169,
+        "raw_local_REC50": 0.6757873892784119
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.3922024667263031,
+        "raw_local_AP25": 0.7758798003196716,
+        "raw_local_AP50": 0.5533131957054138,
+        "raw_local_REC": 0.4977971911430359,
+        "raw_local_REC25": 0.8586035966873169,
+        "raw_local_REC50": 0.6757873892784119
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 3,
+      "kind": "long",
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-long-T3.json",
+      "official_evidence_sha256": "63a25bc2ee45a53456f5fe05dd929dc776b2514740eb3ab953edd2bcd219866f",
+      "recomputed_metrics": {
+        "online_t-REC": 0.20009148120880127,
+        "online_t-REC25": 0.44186174869537354,
+        "online_t-REC50": 0.3407343924045563,
+        "online_t-mAP": 0.09280321002006531,
+        "online_t-mAP25": 0.32233554124832153,
+        "online_t-mAP50": 0.19706103205680847
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.20009148120880127,
+        "online_t-REC25": 0.44186174869537354,
+        "online_t-REC50": 0.3407343924045563,
+        "online_t-mAP": 0.09280321002006531,
+        "online_t-mAP25": 0.32233554124832153,
+        "online_t-mAP50": 0.19706103205680847
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 3,
+      "kind": "current",
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-current-T3.json",
+      "official_evidence_sha256": "a38d240ba2b058ea5b2c50cc7be54146dccf6cd10eee043b05f6934e4b59e2df",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.2683681845664978,
+        "raw_local_AP25": 0.6912479996681213,
+        "raw_local_AP50": 0.429085910320282,
+        "raw_local_REC": 0.4327496588230133,
+        "raw_local_REC25": 0.7960289716720581,
+        "raw_local_REC50": 0.6211591362953186
+      },
+      "reference_count": 8,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.2683681845664978,
+        "raw_local_AP25": 0.6912479996681213,
+        "raw_local_AP50": 0.429085910320282,
+        "raw_local_REC": 0.4327496588230133,
+        "raw_local_REC25": 0.7960289716720581,
+        "raw_local_REC50": 0.6211591362953186
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 4,
+      "kind": "long",
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-long-T4.json",
+      "official_evidence_sha256": "30321208e32b10d8f35c765c86a4506f99fe7e0e8a6a3beb2d6f58cc30cf8962",
+      "recomputed_metrics": {
+        "online_t-REC": 0.13679295778274536,
+        "online_t-REC25": 0.5064638257026672,
+        "online_t-REC50": 0.30849072337150574,
+        "online_t-mAP": 0.08077199012041092,
+        "online_t-mAP25": 0.41046857833862305,
+        "online_t-mAP50": 0.20026350021362305
+      },
+      "reference_count": 5,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.13679295778274536,
+        "online_t-REC25": 0.5064638257026672,
+        "online_t-REC50": 0.30849072337150574,
+        "online_t-mAP": 0.08077199012041092,
+        "online_t-mAP25": 0.41046857833862305,
+        "online_t-mAP50": 0.20026350021362305
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 4,
+      "kind": "current",
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-current-T4.json",
+      "official_evidence_sha256": "82ce29b47b20c2ce2bc954ce097fe2b88156f1e1bc4b8c829844c06a178d94d0",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.27696460485458374,
+        "raw_local_AP25": 0.84394371509552,
+        "raw_local_AP50": 0.5151188373565674,
+        "raw_local_REC": 0.40720921754837036,
+        "raw_local_REC25": 0.9091520309448242,
+        "raw_local_REC50": 0.6601771712303162
+      },
+      "reference_count": 5,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.27696460485458374,
+        "raw_local_AP25": 0.84394371509552,
+        "raw_local_AP50": 0.5151188373565674,
+        "raw_local_REC": 0.40720921754837036,
+        "raw_local_REC25": 0.9091520309448242,
+        "raw_local_REC50": 0.6601771712303162
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 5,
+      "kind": "long",
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-long-T5.json",
+      "official_evidence_sha256": "c9491ca3d9073a1843b4847e5fca71a7b9f86a84cc74f249f5f4c209218c8292",
+      "recomputed_metrics": {
+        "online_t-REC": 0.11005537956953049,
+        "online_t-REC25": 0.45306888222694397,
+        "online_t-REC50": 0.2776677906513214,
+        "online_t-mAP": 0.04539709910750389,
+        "online_t-mAP25": 0.34374505281448364,
+        "online_t-mAP50": 0.1477331966161728
+      },
+      "reference_count": 5,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.11005537956953049,
+        "online_t-REC25": 0.45306888222694397,
+        "online_t-REC50": 0.2776677906513214,
+        "online_t-mAP": 0.04539709910750389,
+        "online_t-mAP25": 0.34374505281448364,
+        "online_t-mAP50": 0.1477331966161728
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 5,
+      "kind": "current",
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-current-T5.json",
+      "official_evidence_sha256": "aa4442c0cf689e62e922133ebbf7be69e90f27d13ddbfebfe29ee8cbf81ea0bf",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.28383755683898926,
+        "raw_local_AP25": 0.7894607782363892,
+        "raw_local_AP50": 0.5098943114280701,
+        "raw_local_REC": 0.4062293469905853,
+        "raw_local_REC25": 0.8646077513694763,
+        "raw_local_REC50": 0.6467174291610718
+      },
+      "reference_count": 5,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.28383755683898926,
+        "raw_local_AP25": 0.7894607782363892,
+        "raw_local_AP50": 0.5098943114280701,
+        "raw_local_REC": 0.4062293469905853,
+        "raw_local_REC25": 0.8646077513694763,
+        "raw_local_REC50": 0.6467174291610718
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "24efb65e9698bf00c2d7288013ab680b312552f188acddc97cf45b6013c0356c",
+      "role": "SEL"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 2,
+      "kind": "long",
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-long-T2.json",
+      "official_evidence_sha256": "45bc6eb999c2a7a489b1d982a53550d69146f24ffd7e8ce4c4de39a02d55afa4",
+      "recomputed_metrics": {
+        "online_t-REC": 0.35622936487197876,
+        "online_t-REC25": 0.7268704771995544,
+        "online_t-REC50": 0.5451061725616455,
+        "online_t-mAP": 0.17730391025543213,
+        "online_t-mAP25": 0.5416536331176758,
+        "online_t-mAP50": 0.30105602741241455
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.35622936487197876,
+        "online_t-REC25": 0.7268704771995544,
+        "online_t-REC50": 0.5451061725616455,
+        "online_t-mAP": 0.17730391025543213,
+        "online_t-mAP25": 0.5416536331176758,
+        "online_t-mAP50": 0.30105602741241455
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "92d19e48233238d079a9651a4f971670a04e39b1418d8ea63e8d9f464e65db2b",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 2,
+      "kind": "current",
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-current-T2.json",
+      "official_evidence_sha256": "2d4d580638f51f471cff840dd285d38cac20e933b9dc693e023aa9b1405ccc8a",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.34625062346458435,
+        "raw_local_AP25": 0.7952123284339905,
+        "raw_local_AP50": 0.5377728939056396,
+        "raw_local_REC": 0.5209152698516846,
+        "raw_local_REC25": 0.8983048796653748,
+        "raw_local_REC50": 0.7200121283531189
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.34625062346458435,
+        "raw_local_AP25": 0.7952123284339905,
+        "raw_local_AP50": 0.5377728939056396,
+        "raw_local_REC": 0.5209152698516846,
+        "raw_local_REC25": 0.8983048796653748,
+        "raw_local_REC50": 0.7200121283531189
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "92d19e48233238d079a9651a4f971670a04e39b1418d8ea63e8d9f464e65db2b",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 3,
+      "kind": "long",
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-long-T3.json",
+      "official_evidence_sha256": "bc41fa8272dfa37630792a1f9ab1656bac8806387e3cb9794a3e5fe9506e4255",
+      "recomputed_metrics": {
+        "online_t-REC": 0.25357821583747864,
+        "online_t-REC25": 0.5985620021820068,
+        "online_t-REC50": 0.42653292417526245,
+        "online_t-mAP": 0.09801165014505386,
+        "online_t-mAP25": 0.3810918629169464,
+        "online_t-mAP50": 0.18813404440879822
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.25357821583747864,
+        "online_t-REC25": 0.5985620021820068,
+        "online_t-REC50": 0.42653292417526245,
+        "online_t-mAP": 0.09801165014505386,
+        "online_t-mAP25": 0.3810918629169464,
+        "online_t-mAP50": 0.18813404440879822
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "92d19e48233238d079a9651a4f971670a04e39b1418d8ea63e8d9f464e65db2b",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 3,
+      "kind": "current",
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-current-T3.json",
+      "official_evidence_sha256": "e388cc8978acd81ae980a4cf0225dd4b9fb9a2d3b988ab8caaaff58c72252080",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.3535059094429016,
+        "raw_local_AP25": 0.79679274559021,
+        "raw_local_AP50": 0.5560141205787659,
+        "raw_local_REC": 0.5452360510826111,
+        "raw_local_REC25": 0.9024741649627686,
+        "raw_local_REC50": 0.7677580118179321
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.3535059094429016,
+        "raw_local_AP25": 0.79679274559021,
+        "raw_local_AP50": 0.5560141205787659,
+        "raw_local_REC": 0.5452360510826111,
+        "raw_local_REC25": 0.9024741649627686,
+        "raw_local_REC50": 0.7677580118179321
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "92d19e48233238d079a9651a4f971670a04e39b1418d8ea63e8d9f464e65db2b",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 4,
+      "kind": "long",
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-long-T4.json",
+      "official_evidence_sha256": "0d7ab7abf764b9a8553aaa1583711d5a6f4436da55bb9e01aa0ee4cedcd69d3c",
+      "recomputed_metrics": {
+        "online_t-REC": 0.18472397327423096,
+        "online_t-REC25": 0.4838698208332062,
+        "online_t-REC50": 0.30846142768859863,
+        "online_t-mAP": 0.0636085569858551,
+        "online_t-mAP25": 0.2650868892669678,
+        "online_t-mAP50": 0.12567418813705444
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.18472397327423096,
+        "online_t-REC25": 0.4838698208332062,
+        "online_t-REC50": 0.30846142768859863,
+        "online_t-mAP": 0.0636085569858551,
+        "online_t-mAP25": 0.2650868892669678,
+        "online_t-mAP50": 0.12567418813705444
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "92d19e48233238d079a9651a4f971670a04e39b1418d8ea63e8d9f464e65db2b",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 4,
+      "kind": "current",
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-current-T4.json",
+      "official_evidence_sha256": "b246a50953ff6e2ec51b5f6cd4cd8d2cd6e7b625fdee8fb7a1c82c9eea009eb0",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.337706983089447,
+        "raw_local_AP25": 0.806471049785614,
+        "raw_local_AP50": 0.5588972568511963,
+        "raw_local_REC": 0.5198256969451904,
+        "raw_local_REC25": 0.9007007479667664,
+        "raw_local_REC50": 0.7396188974380493
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.337706983089447,
+        "raw_local_AP25": 0.806471049785614,
+        "raw_local_AP50": 0.5588972568511963,
+        "raw_local_REC": 0.5198256969451904,
+        "raw_local_REC25": 0.9007007479667664,
+        "raw_local_REC50": 0.7396188974380493
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "92d19e48233238d079a9651a4f971670a04e39b1418d8ea63e8d9f464e65db2b",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 5,
+      "kind": "long",
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-long-T5.json",
+      "official_evidence_sha256": "7b0ce8b53db518acc74aceaa89f7b52239e9c566dff2eabc7a4581cba11bcdf6",
+      "recomputed_metrics": {
+        "online_t-REC": 0.133806049823761,
+        "online_t-REC25": 0.41571328043937683,
+        "online_t-REC50": 0.24900323152542114,
+        "online_t-mAP": 0.042912546545267105,
+        "online_t-mAP25": 0.21135850250720978,
+        "online_t-mAP50": 0.08950233459472656
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "online_t-REC": 0.133806049823761,
+        "online_t-REC25": 0.41571328043937683,
+        "online_t-REC50": 0.24900323152542114,
+        "online_t-mAP": 0.042912546545267105,
+        "online_t-mAP25": 0.21135850250720978,
+        "online_t-mAP50": 0.08950233459472656
+      },
+      "reference_pooled_minus_original": {
+        "online_t-REC": 0.0,
+        "online_t-REC25": 0.0,
+        "online_t-REC50": 0.0,
+        "online_t-mAP": 0.0,
+        "online_t-mAP25": 0.0,
+        "online_t-mAP50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "92d19e48233238d079a9651a4f971670a04e39b1418d8ea63e8d9f464e65db2b",
+      "role": "PB"
+    },
+    {
+      "all_metrics_recomputed_exactly": true,
+      "endpoint": {
+        "adapter_seed": 146,
+        "step": 400,
+        "variant": "M3"
+      },
+      "endpoint_name": "control_star",
+      "horizon": 5,
+      "kind": "current",
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-current-T5.json",
+      "official_evidence_sha256": "e47782c730b0aee5a6c0508ff92142cfa32b7f6f9022d7729b0648b50b0a03af",
+      "recomputed_metrics": {
+        "raw_local_AP": 0.342519074678421,
+        "raw_local_AP25": 0.8093672394752502,
+        "raw_local_AP50": 0.5452388525009155,
+        "raw_local_REC": 0.5099002122879028,
+        "raw_local_REC25": 0.8986246585845947,
+        "raw_local_REC50": 0.6944493651390076
+      },
+      "reference_count": 6,
+      "reference_pool_equals_original": true,
+      "reference_pooled_metrics": {
+        "raw_local_AP": 0.342519074678421,
+        "raw_local_AP25": 0.8093672394752502,
+        "raw_local_AP50": 0.5452388525009155,
+        "raw_local_REC": 0.5099002122879028,
+        "raw_local_REC25": 0.8986246585845947,
+        "raw_local_REC50": 0.6944493651390076
+      },
+      "reference_pooled_minus_original": {
+        "raw_local_AP": 0.0,
+        "raw_local_AP25": 0.0,
+        "raw_local_AP50": 0.0,
+        "raw_local_REC": 0.0,
+        "raw_local_REC25": 0.0,
+        "raw_local_REC50": 0.0
+      },
+      "repeat_index": 0,
+      "results_sha256": "92d19e48233238d079a9651a4f971670a04e39b1418d8ea63e8d9f464e65db2b",
+      "role": "PB"
     }
   ],
   "schema": 1,
-  "scope": "Two locked CAL endpoints, repeat0, all T1..T5 and long/current metrics; reference-state pooling is reported separately, not assumed equal.",
+  "scope": "Repeat0: locked M3/M4 CAL endpoints and completed M0/M3 SEL/PB endpoints, all available horizons and long/current; remaining locked candidate confirmations and final packaged archive are pending.",
   "selection_lock_sha256": "e182171047492635eb6b4b8efe9a502128a3ff639775df5b4c3cf0631fd09e02",
   "status": "OFFICIAL_STATES_RECOMPUTED_EXACTLY",
-  "verified_utc": "2026-10-16T03:40:00.097184+00:00"
+  "verification_runs": [
+    {
+      "cpu_seconds": 46.01932670202223,
+      "official_states_checked": 20,
+      "scope": "Two locked CAL endpoints, repeat0, all T1..T5 and long/current metrics; reference-state pooling is reported separately, not assumed equal.",
+      "verified_utc": "2026-10-16T03:40:00.097184+00:00"
+    },
+    {
+      "cpu_seconds": 390.9993900609843,
+      "cuda_initialized": false,
+      "new_gpu_jobs": 0,
+      "official_states_checked": 36,
+      "scope": "Completed M0 and locked M3, SEL/PB repeat0, all available horizons and long/current",
+      "verified_utc": "2026-10-16T04:44:32.460745+00:00"
+    }
+  ],
+  "verified_utc": "2026-10-16T04:44:32.460745+00:00"
 }

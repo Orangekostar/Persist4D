@@ -31,3 +31,9 @@ python -m scripts.publish_revisit_prompt --dry-run --branch research/persist4d-m
 主代理 2026-10-16 03:31 UTC 再次核对：watcher 3099815、控制器 2546831、评测子进程 3105331 均存活且无控制终端；03:30:53 心跳记录 M3-400 PB r0 为 405/516，较 03:27:53 的 391/516 持续推进，无 error。PRIMARY_IMPLEMENTATION_REVIEW.json 明确区分源码契约、既有实际执行证据与未完成项；没有启动新 GPU 作业或改写冻结的模型、数值源码、选点、预算与协议。最终部署验证可使用 P5 的 `EXACT_PARENT_ENCODER_DELTA_COVERAGE_AND_REAL_FORWARD` 实际完成记录，随后核对所打包 delta 与其源文件字节一致；目前不能把源码中的标记当作已完成的回载证据。
 
 2026-10-16 04:01 UTC：M3-400 PB r0 已实际 COMPLETE。主代理核对 516 个不同输入、1806 个阶段、T2–T5 各 129 个输入、8 份总体及 48 份 reference 官方状态文件哈希，以及所加载 delta 身份；原收费事件仅结算一次，实际 1.273136423938332 GPUh。私有/公开账本 218 个唯一事件完全相同，新增累计 38.61483371920259 GPUh。控制器已自动切换 PB r1（PID 3141434），心跳进度 40/516；watcher/controller/child 存活且无控制终端。STATUS.json 保存该完成验证及实时快照；本轮已完成正式评测进程 85 个。单次 PB 完成不等于三重复确认完成，CAL 失败的复验门槛及全部未完成范围保持原判定。
+
+## 2026-10-16 04:44 UTC — completed SEL/PB offline recomputation
+
+CPU-only recomputation added all 36 official long/current states for M0 and locked M3, SEL/PB repeat0. Every six-metric dictionary exactly matches its original RESULTS record, and pooling the corresponding reference states gives the same dictionary. Together with the prior 20 locked CAL states, OFFLINE_METRIC_RECOMPUTATION.json now records 56 verified states. CUDA remained uninitialized and no GPU job was created. M4 confirmations, other repeats, and the final archive remain outside this completed scope.
+
+A separate cProfile observation of the original M3 PB T5 pool reproduced all six metrics exactly: 26.198 seconds total, with 22.857 seconds in the official scalar precision/recall threshold loop. Any CPU acceleration must preserve the complete original bootstrap draws, formulas, NA handling and output values; the current controller and frozen sources remain unchanged.
