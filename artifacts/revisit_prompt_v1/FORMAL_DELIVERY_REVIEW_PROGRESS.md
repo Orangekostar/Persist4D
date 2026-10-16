@@ -14,7 +14,7 @@
 | §13–14 锁定 SEL/PB | 原 V4 控制器仍执行 M0、M3-400、M4-200 的三次评测 | M0、M3 SEL/PB 及 M4 SEL 完成；M4-200 PB 进行中；其余以实时 STATUS/RESULTS 为准，CSV 在最终 collect 后更新 |
 | §13 统计、机制与资源 | OFFLINE_METRIC_RECOMPUTATION.json 实际 CPU 复算两个锁定 CAL 端点及 M0/M3 SEL/PB repeat0 共 56 份状态；SPARSE_SEL_M4_VERIFICATION 另复算 M4 SEL repeat0 的 10 份状态，共 66 份，全部总体指标及 reference 池化均精确一致；原 run_campaign 后续包含 bootstrap 和 P5 | 尚未覆盖 M4 PB、其他 repeat 的独立复算与最终打包档案；继续等待真实 bootstrap/P5，并检查 NA、少场景边界、置换上下文及分母 |
 | §17 模型与充分状态 | MODEL_PAYLOAD_REVIEW 已实际 CPU 读取六个选定 delta 与两个最终 resume，共 3724164 字节；身份、张量范围及候选/对照 optimizer/scheduler/RNG/400 步边界正确，无禁传字符串匹配；DEPENDENCY_ACQUISITION 核对 BASE 父 LFS 指针、106906589 字节父实体及 taxonomy；DEPLOYMENT_PROTOCOL 明确 V4 构造/前向上下文 | 原 summarize 尚待打包；须核对公开副本和真实部署前向。resume 保存最终 400 步边界，不冒充 CAL 最佳较早选点的 optimizer。部署文档两段 Python 仅 AST 检查，不冒充实际回载 |
-| §17–19 报告与最终内容审核 | PRIMARY_IMPLEMENTATION_REVIEW.json 已记录主代理对十二问的源码和既有证据审阅，重新校验训练 14 个及推理 18 个源码身份 | 尚非最终 PROMPT_AUDIT；确认、统计、P5、全部交付文件及真实远端字节仍待核对；四种状态分开；不得自动宣布 CVPR 就绪 |
+| §17–19 报告与最终内容审核 | PRIMARY_IMPLEMENTATION_REVIEW.json 已记录主代理对十二问的源码和既有证据审阅；PROMPT_AUDIT.md 已逐题草拟执行结论，12 项编号、51 个本地证据链接及 4 项锁定身份核对通过，训练 14 个及推理 18 个源码身份再次相符 | 审计仍为 IN_PROGRESS；确认、统计、P5、全部交付文件及真实远端字节仍待核对；publication_ready 与 prompt_audit_execution_complete 均为 false；四种状态分开，不得自动宣布 CVPR 就绪 |
 | §18 发布 | publish_revisit_prompt.py 已支持显式本轮 branch/tag、实际状态交接和冻结推理源码进入 A manifest；三项离线回归测试通过；PUBLICATION_PREFLIGHT_REVIEW 记录 93 份当前公开材料的定向文本检查无匹配，Git SSH 读取/LFS 可用，新分支/tag 尚未出现在远端，Release API 凭据当前不可用 | 当前仅 dry-run，缺最终 REPORT/MODEL_MANIFEST/PROMPT_AUDIT；尚未上传。最终须检查新二进制/zip 内容与最终 diff，完成 A/B 后实际取回实体字节；Release 回执能力按实际结果记录 |
 
 发布修正验证命令：
