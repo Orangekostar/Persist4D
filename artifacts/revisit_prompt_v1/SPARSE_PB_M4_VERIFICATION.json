@@ -11,21 +11,35 @@
       "3": 0.10438129305839539,
       "4": 0.06381238251924515,
       "5": 0.0449979268014431
+    },
+    {
+      "2": 0.17333635687828064,
+      "3": 0.10438129305839539,
+      "4": 0.06381238251924515,
+      "5": 0.0449979268014431
     }
   ],
   "S_current_by_repeat": [
     0.34513384103775024,
+    0.34513384103775024,
     0.34513384103775024
   ],
   "S_long_by_repeat": [
+    0.07106386745969455,
     0.07106386745969455,
     0.07106386745969455
   ],
   "actual_input_horizon_reference_population_matches_M0": true,
   "actual_reference_state_key_population_matches_M0": true,
   "checkpoint_sha256": "f500184cf7c468269135d08a88132da4ad66b8b619e2777b63f0e2ea18c619f5",
-  "completed_repeats": 2,
+  "completed_repeats": 3,
   "current_AP_by_repeat": [
+    {
+      "2": 0.34604397416114807,
+      "3": 0.359904944896698,
+      "4": 0.33433371782302856,
+      "5": 0.34116286039352417
+    },
     {
       "2": 0.34604397416114807,
       "3": 0.359904944896698,
@@ -57,19 +71,26 @@
       "repeat": 1,
       "results_sha256": "726dec93209b68141aa0ba17ebcb4de216620571d8d4fd4dc4e09a66187ab0b9",
       "status_sha256": "86cd71476b73ec15a8e3f27339705193d0e26443409314ac092cb33db57b00bf"
+    },
+    {
+      "actual_gpu_hours": 1.3275917015894407,
+      "charge_event_id": "mpr:P4:1792143962798744510",
+      "repeat": 2,
+      "results_sha256": "b562c7400b80ac6ad2242fef5cd87123d445300e79abfba06b912220584dd99b",
+      "status_sha256": "52b9154441e20c3ecbffbcacdfbf382cafaaa1380bba08b3df352e5c821e480b"
     }
   ],
   "inference_policy_source_files_verified": 18,
   "inputs_per_repeat": 516,
   "ledger_snapshot": {
     "active_reservations_excluded_from_settled_total": true,
-    "lifetime_actual_gpu_hours": 1759.2112602273357,
-    "new_actual_gpu_hours": 44.3971988116651,
+    "lifetime_actual_gpu_hours": 1760.5388519289252,
+    "new_actual_gpu_hours": 45.72479051325454,
     "prior_gpu_hours": 1714.8140614156707,
     "public_private_bytes_equal": true,
-    "unique_settled_events": 225
+    "unique_settled_events": 226
   },
-  "limitation": "Only repeat0/repeat1 have completed and settled. Their metrics, traces and corresponding official state bytes match exactly; this is finite PB repeat evidence, not global determinism. Last PB repeat, full PB bootstrap, P5, final archive and actual publication remain pending.",
+  "limitation": "All three PB inference processes and their corresponding states match exactly. This is finite repeat evidence, not global determinism. Full PB bootstrap, P5, final delivery audit and actual publication remain pending.",
   "locked_pair_descriptive_comparison": {
     "changes_CAL_selection_or_replication_gate": false,
     "control_step": 400,
@@ -83,12 +104,12 @@
     },
     "delta_S_current_pp": 0.05565186341603412,
     "delta_S_long_pp": 0.2886282900969192,
-    "status": "DESCRIPTIVE_PB_FIRST_TWO_REPEATS_CAL_REPLICATION_GATE_FAILED",
+    "status": "DESCRIPTIVE_PB_THREE_REPEATS_CAL_REPLICATION_GATE_FAILED",
     "unit": "pp"
   },
   "metric_rows_equal": true,
   "official_global_and_reference_state_bytes_equal": true,
-  "official_state_files_byte_verified": 16,
+  "official_state_files_byte_verified": 24,
   "offline_metric_recomputation": {
     "adapter_seed": 146,
     "cpu_curve_acceleration_used": false,
@@ -254,8 +275,8 @@
     "step": 200,
     "variant": "M4"
   },
-  "reference_state_files_byte_verified": 96,
-  "repeat_comparison_status": "TWO_COMPLETED_INDEPENDENT_PROCESSES_EXACT",
+  "reference_state_files_byte_verified": 144,
+  "repeat_comparison_status": "THREE_COMPLETED_INDEPENDENT_PROCESSES_EXACT",
   "repeat_ranges_pp": {
     "S_current": 0.0,
     "S_long": 0.0
@@ -265,11 +286,11 @@
   "seed": 146,
   "selected_public_delta_same_bytes": true,
   "stages_per_repeat": 1806,
-  "status": "FIRST_TWO_PB_REPEATS_VERIFIED",
+  "status": "THREE_PB_REPEATS_VERIFIED",
   "step": 200,
   "structures_raw_predictions_and_identity_diagnostics_equal": true,
   "training_numeric_source_files_verified": 14,
   "variant": "M4",
-  "verified_unix": 1792143984.760776,
-  "verified_utc": "2026-10-16T09:46:24.760776+00:00"
+  "verified_unix": 1792148936.7386293,
+  "verified_utc": "2026-10-16T11:08:56.738634+00:00"
 }

@@ -78,6 +78,10 @@ PY
 
 2026-10-16 CPU 缓存增补见 `CPU_POOL_CACHE_VERIFICATION.json`。独立模块 `scripts/revisit_prompt_pool_cache.py` 按完整且保序的状态内容、taxonomy 字节、源码和运行环境计算缓存键；缺项调用原官方池化，损坏输入仍由原校验拒绝，损坏缓存直接报错。实际 M3/M4 PB 各 T3–T5 的 long/current 共 12 组完整池化及 12 组固定抽样池化，六项指标均精确相同；33 项相关测试通过。10:18 UTC 启动的独立 CPU 预热只计算已有 repeat0 状态的缓存，不写正式 bootstrap 输出。此时最后一个 GPU PB 评测仍在运行，正式控制器没有接管。后续正式统计仍须读取全部六份实际进程结果并执行原 1000 次抽样，不能用缓存预热替代第三次进程确认。
 
+2026-10-16 11:10 UTC：全部 93 个正式 CAL/SEL/PB 评测实际完成；M4 PB 三轮对应指标、轨迹及状态字节一致，见 `SPARSE_PB_M4_VERIFICATION.json` 与 `FORMAL_EVALUATION_COMPLETION_VERIFICATION.json`。独立 CPU 模块 `scripts/revisit_prompt_cooccurrence.py` 读取 18 份实际 SEL/PB 结果和同一 native loader 的最终当前 GT，保留原一对一匹配，仅在诊断中排除未知/歧义身份，按同类的不同实体计数；不运行模型、不改主 AP 或选点。`SAME_CLASS_DIAGNOSTICS.json` 保存 627 个输入、1881 行逐进程诊断与六组汇总，零分母为 null；对应 VERIFICATION 核对全部计数及两份实际 GT 抽查。它是条件召回描述，不是 AP、独立新场景统计或干扰因果证明。默认 `python -m scripts.revisit_prompt_cooccurrence --dry-run` 不加载数据；本轮 `--execute` 已真实完成，现有结果应保留，不重复执行覆盖。
+
+11:12 UTC：预热已完成 1000 个原抽样序列的 12000 次逻辑池化，11916 项缓存，耗时 3181.765 秒，CUDA 未初始化。原控制器只有在全部 93 次 GPU 评测结束且无活动子进程/reservation 后才安全交接；`CPU_CONTROLLER_HANDOFF_VERIFICATION.json` 保留实际新旧 PID、预期中断、来源哈希和守卫范围。新控制器使用相同原环境，读取全部六份实际 PB 结果执行完整 1000 次原 bootstrap，之后由原控制器按原预算锁运行 P5。缓存只复用同一保序完整输入，不改变三重复、抽样、NA 或官方指标。此时 PB bootstrap 实际运行中，最终绑定恢复与区间核验尚未完成。
+
 复算已保存的 AP 不需要模型、编码器、扫描或 GPU，但需要原 evaluator 及 taxonomy 环境。下例读取实际压缩包中的锁定候选 CAL T5 长期状态，调用与 bootstrap 相同的官方池化接口；AP 单位为 0–1。
 
 ```sh

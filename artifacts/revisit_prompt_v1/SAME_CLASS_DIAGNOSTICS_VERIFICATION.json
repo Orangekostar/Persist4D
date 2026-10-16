@@ -1,0 +1,34 @@
+{
+  "actual_GT_samples": [
+    {
+      "actual_match_counts_exact": true,
+      "cooccurring_gt": 2,
+      "current_gt": 8,
+      "input_id": "SEL:0747875ea18f3d2a6870c94e",
+      "official_current_target_metadata_exact": true,
+      "role": "SEL"
+    },
+    {
+      "actual_match_counts_exact": true,
+      "cooccurring_gt": 15,
+      "current_gt": 21,
+      "input_id": "native-long-formal-v1:000b365d1a05e646fe576084655a429b00a77f9828d8bf7e5f0725fbf0de5eb4",
+      "official_current_target_metadata_exact": true,
+      "role": "PB"
+    }
+  ],
+  "actual_result_inputs_verified": 18,
+  "all_six_aggregates_exact": true,
+  "artifact": "SAME_CLASS_DIAGNOSTICS.json",
+  "artifact_sha256": "7028b63291e049a8509023dd3864221a3940e444a867e94e3e16e4add1e11fb3",
+  "cuda_initialized": false,
+  "new_feature_tests_passed": 7,
+  "new_gpu_jobs": 0,
+  "process_input_rows_checked": 1881,
+  "publication_tests_passed": 4,
+  "schema": 1,
+  "scope": "All saved counts/aggregates/hashes plus two actual GT samples using original current metric helpers; not a second full GT replay or causal test",
+  "status": "COMPLETE",
+  "verified_utc": "2026-10-16T11:10:31.928127+00:00",
+  "verifier_sha256": "2ca169e0c4b8f06b65c8fb0b848f796753b84b9e6d5593eccdf0cfa79ebe03ed"
+}

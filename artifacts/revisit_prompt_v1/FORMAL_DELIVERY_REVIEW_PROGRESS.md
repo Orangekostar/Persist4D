@@ -11,10 +11,11 @@
 | §11 六臂与成本 | M1–M6 seed146 均 400 更新；四点 100/200/300/400；原 RUN_LOCK 与累计账本保留 | 正式主训练完成，不追加涨点搜索 |
 | §12–14 全量 CAL 与选点 | SPARSE_CAL_SELECTION_VERIFICATION.json：75 个完整独立进程、25 个三重复组、全部指标及结构/原始预测记录相等；375 个 CSV 行与实际结果核对；用纯选模函数复算冻结 lock 完全相等 | CAL 完成；有限一致性不等于全局确定性或旧 Native 根因已解决 |
 | §14 seed147 条件复验 | CAL_SELECTION_LOCK / REPLICATION_LOCK | 未执行是规定分支：M4-200 相对 M3-400，长期均值 +0.7764pp，但 T3 −0.8040pp、T4 −1.4022pp，未达到逐长度 −0.2pp 门槛；最终科学状态应保留 SCREEN_NO_GO |
-| §13–14 锁定 SEL/PB | 原 V4 控制器仍执行 M0、M3-400、M4-200 的三次评测 | M0、M3 SEL/PB 及 M4 SEL 三轮完成；M4 PB repeat0/1 完成且有限重复逐项一致，repeat2 运行；其余以实时 STATUS/RESULTS 为准，CSV 在最终 collect 后更新 |
+| §13–14 锁定 SEL/PB | M0、M3-400、M4-200 的 SEL/PB 三次实际评测全部完成；FORMAL_EVALUATION_COMPLETION_VERIFICATION 核对全部 93 个正式进程、456 行指标及 6156 份充分状态实体 | 各有限三重复组的指标、轨迹及对应状态字节相同，不代表全局确定性；最终 CSV/ZIP 仍需对齐 |
+| §13.4 同类共现诊断 | SAME_CLASS_DIAGNOSTICS 对 627 个最终当前 GT 输入和三轮实际保存匹配做 CPU 后处理；VERIFICATION 核对全部 1881 行计数/六组汇总、18 份实际结果及两份原评价 GT 抽查；11 项聚焦测试通过 | 未知/歧义身份只退出诊断；PB 中 M4 相对 M3 恢复 91、丢失 125，不支持改善同类干扰的主张；条件召回不是 AP 或因果证据 |
 | §13 统计、机制与资源 | OFFLINE_METRIC_RECOMPUTATION.json 及 M4 SEL/PB 核验文件共独立 CPU 复算 74 份总体状态及各自 reference 池化，指标精确一致；SEL 原规则 bootstrap 已实际完成 1000 次抽样/36000 次池化，元数据、六份输入/源码/输出哈希、三进程差值及全部保存抽样百分位经独立核对 | SEL 的两个 95% 差值区间均跨零，8 个 reference 的少场景警示保留；PB bootstrap/P5/最终档案仍待完成，不声称已第二次执行全部抽样或其他 repeat 的独立复算 |
 | §17 模型与充分状态 | MODEL_PAYLOAD_REVIEW 已实际 CPU 读取六个选定 delta 与两个最终 resume，共 3724164 字节；身份、张量范围及候选/对照 optimizer/scheduler/RNG/400 步边界正确，无禁传字符串匹配；DEPENDENCY_ACQUISITION 核对 BASE 父 LFS 指针、106906589 字节父实体及 taxonomy；DEPLOYMENT_PROTOCOL 明确 V4 构造/前向上下文 | 八份本地公开模型及 LFS 对象已核对；原 summarize 的最终状态包/完整 manifest 与真实部署前向仍待完成。resume 保存最终 400 步边界，不冒充 CAL 最佳较早选点的 optimizer。部署文档两段 Python 仅 AST 检查，不冒充实际回载 |
-| §17–19 报告与最终内容审核 | PRIMARY_IMPLEMENTATION_REVIEW.json 已记录主代理对十二问的源码和既有证据审阅；PROMPT_AUDIT.md 已逐题草拟执行结论，12 项编号、本地证据链接及 4 项锁定身份核对通过，训练 14 个及推理 18 个源码身份再次相符 | 审计仍为 IN_PROGRESS；完整 PB 确认、PB 统计、P5、全部交付文件及真实远端字节仍待核对；publication_ready 与 prompt_audit_execution_complete 均为 false；四种状态分开，不得自动宣布 CVPR 就绪 |
+| §17–19 报告与最终内容审核 | PRIMARY_IMPLEMENTATION_REVIEW.json 已记录主代理对十二问的源码和既有证据审阅；PROMPT_AUDIT.md 已逐题草拟执行结论，12 项编号、本地证据链接及 4 项锁定身份核对通过，训练 14 个及推理 18 个源码身份再次相符 | 审计仍为 IN_PROGRESS；PB 统计、P5、全部交付文件及真实远端字节仍待核对；publication_ready 与 prompt_audit_execution_complete 均为 false；四种状态分开，不得自动宣布 CVPR 就绪 |
 | §18 发布 | publish_revisit_prompt.py 已支持显式本轮 branch/tag、实际状态交接和冻结推理源码进入 A manifest；三项离线回归测试通过；PUBLICATION_PREFLIGHT_REVIEW 记录 93 份当前公开材料的定向文本检查无匹配，Git SSH 读取/LFS 可用，新分支/tag 尚未出现在远端，Release API 凭据当前不可用 | 当前仅 dry-run；REPORT 尚未生成，MODEL_MANIFEST 与 PROMPT_AUDIT 已有明确未完成的草稿，最终验收待补齐；尚未上传。最终须检查新二进制/zip 内容与最终 diff，完成 A/B 后实际取回实体字节；Release 回执能力按实际结果记录 |
 
 发布修正验证命令：
@@ -24,7 +25,7 @@ python -m pytest tests/test_revisit_prompt_publication.py -q
 python -m scripts.publish_revisit_prompt --dry-run --branch research/persist4d-mpr-v1-formal-20261014 --tag persist4d-mpr-v1-formal-20261014-v1
 ```
 
-三项回归分别覆盖自定义发布身份、错误 origin 在写入前被拒绝，以及当前冻结推理源码的纳入与身份校验。该修正仅改发布脚本，训练 14 个数值文件和 V4 的 18 个推理文件身份保持原锁。
+四项当前发布回归覆盖自定义发布身份、错误 origin 在写入前被拒绝、全部独立 CPU 后处理模块的纳入，以及冻结推理源码的纳入与身份校验。训练 14 个数值文件和 V4 的 18 个推理文件身份保持原锁。
 
 后台监控由 GPT-5.6 Luna 负责机械轮询；主代理保留错误判断、修复、科学结论和最终集成责任。2026-10-16 03:18 UTC Luna 实测 watcher/controller 均存活且无控制终端，M3-400 PB r0 为 332/516，无 error。实时状态以运行根的 monitor_luna/latest.json 与活进程核对为准。
 
@@ -57,3 +58,5 @@ A separate cProfile observation of the original M3 PB T5 pool reproduced all six
 2026-10-16 09:46 UTC（M4 PB 前两轮完成）：主代理核对 repeat1 的 516 个不同输入、1806 个阶段、T2–T5 各 129 输入及一次费用结算；SPARSE_PB_M4_VERIFICATION.json 已覆盖两轮共 16 份总体、96 份 reference 状态实体 SHA，对应状态字节、指标、结构、原始预测指纹和 identity 诊断完全一致，观察范围均为 0pp。保留 repeat0 原标量 CPU 复算的完整记录，不冒充 repeat1 另做一次独立复算。r1 实际费用 1.3310640143999868 GPUh；公开/原账本 225 个唯一事件相同，新增实际累计 44.3971988116651 GPUh，含历史累计 1759.2112602273357 GPUh。正式评测完成 92/93，原控制器自动启动最后的 M4 PB repeat2（PID 3327543）；SEL bootstrap 已完成，PB bootstrap、P5、最终打包审核和实际发布仍待完成，CAL 负结果及最终验收标记保持原结论。
 
 2026-10-16 10:18 UTC（精确 CPU 池化缓存）：主代理实现独立模块及其测试，先观察新增行为测试失败，再验证全部 33 项相关测试通过。实际 M3/M4 PB repeat0、T3–T5 的 long/current 共 12 组完整池化和 12 组固定抽样池化，全部六项指标精确相同；修改状态但保留其旧嵌入 SHA 时仍被原校验拒绝。缓存按完整输入顺序、实际 taxonomy 字节、源码和运行环境身份匹配，损坏缓存报错，后续只读消费者对缺项计算原官方池化。实际 12 组完整池化的首次计算/命中平均耗时为 0.2641/0.0181 秒，只是局部计时。独立 CPU 预热 PID 3344563 已启动，CUDA 不可见、不产生 GPU 作业或正式统计结果；只枚举现有 repeat0 状态以复用相同输入，原正式 bootstrap 仍需三轮真实结果及全部 1000 次抽样。CPU_POOL_CACHE_VERIFICATION.json 记录实际证据、源码和边界，发布清单纳入新模块；32 项冻结训练/推理源码及四份锁再次核对未变。最后一轮 GPU PB 继续运行，控制器接管、PB bootstrap、P5、最终打包审核和远端发布均待完成，科学失败门槛保持原结论。
+
+2026-10-16 11:14 UTC（全部 P4 与同类诊断完成、CPU 统计交接）：全部 93 个正式评测进程、31 个三重复组通过完整实体核对，共 456 行指标、912 份总体及 5244 份 reference 充分状态、11943 行输入诊断。M4 PB 三轮指标/轨迹/对应状态字节相同，repeat0 原标量复算完整保留；第三轮费用 1.327591702 GPUh 仅结算一次，公开/私有账本 226 个唯一事件相同，新增实际累计 45.724790513 GPUh，含历史累计 1760.538851929 GPUh（展示舍入）。独立 CPU 同类共现后处理已完成 627 个输入及三轮共 1881 行计数；全部计数/六组汇总、18 份实际结果和两份原当前评价 GT 抽查通过，11 项聚焦测试通过。PB 中 M4 条件召回较 M3 低，恢复/丢失为 91/125，不能宣称同类干扰改善。缓存预热于 11:11:30 完成 12000 次逻辑池化、11916 项缓存；在全部 GPU 评测结束、无子进程/reservation 且原 JOB.lock 守卫成立后，主代理交接仅 CPU 父控制器，新 PID3371682 已以 PPID1 运行。原六份实际 PB 结果及原 1000 次统计正在计算；P5、最终打包审核及真实发布尚待完成，最终验收标记仍为 false。详见 FORMAL_EVALUATION_COMPLETION_VERIFICATION、SAME_CLASS_DIAGNOSTICS/VERIFICATION 与 CPU_CONTROLLER_HANDOFF_VERIFICATION。

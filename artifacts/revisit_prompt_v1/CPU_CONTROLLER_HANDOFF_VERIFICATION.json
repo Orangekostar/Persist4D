@@ -1,0 +1,24 @@
+{
+  "active_gpu_reservation_at_handoff": false,
+  "complete_evaluation_processes": 93,
+  "completed_prewarm_manifest_sha256": "a05fa17f17007f295af8879c56bfd2fdd71f62bbd5cb7f4adf5d624d79536a0e",
+  "environment_preserved_in_memory_only": true,
+  "formal_evaluation_verification_sha256": "748c70bba9a1b5fc8973092d09fa3a3654bb40919867da33afee881a52ad8729",
+  "handoff_source_sha256": "dd18f63f888c837b6b243a417aa6d2f7627ea9478c303eacb95ef028906487e0",
+  "new_controller_pid": 3371682,
+  "new_controller_ppid": 1,
+  "new_gpu_jobs_launched_by_handoff": 0,
+  "old_controller_pid": 2546831,
+  "old_parent_stopped_only_after_all_p4_complete": true,
+  "old_terminal_status": "FAILED_KeyboardInterrupt_EXPECTED_OWNED_CPU_HANDOFF",
+  "owned_job_lock_guard": true,
+  "policy": {
+    "policy_id": "ordered-sparse-reference-v4",
+    "policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+  },
+  "progress_observer_sha256": "83a6112afb70673c64fc498e60e9a0361c4f445ae9d9e7953414e4cf3290476f",
+  "schema": 1,
+  "scope": "Owned idle CPU controller replacement only. All 93 real GPU evaluations were complete; original PB bootstrap now running, with original charged P5 scheduled afterward. No GPU child was interrupted. Final binding restoration and delivery/publication remain pending.",
+  "status": "CPU_HANDOFF_EXECUTED_PB_BOOTSTRAP_RUNNING",
+  "verified_utc": "2026-10-16T11:14:43.886334+00:00"
+}

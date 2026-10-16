@@ -30,6 +30,7 @@ def phase_a_files():
         "scripts/publish_revisit_prompt.py","scripts/revisit_prompt_cpu_statistics.py",
         "scripts/continue_revisit_prompt_statistics.py",
         "scripts/revisit_prompt_pool_cache.py",
+        "scripts/revisit_prompt_cooccurrence.py",
         "tests/test_revisit_prompt.py",
         "tests/revisit_prompt_selection_cases.py",
         "docs/superpowers/specs/2026-10-13-revisit-prompt-design.md",
