@@ -1,0 +1,303 @@
+{
+  "current_scientific_scope": "CAL_SCREEN_NO_GO_CONFIRMATION_PENDING",
+  "evaluation_policy": {
+    "policy_id": "ordered-sparse-reference-v4",
+    "policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+  },
+  "execution_instruction_sha256": "08cf2d2c83f1bd93d3120623f3ea9884fddd0f1fb13af843677b92160cc0070e",
+  "final_prompt_audit_complete": false,
+  "inference_policy_sources_verified": {
+    "datasets/native_long_dataset.py": "5f78968d95000e1ac92e41d20b73f21127b7fb528947014e40148ede787cba20",
+    "datasets/pointcept_utils.py": "12dc773c74c1d2c28b0c1c0326633a3ce9b3527330648302c2c080e0883976e1",
+    "models/pointcept.py": "88945a48faf0edf949a7ff9ac0fea3d90cc431609569532bb5f221e1d4628007",
+    "models/revisit_prompt_centroid_numerics.py": "e3a9fce4c699920d2ab1831eb14c6374d3ec28294219f5cc73fd9cc445ebb4f5",
+    "models/revisit_prompt_native_numerics.py": "870a984a1e730e5e8557660a0f24576bfb692c3bbe8ea31ab7c8a541736c84ba",
+    "models/revisit_prompt_numerics.py": "6351af7ff038c0dd8b311474974d29cdbacb96c0409155056877f686940b1e55",
+    "models/revisit_prompt_sparse_reference.py": "f964d3243cc9bac212c606176f0fcd49c1fe3dc4e7a00ffc30a7664a155fc20c",
+    "models/scatter.py": "99ed4fc0e377fe57927cf31980f100428e6b8623f2caff05bba6d4f39aa85d20",
+    "scripts/continue_revisit_prompt_formal.py": "0a445e93b62cecfddcc390dffeb9d7ca26fa9d9b1926b85d3b748191147c6903",
+    "scripts/continue_revisit_prompt_native.py": "e2a5a36b4a143cccf1c0f8ec0fc8686ae8a5ce726f267c544480bf20331effc7",
+    "scripts/continue_revisit_prompt_policy.py": "741cee2d2528d561ec429cde44d0d03f614ef4c2ae966b58d9341ff071cfa68f",
+    "scripts/continue_revisit_prompt_sparse.py": "5f26fefc8542e93c750955181c2e7e1d4a38946dba075831f8517f1af9493fff",
+    "scripts/evaluate_revisit_prompt_native.py": "80f93ec4efec4f8293c243df0f877ebc9de6616150097eb9ea9db7d84d21055b",
+    "scripts/evaluate_revisit_prompt_policy.py": "59c772e498be45048ea786366f4b75c36c45e66d8653d349e98ed1b8015cc872",
+    "scripts/evaluate_revisit_prompt_sparse.py": "5e1e2d210ed5fe095cc4e0416580450ba69b854021da0f822f3efe30ccf211e7",
+    "scripts/revisit_prompt_evaluation_policy.py": "a1af3d2c156d808ca1c8207798c320ad65566126393b1cd293d2c6c0beb55247",
+    "scripts/revisit_prompt_native_policy.py": "ac333ba340ebafd7efe4d1131576c403087f20913d4c9991c07766bbe3fb1dd4",
+    "scripts/revisit_prompt_sparse_policy.py": "374e780f49191dff01003804f43c38bb095efc9a1ed4c91c77639a33614f7328"
+  },
+  "items": [
+    {
+      "evidence_files": [
+        "SPARSE_CAL_SELECTION_VERIFICATION.json"
+      ],
+      "finding": "ReScene 在 initialize_queries 后调用 before_first_mask，再执行第一个 mask module；M4–M6 的检索使用完整当前段特征和先前预测状态。",
+      "question": 1,
+      "remaining_or_limit": "调用链和实际正式前向相符；尚未以机制干预结果证明提升来源。",
+      "source_anchors": [
+        "models/rescene.py:610",
+        "models/rescene.py:615",
+        "models/revisit_prompt.py:69",
+        "models/revisit_prompt_modules.py:111"
+      ],
+      "status": "STATIC_CALL_CHAIN_VERIFIED"
+    },
+    {
+      "evidence_files": [],
+      "finding": "检索路径不读取当前 proposal 或其分数；历史槽上限 32，剩余至少 68 个原始 FPS 查询；空历史严格不修改查询及位置。M2 单独为 proposal-read 适配对照。",
+      "question": 2,
+      "remaining_or_limit": "这是结构及调用输入核对，不是新对象召回率的实验结论。",
+      "source_anchors": [
+        "models/revisit_prompt.py:74",
+        "models/revisit_prompt.py:91",
+        "models/revisit_prompt.py:125",
+        "models/revisit_prompt.py:146",
+        "models/revisit_prompt_modules.py:27"
+      ],
+      "status": "STATIC_QUERY_BUDGET_AND_NO_PROPOSAL_GATE_VERIFIED"
+    },
+    {
+      "evidence_files": [
+        "DATA_MANIFEST.json"
+      ],
+      "finding": "完整 UUID 校验；TRAIN/CAL/SEL 使用 train，PB 使用 validation；stage j 的公共 GT 只由 0..j 构造；当前窗口 local-t 与 absolute-t 分开。superpoint 索引及 padding 对齐，实际参考坐标偏移在上下文中还原。",
+      "question": 3,
+      "remaining_or_limit": "该审阅没有重新下载或改写数据；V4 在冻结的独立推理上下文中替换部分数值归约。",
+      "source_anchors": [
+        "datasets/revisit_prompt_episode.py:28",
+        "datasets/revisit_prompt_episode.py:180",
+        "datasets/revisit_prompt_episode.py:199",
+        "models/revisit_prompt_modules.py:45",
+        "scripts/revisit_prompt_runtime.py:68"
+      ],
+      "status": "STATIC_CAUSAL_DATA_AND_COORDINATE_CONTRACT_VERIFIED"
+    },
+    {
+      "evidence_files": [
+        "SOURCE_BINDINGS.json",
+        "PARAMETER_AND_LOAD_AUDIT.json",
+        "MAIN_TRAINING_VERIFICATION.json"
+      ],
+      "finding": "父包按 BASE 原数值源码验证身份；父任务参数及 buffer 集合、shape/dtype、加载后值均严格校验，仅省略指定编码器参数并允许新增命名空间。delta 再检查父/编码器/taxonomy/数值源码及全部新增张量覆盖。",
+      "question": 4,
+      "remaining_or_limit": "六条训练的实际父加载覆盖已记录；最终交付副本字节与一次完整部署回载证据待 P5 和打包后核对。",
+      "source_anchors": [
+        "scripts/revisit_prompt_assets.py:57",
+        "scripts/revisit_prompt_assets.py:84",
+        "scripts/revisit_prompt_assets.py:126"
+      ],
+      "status": "STATIC_LOAD_CONTRACT_AND_REAL_TRAINING_COVERAGE_VERIFIED"
+    },
+    {
+      "evidence_files": [
+        "PARAMETER_AND_LOAD_AUDIT.json",
+        "MAIN_TRAINING_VERIFICATION.json"
+      ],
+      "finding": "父模块保持 eval；no_grad 只包围冻结 backbone，后续冻结解码器仍允许梯度回传到新增提示。M1/M4 均为 84224 参数、初始化哈希相同；正式状态记录父张量未变且所有新增张量训练后改变。",
+      "question": 5,
+      "remaining_or_limit": "未重复运行 GPU 梯度测试；此前小型 P0 梯度测试与正式训练状态不混作新的完整验证。",
+      "source_anchors": [
+        "models/revisit_prompt.py:51",
+        "models/revisit_prompt.py:162",
+        "trainer/revisit_prompt_trainer.py:127"
+      ],
+      "status": "REAL_TRAINING_FREEZE_AND_PARAMETER_PARITY_VERIFIED"
+    },
+    {
+      "evidence_files": [
+        "SPARSE_FORMAL_BASELINE_VERIFICATION.json",
+        "EVALUATION_M0_ADMISSION_V4.json"
+      ],
+      "finding": "M2 是使用本轮训练协议的 proposal-read 适配对照；M0 为本轮 V4 独立三进程评测。所有变体使用相同最终 common_commit 和身份路由，M6 预定义 support 只缩放来源 query 的官方候选一次。",
+      "question": 6,
+      "remaining_or_limit": "所有 CAL 重复已完成；M3/M4 锁定 SEL/PB 尚未全部完成。V4 的一致结果不解决旧 Native 异常根因。",
+      "source_anchors": [
+        "models/revisit_prompt.py:146",
+        "scripts/revisit_prompt_runtime.py:22",
+        "scripts/revisit_prompt_runtime.py:40",
+        "scripts/revisit_prompt_runtime.py:87"
+      ],
+      "status": "COMMON_POLICY_AND_ADAPTED_CONTROL_VERIFIED_PENDING_FINAL_ENDPOINTS"
+    },
+    {
+      "evidence_files": [],
+      "finding": "检索/提示前向无 GT 参数。训练标签账本在预测提交后的可靠 birth 才绑定 logical_id+generation+reference，已有标签不能重写。检索无正段时跳过；support 的 UNKNOWN=-1 被排除。可靠 anchor 属另一可靠对象时是显式不相容负例，不能等同历史缺席推断的负例。",
+      "question": 7,
+      "remaining_or_limit": "未将未绑定或 anchor 模糊样本当负例；当前静态审阅未发现需修改冻结损失源码的问题。",
+      "source_anchors": [
+        "models/revisit_prompt.py:69",
+        "models/revisit_prompt_loss.py:9",
+        "models/revisit_prompt_loss.py:20",
+        "models/revisit_prompt_loss.py:32",
+        "models/revisit_prompt_loss.py:47",
+        "models/revisit_prompt_loss.py:141"
+      ],
+      "status": "STATIC_GT_SEPARATION_AND_UNKNOWN_MASKING_VERIFIED"
+    },
+    {
+      "evidence_files": [
+        "RUN_LOCK.json",
+        "MAIN_TRAINING_VERIFICATION.json",
+        "CAL_SELECTION_LOCK.json",
+        "REPLICATION_LOCK.json",
+        "SPARSE_CAL_SELECTION_VERIFICATION.json"
+      ],
+      "finding": "六臂 seed146 均完成 400 更新及 100/200/300/400 四点；优化器采用锁定的 1e-4 学习率配方。seed147 因 CAL 逐长度门槛失败按规定不执行；没有替换候选、额外训练或参数搜索。",
+      "question": 8,
+      "remaining_or_limit": "锁定确认评测、P5 和最终打包仍待完成。",
+      "source_anchors": [
+        "trainer/revisit_prompt_trainer.py:127",
+        "scripts/revisit_prompt_campaign.py:845",
+        "scripts/select_revisit_prompt.py"
+      ],
+      "status": "LOCKED_MAIN_MATRIX_AND_FAILED_REPLICATION_GATE_VERIFIED"
+    },
+    {
+      "evidence_files": [
+        "SPARSE_CAL_SELECTION_VERIFICATION.json",
+        "SPARSE_SEL_M3_VERIFICATION.json",
+        "DATA_MANIFEST.json"
+      ],
+      "finding": "已核对 75 个 CAL 进程、375 行结果与 25 个三重复组；保留旧失败及数值异常证据。bootstrap 源码按 reference 成对重采样并池化官方充分状态，三进程差值分别计算后取均值，NA 不重抽，少于 10 场景有警示。",
+      "question": 9,
+      "remaining_or_limit": "bootstrap、完整锁定 SEL/PB 的实际输出、历史暴露分母及最终报告尚待核查；源码可用不等于统计已完成。",
+      "source_anchors": [
+        "scripts/evaluate_revisit_prompt.py:97",
+        "scripts/revisit_prompt_campaign.py:111"
+      ],
+      "status": "PARTIAL_RUNTIME_EVIDENCE_PENDING_CONFIRMATION_AND_STATISTICS"
+    },
+    {
+      "evidence_files": [
+        "CAL_SELECTION_LOCK.json",
+        "REPLICATION_LOCK.json",
+        "SPARSE_CAL_SELECTION_VERIFICATION.json"
+      ],
+      "finding": "描述性最佳候选为 M4-200，对照 M3-400。CAL 长期均值增加约 0.7764pp，但 T3/T4 分别降低约 0.8040/1.4022pp，失败的复验晋级门槛必须保留。",
+      "question": 10,
+      "remaining_or_limit": "候选排序不等于方法胜出；确认和诊断完成后仍须保留 SCREEN_NO_GO，不能自动标记 CVPR 就绪。",
+      "source_anchors": [
+        "scripts/select_revisit_prompt.py",
+        "scripts/revisit_prompt_campaign.py:950"
+      ],
+      "status": "CAL_SCREEN_NO_GO_RETAINED"
+    },
+    {
+      "evidence_files": [
+        "RUN_LOCK.json",
+        "PROTOCOL_AMENDMENT.json",
+        "SPARSE_CAL_SELECTION_VERIFICATION.json",
+        "COST_LEDGER.jsonl"
+      ],
+      "finding": "原 RUN_LOCK 与用户授权预算修订未重置；既有账本核查区分 reserved 与实际 settled GPUh，私有和公开事件在上次快照一致，保留 8 GPUh 预留。",
+      "question": 11,
+      "remaining_or_limit": "此项引用上次已核对快照；当前活动评测尚未结算，最终累计费用和无活动进程状态需要收尾再次核对。",
+      "source_anchors": [
+        "scripts/revisit_prompt_campaign.py:505",
+        "scripts/revisit_prompt_campaign.py:566"
+      ],
+      "status": "APPEND_ONLY_LEDGER_PREVIOUS_SNAPSHOT_VERIFIED_FINAL_TOTAL_PENDING"
+    },
+    {
+      "evidence_files": [
+        "PUBLICATION_IMPLEMENTATION_VERIFICATION.json"
+      ],
+      "finding": "P5 profile 已实现严格 load_revisit_bundle、固定真实 CAL panel 的 warmup 和 3 次测量；首轮真实前向完成后写 deployment_reload 标记。可在其实际完成后核验该证据与打包副本同 SHA，无需新增重复 GPU 回载任务。发布脚本已支持本轮分支/标签及取回实体字节核验。",
+      "question": 12,
+      "remaining_or_limit": "目前未出现本轮 P5 完成结果，未生成最终全部模型清单，未执行实际远端发布；离线测试和 dry-run 不能代替远端字节证据。",
+      "source_anchors": [
+        "scripts/revisit_prompt_campaign.py:262",
+        "scripts/revisit_prompt_campaign.py:298",
+        "scripts/revisit_prompt_campaign.py:312",
+        "scripts/revisit_prompt_campaign.py:329",
+        "scripts/publish_revisit_prompt.py"
+      ],
+      "status": "PENDING_P5_PACKAGING_AND_ACTUAL_REMOTE_VERIFICATION"
+    }
+  ],
+  "new_gpu_jobs_launched": 0,
+  "numeric_or_protocol_files_modified": false,
+  "numerical_root_cause": "PREVIOUS_NATIVE_OUTLIER_UNRESOLVED",
+  "owner": "primary_agent",
+  "publication_ready": false,
+  "referenced_artifact_sha256": {
+    "CAL_SELECTION_LOCK.json": {
+      "bytes": 9308,
+      "sha256": "e182171047492635eb6b4b8efe9a502128a3ff639775df5b4c3cf0631fd09e02"
+    },
+    "COST_LEDGER.jsonl": {
+      "bytes": 85297,
+      "sha256": "da8bfa2ae90042c2cb07ba1fea22684e8e9a498c4f814447a7e695a2470e51cf"
+    },
+    "DATA_MANIFEST.json": {
+      "bytes": 868220,
+      "sha256": "0c87afc7b1282897bd395fe7af7c1dd514c42e1ce8adff47675e3d27f16ba63d"
+    },
+    "EVALUATION_M0_ADMISSION_V4.json": {
+      "bytes": 1154,
+      "sha256": "715bae3d41f66ec759636d1922485bf9faef48f8e1c9405c045bb1235a72f6d1"
+    },
+    "MAIN_TRAINING_VERIFICATION.json": {
+      "bytes": 6500,
+      "sha256": "b671afc7519414ca94fbcb79ff0eb56e4e5e10e315c08f51ba8bdd4afc6a55c7"
+    },
+    "PARAMETER_AND_LOAD_AUDIT.json": {
+      "bytes": 15114,
+      "sha256": "f99fa92222de273b437d0cc4eddab75b872330f6097a3c3b125dfaf63b44b143"
+    },
+    "PROTOCOL_AMENDMENT.json": {
+      "bytes": 1617,
+      "sha256": "66095ef08262703c4dc852dfd08104f35c32d0595443cb664aa0907a1205364d"
+    },
+    "PUBLICATION_IMPLEMENTATION_VERIFICATION.json": {
+      "bytes": 1644,
+      "sha256": "6b839049885e10217823f74abf903e05c3cf6c0b3d85b5e754f0f4fc16f3e61b"
+    },
+    "REPLICATION_LOCK.json": {
+      "bytes": 239,
+      "sha256": "f8a66da13e467fdd8f6f28e79162734a692104d45fe8e7db5460f92688e684ab"
+    },
+    "RUN_LOCK.json": {
+      "bytes": 10051,
+      "sha256": "c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5"
+    },
+    "SOURCE_BINDINGS.json": {
+      "bytes": 23744,
+      "sha256": "f9b85065a618984afba73aab1a8ac447eb5fb4e8854f59347dd0c523bb671f3a"
+    },
+    "SPARSE_CAL_SELECTION_VERIFICATION.json": {
+      "bytes": 78826,
+      "sha256": "d0107eedfc11e8b00a8f83cda3400e5024800a2c047aab8dcad4231dc60792f7"
+    },
+    "SPARSE_FORMAL_BASELINE_VERIFICATION.json": {
+      "bytes": 3382,
+      "sha256": "5c98e1e223ba92b7099fe225af9e33c7fa69d84a0c0c599038a572e8afbcbd9e"
+    },
+    "SPARSE_SEL_M3_VERIFICATION.json": {
+      "bytes": 2477,
+      "sha256": "11944a59cae51a28ee6603525326ae0c2cd0b162c1f1674cbcd168df6a4d8aaa"
+    }
+  },
+  "reviewed_at_utc": "2026-10-16T03:31:05.049400+00:00",
+  "schema": 1,
+  "scope": "主代理静态内容核对及既有实际证据审阅；不是最终 PROMPT_AUDIT，不替代尚未完成的确认/统计/P5/打包/发布。",
+  "status": "PRIMARY_CONTENT_REVIEW_IN_PROGRESS",
+  "training_implementation_commit": "c472a4923c0418cd5ad02a47b6744b51e4e16922",
+  "training_numeric_sources_verified": {
+    "conf/revisit_prompt/default.yaml": "c87ca9f0f2683a19aeaf96e2cfe716e896d4fe3514559a114f5e5bcc5e359ea0",
+    "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
+    "models/rescene.py": "cb8008610dd248f4e9a80de924d6883e4ca0d41dda16801e9e1621ebe54def9b",
+    "models/revisit_prompt.py": "e8eb01f17f1c21caadf85db0b0820d7351043e913ccccc975dc590d1c6ac75ee",
+    "models/revisit_prompt_loss.py": "ea0aa0b36131e235a3f10a647852a7103e24d03391256aa6347b129983c762e6",
+    "models/revisit_prompt_modules.py": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
+    "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
+    "scripts/evaluate_revisit_prompt.py": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
+    "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
+    "scripts/revisit_prompt_campaign.py": "c7c06def3a089a220093b7335909d40ab3f258559b39b03e6f9519d064c33be3",
+    "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
+    "scripts/select_revisit_prompt.py": "2ab50193500a125f98388b31223adb80399cfd5d7582c4db1ff47eed09fabc03",
+    "scripts/train_revisit_prompt.py": "58dc60049a5f9fc0f5ebb2119b1597614d76a73c5cc916603f6467dda6c8456f",
+    "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d"
+  },
+  "training_run_lock_sha256": "c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5"
+}
