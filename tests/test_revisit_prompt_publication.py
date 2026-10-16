@@ -52,7 +52,8 @@ def test_wrong_origin_is_rejected_before_publication_mutations(delivery, monkeyp
 
 def test_cpu_statistics_helper_is_in_the_frozen_code_manifest(delivery):
     _, project, _, _ = delivery
-    for name in ('revisit_prompt_cpu_statistics.py', 'continue_revisit_prompt_statistics.py'):
+    for name in ('revisit_prompt_cpu_statistics.py', 'continue_revisit_prompt_statistics.py',
+                 'revisit_prompt_pool_cache.py'):
         source = project / 'scripts' / name
         source.parent.mkdir(exist_ok=True)
         source.write_text('offline CPU statistics helper')

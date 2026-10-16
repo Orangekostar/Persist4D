@@ -21,6 +21,8 @@
 
 SEL 统计执行增补：独立 CPU 进程于 07:26 UTC 启动，09:34:57 UTC 实际完成原 `bootstrap_locked` 的全部 1000 次抽样及 36000 次池化，使用已验证加速上下文与 V4 命名空间。主代理另核对六份输入及源码/输出哈希、三进程实际差值、全部保存抽样及原百分位区间，见 [SEL_BOOTSTRAP_EXECUTION_VERIFICATION.json](SEL_BOOTSTRAP_EXECUTION_VERIFICATION.json)；[BOOTSTRAP_SEL_s146.json](BOOTSTRAP_SEL_s146.json) 保存全部实际抽样。正式 GPU 控制器没有接管或重启，PB 队列继续运行；PB bootstrap 尚未执行。
 
+CPU 缓存增补：独立模块按完整保序输入、taxonomy 内容及代码/环境身份缓存原官方池化值，缺项仍计算原池化，损坏输入或缓存不会命中旧值。12 组实际 PB 完整池化及 12 组固定抽样池化的六项指标精确相同，33 项相关测试通过，见 [CPU_POOL_CACHE_VERIFICATION.json](CPU_POOL_CACHE_VERIFICATION.json)。10:18 UTC 开始的 CPU 预热仅使用已有 repeat0 状态，不写正式 bootstrap，不替代第三次实际确认；此时 PB bootstrap 与控制器接管均未执行。
+
 ## §19 执行内容逐项审核
 
 ### 1. 首掩码前是否使用历史检索

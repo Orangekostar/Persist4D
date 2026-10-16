@@ -76,6 +76,8 @@ PY
 
 ## 从官方充分状态复算
 
+2026-10-16 CPU 缓存增补见 `CPU_POOL_CACHE_VERIFICATION.json`。独立模块 `scripts/revisit_prompt_pool_cache.py` 按完整且保序的状态内容、taxonomy 字节、源码和运行环境计算缓存键；缺项调用原官方池化，损坏输入仍由原校验拒绝，损坏缓存直接报错。实际 M3/M4 PB 各 T3–T5 的 long/current 共 12 组完整池化及 12 组固定抽样池化，六项指标均精确相同；33 项相关测试通过。10:18 UTC 启动的独立 CPU 预热只计算已有 repeat0 状态的缓存，不写正式 bootstrap 输出。此时最后一个 GPU PB 评测仍在运行，正式控制器没有接管。后续正式统计仍须读取全部六份实际进程结果并执行原 1000 次抽样，不能用缓存预热替代第三次进程确认。
+
 复算已保存的 AP 不需要模型、编码器、扫描或 GPU，但需要原 evaluator 及 taxonomy 环境。下例读取实际压缩包中的锁定候选 CAL T5 长期状态，调用与 bootstrap 相同的官方池化接口；AP 单位为 0–1。
 
 ```sh
