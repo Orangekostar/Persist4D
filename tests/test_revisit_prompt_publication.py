@@ -50,6 +50,15 @@ def test_wrong_origin_is_rejected_before_publication_mutations(delivery, monkeyp
     assert not (root / 'publication/PUBLICATION_PENDING.json').exists()
 
 
+def test_cpu_statistics_helper_is_in_the_frozen_code_manifest(delivery):
+    _, project, _, _ = delivery
+    for name in ('revisit_prompt_cpu_statistics.py', 'continue_revisit_prompt_statistics.py'):
+        source = project / 'scripts' / name
+        source.parent.mkdir(exist_ok=True)
+        source.write_text('offline CPU statistics helper')
+        assert source in publication.phase_a_files()
+
+
 def test_frozen_inference_sources_are_included_and_validated(delivery):
     _, project, public, _ = delivery
     source = project / 'models/frozen_inference.py'

@@ -27,7 +27,9 @@ def git(*args, cwd=PROJECT, env=None):
 def phase_a_files():
     files = {PROJECT/name for name in NUMERIC_FILES}
     files.update(PROJECT/name for name in (
-        "scripts/publish_revisit_prompt.py","tests/test_revisit_prompt.py",
+        "scripts/publish_revisit_prompt.py","scripts/revisit_prompt_cpu_statistics.py",
+        "scripts/continue_revisit_prompt_statistics.py",
+        "tests/test_revisit_prompt.py",
         "tests/revisit_prompt_selection_cases.py",
         "docs/superpowers/specs/2026-10-13-revisit-prompt-design.md",
         "docs/superpowers/plans/2026-10-13-revisit-prompt.md"))

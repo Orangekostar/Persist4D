@@ -1,0 +1,441 @@
+{
+  "accelerated_full_recomputation_seconds": 23.69314809300704,
+  "acceleration_source_sha256": "1055376e1dd33f74d18272524fda8032edb4736440ecc17d6951a3d1c06e6028",
+  "actual_curve_argument_types": [
+    [
+      "torch.float32",
+      "torch.float32",
+      "int"
+    ]
+  ],
+  "actual_pr_curves_checked": 220,
+  "all_actual_pr_curve_elements_exact": true,
+  "all_global_and_reference_metrics_exact": true,
+  "baseline_recomputation_sha256": "6880bc6ce1cde6040ae8861087b2903d8d9820e5a0c101283d5fb9b7b9dbd955",
+  "complete_accelerated_bootstrap_status": "NOT_EXECUTED",
+  "continuation_validation": {
+    "binding_restoration_normal_and_exception": "PASS",
+    "cli_dry_run_status": "DRY_RUN_NOT_STARTED",
+    "controller_handoff": "NOT_EXECUTED",
+    "frozen_policy_files_unchanged": 18,
+    "frozen_training_files_unchanged": 14,
+    "phase_a_manifest_includes_both_modules": true,
+    "source": "scripts/continue_revisit_prompt_statistics.py",
+    "source_sha256": "9232d21444a38735ae2d0063945a4d010ee7286cbfc7b31b2ccd26912a5bc0dd",
+    "test_command": "python -m pytest -q tests/test_revisit_prompt_cpu_statistics.py tests/test_revisit_prompt_publication.py",
+    "tests_passed": 23,
+    "verified_utc": "2026-10-16T05:04:35.761689+00:00"
+  },
+  "cuda_initialized": false,
+  "curve_timing": {
+    "batched_seconds": 0.12065516324946657,
+    "original_scalar_seconds": 26.086112239339855,
+    "scope": "same actual PR arguments in one CPU process; excludes imports, pooling, AP integration and bootstrap"
+  },
+  "evaluation_policy": {
+    "policy_id": "ordered-sparse-reference-v4",
+    "policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+  },
+  "new_gpu_jobs": 0,
+  "official_state_validation_preserved": true,
+  "official_states_checked": 56,
+  "original_bootstrap_implementation_unchanged": true,
+  "rows": [
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/CAL/repeat0/official-long-T1.json",
+      "official_evidence_sha256": "7449e0048d24ef6f6f61b85fe4fa4da7b7ff08150b21725d4f35509197da994a",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/CAL/repeat0/official-current-T1.json",
+      "official_evidence_sha256": "7449e0048d24ef6f6f61b85fe4fa4da7b7ff08150b21725d4f35509197da994a",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/CAL/repeat0/official-long-T2.json",
+      "official_evidence_sha256": "6bf211d4efe6fa006455dd486eedf85e753e98df6f41f74b303794d28497fd79",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/CAL/repeat0/official-current-T2.json",
+      "official_evidence_sha256": "a581b74d16f8a0dfb261e6dcd7444991ad684921dd2008c9ff78c157f075c964",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/CAL/repeat0/official-long-T3.json",
+      "official_evidence_sha256": "57b5734b134ca8b37c435f893dee94d5b426eb8c49dac1ed58b32b349272587f",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/CAL/repeat0/official-current-T3.json",
+      "official_evidence_sha256": "0f36bed4ba0f9a6d9a80f2dc8b07b479aaf17084522721129070482934172463",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/CAL/repeat0/official-long-T4.json",
+      "official_evidence_sha256": "d86f9c170b0e8657cab33bb1a7c5ae6205fdaa942e4ba7011f5504b8e375ba53",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/CAL/repeat0/official-current-T4.json",
+      "official_evidence_sha256": "8c08a5711b5ed06e806cf56d14d23b72d1da078b94dd9ed78c72e21925ac0efa",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/CAL/repeat0/official-long-T5.json",
+      "official_evidence_sha256": "3ac1ce720ecc13dfda4439c4b6996fd8fb9542c4cc2845ee9fa8259693bbf016",
+      "reference_count": 2,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/CAL/repeat0/official-current-T5.json",
+      "official_evidence_sha256": "b8c33144d52606ef6bf14c92caf87b273acef591fdd4f44f198d6084b2b35e68",
+      "reference_count": 2,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M4-s146-u000200/CAL/repeat0/official-long-T1.json",
+      "official_evidence_sha256": "7449e0048d24ef6f6f61b85fe4fa4da7b7ff08150b21725d4f35509197da994a",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M4-s146-u000200/CAL/repeat0/official-current-T1.json",
+      "official_evidence_sha256": "7449e0048d24ef6f6f61b85fe4fa4da7b7ff08150b21725d4f35509197da994a",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M4-s146-u000200/CAL/repeat0/official-long-T2.json",
+      "official_evidence_sha256": "5b21b6e2307dad50cfcf831931d315a667b5abf8ceb7448683bc841741158f2e",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M4-s146-u000200/CAL/repeat0/official-current-T2.json",
+      "official_evidence_sha256": "05bb7ae5a8b48781c51c640f1b3ddc0d7be60840e59d2cc19344222328f36dd1",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M4-s146-u000200/CAL/repeat0/official-long-T3.json",
+      "official_evidence_sha256": "fd9e7e4ce270e8e15c93c1ddd6e39a48163f7065446bc65f3e5596a7a0ee4344",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M4-s146-u000200/CAL/repeat0/official-current-T3.json",
+      "official_evidence_sha256": "c5ee73030ee52ead9a98455e82ead885ddc42f8ee40a8a88b3657458a1951fbf",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M4-s146-u000200/CAL/repeat0/official-long-T4.json",
+      "official_evidence_sha256": "7278460dae21851aaca4dd74124380b42d5b6eeb550e9677393fa8853674f28a",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M4-s146-u000200/CAL/repeat0/official-current-T4.json",
+      "official_evidence_sha256": "facf35213d358dcb08fac01ac2fea8245acc8ef697d3a4057e2383deb2a0694a",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M4-s146-u000200/CAL/repeat0/official-long-T5.json",
+      "official_evidence_sha256": "b40a8cf999d65a7b2970a2a4ebfe3fdf6795dd2f87228e6613abb8bcff3dfe56",
+      "reference_count": 2,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M4-s146-u000200/CAL/repeat0/official-current-T5.json",
+      "official_evidence_sha256": "ce85be2e6380c498cdfb05fed390ef585d0237ac141d226c06bd457137aa8fd3",
+      "reference_count": 2,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-long-T1.json",
+      "official_evidence_sha256": "459a74be01f49213c54a38f29ddadf0be318fcffdbfbcdb3c42cd0300c804582",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-current-T1.json",
+      "official_evidence_sha256": "459a74be01f49213c54a38f29ddadf0be318fcffdbfbcdb3c42cd0300c804582",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-long-T2.json",
+      "official_evidence_sha256": "03da576f241384622889db12b7d49e945c0f644a4c49a3a50de41ad6037656fb",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-current-T2.json",
+      "official_evidence_sha256": "041636837979aa2dc571e25f50ebfb28b45b44c0a11cc55ddf1c322fdd481e0c",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-long-T3.json",
+      "official_evidence_sha256": "ae8954abb07060c68a32966dc918183e19fcc2b5bbc5b772770a484b30ecd109",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-current-T3.json",
+      "official_evidence_sha256": "de1414d9512e77f50677f885940fee7b816a62c294eeec95f20c8374503be854",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-long-T4.json",
+      "official_evidence_sha256": "5c1c7da41622788026814f888020f54790b29e0d9a2b4aef0ddf1478f18a8dd5",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-current-T4.json",
+      "official_evidence_sha256": "84a2a99e7233e4ef04aee747671b85436c71a5e5ccfc12cbf0a76952bf97102c",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-long-T5.json",
+      "official_evidence_sha256": "04d605705f4a3dbc368c4255e963a53ed8be6ab01cecfb09810e6aeda72220bc",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/SEL/repeat0/official-current-T5.json",
+      "official_evidence_sha256": "3b415e89b0d552c18d7d21143a0262aec9b9c5c9f964939fd56e5b3eeceeb8d4",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-long-T2.json",
+      "official_evidence_sha256": "aee2792cfa4a7cfbc9e0931e2a256bc78f7ed25b25b162848860fc4d24957ae1",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-current-T2.json",
+      "official_evidence_sha256": "54a30b8fca4d5f5a4ff8738b21d84d81ee86368d9b0f0f834dad563a4d75224a",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-long-T3.json",
+      "official_evidence_sha256": "983d3ea7f03f734afc6bc4084f01f80a75475fac053ece153332074ff6cc94fb",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-current-T3.json",
+      "official_evidence_sha256": "32b7169e740b92ec210e6ae6ddb558652169fdaf09d28b70ed5bddaed4a59380",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-long-T4.json",
+      "official_evidence_sha256": "facac8ccca6b6f8cb1ba4e1484e658c0bfbd5addc9bad0c64e80801808400023",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-current-T4.json",
+      "official_evidence_sha256": "9d05fe07ffffeb30f51331f43b121dc06b5633eadd4a05092759452463e8d373",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-long-T5.json",
+      "official_evidence_sha256": "68f663707e7435bf45aa79e68c9da1e34d2fe819135e09fb3621f13c86ae6b8b",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M0-s146-u000000/PB/repeat0/official-current-T5.json",
+      "official_evidence_sha256": "7254bac438d2bb5e5979aa53e21754dafe7a2b1f6a0cceb1896a1a04699d005a",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-long-T1.json",
+      "official_evidence_sha256": "459a74be01f49213c54a38f29ddadf0be318fcffdbfbcdb3c42cd0300c804582",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-current-T1.json",
+      "official_evidence_sha256": "459a74be01f49213c54a38f29ddadf0be318fcffdbfbcdb3c42cd0300c804582",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-long-T2.json",
+      "official_evidence_sha256": "278f94d28c1ff3b0af7b064b89b61f303c748f29f9a7e1cbe4f3c04a07ce7410",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-current-T2.json",
+      "official_evidence_sha256": "cd7a07c507d07d2cb29982042ae47671428519ddfa753a12124926a7691ff329",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-long-T3.json",
+      "official_evidence_sha256": "63a25bc2ee45a53456f5fe05dd929dc776b2514740eb3ab953edd2bcd219866f",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-current-T3.json",
+      "official_evidence_sha256": "a38d240ba2b058ea5b2c50cc7be54146dccf6cd10eee043b05f6934e4b59e2df",
+      "reference_count": 8,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-long-T4.json",
+      "official_evidence_sha256": "30321208e32b10d8f35c765c86a4506f99fe7e0e8a6a3beb2d6f58cc30cf8962",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-current-T4.json",
+      "official_evidence_sha256": "82ce29b47b20c2ce2bc954ce097fe2b88156f1e1bc4b8c829844c06a178d94d0",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-long-T5.json",
+      "official_evidence_sha256": "c9491ca3d9073a1843b4847e5fca71a7b9f86a84cc74f249f5f4c209218c8292",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/SEL/repeat0/official-current-T5.json",
+      "official_evidence_sha256": "aa4442c0cf689e62e922133ebbf7be69e90f27d13ddbfebfe29ee8cbf81ea0bf",
+      "reference_count": 5,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-long-T2.json",
+      "official_evidence_sha256": "45bc6eb999c2a7a489b1d982a53550d69146f24ffd7e8ce4c4de39a02d55afa4",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-current-T2.json",
+      "official_evidence_sha256": "2d4d580638f51f471cff840dd285d38cac20e933b9dc693e023aa9b1405ccc8a",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-long-T3.json",
+      "official_evidence_sha256": "bc41fa8272dfa37630792a1f9ab1656bac8806387e3cb9794a3e5fe9506e4255",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-current-T3.json",
+      "official_evidence_sha256": "e388cc8978acd81ae980a4cf0225dd4b9fb9a2d3b988ab8caaaff58c72252080",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-long-T4.json",
+      "official_evidence_sha256": "0d7ab7abf764b9a8553aaa1583711d5a6f4436da55bb9e01aa0ee4cedcd69d3c",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-current-T4.json",
+      "official_evidence_sha256": "b246a50953ff6e2ec51b5f6cd4cd8d2cd6e7b625fdee8fb7a1c82c9eea009eb0",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-long-T5.json",
+      "official_evidence_sha256": "7b0ce8b53db518acc74aceaa89f7b52239e9c566dff2eabc7a4581cba11bcdf6",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    },
+    {
+      "global_all_six_metrics_exact": true,
+      "official_evidence": "M3-s146-u000400/PB/repeat0/official-current-T5.json",
+      "official_evidence_sha256": "e47782c730b0aee5a6c0508ff92142cfa32b7f6f9022d7729b0648b50b0a03af",
+      "reference_count": 6,
+      "reference_pool_all_six_metrics_exact": true
+    }
+  ],
+  "schema": 1,
+  "scope": "56 completed repeat0 CAL/SEL/PB global states and their reference pools; elementwise PR comparison for M3 PB repeat0 T5 long/current; complete accelerated bootstrap not executed",
+  "status": "CPU_CURVES_AND_POOLED_METRICS_EXACT",
+  "verified_utc": "2026-10-16T04:58:11.035846+00:00"
+}

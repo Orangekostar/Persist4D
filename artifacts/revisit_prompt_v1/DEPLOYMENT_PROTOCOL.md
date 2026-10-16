@@ -70,6 +70,10 @@ PY
 
 原实验环境中的队列恢复使用 `python -m scripts.continue_revisit_prompt_sparse`，其内部负责收费和原锁定任务去重。它不会重新训练已完成的主轨迹。不要手工伪造 `MPR_CHARGED_EVENT_ID` 绕过费用记录。既有候选/对照的 resume 位于 manifest 的 `kind=resume` 项，恢复到原 N=400 边界；不是为了本轮追加训练。
 
+可选的 CPU 统计恢复入口是 `python -m scripts.continue_revisit_prompt_statistics --execute`，默认或 `--dry-run` 只打印 `DRY_RUN_NOT_STARTED`。它仍调用上述原控制器，沿用其互斥锁、收费、身份核查与完成任务去重；仅在原 `bootstrap_locked` 调用期间批量计算 CPU float32 PR 阈值，退出或异常时恢复函数绑定。原 AP 积分、reference 抽样、1000 次 bootstrap、种子、三次重复和 NA 规则均保留。当前 GPU 评测运行期间不得据此启动第二个控制器。
+
+2026-10-16 的实现验证见 `CPU_STATISTICS_ACCELERATION_VERIFICATION.json`：56 份已完成状态及各自 reference 池化指标精确相同，220 条实际 PR 曲线逐元素精确相同；23 项测试通过，包括 dry-run 不启动控制器、正常/异常退出恢复绑定及损坏状态被拒绝。该入口尚未用于接管正式控制器，完整加速 bootstrap 尚未执行。曲线局部计时不代表整套 bootstrap 的实测耗时。
+
 ## 从官方充分状态复算
 
 复算已保存的 AP 不需要模型、编码器、扫描或 GPU，但需要原 evaluator 及 taxonomy 环境。下例读取实际压缩包中的锁定候选 CAL T5 长期状态，调用与 bootstrap 相同的官方池化接口；AP 单位为 0–1。
