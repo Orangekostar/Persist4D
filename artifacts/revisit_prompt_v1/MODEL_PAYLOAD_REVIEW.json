@@ -1,8 +1,15 @@
 {
   "cuda_initialized": false,
   "deployment_real_forward": "PENDING_ORIGINAL_P5_PROFILE",
+  "local_lfs_verification": {
+    "lfs_object_bytes": 3724164,
+    "normal_git_pointer_bytes": 1049,
+    "pointer_file_count": 8,
+    "remote_upload": "NOT_EXECUTED",
+    "status": "ALL_EIGHT_POINTERS_AND_LOCAL_OBJECT_BYTES_VERIFIED"
+  },
   "new_gpu_jobs_launched": 0,
-  "packaged_copy_verification": "PENDING_FINAL_SUMMARIZE",
+  "packaged_copy_verification": "SIX_DELTA_AND_TWO_RESUME_PUBLIC_COPIES_BYTES_AND_SHA256_EXACT",
   "payloads": [
     {
       "adapter_seed": 146,
@@ -249,9 +256,92 @@
       "variant": "M4"
     }
   ],
+  "public_copies": [
+    {
+      "adapter_seed": 146,
+      "bytes": 342272,
+      "kind": "delta",
+      "optimizer_included": false,
+      "path": "artifacts/revisit_prompt_v1/deployment/M1-s146-u000200.pt",
+      "sha256": "fec9df4caecf098ee50c20f5de0d7057d57a040a1e3a38f7daae220d346a66b9",
+      "step": 200,
+      "variant": "M1"
+    },
+    {
+      "adapter_seed": 146,
+      "bytes": 402674,
+      "kind": "delta",
+      "optimizer_included": false,
+      "path": "artifacts/revisit_prompt_v1/deployment/M2-s146-u000300.pt",
+      "sha256": "3589ec0330db6758f0f99ea2d7b454c352e16cdfb69bac7d412ea9fc5983b451",
+      "step": 300,
+      "variant": "M2"
+    },
+    {
+      "adapter_seed": 146,
+      "bytes": 209360,
+      "kind": "delta",
+      "optimizer_included": false,
+      "path": "artifacts/revisit_prompt_v1/deployment/M3-s146-u000400.pt",
+      "sha256": "d2c35487d4bee08fd294eee1ed8098729c2a1fbd26517f3d0bc270561ef5dc77",
+      "step": 400,
+      "variant": "M3"
+    },
+    {
+      "adapter_seed": 146,
+      "bytes": 342272,
+      "kind": "delta",
+      "optimizer_included": false,
+      "path": "artifacts/revisit_prompt_v1/deployment/M4-s146-u000200.pt",
+      "sha256": "f500184cf7c468269135d08a88132da4ad66b8b619e2777b63f0e2ea18c619f5",
+      "step": 200,
+      "variant": "M4"
+    },
+    {
+      "adapter_seed": 146,
+      "bytes": 342272,
+      "kind": "delta",
+      "optimizer_included": false,
+      "path": "artifacts/revisit_prompt_v1/deployment/M5-s146-u000200.pt",
+      "sha256": "ca495c082af9ab09d719b4fa81bf50566f70b0f5c2bc3911d42469dcbd79341e",
+      "step": 200,
+      "variant": "M5"
+    },
+    {
+      "adapter_seed": 146,
+      "bytes": 413490,
+      "kind": "delta",
+      "optimizer_included": false,
+      "path": "artifacts/revisit_prompt_v1/deployment/M6-s146-u000200.pt",
+      "sha256": "7ccd33d056b9ba8a98f341f0d2c0ba30cc8320a31a0bbede54192703356fd6fb",
+      "step": 200,
+      "variant": "M6"
+    },
+    {
+      "adapter_seed": 146,
+      "bytes": 635552,
+      "kind": "resume",
+      "optimizer_included": true,
+      "path": "artifacts/revisit_prompt_v1/resume/M3-s146-u000400.pt",
+      "sha256": "fc4c561d6b6fa9f7fc8e0ede80debddf9e023865de6ca31e6991f116c01adeaf",
+      "step": 400,
+      "variant": "M3"
+    },
+    {
+      "adapter_seed": 146,
+      "bytes": 1036272,
+      "kind": "resume",
+      "optimizer_included": true,
+      "path": "artifacts/revisit_prompt_v1/resume/M4-s146-u000400.pt",
+      "sha256": "e9d7ea3e13124e22c1df5a4a42c1af2195ea98b22207c98657c017756c98eb92",
+      "step": 400,
+      "variant": "M4"
+    }
+  ],
+  "public_copies_verified_utc": "2026-10-16T07:33:39.680061+00:00",
   "remote_verification": "NOT_EXECUTED",
   "schema": 1,
-  "scope": "Actual immutable source checkpoint payloads selected for final packaging; no parent/encoder or raw scene payload included, and no new model reload or forward executed. Final public-copy and remote byte checks remain pending.",
+  "scope": "Actual immutable source checkpoint payloads and all eight corresponding public copies verified. No parent/encoder or raw scene payload included; no new full-model reload or forward executed. Final official archive, P5 real deployment forward and remote byte verification remain pending.",
   "selection_lock_sha256": "e182171047492635eb6b4b8efe9a502128a3ff639775df5b4c3cf0631fd09e02",
   "status": "SIX_SELECTED_DELTA_AND_TWO_FINAL_RESUME_PAYLOADS_INSPECTED",
   "training_run_lock_sha256": "c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5",

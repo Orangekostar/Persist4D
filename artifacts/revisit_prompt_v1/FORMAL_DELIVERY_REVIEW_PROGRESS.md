@@ -7,7 +7,7 @@
 | 要求 | 已核查的实际证据 | 当前结论 / 剩余工作 |
 |---|---|---|
 | §3 固定起点与源码绑定 | SOURCE_BINDINGS.json 在本地核对 BASE 的 29 个 Git blob；INPUT_PACKAGE_VERIFICATION.json 核对 ZIP 全部五个原始 checksum，主指令字节一致，原 registry 字段完整保留；原静态审阅另存 PROMPT_REVIEW_SOURCE/INSTRUCTION_STATIC_AUDIT | 绑定完成；源码阅读范围保留原审阅边界，原静态 PASS 不等于实际执行完成 |
-| §5 父加载、冻结、新参数覆盖 | PARAMETER_AND_LOAD_AUDIT.json 核对六条真实正式训练状态、六个最佳 delta 张量及其身份；24 个训练检查点哈希另见 MAIN_TRAINING_VERIFICATION | M1/M4 均为 84224 参数且初始化一致；P5 profile 已实现严格回载及真实前向，待其实际完成后核对与打包副本的 SHA |
+| §5 父加载、冻结、新参数覆盖 | PARAMETER_AND_LOAD_AUDIT.json 核对六条真实正式训练状态、六个最佳 delta 张量及其身份；24 个训练检查点哈希另见 MAIN_TRAINING_VERIFICATION；MODEL_PAYLOAD_REVIEW/MODEL_MANIFEST 已核对六个 delta 和两份 resume 的本地公开副本，共 3724164 bytes | M1/M4 均为 84224 参数且初始化一致；P5 profile 已实现严格回载及真实前向，待其实际完成后核对与公开副本的 SHA；完整状态包与远端字节仍待完成 |
 | §11 六臂与成本 | M1–M6 seed146 均 400 更新；四点 100/200/300/400；原 RUN_LOCK 与累计账本保留 | 正式主训练完成，不追加涨点搜索 |
 | §12–14 全量 CAL 与选点 | SPARSE_CAL_SELECTION_VERIFICATION.json：75 个完整独立进程、25 个三重复组、全部指标及结构/原始预测记录相等；375 个 CSV 行与实际结果核对；用纯选模函数复算冻结 lock 完全相等 | CAL 完成；有限一致性不等于全局确定性或旧 Native 根因已解决 |
 | §14 seed147 条件复验 | CAL_SELECTION_LOCK / REPLICATION_LOCK | 未执行是规定分支：M4-200 相对 M3-400，长期均值 +0.7764pp，但 T3 −0.8040pp、T4 −1.4022pp，未达到逐长度 −0.2pp 门槛；最终科学状态应保留 SCREEN_NO_GO |
@@ -47,3 +47,5 @@ A separate cProfile observation of the original M3 PB T5 pool reproduced all six
 2026-10-16（M4 SEL 三重复完成核查）：SPARSE_SEL_M4_VERIFICATION.json 记录三次独立进程各 111 个不同输入、279 个阶段，实际 input_id/horizon/reference 集合及 reference 状态键与同角色 M0 完全相同；指标行、结构、原始预测指纹和 identity 诊断完全一致。主代理逐份核对 30 份总体和 204 份 reference 状态哈希；另用原标量官方池化接口独立 CPU 复算 repeat0 的 10 份总体状态及其 68 份 reference 状态，所有指标精确相同，耗时 31.305 秒，CUDA 未初始化。三次 S_long=0.07959490269422531、S_current=0.271793266137441，观察范围均为 0pp；相对锁定 M3-400 的描述性 SEL 差值分别为 +0.6604pp、−0.4597pp，不改 CAL 选点或失败的 seed147 门槛。三次分别收费 0.2257816890955534、0.21813176407611334、0.21880094746389658 GPUh，均仅结算一次；公开/原账本 223 个唯一事件一致，新增实际累计 41.784839852624266 GPUh，含历史累计 1756.598901268295 GPUh。正式评测已完成 90 个，原控制器进入 M4-200 PB r0（PID 3248718），写入 STATUS 快照时为 57/516、无错误，Luna 继续只读监控其余三个 PB 任务。完整 PB、bootstrap、P5、最终打包核对及真实发布仍待完成；CPU 加速控制器尚未部署。
 
 2026-10-16 07:26 UTC：SEL 锁定对照 M3-400 与描述性候选 M4-200 的三轮结果均完成后，主代理启动独立 CPU bootstrap（PID 3257481，CUDA 不可见，2 个 CPU 线程），在原 V4 命名空间及已验证加速上下文内调用原 bootstrap_locked，保留 seed9101/1000 次成对物理 reference 抽样及 NA 规则。原 GPU 控制器 2546831 与 PB 子进程 3248718 继续运行，没有启动第二个 GPU 控制器。CPU 六份输入已验证，07:30 心跳记录 1083 次官方池化；完整区间仍未完成，PB bootstrap 尚未执行。CPU_STATISTICS_ACCELERATION_VERIFICATION/STATUS 仅记录 RUNNING，不据此关闭最终审计。Luna 已将该 CPU PID、心跳和池化计数纳入只读监控。
+
+2026-10-16（本地模型副本）：六个 CAL 最佳 delta 与 M3/M4 的 N=400 resume 已复制到公开目录；八份共 3724164 bytes，逐份实体字节数及 SHA256 与已审阅原件一致，路径均具有 LFS 属性。MODEL_MANIFEST 只列实际八份模型并绑定 DEPENDENCY_ACQUISITION，不列尚不存在的状态压缩包；MODEL_PAYLOAD_REVIEW 记录本地副本核验完成。真实 P5 部署前向、最终指标包和远端上传/取回仍未完成，publication_ready 保持 false。最终 summarize 会重写 MODEL_MANIFEST，届时必须保留或重新补全依赖取得信息。

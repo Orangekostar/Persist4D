@@ -45,7 +45,7 @@ SEL 三轮的实际 `(input_id, horizon, reference_id)` 集合及 reference 状�
 
 ### 4. 父参数、缓冲区和新旧身份是否完整保留
 
-结论：实际训练加载覆盖与六个最佳 delta 已核对；最终公开副本和真实部署回载待完成。父包按 BASE 原源码身份校验，所有任务参数及 buffer 的名称、shape、dtype、值严格覆盖；编码器仅按规定前缀单独取得，不能遗漏其任务 decoder。delta 校验父/编码器/taxonomy/训练数值身份及全部新增张量。
+结论：实际训练加载覆盖、六个最佳 delta 及六个 delta/两份 resume 的本地公开副本已核对；真实部署回载待完成。父包按 BASE 原源码身份校验，所有任务参数及 buffer 的名称、shape、dtype、值严格覆盖；编码器仅按规定前缀单独取得，不能遗漏其任务 decoder。delta 校验父/编码器/taxonomy/训练数值身份及全部新增张量。
 
 证据：[PARAMETER_AND_LOAD_AUDIT.json](PARAMETER_AND_LOAD_AUDIT.json)、[MAIN_TRAINING_VERIFICATION.json](MAIN_TRAINING_VERIFICATION.json)、[MODEL_PAYLOAD_REVIEW.json](MODEL_PAYLOAD_REVIEW.json)、[DEPENDENCY_ACQUISITION.json](DEPENDENCY_ACQUISITION.json)。P5 实际前向标记、最终 MODEL_MANIFEST 和公开资产 SHA 仍需核对。
 
@@ -103,11 +103,11 @@ H1 还需要当前掩码的一对一恢复与丢失诊断；仅长期正差而 c
 
 ### 12. 可加载资产、交接、远端字节和 SHA 自引用是否完成
 
-结论：未完成。已有六个最佳 delta 和 M3/M4 的 N=400 resume 原件完成离线张量/身份审核；M4 最佳 delta 位于 step200，resume 位于 step400，两者不混称相同步数的 optimizer 恢复。最终公开副本、完整 MODEL_MANIFEST、官方状态压缩包及一次真实 P5 部署前向尚待生成或核验。
+结论：尚未全部完成。六个最佳 delta 和 M3/M4 的 N=400 resume 原件已完成离线张量/身份审核；八份本地公开副本共 3724164 bytes，与原件字节数及 SHA256 全部一致，MODEL_MANIFEST 已逐份列出真实资产并绑定依赖取得记录。M4 最佳 delta 位于 step200，resume 位于 step400，两者不混称相同步数的 optimizer 恢复。当前 manifest 尚不含官方状态压缩包；完整档案、一次真实 P5 部署前向及远端取回仍待生成或核验。
 
 P5 profile 已实现严格父/编码器/delta 覆盖及固定 CAL panel 的实际 warmup/测量。只有真实输出中的 `EXACT_PARENT_ENCODER_DELTA_COVERAGE_AND_REAL_FORWARD` 与最终公开 delta 同 SHA，才满足该回载证据；源码字符串和加载示例不算实际完成。
 
-发布脚本支持本轮显式 branch/tag、冻结推理源码进入 A manifest、选定 Git LFS 上传及一次空缓存远端下载核验。当前仅预检/dry-run，没有 A/B/tag 或实际 Git/LFS 上传；SSH 读取成功不证明写权限。Release API 凭据在预检时不可用，最终按实际尝试记录本地回执或 Release 回执，不能伪造成功链接。
+发布脚本支持本轮显式 branch/tag、冻结推理源码进入 A manifest、选定 Git LFS 上传及一次空缓存远端下载核验。八个模型路径使用 LFS 属性；本地副本不代表远端资产可取回。当前仅预检/dry-run，没有 A/B/tag 或实际 Git/LFS 上传；SSH 读取成功不证明写权限。Release API 凭据在预检时不可用，最终按实际尝试记录本地回执或 Release 回执，不能伪造成功链接。
 
 证据：[MODEL_PAYLOAD_REVIEW.json](MODEL_PAYLOAD_REVIEW.json)、[DEPENDENCY_ACQUISITION.json](DEPENDENCY_ACQUISITION.json)、[DEPLOYMENT_PROTOCOL.md](DEPLOYMENT_PROTOCOL.md)、[PUBLICATION_IMPLEMENTATION_VERIFICATION.json](PUBLICATION_IMPLEMENTATION_VERIFICATION.json)、[PUBLICATION_PREFLIGHT_REVIEW.json](PUBLICATION_PREFLIGHT_REVIEW.json)。远端证据最终由 run root 外部 publication 回执负责，不能预填在 A/B。
 
@@ -116,7 +116,7 @@ P5 profile 已实现严格父/编码器/delta 覆盖及固定 CAL panel 的实�
 1. M4 PB 三次完整结果、分母/实际 ID 集合、官方总体/reference 状态实体 SHA 与一次结算；候选 PB 的独立 CPU 复算。
 2. 原规则的 SEL/PB bootstrap 实际输出及 NA/少场景边界、P5 机制与 profile 的实际状态、共同上下文及部署回载证据。
 3. 完整 TRAINING/CAL/SEL/PB/BY_REFERENCE/IDENTITY/MECHANISM/PROFILE、CURRENT_MASK_DIAGNOSTICS、SELECTION_DECISION、REPORT 和本页最终执行结论；失败及历史暴露完整保留。
-4. 六个最佳 delta、实际候选/对照 resume、最终状态压缩包和 MODEL_MANIFEST 实体字节核验；依赖取得位置、合法来源和严格加载契约完整。最终公开 diff/压缩包不得含原始点云、逐点 GT、编码器、绝对运行路径或凭据。
+4. 已核对的六个最佳 delta/两份 resume 与最终 MODEL_MANIFEST 仍保持同 SHA；补齐并核验最终状态压缩包。依赖取得位置、合法来源和严格加载契约完整，最终自动汇总后不能丢失依赖取得记录。最终公开 diff/压缩包不得含原始点云、逐点 GT、编码器、绝对运行路径或凭据。
 5. 最终账本及无活动 GPU reservation/子进程；原规则与冻结源码身份仍一致；仅完成所需聚焦检查。
 6. 冻结 A、仅交接的 B、tag、实际 Git/LFS push、一次空 LFS 缓存取回全部本轮资产及 B 文档；外部回执记录真实 SHA/时间/错误。四种 CODE/EXPERIMENT/SCIENCE/PUBLICATION 状态分别报告，远端未完成项不能用本地测试代替。
 
