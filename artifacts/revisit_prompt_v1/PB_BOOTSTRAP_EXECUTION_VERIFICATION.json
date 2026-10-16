@@ -1,0 +1,194 @@
+{
+  "binding_restoration_utc": "2026-10-16T11:29:52.721975+00:00",
+  "bootstrap_seed": 9101,
+  "candidate": {
+    "AP": {
+      "T1": 0.43269217014312744,
+      "T2": 0.2687074542045593,
+      "T3": 0.13553912937641144,
+      "T4": 0.10350719094276428,
+      "T5": 0.18716569244861603
+    },
+    "AP_ranges": {
+      "T1": 0.0,
+      "T2": 0.0,
+      "T3": 0.0,
+      "T4": 0.0,
+      "T5": 0.0
+    },
+    "S_current": 0.4079311589399974,
+    "S_long": 0.14207067092259726,
+    "S_long_range": 0.0,
+    "adapter_seed": 146,
+    "current_AP": {
+      "T1": 0.43269217014312744,
+      "T2": 0.4164098799228668,
+      "T3": 0.38026824593544006,
+      "T4": 0.376382976770401,
+      "T5": 0.467142254114151
+    },
+    "guard_pass": true,
+    "parameters": 84224,
+    "step": 200,
+    "variant": "M4"
+  },
+  "control": {
+    "AP": {
+      "T1": 0.43269217014312744,
+      "T2": 0.27176153659820557,
+      "T3": 0.14357934892177582,
+      "T4": 0.11752919107675552,
+      "T5": 0.1418112963438034
+    },
+    "AP_ranges": {
+      "T1": 0.0,
+      "T2": 0.0,
+      "T3": 0.0,
+      "T4": 0.0,
+      "T5": 0.0
+    },
+    "S_current": 0.391400545835495,
+    "S_long": 0.13430661211411157,
+    "S_long_range": 0.0,
+    "adapter_seed": 146,
+    "current_AP": {
+      "T1": 0.43269217014312744,
+      "T2": 0.40336376428604126,
+      "T3": 0.3761378824710846,
+      "T4": 0.3838258981704712,
+      "T5": 0.4142378568649292
+    },
+    "guard_pass": true,
+    "parameters": 51200,
+    "step": 400,
+    "variant": "M3"
+  },
+  "cpu_curve_source_sha256": "1055376e1dd33f74d18272524fda8032edb4736440ecc17d6951a3d1c06e6028",
+  "cuda_initialized": false,
+  "defined_draws": 1000,
+  "elapsed_seconds": 530.6462836469873,
+  "endpoint_metadata_scope": "Original immutable CAL endpoint records; actual PB differences are separate.",
+  "evaluation_policy": {
+    "policy_id": "ordered-sparse-reference-v4",
+    "policy_sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+  },
+  "exact_cache": {
+    "cache_source_sha256": "52a9d62f10ed4a44a64fcdfb791752910c3bd151fd916027fdf22be095cea6cd",
+    "factory_source_sha256": "937bb1cc41b02ea938f348af427b082f73caf50f16da797c91a008c2accc4848",
+    "hits": 36000,
+    "identity": "Complete ordered state content, taxonomy bytes, pinned code and runtime. Missing entries call the original pool.",
+    "official_pool_computations": 0,
+    "prewarm_logical_pool_calls": 12000,
+    "prewarm_manifest_sha256": "a05fa17f17007f295af8879c56bfd2fdd71f62bbd5cb7f4adf5d624d79536a0e",
+    "prewarm_source_repeat": 0,
+    "prewarm_source_sha256": "8c80baad67fefddf12119c25a700b5f292e249ab76f6c68f689a717d9e0c0a35",
+    "read_only": true,
+    "runtime_identity": {
+      "curve_binding": "scripts.revisit_prompt_cpu_statistics.precision_recall_cpu",
+      "numpy": "2.2.6",
+      "python": "3.10.20",
+      "torch": "2.6.0+cu126",
+      "torch_default_dtype": "torch.float32",
+      "torch_threads": 2
+    }
+  },
+  "finished_utc": "2026-10-16T11:21:40.982677+00:00",
+  "function_binding_restoration_status": "COMPLETE",
+  "function_bindings_restored": true,
+  "inputs": [
+    {
+      "repeat_index": 0,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M3-s146-u000400/PB/repeat0/RESULTS.json",
+      "results_sha256": "92d19e48233238d079a9651a4f971670a04e39b1418d8ea63e8d9f464e65db2b",
+      "step": 400,
+      "variant": "M3"
+    },
+    {
+      "repeat_index": 1,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M3-s146-u000400/PB/repeat1/RESULTS.json",
+      "results_sha256": "4e7f579e267434fa83a6a9248770fdcde9689247e17cfafc1ce33adf8d0f5a6e",
+      "step": 400,
+      "variant": "M3"
+    },
+    {
+      "repeat_index": 2,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M3-s146-u000400/PB/repeat2/RESULTS.json",
+      "results_sha256": "dba294b43cefec26f5396012a49ac2a405ca7a90628d6c53d862b58f0f6035e1",
+      "step": 400,
+      "variant": "M3"
+    },
+    {
+      "repeat_index": 0,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M4-s146-u000200/PB/repeat0/RESULTS.json",
+      "results_sha256": "d28a79c762f2b7abebe23f6cebfa5b9f9729248775428d53eefe7194ea537fc4",
+      "step": 200,
+      "variant": "M4"
+    },
+    {
+      "repeat_index": 1,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M4-s146-u000200/PB/repeat1/RESULTS.json",
+      "results_sha256": "726dec93209b68141aa0ba17ebcb4de216620571d8d4fd4dc4e09a66187ab0b9",
+      "step": 200,
+      "variant": "M4"
+    },
+    {
+      "repeat_index": 2,
+      "result_path": "policies/ordered-sparse-reference-v4/evaluation/M4-s146-u000200/PB/repeat2/RESULTS.json",
+      "results_sha256": "b562c7400b80ac6ad2242fef5cd87123d445300e79abfba06b912220584dd99b",
+      "step": 200,
+      "variant": "M4"
+    }
+  ],
+  "interval_status": "DEFINED",
+  "intervals_95": {
+    "S_current": [
+      -0.004073021312554677,
+      0.0029666694502035735
+    ],
+    "S_long": [
+      -0.0006465164013206958,
+      0.0059881483515103655
+    ]
+  },
+  "new_gpu_jobs_during_bootstrap": 0,
+  "original_bootstrap_source_sha256": "c12a50a04282da7a48ec83c8b224dc84cc50208cf4a30fa84da1f7247ca5e62a",
+  "outputs": [
+    {
+      "bytes": 143001,
+      "path": "BOOTSTRAP_PB.json",
+      "sha256": "4943c925a1800c414de75e607d8f07110b9ad663914c3570235d7160fc0e5c43"
+    }
+  ],
+  "panel_warning": "INTERVAL_UNSTABLE_FEWER_THAN_TEN_REFERENCES",
+  "pool_calls_completed": 36000,
+  "process_difference_ranges": {
+    "S_current": 0.0,
+    "S_long": 0.0
+  },
+  "process_differences": [
+    {
+      "S_current": 0.0005565186341603597,
+      "S_long": 0.0028862829009691873
+    },
+    {
+      "S_current": 0.0005565186341603597,
+      "S_long": 0.0028862829009691873
+    },
+    {
+      "S_current": 0.0005565186341603597,
+      "S_long": 0.0028862829009691873
+    }
+  ],
+  "progress_wrapper_source_sha256": "83a6112afb70673c64fc498e60e9a0361c4f445ae9d9e7953414e4cf3290476f",
+  "reference_count": 6,
+  "role": "PB",
+  "samples": 1000,
+  "schema": 1,
+  "scope": "All original PB draws load all six actual process results. Exactly matching pool inputs reuse validated official values; misses compute the unchanged original pool. P5, final review and publication require separate evidence.",
+  "scoped_launcher_source_sha256": "9232d21444a38735ae2d0063945a4d010ee7286cbfc7b31b2ccd26912a5bc0dd",
+  "seed_specific_copy_status": "Original campaign writes it after this call returns.",
+  "selection_lock_sha256": "e182171047492635eb6b4b8efe9a502128a3ff639775df5b4c3cf0631fd09e02",
+  "started_utc": "2026-10-16T11:12:50.336620+00:00",
+  "status": "COMPLETE_ORIGINAL_LOCKED_PB_BOOTSTRAP_ON_CPU",
+  "undefined_draws": 0
+}

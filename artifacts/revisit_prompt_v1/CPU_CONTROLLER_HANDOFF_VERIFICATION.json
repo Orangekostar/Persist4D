@@ -3,10 +3,14 @@
   "complete_evaluation_processes": 93,
   "completed_prewarm_manifest_sha256": "a05fa17f17007f295af8879c56bfd2fdd71f62bbd5cb7f4adf5d624d79536a0e",
   "environment_preserved_in_memory_only": true,
+  "final_bootstrap_bindings_restored": true,
+  "final_verification_utc": "2026-10-16T11:30:59.757355+00:00",
   "formal_evaluation_verification_sha256": "748c70bba9a1b5fc8973092d09fa3a3654bb40919867da33afee881a52ad8729",
   "handoff_source_sha256": "dd18f63f888c837b6b243a417aa6d2f7627ea9478c303eacb95ef028906487e0",
+  "new_controller_alive": false,
   "new_controller_pid": 3371682,
   "new_controller_ppid": 1,
+  "new_controller_terminal_status": "COMPLETE",
   "new_gpu_jobs_launched_by_handoff": 0,
   "old_controller_pid": 2546831,
   "old_parent_stopped_only_after_all_p4_complete": true,
@@ -19,6 +23,6 @@
   "progress_observer_sha256": "83a6112afb70673c64fc498e60e9a0361c4f445ae9d9e7953414e4cf3290476f",
   "schema": 1,
   "scope": "Owned idle CPU controller replacement only. All 93 real GPU evaluations were complete; original PB bootstrap now running, with original charged P5 scheduled afterward. No GPU child was interrupted. Final binding restoration and delivery/publication remain pending.",
-  "status": "CPU_HANDOFF_EXECUTED_PB_BOOTSTRAP_RUNNING",
+  "status": "CPU_HANDOFF_COMPLETED_ORIGINAL_PB_AND_P5_CONTROLLER_EXITED",
   "verified_utc": "2026-10-16T11:14:43.886334+00:00"
 }

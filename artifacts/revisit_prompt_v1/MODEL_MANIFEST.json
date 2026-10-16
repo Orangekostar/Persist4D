@@ -79,6 +79,13 @@
       "sha256": "e9d7ea3e13124e22c1df5a4a42c1af2195ea98b22207c98657c017756c98eb92",
       "step": 400,
       "variant": "M4"
+    },
+    {
+      "bytes": 212215855,
+      "file_count": 6156,
+      "kind": "official-sufficient-states",
+      "path": "artifacts/revisit_prompt_v1/evidence/official_states.zip",
+      "sha256": "cd12331a35dd025b624881bcb04be9e60f8972568c687bbbbe3cf9ea25d1be74"
     }
   ],
   "delta_requires_parent_and_encoder": true,
@@ -97,11 +104,13 @@
     },
     "taxonomy_sha256": "fd66f9339b1ea44a0b6ea282317313c4dd7290711b0d1e027de59a6ba59a68ba"
   },
-  "deployment_real_forward": "PENDING_ORIGINAL_P5_PROFILE",
+  "deployment_forward_verification": {
+    "path": "artifacts/revisit_prompt_v1/P5_EXECUTION_VERIFICATION.json",
+    "scope": "Actual strict parent/encoder/delta coverage and real P5 forward for locked M3-400 and M4-200; public copies have identical source bytes",
+    "selected_delta_count": 2,
+    "sha256": "d25e8681177d8516a24594df15e87ba8937e1f56f773b52dbc9cf35ec40b0580"
+  },
   "formal_models_produced": true,
-  "local_model_copy_verified_utc": "2026-10-16T07:33:39.680061+00:00",
-  "official_state_archive_status": "PENDING_COMPLETE_LOCKED_PB_AND_FINAL_SUMMARIZE",
-  "remote_verification": "NOT_EXECUTED",
   "schema": 1,
-  "status": "ACTUAL_MODEL_COPIES_VERIFIED_OFFICIAL_STATE_ARCHIVE_PENDING"
+  "status": "ACTUAL_ASSETS_ONLY"
 }

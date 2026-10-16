@@ -1,0 +1,119 @@
+{
+  "active_gpu_reservations": 0,
+  "archive_cpu_example": {
+    "cpu_only": true,
+    "member": "M4-s146-u000200/CAL/repeat0/official-long-T5.json",
+    "metrics": {
+      "online_t-REC": 0.2150883823633194,
+      "online_t-REC25": 0.48806819319725037,
+      "online_t-REC50": 0.4276515245437622,
+      "online_t-mAP": 0.18716569244861603,
+      "online_t-mAP25": 0.4248914420604706,
+      "online_t-mAP50": 0.3716099262237549
+    },
+    "scope": "One documented packaged-state CPU example, not all 6156 metrics re-executed",
+    "status": "ACTUAL_ARCHIVE_CPU_RECOMPUTATION_EXAMPLE_PASS",
+    "verified_utc": "2026-10-16T11:39:54.233076+00:00"
+  },
+  "evidence": [
+    {
+      "bytes": 83238,
+      "path": "EXECUTION_INSTRUCTION.md",
+      "sha256": "08cf2d2c83f1bd93d3120623f3ea9884fddd0f1fb13af843677b92160cc0070e"
+    },
+    {
+      "bytes": 10051,
+      "path": "RUN_LOCK.json",
+      "sha256": "c1978630045a611325a110653ecf9f983c4081d00705cf53dfc28342ee0d4ed5"
+    },
+    {
+      "bytes": 9308,
+      "path": "CAL_SELECTION_LOCK.json",
+      "sha256": "e182171047492635eb6b4b8efe9a502128a3ff639775df5b4c3cf0631fd09e02"
+    },
+    {
+      "bytes": 6303,
+      "path": "EVALUATION_POLICY_V4.json",
+      "sha256": "4f1f7b6d1d1efdfbf73cbb6c56296b8d00b39dd5c1f2f6a7ead5a2a15dc309c6"
+    },
+    {
+      "bytes": 16526,
+      "path": "REPORT.md",
+      "sha256": "8ef02a03620e48ac920c1ca96cf87d3c48b4df2c367de4fc11be33d6c139059a"
+    },
+    {
+      "bytes": 14898,
+      "path": "PROMPT_AUDIT.md",
+      "sha256": "1793208592e8e5d86ef262830658eba62cf6feb9b0be90927c830d4b7da6f249"
+    },
+    {
+      "bytes": 3979,
+      "path": "MODEL_MANIFEST.json",
+      "sha256": "31536e2ad571fb6827d0bf4d2a1a1194f57f656982d07c2dca7b6109284e9ec7"
+    },
+    {
+      "bytes": 30402,
+      "path": "FINAL_DELIVERY_VERIFICATION.json",
+      "sha256": "18fa047c1a2145e558fb1ee0c39b639fb4135f62963b04e955cb24463fb400f7"
+    },
+    {
+      "bytes": 615500,
+      "path": "P5_EXECUTION_VERIFICATION.json",
+      "sha256": "d25e8681177d8516a24594df15e87ba8937e1f56f773b52dbc9cf35ec40b0580"
+    },
+    {
+      "bytes": 6664,
+      "path": "PB_BOOTSTRAP_EXECUTION_VERIFICATION.json",
+      "sha256": "02f74fa6f457aa5983ca8bff48421826bf110a74e7d4ee5189805b34c6ab547f"
+    },
+    {
+      "bytes": 1198,
+      "path": "PB_BOOTSTRAP_INDEPENDENT_VERIFICATION.json",
+      "sha256": "0bf6bcbdf95e8a8eb1d430f2a10d6bba51c7e716af4af9b19ea58fa8aebdf9ac"
+    },
+    {
+      "bytes": 1250,
+      "path": "SAME_CLASS_DIAGNOSTICS_VERIFICATION.json",
+      "sha256": "1f55d7470fe5d3a5c7ed1598db55184bec6f4899c2e593ec6c6a98ce6468620b"
+    },
+    {
+      "bytes": 12948,
+      "path": "DEPLOYMENT_PROTOCOL.md",
+      "sha256": "69e41688c44c5a2b31b96ce63300ab0fc5c69ae58f6eb07aa252751f9feea6e7"
+    }
+  ],
+  "focused_publication_tests": {
+    "command": "python -m pytest tests/test_revisit_prompt_publication.py -q",
+    "failed": 0,
+    "passed": 4
+  },
+  "git_diff_check_exit_code": 0,
+  "known_processes_exited": true,
+  "no_sha_self_reference": "ARTIFACT_MANIFEST excludes itself and B handoff/audit/commands; B references A only; final publication receipt remains external",
+  "original_instruction_section19_questions": 12,
+  "owner": "primary_agent",
+  "privacy": {
+    "assets": 9,
+    "findings": [],
+    "selected_files": 182,
+    "status": "FINAL_SELECTED_FILES_PRIVACY_AND_LFS_CHECKS_PASS",
+    "text_files": 173
+  },
+  "publication_help_exit_code": 0,
+  "publication_status": "PENDING_EXTERNAL_VERIFICATION",
+  "schema": 1,
+  "scientific_findings": {
+    "H1": "NOT_ESTABLISHED",
+    "H2": "NOT_AVAILABLE_MOVING_SUBSET",
+    "H3": "NOT_ESTABLISHED",
+    "PB_same_class_conditional_recall": "LOWER_THAN_M3",
+    "QUALITY_SCOPE": "TEMPORAL_ONLY",
+    "SEL_PB_intervals_all_cross_zero": true,
+    "native_outlier_root_cause": "UNRESOLVED",
+    "seed147": "NOT_EXECUTED_CAL_GATE_FAILED",
+    "status": "SCREEN_NO_GO"
+  },
+  "scope": "Final primary content review and local delivery; no remote success or Release upload claimed",
+  "status": "PRIMARY_LOCAL_CONTENT_AND_DELIVERY_REVIEW_COMPLETE_READY_FOR_ACTUAL_PUBLICATION",
+  "verified_utc": "2026-10-16T11:40:24.231690+00:00"
+}

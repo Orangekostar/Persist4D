@@ -1,4 +1,7 @@
-# 正式轮交付核对进度
+# 正式交付历史进度记录（截至 2026-10-16 11:14 UTC）
+
+本页保留各时点的历史快照，pending 表述仅对应当时时间。最终完成范围、科学结论及发布边界见 REPORT.md、PROMPT_AUDIT.md、FINAL_DELIVERY_VERIFICATION.json 和外部 PUBLICATION_RECEIPT；不以本页旧状态代替最终状态。
+
 
 状态：未完成，不能据此设置 publication_ready 或 goal complete。
 

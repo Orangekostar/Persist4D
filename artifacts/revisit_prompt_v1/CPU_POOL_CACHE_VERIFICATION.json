@@ -152,7 +152,11 @@
   "metrics_per_pool": 6,
   "miss_contract": "Compute the unchanged original official pool in the verified CPU PR context; do not cache errors.",
   "new_gpu_jobs": 0,
-  "official_pb_bootstrap_status": "RUNNING_ALL_SIX_ACTUAL_PROCESS_INPUTS",
+  "official_pb_bootstrap_status": "COMPLETE_ALL_SIX_ACTUAL_PROCESS_INPUTS_AND_1000_ORIGINAL_DRAWS",
+  "official_pb_bootstrap_verification": {
+    "path": "PB_BOOTSTRAP_EXECUTION_VERIFICATION.json",
+    "sha256": "02f74fa6f457aa5983ca8bff48421826bf110a74e7d4ee5189805b34c6ab547f"
+  },
   "original_bootstrap_implementation_unchanged": true,
   "prewarm": {
     "cache_hits": 84,

@@ -1,23 +1,7 @@
 {
   "accelerated_full_recomputation_seconds": 23.69314809300704,
   "acceleration_source_sha256": "1055376e1dd33f74d18272524fda8032edb4736440ecc17d6951a3d1c06e6028",
-  "active_full_bootstrap": {
-    "bootstrap_seed": 9101,
-    "cache_hits": 3882,
-    "controller_handoff_verification": "CPU_CONTROLLER_HANDOFF_VERIFICATION.json",
-    "elapsed_seconds": 60.00719283596845,
-    "expected_pool_calls": 36000,
-    "heartbeat_utc": "2026-10-16T11:13:50.343587+00:00",
-    "inputs_verified": 6,
-    "official_pool_computations": 0,
-    "pid": 3371682,
-    "pool_calls_completed": 3882,
-    "role": "PB",
-    "samples": 1000,
-    "scope": "Original PB bootstrap, unchanged 1000 physical-reference draws and all three real process pairs; output and final restoration not complete",
-    "started_utc": "2026-10-16T11:12:50.336620+00:00",
-    "status": "RUNNING"
-  },
+  "active_full_bootstrap": null,
   "actual_curve_argument_types": [
     [
       "torch.float32",
@@ -29,7 +13,7 @@
   "all_actual_pr_curve_elements_exact": true,
   "all_global_and_reference_metrics_exact": true,
   "baseline_recomputation_sha256": "6880bc6ce1cde6040ae8861087b2903d8d9820e5a0c101283d5fb9b7b9dbd955",
-  "complete_accelerated_bootstrap_status": "SEL_COMPLETE_PB_RUNNING",
+  "complete_accelerated_bootstrap_status": "SEL_AND_PB_COMPLETE",
   "completed_full_bootstraps": [
     {
       "bootstrap_seed": 9101,
@@ -66,6 +50,34 @@
       "undefined_draws": 0,
       "verification": "SEL_BOOTSTRAP_EXECUTION_VERIFICATION.json",
       "verification_sha256": "bb44e2045773713a961b707dd1ad08d1b9f4aaeb96ae179423dac9350b688f75"
+    },
+    {
+      "bootstrap_seed": 9101,
+      "cuda_initialized": false,
+      "defined_draws": 1000,
+      "elapsed_seconds": 530.6462836469873,
+      "function_bindings_restored": true,
+      "independent_verification": "PB_BOOTSTRAP_INDEPENDENT_VERIFICATION.json",
+      "independent_verification_sha256": "0bf6bcbdf95e8a8eb1d430f2a10d6bba51c7e716af4af9b19ea58fa8aebdf9ac",
+      "intervals_95": {
+        "S_current": [
+          -0.004073021312554677,
+          0.0029666694502035735
+        ],
+        "S_long": [
+          -0.0006465164013206958,
+          0.0059881483515103655
+        ]
+      },
+      "new_gpu_jobs_during_bootstrap": 0,
+      "pool_calls_completed": 36000,
+      "reference_count": 6,
+      "role": "PB",
+      "samples": 1000,
+      "status": "COMPLETE",
+      "undefined_draws": 0,
+      "verification": "PB_BOOTSTRAP_EXECUTION_VERIFICATION.json",
+      "verification_sha256": "02f74fa6f457aa5983ca8bff48421826bf110a74e7d4ee5189805b34c6ab547f"
     }
   ],
   "continuation_validation": {

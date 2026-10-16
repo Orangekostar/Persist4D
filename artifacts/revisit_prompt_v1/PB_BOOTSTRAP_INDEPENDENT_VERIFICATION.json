@@ -1,0 +1,29 @@
+{
+  "elapsed_seconds": 530.6462836469873,
+  "exact_cache_hits": 36000,
+  "execution_record_input_output_and_source_hashes_exact": true,
+  "generic_and_seed_specific_bytes_identical": true,
+  "independently_regenerated_empty_state_draw_indices": [],
+  "interval_status": "DEFINED",
+  "intervals_95": {
+    "S_current": [
+      -0.004073021312554677,
+      0.0029666694502035735
+    ],
+    "S_long": [
+      -0.0006465164013206958,
+      0.0059881483515103655
+    ]
+  },
+  "official_pool_computations": 0,
+  "percentiles_exact_from_all_1000_saved_draws": true,
+  "pool_calls_completed": 36000,
+  "process_differences_exact_from_all_six_actual_results": true,
+  "reference_count": 6,
+  "samples": 1000,
+  "scope": "Independent completed PB metadata, byte/provenance, process-difference and saved-draw percentile checks. Does not claim a second execution of all 1000 official pooling draws, P5 completion or an independent training seed.",
+  "status": "COMPLETED_PB_BOOTSTRAP_INDEPENDENT_METADATA_AND_PERCENTILE_CHECKS_PASS",
+  "undefined_draw_indices": [],
+  "verified_utc": "2026-10-16T11:30:39.094741+00:00",
+  "verifier_sha256": "b5eb916efb8d8c20b09c6060124dd6f0843308633120d6b906453f2e30cabcf1"
+}

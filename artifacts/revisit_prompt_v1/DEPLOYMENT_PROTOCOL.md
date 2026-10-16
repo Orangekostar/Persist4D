@@ -72,6 +72,8 @@ PY
 
 可选的 CPU 统计恢复入口是 `python -m scripts.continue_revisit_prompt_statistics --execute`，默认或 `--dry-run` 只打印 `DRY_RUN_NOT_STARTED`。它仍调用上述原控制器，沿用其互斥锁、收费、身份核查与完成任务去重；仅在原 `bootstrap_locked` 调用期间批量计算 CPU float32 PR 阈值，退出或异常时恢复函数绑定。原 AP 积分、reference 抽样、1000 次 bootstrap、种子、三次重复和 NA 规则均保留。当前 GPU 评测运行期间不得据此启动第二个控制器。
 
+以下日期段落保留当时状态；最终完成证据见本页末尾。
+
 2026-10-16 的实现验证见 `CPU_STATISTICS_ACCELERATION_VERIFICATION.json`：56 份已完成状态及各自 reference 池化指标精确相同，220 条实际 PR 曲线逐元素精确相同；23 项测试通过，包括 dry-run 不启动控制器、正常/异常退出恢复绑定及损坏状态被拒绝。该入口尚未用于接管正式控制器。SEL 两个锁定端点的三轮结果齐备后，主代理在独立 CPU 进程中调用原 `bootstrap_locked`，使用同一加速上下文及 V4 命名空间；保留 seed9101、原 1000 次抽样及 NA 规则，CUDA 未初始化。该进程于 09:34:57 UTC 实际完成全部 36000 次池化，耗时 7729.626 秒；1000 次抽样均有效。`SEL_BOOTSTRAP_EXECUTION_VERIFICATION.json` 记录实际输入/源码/输出哈希，以及独立的三进程差值、全部保存抽样百分位及字节核对。8 个 reference 的少场景警示保留，长期和当前差值的区间均跨零。原 GPU 控制器继续执行 PB，PB bootstrap 尚未执行；完整 SEL 耗时不代表 PB 耗时或整套统计加速比。
 
 ## 从官方充分状态复算
@@ -105,3 +107,11 @@ PY
 `OFFLINE_METRIC_RECOMPUTATION.json` 记录主代理已执行的 CPU 核查范围：两个锁定 CAL 端点的 repeat0 共 20 份 long/current 状态，以及 M0、M3 已完成的 SEL/PB repeat0 共 36 份状态，总计 56 份。所有官方指标与记录值完全相同，分别从 reference 状态重新池化也完全相同。`SPARSE_SEL_M4_VERIFICATION.json` 的 `offline_metric_recomputation` 另记录 M4-200 SEL repeat0 的 10 份总体状态及 68 份 reference 状态；使用原标量官方实现，指标也完全相同，CUDA 未初始化。`SPARSE_PB_M4_VERIFICATION.json` 的同名字段另记录 M4-200 PB repeat0 的 8 份总体状态及 48 份 reference 状态，全部六项指标与记录及 reference 池化精确相同；原标量官方实现实际耗时 166.375 秒，CUDA 未初始化。因此已有 74 份总体状态完成独立 CPU 核查，但尚未覆盖其他 repeat 的独立复算及最终压缩包，不能扩大表述为全部交付已经验收。
 
 一次真实部署回载和有限前向可使用本轮 P5 profile 的 `EXACT_PARENT_ENCODER_DELTA_COVERAGE_AND_REAL_FORWARD` 完成证据，并核对所加载原 delta 与最终公开副本的 SHA256 相同。代码中的字符串、此处加载示例和 CPU 指标复算均不能代替这份实际前向证据。旧 Native 的数值异常根因仍未解决；有限 V4 重复一致不等于全局逐张量确定性。
+
+## 2026-10-16 最终完成证据
+
+PB 已实际完成原 1000 次成对 bootstrap，1000 有效/0 NA，全部 36000 次逻辑池化精确命中完整保序缓存；读取六份真实进程结果，函数绑定最终恢复，CPU 未初始化 CUDA。PB_BOOTSTRAP_EXECUTION_VERIFICATION 与 PB_BOOTSTRAP_INDEPENDENT_VERIFICATION 记录来源/输出身份、保存抽样及原百分位区间核对；后者不冒称第二轮 1000 次池化。SEL/PB 四个区间均跨零，少场景警示保留。
+
+P5 实际四项作业均完成，六项内容干预 CONTROLLED，三个端点各一次 warmup/三次 measured pass。P5_EXECUTION_VERIFICATION 逐字段核对 MECHANISM/PROFILE 和实际收费；M3-400、M4-200 的严格父/编码器/delta 覆盖及真实前向与公开 delta 同 SHA，已满足本轮有限部署核验，不需重新加载。内容敏感性不能证明 AP 收益。正式控制器已正常退出，ACTIVE_JOB/reservation 均释放。
+
+MODEL_MANIFEST 列出六份最佳 delta、两份 N=400 resume 及充分状态 ZIP；FINAL_DELIVERY_VERIFICATION 已核对所有实体字节，以及 ZIP 内全部 6156 份状态与原件一致。这里的字节核对不扩大原 74 份总体状态独立 CPU 指标复算的范围。原指令 §19 的最终内容审核见 PROMPT_AUDIT，科学状态仍 SCREEN_NO_GO；实际 Git/LFS/Release 发布事实由外部回执负责。
