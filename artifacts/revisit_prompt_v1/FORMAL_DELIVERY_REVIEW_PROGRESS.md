@@ -11,7 +11,7 @@
 | §11 六臂与成本 | M1–M6 seed146 均 400 更新；四点 100/200/300/400；原 RUN_LOCK 与累计账本保留 | 正式主训练完成，不追加涨点搜索 |
 | §12–14 全量 CAL 与选点 | SPARSE_CAL_SELECTION_VERIFICATION.json：75 个完整独立进程、25 个三重复组、全部指标及结构/原始预测记录相等；375 个 CSV 行与实际结果核对；用纯选模函数复算冻结 lock 完全相等 | CAL 完成；有限一致性不等于全局确定性或旧 Native 根因已解决 |
 | §14 seed147 条件复验 | CAL_SELECTION_LOCK / REPLICATION_LOCK | 未执行是规定分支：M4-200 相对 M3-400，长期均值 +0.7764pp，但 T3 −0.8040pp、T4 −1.4022pp，未达到逐长度 −0.2pp 门槛；最终科学状态应保留 SCREEN_NO_GO |
-| §13–14 锁定 SEL/PB | 原 V4 控制器仍执行 M0、M3-400、M4-200 的三次评测 | M0 SEL/PB 完成；M3 SEL 完成、PB 进行中；其余以实时 STATUS/RESULTS 为准，CSV 在最终 collect 后更新 |
+| §13–14 锁定 SEL/PB | 原 V4 控制器仍执行 M0、M3-400、M4-200 的三次评测 | M0、M3 SEL/PB 完成；M4-200 SEL 进行中；其余以实时 STATUS/RESULTS 为准，CSV 在最终 collect 后更新 |
 | §13 统计、机制与资源 | OFFLINE_METRIC_RECOMPUTATION.json 实际 CPU 复算两个锁定 CAL 端点及 M0/M3 SEL/PB repeat0 共 56 份状态，全部指标及分别按 reference 重新池化均精确一致；原 run_campaign 后续包含 bootstrap 和 P5 | 尚未覆盖 M4 SEL/PB、其他 repeat 的独立复算与最终打包档案；继续等待真实 bootstrap/P5，并检查 NA、少场景边界、置换上下文及分母 |
 | §17 模型与充分状态 | MODEL_PAYLOAD_REVIEW 已实际 CPU 读取六个选定 delta 与两个最终 resume，共 3724164 字节；身份、张量范围及候选/对照 optimizer/scheduler/RNG/400 步边界正确，无禁传字符串匹配；DEPENDENCY_ACQUISITION 核对 BASE 父 LFS 指针、106906589 字节父实体及 taxonomy；DEPLOYMENT_PROTOCOL 明确 V4 构造/前向上下文 | 原 summarize 尚待打包；须核对公开副本和真实部署前向。resume 保存最终 400 步边界，不冒充 CAL 最佳较早选点的 optimizer。部署文档两段 Python 仅 AST 检查，不冒充实际回载 |
 | §17–19 报告与最终内容审核 | PRIMARY_IMPLEMENTATION_REVIEW.json 已记录主代理对十二问的源码和既有证据审阅，重新校验训练 14 个及推理 18 个源码身份 | 尚非最终 PROMPT_AUDIT；确认、统计、P5、全部交付文件及真实远端字节仍待核对；四种状态分开；不得自动宣布 CVPR 就绪 |
@@ -41,3 +41,5 @@ A separate cProfile observation of the original M3 PB T5 pool reproduced all six
 2026-10-16 05:04 UTC：新增独立 CPU 统计模块及可选恢复入口；主代理核对原控制器与 V4 上下文的函数绑定顺序，限定加速仅在原 bootstrap 内生效。CPU_STATISTICS_ACCELERATION_VERIFICATION.json 记录 56 份总体状态及 reference 池化指标与原实现完全一致、220 条实际 PR 曲线逐元素精确一致，CUDA 未初始化。相同实际曲线参数的原循环耗时 26.086 秒、批处理 0.121 秒；这只是 PR 曲线局部计时，不是完整 bootstrap 加速比。新增入口及发布范围共 23 项测试通过；发布清单纳入两个新模块。未更改原训练/推理冻结源码、抽样规则、费用或锁，未启动新 GPU 作业，完整加速 bootstrap 与正式控制器接管均尚未执行。
 
 2026-10-16 05:15 UTC：M3-400 PB r1 已真实完成并结算，516 个不同输入、1806 个阶段、T2–T5 各 129 个输入。SPARSE_PB_M3_VERIFICATION.json 核对前两次的指标、结构、原始预测指纹和 identity 诊断完全一致，并逐份检查 16 份总体及 96 份 reference 官方状态实体哈希；两个重复的对应状态字节相同。r1 实际费用 1.2452366792674971 GPUh，仅结算一次；公开账本与原账本 219 个唯一事件一致，新增实际累计 39.86007039847009 GPUh。本轮已完成正式评测 86 个；原控制器自动启动 PB r2（PID 3188365），STATUS 快照为 16/516，无错误，Luna 已续接只读监控。第三次 PB、M4 确认、bootstrap、P5、最终交付核对和真实发布仍待完成；CAL 复验门槛失败的科学判断保持原结论。
+
+2026-10-16（M3 PB 三重复完成核查）：SPARSE_PB_M3_VERIFICATION.json 已扩展至全部三次独立进程，各 516 个不同输入、1806 个阶段；指标行、结构、原始预测指纹及 identity 诊断完全一致，24 份总体与 144 份 reference 官方状态实体哈希均已核对，对应状态字节完全相同。PB 的 S_long=0.06817758455872536，S_current=0.3445773224035899，单位 0–1，三次观察范围均为 0pp；有限重复一致不证明全局确定性。r2 实际费用 1.2620550535186097 GPUh，仅结算一次。公开/原账本 220 个唯一事件一致，新增实际累计 41.1221254519887 GPUh，含历史累计 1755.9361868676594 GPUh；原 RUN_LOCK、CAL 选点/快照及 V4 政策哈希保持原锁。本轮正式评测完成 87 个，原控制器自动进入 M4-200 SEL r0（PID 3228149），主代理写入快照时为 45/111、无错误，Luna 已续接 M4 的六个锁定确认任务。M4 确认、完整 bootstrap、P5、打包与最终核对/真实发布仍待完成；CPU 加速入口尚未接管控制器，科学门槛保持原负结果。
