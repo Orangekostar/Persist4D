@@ -1,0 +1,13 @@
+{
+  "error": "'NoneType' object is not subscriptable",
+  "error_type": "TypeError",
+  "failure_event_id": "ogr:I_INTEGRATION_REPAIR:e704029da7e847bb94fd5a7e6adc9029",
+  "fixed_file": "models/observation_grounded_loss.py",
+  "fixed_sha256": "4cd612b44493c7064b5718455e5249c7f5ed81abbeaa8e82f6661e4109170579",
+  "previous_evidence_preserved": true,
+  "reproducer": "tests/test_ogr_learning.py::test_constrained_assignment_forces_target_once_and_removes_duplicate_from_all_losses",
+  "retry_limit": 1,
+  "root_cause": "Frozen E1 disables change head; pred_changes key contains None. Reduced matcher sliced it as a tensor.",
+  "status": "SPECIFIC_REPAIR_TESTED",
+  "verification": "16 focused tests passed after the reproducer failed with the identical traceback"
+}

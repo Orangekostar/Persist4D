@@ -1,0 +1,98 @@
+[
+  {
+    "completed_inputs": 6,
+    "last_input_id": "CAL:9d8eea9123412f6f8a1ff014",
+    "path": "timing/FH-COMMIT0-s246-u000000/CAL/STATUS.json",
+    "request": {
+      "adapter_seed": 246,
+      "event_id": "ogr:I_INTEGRATION_REPAIR:faef8ee99dac4a5ab38f5585ff37851b",
+      "input_ids": [
+        "CAL:000b4a0c7ee7c04e80289e8b",
+        "CAL:27b53d9f264fd0f0cb66b66d",
+        "CAL:2e2aceb44fbcbc27fa853a75",
+        "CAL:6d64bb23f81a2f8a36c0e9ff",
+        "CAL:79ff3cb8b93e7d9a1a42f4d2",
+        "CAL:9d8eea9123412f6f8a1ff014"
+      ],
+      "role": "CAL",
+      "step": 0,
+      "timing_only": true,
+      "variant": "FH-COMMIT0"
+    },
+    "startup_seconds": 15.58452457099338,
+    "status": "COMPLETE",
+    "updated_unix": 1792340023.0828688
+  },
+  {
+    "completed_inputs": 6,
+    "last_input_id": "native-long-formal-v1:0e7c4e64e4f15f0078940408fc665b7071dc6218defa45fecb0f1ae601c318ab",
+    "path": "timing/FH-COMMIT0-s246-u000000/PB/STATUS.json",
+    "request": {
+      "adapter_seed": 246,
+      "event_id": "ogr:I_INTEGRATION_REPAIR:425e2689006c423f8a15330cea5c42ab",
+      "input_ids": [
+        "native-long-formal-v1:000b365d1a05e646fe576084655a429b00a77f9828d8bf7e5f0725fbf0de5eb4",
+        "native-long-formal-v1:005d7d441d20978ff68997848e5160e2753e9a7abf69a5ce047fada3a36bac96",
+        "native-long-formal-v1:00b30cdb026705a192862461d85765dea53767c3c98232565d985a94862a526f",
+        "native-long-formal-v1:067c02acd74d25cd99e27bf82d9e7153bfca596d57e719ce7db089ac08fb3681",
+        "native-long-formal-v1:09faf407b07eab2def55caf2832a85d909fc7ee746ba9979c65a7646d0ce1c1e",
+        "native-long-formal-v1:0e7c4e64e4f15f0078940408fc665b7071dc6218defa45fecb0f1ae601c318ab"
+      ],
+      "role": "PB",
+      "step": 0,
+      "timing_only": true,
+      "variant": "FH-COMMIT0"
+    },
+    "startup_seconds": 14.575431656005094,
+    "status": "COMPLETE",
+    "updated_unix": 1792340020.1837223
+  },
+  {
+    "completed_inputs": 6,
+    "last_input_id": "CAL:9d8eea9123412f6f8a1ff014",
+    "path": "timing/R-OBS-s246-u000000/CAL/STATUS.json",
+    "request": {
+      "adapter_seed": 246,
+      "event_id": "ogr:I_INTEGRATION_REPAIR:9807d3056a0c40a892ae6638c412af51",
+      "input_ids": [
+        "CAL:000b4a0c7ee7c04e80289e8b",
+        "CAL:27b53d9f264fd0f0cb66b66d",
+        "CAL:2e2aceb44fbcbc27fa853a75",
+        "CAL:6d64bb23f81a2f8a36c0e9ff",
+        "CAL:79ff3cb8b93e7d9a1a42f4d2",
+        "CAL:9d8eea9123412f6f8a1ff014"
+      ],
+      "role": "CAL",
+      "step": 0,
+      "timing_only": true,
+      "variant": "R-OBS"
+    },
+    "startup_seconds": 15.915350295006647,
+    "status": "COMPLETE",
+    "updated_unix": 1792339977.687821
+  },
+  {
+    "completed_inputs": 6,
+    "last_input_id": "native-long-formal-v1:0e7c4e64e4f15f0078940408fc665b7071dc6218defa45fecb0f1ae601c318ab",
+    "path": "timing/R-OBS-s246-u000000/PB/STATUS.json",
+    "request": {
+      "adapter_seed": 246,
+      "event_id": "ogr:I_INTEGRATION_REPAIR:fe754af817fb410db30d6b3fad7fc047",
+      "input_ids": [
+        "native-long-formal-v1:000b365d1a05e646fe576084655a429b00a77f9828d8bf7e5f0725fbf0de5eb4",
+        "native-long-formal-v1:005d7d441d20978ff68997848e5160e2753e9a7abf69a5ce047fada3a36bac96",
+        "native-long-formal-v1:00b30cdb026705a192862461d85765dea53767c3c98232565d985a94862a526f",
+        "native-long-formal-v1:067c02acd74d25cd99e27bf82d9e7153bfca596d57e719ce7db089ac08fb3681",
+        "native-long-formal-v1:09faf407b07eab2def55caf2832a85d909fc7ee746ba9979c65a7646d0ce1c1e",
+        "native-long-formal-v1:0e7c4e64e4f15f0078940408fc665b7071dc6218defa45fecb0f1ae601c318ab"
+      ],
+      "role": "PB",
+      "step": 0,
+      "timing_only": true,
+      "variant": "R-OBS"
+    },
+    "startup_seconds": 15.818945335005992,
+    "status": "COMPLETE",
+    "updated_unix": 1792339975.477634
+  }
+]

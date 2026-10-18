@@ -1,0 +1,150 @@
+{
+  "comparisons": [
+    {
+      "AP_range_pp": {
+        "3": 0.0,
+        "4": 0.0
+      },
+      "accepted": true,
+      "actual_tensor_differences": [
+        {
+          "input_id": "CAL:000b4a0c7ee7c04e80289e8b",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 0
+        },
+        {
+          "input_id": "CAL:000b4a0c7ee7c04e80289e8b",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 1
+        },
+        {
+          "input_id": "CAL:000b4a0c7ee7c04e80289e8b",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 2
+        },
+        {
+          "input_id": "CAL:27b53d9f264fd0f0cb66b66d",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 0
+        },
+        {
+          "input_id": "CAL:27b53d9f264fd0f0cb66b66d",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 1
+        },
+        {
+          "input_id": "CAL:27b53d9f264fd0f0cb66b66d",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 2
+        },
+        {
+          "input_id": "CAL:2e2aceb44fbcbc27fa853a75",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 0
+        },
+        {
+          "input_id": "CAL:2e2aceb44fbcbc27fa853a75",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 1
+        },
+        {
+          "input_id": "CAL:2e2aceb44fbcbc27fa853a75",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 2
+        },
+        {
+          "input_id": "CAL:356b877b1e1fa6cceb155500",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 0
+        },
+        {
+          "input_id": "CAL:356b877b1e1fa6cceb155500",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 1
+        },
+        {
+          "input_id": "CAL:356b877b1e1fa6cceb155500",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 2
+        },
+        {
+          "input_id": "CAL:356b877b1e1fa6cceb155500",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 3
+        },
+        {
+          "input_id": "CAL:3cb1f14f71bd0b9ae9d83e83",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 0
+        },
+        {
+          "input_id": "CAL:3cb1f14f71bd0b9ae9d83e83",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 1
+        },
+        {
+          "input_id": "CAL:3cb1f14f71bd0b9ae9d83e83",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 2
+        },
+        {
+          "input_id": "CAL:3cb1f14f71bd0b9ae9d83e83",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 3
+        },
+        {
+          "input_id": "CAL:3cd7fe0a7fb3ead0ab09dde3",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 0
+        },
+        {
+          "input_id": "CAL:3cd7fe0a7fb3ead0ab09dde3",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 1
+        },
+        {
+          "input_id": "CAL:3cd7fe0a7fb3ead0ab09dde3",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 2
+        },
+        {
+          "input_id": "CAL:3cd7fe0a7fb3ead0ab09dde3",
+          "logits_max_abs": 0.0,
+          "mask_logits_max_abs": 0.0,
+          "stage": 3
+        }
+      ],
+      "discrete_equal": true,
+      "method": "R-OBS",
+      "tensor_difference_scope": "actual class and segment-mask logit maximum absolute differences on the fixed panel",
+      "tensor_summary_differences": 0
+    }
+  ],
+  "final": false,
+  "full_global_determinism_claim": false,
+  "process_bindings": [
+    "f48cc0817ecb07da01e673125665ec93a6ada5ed27610a6a0dff36a9756fc999",
+    "09f8c8ce240e4f355643ac9928c08ef4b956a9a0d9523f1487bdd4964c0dd1f2"
+  ],
+  "status": "FINITE_PANEL_WITHIN_LIMIT"
+}

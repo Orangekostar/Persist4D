@@ -1,0 +1,7 @@
+variant,adapter_seed,status,logged_rows,excluded_rows,unique_updates,stage_rows,selected_slots_total,stages_with_selected_slots,aux_absent_history,aux_ambiguous_history,aux_negative,aux_no_valid_positive_segment,aux_positive,aux_retrieval_rows,aux_unknown,aux_unknown_history,birth_accepted_births,birth_ambiguous_gt_excluded,birth_bound_births,birth_unmatched_births,retrieval_aux_enabled,support_aux_enabled
+M1,146,OPTIMIZER_BOUNDARY_COMPLETE,400,0,400,5600,45770,3990,0,0,0,0,0,0,0,0,22423,7028,12031,10392,false,false
+M2,146,OPTIMIZER_BOUNDARY_COMPLETE,400,0,400,5600,45766,3990,0,0,0,0,0,0,0,0,22352,7028,11987,10365,false,false
+M3,146,OPTIMIZER_BOUNDARY_COMPLETE,400,0,400,5600,45805,3990,0,0,0,0,0,0,0,0,22321,7028,11934,10387,false,false
+M4,146,OPTIMIZER_BOUNDARY_COMPLETE,400,0,400,5600,45746,3990,0,0,0,0,0,0,0,0,22369,7028,11965,10404,false,false
+M5,146,OPTIMIZER_BOUNDARY_COMPLETE,400,0,400,5600,45796,3990,2849,0,0,1,0,22637,0,20309,22373,7028,11983,10390,true,false
+M6,146,OPTIMIZER_BOUNDARY_COMPLETE,400,0,400,5600,45680,3990,2801,0,6085,1,13702,22510,25893,20368,22157,7028,11899,10258,true,true

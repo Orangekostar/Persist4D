@@ -1,0 +1,36 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "-m",
+        "scripts.ogr_campaign",
+        "finalize",
+        "--config",
+        "conf/observation_grounded_v1/default.yaml"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "CODE": "IMPLEMENTED_FOCUSED_VALIDATION",
+        "EXPERIMENT": "BUDGET_BLOCKED",
+        "SCIENCE": "NOT_TESTED",
+        "formal_N": null
+      }
+    },
+    {
+      "argv": [
+        "python",
+        "artifacts/observation_grounded_v1/figures/render_ogr_figures.py",
+        "--run-root",
+        "<private_run_root>"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "anchor_denominator": 67,
+        "figures": 6,
+        "target_denominator": 165
+      }
+    }
+  ],
+  "scope": "Latest directly observed finalize/render calls. Historical child argv not recorded is not invented; see COMMANDS_EXECUTED and VALIDATION."
+}

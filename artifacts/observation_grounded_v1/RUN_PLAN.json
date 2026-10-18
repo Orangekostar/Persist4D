@@ -1,0 +1,347 @@
+{
+  "CAL_scores_read_before_lock": false,
+  "N": null,
+  "adapter_seeds": [
+    246,
+    247
+  ],
+  "blocked_development_source_reconciliations": [
+    {
+      "N_unchanged": true,
+      "changes": {
+        "scripts/ogr_assets.py": {
+          "after": "d76a06e15ce91e50c0dd3e8fe6be90ee35e8affbe210426a9e9140b0238ed90e",
+          "before": "14ed8b3763a12af99bec9a624bab334a6e0fcee865f8b631a22e5c997c3d811d"
+        },
+        "scripts/ogr_campaign.py": {
+          "after": "3c00eee02f2256f04cd00fa2edff769b06718eeb177ff7ac72b3029eb5b9a8a0",
+          "before": "c1b9ae5cb0a70a662c92563edfc3b04f2f275fc57a8149a57c8406d20c61bb5b"
+        },
+        "scripts/ogr_delivery.py": {
+          "after": "2676073a9ab6dcd70a1e02eb33bda1385d4fe1d94f7c5bdc441078981b4435ce",
+          "before": "b802aee1e9499edaa93f7b0f0ebeb373a7acf094da793943a754b6e514d2192e"
+        },
+        "scripts/ogr_diagnostics.py": {
+          "after": "883d44abc0ab749d7e794120c600df0714d3d35516ee5b7df55975d35ff57301",
+          "before": "2806a00713abdb8098946c8cf024c26809a4e57763fd760fe0d5bbc71c07ab42"
+        },
+        "scripts/ogr_selection.py": {
+          "after": "11e70064f492f7d6eb270442dc3694eb489056116f43983c9a0dde8496c8734a",
+          "before": "249ba3fbc5d940419b3b297076e3c0c66923fe7ddefad4df700c81a5135e4ba7"
+        }
+      },
+      "decision_inputs_unchanged": true,
+      "forecast_unchanged": true,
+      "lambda_unchanged": true,
+      "reason": "Nonformal evidence validation, CSV line endings and delivery fixes after the infeasible decision; no formal trajectory exists"
+    },
+    {
+      "N_unchanged": true,
+      "changes": {
+        "scripts/ogr_delivery.py": {
+          "after": "3a4834a09a851053d8590fe1ce7daa44cd9050c87f3137358c1063683019e656",
+          "before": "2676073a9ab6dcd70a1e02eb33bda1385d4fe1d94f7c5bdc441078981b4435ce"
+        },
+        "scripts/ogr_diagnostics.py": {
+          "after": "e9ecd09c3ab147991d51d48443d9f5ecd64be73bf9e68ee4d75bbbfb6a485ac3",
+          "before": "883d44abc0ab749d7e794120c600df0714d3d35516ee5b7df55975d35ff57301"
+        },
+        "scripts/ogr_selection.py": {
+          "after": "edfcab9acad7c85c4b4776d37dceb57924aef12f9293be48f436fa965f663bc9",
+          "before": "11e70064f492f7d6eb270442dc3694eb489056116f43983c9a0dde8496c8734a"
+        }
+      },
+      "decision_inputs_unchanged": true,
+      "forecast_unchanged": true,
+      "lambda_unchanged": true,
+      "reason": "Primary review: publication tag/receipt correction; unexecuted formal numeric gates, shared-state verification and diagnostic export completion. No formal trajectory exists and model/data/trainer numerical sources are unchanged."
+    }
+  ],
+  "blocked_reasons": [
+    "evaluation forecast exceeds the fixed 12 GPUh phase cap"
+  ],
+  "budget_at_lock": {
+    "active_jobs": [],
+    "active_reserved_gpu_hours": 0,
+    "event_count": 12,
+    "identity": {
+      "external_reserved_gpu_hours": 0.0,
+      "lifetime_cap_gpu_hours": 1823.0,
+      "phase_caps_gpu_hours": {
+        "D_DIAGNOSTIC": 2.0,
+        "E_EVALUATION": 12.0,
+        "F_PROFILE_CONFIRM": 4.0,
+        "I_INTEGRATION_REPAIR": 4.0,
+        "T_FIRST": 16.0,
+        "T_REPLICATION": 12.0
+      },
+      "prior_gpu_hours": 1760.6677541187637,
+      "reserve_gpu_hours": 8.0,
+      "run_cap_gpu_hours": 50.0
+    },
+    "initial_available_gpu_hours": 50.0,
+    "remaining_gpu_hours": 49.45464718232584,
+    "schema": 1,
+    "spent_gpu_hours": 0.5453528176741586
+  },
+  "checkpoint_steps": [],
+  "data_manifest_sha256": "af93216660efac6c956da799337e4364d44137beaa68764966462d6fd0b23044",
+  "draws": {},
+  "evaluation_forecast": {
+    "factor": 1.5,
+    "gpu_hours": 20.907032512731963,
+    "jobs": 44,
+    "limitation": "SEL uses slower CAL/PB timing; FH T3 timing is scaled for T5 prefix point growth; no AP was read",
+    "measured_costs": {
+      "FH-COMMIT0:CAL": {
+        "p90_stage_seconds": 2.2331874384966794,
+        "prefix_forecast_factor": 1.6666666666666667,
+        "stage_seconds": 3.7219790641611326,
+        "startup_seconds": 15.58452457099338
+      },
+      "FH-COMMIT0:PB": {
+        "p90_stage_seconds": 2.1383845982913043,
+        "prefix_forecast_factor": 1.6666666666666667,
+        "stage_seconds": 3.5639743304855074,
+        "startup_seconds": 14.575431656005094
+      },
+      "R-OBS:CAL": {
+        "p90_stage_seconds": 2.0848622352932584,
+        "prefix_forecast_factor": 1.0,
+        "stage_seconds": 2.0848622352932584,
+        "startup_seconds": 15.915350295006647
+      },
+      "R-OBS:PB": {
+        "p90_stage_seconds": 1.8460685163008748,
+        "prefix_forecast_factor": 1.0,
+        "stage_seconds": 1.8460685163008748,
+        "startup_seconds": 15.818945335005992
+      }
+    },
+    "method_role_gpu_hours": {
+      "FH-COMMIT0:CAL": 0.3120060000878069,
+      "FH-COMMIT0:PB": 2.6879637802136798,
+      "FH-COMMIT0:SEL": 0.43917361811331224,
+      "R-OBS:CAL": 0.17776383776990776,
+      "R-OBS:PB": 1.3957577857393275,
+      "R-OBS:SEL": 0.24899663080909407
+    },
+    "stage_count": 23887,
+    "timing_evidence": [
+      {
+        "input_ids": [
+          "CAL:000b4a0c7ee7c04e80289e8b",
+          "CAL:27b53d9f264fd0f0cb66b66d",
+          "CAL:2e2aceb44fbcbc27fa853a75",
+          "CAL:6d64bb23f81a2f8a36c0e9ff",
+          "CAL:79ff3cb8b93e7d9a1a42f4d2",
+          "CAL:9d8eea9123412f6f8a1ff014"
+        ],
+        "method": "R-OBS",
+        "path": "timing/R-OBS-s246-u000000/CAL/RESULTS.json",
+        "role": "CAL",
+        "sha256": "bd6e3f8adb78b31df762471038ffa9fd67a835dea122f517df6921a993d513ee"
+      },
+      {
+        "input_ids": [
+          "native-long-formal-v1:000b365d1a05e646fe576084655a429b00a77f9828d8bf7e5f0725fbf0de5eb4",
+          "native-long-formal-v1:005d7d441d20978ff68997848e5160e2753e9a7abf69a5ce047fada3a36bac96",
+          "native-long-formal-v1:00b30cdb026705a192862461d85765dea53767c3c98232565d985a94862a526f",
+          "native-long-formal-v1:067c02acd74d25cd99e27bf82d9e7153bfca596d57e719ce7db089ac08fb3681",
+          "native-long-formal-v1:09faf407b07eab2def55caf2832a85d909fc7ee746ba9979c65a7646d0ce1c1e",
+          "native-long-formal-v1:0e7c4e64e4f15f0078940408fc665b7071dc6218defa45fecb0f1ae601c318ab"
+        ],
+        "method": "R-OBS",
+        "path": "timing/R-OBS-s246-u000000/PB/RESULTS.json",
+        "role": "PB",
+        "sha256": "db66e30526c79e09e06c721a8a86c4b768a32f68a706de884e99e5f800066cbe"
+      },
+      {
+        "input_ids": [
+          "CAL:000b4a0c7ee7c04e80289e8b",
+          "CAL:27b53d9f264fd0f0cb66b66d",
+          "CAL:2e2aceb44fbcbc27fa853a75",
+          "CAL:6d64bb23f81a2f8a36c0e9ff",
+          "CAL:79ff3cb8b93e7d9a1a42f4d2",
+          "CAL:9d8eea9123412f6f8a1ff014"
+        ],
+        "method": "FH-COMMIT0",
+        "path": "timing/FH-COMMIT0-s246-u000000/CAL/RESULTS.json",
+        "role": "CAL",
+        "sha256": "5ab731b58dd680e6df87cf90778c7ba6e8183b83079a5373c3476e9ada8663f8"
+      },
+      {
+        "input_ids": [
+          "native-long-formal-v1:000b365d1a05e646fe576084655a429b00a77f9828d8bf7e5f0725fbf0de5eb4",
+          "native-long-formal-v1:005d7d441d20978ff68997848e5160e2753e9a7abf69a5ce047fada3a36bac96",
+          "native-long-formal-v1:00b30cdb026705a192862461d85765dea53767c3c98232565d985a94862a526f",
+          "native-long-formal-v1:067c02acd74d25cd99e27bf82d9e7153bfca596d57e719ce7db089ac08fb3681",
+          "native-long-formal-v1:09faf407b07eab2def55caf2832a85d909fc7ee746ba9979c65a7646d0ce1c1e",
+          "native-long-formal-v1:0e7c4e64e4f15f0078940408fc665b7071dc6218defa45fecb0f1ae601c318ab"
+        ],
+        "method": "FH-COMMIT0",
+        "path": "timing/FH-COMMIT0-s246-u000000/PB/RESULTS.json",
+        "role": "PB",
+        "sha256": "683f4bc2884e4ee19d269b7ff63638adf02bfac38fd0483ebcb6b0154fce06df"
+      }
+    ]
+  },
+  "experiment_status": "BUDGET_BLOCKED",
+  "lambda_calibration": {
+    "evidence_sha256": "f738a6d7ff11ffd5d8d996e0666cc49e2229d94ad913fc8cadc8682865c35532",
+    "identity_median": 1.6788811683654785,
+    "lambda_id": 0.3,
+    "status": "CALIBRATED_TRAIN_ONLY",
+    "task_median": 131.7167739868164,
+    "updates": [
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "valid_stage_pairs": 80
+  },
+  "lambda_id": 0.3,
+  "measured_training_costs": {
+    "R-ID": {
+      "p90_update_seconds": 19.92982644750009,
+      "startup_seconds": 17.758630529002403
+    },
+    "R-OBS": {
+      "p90_update_seconds": 19.317433667500154,
+      "startup_seconds": 16.815438866004115
+    },
+    "R-QFB": {
+      "p90_update_seconds": 18.638236233004136,
+      "startup_seconds": 16.505197113001486
+    },
+    "R-TARGET": {
+      "p90_update_seconds": 18.130193501005124,
+      "startup_seconds": 16.65942512800393
+    }
+  },
+  "nontraining_forecast_gpu_hours": 30.907032512731963,
+  "numeric_sources": {
+    "conf/observation_grounded_v1/default.yaml": "63de2ff22ed1bacbfd8fa9afd96f22a7b3e32831dd2be2f90dfd741cf0d0afef",
+    "datasets/observation_grounded_episode.py": "5a4bcb59123da14f36f4ae08513906749439cc8f45c0247594396d341cb6a037",
+    "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
+    "models/criterion.py": "b61bbc4a712db297f094080ffb1f4346d23651bab7e3a8622731f0a4b34b2820",
+    "models/matcher.py": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc",
+    "models/observation_evidence_state.py": "c367c0149988408c9eeebaf50c387eb37eb6b30cf55f88e83d5957e88e5c033c",
+    "models/observation_grounded.py": "3cb13bbe88ddab5b8d55a388e416d89eb67be14a6dec48ef6b87e74cf9d95a62",
+    "models/observation_grounded_loss.py": "4cd612b44493c7064b5718455e5249c7f5ed81abbeaa8e82f6661e4109170579",
+    "models/observation_grounded_modules.py": "87ad8be73c5da662260daa5e08460884d172ca15d902c1cc45dcc355d7c7229b",
+    "models/rescene.py": "cb8008610dd248f4e9a80de924d6883e4ca0d41dda16801e9e1621ebe54def9b",
+    "models/revisit_prompt.py": "e8eb01f17f1c21caadf85db0b0820d7351043e913ccccc975dc590d1c6ac75ee",
+    "models/revisit_prompt_centroid_numerics.py": "e3a9fce4c699920d2ab1831eb14c6374d3ec28294219f5cc73fd9cc445ebb4f5",
+    "models/revisit_prompt_loss.py": "ea0aa0b36131e235a3f10a647852a7103e24d03391256aa6347b129983c762e6",
+    "models/revisit_prompt_modules.py": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
+    "models/revisit_prompt_native_numerics.py": "870a984a1e730e5e8557660a0f24576bfb692c3bbe8ea31ab7c8a541736c84ba",
+    "models/revisit_prompt_numerics.py": "6351af7ff038c0dd8b311474974d29cdbacb96c0409155056877f686940b1e55",
+    "models/revisit_prompt_sparse_reference.py": "f964d3243cc9bac212c606176f0fcd49c1fe3dc4e7a00ffc30a7664a155fc20c",
+    "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
+    "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+    "models/task_memory_state.py": "5d15a88775d8f6d2f6ce564a3844876690db034783674bd9687063fe12af4f0d",
+    "scripts/ogr_assets.py": "d76a06e15ce91e50c0dd3e8fe6be90ee35e8affbe210426a9e9140b0238ed90e",
+    "scripts/ogr_campaign.py": "3c00eee02f2256f04cd00fa2edff769b06718eeb177ff7ac72b3029eb5b9a8a0",
+    "scripts/ogr_delivery.py": "3a4834a09a851053d8590fe1ce7daa44cd9050c87f3137358c1063683019e656",
+    "scripts/ogr_diagnostics.py": "e9ecd09c3ab147991d51d48443d9f5ecd64be73bf9e68ee4d75bbbfb6a485ac3",
+    "scripts/ogr_evaluation.py": "c2aa3f1aae6c5eaa7899f40a86e78443ed3e9e234c0986453fa9a56795732535",
+    "scripts/ogr_policy.py": "8dd13d10a602b796186fd7d725d8426a76c324d75725cfdf15c714e352b91a8f",
+    "scripts/ogr_runtime.py": "ff63e43504718db02fdf8e7b9e8ec9d238ff535526b194eb2f5b3fba79931b3f",
+    "scripts/ogr_selection.py": "edfcab9acad7c85c4b4776d37dceb57924aef12f9293be48f436fa965f663bc9",
+    "scripts/ogr_statistics.py": "bdf0a72fbb3fc45dc9a279c8d82df353860803f75e8ab4863d5e778444605758",
+    "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
+    "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
+    "trainer/observation_grounded_trainer.py": "5d1d06d8be386571ce01c18c93b1ee773fa6a4819ddc1df8a883501c226c85ac",
+    "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d",
+    "trainer/task_memory_trainer.py": "49c8326ea3001a25475ad8c14044dfcae9592f8cf932f6800b2b160cc072ccbb"
+  },
+  "parent_seed": 45,
+  "parent_sha256": "8c9d0d57044ce23c7964ddb1e7a2d8bd18e388e6ee657a7f4b02b1368b5b3a98",
+  "probe_evidence": [
+    {
+      "nontraining_probe": true,
+      "path": "probe/R-TARGET-s246/STATUS.json",
+      "sha256": "a943124e4f620cdcb7a80b67a45161d213dea8dfc62b2fa984c7c0f02dbf829c",
+      "source_change_scope": "source permutation diagnostic and provenance only; inactive in probes",
+      "source_changes": [
+        "models/observation_grounded.py"
+      ],
+      "variant": "R-TARGET"
+    },
+    {
+      "nontraining_probe": true,
+      "path": "probe/R-ID-s246/STATUS.json",
+      "sha256": "ac0bd9724e3e29cfef536174d988e1052be77029c410dec41a97e86cf8391a8f",
+      "source_change_scope": "source permutation diagnostic and provenance only; inactive in probes",
+      "source_changes": [
+        "models/observation_grounded.py"
+      ],
+      "variant": "R-ID"
+    },
+    {
+      "nontraining_probe": true,
+      "path": "probe/R-QFB-s246/STATUS.json",
+      "sha256": "f049a2621407c2e422678900a7b7f8e42ede033d7511c391faf9c10578ba1cbe",
+      "source_change_scope": "source permutation diagnostic and provenance only; inactive in probes",
+      "source_changes": [
+        "models/observation_grounded.py"
+      ],
+      "variant": "R-QFB"
+    },
+    {
+      "nontraining_probe": true,
+      "path": "probe/R-OBS-s246/STATUS.json",
+      "sha256": "6e68e98cb4975064f5064bf1981e58927cfb937a7ba60f234725acd77a37ba5a",
+      "source_change_scope": "source permutation diagnostic and provenance only; inactive in probes",
+      "source_changes": [
+        "models/observation_grounded.py"
+      ],
+      "variant": "R-OBS"
+    }
+  ],
+  "projections": {
+    "1200": {
+      "by_variant": {
+        "R-ID": 8.310260544280942,
+        "R-OBS": 8.054769388842427,
+        "R-QFB": 7.771662734971516,
+        "R-TARGET": 7.560031814699358
+      },
+      "first": 31.69672448279424,
+      "replication": 16.365029933123367
+    },
+    "400": {
+      "by_variant": {
+        "R-ID": 2.7741976421975827,
+        "R-OBS": 2.688815592314606,
+        "R-QFB": 2.5943748924703667,
+        "R-TARGET": 2.5238669533090463
+      },
+      "first": 10.581255080291601,
+      "replication": 5.463013234512189
+    },
+    "800": {
+      "by_variant": {
+        "R-ID": 5.542229093239262,
+        "R-OBS": 5.371792490578517,
+        "R-QFB": 5.183018813720941,
+        "R-TARGET": 5.0419493840042025
+      },
+      "first": 21.138989781542925,
+      "replication": 10.914021583817778
+    }
+  },
+  "remaining_nontraining_caps_included_once": {
+    "D": 2.0,
+    "F": 4.0,
+    "I": 4.0
+  },
+  "schema": 1,
+  "status": "NO_FEASIBLE_COMMON_N"
+}

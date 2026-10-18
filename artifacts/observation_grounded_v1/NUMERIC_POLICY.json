@@ -1,0 +1,201 @@
+{
+  "TF32": false,
+  "backbone_ordered_subm": true,
+  "centroids": "stable_segment_centroids",
+  "dense_scatter": "stable_group_mean",
+  "final_endpoint_panel": {
+    "status": "NOT_RUN_NO_FORMAL_ENDPOINTS"
+  },
+  "frozen_backbone_only_no_grad": true,
+  "global_determinism_claim": false,
+  "inherited_internal_attention": "Concerto FP16 FlashAttention where required",
+  "new_path_panel": {
+    "comparisons": [
+      {
+        "AP_range_pp": {
+          "3": 0.0,
+          "4": 0.0
+        },
+        "accepted": true,
+        "actual_tensor_differences": [
+          {
+            "input_id": "CAL:000b4a0c7ee7c04e80289e8b",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 0
+          },
+          {
+            "input_id": "CAL:000b4a0c7ee7c04e80289e8b",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 1
+          },
+          {
+            "input_id": "CAL:000b4a0c7ee7c04e80289e8b",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 2
+          },
+          {
+            "input_id": "CAL:27b53d9f264fd0f0cb66b66d",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 0
+          },
+          {
+            "input_id": "CAL:27b53d9f264fd0f0cb66b66d",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 1
+          },
+          {
+            "input_id": "CAL:27b53d9f264fd0f0cb66b66d",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 2
+          },
+          {
+            "input_id": "CAL:2e2aceb44fbcbc27fa853a75",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 0
+          },
+          {
+            "input_id": "CAL:2e2aceb44fbcbc27fa853a75",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 1
+          },
+          {
+            "input_id": "CAL:2e2aceb44fbcbc27fa853a75",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 2
+          },
+          {
+            "input_id": "CAL:356b877b1e1fa6cceb155500",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 0
+          },
+          {
+            "input_id": "CAL:356b877b1e1fa6cceb155500",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 1
+          },
+          {
+            "input_id": "CAL:356b877b1e1fa6cceb155500",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 2
+          },
+          {
+            "input_id": "CAL:356b877b1e1fa6cceb155500",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 3
+          },
+          {
+            "input_id": "CAL:3cb1f14f71bd0b9ae9d83e83",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 0
+          },
+          {
+            "input_id": "CAL:3cb1f14f71bd0b9ae9d83e83",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 1
+          },
+          {
+            "input_id": "CAL:3cb1f14f71bd0b9ae9d83e83",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 2
+          },
+          {
+            "input_id": "CAL:3cb1f14f71bd0b9ae9d83e83",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 3
+          },
+          {
+            "input_id": "CAL:3cd7fe0a7fb3ead0ab09dde3",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 0
+          },
+          {
+            "input_id": "CAL:3cd7fe0a7fb3ead0ab09dde3",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 1
+          },
+          {
+            "input_id": "CAL:3cd7fe0a7fb3ead0ab09dde3",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 2
+          },
+          {
+            "input_id": "CAL:3cd7fe0a7fb3ead0ab09dde3",
+            "logits_max_abs": 0.0,
+            "mask_logits_max_abs": 0.0,
+            "stage": 3
+          }
+        ],
+        "discrete_equal": true,
+        "method": "R-OBS",
+        "tensor_difference_scope": "actual class and segment-mask logit maximum absolute differences on the fixed panel",
+        "tensor_summary_differences": 0
+      }
+    ],
+    "final": false,
+    "full_global_determinism_claim": false,
+    "process_bindings": [
+      "f48cc0817ecb07da01e673125665ec93a6ada5ed27610a6a0dff36a9756fc999",
+      "09f8c8ce240e4f355643ac9928c08ef4b956a9a0d9523f1487bdd4964c0dd1f2"
+    ],
+    "status": "FINITE_PANEL_WITHIN_LIMIT"
+  },
+  "numeric_sources": {
+    "conf/observation_grounded_v1/default.yaml": "63de2ff22ed1bacbfd8fa9afd96f22a7b3e32831dd2be2f90dfd741cf0d0afef",
+    "datasets/observation_grounded_episode.py": "5a4bcb59123da14f36f4ae08513906749439cc8f45c0247594396d341cb6a037",
+    "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
+    "models/criterion.py": "b61bbc4a712db297f094080ffb1f4346d23651bab7e3a8622731f0a4b34b2820",
+    "models/matcher.py": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc",
+    "models/observation_evidence_state.py": "c367c0149988408c9eeebaf50c387eb37eb6b30cf55f88e83d5957e88e5c033c",
+    "models/observation_grounded.py": "3cb13bbe88ddab5b8d55a388e416d89eb67be14a6dec48ef6b87e74cf9d95a62",
+    "models/observation_grounded_loss.py": "4cd612b44493c7064b5718455e5249c7f5ed81abbeaa8e82f6661e4109170579",
+    "models/observation_grounded_modules.py": "87ad8be73c5da662260daa5e08460884d172ca15d902c1cc45dcc355d7c7229b",
+    "models/rescene.py": "cb8008610dd248f4e9a80de924d6883e4ca0d41dda16801e9e1621ebe54def9b",
+    "models/revisit_prompt.py": "e8eb01f17f1c21caadf85db0b0820d7351043e913ccccc975dc590d1c6ac75ee",
+    "models/revisit_prompt_centroid_numerics.py": "e3a9fce4c699920d2ab1831eb14c6374d3ec28294219f5cc73fd9cc445ebb4f5",
+    "models/revisit_prompt_loss.py": "ea0aa0b36131e235a3f10a647852a7103e24d03391256aa6347b129983c762e6",
+    "models/revisit_prompt_modules.py": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
+    "models/revisit_prompt_native_numerics.py": "870a984a1e730e5e8557660a0f24576bfb692c3bbe8ea31ab7c8a541736c84ba",
+    "models/revisit_prompt_numerics.py": "6351af7ff038c0dd8b311474974d29cdbacb96c0409155056877f686940b1e55",
+    "models/revisit_prompt_sparse_reference.py": "f964d3243cc9bac212c606176f0fcd49c1fe3dc4e7a00ffc30a7664a155fc20c",
+    "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
+    "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+    "models/task_memory_state.py": "5d15a88775d8f6d2f6ce564a3844876690db034783674bd9687063fe12af4f0d",
+    "scripts/ogr_assets.py": "d76a06e15ce91e50c0dd3e8fe6be90ee35e8affbe210426a9e9140b0238ed90e",
+    "scripts/ogr_campaign.py": "3c00eee02f2256f04cd00fa2edff769b06718eeb177ff7ac72b3029eb5b9a8a0",
+    "scripts/ogr_delivery.py": "3a4834a09a851053d8590fe1ce7daa44cd9050c87f3137358c1063683019e656",
+    "scripts/ogr_diagnostics.py": "e9ecd09c3ab147991d51d48443d9f5ecd64be73bf9e68ee4d75bbbfb6a485ac3",
+    "scripts/ogr_evaluation.py": "c2aa3f1aae6c5eaa7899f40a86e78443ed3e9e234c0986453fa9a56795732535",
+    "scripts/ogr_policy.py": "8dd13d10a602b796186fd7d725d8426a76c324d75725cfdf15c714e352b91a8f",
+    "scripts/ogr_runtime.py": "ff63e43504718db02fdf8e7b9e8ec9d238ff535526b194eb2f5b3fba79931b3f",
+    "scripts/ogr_selection.py": "edfcab9acad7c85c4b4776d37dceb57924aef12f9293be48f436fa965f663bc9",
+    "scripts/ogr_statistics.py": "bdf0a72fbb3fc45dc9a279c8d82df353860803f75e8ab4863d5e778444605758",
+    "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
+    "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
+    "trainer/observation_grounded_trainer.py": "5d1d06d8be386571ce01c18c93b1ee773fa6a4819ddc1df8a883501c226c85ac",
+    "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d",
+    "trainer/task_memory_trainer.py": "49c8326ea3001a25475ad8c14044dfcae9592f8cf932f6800b2b160cc072ccbb"
+  },
+  "policy_id": "ogr-frozen-backbone-v4-derived-v1",
+  "precision": "32-true",
+  "train_inference_mode": false
+}

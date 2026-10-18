@@ -1,0 +1,9 @@
+panel,metric,value,denominator,source,filter
+source_counts,all_rows,407,407,TARGET_FLOW.csv,all rows
+source_counts,reliable_current_rows,170,407,TARGET_FLOW.csv,history_binding=RELIABLE and current_target_evaluable=True
+source_counts,positive_rows,170,407,TARGET_FLOW.csv,positive_segment_count>0
+source_counts,canonical_rows,165,407,TARGET_FLOW.csv,canonical_entity_event=True
+source_counts,canonical_reliable_current_rows,165,407,TARGET_FLOW.csv,canonical_entity_event=True and history_binding=RELIABLE and current_target_evaluable=True
+target_evidence,raw_target_IoU,0.04009344720027663,165,TARGET_FLOW.csv,canonical_entity_event=True and history_binding=RELIABLE and current_target_evaluable=True; common finite rows
+target_evidence,raw_sameclass_best_IoU,0.830529940941117,165,TARGET_FLOW.csv,canonical_entity_event=True and history_binding=RELIABLE and current_target_evaluable=True; common finite rows
+target_evidence,published_target_IoU,0.011647512179895927,165,TARGET_FLOW.csv,canonical_entity_event=True and history_binding=RELIABLE and current_target_evaluable=True; common finite rows

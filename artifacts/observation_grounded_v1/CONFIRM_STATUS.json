@@ -1,0 +1,18 @@
+{
+  "core_experiments_may_continue": true,
+  "current_train_references": 361,
+  "dataset_scope": "EXPLICIT_ONLY_NO_PB_ALIAS",
+  "encoder_pretraining_non_exposure_claim": false,
+  "known_exposure_excluded": 424,
+  "metadata_references_checked": 478,
+  "metadata_sha256": "674a00f50f76b198b9de44efd86c390fea3da37ba8f12cf8ccd00045e265fa64",
+  "minimum_one_horizon": 3,
+  "minimum_references": 2,
+  "reason": "No candidate has complete verified non-exposure to parent task training and all known historical research roles",
+  "records": [],
+  "reference_count": 0,
+  "schema": 1,
+  "status": "UNAVAILABLE",
+  "unknown_exposure_references": 54,
+  "unknown_is_independent": false
+}

@@ -1,0 +1,213 @@
+schema: persist4d-ogr-execution-v1
+date: '2026-10-18'
+repository: Orangekostar/Persist4D
+base_commit: 758b5aa4bd2e9119ae5e05f725faa360c2120d88
+parent_source_commit: 6b1b779172afdeb51e2719a737cd05e7eeeca982
+branch: research/persist4d-ogr-v1-20261018
+tag: persist4d-ogr-v1-20261018-v1
+artifact_root: artifacts/observation_grounded_v1
+parent_bundle: artifacts/native_long_postselection_v1/deployment/E1-23760.pt
+parent_sha256: 8c9d0d57044ce23c7964ddb1e7a2d8bd18e388e6ee657a7f4b02b1368b5b3a98
+encoder_sha256: 845ec7dec97a5fabff8fadb5d9858ac6734347b612d1a4b574213419c139de07
+variants:
+- R-TARGET
+- R-ID
+- R-QFB
+- R-OBS
+baselines:
+- M0
+- M4-200
+- FH-COMMIT0
+budget:
+  historical_reference_gpu_hours: 1760.667754119
+  lifetime_cap_gpu_hours: 1823.0
+  reserve_gpu_hours: 8.0
+  new_cap_gpu_hours: 50.0
+  phase_caps_gpu_hours:
+    D_DIAGNOSTIC: 2.0
+    T_FIRST: 16.0
+    T_REPLICATION: 12.0
+    E_EVALUATION: 12.0
+    F_PROFILE_CONFIRM: 4.0
+    I_INTEGRATION_REPAIR: 4.0
+  max_parallel_jobs: 2
+  gpus_per_job: 1
+  training_cost_factor: 1.25
+  evaluation_cost_factor: 1.5
+  max_same_error_retries: 1
+seeds:
+  parent: 45
+  first_adapter: 246
+  replication_adapter: 247
+  evaluation: 9001
+  bootstrap: 9101
+data:
+  train_role: TRAIN
+  selection_role: CAL
+  historical_eval_roles:
+  - SEL
+  - PB
+  confirmation_role: CONFIRM
+  confirmation_default: UNAVAILABLE_UNTIL_EXPOSURE_VERIFIED
+  expected_inputs:
+    CAL:
+      1: 31
+      2: 19
+      3: 14
+      4: 14
+      5: 6
+    SEL:
+      1: 39
+      2: 21
+      3: 21
+      4: 15
+      5: 15
+    PB:
+      2: 129
+      3: 129
+      4: 129
+      5: 129
+  diagnostic_horizons:
+  - 3
+  - 4
+  - 5
+  diagnostic_inputs: 34
+  anchor_reference_max_prompts_per_input: 2
+  same_class_prompt_pairs_max_per_input: 1
+  confirmation_max_references: 8
+model:
+  num_queries: 100
+  capacity: 100
+  feature_dim: 128
+  max_prompt_slots: 32
+  recent_slots: 16
+  dormant_slots: 16
+  retrieval_neighbors: 32
+  retrieval_temperature: 0.1
+  freeze_parent: true
+  augmentation: false
+  tbptt_steps: 1
+  feedback_after: len(hlevels)-1
+  feedback_calls_per_nonempty_episode_stage: 1
+  feedback_hidden_dim: 128
+  feedback_input_dim: 384
+  identity_projection_dim: 128
+  identity_temperature: 0.1
+  identity_null_logit_initial: 0.0
+  identity_log_class_prior_weight: 0.25
+  identity_acceptance_probability: 0.5
+  identity_require_better_than_null: true
+  pool_mass_epsilon: 1.0e-06
+  pool_norm_epsilon: 1.0e-06
+  norm_affine: false
+  confidence_threshold: 0.5
+  mask_threshold: 0.5
+  minimum_mask_support: 1
+  association_class_weight: 0.25
+  association_threshold: 0.5
+  update_mode: confidence_ema
+  update_rate: 0.2
+  max_update_rate: 0.2
+  eviction: false
+  feedback_assignment_source: regional_evidence_for_both_R-QFB_and_R-OBS
+  feedback_value_source:
+    R-QFB: decoder_norm_query
+    R-OBS: current_region_pool
+  candidate_score_identity_scaling: false
+  trajectory_score_reducer: mean
+  output_commit: commit0
+training:
+  candidate_updates:
+  - 400
+  - 800
+  - 1200
+  probe_updates_per_variant: 20
+  probe_warmup_updates: 4
+  probe_total_schedule: 20
+  formal_checkpoint_fractions:
+  - 0.25
+  - 0.5
+  - 0.75
+  - 1.0
+  resume_interval: 50
+  episode_horizons:
+  - 2
+  - 3
+  - 4
+  - 5
+  episodes_per_update: 4
+  stage_forwards_per_update: 14
+  optimizer: AdamW
+  lr: 0.0001
+  betas:
+  - 0.9
+  - 0.999
+  eps: 1.0e-08
+  weight_decay: 0.01
+  gradient_clip: 1.0
+  warmup_fraction: 0.05
+  final_lr_fraction: 0.1
+  identity_weight_candidates:
+  - 0.01
+  - 0.03
+  - 0.1
+  - 0.3
+  identity_gradient_target_ratio: 0.1
+  identity_loss_stages:
+  - pre_feedback
+  - final
+  identity_loss_reduction: equal_mean_of_two_stages
+  old_retrieval_aux_loss_weight: 0.0
+  old_support_aux_loss_weight: 0.0
+  objective: raw_sum_with_constrained_assignment
+  replication_policy: R-OBS_and_CAL_locked_strongest_control_even_if_first_seed_is_negative
+selection:
+  metric_unit: fraction
+  guard_current_drop: 0.002
+  guard_T2_drop: 0.002
+  tie_tolerance: 1.0e-06
+  sort_keys:
+  - S_long_desc
+  - S_current_desc
+  - T2_desc
+  - step_asc
+  control_variants:
+  - R-TARGET
+  - R-ID
+  - R-QFB
+  no_guard_pass: descriptive_best_not_validated_winner
+  test_reselection: false
+evaluation:
+  full_process_repeats_per_checkpoint: 1
+  finite_repeat_panel_new_processes: 2
+  repeat_panel_inputs: 6
+  numeric_AP_range_limit_pp: 0.2
+  bootstrap_samples: 1000
+  bootstrap_unit: physical_reference
+  pooled_AP: true
+  NA_draws: preserve_no_redraw
+  NA_interval_min_valid_draws: 950
+  same_seed_processes_are_training_seeds: false
+  full_jobs_without_confirm: 44
+  official_task_thresholds: inherit_pinned_evaluator
+  target_iou_success_threshold: 0.5
+numeric_policy:
+  new_policy_id: ogr-frozen-backbone-v4-derived-v1
+  frozen_backbone_context: torch.no_grad
+  train_inference_mode: false
+  precision: 32-true
+  tf32: false
+  reuse_legacy_policy_lock: false
+  global_determinism_claim: false
+publication:
+  force_push: false
+  overwrite_old_tag: false
+  experiment_commit: A
+  handoff_commit: B
+  branch_and_tag_target: B
+  manifest_excludes:
+  - ARTIFACT_MANIFEST.json
+  - HANDOFF.md
+  - PUBLICATION_RECEIPT.json
+  required_remote_verification: empty_LFS_cache_one_fetch_per_final_asset
+  release_without_api: record_Git_LFS_success_and_Release_unavailable_separately_save_local_receipt

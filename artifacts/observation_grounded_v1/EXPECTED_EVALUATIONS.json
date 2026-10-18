@@ -1,0 +1,450 @@
+{
+  "N": null,
+  "complete_jobs": 0,
+  "conditional_confirm_jobs": [],
+  "control": null,
+  "expected_jobs": 44,
+  "jobs": [
+    {
+      "actual_step": null,
+      "job_id": 1,
+      "method": "M0",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": null,
+      "status": "BUDGET_BLOCKED",
+      "step": 0
+    },
+    {
+      "actual_step": null,
+      "job_id": 2,
+      "method": "M0",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "SEL",
+      "seed": null,
+      "status": "BUDGET_BLOCKED",
+      "step": 0
+    },
+    {
+      "actual_step": null,
+      "job_id": 3,
+      "method": "M0",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "PB",
+      "seed": null,
+      "status": "BUDGET_BLOCKED",
+      "step": 0
+    },
+    {
+      "actual_step": null,
+      "job_id": 4,
+      "method": "M4-200",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 146,
+      "status": "BUDGET_BLOCKED",
+      "step": 200
+    },
+    {
+      "actual_step": null,
+      "job_id": 5,
+      "method": "M4-200",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "SEL",
+      "seed": 146,
+      "status": "BUDGET_BLOCKED",
+      "step": 200
+    },
+    {
+      "actual_step": null,
+      "job_id": 6,
+      "method": "M4-200",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "PB",
+      "seed": 146,
+      "status": "BUDGET_BLOCKED",
+      "step": 200
+    },
+    {
+      "actual_step": null,
+      "job_id": 7,
+      "method": "R-TARGET",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "100/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 8,
+      "method": "R-TARGET",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "200/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 9,
+      "method": "R-TARGET",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "300/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 10,
+      "method": "R-TARGET",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "400/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 11,
+      "method": "R-TARGET",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "SEL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 12,
+      "method": "R-TARGET",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "PB",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 13,
+      "method": "R-ID",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "100/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 14,
+      "method": "R-ID",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "200/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 15,
+      "method": "R-ID",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "300/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 16,
+      "method": "R-ID",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "400/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 17,
+      "method": "R-ID",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "SEL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 18,
+      "method": "R-ID",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "PB",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 19,
+      "method": "R-QFB",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "100/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 20,
+      "method": "R-QFB",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "200/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 21,
+      "method": "R-QFB",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "300/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 22,
+      "method": "R-QFB",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "400/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 23,
+      "method": "R-QFB",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "SEL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 24,
+      "method": "R-QFB",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "PB",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 25,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "100/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 26,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "200/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 27,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "300/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 28,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "400/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 29,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "SEL",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 30,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "PB",
+      "seed": 246,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 31,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "100/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 32,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "200/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 33,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "300/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 34,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "400/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 35,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "SEL",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 36,
+      "method": "R-OBS",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "PB",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 37,
+      "method": "CONTROL_STAR_UNBOUND",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "100/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 38,
+      "method": "CONTROL_STAR_UNBOUND",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "200/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 39,
+      "method": "CONTROL_STAR_UNBOUND",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "300/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 40,
+      "method": "CONTROL_STAR_UNBOUND",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "CAL",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "400/400*N"
+    },
+    {
+      "actual_step": null,
+      "job_id": 41,
+      "method": "CONTROL_STAR_UNBOUND",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "SEL",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 42,
+      "method": "CONTROL_STAR_UNBOUND",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "PB",
+      "seed": 247,
+      "status": "BUDGET_BLOCKED",
+      "step": "CAL_SELECTED"
+    },
+    {
+      "actual_step": null,
+      "job_id": 43,
+      "method": "FH-COMMIT0",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "SEL",
+      "seed": null,
+      "status": "BUDGET_BLOCKED",
+      "step": 0
+    },
+    {
+      "actual_step": null,
+      "job_id": 44,
+      "method": "FH-COMMIT0",
+      "reason": "NO_FEASIBLE_COMMON_N",
+      "role": "PB",
+      "seed": null,
+      "status": "BUDGET_BLOCKED",
+      "step": 0
+    }
+  ],
+  "schema": 1
+}

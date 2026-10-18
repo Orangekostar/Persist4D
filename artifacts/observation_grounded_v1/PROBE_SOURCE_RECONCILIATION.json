@@ -1,0 +1,13 @@
+{
+  "approved_nonformal_changes": {
+    "models/observation_grounded.py": {
+      "after_sha256": "3cb13bbe88ddab5b8d55a388e416d89eb67be14a6dec48ef6b87e74cf9d95a62",
+      "before_sha256": "c7f48cf0f093bb5f902b66a753c3806e43cf926d1564766d056251cbb7dbc0e3",
+      "reason": "Add complete source permutation to feedback and provenance for diagnostic interventions; no history_permutation was used in any probe, so the changed numerical branch was inactive. Added metadata does not enter losses or outputs."
+    }
+  },
+  "exact_probe_resume_from_current_full_source_identity_claim": false,
+  "formal_training_affected": false,
+  "probe_weights_can_be_loaded_for_bounded_validation": true,
+  "scope": "NONFORMAL_PROBE_COST_AND_TRAIN_GRADIENT_EVIDENCE_ONLY"
+}

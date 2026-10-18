@@ -1,0 +1,3 @@
+case_type,selection_rule,method,context,input_id,reference_id,horizon,source_query_id,source_logical_id,gt_instance_id,raw_target_IoU,raw_sameclass_best_IoU,published_target_IoU
+SUCCESS,first input_id/source_query_id in fixed canonical order; published target IoU threshold 0.5,M4-200,SHARED_M0_HISTORY_SINGLE_TERMINAL_STEP,CAL:6e247a7dfee96bd92f5c3d83,531cff08-0021-28f6-8e08-ba2eeb945e09,5,6,6,12,0.5022522807121277,0.9955357313156128,0.5050962627406569
+FAILURE,first input_id/source_query_id in fixed canonical order; published target IoU threshold 0.5,M4-200,SHARED_M0_HISTORY_SINGLE_TERMINAL_STEP,CAL:000b4a0c7ee7c04e80289e8b,fcf66d94-622d-291c-85fc-284b68d64c81,3,0,0,5,0.0,0.9007238745689392,0.0

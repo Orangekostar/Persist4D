@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "status": "GENERATED",
+  "contract": "VISUAL_CONTRACT.md",
+  "execution": "read-only aggregation and CPU plotting; no GPU, network, training, or scientific inference",
+  "source_files": [
+    {
+      "path": "VISUAL_CONTRACT.md",
+      "bytes": 2453,
+      "sha256": "b2fd5b93474d7df06f0150c9deba7df945bd1ae6be1f925a58551f7265f4f3c5"
+    },
+    {
+      "path": "TARGET_FLOW.csv",
+      "bytes": 121839,
+      "sha256": "9511258baa537368bb668ef9125748d0a56380df89d891fb3c0135cde0cd9a3e"
+    },
+    {
+      "path": "ANCHOR_REFERENCE.csv",
+      "bytes": 27101,
+      "sha256": "855f9815a6ec442b2eafabfe4404290f6fc7cb724b4c7c4d601835c6b2a1879c"
+    },
+    {
+      "path": "RUN_PLAN.json",
+      "bytes": 15035,
+      "sha256": "574d5e5eb97c4ec80090471fceb76787bc649a23a223c8e5da797d4a66399e39"
+    },
+    {
+      "path": "probe/R-TARGET-s246/STATUS.json",
+      "bytes": 7926,
+      "sha256": "a943124e4f620cdcb7a80b67a45161d213dea8dfc62b2fa984c7c0f02dbf829c"
+    },
+    {
+      "path": "probe/R-ID-s246/STATUS.json",
+      "bytes": 8165,
+      "sha256": "ac0bd9724e3e29cfef536174d988e1052be77029c410dec41a97e86cf8391a8f"
+    },
+    {
+      "path": "probe/R-QFB-s246/STATUS.json",
+      "bytes": 8656,
+      "sha256": "f049a2621407c2e422678900a7b7f8e42ede033d7511c391faf9c10578ba1cbe"
+    },
+    {
+      "path": "probe/R-OBS-s246/STATUS.json",
+      "bytes": 8651,
+      "sha256": "6e68e98cb4975064f5064bf1981e58927cfb937a7ba60f234725acd77a37ba5a"
+    }
+  ],
+  "aggregations": [
+    {
+      "path": "DIAGNOSTIC_SUMMARY.csv",
+      "bytes": 1098,
+      "sha256": "321f942278a9fe51dd048b5b612d7c1d6a342f8174a261178f7fc7fadd8f6194"
+    },
+    {
+      "path": "ANCHOR_SUMMARY.csv",
+      "bytes": 580,
+      "sha256": "4f9554322376d8ba132f1f90512764890480b6ad49f95a5c5e0b9997dcebe590"
+    },
+    {
+      "path": "TIMING_SUMMARY.csv",
+      "bytes": 1289,
+      "sha256": "dbc0a50e0d12fb6b94726f02d6df979634b39893bb3814310bf402b2357aee0a"
+    }
+  ],
+  "figures": [
+    {
+      "path": "figures/target_evidence.svg",
+      "bytes": 85176,
+      "sha256": "d71a68d828a2573837d47bae14269e552359e6a28f003a3fa6a01b66ae72c2ad"
+    },
+    {
+      "path": "figures/target_evidence.pdf",
+      "bytes": 28258,
+      "sha256": "ec53e130dc7ac103bfc61079a5273ab4e565f64c19bbc98ee0076ee84ffd4f4a"
+    },
+    {
+      "path": "figures/target_evidence.png",
+      "bytes": 105541,
+      "sha256": "7973f8ec8581e3a7974c4e6dcd6a41c360e63b8ba2915c112f252f77176a8c42"
+    },
+    {
+      "path": "figures/resource_probe.svg",
+      "bytes": 20247,
+      "sha256": "9eb842196e42ad3ded4e837878ff0e5a6ae9cfb2ce36031f4e175b1d2e68489f"
+    },
+    {
+      "path": "figures/resource_probe.pdf",
+      "bytes": 16567,
+      "sha256": "6ccb21149e819b6dbc884370b4b46a79d82465bb7635fd24616c2c87403b5504"
+    },
+    {
+      "path": "figures/resource_probe.png",
+      "bytes": 112026,
+      "sha256": "37e461e64f3dfa84932e3e86e560dcd33ec6b7365ef51d5ec0c0a4723761e469"
+    }
+  ],
+  "families": {
+    "quality": {
+      "status": "NOT_GENERATED_BUDGET_BLOCKED",
+      "reason": "Formal AP endpoints are unavailable because the fixed evaluation phase is budget blocked."
+    },
+    "target": {
+      "status": "GENERATED_SHARED_HISTORY_DIAGNOSTIC",
+      "source": "TARGET_FLOW.csv and ANCHOR_REFERENCE.csv",
+      "denominators": {
+        "target_all": 407,
+        "target_reliable_current": 170,
+        "target_positive": 170,
+        "target_canonical": 165,
+        "target_panel_common_finite": 165,
+        "anchor_complete_common_finite": 67
+      },
+      "scope": "M4-200/shared-M0 and GT-assisted diagnostic; not an OGR formal score or theoretical upper bound."
+    },
+    "recovery_resources": {
+      "status": "PARTIAL_PROBE_AND_STRUCTURE_TIMING_ONLY",
+      "reason": "Recovery/loss evidence and the seven-configuration P6 profile require unavailable formal endpoints; only nonformal probes and measured structural timing are present."
+    }
+  }
+}

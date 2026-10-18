@@ -1,0 +1,36 @@
+Loading checkpoint in local path: <encoder_path> ...
+Model params: 133.33M
+Traceback (most recent call last):
+  File "<HOME>/miniconda3/envs/persist4d/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "<HOME>/miniconda3/envs/persist4d/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "<repo_root>/scripts/ogr_campaign.py", line 261, in <module>
+    raise SystemExit(main())
+  File "<repo_root>/scripts/ogr_campaign.py", line 238, in main
+    result = train_worker(args, assets)
+  File "<repo_root>/scripts/ogr_campaign.py", line 160, in train_worker
+    record = system.optimize_update(loader, records[step*4:(step+1)*4], optimizer, scheduler,
+  File "<repo_root>/trainer/observation_grounded_trainer.py", line 134, in optimize_update
+    loss, components, coverage, norms = self.task_and_identity_loss(output, stage,
+  File "<repo_root>/trainer/observation_grounded_trainer.py", line 82, in task_and_identity_loss
+    losses = self.criterion(output, stage.batch[1], self.mask_type, constraints=context['constraints'])
+  File "<HOME>/miniconda3/envs/persist4d/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "<HOME>/miniconda3/envs/persist4d/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "<repo_root>/models/observation_grounded_loss.py", line 88, in forward
+    return super().forward(outputs, targets, mask_type)
+  File "<repo_root>/models/criterion.py", line 1475, in forward
+    indices = self.matcher(outputs_without_aux, targets, mask_type)
+  File "<HOME>/miniconda3/envs/persist4d/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "<HOME>/miniconda3/envs/persist4d/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "<repo_root>/models/observation_grounded_loss.py", line 64, in forward
+    result = constrained_assignment(self.matcher, output, targets, mask_type, self.constraints)
+  File "<HOME>/miniconda3/envs/persist4d/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "<repo_root>/models/observation_grounded_loss.py", line 47, in constrained_assignment
+    reduced['pred_changes'] = output['pred_changes'][:, query_device]
+TypeError: 'NoneType' object is not subscriptable

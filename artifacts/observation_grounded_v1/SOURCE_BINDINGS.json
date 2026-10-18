@@ -1,0 +1,1993 @@
+{
+  "base_commit": "758b5aa4bd2e9119ae5e05f725faa360c2120d88",
+  "diff_scope": "new OGR modules/config/tests/docs and task-scoped LFS attributes; original MPR implementation preserved",
+  "files": [
+    {
+      "path": "models/rescene.py",
+      "sha256": "cb8008610dd248f4e9a80de924d6883e4ca0d41dda16801e9e1621ebe54def9b",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 12,
+          "symbol": "ReScene"
+        },
+        {
+          "line": 13,
+          "symbol": "ReScene.__init__"
+        },
+        {
+          "line": 249,
+          "symbol": "ReScene.initialize_queries"
+        },
+        {
+          "line": 387,
+          "symbol": "ReScene.sample_and_batch_features"
+        },
+        {
+          "line": 477,
+          "symbol": "ReScene.unstack_batched"
+        },
+        {
+          "line": 480,
+          "symbol": "ReScene.get_pos_encs"
+        },
+        {
+          "line": 500,
+          "symbol": "ReScene.after_decoder_stage"
+        },
+        {
+          "line": 513,
+          "symbol": "ReScene.update_mask_features"
+        },
+        {
+          "line": 521,
+          "symbol": "ReScene._native_long_stage_ids"
+        },
+        {
+          "line": 534,
+          "symbol": "ReScene.before_first_mask"
+        },
+        {
+          "line": 541,
+          "symbol": "ReScene.forward"
+        },
+        {
+          "line": 792,
+          "symbol": "ReScene.aggregate_features"
+        },
+        {
+          "line": 819,
+          "symbol": "ReScene.mask_module"
+        },
+        {
+          "line": 835,
+          "symbol": "ReScene.attn_mask"
+        },
+        {
+          "line": 877,
+          "symbol": "ReScene.space_n_time_m"
+        },
+        {
+          "line": 881,
+          "symbol": "ReScene._set_aux_loss"
+        }
+      ]
+    },
+    {
+      "path": "models/criterion.py",
+      "sha256": "b61bbc4a712db297f094080ffb1f4346d23651bab7e3a8622731f0a4b34b2820",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 27,
+          "symbol": "dice_loss"
+        },
+        {
+          "line": 52,
+          "symbol": "sigmoid_ce_loss"
+        },
+        {
+          "line": 75,
+          "symbol": "calculate_uncertainty"
+        },
+        {
+          "line": 93,
+          "symbol": "_sanitize_features"
+        },
+        {
+          "line": 99,
+          "symbol": "_normalize_features"
+        },
+        {
+          "line": 104,
+          "symbol": "_instances_points"
+        },
+        {
+          "line": 113,
+          "symbol": "_build_chunk_pairs"
+        },
+        {
+          "line": 219,
+          "symbol": "_build_instance_structures"
+        },
+        {
+          "line": 254,
+          "symbol": "_info_nce_accumulation_dtype"
+        },
+        {
+          "line": 260,
+          "symbol": "_merge_block_logsumexp"
+        },
+        {
+          "line": 280,
+          "symbol": "_streaming_info_nce_chunk"
+        },
+        {
+          "line": 394,
+          "symbol": "_get_positive_indices_for_point"
+        },
+        {
+          "line": 422,
+          "symbol": "infoNCE_chunked_loss"
+        },
+        {
+          "line": 566,
+          "symbol": "bce_sampled_loss"
+        },
+        {
+          "line": 693,
+          "symbol": "ContrastiveLoss"
+        },
+        {
+          "line": 703,
+          "symbol": "ContrastiveLoss.__init__"
+        },
+        {
+          "line": 743,
+          "symbol": "ContrastiveLoss.temperature"
+        },
+        {
+          "line": 749,
+          "symbol": "ContrastiveLoss.logits_and_gt_mask"
+        },
+        {
+          "line": 775,
+          "symbol": "ContrastiveLoss.sigmoid_loss"
+        },
+        {
+          "line": 792,
+          "symbol": "ContrastiveLoss.infoNCE_loss"
+        },
+        {
+          "line": 834,
+          "symbol": "ContrastiveLoss.sinkhorn_contrastive_loss"
+        },
+        {
+          "line": 853,
+          "symbol": "ContrastiveLoss.sinkhorn_knopp"
+        },
+        {
+          "line": 870,
+          "symbol": "ContrastiveLoss.forward"
+        },
+        {
+          "line": 990,
+          "symbol": "ContrastiveLoss.temporal_positive_weights"
+        },
+        {
+          "line": 1012,
+          "symbol": "SetCriterion"
+        },
+        {
+          "line": 1019,
+          "symbol": "SetCriterion.__init__"
+        },
+        {
+          "line": 1119,
+          "symbol": "SetCriterion.loss_labels"
+        },
+        {
+          "line": 1147,
+          "symbol": "SetCriterion.loss_change_labels"
+        },
+        {
+          "line": 1175,
+          "symbol": "SetCriterion.loss_aux_contrastive"
+        },
+        {
+          "line": 1236,
+          "symbol": "SetCriterion.loss_segment_contrastive"
+        },
+        {
+          "line": 1297,
+          "symbol": "SetCriterion.loss_masks"
+        },
+        {
+          "line": 1352,
+          "symbol": "SetCriterion._loss_masks_by_stage"
+        },
+        {
+          "line": 1416,
+          "symbol": "SetCriterion._get_src_permutation_idx"
+        },
+        {
+          "line": 1424,
+          "symbol": "SetCriterion._get_tgt_permutation_idx"
+        },
+        {
+          "line": 1432,
+          "symbol": "SetCriterion.get_loss"
+        },
+        {
+          "line": 1441,
+          "symbol": "SetCriterion.forward"
+        },
+        {
+          "line": 1518,
+          "symbol": "SetCriterion.__repr__"
+        }
+      ]
+    },
+    {
+      "path": "models/matcher.py",
+      "sha256": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 16,
+          "symbol": "batch_dice_loss"
+        },
+        {
+          "line": 39,
+          "symbol": "batch_sigmoid_ce_loss"
+        },
+        {
+          "line": 71,
+          "symbol": "HungarianMatcher"
+        },
+        {
+          "line": 79,
+          "symbol": "HungarianMatcher.__init__"
+        },
+        {
+          "line": 105,
+          "symbol": "HungarianMatcher.memory_efficient_forward"
+        },
+        {
+          "line": 238,
+          "symbol": "HungarianMatcher.forward"
+        },
+        {
+          "line": 260,
+          "symbol": "HungarianMatcher.__repr__"
+        }
+      ]
+    },
+    {
+      "path": "models/task_memory_routing.py",
+      "sha256": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 21,
+          "symbol": "TaskMemoryRoutingError"
+        },
+        {
+          "line": 26,
+          "symbol": "PredictionObservation"
+        },
+        {
+          "line": 35,
+          "symbol": "PredictionObservation.batch_size"
+        },
+        {
+          "line": 39,
+          "symbol": "PredictionObservation.query_count"
+        },
+        {
+          "line": 42,
+          "symbol": "PredictionObservation.validate"
+        },
+        {
+          "line": 88,
+          "symbol": "PredictionObservation.as_local_instance"
+        },
+        {
+          "line": 106,
+          "symbol": "EntityRoute"
+        },
+        {
+          "line": 120,
+          "symbol": "EntityRoute.validate"
+        },
+        {
+          "line": 189,
+          "symbol": "CommitResult"
+        },
+        {
+          "line": 199,
+          "symbol": "CommitResult.identity_map"
+        },
+        {
+          "line": 212,
+          "symbol": "_update_hash_with_tensor"
+        },
+        {
+          "line": 219,
+          "symbol": "_state_sha256"
+        },
+        {
+          "line": 240,
+          "symbol": "_metadata_sha256"
+        },
+        {
+          "line": 270,
+          "symbol": "_route_sha256"
+        },
+        {
+          "line": 279,
+          "symbol": "_validate_stage_meta"
+        },
+        {
+          "line": 298,
+          "symbol": "_validate_observation_state"
+        },
+        {
+          "line": 315,
+          "symbol": "route_entities"
+        },
+        {
+          "line": 362,
+          "symbol": "_update_rates"
+        },
+        {
+          "line": 379,
+          "symbol": "commit_entities"
+        }
+      ]
+    },
+    {
+      "path": "models/task_memory_state.py",
+      "sha256": "5d15a88775d8f6d2f6ce564a3844876690db034783674bd9687063fe12af4f0d",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 12,
+          "symbol": "TaskMemoryStateError"
+        },
+        {
+          "line": 17,
+          "symbol": "TaskMemoryConfig"
+        },
+        {
+          "line": 24,
+          "symbol": "TaskMemoryConfig.__post_init__"
+        },
+        {
+          "line": 57,
+          "symbol": "TaskMemoryState"
+        },
+        {
+          "line": 72,
+          "symbol": "TaskMemoryState.empty"
+        },
+        {
+          "line": 116,
+          "symbol": "TaskMemoryState.batch_size"
+        },
+        {
+          "line": 120,
+          "symbol": "TaskMemoryState.capacity"
+        },
+        {
+          "line": 124,
+          "symbol": "TaskMemoryState.feature_dim"
+        },
+        {
+          "line": 128,
+          "symbol": "TaskMemoryState.class_count"
+        },
+        {
+          "line": 132,
+          "symbol": "TaskMemoryState.state_bytes"
+        },
+        {
+          "line": 135,
+          "symbol": "TaskMemoryState.association_tensors"
+        },
+        {
+          "line": 149,
+          "symbol": "TaskMemoryState.tensors"
+        },
+        {
+          "line": 157,
+          "symbol": "TaskMemoryState.as_persistent_state"
+        },
+        {
+          "line": 162,
+          "symbol": "TaskMemoryState.detach"
+        },
+        {
+          "line": 168,
+          "symbol": "TaskMemoryState.validate"
+        }
+      ]
+    },
+    {
+      "path": "models/revisit_prompt.py",
+      "sha256": "e8eb01f17f1c21caadf85db0b0820d7351043e913ccccc975dc590d1c6ac75ee",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 17,
+          "symbol": "RevisitPromptReScene"
+        },
+        {
+          "line": 18,
+          "symbol": "RevisitPromptReScene.__init__"
+        },
+        {
+          "line": 51,
+          "symbol": "RevisitPromptReScene.train"
+        },
+        {
+          "line": 60,
+          "symbol": "RevisitPromptReScene._position"
+        },
+        {
+          "line": 69,
+          "symbol": "RevisitPromptReScene.before_first_mask"
+        },
+        {
+          "line": 146,
+          "symbol": "RevisitPromptReScene.after_decoder_stage"
+        },
+        {
+          "line": 162,
+          "symbol": "RevisitPromptReScene.forward"
+        }
+      ]
+    },
+    {
+      "path": "models/revisit_prompt_modules.py",
+      "sha256": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 13,
+          "symbol": "tensor_summary"
+        },
+        {
+          "line": 27,
+          "symbol": "select_history_slots"
+        },
+        {
+          "line": 45,
+          "symbol": "segment_context"
+        },
+        {
+          "line": 70,
+          "symbol": "geometry6"
+        },
+        {
+          "line": 87,
+          "symbol": "nearest_indices"
+        },
+        {
+          "line": 92,
+          "symbol": "PromptAdapter"
+        },
+        {
+          "line": 93,
+          "symbol": "PromptAdapter.__init__"
+        },
+        {
+          "line": 107,
+          "symbol": "PromptAdapter.forward"
+        },
+        {
+          "line": 111,
+          "symbol": "PromptAdapter.retrieve"
+        },
+        {
+          "line": 126,
+          "symbol": "SupportHead"
+        },
+        {
+          "line": 127,
+          "symbol": "SupportHead.__init__"
+        },
+        {
+          "line": 135,
+          "symbol": "SupportHead.forward"
+        }
+      ]
+    },
+    {
+      "path": "models/revisit_prompt_state.py",
+      "sha256": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 11,
+          "symbol": "RevisitGeometryState"
+        },
+        {
+          "line": 20,
+          "symbol": "RevisitGeometryState.empty"
+        },
+        {
+          "line": 27,
+          "symbol": "RevisitGeometryState.update"
+        },
+        {
+          "line": 49,
+          "symbol": "RevisitGeometryState.tensors"
+        },
+        {
+          "line": 53,
+          "symbol": "RevisitGeometryState.assert_synchronized"
+        },
+        {
+          "line": 63,
+          "symbol": "RevisitGeometryState.clone"
+        },
+        {
+          "line": 66,
+          "symbol": "RevisitGeometryState.nbytes"
+        }
+      ]
+    },
+    {
+      "path": "models/revisit_prompt_loss.py",
+      "sha256": "ea0aa0b36131e235a3f10a647852a7103e24d03391256aa6347b129983c762e6",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 9,
+          "symbol": "retrieval_loss"
+        },
+        {
+          "line": 20,
+          "symbol": "support_loss"
+        },
+        {
+          "line": 31,
+          "symbol": "TrainingLabelLedger"
+        },
+        {
+          "line": 33,
+          "symbol": "TrainingLabelLedger.__init__"
+        },
+        {
+          "line": 36,
+          "symbol": "TrainingLabelLedger.lookup"
+        },
+        {
+          "line": 39,
+          "symbol": "TrainingLabelLedger.bind"
+        },
+        {
+          "line": 47,
+          "symbol": "evidence_labels"
+        },
+        {
+          "line": 82,
+          "symbol": "auxiliary_losses"
+        },
+        {
+          "line": 141,
+          "symbol": "bind_training_births"
+        }
+      ]
+    },
+    {
+      "path": "models/revisit_prompt_numerics.py",
+      "sha256": "6351af7ff038c0dd8b311474974d29cdbacb96c0409155056877f686940b1e55",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 6,
+          "symbol": "stable_group_mean"
+        },
+        {
+          "line": 16,
+          "symbol": "install_evaluation_policy"
+        }
+      ]
+    },
+    {
+      "path": "models/revisit_prompt_native_numerics.py",
+      "sha256": "870a984a1e730e5e8557660a0f24576bfb692c3bbe8ea31ab7c8a541736c84ba",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 6,
+          "symbol": "pin_native_convolutions"
+        },
+        {
+          "line": 24,
+          "symbol": "runtime_identity"
+        },
+        {
+          "line": 39,
+          "symbol": "evaluation_builders"
+        }
+      ]
+    },
+    {
+      "path": "models/revisit_prompt_centroid_numerics.py",
+      "sha256": "e3a9fce4c699920d2ab1831eb14c6374d3ec28294219f5cc73fd9cc445ebb4f5",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 10,
+          "symbol": "stable_segment_context"
+        },
+        {
+          "line": 19,
+          "symbol": "evaluation_centroids"
+        }
+      ]
+    },
+    {
+      "path": "models/revisit_prompt_sparse_reference.py",
+      "sha256": "f964d3243cc9bac212c606176f0fcd49c1fe3dc4e7a00ffc30a7664a155fc20c",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 12,
+          "symbol": "ordered_subm_convolution"
+        },
+        {
+          "line": 78,
+          "symbol": "evaluation_sparse_reference"
+        }
+      ]
+    },
+    {
+      "path": "datasets/revisit_prompt_episode.py",
+      "sha256": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 18,
+          "symbol": "RevisitEpisodeSpec"
+        },
+        {
+          "line": 28,
+          "symbol": "RevisitEpisodeSpec.__post_init__"
+        },
+        {
+          "line": 42,
+          "symbol": "RevisitEpisodeSpec.from_record"
+        },
+        {
+          "line": 52,
+          "symbol": "RevisitEpisodeSpec.stage_scan_ids"
+        },
+        {
+          "line": 56,
+          "symbol": "RevisitEpisodeSpec.stage_scan_indices"
+        },
+        {
+          "line": 60,
+          "symbol": "RevisitDrawPlan"
+        },
+        {
+          "line": 63,
+          "symbol": "RevisitDrawPlan.__init__"
+        },
+        {
+          "line": 72,
+          "symbol": "RevisitDrawPlan.draw_update"
+        },
+        {
+          "line": 93,
+          "symbol": "causal_prefix_truth"
+        },
+        {
+          "line": 108,
+          "symbol": "project_causal_target"
+        },
+        {
+          "line": 131,
+          "symbol": "RevisitStageData"
+        },
+        {
+          "line": 138,
+          "symbol": "RevisitStageData.to"
+        },
+        {
+          "line": 149,
+          "symbol": "RevisitEpisodeLoader"
+        },
+        {
+          "line": 152,
+          "symbol": "RevisitEpisodeLoader.__init__"
+        },
+        {
+          "line": 161,
+          "symbol": "RevisitEpisodeLoader.dataset"
+        },
+        {
+          "line": 180,
+          "symbol": "RevisitEpisodeLoader._sample"
+        },
+        {
+          "line": 199,
+          "symbol": "RevisitEpisodeLoader.stages"
+        }
+      ]
+    },
+    {
+      "path": "scripts/revisit_prompt_assets.py",
+      "sha256": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 23,
+          "symbol": "read_json"
+        },
+        {
+          "line": 27,
+          "symbol": "sha256"
+        },
+        {
+          "line": 35,
+          "symbol": "git_output"
+        },
+        {
+          "line": 39,
+          "symbol": "local_assets"
+        },
+        {
+          "line": 43,
+          "symbol": "validate_bound_file"
+        },
+        {
+          "line": 57,
+          "symbol": "load_parent_state"
+        },
+        {
+          "line": 84,
+          "symbol": "parent_payload"
+        },
+        {
+          "line": 98,
+          "symbol": "parent_config"
+        },
+        {
+          "line": 126,
+          "symbol": "load_revisit_bundle"
+        },
+        {
+          "line": 155,
+          "symbol": "resolve_assets"
+        },
+        {
+          "line": 279,
+          "symbol": "digest"
+        },
+        {
+          "line": 283,
+          "symbol": "numeric_sources"
+        },
+        {
+          "line": 287,
+          "symbol": "validate_run_plan"
+        },
+        {
+          "line": 302,
+          "symbol": "read_run_plan"
+        },
+        {
+          "line": 311,
+          "symbol": "validate_replication"
+        },
+        {
+          "line": 317,
+          "symbol": "validate_evaluation_request"
+        },
+        {
+          "line": 343,
+          "symbol": "require_charged_child"
+        },
+        {
+          "line": 349,
+          "symbol": "configure_runtime"
+        },
+        {
+          "line": 365,
+          "symbol": "build_system"
+        },
+        {
+          "line": 377,
+          "symbol": "configuration_digest"
+        },
+        {
+          "line": 394,
+          "symbol": "parent_tensor_digest"
+        },
+        {
+          "line": 407,
+          "symbol": "public_error"
+        }
+      ]
+    },
+    {
+      "path": "scripts/revisit_prompt_runtime.py",
+      "sha256": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 14,
+          "symbol": "empty_common_state"
+        },
+        {
+          "line": 22,
+          "symbol": "common_commit"
+        },
+        {
+          "line": 40,
+          "symbol": "scale_candidates"
+        },
+        {
+          "line": 51,
+          "symbol": "track_step"
+        },
+        {
+          "line": 61,
+          "symbol": "RevisitEpisodeRuntime"
+        },
+        {
+          "line": 62,
+          "symbol": "RevisitEpisodeRuntime.__init__"
+        },
+        {
+          "line": 68,
+          "symbol": "RevisitEpisodeRuntime._validate_stage"
+        },
+        {
+          "line": 78,
+          "symbol": "RevisitEpisodeRuntime.forward"
+        },
+        {
+          "line": 87,
+          "symbol": "RevisitEpisodeRuntime.finish"
+        },
+        {
+          "line": 122,
+          "symbol": "trajectory_sidecar"
+        }
+      ]
+    },
+    {
+      "path": "trainer/revisit_prompt_trainer.py",
+      "sha256": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 18,
+          "symbol": "lr_scale"
+        },
+        {
+          "line": 26,
+          "symbol": "adapter_state"
+        },
+        {
+          "line": 31,
+          "symbol": "load_adapter_state"
+        },
+        {
+          "line": 43,
+          "symbol": "_save_torch_atomic"
+        },
+        {
+          "line": 54,
+          "symbol": "save_resume"
+        },
+        {
+          "line": 67,
+          "symbol": "restore_resume"
+        },
+        {
+          "line": 86,
+          "symbol": "RevisitPromptTrainer"
+        },
+        {
+          "line": 87,
+          "symbol": "RevisitPromptTrainer.__init__"
+        },
+        {
+          "line": 96,
+          "symbol": "RevisitPromptTrainer.train"
+        },
+        {
+          "line": 102,
+          "symbol": "RevisitPromptTrainer.new_parameters"
+        },
+        {
+          "line": 105,
+          "symbol": "RevisitPromptTrainer.make_optimizer"
+        },
+        {
+          "line": 113,
+          "symbol": "RevisitPromptTrainer.task_and_auxiliary_loss"
+        },
+        {
+          "line": 126,
+          "symbol": "RevisitPromptTrainer.optimize_update"
+        },
+        {
+          "line": 176,
+          "symbol": "RevisitPromptTrainer.save_delta"
+        }
+      ]
+    },
+    {
+      "path": "trainer/task_memory_trainer.py",
+      "sha256": "49c8326ea3001a25475ad8c14044dfcae9592f8cf932f6800b2b160cc072ccbb",
+      "status": "UNCHANGED_PARENT",
+      "symbols": [
+        {
+          "line": 51,
+          "symbol": "TaskMemoryTrainerError"
+        },
+        {
+          "line": 55,
+          "symbol": "_reset_lightning_batch_progress_for_sliced_resume"
+        },
+        {
+          "line": 94,
+          "symbol": "stage_mean_coefficients"
+        },
+        {
+          "line": 104,
+          "symbol": "tbptt_stage_chunks"
+        },
+        {
+          "line": 120,
+          "symbol": "training_stage_chunks"
+        },
+        {
+          "line": 137,
+          "symbol": "task_memory_lr_multiplier"
+        },
+        {
+          "line": 164,
+          "symbol": "task_read_gradient_snapshot"
+        },
+        {
+          "line": 201,
+          "symbol": "_task_read_parameters"
+        },
+        {
+          "line": 211,
+          "symbol": "_task_read_parameter_change"
+        },
+        {
+          "line": 237,
+          "symbol": "TaskMemoryProgress"
+        },
+        {
+          "line": 244,
+          "symbol": "TaskMemoryProgress.initial"
+        },
+        {
+          "line": 247,
+          "symbol": "TaskMemoryProgress.__post_init__"
+        },
+        {
+          "line": 262,
+          "symbol": "TaskMemoryProgress.advance"
+        },
+        {
+          "line": 288,
+          "symbol": "TaskMemoryProgress.state_dict"
+        },
+        {
+          "line": 298,
+          "symbol": "TaskMemoryProgress.from_state_dict"
+        },
+        {
+          "line": 320,
+          "symbol": "capture_task_memory_rng_state"
+        },
+        {
+          "line": 333,
+          "symbol": "restore_task_memory_rng_state"
+        },
+        {
+          "line": 356,
+          "symbol": "_unit_interval"
+        },
+        {
+          "line": 367,
+          "symbol": "build_final_prediction_observation"
+        },
+        {
+          "line": 444,
+          "symbol": "_state_parity_max_abs"
+        },
+        {
+          "line": 462,
+          "symbol": "TaskMemoryStageTransition"
+        },
+        {
+          "line": 469,
+          "symbol": "commit_task_memory_stage"
+        },
+        {
+          "line": 490,
+          "symbol": "bind_training_births"
+        },
+        {
+          "line": 531,
+          "symbol": "_visual_source_key"
+        },
+        {
+          "line": 538,
+          "symbol": "build_visual_slot_candidates"
+        },
+        {
+          "line": 610,
+          "symbol": "TaskMemoryTrainer"
+        },
+        {
+          "line": 613,
+          "symbol": "TaskMemoryTrainer.__init__"
+        },
+        {
+          "line": 629,
+          "symbol": "TaskMemoryTrainer.begin_smoke_audit"
+        },
+        {
+          "line": 649,
+          "symbol": "TaskMemoryTrainer.setup"
+        },
+        {
+          "line": 653,
+          "symbol": "TaskMemoryTrainer.transfer_batch_to_device"
+        },
+        {
+          "line": 681,
+          "symbol": "TaskMemoryTrainer._backward_context"
+        },
+        {
+          "line": 686,
+          "symbol": "TaskMemoryTrainer._new_task_state"
+        },
+        {
+          "line": 698,
+          "symbol": "TaskMemoryTrainer._new_visual_state"
+        },
+        {
+          "line": 709,
+          "symbol": "TaskMemoryTrainer._forward_stage"
+        },
+        {
+          "line": 736,
+          "symbol": "TaskMemoryTrainer.training_step"
+        },
+        {
+          "line": 1007,
+          "symbol": "TaskMemoryTrainer.configure_optimizers"
+        },
+        {
+          "line": 1054,
+          "symbol": "TaskMemoryTrainer.on_save_checkpoint"
+        },
+        {
+          "line": 1070,
+          "symbol": "TaskMemoryTrainer.on_load_checkpoint"
+        },
+        {
+          "line": 1096,
+          "symbol": "TaskMemoryTrainer.on_train_start"
+        }
+      ]
+    },
+    {
+      "path": "models/observation_evidence_state.py",
+      "sha256": "c367c0149988408c9eeebaf50c387eb37eb6b30cf55f88e83d5957e88e5c033c",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 12,
+          "symbol": "ObservationEvidenceState"
+        },
+        {
+          "line": 21,
+          "symbol": "ObservationEvidenceState.empty"
+        },
+        {
+          "line": 29,
+          "symbol": "ObservationEvidenceState.update"
+        },
+        {
+          "line": 57,
+          "symbol": "ObservationEvidenceState.tensors"
+        },
+        {
+          "line": 61,
+          "symbol": "ObservationEvidenceState.assert_synchronized"
+        },
+        {
+          "line": 71,
+          "symbol": "ObservationEvidenceState.clone"
+        },
+        {
+          "line": 74,
+          "symbol": "ObservationEvidenceState.nbytes"
+        }
+      ]
+    },
+    {
+      "path": "models/observation_grounded_modules.py",
+      "sha256": "87ad8be73c5da662260daa5e08460884d172ca15d902c1cc45dcc355d7c7229b",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 13,
+          "symbol": "pool_observation"
+        },
+        {
+          "line": 31,
+          "symbol": "IdentityEvidenceHead"
+        },
+        {
+          "line": 32,
+          "symbol": "IdentityEvidenceHead.__init__"
+        },
+        {
+          "line": 41,
+          "symbol": "IdentityEvidenceHead.forward"
+        },
+        {
+          "line": 70,
+          "symbol": "ObservationFeedback"
+        },
+        {
+          "line": 71,
+          "symbol": "ObservationFeedback.__init__"
+        },
+        {
+          "line": 81,
+          "symbol": "ObservationFeedback.forward"
+        }
+      ]
+    },
+    {
+      "path": "models/observation_grounded.py",
+      "sha256": "3cb13bbe88ddab5b8d55a388e416d89eb67be14a6dec48ef6b87e74cf9d95a62",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 12,
+          "symbol": "current_point_counts"
+        },
+        {
+          "line": 22,
+          "symbol": "ObservationGroundedReScene"
+        },
+        {
+          "line": 23,
+          "symbol": "ObservationGroundedReScene.__init__"
+        },
+        {
+          "line": 38,
+          "symbol": "ObservationGroundedReScene.train"
+        },
+        {
+          "line": 45,
+          "symbol": "ObservationGroundedReScene.before_first_mask"
+        },
+        {
+          "line": 71,
+          "symbol": "ObservationGroundedReScene._source_slots"
+        },
+        {
+          "line": 81,
+          "symbol": "ObservationGroundedReScene._regional"
+        },
+        {
+          "line": 95,
+          "symbol": "ObservationGroundedReScene.after_decoder_stage"
+        },
+        {
+          "line": 126,
+          "symbol": "ObservationGroundedReScene.forward"
+        }
+      ]
+    },
+    {
+      "path": "models/observation_grounded_loss.py",
+      "sha256": "4cd612b44493c7064b5718455e5249c7f5ed81abbeaa8e82f6661e4109170579",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 14,
+          "symbol": "AssignmentConstraints"
+        },
+        {
+          "line": 18,
+          "symbol": "AssignmentConstraints.validate"
+        },
+        {
+          "line": 30,
+          "symbol": "constrained_assignment"
+        },
+        {
+          "line": 59,
+          "symbol": "_AssignmentRecorder"
+        },
+        {
+          "line": 60,
+          "symbol": "_AssignmentRecorder.__init__"
+        },
+        {
+          "line": 64,
+          "symbol": "_AssignmentRecorder.forward"
+        },
+        {
+          "line": 70,
+          "symbol": "ConstrainedTaskCriterion"
+        },
+        {
+          "line": 72,
+          "symbol": "ConstrainedTaskCriterion.from_parent"
+        },
+        {
+          "line": 81,
+          "symbol": "ConstrainedTaskCriterion.forward"
+        },
+        {
+          "line": 94,
+          "symbol": "ConstrainedTaskCriterion.loss_labels"
+        },
+        {
+          "line": 107,
+          "symbol": "grouped_identity_loss"
+        },
+        {
+          "line": 135,
+          "symbol": "supervision_context"
+        },
+        {
+          "line": 168,
+          "symbol": "identity_loss_for_assignment"
+        }
+      ]
+    },
+    {
+      "path": "datasets/observation_grounded_episode.py",
+      "sha256": "5a4bcb59123da14f36f4ae08513906749439cc8f45c0247594396d341cb6a037",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 18,
+          "symbol": "ObservationEpisodeSpec"
+        },
+        {
+          "line": 21,
+          "symbol": "ObservationEpisodeSpec.__post_init__"
+        },
+        {
+          "line": 38,
+          "symbol": "ObservationEpisodeSpec.from_record"
+        },
+        {
+          "line": 46,
+          "symbol": "ObservationEpisodeSpec.window_start"
+        },
+        {
+          "line": 52,
+          "symbol": "ObservationEpisodeSpec.stage_scan_ids"
+        },
+        {
+          "line": 56,
+          "symbol": "ObservationEpisodeSpec.stage_scan_indices"
+        },
+        {
+          "line": 60,
+          "symbol": "ObservationEpisodeLoader"
+        },
+        {
+          "line": 62,
+          "symbol": "ObservationEpisodeLoader.stages"
+        }
+      ]
+    },
+    {
+      "path": "trainer/observation_grounded_trainer.py",
+      "sha256": "5d1d06d8be386571ce01c18c93b1ee773fa6a4819ddc1df8a883501c226c85ac",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 17,
+          "symbol": "adapter_state"
+        },
+        {
+          "line": 22,
+          "symbol": "load_adapter_state"
+        },
+        {
+          "line": 34,
+          "symbol": "save_resume"
+        },
+        {
+          "line": 46,
+          "symbol": "restore_resume"
+        },
+        {
+          "line": 65,
+          "symbol": "ObservationGroundedTrainer"
+        },
+        {
+          "line": 66,
+          "symbol": "ObservationGroundedTrainer.__init__"
+        },
+        {
+          "line": 76,
+          "symbol": "ObservationGroundedTrainer.new_parameters"
+        },
+        {
+          "line": 80,
+          "symbol": "ObservationGroundedTrainer.task_and_identity_loss"
+        },
+        {
+          "line": 115,
+          "symbol": "ObservationGroundedTrainer.optimize_update"
+        },
+        {
+          "line": 165,
+          "symbol": "ObservationGroundedTrainer.save_delta"
+        }
+      ]
+    },
+    {
+      "path": "scripts/ogr_assets.py",
+      "sha256": "d76a06e15ce91e50c0dd3e8fe6be90ee35e8affbe210426a9e9140b0238ed90e",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 48,
+          "symbol": "BudgetJournal"
+        },
+        {
+          "line": 54,
+          "symbol": "BudgetJournal.__init__"
+        },
+        {
+          "line": 74,
+          "symbol": "BudgetJournal._locked"
+        },
+        {
+          "line": 83,
+          "symbol": "BudgetJournal._snapshot"
+        },
+        {
+          "line": 93,
+          "symbol": "BudgetJournal.snapshot"
+        },
+        {
+          "line": 97,
+          "symbol": "BudgetJournal.export"
+        },
+        {
+          "line": 112,
+          "symbol": "BudgetJournal.reserve"
+        },
+        {
+          "line": 134,
+          "symbol": "BudgetJournal.finish"
+        },
+        {
+          "line": 154,
+          "symbol": "local_assets"
+        },
+        {
+          "line": 158,
+          "symbol": "numeric_sources"
+        },
+        {
+          "line": 166,
+          "symbol": "frozen_numeric_policy"
+        },
+        {
+          "line": 186,
+          "symbol": "load_parent_state"
+        },
+        {
+          "line": 212,
+          "symbol": "build_system"
+        },
+        {
+          "line": 232,
+          "symbol": "parent_tensor_digest"
+        },
+        {
+          "line": 246,
+          "symbol": "load_ogr_bundle"
+        },
+        {
+          "line": 266,
+          "symbol": "resolve_assets"
+        },
+        {
+          "line": 340,
+          "symbol": "reconcile_exposure"
+        }
+      ]
+    },
+    {
+      "path": "scripts/ogr_runtime.py",
+      "sha256": "ff63e43504718db02fdf8e7b9e8ec9d238ff535526b194eb2f5b3fba79931b3f",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 15,
+          "symbol": "observation_route"
+        },
+        {
+          "line": 64,
+          "symbol": "ObservationEpisodeRuntime"
+        },
+        {
+          "line": 65,
+          "symbol": "ObservationEpisodeRuntime.__init__"
+        },
+        {
+          "line": 70,
+          "symbol": "ObservationEpisodeRuntime._validate_stage"
+        },
+        {
+          "line": 75,
+          "symbol": "ObservationEpisodeRuntime.forward"
+        },
+        {
+          "line": 85,
+          "symbol": "ObservationEpisodeRuntime.finish"
+        },
+        {
+          "line": 130,
+          "symbol": "ObservationEpisodeRuntime.state_nbytes"
+        }
+      ]
+    },
+    {
+      "path": "scripts/ogr_evaluation.py",
+      "sha256": "c2aa3f1aae6c5eaa7899f40a86e78443ed3e9e234c0986453fa9a56795732535",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 17,
+          "symbol": "small_observation_fingerprint"
+        },
+        {
+          "line": 28,
+          "symbol": "replay_episode"
+        },
+        {
+          "line": 115,
+          "symbol": "load_endpoint"
+        },
+        {
+          "line": 141,
+          "symbol": "evaluation_worker"
+        }
+      ]
+    },
+    {
+      "path": "scripts/ogr_diagnostics.py",
+      "sha256": "e9ecd09c3ab147991d51d48443d9f5ecd64be73bf9e68ee4d75bbbfb6a485ac3",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 15,
+          "symbol": "write_csv"
+        },
+        {
+          "line": 28,
+          "symbol": "published_target_iou"
+        },
+        {
+          "line": 40,
+          "symbol": "clone_runtime"
+        },
+        {
+          "line": 53,
+          "symbol": "prediction_state_fingerprint"
+        },
+        {
+          "line": 68,
+          "symbol": "reliable_segments"
+        },
+        {
+          "line": 92,
+          "symbol": "target_flow"
+        },
+        {
+          "line": 172,
+          "symbol": "anchor_reference"
+        },
+        {
+          "line": 198,
+          "symbol": "shared_history_worker"
+        },
+        {
+          "line": 328,
+          "symbol": "single_step_interventions"
+        },
+        {
+          "line": 376,
+          "symbol": "diagnose"
+        },
+        {
+          "line": 403,
+          "symbol": "run_final_panels"
+        },
+        {
+          "line": 444,
+          "symbol": "measured_forward_components"
+        },
+        {
+          "line": 470,
+          "symbol": "profile_worker"
+        },
+        {
+          "line": 539,
+          "symbol": "numeric_panel_worker"
+        },
+        {
+          "line": 609,
+          "symbol": "compare_numeric_panel"
+        },
+        {
+          "line": 656,
+          "symbol": "causality_worker"
+        }
+      ]
+    },
+    {
+      "path": "scripts/ogr_selection.py",
+      "sha256": "edfcab9acad7c85c4b4776d37dceb57924aef12f9293be48f436fa965f663bc9",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 22,
+          "symbol": "journal_for"
+        },
+        {
+          "line": 27,
+          "symbol": "training_costs"
+        },
+        {
+          "line": 35,
+          "symbol": "evaluation_forecast"
+        },
+        {
+          "line": 80,
+          "symbol": "calibrated_identity_weight"
+        },
+        {
+          "line": 105,
+          "symbol": "verified_probe"
+        },
+        {
+          "line": 134,
+          "symbol": "expected_evaluations"
+        },
+        {
+          "line": 163,
+          "symbol": "lock_plan"
+        },
+        {
+          "line": 234,
+          "symbol": "evaluation_folder"
+        },
+        {
+          "line": 238,
+          "symbol": "verified_evaluation"
+        },
+        {
+          "line": 268,
+          "symbol": "point_from_evaluation"
+        },
+        {
+          "line": 275,
+          "symbol": "validate_evaluation_request"
+        },
+        {
+          "line": 308,
+          "symbol": "run_evaluation"
+        },
+        {
+          "line": 320,
+          "symbol": "run_training_wave"
+        },
+        {
+          "line": 363,
+          "symbol": "lock_endpoints"
+        },
+        {
+          "line": 388,
+          "symbol": "run_locked_campaign"
+        }
+      ]
+    },
+    {
+      "path": "scripts/ogr_statistics.py",
+      "sha256": "bdf0a72fbb3fc45dc9a279c8d82df353860803f75e8ab4863d5e778444605758",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 11,
+          "symbol": "conditional_interval"
+        },
+        {
+          "line": 22,
+          "symbol": "signed_difference"
+        },
+        {
+          "line": 26,
+          "symbol": "paired_seed_mean"
+        },
+        {
+          "line": 30,
+          "symbol": "classify_evidence"
+        },
+        {
+          "line": 56,
+          "symbol": "_alignment_check"
+        },
+        {
+          "line": 88,
+          "symbol": "bootstrap_role"
+        },
+        {
+          "line": 161,
+          "symbol": "compute_statistics"
+        }
+      ]
+    },
+    {
+      "path": "scripts/ogr_campaign.py",
+      "sha256": "3c00eee02f2256f04cd00fa2edff769b06718eeb177ff7ac72b3029eb5b9a8a0",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 22,
+          "symbol": "append_jsonl"
+        },
+        {
+          "line": 31,
+          "symbol": "require_charged_worker"
+        },
+        {
+          "line": 38,
+          "symbol": "idle_gpus"
+        },
+        {
+          "line": 45,
+          "symbol": "charged_launch"
+        },
+        {
+          "line": 95,
+          "symbol": "train_worker"
+        },
+        {
+          "line": 200,
+          "symbol": "probe"
+        },
+        {
+          "line": 233,
+          "symbol": "main"
+        }
+      ]
+    },
+    {
+      "path": "scripts/ogr_delivery.py",
+      "sha256": "3a4834a09a851053d8590fe1ce7daa44cd9050c87f3137358c1063683019e656",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 29,
+          "symbol": "git"
+        },
+        {
+          "line": 34,
+          "symbol": "publication_files"
+        },
+        {
+          "line": 40,
+          "symbol": "public_record"
+        },
+        {
+          "line": 55,
+          "symbol": "require_settled"
+        },
+        {
+          "line": 74,
+          "symbol": "export_sources"
+        },
+        {
+          "line": 96,
+          "symbol": "export_training"
+        },
+        {
+          "line": 128,
+          "symbol": "export_models"
+        },
+        {
+          "line": 176,
+          "symbol": "export_official_states"
+        },
+        {
+          "line": 200,
+          "symbol": "export_evaluations"
+        },
+        {
+          "line": 273,
+          "symbol": "export_execution"
+        },
+        {
+          "line": 312,
+          "symbol": "finalize"
+        },
+        {
+          "line": 348,
+          "symbol": "write_reports"
+        },
+        {
+          "line": 404,
+          "symbol": "validate_manifest_assets"
+        },
+        {
+          "line": 414,
+          "symbol": "verify_remote_references"
+        },
+        {
+          "line": 423,
+          "symbol": "publish"
+        },
+        {
+          "line": 545,
+          "symbol": "main"
+        }
+      ]
+    },
+    {
+      "path": "scripts/ogr_policy.py",
+      "sha256": "8dd13d10a602b796186fd7d725d8426a76c324d75725cfdf15c714e352b91a8f",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 17,
+          "symbol": "finite"
+        },
+        {
+          "line": 26,
+          "symbol": "new_budget"
+        },
+        {
+          "line": 38,
+          "symbol": "select_n"
+        },
+        {
+          "line": 70,
+          "symbol": "Point"
+        },
+        {
+          "line": 80,
+          "symbol": "Point.long"
+        },
+        {
+          "line": 84,
+          "symbol": "Point.current_long"
+        },
+        {
+          "line": 87,
+          "symbol": "Point.validate"
+        },
+        {
+          "line": 101,
+          "symbol": "Selected"
+        },
+        {
+          "line": 106,
+          "symbol": "eligible"
+        },
+        {
+          "line": 111,
+          "symbol": "_metric_compare"
+        },
+        {
+          "line": 118,
+          "symbol": "select_endpoint"
+        },
+        {
+          "line": 143,
+          "symbol": "select_control"
+        },
+        {
+          "line": 163,
+          "symbol": "identity_weight"
+        },
+        {
+          "line": 172,
+          "symbol": "evaluation_jobs"
+        },
+        {
+          "line": 190,
+          "symbol": "self_test"
+        }
+      ]
+    },
+    {
+      "path": "conf/observation_grounded_v1/default.yaml",
+      "sha256": "63de2ff22ed1bacbfd8fa9afd96f22a7b3e32831dd2be2f90dfd741cf0d0afef",
+      "status": "NEW_OGR_FILE",
+      "symbols": []
+    },
+    {
+      "path": "tests/test_ogr_data.py",
+      "sha256": "b9f7ffdf9693d074441c244f3f306c3ca8cc58912a9eabb0a13ffd245e1d2c09",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 9,
+          "symbol": "test_full_prefix_and_local_pair_have_distinct_causal_windows"
+        },
+        {
+          "line": 25,
+          "symbol": "test_current_counts_use_full_vertices_instead_of_voxels"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_ogr_learning.py",
+      "sha256": "31f1eb5aa116276cc99f80abde3d9107f957c92946add9ac0264b74614542f39",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 6,
+          "symbol": "test_pool_excludes_past_points_and_keeps_mask_gradient"
+        },
+        {
+          "line": 22,
+          "symbol": "test_identity_uses_shared_feature_domain_and_detaches_class_prior"
+        },
+        {
+          "line": 41,
+          "symbol": "test_feedback_zero_initialization_then_upstream_gradient_after_projection_update"
+        },
+        {
+          "line": 61,
+          "symbol": "test_fresh_four_arm_counts_and_empty_history_match_frozen_parent"
+        },
+        {
+          "line": 103,
+          "symbol": "_criterion"
+        },
+        {
+          "line": 113,
+          "symbol": "_loss_example"
+        },
+        {
+          "line": 121,
+          "symbol": "test_constrained_assignment_forces_target_once_and_removes_duplicate_from_all_losses"
+        },
+        {
+          "line": 141,
+          "symbol": "test_unconstrained_loss_preserves_every_original_key_value_and_rng"
+        },
+        {
+          "line": 165,
+          "symbol": "test_group_identity_loss_excludes_unknown_columns_and_does_not_invent_null_labels"
+        },
+        {
+          "line": 178,
+          "symbol": "test_optimizer_boundary_resume_reproduces_next_update_and_rng"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_ogr_runtime.py",
+      "sha256": "6d85ac81eec1663bc2101f956d5b5bf92a4df27e2267584098f34f2ebffd45f9",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 8,
+          "symbol": "test_published_target_iou_follows_source_query_after_candidate_shuffle"
+        },
+        {
+          "line": 25,
+          "symbol": "test_shared_history_clone_preserves_episode_and_owns_independent_sidecars"
+        },
+        {
+          "line": 44,
+          "symbol": "test_partial_route_resolves_contention_with_dummy_and_preserves_ephemeral"
+        },
+        {
+          "line": 62,
+          "symbol": "test_no_current_support_cannot_reclaim_identity_even_with_high_probability"
+        },
+        {
+          "line": 72,
+          "symbol": "test_observation_state_uses_common_confidence_ema_and_preserves_unobserved_values"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_ogr_delivery.py",
+      "sha256": "90c336c5732a65ade33682dbb2562fce066db7cb72d7522cd940dd80e001e29f",
+      "status": "NEW_OGR_FILE",
+      "symbols": [
+        {
+          "line": 6,
+          "symbol": "test_budget_resume_never_renews_run_cap_or_double_deducts_reservations"
+        },
+        {
+          "line": 24,
+          "symbol": "test_shared_lock_enforces_two_single_gpu_jobs_and_tight_lifetime_limit"
+        },
+        {
+          "line": 38,
+          "symbol": "test_gpu_worker_refuses_unaccounted_execution"
+        },
+        {
+          "line": 46,
+          "symbol": "test_public_budget_export_contains_both_peer_settlements"
+        },
+        {
+          "line": 62,
+          "symbol": "test_publication_checks_peeled_annotated_tag_not_tag_object"
+        },
+        {
+          "line": 74,
+          "symbol": "test_reference_interval_preserves_NA_without_redraw_and_seed_pairing"
+        }
+      ]
+    }
+  ],
+  "numeric_sources": {
+    "conf/observation_grounded_v1/default.yaml": "63de2ff22ed1bacbfd8fa9afd96f22a7b3e32831dd2be2f90dfd741cf0d0afef",
+    "datasets/observation_grounded_episode.py": "5a4bcb59123da14f36f4ae08513906749439cc8f45c0247594396d341cb6a037",
+    "datasets/revisit_prompt_episode.py": "4acb8fe6b42cfed0f9fd5f825475e69fa83ccae50d5c35699dd03b676071a234",
+    "models/criterion.py": "b61bbc4a712db297f094080ffb1f4346d23651bab7e3a8622731f0a4b34b2820",
+    "models/matcher.py": "818c23542c6e09e6431d07eb1f20d2ec8f7a003d63cc2daca72acc56798ecccc",
+    "models/observation_evidence_state.py": "c367c0149988408c9eeebaf50c387eb37eb6b30cf55f88e83d5957e88e5c033c",
+    "models/observation_grounded.py": "3cb13bbe88ddab5b8d55a388e416d89eb67be14a6dec48ef6b87e74cf9d95a62",
+    "models/observation_grounded_loss.py": "4cd612b44493c7064b5718455e5249c7f5ed81abbeaa8e82f6661e4109170579",
+    "models/observation_grounded_modules.py": "87ad8be73c5da662260daa5e08460884d172ca15d902c1cc45dcc355d7c7229b",
+    "models/rescene.py": "cb8008610dd248f4e9a80de924d6883e4ca0d41dda16801e9e1621ebe54def9b",
+    "models/revisit_prompt.py": "e8eb01f17f1c21caadf85db0b0820d7351043e913ccccc975dc590d1c6ac75ee",
+    "models/revisit_prompt_centroid_numerics.py": "e3a9fce4c699920d2ab1831eb14c6374d3ec28294219f5cc73fd9cc445ebb4f5",
+    "models/revisit_prompt_loss.py": "ea0aa0b36131e235a3f10a647852a7103e24d03391256aa6347b129983c762e6",
+    "models/revisit_prompt_modules.py": "8343591e0afdc449a44bfc59c78746c541696e742ce022553920f8f91ae258ed",
+    "models/revisit_prompt_native_numerics.py": "870a984a1e730e5e8557660a0f24576bfb692c3bbe8ea31ab7c8a541736c84ba",
+    "models/revisit_prompt_numerics.py": "6351af7ff038c0dd8b311474974d29cdbacb96c0409155056877f686940b1e55",
+    "models/revisit_prompt_sparse_reference.py": "f964d3243cc9bac212c606176f0fcd49c1fe3dc4e7a00ffc30a7664a155fc20c",
+    "models/revisit_prompt_state.py": "6d2df7a4ca4ca15c54a721b0cab9d1c4b40c8dee91b3f381abb914dc24d1e1a0",
+    "models/task_memory_routing.py": "77bf13667ad574fbe2f737ddcb7a19142ee219696778c70121e8aa677edac321",
+    "models/task_memory_state.py": "5d15a88775d8f6d2f6ce564a3844876690db034783674bd9687063fe12af4f0d",
+    "scripts/ogr_assets.py": "d76a06e15ce91e50c0dd3e8fe6be90ee35e8affbe210426a9e9140b0238ed90e",
+    "scripts/ogr_campaign.py": "3c00eee02f2256f04cd00fa2edff769b06718eeb177ff7ac72b3029eb5b9a8a0",
+    "scripts/ogr_delivery.py": "3a4834a09a851053d8590fe1ce7daa44cd9050c87f3137358c1063683019e656",
+    "scripts/ogr_diagnostics.py": "e9ecd09c3ab147991d51d48443d9f5ecd64be73bf9e68ee4d75bbbfb6a485ac3",
+    "scripts/ogr_evaluation.py": "c2aa3f1aae6c5eaa7899f40a86e78443ed3e9e234c0986453fa9a56795732535",
+    "scripts/ogr_policy.py": "8dd13d10a602b796186fd7d725d8426a76c324d75725cfdf15c714e352b91a8f",
+    "scripts/ogr_runtime.py": "ff63e43504718db02fdf8e7b9e8ec9d238ff535526b194eb2f5b3fba79931b3f",
+    "scripts/ogr_selection.py": "edfcab9acad7c85c4b4776d37dceb57924aef12f9293be48f436fa965f663bc9",
+    "scripts/ogr_statistics.py": "bdf0a72fbb3fc45dc9a279c8d82df353860803f75e8ab4863d5e778444605758",
+    "scripts/revisit_prompt_assets.py": "515d6b39c33e77c43015ece18b62c0521f9d6ebd009add5af2e9bfe6f1786e3e",
+    "scripts/revisit_prompt_runtime.py": "4508ccb0de08e131c7a2332a5f2f53bb09ad4bbad67b6f916b0e683ef14be993",
+    "trainer/observation_grounded_trainer.py": "5d1d06d8be386571ce01c18c93b1ee773fa6a4819ddc1df8a883501c226c85ac",
+    "trainer/revisit_prompt_trainer.py": "2d3afa66665b0238e23e7e477a5c19d4cfd4f058c035cb441d7771ff80d2d80d",
+    "trainer/task_memory_trainer.py": "49c8326ea3001a25475ad8c14044dfcae9592f8cf932f6800b2b160cc072ccbb"
+  },
+  "parent_files_modified": [],
+  "schema": 1
+}

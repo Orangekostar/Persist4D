@@ -1,0 +1,170 @@
+{
+  "commands": [
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:e704029da7e847bb94fd5a7e6adc9029",
+      "exit_code": 1,
+      "gpu_hours": 0.007666893834721122,
+      "job_key": "integration:R-OBS:s246",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 0,
+      "seconds": 27.60081780499604,
+      "status": "FAILED",
+      "stdout": "logs/integration_R-OBS_s246.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:51cbb79141f949dea86c878635d55d30",
+      "exit_code": 0,
+      "gpu_hours": 0.014171415406942995,
+      "job_key": "integration:R-OBS:s246:fixed-retry1",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 0,
+      "seconds": 51.01709546499478,
+      "status": "COMPLETE",
+      "stdout": "logs/integration_R-OBS_s246_fixed-retry1.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:03e11ef5811a47888623a3c23d0570bd",
+      "exit_code": 0,
+      "gpu_hours": 0.09766631406389126,
+      "job_key": "probe:R-ID:s246",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 1,
+      "seconds": 351.5987306300085,
+      "status": "COMPLETE",
+      "stdout": "logs/probe_R-ID_s246.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:35392ebaf72d44db923e9ab2d0c5c9d8",
+      "exit_code": 0,
+      "gpu_hours": 0.09112679433694414,
+      "job_key": "probe:R-TARGET:s246",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 0,
+      "seconds": 328.0564596129989,
+      "status": "COMPLETE",
+      "stdout": "logs/probe_R-TARGET_s246.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:2c7cbf66539d41eba8403cceeb7d5ab3",
+      "exit_code": 0,
+      "gpu_hours": 0.09332555253277759,
+      "job_key": "probe:R-QFB:s246",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 0,
+      "seconds": 335.9719891179993,
+      "status": "COMPLETE",
+      "stdout": "logs/probe_R-QFB_s246.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:34efa55c40f84a14a46c60fd2203a504",
+      "exit_code": 0,
+      "gpu_hours": 0.09794015091388751,
+      "job_key": "probe:R-OBS:s246",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 2,
+      "seconds": 352.58454328999505,
+      "status": "COMPLETE",
+      "stdout": "logs/probe_R-OBS_s246.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:9807d3056a0c40a892ae6638c412af51",
+      "exit_code": 0,
+      "gpu_hours": 0.012082726813055665,
+      "job_key": "timing:R-OBS:CAL:s246",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 0,
+      "seconds": 43.497816527000396,
+      "status": "COMPLETE",
+      "stdout": "logs/timing_R-OBS_CAL_s246.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:fe754af817fb410db30d6b3fad7fc047",
+      "exit_code": 0,
+      "gpu_hours": 0.011411463833889381,
+      "job_key": "timing:R-OBS:PB:s246",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 1,
+      "seconds": 41.08126980200177,
+      "status": "COMPLETE",
+      "stdout": "logs/timing_R-OBS_PB_s246.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:425e2689006c423f8a15330cea5c42ab",
+      "exit_code": 0,
+      "gpu_hours": 0.011708103754721783,
+      "job_key": "timing:FH-COMMIT0:PB:s246",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 2,
+      "seconds": 42.14917351699842,
+      "status": "COMPLETE",
+      "stdout": "logs/timing_FH-COMMIT0_PB_s246.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:faef8ee99dac4a5ab38f5585ff37851b",
+      "exit_code": 0,
+      "gpu_hours": 0.012542781742777152,
+      "job_key": "timing:FH-COMMIT0:CAL:s246",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 1,
+      "seconds": 45.154014273997745,
+      "status": "COMPLETE",
+      "stdout": "logs/timing_FH-COMMIT0_CAL_s246.log"
+    },
+    {
+      "event_id": "ogr:D_DIAGNOSTIC:a78f0282afb14c55b02de7dc5dd81d56",
+      "exit_code": 1,
+      "gpu_hours": 0.0066249685924978825,
+      "job_key": "diagnostics:P1:shared-M0:M4-200",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 0,
+      "seconds": 23.849886932992376,
+      "status": "FAILED",
+      "stdout": "logs/diagnostics_P1_shared-M0_M4-200.log"
+    },
+    {
+      "event_id": "ogr:D_DIAGNOSTIC:605aa3d7ab6d454f98ede015fd5e5c1e",
+      "exit_code": 0,
+      "gpu_hours": 0.08908565184805209,
+      "job_key": "diagnostics:P1:shared-M0:M4-200:fixed-retry1",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 0,
+      "seconds": 320.70834665298753,
+      "status": "COMPLETE",
+      "stdout": "logs/diagnostics_P1_shared-M0_M4-200_fixed-retry1.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:0add101b05fe4d888a302997c1fd4c2e",
+      "exit_code": 0,
+      "gpu_hours": 0.006040402313891617,
+      "job_key": "check:causality",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 0,
+      "seconds": 21.745448330009822,
+      "status": "COMPLETE",
+      "stdout": "logs/check_causality.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:03345d0c2ae540409ec444c8b4e66878",
+      "exit_code": 0,
+      "gpu_hours": 0.021248887886112143,
+      "job_key": "check:new-path-repeat0",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 1,
+      "seconds": 76.49599639000371,
+      "status": "COMPLETE",
+      "stdout": "logs/check_new-path-repeat0.log"
+    },
+    {
+      "event_id": "ogr:I_INTEGRATION_REPAIR:de5be3333e25424d98f874c53fa90532",
+      "exit_code": 0,
+      "gpu_hours": 0.019859277789720284,
+      "job_key": "check:new-path-repeat1",
+      "parameters": "see job_key and frozen campaign dispatcher for historical launches",
+      "physical_gpu_index": 0,
+      "seconds": 71.49340004299302,
+      "status": "COMPLETE",
+      "stdout": "logs/check_new-path-repeat1.log"
+    }
+  ],
+  "scope": "actual charged process launches"
+}

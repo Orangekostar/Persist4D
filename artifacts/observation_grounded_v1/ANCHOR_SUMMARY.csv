@@ -1,0 +1,5 @@
+panel,metric,value,denominator,source,filter
+anchor_evidence,paired_raw_target_IoU,0.028176366448847214,67,ANCHOR_REFERENCE.csv,status=COMPLETE; common finite paired and baseline rows
+anchor_evidence,raw_target_IoU,0.04712621954360059,67,ANCHOR_REFERENCE.csv,status=COMPLETE; common finite paired and baseline rows
+anchor_evidence,paired_published_target_IoU,0.0,67,ANCHOR_REFERENCE.csv,status=COMPLETE; common finite paired and baseline rows
+anchor_evidence,published_target_IoU,0.03216560425781893,67,ANCHOR_REFERENCE.csv,status=COMPLETE; common finite paired and baseline rows

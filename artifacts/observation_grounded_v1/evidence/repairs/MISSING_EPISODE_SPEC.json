@@ -1,0 +1,10 @@
+{
+  "changed_source_sha256": "ff63e43504718db02fdf8e7b9e8ec9d238ff535526b194eb2f5b3fba79931b3f",
+  "failed_event_id": "ogr:D_DIAGNOSTIC:a78f0282afb14c55b02de7dc5dd81d56",
+  "failed_status_sha256": "38fa49e63ee41f48cfd5d9205c45ba09f9f8168d5a3d1c5830e833b394450d72",
+  "regression": "test_shared_history_clone_preserves_episode_and_owns_independent_sidecars: failed with identical AttributeError, then passed",
+  "repair": "store the immutable spec in ObservationEpisodeRuntime.__init__",
+  "root_cause": "new diagnostic clone expected an episode spec that the inherited runtime did not store",
+  "same_error_retry_limit": 1,
+  "status": "SPECIFIC_REPAIR_WITH_REGRESSION_PASS"
+}

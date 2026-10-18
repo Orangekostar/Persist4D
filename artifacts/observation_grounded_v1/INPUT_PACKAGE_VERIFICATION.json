@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "status": "VERIFIED",
+  "verified_utc": "2026-10-18T15:27:11.377291+00:00",
+  "scope": "Input package byte identity, copied-file byte identity, synthetic CPU policy self-test, configuration extraction, and fixed-BASE Git blob identity checks. Source bindings are object-identity checks only; no source reading or execution claim.",
+  "archive_name": "Persist4D_OGR_Codex_Prompts_Audited.zip",
+  "archive_sha256": "50cb4d1854c7ba137b9129c33859bd96bae80f4ac51da12371ecd1c9969b5fb0",
+  "checked_package_members": [
+    {"name": "00_README.md", "bytes": 1213, "sha256": "d4c8c4081a9b2933cea5911efc70eac0d3a62b329123b2415c422ade87eaf1b2", "matches_extracted": true},
+    {"name": "01_CODEX_EXECUTION.md", "bytes": 60108, "sha256": "287860b2176c014294d74abfe12e2ca042feff91d8a12250f2fff1fe71f5686a", "matches_extracted": true},
+    {"name": "02_EVIDENCE_AND_REVIEW.md", "bytes": 9056, "sha256": "0cb6ed821af7489dd660bfc486c6f638743e3a62644242b240f3116efccd25f3", "matches_extracted": true},
+    {"name": "03_EXECUTION_SPEC.yaml", "bytes": 5257, "sha256": "63de2ff22ed1bacbfd8fa9afd96f22a7b3e32831dd2be2f90dfd741cf0d0afef", "matches_extracted": true},
+    {"name": "04_POLICY_REFERENCE.py", "bytes": 10248, "sha256": "8dd13d10a602b796186fd7d725d8426a76c324d75725cfdf15c714e352b91a8f", "matches_extracted": true},
+    {"name": "05_SOURCE_BINDINGS.json", "bytes": 14734, "sha256": "f848f9489b3f5792303f0fe918416f8374940ed73633f5edcb8805a3ff433d58", "matches_extracted": true},
+    {"name": "06_STATIC_AUDIT.json", "bytes": 5253, "sha256": "14ec38ebc7f066626c64e2e6e89a68ccb2f0aea0d57b5b27303a7d0c3789f18f", "matches_extracted": true}
+  ],
+  "copied_files": [
+    {"source_member": "04_POLICY_REFERENCE.py", "destination": "scripts/ogr_policy.py", "bytes": 10248, "sha256": "8dd13d10a602b796186fd7d725d8426a76c324d75725cfdf15c714e352b91a8f", "matches_source_bytes": true},
+    {"source_member": "03_EXECUTION_SPEC.yaml", "destination": "conf/observation_grounded_v1/default.yaml", "bytes": 5257, "sha256": "63de2ff22ed1bacbfd8fa9afd96f22a7b3e32831dd2be2f90dfd741cf0d0afef", "matches_source_bytes": true},
+    {"source_member": "01_CODEX_EXECUTION.md", "destination": "artifacts/observation_grounded_v1/EXECUTION_INSTRUCTION.md", "bytes": 60108, "sha256": "287860b2176c014294d74abfe12e2ca042feff91d8a12250f2fff1fe71f5686a", "matches_source_bytes": true}
+  ],
+  "policy_self_test": {
+    "command": "python scripts/ogr_policy.py",
+    "status": "PASS",
+    "count": 15,
+    "scope": "synthetic CPU policy checks, not model training"
+  },
+  "configuration_check": {
+    "independent_file": "conf/observation_grounded_v1/default.yaml",
+    "instruction_file": "artifacts/observation_grounded_v1/EXECUTION_INSTRUCTION.md",
+    "embedded_yaml_block": "final yaml fence in instruction file",
+    "yaml_parse_equal": true
+  },
+  "source_binding_verification": {
+    "registry_member": "05_SOURCE_BINDINGS.json",
+    "registry_sha256": "f848f9489b3f5792303f0fe918416f8374940ed73633f5edcb8805a3ff433d58",
+    "base_commit": "758b5aa4bd2e9119ae5e05f725faa360c2120d88",
+    "source_count": 28,
+    "all_matches": true,
+    "scope": "git rev-parse BASE:path object identifiers only; no source reading or execution claim",
+    "sources": [
+      {"id": "S01", "path": "artifacts/revisit_prompt_v1/REPORT.md", "expected_git_blob_sha": "9464be94b2e8dfea915cb08774244c612de98f56", "actual_git_blob_sha": "9464be94b2e8dfea915cb08774244c612de98f56", "matches": true},
+      {"id": "S02", "path": "artifacts/revisit_prompt_v1/HANDOFF.md", "expected_git_blob_sha": "2d314baaacab01942c9001e8f1e3358e1436aeed", "actual_git_blob_sha": "2d314baaacab01942c9001e8f1e3358e1436aeed", "matches": true},
+      {"id": "S03", "path": "artifacts/revisit_prompt_v1/RUN_LOCK.json", "expected_git_blob_sha": "36df3cc539c4ff35509af016a8e55f1a58af64d7", "actual_git_blob_sha": "36df3cc539c4ff35509af016a8e55f1a58af64d7", "matches": true},
+      {"id": "S04", "path": "models/rescene.py", "expected_git_blob_sha": "384fbabc4fd11e18160f0371c6addc5e7d674916", "actual_git_blob_sha": "384fbabc4fd11e18160f0371c6addc5e7d674916", "matches": true},
+      {"id": "S05", "path": "models/revisit_prompt.py", "expected_git_blob_sha": "c4a5c8c3671a53ae7c90f1b054f517ae33cd5bac", "actual_git_blob_sha": "c4a5c8c3671a53ae7c90f1b054f517ae33cd5bac", "matches": true},
+      {"id": "S06", "path": "models/revisit_prompt_modules.py", "expected_git_blob_sha": "8ddd8f175ad5b1cc7bc1563c20f07e2b13310b35", "actual_git_blob_sha": "8ddd8f175ad5b1cc7bc1563c20f07e2b13310b35", "matches": true},
+      {"id": "S07", "path": "models/criterion.py", "expected_git_blob_sha": "f586e8c1c613b8471b043337f30122fda7e2365c", "actual_git_blob_sha": "f586e8c1c613b8471b043337f30122fda7e2365c", "matches": true},
+      {"id": "S08", "path": "models/task_memory_criterion.py", "expected_git_blob_sha": "d215cfdb215881321a9eadaaa8e40543527157eb", "actual_git_blob_sha": "d215cfdb215881321a9eadaaa8e40543527157eb", "matches": true},
+      {"id": "S09", "path": "models/task_memory_supervision.py", "expected_git_blob_sha": "50f84573a7a53de0684d2f341717e5c364888cff", "actual_git_blob_sha": "50f84573a7a53de0684d2f341717e5c364888cff", "matches": true},
+      {"id": "S10", "path": "models/revisit_prompt_loss.py", "expected_git_blob_sha": "7b9133a4e6dd7579fd41b6840dfac9320797145f", "actual_git_blob_sha": "7b9133a4e6dd7579fd41b6840dfac9320797145f", "matches": true},
+      {"id": "S11", "path": "trainer/revisit_prompt_trainer.py", "expected_git_blob_sha": "432d8db9b671ca7964e9bb7176337881d1d1a0b2", "actual_git_blob_sha": "432d8db9b671ca7964e9bb7176337881d1d1a0b2", "matches": true},
+      {"id": "S12", "path": "trainer/trainer.py", "expected_git_blob_sha": "64447b8b8cdc110b40b260829a078fe15dd8865b", "actual_git_blob_sha": "64447b8b8cdc110b40b260829a078fe15dd8865b", "matches": true},
+      {"id": "S13", "path": "datasets/revisit_prompt_episode.py", "expected_git_blob_sha": "f58083818e3b911d58af932921b36c38b189e6f1", "actual_git_blob_sha": "f58083818e3b911d58af932921b36c38b189e6f1", "matches": true},
+      {"id": "S14", "path": "models/task_memory_routing.py", "expected_git_blob_sha": "7a0e2dcb6d40fc81a58ff8d8c23bffaa71c5388b", "actual_git_blob_sha": "7a0e2dcb6d40fc81a58ff8d8c23bffaa71c5388b", "matches": true},
+      {"id": "S15", "path": "models/revisit_prompt_state.py", "expected_git_blob_sha": "4ca3a20704900eebeafd4955ede7dcd811b9b5eb", "actual_git_blob_sha": "4ca3a20704900eebeafd4955ede7dcd811b9b5eb", "matches": true},
+      {"id": "S16", "path": "scripts/revisit_prompt_runtime.py", "expected_git_blob_sha": "c3ff84e0ca5cf59e331e5b9a6f8706cc7d945666", "actual_git_blob_sha": "c3ff84e0ca5cf59e331e5b9a6f8706cc7d945666", "matches": true},
+      {"id": "S17", "path": "scripts/evaluate_revisit_prompt.py", "expected_git_blob_sha": "3935165f8ca97903b3c087d31d002268005d04a2", "actual_git_blob_sha": "3935165f8ca97903b3c087d31d002268005d04a2", "matches": true},
+      {"id": "S18", "path": "scripts/revisit_prompt_assets.py", "expected_git_blob_sha": "ddc2451a16d0e58a82421283edf379c430e1d58f", "actual_git_blob_sha": "ddc2451a16d0e58a82421283edf379c430e1d58f", "matches": true},
+      {"id": "S19", "path": "scripts/select_revisit_prompt.py", "expected_git_blob_sha": "9b28c348249279c74288c90d97653c34ab949d10", "actual_git_blob_sha": "9b28c348249279c74288c90d97653c34ab949d10", "matches": true},
+      {"id": "S20", "path": "scripts/revisit_prompt_campaign.py", "expected_git_blob_sha": "cb8375be36ac322fdbb708395a86906cb7032ad0", "actual_git_blob_sha": "cb8375be36ac322fdbb708395a86906cb7032ad0", "matches": true},
+      {"id": "S21", "path": "models/revisit_prompt_numerics.py", "expected_git_blob_sha": "39a322f99e79f59c3f627c55603859f498ae2d7b", "actual_git_blob_sha": "39a322f99e79f59c3f627c55603859f498ae2d7b", "matches": true},
+      {"id": "S22", "path": "models/revisit_prompt_native_numerics.py", "expected_git_blob_sha": "c4a7416d9639a4c7e3d70e61368d05f2f22d0af5", "actual_git_blob_sha": "c4a7416d9639a4c7e3d70e61368d05f2f22d0af5", "matches": true},
+      {"id": "S23", "path": "models/revisit_prompt_centroid_numerics.py", "expected_git_blob_sha": "406b10d9c0ec1b78a781374efcfec172d4f76737", "actual_git_blob_sha": "406b10d9c0ec1b78a781374efcfec172d4f76737", "matches": true},
+      {"id": "S24", "path": "models/revisit_prompt_sparse_reference.py", "expected_git_blob_sha": "95d8641342a26c3a1d32ac36a1cf0390d97d8fcc", "actual_git_blob_sha": "95d8641342a26c3a1d32ac36a1cf0390d97d8fcc", "matches": true},
+      {"id": "S25", "path": "scripts/evaluate_revisit_prompt_sparse.py", "expected_git_blob_sha": "ef15e97a8e422db52d3376d531d4298785717940", "actual_git_blob_sha": "ef15e97a8e422db52d3376d531d4298785717940", "matches": true},
+      {"id": "S26", "path": "scripts/revisit_prompt_sparse_policy.py", "expected_git_blob_sha": "01b30548ef17ab130836d3bd067c561bcf93cc3c", "actual_git_blob_sha": "01b30548ef17ab130836d3bd067c561bcf93cc3c", "matches": true},
+      {"id": "S27", "path": "conf/model/rescene.yaml", "expected_git_blob_sha": "3b4b4c4c93690b7e190f254a756b6d312b6c52b4", "actual_git_blob_sha": "3b4b4c4c93690b7e190f254a756b6d312b6c52b4", "matches": true},
+      {"id": "S28", "path": "conf/revisit_prompt/default.yaml", "expected_git_blob_sha": "5d2dc76b9f470f0da9843a3a126de3720e5b56a5", "actual_git_blob_sha": "5d2dc76b9f470f0da9843a3a126de3720e5b56a5", "matches": true}
+    ]
+  },
+  "private_absolute_paths_absent": true
+}

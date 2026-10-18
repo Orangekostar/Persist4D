@@ -1,0 +1,9 @@
+panel,variant,role,metric,value,denominator,source,filter
+probe_timing,R-TARGET,PROBE,timed_p90_seconds,18.130193501005124,16,probe/R-TARGET-s246/STATUS.json,STATUS.json timed_p90_seconds; final 16 of 20 updates
+probe_timing,R-ID,PROBE,timed_p90_seconds,19.92982644750009,16,probe/R-ID-s246/STATUS.json,STATUS.json timed_p90_seconds; final 16 of 20 updates
+probe_timing,R-QFB,PROBE,timed_p90_seconds,18.638236233004136,16,probe/R-QFB-s246/STATUS.json,STATUS.json timed_p90_seconds; final 16 of 20 updates
+probe_timing,R-OBS,PROBE,timed_p90_seconds,19.317433667500154,16,probe/R-OBS-s246/STATUS.json,STATUS.json timed_p90_seconds; final 16 of 20 updates
+structure_timing,R-OBS,CAL,p90_stage_seconds,2.0848622352932584,18,RUN_PLAN.json,evaluation_forecast.measured_costs[R-OBS:CAL]; unscaled p90_stage_seconds
+structure_timing,R-OBS,PB,p90_stage_seconds,1.8460685163008748,18,RUN_PLAN.json,evaluation_forecast.measured_costs[R-OBS:PB]; unscaled p90_stage_seconds
+structure_timing,FH-COMMIT0,CAL,p90_stage_seconds,2.2331874384966794,18,RUN_PLAN.json,evaluation_forecast.measured_costs[FH-COMMIT0:CAL]; unscaled p90_stage_seconds
+structure_timing,FH-COMMIT0,PB,p90_stage_seconds,2.1383845982913043,18,RUN_PLAN.json,evaluation_forecast.measured_costs[FH-COMMIT0:PB]; unscaled p90_stage_seconds

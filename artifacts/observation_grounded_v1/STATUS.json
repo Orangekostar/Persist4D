@@ -1,0 +1,29 @@
+{
+  "CODE": "IMPLEMENTED_FOCUSED_VALIDATION",
+  "EXPERIMENT": "BUDGET_BLOCKED",
+  "PUBLICATION": "PENDING_EXTERNAL_VERIFICATION",
+  "SCIENCE": "NOT_TESTED",
+  "active_jobs": 0,
+  "adapter_seeds": [
+    246,
+    247
+  ],
+  "completed_core_evaluations": 0,
+  "cumulative_gpu_hours": 1761.2602555044275,
+  "expected_core_evaluations": 44,
+  "focused_tests_passed": 21,
+  "formal_N": null,
+  "formal_deltas": 0,
+  "formal_pipeline_end_to_end_validated": false,
+  "formal_updates": 0,
+  "lifetime_remaining_gpu_hours": 61.739744495572495,
+  "official_state_members": 4,
+  "parent_seed": 45,
+  "primary_review_complete": true,
+  "prior_gpu_hours": 1760.6677541187637,
+  "probe_updates": 80,
+  "protected_reserve_gpu_hours": 8.0,
+  "publication_status_scope": "Frozen pre-push snapshot. Actual remote status is in the external publication/PUBLICATION_RECEIPT.json.",
+  "schema": 1,
+  "spent_gpu_hours": 0.5925013856638826
+}

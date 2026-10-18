@@ -1,0 +1,20 @@
+Loading checkpoint in local path: <encoder_path> ...
+Model params: 133.33M
+Loading checkpoint in local path: <encoder_path> ...
+Model params: 133.33M
+Traceback (most recent call last):
+  File "<HOME>/miniconda3/envs/persist4d/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "<HOME>/miniconda3/envs/persist4d/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "<repo_root>/scripts/ogr_campaign.py", line 286, in <module>
+    raise SystemExit(main())
+  File "<repo_root>/scripts/ogr_campaign.py", line 267, in main
+    result = diagnose(args, assets)
+  File "<repo_root>/scripts/ogr_diagnostics.py", line 358, in diagnose
+    return shared_history_worker(args, assets, final=args.panel == 'mechanism')
+  File "<repo_root>/scripts/ogr_diagnostics.py", line 235, in shared_history_worker
+    endpoint_runtime = clone_runtime(runtime)
+  File "<repo_root>/scripts/ogr_diagnostics.py", line 44, in clone_runtime
+    clone = ObservationEpisodeRuntime(runtime.spec, class_count=runtime.state.class_count,
+AttributeError: 'ObservationEpisodeRuntime' object has no attribute 'spec'
